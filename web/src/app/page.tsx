@@ -1,4 +1,5 @@
 import { join } from "node:path";
+import { AccountChip } from "@/app/auth/AccountChip";
 import { BuildStamp } from "@/game/build-stamp";
 import { FirstRunLink } from "@/game/first-run";
 import { OptionsDrawer } from "@/game/options-panel";
@@ -24,6 +25,8 @@ export default function Home() {
           </>
         }
       />
+      {/* take-store: who's playing (Sign in, or the Google player with Profile, History and Sign out), bottom right */}
+      <AccountChip />
       {/* build-stamp: the commit this page was built from and its age, so a stale checkout shows */}
       <BuildStamp />
     </>

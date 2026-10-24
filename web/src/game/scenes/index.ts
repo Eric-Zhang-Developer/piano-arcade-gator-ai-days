@@ -1,9 +1,11 @@
-import type { Chart, GamePlugin, InputEvent } from "../../contracts";
+import type { Chart, GamePlugin, InputDevice, InputEvent, TakeEvent } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
 import { KEYS_VELOCITY, loadLatencyOffset } from "../core/settings";
 import { gaugeSize } from "../fever-gauge/gauge";
 import { seededRandom } from "../sim/fake";
 import { toast } from "../notice-toast";
+import { pianoOutSettings } from "../piano-out";
+import { readTakeMidi } from "../take-midi";
 
 export const scenesSettings = {
   seed: 118,
@@ -28,7 +30,17 @@ export interface Press {
   pitch: number;
   timeMs: number; // chart clock
   holdMs: number;
+  velocity?: number; // a take's own; the scripted bots press at KEYS_VELOCITY
 }
+
+// ?bot=take&take=<file>: a take file under /takes/ (hero-replay). Only a plain name: nothing outside /takes/.
+export const TAKE_FILE = /^[\w.-]+\.mid$/;
+
+// A read take's presses, each with its own velocity and hold, in time order.
+export const takePresses = (events: TakeEvent[]): Press[] =>
+  events
+    .map((e) => ({ pitch: e.pitch, timeMs: e.timeMs, holdMs: (e.offTimeMs ?? e.timeMs + pianoOutSettings.heldMs) - e.timeMs, velocity: e.velocity }))
+    .sort((a, b) => a.timeMs - b.timeMs);
 
 // `fever`: the chart end to end, each copy starting on the bar after the last one ends, until it is long enough to
 // fill the fever gauge and hold fever. Only existing notes, re-timed; most charts need no copy.
@@ -89,7 +101,10 @@ const isBot = (v: string | null): v is BotName => BOTS.includes(v as BotName);
 // ?bot=<name>: a scripted player replaces the laptop keys (MIDI stays live). Fever, full combo and every rank can be
 // shown on demand, for verify screenshots, video B-roll and later features' Validation. Core doesn't change.
 export function scenes(): GamePlugin {
-  let bot: BotName | null = null;
+  let bot: BotName | "take" | null = null;
+  let takeFile = "";
+  let take: Press[] | null = null; // bot=take's presses, once read
+  let loading: Promise<Press[] | null> | null = null;
   let audible = false;
   let chart: Chart | null = null;
   let emit: ((e: InputEvent) => void) | null = null; // the bot device's handler, while it runs
@@ -102,22 +117,40 @@ export function scenes(): GamePlugin {
     timers.length = 0;
   };
   const at = (perfMs: number, f: () => void) => timers.push(setTimeout(f, perfMs - performance.now()));
-  const send = (type: InputEvent["type"], pitch: number, timeMs: number) => {
-    const velocity = type === "on" ? KEYS_VELOCITY : 0;
+  const send = (type: InputEvent["type"], pitch: number, timeMs: number, onVelocity = KEYS_VELOCITY) => {
+    const velocity = type === "on" ? onVelocity : 0;
     emit?.({ type, pitch, velocity, timeMs });
     out?.send([0x90, pitch, velocity]);
   };
   const play = () => {
     cancel();
     if (!bot || !chart || !emit || zeroPerf === null) return;
+    if (bot === "take" && !take) return; // still reading: start() plays once it has
     const shift = zeroPerf + loadLatencyOffset(); // /play judges arrival - zero - latency
-    for (const p of botPresses(chart, bot)) {
+    for (const p of bot === "take" ? take! : botPresses(chart, bot)) {
       const on = shift + p.timeMs;
       const off = on + p.holdMs;
-      if (p.timeMs >= fromMs) at(on, () => send("on", p.pitch, on));
+      if (p.timeMs >= fromMs) at(on, () => send("on", p.pitch, on, p.velocity));
       if (p.timeMs + p.holdMs >= fromMs) at(off, () => send("off", p.pitch, off));
     }
   };
+
+  // bot=take: read the file once, for both devices. Refused -> a toast, and the take plays normally.
+  const loadTake = () =>
+    (loading ??= (async () => {
+      try {
+        const res = await fetch(`/takes/${takeFile}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const r = readTakeMidi(new Uint8Array(await res.arrayBuffer()), chart!);
+        if ("error" in r) throw new Error(r.error);
+        if (!r.marker) toast(`Take ${takeFile} has no bar-1 marker (saved before hero-replay): its tick 0 is read as beat 0.`);
+        return (take = takePresses(r.events));
+      } catch (e) {
+        bot = null;
+        toast(`Take ${takeFile} can't be replayed: ${(e as Error).message}. Playing normally.`);
+        return null;
+      }
+    })());
 
   return {
     id: "scenes",
@@ -126,7 +159,12 @@ export function scenes(): GamePlugin {
       bot = isBot(name) ? name : null;
       audible = params.get("audible") === "1";
       zeroPerf = null;
-      if (name !== null && !bot) toast(`Unknown bot "${name}". Bots: ${BOTS.join(", ")}. Playing normally.`);
+      [take, loading] = [null, null];
+      if (name === "take") {
+        takeFile = params.get("take") ?? "";
+        if (TAKE_FILE.test(takeFile)) bot = "take";
+        else toast(`Take "${takeFile}" isn't a file name in /takes/ (like fur-elise-20261024-1900.mid). Playing normally.`);
+      } else if (name !== null && !bot) toast(`Unknown bot "${name}". Bots: ${BOTS.join(", ")}, take. Playing normally.`);
       chart = bot === "fever" ? feverChart(c) : c;
       return chart;
     },
@@ -145,10 +183,16 @@ export function scenes(): GamePlugin {
       play();
     },
     wrapInput(device) {
+      if (bot === "take" && device.kind === "midi") return silentWhileReplaying(device, loadTake);
       if (!bot || device.kind !== "keys") return device;
+      let live = false; // bot=take refused: the laptop keys play
       return {
         kind: "test",
         async start(onEvent) {
+          if (bot === "take" && !(await loadTake())) {
+            live = true;
+            return device.start(onEvent);
+          }
           out = audible ? await pianoOutput() : null;
           emit = onEvent;
           play(); // in case the first frame came first
@@ -156,8 +200,26 @@ export function scenes(): GamePlugin {
         stop() {
           cancel();
           emit = null;
+          if (live) device.stop();
         },
       };
+    },
+  };
+}
+
+// bot=take: the MIDI input says nothing while a take replays, so a touched key or the piano's echo of the replayed
+// notes can't change it. If the take is refused, it's the live input again.
+function silentWhileReplaying(device: InputDevice, loadTake: () => Promise<Press[] | null>): InputDevice {
+  let live = false;
+  return {
+    ...device,
+    async start(onEvent) {
+      if (await loadTake()) return;
+      live = true;
+      return device.start(onEvent);
+    },
+    stop() {
+      if (live) device.stop();
     },
   };
 }

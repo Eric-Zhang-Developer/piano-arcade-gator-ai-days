@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Saira } from "next/font/google";
+import { CaptureMode } from "../game/capture-mode";
 import "./globals.css";
 
 // The display face (visual-direction.md), exposed as --pa-font-display only: the body stays system-ui.
@@ -19,7 +20,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={saira.variable}>
-      <body>{children}</body>
+      <body>
+        {children}
+        {/* ?capture=1: no cursor or setup text while the video is recorded (capture-mode) */}
+        <CaptureMode />
+      </body>
     </html>
   );
 }

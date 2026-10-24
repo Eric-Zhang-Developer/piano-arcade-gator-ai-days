@@ -8,6 +8,7 @@ import { useState, type KeyboardEvent } from "react";
 import { useBestGrades } from "../records/best";
 import { SongCard } from "../song-card";
 import { SongJacket } from "../song-jacket/SongJacket";
+import { SelectStage } from "../select-stage";
 import { isLearnKey, learnUrl, SongPreview } from "../song-preview";
 import type { Song } from "../song-select/load";
 import styles from "./select-layout.module.css";
@@ -35,6 +36,7 @@ export function MusicSelect({ songs }: { songs: Song[] }) {
 
   return (
     <main className={styles.screen}>
+      <SelectStage />
       <header className={styles.top}>
         <h1 className={styles.wordmark}>Piano Arcade</h1>
         <p className={styles.hint}>

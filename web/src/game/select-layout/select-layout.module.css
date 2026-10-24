@@ -7,7 +7,7 @@
   grid-template-rows: auto minmax(0, 1fr);
   column-gap: 4vw;
   padding: 4vh 4vw 0;
-  background: linear-gradient(to bottom, var(--pa-bg) 0%, var(--pa-sky) 100%);
+  isolation: isolate; /* select-stage's layer (z-index -1) paints above the page's black, below the select */
   color: var(--pa-ink);
   overflow: hidden;
 }

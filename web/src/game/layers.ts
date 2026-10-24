@@ -2,6 +2,7 @@ import type { GamePlugin } from "../contracts";
 import { barLoop } from "./bar-loop";
 import { chordSync } from "./chord-sync";
 import { chunkPractice } from "./chunk-practice";
+import { easyCharts } from "./easy-charts";
 import { beatTrack } from "./beat";
 import { handColors } from "./hand-colors";
 import { ghost } from "./ghost";
@@ -43,6 +44,7 @@ import { crashGuard } from "./crash-guard";
 // Open file: each game feature registers its plugin here, one line each. /play draws every plugin's layer on its
 // own canvas above the highway, forwards every GameEvent, and applies transformChart and wrapInput in this order.
 export const plugins: GamePlugin[] = [
+  easyCharts(), // ?level=easy: first, so every later plugin (chunks, loops, hands, bots, the judge) sees the Easy chart
   chunkPractice(), // before bar-loop, so it sees the whole chart to cut into chunks (returns it unchanged)
   barLoop(), // first: every later plugin (the sim's bot included) sees the looped chart
   handMode(), // ?hands=R|L: before scenes and the sim, so their bots and the judge get only the played hand

@@ -129,11 +129,14 @@ export default function Play() {
       nowMs: -settings.countInBeats * mpb,
       noteState: new Map(),
       pressed: new Set(),
+      pressedHand: new Map(),
       latest: null,
       countInBeat: null,
       backdropAlpha: background ? settings.stageBackdropAlpha : 1,
     };
+    const handOf = new Map(chart.notes.map((n) => [n.id, n.hand]));
     const emit = (e: GameEvent) => {
+      if (e.type === "noteHit") hw.pressedHand!.set(e.pitch, handOf.get(e.noteId)!); // the key lights in its note's hand
       if (e.type === "noteHit") hw.latest = { judgment: e.judgment, offsetMs: e.offsetMs, atMs: e.atMs };
       if (e.type === "noteMiss") hw.latest = { judgment: "MISS", offsetMs: null, atMs: e.atMs };
       if (e.type === "wrongNote") hw.latest = { judgment: "WRONG", offsetMs: null, atMs: e.atMs };
@@ -160,6 +163,7 @@ export default function Play() {
         judge.press(e.pitch, t, take.events.length - 1);
       } else {
         hw.pressed.delete(e.pitch);
+        hw.pressedHand!.delete(e.pitch);
         const ev = take.events.findLast((x) => x.pitch === e.pitch && x.offTimeMs === null);
         if (ev) ev.offTimeMs = t;
       }
@@ -210,6 +214,7 @@ export default function Play() {
           if (ev) ev.offTimeMs = at - latencyRef.current;
         }
         hw.pressed.clear();
+        hw.pressedHand!.clear();
       }
       if (next === "countdown") countdownUntil = perf + chart.beatsPerBar * mpb;
       if (next === "playing") {

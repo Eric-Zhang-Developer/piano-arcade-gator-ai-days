@@ -107,6 +107,9 @@ export type GameEvent = At &
   );
 
 export interface InputEvent {
+  // Internal transport cancellation (e.g. unplug), not evidence of a physical
+  // release. V2 leaves offTimeMs unknown and cannot manufacture full credit.
+  cancelled?: true;
   type: "on" | "off";
   pitch: number;
   velocity: number;

@@ -9,6 +9,7 @@ import { drawHighway, makeLayout, type HighwayState, type Layout } from "../../g
 import { Judge, noteTimeMs } from "../../game/core/judge";
 import { keysDevice, midiDevice, testDevice } from "../../game/core/input";
 import { describeTiming, timingSummary, type TimingSummary } from "../../game/timing";
+import { SfxControls } from "../../game/sound/SfxControls";
 import {
   GOOD_MS,
   LATENCY_MAX,
@@ -262,6 +263,7 @@ export default function Play() {
             <input type="range" min={LATENCY_MIN} max={LATENCY_MAX} step={1} value={latency} onChange={(e) => onLatency(Number(e.target.value))} />
             <output style={{ width: 64 }}>{latency} ms</output>
           </label>
+          <SfxControls />
           {!isTest && <p style={{ opacity: 0.6, fontSize: 14 }}>{midiStatus}</p>}
         </div>
       )}

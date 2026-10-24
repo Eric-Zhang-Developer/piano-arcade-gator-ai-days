@@ -1,15 +1,12 @@
 "use client";
-// Effects volume, mute and the miss cue, for /play's start screen. Saved in localStorage.
-import { useState } from "react";
-import { DEFAULT_PREFS, loadPrefs, savePrefs, type Prefs } from "./index";
+// Effects volume, mute and the miss cue, for /play's start screen. Saved in localStorage; the server renders the
+// defaults, and the saved values replace them after hydration.
+import { useSyncExternalStore } from "react";
+import { DEFAULT_PREFS, getPrefs, savePrefs, subscribePrefs, type Prefs } from "./index";
 
 export function SfxControls() {
-  const [p, setP] = useState<Prefs>(() => (typeof window === "undefined" ? DEFAULT_PREFS : loadPrefs()));
-  const set = (next: Partial<Prefs>) => {
-    const merged = { ...p, ...next };
-    setP(merged);
-    savePrefs(merged);
-  };
+  const p = useSyncExternalStore(subscribePrefs, getPrefs, () => DEFAULT_PREFS);
+  const set = (next: Partial<Prefs>) => savePrefs({ ...p, ...next });
   return (
     <div style={{ marginTop: 12, display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap", justifyContent: "center" }}>
       <label style={{ display: "flex", gap: 8, alignItems: "center" }}>

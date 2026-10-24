@@ -9,6 +9,7 @@ import { midiWatchdog } from "./midi-watchdog";
 import { pianoOut } from "./piano-out";
 import { scenes } from "./scenes";
 import { evenness } from "./evenness";
+import { dynamics } from "./dynamics";
 import { eventSounds } from "./sound";
 import { simPlugin } from "./sim/plugin";
 import { weakBars } from "./weak-bars";
@@ -24,6 +25,7 @@ export const plugins: GamePlugin[] = [
   hud(), // before beat-track, so beat-track's status line draws over the HUD's top panel
   beatTrack(),
   midiWatchdog(), // reconnects a piano that goes silent mid-song
+  dynamics(), // results panel: how loud you played against the score, above "Replay on piano"
   pianoOut(), // records the take for "Replay on piano"
   feverStage(), // three.js stage behind the highway (background hook only, no 2D layer)
   weakBars(), // results panel: accuracy per phrase, and a link to loop the weakest

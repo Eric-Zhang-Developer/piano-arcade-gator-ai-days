@@ -127,3 +127,56 @@ test("?capture=1: draw writes no Beat: text, and the beat still plays", () => {
   plugin.draw!(ctx, { nowMs: 0, width: 800 } as Frame);
   expect(texts).toEqual([]);
 });
+
+// ?beat=<style>: one bar after the count-in, on synthetic charts of the pattern's meter, at 60 bpm (1 beat = 1000 ms).
+const meter = (beatsPerBar: number): Chart => ({
+  id: "m",
+  title: "m",
+  composer: "c",
+  source: "synthetic",
+  bpm: 60,
+  beatsPerBar,
+  notes: [{ id: "n", pitch: 60, beat: 0, duration: beatsPerBar * 2, hand: "R" }],
+});
+const bar = (c: Chart, style: string, from = 0) =>
+  beatHits(c, from * 1000, (from + c.beatsPerBar) * 1000, count, style).map((h) => [h.atMs / 1000, h.note, h.velocity]);
+
+test("?beat=ragtime: kick on 1, snare on 2, hi-hat eighths, each 2-beat cycle of a 4/4 bar", () => {
+  const c = meter(4);
+  expect(bar(c, "ragtime")).toEqual([
+    [0, 36, 80], [0, 42, 45], [0.5, 42, 45], [1, 38, 70], [1, 42, 45], [1.5, 42, 45],
+    [2, 36, 80], [2, 42, 45], [2.5, 42, 45], [3, 38, 70], [3, 42, 45], [3.5, 42, 45],
+  ]);
+});
+
+test("?beat=waltz: kick on 1, hi-hat on 2 and 3", () => {
+  expect(bar(meter(3), "waltz")).toEqual([[0, 36, 80], [1, 42, 50], [2, 42, 50]]);
+});
+
+test("?beat=trap: kick on 1, clap on 3, hi-hat sixteenths louder on the beat", () => {
+  const hits = bar(meter(4), "trap");
+  expect(hits.filter(([, n]) => n !== 42)).toEqual([[0, 36, 85], [2, 39, 75]]);
+  expect(hits.filter(([, n]) => n === 42).map(([t, , v]) => [t, v])).toEqual(
+    Array.from({ length: 16 }, (_, i) => [i / 4, i % 4 ? 35 : 50]),
+  );
+});
+
+test("?beat=lullaby: one soft side stick on each bar's 1, any meter", () => {
+  expect(bar(meter(3), "lullaby")).toEqual([[0, 37, 40]]);
+  expect(bar(meter(4), "lullaby", 4)).toEqual([[4, 37, 40]]);
+});
+
+test("a style that doesn't fit the meter, or an unknown one, plays the default; the count-in never changes", () => {
+  const c = meter(3);
+  expect(bar(c, "trap")).toEqual(bar(c, "nope"));
+  expect(beatHits(c, -Infinity, 0, count, "trap")).toEqual(beatHits(c, -Infinity, 0));
+  expect(beatHits(chart, -Infinity, Infinity, count, null)).toEqual(all);
+});
+
+test("consecutive windows return every styled hit exactly once", () => {
+  const c = meter(4);
+  const whole = beatHits(c, -Infinity, Infinity, count, "trap");
+  const windows: ReturnType<typeof beatHits> = [];
+  for (let t = -count * 1000 - 7; t < 12000; t += 300) windows.push(...beatHits(c, t, t + 300, count, "trap"));
+  expect(windows).toEqual(whole);
+});

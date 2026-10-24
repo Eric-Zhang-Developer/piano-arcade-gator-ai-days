@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { Chart } from "../../contracts";
-import { SongPreview } from ".";
+import { isLearnKey, SongPreview } from ".";
 import { opening, playOnPiano, practiceUrl } from "./opening";
 
 const song = (id: string): Chart => JSON.parse(readFileSync(new URL(`../../../public/songs/${id}/chart.json`, import.meta.url), "utf8"));
@@ -49,4 +49,17 @@ it("a song never played shows a blank best grade", () => {
   expect(html).toMatch(/data-testid="preview-best"><\/b>/);
   expect(renderToStaticMarkup(<SongPreview id="twinkle" best={{ rank: "A", accuracy: 0.912 }} />)).toContain("A · 91.2%");
   expect(html).toContain("Press any key for previews");
+});
+
+it("LEARN links the song in wait mode before its chart has loaded (learn-from-select)", () => {
+  const html = renderToStaticMarkup(<SongPreview id="fur-elise" />);
+  expect(html).toContain('data-testid="preview-learn" href="/play?song=fur-elise&amp;mode=wait"');
+  expect(html).not.toContain("preview-practice"); // PRACTICE 70% waits for the chart; LEARN doesn't
+});
+
+it("L is plain l or L: no Ctrl, Meta or Alt, no repeat", () => {
+  const k = (key: string, mods: Partial<Record<"ctrlKey" | "metaKey" | "altKey" | "repeat", boolean>> = {}) =>
+    isLearnKey({ key, ctrlKey: false, metaKey: false, altKey: false, repeat: false, ...mods });
+  expect([k("l"), k("L")]).toEqual([true, true]);
+  expect([k("l", { metaKey: true }), k("l", { ctrlKey: true }), k("l", { altKey: true }), k("l", { repeat: true }), k("k")]).toEqual([false, false, false, false, false]);
 });

@@ -1,21 +1,28 @@
 "use client";
 // The music select (/): the focused song large on the left, the song cards on the right. Each card is a link, so
-// click and Enter play natively; ↑/↓ move focus and keep the focused card centered in the list.
+// click and Enter play natively; ↑/↓ move focus and keep the focused card centered in the list; L learns the focused
+// song in wait mode (learn-from-select).
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, type KeyboardEvent } from "react";
 import { useBestGrades } from "../records/best";
 import { SongCard } from "../song-card";
 import { SongJacket } from "../song-jacket/SongJacket";
-import { SongPreview } from "../song-preview";
+import { isLearnKey, learnUrl, SongPreview } from "../song-preview";
 import type { Song } from "../song-select/load";
 import styles from "./select-layout.module.css";
 
 export function MusicSelect({ songs }: { songs: Song[] }) {
   const [focused, setFocused] = useState(0);
   const best = useBestGrades();
+  const router = useRouter();
   const song = songs[focused];
 
   function onKeyDown(e: KeyboardEvent<HTMLOListElement>) {
+    if (isLearnKey(e) && song) {
+      e.preventDefault();
+      return router.push(learnUrl(song.id));
+    }
     const step = e.key === "ArrowDown" ? 1 : e.key === "ArrowUp" ? -1 : 0;
     if (!step) return;
     e.preventDefault();
@@ -30,7 +37,9 @@ export function MusicSelect({ songs }: { songs: Song[] }) {
     <main className={styles.screen}>
       <header className={styles.top}>
         <h1 className={styles.wordmark}>Piano Arcade</h1>
-        <p className={styles.hint}>↑ ↓ choose · Enter play</p>
+        <p className={styles.hint}>
+          <b>↑ ↓</b> choose · <b>Enter</b> play · <b>L</b> learn
+        </p>
       </header>
       {song && (
         <section className={styles.focus} key={song.id} aria-live="polite">

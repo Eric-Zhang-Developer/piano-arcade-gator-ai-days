@@ -21,6 +21,17 @@ function play(shift: (i: number) => number | null, pitchFor = (i: number) => cha
 describe("synthetic players on Twinkle", () => {
   const N = chart.notes.length;
 
+  it("Perfect: fever starts once, on the 12th note (the fever gauge)", () => {
+    const events: GameEvent[] = [];
+    const judge = new Judge(chart, (e) => events.push(e));
+    play(() => 0).events.forEach((e, i) => judge.press(e.pitch, e.timeMs, i));
+    judge.finish(1e9);
+    const types = events.map((e) => e.type);
+    expect(types.filter((t) => t === "feverStart")).toHaveLength(1);
+    expect(events[types.indexOf("feverStart") - 1]).toMatchObject({ type: "combo", count: 12 });
+    expect(types).not.toContain("feverEnd");
+  });
+
   it("Perfect: all PERFECT, 100%, rank S, full combo", () => {
     const events: GameEvent[] = [];
     const judge = new Judge(chart, (e) => events.push(e));
@@ -126,7 +137,7 @@ describe("live judging", () => {
     expect(judge.finish(3000)).toBe(r); // idempotent
   });
 
-  it("combo milestones at 25 and 50, fever from 50 to the next MISS", () => {
+  it("combo milestones at 25 and 50, fever from a full gauge (15 for 60 notes) to the next MISS", () => {
     const c = synth(60);
     const events: GameEvent[] = [];
     const judge = new Judge(c, (e) => events.push(e));
@@ -135,6 +146,7 @@ describe("live judging", () => {
     expect(events.filter((e) => e.type === "comboMilestone").map((e) => (e as { count: number }).count)).toEqual([25, 50]);
     const types = events.map((e) => e.type);
     expect(types.filter((t) => t === "feverStart")).toHaveLength(1);
+    expect(events[types.indexOf("feverStart") - 1]).toEqual({ type: "combo", count: 15, atMs: noteTimeMs(c, c.notes[14]) });
     expect(types.indexOf("feverEnd")).toBe(types.indexOf("noteMiss") + 1);
     expect(types).not.toContain("fullCombo");
   });

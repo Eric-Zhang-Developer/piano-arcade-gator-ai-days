@@ -9,6 +9,7 @@ import styles from "./results-layout.module.css";
 
 export const resultsLayoutSettings = {
   featured: ["take-graph"], // panels in the first view, under the counts
+  practiceFeatured: ["chunk-practice"], // a practice=1 take: chunk practice's way on in place of the graph (#294)
   actions: ["piano-out", "wait-mode"], // panels that are buttons: they join Retry and Songs
   names: { "take-midi": "MIDI", "replay-view": "Replay", "weak-bars": "Phrases", "tempo-curve": "Tempo" } as Record<string, string>,
 };
@@ -18,6 +19,10 @@ export function panelName(id: string): string {
   const name = resultsLayoutSettings.names[id] ?? id.replaceAll("-", " ");
   return name[0].toUpperCase() + name.slice(1);
 }
+
+// The first view's panels for this take: on a chunk-practice step, Next or "Learn again" with the rank.
+export const featuredFor = (params: URLSearchParams) =>
+  params.get("practice") === "1" ? resultsLayoutSettings.practiceFeatured : resultsLayoutSettings.featured;
 
 export function countRows(results: Results): { label: string; id: string; value: number; tone: string }[] {
   const { counts } = results;
@@ -41,6 +46,7 @@ export function ResultsLayout({
   panel,
   onRetry,
   settings,
+  params = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search),
 }: {
   results: Results;
   title?: string; // the song's title, over the rank
@@ -51,8 +57,10 @@ export function ResultsLayout({
   panel: (p: GamePlugin) => ReactNode; // a plugin's results panel, as Slots takes it
   onRetry: () => void;
   settings?: ReactNode; // latency, sound and MIDI controls: last, under the details
+  params?: URLSearchParams; // the take's URL; /play's own when not given
 }) {
-  const { featured, actions } = resultsLayoutSettings;
+  const { actions } = resultsLayoutSettings;
+  const featured = featuredFor(params);
   const only = (ids: string[]) => plugins.filter((p) => ids.includes(p.id));
   const rest = plugins.filter((p) => !featured.includes(p.id) && !actions.includes(p.id));
   const card = (p: GamePlugin) => {

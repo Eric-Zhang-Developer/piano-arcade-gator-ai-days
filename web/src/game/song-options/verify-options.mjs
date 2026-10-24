@@ -4,7 +4,8 @@
 //    no NEW RECORD and saves no record.
 // 3. After a reload Für Elise still shows Right and 70%; Twinkle shows no Hands, 100%, and href /play?song=twinkle.
 // 4. L on Für Elise opens mode=wait&hands=R&tempo=70, and LEARN's href matches.
-// 5. Screenshots of the panel at 1280×720 and 1920×1080, where the preview ends above the first-run link and Options.
+// 5. Screenshots of the panel at 1280×720 and 1920×1080; for every song the preview ends above the footer (Options,
+//    first-run's link), the footer stays on screen and the page doesn't scroll.
 // Usage: node web/src/game/song-options/verify-options.mjs --out <dir>
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -148,19 +149,32 @@ try {
     await focus("fur-elise", true);
     await page.getByTestId("first-run-link").waitFor({ timeout: 10_000 });
     await page.screenshot({ path: join(out, `panel-${w}.png`) });
-    // For every song (titles wrap to two lines; one-hand charts have no Hands row): the preview's lowest drawn box, any
-    // descendant since its children overflow it, stays above the footer row.
+    // For every song (titles wrap to two lines; one-hand charts have no Hands row): the left column's footer (Options
+    // and first-run's link, in flow under the preview since #492) stays on screen, nothing of the preview runs under it,
+    // and the page doesn't scroll.
     const gaps = [];
     for (const id of await page.$$eval('ol a[data-testid^="song-"]', (a) => a.map((e) => e.dataset.testid.slice(5)))) {
       await focus(id, false);
       gaps.push([id, await page.evaluate(() => {
-        const bottom = Math.max(...[...document.querySelectorAll('[data-testid="song-preview"] *')].map((e) => e.getBoundingClientRect().bottom));
-        const top = Math.min(...["first-run-link", "options-open"].map((t) => document.querySelector(`[data-testid="${t}"]`).getBoundingClientRect().top));
-        return Math.round(top - bottom);
+        const footer = ["first-run-link", "options-open"].map((t) => document.querySelector(`[data-testid="${t}"]`).getBoundingClientRect());
+        // The focus section can shrink (min-height: 0) and draw the preview under the footer: its lowest box, any
+        // descendant since children overflow, must end above the footer's top.
+        const preview = Math.max(...[...document.querySelectorAll('[data-testid="song-preview"] *')].map((e) => e.getBoundingClientRect().bottom));
+        const scroll = document.documentElement.scrollHeight - innerHeight;
+        if (scroll > 0) return -Math.round(scroll);
+        // Nothing in the focused song is squeezed: with flex-shrink off, every box keeps its height. (The title clips
+        // its overflow, so a short column shrank it and cut the title in half, with no overlap to see.)
+        const boxes = [document.querySelector('[data-testid="song-preview"]').closest("section"), ...document.querySelector('[data-testid="song-preview"]').closest("section").children];
+        const heights = boxes.map((e) => e.getBoundingClientRect().height);
+        boxes.forEach((e) => (e.style.flexShrink = "0"));
+        const squeezed = boxes.map((e, i) => e.getBoundingClientRect().height - heights[i]);
+        boxes.forEach((e) => (e.style.flexShrink = ""));
+        if (Math.max(...squeezed) > 0.5) return -Math.round(Math.max(...squeezed));
+        return Math.round(Math.min(Math.min(...footer.map((r) => r.top)) - preview, innerHeight - Math.max(...footer.map((r) => r.bottom))));
       })]);
     }
     const [worst, least] = gaps.reduce((m, g) => (g[1] < m[1] ? g : m));
-    check(least >= 0, `${w}×${h}: every song's preview ends above the footer (closest: ${worst}, ${least}px; panel-${w}.png)`);
+    check(least >= 0, `${w}×${h}: every song fits: nothing squeezed, the preview above the footer, the footer on screen, no page scroll (closest: ${worst}, ${least}px; panel-${w}.png)`);
   }
   writeFileSync(join(out, "results.json"), JSON.stringify({ q, results, records, twinkleHref, learnHref }, null, 2));
   check(errors.length === 0, `no page errors${errors.length ? `: ${errors.join(" | ")}` : ""}`);

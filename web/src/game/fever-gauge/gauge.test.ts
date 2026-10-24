@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { GameEvent } from "../../contracts";
+import { meterLayout } from ".";
+import { hudLayout } from "../hud";
 import { emptyGauge, gaugeSize, reduceGauge } from "./gauge";
 
 const hit = (judgment: "PERFECT" | "GREAT" | "GOOD"): GameEvent => ({ type: "noteHit", noteId: "n", pitch: 60, judgment, offsetMs: 0, atMs: 0 });
@@ -31,5 +33,15 @@ describe("fever gauge", () => {
     const twelve = Array(12).fill(hit("PERFECT"));
     expect(run(42, [...twelve, hit("PERFECT"), miss])).toEqual({ size: 12, fill: 0, fever: false });
     expect(run(42, [...twelve, wrong, ...twelve]).fever).toBe(true);
+  });
+});
+
+describe("fever meter", () => {
+  it("sits under the HUD's panel and above its safe line, at 1280×720 and 1920×1080", () => {
+    for (const [w, line] of [[1280, 600], [1920, 900], [800, 300]]) {
+      const l = meterLayout(w, line);
+      expect(l.bar.y).toBe(hudLayout(w, line).panel.h);
+      expect(l.bottom).toBeLessThan(hudLayout(w, line).safeY);
+    }
   });
 });

@@ -2,6 +2,7 @@ import type { GamePlugin } from "../contracts";
 import { barLoop } from "./bar-loop";
 import { beatTrack } from "./beat";
 import { hud } from "./hud";
+import { feverGauge } from "./fever-gauge";
 import { juiceVisual } from "./juice";
 import { midiWatchdog } from "./midi-watchdog";
 import { pianoOut } from "./piano-out";
@@ -23,4 +24,5 @@ export const plugins: GamePlugin[] = [
   pianoOut(), // records the take for "Replay on piano"
   feverStage(), // three.js stage behind the highway (background hook only, no 2D layer)
   eventSounds(), // laptop sounds at combo milestones, fever, full combo, rank and (optionally) misses
+  feverGauge(), // last: its gauge sizes from the chart after every transformChart, as the judge does
 ];

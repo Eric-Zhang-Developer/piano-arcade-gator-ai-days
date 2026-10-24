@@ -70,3 +70,20 @@ export function placeLabels(points: ScreenPoint[], visible: Set<string>, preview
   }
   return labels;
 }
+
+export type AnchoredLabel = GraphLabel & { offsetX: number; offsetY: number };
+/** Keep a caption attached to its node while the prepared-entry camera moves. */
+export function anchorLabels(labels: GraphLabel[], points: ScreenPoint[]): AnchoredLabel[] {
+  const nodes = new Map(points.map(point => [point.node.id, point]));
+  return labels.flatMap(label => {
+    const node = nodes.get(label.id);
+    return node ? [{ ...label, offsetX: label.x - node.screenX, offsetY: label.y - node.screenY }] : [];
+  });
+}
+export function followLabels(labels: AnchoredLabel[], points: ScreenPoint[]): GraphLabel[] {
+  const nodes = new Map(points.map(point => [point.node.id, point]));
+  return labels.flatMap(label => {
+    const node = nodes.get(label.id);
+    return node ? [{ ...label, x: node.screenX + label.offsetX, y: node.screenY + label.offsetY }] : [];
+  });
+}

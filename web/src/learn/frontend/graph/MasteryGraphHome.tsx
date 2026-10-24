@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { actionFor, byId, demoGoal, rootRelationships, stateOf, type Domain, type GraphAction } from './data';
 import { layoutGraph, neighbor } from './layout';
-import { branchCurve, curve, mapSize, overviewCamera, placeLabels, presentation, projectGraph, viewPoints } from './projection';
+import { anchorLabels, followLabels, type AnchoredLabel, branchCurve, curve, mapSize, overviewCamera, placeLabels, presentation, projectGraph, viewPoints } from './projection';
 import styles from './graph.module.css';
 import { GraphCompanion, type CompanionControl } from './GraphCompanion';
 import type { preparedActivity } from './prepared';
@@ -17,6 +17,7 @@ const relationships = rootRelationships;
 
 export function MasteryGraphHome({ onAction, actionLabel, guide }: MasteryGraphHomeProps) {
   const [entering, setEntering] = useState(false);
+  const [flightCaptions, setFlightCaptions] = useState<AnchoredLabel[] | null>(null);
   const flight = useRef<CameraFlight | null>(null);
   const [exploring, setExploring] = useState(false);
   const recoverButton = useRef<HTMLButtonElement>(null), exploreMenu = useRef<HTMLDetailsElement>(null);
@@ -30,7 +31,7 @@ export function MasteryGraphHome({ onAction, actionLabel, guide }: MasteryGraphH
     if (flight.current) {
       cancelAnimationFrame(flight.current.frame); clearTimeout(flight.current.timer); flight.current = null;
       // Activity hides effects while offline, but retains state for reconnection.
-      setEntering(false); setCamera(overviewCamera);
+      setEntering(false); setFlightCaptions(null); setCamera(overviewCamera);
     }
   }, []);
   const drag = useRef<{x:number;y:number;camera:typeof camera;moved:boolean;skillId:string|null} | null>(null);
@@ -47,15 +48,17 @@ export function MasteryGraphHome({ onAction, actionLabel, guide }: MasteryGraphH
   const { visible, preview } = presentation(points, selectedId, viewport.width, viewport.height);
   const showCompanion = entering || (!exploring && !guide.collapsed && !selectedId && camera.scale === 1 && camera.x === 0 && camera.y === 0);
   const recommendedId = showCompanion && domain === guide.activity.domain ? guide.activity.skillId : undefined;
-  const labels = placeLabels(points, visible, preview, selectedId, hover ?? recommendedId ?? null, camera.scale, viewport.width, viewport.height);
+  const restingLabels = placeLabels(points, visible, preview, selectedId, hover ?? recommendedId ?? null, camera.scale, viewport.width, viewport.height);
+  const labels = entering && flightCaptions ? followLabels(flightCaptions, points) : restingLabels;
   const selected = selectedId ? byId.get(selectedId) : undefined;
   const selectedPoint = selectedId ? pointById.get(selectedId) : undefined;
   const policy = selected ? actionFor(selected) : undefined;
   const status = selected ? stateOf(selected.id) : undefined;
   const backbone = relationships.filter(edge => pointById.has(edge.from) && pointById.has(edge.to));
-  function enterActivity() {
+  function enterActivity(event: MouseEvent<HTMLButtonElement>) {
     if (flight.current) return;
     const run: CameraFlight = { frame: 0 };
+    setFlightCaptions(anchorLabels(restingLabels, points));
     flight.current = run;
     drag.current = null;
     const target = projected.find(point => point.node.id === guide.activity.skillId);
@@ -63,7 +66,7 @@ export function MasteryGraphHome({ onAction, actionLabel, guide }: MasteryGraphH
     setEntering(true);
     if (!target || reduced.matches) { guide.onStart(); return; }
     const destination = activityCamera(target, viewport.width, viewport.height);
-    const started = performance.now();
+    const started = event.timeStamp;
     function frame(now: number) {
       if (flight.current !== run) return;
       if (reduced.matches) { guide.onStart(); return; }
@@ -149,7 +152,7 @@ export function MasteryGraphHome({ onAction, actionLabel, guide }: MasteryGraphH
             <circle cx={point.screenX} cy={point.screenY} r={radius} className={styles.dot}/>
           </g>;
         })}
-        {labels.map(label => <g key={`label-${label.id}`} pointerEvents="none"><rect className={styles.labelClearance} x={label.x} y={label.y} width={label.width} height={label.height}/><text x={label.x+label.width/2} y={label.y+label.height-6} textAnchor="middle" className={label.root?styles.groupLabel:styles.nodeLabel}>{label.text}</text></g>)}
+        {labels.map(label => <g key={`label-${label.id}`} className={styles.caption} data-label-id={label.id} data-target={label.id === guide.activity.skillId} data-detail={!label.root} pointerEvents="none"><rect className={styles.labelClearance} x={label.x} y={label.y} width={label.width} height={label.height}/><text x={label.x+label.width/2} y={label.y+label.height-6} textAnchor="middle" className={label.root?styles.groupLabel:styles.nodeLabel}>{label.text}</text></g>)}
       </svg>
       {showCompanion && <GraphCompanion title={guide.activity.title} reason={guide.activity.reason} actionLabel={guide.actionLabel} complete={guide.complete} entering={entering} onStart={enterActivity} onDismiss={dismissGuide}/>}
       {exploring && <div className={styles.cameraControls} aria-label="Map view"><button type="button" aria-label="Zoom out" disabled={camera.scale<=1} onClick={()=>zoom(.8)}>−</button><output aria-label="Map zoom">{Math.round(camera.scale*100)}%</output><button type="button" aria-label="Zoom in" disabled={camera.scale>=4} onClick={()=>zoom(1.25)}>+</button><button type="button" onClick={fit}>Fit map</button></div>}

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { actionFor, byId, demoGoal, demoLearner, recommendation, rootRelationships, skills } from './data';
+import { activityCamera, cameraAt } from './camera';
 import { layoutGraph, neighbor } from './layout';
-import { mapSize, placeLabels, presentation, projectGraph } from './projection';
+import { anchorLabels, followLabels, overviewCamera, viewPoints, mapSize, placeLabels, presentation, projectGraph } from './projection';
 
 describe('demo graph activity choices', () => {
   it('selects goal-related reachable activities that match available lesson content', () => {
@@ -62,4 +63,24 @@ describe('stable subject layout and navigation', () => {
     expect(byId.has(next)).toBe(true);
     expect(JSON.stringify(demoLearner)).toBe(before);
   });
+});
+
+it('keeps the prepared target caption on its original side throughout entry instead of reselecting candidates', () => {
+  for (const [width, height] of [[1392, 736], [1232, 636]]) {
+    const projected = projectGraph(layoutGraph('theory'), width, height);
+    const target = projected.find(point => point.node.id === 'theory.phrase-endings')!;
+    const { visible, preview } = presentation(projected, null, width, height);
+    const initial = placeLabels(projected, visible, preview, null, target.node.id, 1, width, height);
+    const captions = anchorLabels(initial, projected);
+    const initialCaption = initial.find(label => label.id === target.node.id)!;
+    const offset = { x: initialCaption.x - target.screenX, y: initialCaption.y - target.screenY };
+    for (let frame = 0; frame <= 44; frame++) {
+      const points = viewPoints(projected, cameraAt(overviewCamera, activityCamera(target, width, height), frame / 44), width, height);
+      const labels = followLabels(captions, points), caption = labels.find(label => label.id === target.node.id)!;
+      const node = points.find(point => point.node.id === target.node.id)!;
+      expect(labels.map(label => label.id)).toEqual(initial.map(label => label.id));
+      expect(caption.x - node.screenX).toBeCloseTo(offset.x, 8);
+      expect(caption.y - node.screenY).toBeCloseTo(offset.y, 8);
+    }
+  }
 });

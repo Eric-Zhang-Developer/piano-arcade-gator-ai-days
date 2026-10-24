@@ -1,11 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useState, type MouseEvent } from 'react';
 import styles from './companion.module.css';
 
 export type CompanionControl = { collapsed: boolean; onCollapsedChange: (collapsed: boolean) => void };
-type Props = { title: string; reason: string; actionLabel: string; complete: boolean; entering: boolean; onStart: () => void; onDismiss: () => void };
+type Props = { title: string; reason: string; actionLabel: string; complete: boolean; entering: boolean; onStart: (event: MouseEvent<HTMLButtonElement>) => void; onDismiss: () => void };
 
 /** Presents a prepared fixture; exploring the map cannot make a new assignment. */
 export function GraphCompanion({ title, reason, actionLabel, complete, entering, onStart, onDismiss }: Props) {

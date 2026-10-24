@@ -24,9 +24,9 @@
 .node:hover .dot,.node[data-selected=true] .dot { opacity:1; stroke:var(--graph-ink); }
 .selection { fill:none; stroke:var(--graph-focus); stroke-width:1.8; }
 .node:focus-visible .hit { stroke:var(--graph-focus); stroke-width:1.5; }
-.groupLabel,.nodeLabel { fill:var(--graph-ink); paint-order:stroke; stroke:var(--graph-bg); stroke-width:6px; stroke-linejoin:round; pointer-events:none; }
-.groupLabel { font-size:18px; font-weight:650; }
-.nodeLabel { font-size:14px; }
+.groupLabel,.nodeLabel { fill:var(--graph-ink); stroke:none; font-kerning:normal; letter-spacing:.01em; pointer-events:none; }
+.groupLabel { font-size:18px; font-weight:600; }
+.nodeLabel { font-size:14px; font-weight:500; }
 .inspector { position:absolute; top:16px; right:12px; width:294px; max-height:calc(100% - 82px); display:flex; flex-direction:column; background:var(--graph-panel); border:1px solid var(--graph-rule); border-radius:6px; box-shadow:0 12px 36px rgb(0 0 0 / .35); }
 .inspector[data-side=left] { right:auto; left:12px; }
 .inspector>header { display:flex; align-items:flex-start; gap:12px; padding:20px 20px 0; }
@@ -71,3 +71,9 @@
 .mapStage[data-entering=true] aside[aria-label="Your next activity"] { opacity:0; pointer-events:none; }
 .mapStage aside[aria-label="Your next activity"] { transition:opacity 120ms ease-out; }
 @media (prefers-reduced-motion:reduce) { .mapStage aside[aria-label="Your next activity"] { transition:none; } }
+
+.caption { opacity:1; transition:opacity 120ms ease-out; }
+.mapStage[data-entering=true] .caption:not([data-target=true]) { opacity:0; }
+@media (prefers-reduced-motion:no-preference) { .caption[data-detail=true] { animation:caption-appear 140ms ease-out; } }
+@keyframes caption-appear { from { opacity:0; } to { opacity:1; } }
+@media (prefers-reduced-motion:reduce) { .caption { transition:none; animation:none; } }

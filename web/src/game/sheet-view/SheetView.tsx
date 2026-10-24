@@ -5,7 +5,11 @@ import { useEffect, useRef, useState } from "react";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import type { Chart } from "../../contracts";
 import { validateChart } from "../../contracts";
+import { hudSettings } from "../hud";
 import { chartToMusicXml } from "../sheet-xml";
+import { cyan, ink } from "../ui-tokens";
+import { follow, type Follower } from "./follow";
+import { SHEET_CHANNEL, type Judgment, type SheetMessage } from "./plugin";
 import styles from "./sheet-view.module.css";
 
 // The ids /play takes: a folder under web/public/songs/ (the same pattern as play/page.tsx).
@@ -14,7 +18,19 @@ const ZOOM_KEY = "pianoArcade.sheetZoom";
 const ZOOM_MIN = 0.5;
 const ZOOM_MAX = 2.5;
 const ZOOM_STEP = 0.1;
-const INK = "#f2f2f5"; // --pa-ink: OSMD takes a color string, not a CSS variable
+const JUDGMENTS: Judgment[] = ["PERFECT", "GREAT", "GOOD", "MISS"];
+const COLORS = hudSettings.judgmentColors; // the HUD's, so a notehead means what the counter means
+
+// For headless checks: where the cursor is, and how many noteheads are painted per judgment (not judgments heard).
+interface SheetHook {
+  cursorMs: number | null;
+  colored: Record<Judgment, number>;
+}
+declare global {
+  interface Window {
+    __pianoArcadeSheet?: SheetHook;
+  }
+}
 
 const clampZoom = (z: number) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Math.round(z * 10) / 10));
 
@@ -44,7 +60,40 @@ export function SheetView() {
   const [zoom, setZoom] = useState(1);
   const [rendered, setRendered] = useState(false);
   const scoreRef = useRef<HTMLDivElement>(null);
+  const headRef = useRef<HTMLElement>(null);
   const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
+  const shownRef = useRef<Chart | null>(null); // the chart the score shows
+  const followerRef = useRef<Follower | null>(null);
+  const judgedRef = useRef(new Map<string, Judgment>()); // this take's judgments, kept to repaint after a re-render
+  const paintedRef = useRef(new Map<string, Judgment>()); // the ones with a notehead painted
+  const clockRef = useRef<number | null>(null);
+
+  const publish = () => {
+    const colored = { PERFECT: 0, GREAT: 0, GOOD: 0, MISS: 0 };
+    for (const j of paintedRef.current.values()) colored[j]++;
+    window.__pianoArcadeSheet = { cursorMs: clockRef.current, colored };
+  };
+  const paint = (id: string, j: Judgment) => {
+    if (followerRef.current?.paint(id, COLORS[j])) paintedRef.current.set(id, j);
+  };
+  // The cursor to the chart clock; the page, not OSMD, scrolls, so reduced motion can make it a jump.
+  const moveCursor = (nowMs: number) => {
+    const el = followerRef.current?.clock(nowMs);
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const top = headRef.current?.offsetHeight ?? 0;
+    if (r.top >= top && r.bottom <= window.innerHeight) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: window.scrollY + r.top - top - 24, behavior: reduce ? "auto" : "smooth" });
+  };
+  // After every render: a new follower on the new SVG, this take's colors back on, the cursor where the take is.
+  const attach = (osmd: OpenSheetMusicDisplay, chart: Chart) => {
+    followerRef.current = follow(osmd, chart);
+    paintedRef.current.clear();
+    for (const [id, j] of judgedRef.current) paint(id, j);
+    if (clockRef.current !== null) moveCursor(clockRef.current);
+    publish();
+  };
 
   // Load the chart once, as /play does.
   useEffect(() => {
@@ -60,7 +109,7 @@ export function SheetView() {
         if (problems.length) throw new Error(`Bad chart: ${problems.join("; ")}`);
         if (!live) return;
         setZoom(loadZoom()); // here, not at first render: the server has no localStorage
-        setState({ phase: "ready", chart: raw as Chart });
+        setState((s) => (s.phase === "loading" ? { phase: "ready", chart: raw as Chart } : s)); // a take may have come first
       })
       .catch((e: Error) => live && setState({ phase: "error", error: e.message }));
     return () => {
@@ -75,7 +124,7 @@ export function SheetView() {
     if (!chart || !el) return;
     let live = true;
     (async () => {
-      const { OpenSheetMusicDisplay } = await import("opensheetmusicdisplay");
+      const { OpenSheetMusicDisplay, CursorType } = await import("opensheetmusicdisplay");
       if (!live) return;
       el.innerHTML = "";
       const osmd = new OpenSheetMusicDisplay(el, {
@@ -84,8 +133,9 @@ export function SheetView() {
         drawComposer: false,
         drawCredits: false,
         drawPartNames: false,
-        defaultColorMusic: INK,
+        defaultColorMusic: ink,
         backend: "svg",
+        cursorsOptions: [{ type: CursorType.Standard, color: cyan, alpha: 0.35, follow: false }],
       });
       // The page's padding sets the edges, so the score lines up with the title; the left keeps room for the brace.
       osmd.EngravingRules.PageLeftMargin = 2;
@@ -95,11 +145,14 @@ export function SheetView() {
       osmd.Zoom = loadZoom();
       osmd.render();
       osmdRef.current = osmd;
+      shownRef.current = chart;
+      attach(osmd, chart);
       setRendered(true);
     })().catch((e: Error) => live && setState({ phase: "error", error: `The score didn't render: ${e.message}` }));
     return () => {
       live = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- attach only reads refs
   }, [chart]);
 
   // Zoom: re-render at the new size and remember it.
@@ -108,8 +161,39 @@ export function SheetView() {
     if (!rendered || !osmd || osmd.Zoom === zoom) return;
     osmd.Zoom = zoom;
     osmd.render();
+    if (shownRef.current) attach(osmd, shownRef.current);
     saveZoom(zoom);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- attach only reads refs
   }, [zoom, rendered]);
+
+  // Follow /play: the latest take wins.
+  useEffect(() => {
+    const ch = new BroadcastChannel(SHEET_CHANNEL);
+    ch.onmessage = ({ data: m }: MessageEvent<SheetMessage>) => {
+      if (m.type === "take") {
+        judgedRef.current.clear();
+        clockRef.current = null;
+        const osmd = osmdRef.current;
+        if (osmd && shownRef.current && JSON.stringify(shownRef.current) === JSON.stringify(m.chart)) {
+          for (const id of paintedRef.current.keys()) followerRef.current?.paint(id, ink);
+          attach(osmd, shownRef.current); // the same score: clear the colors and reset the cursor, no re-render
+        } else {
+          setState({ phase: "ready", chart: m.chart }); // hands, loops or another song: render the chart as played
+        }
+      }
+      if (m.type === "clock") {
+        clockRef.current = m.nowMs;
+        moveCursor(m.nowMs);
+      }
+      if (m.type === "judgment") {
+        judgedRef.current.set(m.noteId, m.judgment);
+        paint(m.noteId, m.judgment);
+      }
+      publish();
+    };
+    return () => ch.close();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the helpers only read refs
+  }, []);
 
   // − and + on the keyboard too (= is + without Shift).
   useEffect(() => {
@@ -133,12 +217,20 @@ export function SheetView() {
 
   return (
     <main className={styles.sheet} data-sheet={rendered ? "ready" : "loading"}>
-      <header className={styles.head}>
+      <header className={styles.head} ref={headRef}>
         <div>
           <h1 className={styles.title}>{chart?.title ?? "Loading the score…"}</h1>
           {chart?.composer && <p className={styles.composer}>{chart.composer}</p>}
           {chart && <p className={styles.note}>Generated from the chart</p>}
         </div>
+        <ul className={styles.legend} aria-label="Note colors">
+          {JUDGMENTS.map((j) => (
+            <li key={j}>
+              <span className={styles.swatch} style={{ background: COLORS[j] }} aria-hidden />
+              {j}
+            </li>
+          ))}
+        </ul>
         <div className={styles.zoom} role="group" aria-label="Zoom">
           <button onClick={() => setZoom((z) => clampZoom(z - ZOOM_STEP))} disabled={zoom <= ZOOM_MIN} aria-label="Zoom out">
             −

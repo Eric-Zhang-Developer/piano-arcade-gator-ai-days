@@ -23,6 +23,7 @@ import { noteLabels } from "./note-labels";
 import { pianoOut } from "./piano-out";
 import { pianoVoice } from "./piano-voice";
 import { scenes } from "./scenes";
+import { watchDemo } from "./watch-demo";
 import { evenness } from "./evenness";
 import { dynamics } from "./dynamics";
 import { records } from "./records";
@@ -66,6 +67,7 @@ export const plugins: GamePlugin[] = [
   hud(), // before beat-track, so beat-track's status line draws over the HUD's top panel
   firstRun(), // ?firstrun=1: its text cues draw over the HUD's layer, between the band and the 1 s mark
   waitHud(), // wait mode: LEARN and note n / N in the HUD's band, where the counters and score were
+  watchDemo(), // ?demo=1 (W on the select): after scenes, and over the HUD band, where its DEMO badge draws; back to / after the results
   feverMoment(), // fever's start: the edge flash and a FEVER banner over the HUD band, under beat-track's status line
   beatTrack(),
   midiWatchdog(), // reconnects a piano that goes silent mid-song

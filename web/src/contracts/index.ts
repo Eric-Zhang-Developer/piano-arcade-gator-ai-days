@@ -80,7 +80,7 @@ export type GameEvent = At &
     | { type: "fullCombo" }
     | { type: "songEnd"; results: Results }
     | { type: "pause" } // Esc during a take: the chart clock stops at atMs
-    | { type: "resume" } // the clock runs on from the same atMs: no chart time passes while paused
+    | { type: "resume" } // the clock runs on from atMs: the pause's own time, or after a rewind (wait mode's ← →) the bar start it moved to
     | { type: "quit" } // the take ends without results: no songEnd follows
   );
 

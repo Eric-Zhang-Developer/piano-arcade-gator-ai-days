@@ -1,6 +1,7 @@
 import type { GamePlugin } from "../contracts";
 import { barLoop } from "./bar-loop";
 import { beatTrack } from "./beat";
+import { handColors } from "./hand-colors";
 import { hud } from "./hud";
 import { warningCard } from "./difficulty";
 import { feverGauge } from "./fever-gauge";
@@ -22,6 +23,7 @@ export const plugins: GamePlugin[] = [
   scenes(), // ?bot=<name>: after bar-loop, so the bot plays the looped chart
   simPlugin, // piano-sim: /play?midi=sim only. First, so later plugins asking for MIDI get the fake piano.
   juiceVisual(), // under the HUD: wisps and flares never cover the score
+  handColors(), // the L/R legend during the count-in, two-hand charts only
   hud(), // before beat-track, so beat-track's status line draws over the HUD's top panel
   beatTrack(),
   midiWatchdog(), // reconnects a piano that goes silent mid-song

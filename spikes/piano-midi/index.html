@@ -1,0 +1,130 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Piano MIDI spike</title>
+<!-- Chrome layer of the piano MIDI spike. Throwaway evidence, see README.md. Serve with: python3 -m http.server 8000 -->
+<style>body{font:14px monospace;margin:16px}button,select{font:inherit;margin:2px}#log{white-space:pre;border:1px solid #888;padding:8px;height:60vh;overflow:auto}</style>
+<p>
+  <button id="connect">Connect MIDI</button>
+  in <select id="in"></select> out <select id="out"></select>
+</p>
+<p>
+  <button id="scale">Play scale + 16ths</button>
+  <button id="bandStart">Band start</button>
+  <button id="bandStop">Band stop</button>
+  <button id="localOff">Local off</button>
+  <button id="localOn">Local on</button>
+  <button id="stats">Stats + reset</button>
+  <button id="copy">Copy log</button>
+  <button id="clear">Clear log</button>
+</p>
+<div id="log"></div>
+<script>
+const $ = id => document.getElementById(id);
+let midi, input, output, t0 = null, lastOn = null, gaps = [], vels = [], band = null;
+
+function log(line) { $('log').textContent += line + '\n'; $('log').scrollTop = 1e9; }
+const hex = d => [...d].map(b => b.toString(16).padStart(2, '0').toUpperCase()).join(' ');
+
+function onMessage(e) {
+  const d = e.data, s = d[0];
+  if (s === 0xFE || s === 0xF8) return;  // Active Sensing every ~300 ms, clock 24/beat: noise
+  if (t0 === null) t0 = e.timeStamp;
+  const t = e.timeStamp - t0, type = s & 0xF0, ch = s < 0xF0 ? (s & 15) + 1 : '-';
+  let kind = {0x80: 'note_off', 0x90: 'note_on', 0xB0: 'control_change', 0xC0: 'program_change', 0xE0: 'pitchwheel'}[type] || 'other';
+  let gap = '';
+  if (type === 0x90 && d[2] === 0) kind = 'release(v0)';
+  else if (type === 0x90) {
+    if (lastOn !== null) { gaps.push(t - lastOn); gap = (t - lastOn).toFixed(1); }
+    lastOn = t; vels.push(d[2]);
+  }
+  log(`${t.toFixed(1).padStart(10)} ${gap.padStart(8)} ch${String(ch).padEnd(3)} ${kind.padEnd(15)} ${hex(d)}`);
+}
+
+function stats() {
+  if (vels.length) log(`# note-ons: ${vels.length}  velocity min ${Math.min(...vels)} max ${Math.max(...vels)}`);
+  if (gaps.length) {
+    const sorted = [...gaps].sort((a, b) => a - b), bins = {};
+    gaps.forEach(g => bins[Math.round(g)] = (bins[Math.round(g)] || 0) + 1);
+    const [common, n] = Object.entries(bins).sort((a, b) => b[1] - a[1])[0];
+    log(`# gaps ms: min ${sorted[0].toFixed(1)} median ${sorted[sorted.length >> 1].toFixed(1)} max ${sorted.at(-1).toFixed(1)}` +
+        `  under 2 ms: ${gaps.filter(g => g < 2).length}  most common (1 ms bins): ${common} ms x${n} of ${gaps.length}`);
+  }
+  gaps = []; vels = []; lastOn = null;
+}
+
+function pickPorts() {
+  if (input) input.onmidimessage = null;
+  input = midi.inputs.get($('in').value); output = midi.outputs.get($('out').value);
+  if (input) input.onmidimessage = onMessage;
+  log(`# in=${JSON.stringify(input?.name)} out=${JSON.stringify(output?.name)}`);
+}
+
+function listPorts() {
+  for (const [sel, ports] of [[$('in'), midi.inputs], [$('out'), midi.outputs]]) {
+    const keep = sel.value;
+    sel.innerHTML = '';
+    for (const p of ports.values()) sel.add(new Option(p.name, p.id));
+    if (keep) sel.value = keep;
+  }
+  const desc = ports => JSON.stringify([...ports.values()].map(p => `${p.name} (${p.manufacturer})`));
+  log(`# inputs (${midi.inputs.size}): ${desc(midi.inputs)}`);
+  log(`# outputs (${midi.outputs.size}): ${desc(midi.outputs)}`);
+  pickPorts();
+}
+
+$('connect').onclick = async () => {
+  try { midi = await navigator.requestMIDIAccess(); } catch (e) { return log(`# requestMIDIAccess failed: ${e}`); }
+  midi.onstatechange = e => log(`# port ${e.port.type} ${JSON.stringify(e.port.name)} ${e.port.state}`);
+  listPorts();
+  log(`# ${'t_ms'.padStart(8)} ${'gap_ms'.padStart(8)} ch   type            bytes`);
+};
+$('in').onchange = $('out').onchange = pickPorts;
+
+// Notes are scheduled with send(data, timestamp), so timing comes from Chrome's MIDI clock, not JS timers.
+function note(at, dur, n, ch = 0, vel = 90) {
+  output.send([0x90 | ch, n, vel], at);
+  output.send([0x80 | ch, n, 0], at + dur);
+}
+
+$('scale').onclick = () => {
+  const t = performance.now() + 100;
+  [60, 62, 64, 65, 67, 69, 71, 72].forEach((n, i) => note(t + i * 500, 400, n));
+  for (let i = 0; i < 16; i++) note(t + 4500 + i * 125, 100, 72);
+  log('# playing scale + 16 16ths');
+};
+
+// One bar of 8th notes at 120 BPM (250 ms): hi-hat every 8th, kick on 1 and 3, snare on 2 and 4, bass on ch 2.
+const BASS = [36, 48, 36, 48, 43, 55, 43, 55];
+function scheduleEighth(at, e) {
+  note(at, 60, 42, 9, 70);
+  if (e === 0 || e === 4) note(at, 60, 36, 9, 100);
+  if (e === 2 || e === 6) note(at, 60, 38, 9, 100);
+  note(at, 200, BASS[e], 1, 100);
+}
+
+$('bandStart').onclick = () => {
+  if (band) return;
+  output.send([0xC1, 33]);  // ch 2 program: GM 34 Electric Bass (finger)
+  let next = performance.now() + 100, e = 0;
+  // ponytail: 50 ms timer scheduling 200 ms ahead; on stop up to 200 ms of notes are already queued in Chrome
+  band = setInterval(() => {
+    while (next < performance.now() + 200) { scheduleEighth(next, e); next += 250; e = (e + 1) % 8; }
+  }, 50);
+  log('# band started');
+};
+
+function allNotesOff() { for (let ch = 0; ch < 16; ch++) output.send([0xB0 | ch, 123, 0]); }
+$('bandStop').onclick = () => {
+  clearInterval(band); band = null;
+  try { output.clear(); } catch {}  // drops queued notes where Chrome supports it
+  allNotesOff();
+  setTimeout(allNotesOff, 300);  // again after anything already queued has gone out
+  log('# band stopped, sent All Notes Off (CC 123) on 16 channels, twice');
+};
+
+$('localOff').onclick = () => { output.send([0xB0, 122, 0]); log('# sent Local Control off (CC 122 = 0) on ch1'); };
+$('localOn').onclick = () => { output.send([0xB0, 122, 127]); log('# sent Local Control on (CC 122 = 127) on ch1'); };
+$('stats').onclick = stats;
+$('copy').onclick = () => navigator.clipboard.writeText($('log').textContent).then(() => log('# copied'));
+$('clear').onclick = () => { $('log').textContent = ''; t0 = null; gaps = []; vels = []; lastOn = null; };
+</script>

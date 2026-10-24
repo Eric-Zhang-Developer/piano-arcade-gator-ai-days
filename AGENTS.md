@@ -7,6 +7,8 @@ The spec is the source of truth. Chat and memory aren't. Everything you need is 
 2. Write your heartbeat: `d="$(git rev-parse --git-common-dir)/agent-heartbeats"; mkdir -p "$d"; pwd > "$d/<your-worker-name>"`.
 3. Read from `origin/main`: `specs/mission.md`, `specs/tech-stack.md`, `specs/roadmap.md`, `specs/milestones.toml`,
    then your feature's `specs/features/<slug>/spec.md`.
+   State (status, what's done, what a build contains) comes from a fresh detached worktree of `origin/main`, never from
+   the main checkout's HEAD or an old worktree; a server you show a person runs from one too.
 4. Finish your own open PRs first (fix red ones). Then pick new work.
 5. Before re-taking a feature with earlier PRs, read its open and closed PRs: `gh pr list --search "<slug> in:title" --state all`.
 

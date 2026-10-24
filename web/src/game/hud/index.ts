@@ -1,29 +1,31 @@
 // Arcade HUD: song card, live counters, score and multiplier up top, and a giant translucent combo (spec: hud).
 // Driven only by GameEvents; reduceHud and hudLayout are pure so tests can pin them.
 import type { Chart, Frame, GameEvent, GamePlugin } from "../../contracts";
+import { gold, good, miss, panel, tierX1, tierX2, tierX3, tierX4, whenDisplayFontReady, wrong } from "../ui-tokens";
 
 export const hudSettings = {
   comboFrom: 5, // the combo number shows from this combo
   points: { PERFECT: 100, GREAT: 50, GOOD: 25 },
   // Guitar Hero 3's tier colors: white, orange, green, purple (decision hud-look).
   tiers: [
-    { from: 0, mult: 1, color: "#e8e8ec" },
-    { from: 10, mult: 2, color: "#ff9f43" },
-    { from: 20, mult: 3, color: "#8ee05e" },
-    { from: 30, mult: 4, color: "#c47cff" },
+    { from: 0, mult: 1, color: tierX1 },
+    { from: 10, mult: 2, color: tierX2 },
+    { from: 20, mult: 3, color: tierX3 },
+    { from: 30, mult: 4, color: tierX4 },
   ],
   // PERFECT, GREAT and MISS as core's highway; GOOD and WRONG per judging-tiers' defaults (calm blue, strong red).
-  judgmentColors: { PERFECT: "#ffe27a", GREAT: "#5ef2c4", GOOD: "#7cb7ff", MISS: "#c98a9a", wrong: "#ff4d5e" },
+  // GREAT has no token of its own (visual-direction names none), so it keeps its literal value.
+  judgmentColors: { PERFECT: gold, GREAT: "#5ef2c4", GOOD: good, MISS: miss, wrong },
   statusGutterPx: 120, // beat-track's status line ("Beat: piano", 13px) sits in the top-right corner
   safeFraction: 0.6, // nothing below this fraction of the judgment line: the lowest 40% is where notes land
-  panelBg: "rgba(12,12,16,0.72)",
+  panelBg: panel,
   comboAlpha: 0.2, // drawn over the notes, so faint enough that they read through (decision hud-look)
   swellMs: 250,
   swellScale: 1.25,
   ghostMs: 1000,
   ghostScale: 1.6,
   ghostAlpha: 0.3,
-  font: "system-ui, sans-serif",
+  font: "system-ui, sans-serif", // labels; numbers and the title use the display face once it has loaded
 };
 
 // ---------- state ----------
@@ -102,8 +104,8 @@ export function hudBottom(l: HudLayout): number {
 type Card = { title: string; line2: string };
 
 // Draws at (0, 0), shrunk to fit down to 60%, then cut with an ellipsis.
-function fitText(ctx: CanvasRenderingContext2D, text: string, maxW: number, px: number, weight = ""): void {
-  const set = (p: number) => (ctx.font = `${weight} ${Math.round(p)}px ${hudSettings.font}`);
+function fitText(ctx: CanvasRenderingContext2D, text: string, maxW: number, px: number, weight = "", family = hudSettings.font): void {
+  const set = (p: number) => (ctx.font = `${weight} ${Math.round(p)}px ${family}`);
   set(px);
   const w = ctx.measureText(text).width;
   if (w > maxW) set(Math.max(px * 0.6, (px * maxW) / w));
@@ -112,7 +114,7 @@ function fitText(ctx: CanvasRenderingContext2D, text: string, maxW: number, px: 
   ctx.fillText(t, 0, 0);
 }
 
-function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Card | null): void {
+function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Card | null, display: string): void {
   const l = hudLayout(f.width, f.judgmentLineY);
   const { h } = l.panel;
   const pad = Math.max(10, h * 0.25);
@@ -123,13 +125,13 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Car
     const t = f.nowMs - s.milestone.atMs;
     if (t >= 0 && t < hudSettings.ghostMs) {
       const k = t / hudSettings.ghostMs;
-      drawCombo(ctx, l, String(s.milestone.count), 1 + (hudSettings.ghostScale - 1) * k, hudSettings.ghostAlpha * (1 - k), tier.color);
+      drawCombo(ctx, l, String(s.milestone.count), 1 + (hudSettings.ghostScale - 1) * k, hudSettings.ghostAlpha * (1 - k), tier.color, display);
     }
   }
   if (s.combo >= hudSettings.comboFrom) {
     const t = s.milestone ? f.nowMs - s.milestone.atMs : Infinity;
     const swell = t >= 0 && t < hudSettings.swellMs ? 1 + (hudSettings.swellScale - 1) * Math.sin((Math.PI * t) / hudSettings.swellMs) : 1;
-    drawCombo(ctx, l, String(s.combo), swell, hudSettings.comboAlpha, "#ffffff");
+    drawCombo(ctx, l, String(s.combo), swell, hudSettings.comboAlpha, "#ffffff", display);
     ctx.globalAlpha = 0.45;
     ctx.fillStyle = "#ffffff";
     ctx.font = `600 ${Math.round(l.combo.size * 0.16)}px ${hudSettings.font}`;
@@ -155,7 +157,7 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Car
     ctx.save();
     ctx.translate(pad, h * 0.36);
     ctx.fillStyle = "#ffffff";
-    fitText(ctx, card.title, cardW - pad * 1.5, h * 0.3, "700");
+    fitText(ctx, card.title, cardW - pad * 1.5, h * 0.3, "italic 800", display);
     ctx.translate(0, h * 0.34);
     ctx.fillStyle = "rgba(255,255,255,0.6)";
     fitText(ctx, card.line2, cardW - pad * 1.5, h * 0.2);
@@ -175,7 +177,7 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Car
   counters.forEach(([label, key], i) => {
     const x = cardW + cw * (i + 0.5);
     ctx.fillStyle = hudSettings.judgmentColors[key];
-    ctx.font = `800 ${Math.round(h * 0.34)}px ${hudSettings.font}`;
+    ctx.font = `italic 800 ${Math.round(h * 0.34)}px ${display}`;
     ctx.fillText(String(s[key]), x, h * 0.4);
     ctx.font = `600 ${Math.round(Math.min(h * 0.16, cw * 0.15))}px ${hudSettings.font}`;
     ctx.fillText(label, x, h * 0.76);
@@ -186,7 +188,7 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Car
   const badge = Math.round(h * 0.5);
   ctx.textAlign = "right";
   ctx.fillStyle = tier.color;
-  ctx.font = `900 ${badge}px ${hudSettings.font}`;
+  ctx.font = `italic 900 ${badge}px ${display}`;
   ctx.fillText(`x${tier.mult}`, right, h * 0.4);
   const badgeW = ctx.measureText(`x${tier.mult}`).width;
   const { filled, of } = tierProgress(s.combo);
@@ -199,19 +201,19 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Car
   }
   ctx.globalAlpha = 1;
   ctx.fillStyle = "#ffffff";
-  ctx.font = `800 ${Math.round(h * 0.42)}px ${hudSettings.font}`;
+  ctx.font = `italic 800 ${Math.round(h * 0.42)}px ${display}`;
   ctx.fillText(s.score.toLocaleString("en-US"), right - badgeW - pad, h * 0.42);
   ctx.fillStyle = "rgba(255,255,255,0.55)";
   ctx.font = `600 ${Math.round(h * 0.16)}px ${hudSettings.font}`;
   ctx.fillText("SCORE", right - badgeW - pad, h * 0.8);
 }
 
-function drawCombo(ctx: CanvasRenderingContext2D, l: HudLayout, text: string, scale: number, alpha: number, color: string): void {
+function drawCombo(ctx: CanvasRenderingContext2D, l: HudLayout, text: string, scale: number, alpha: number, color: string, display: string): void {
   ctx.globalAlpha = alpha;
   ctx.fillStyle = color;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.font = `900 ${Math.round(l.combo.size * scale)}px ${hudSettings.font}`;
+  ctx.font = `italic 900 ${Math.round(l.combo.size * scale)}px ${display}`;
   ctx.fillText(text, l.combo.cx, l.combo.cy);
   ctx.globalAlpha = 1;
 }
@@ -227,6 +229,13 @@ declare global {
 export function hud(): GamePlugin {
   let state = emptyHud();
   let card: Card | null = null;
+  // Body face until the display face has loaded (or 1 s has passed), so the HUD never draws a half-loaded font.
+  let display = hudSettings.font;
+  if (typeof document !== "undefined")
+    void whenDisplayFontReady().then(() => {
+      const family = getComputedStyle(document.documentElement).getPropertyValue("--pa-font-display").trim();
+      if (family) display = `${family}, ${hudSettings.font}`;
+    });
   return {
     id: "hud",
     transformChart(chart: Chart) {
@@ -238,7 +247,7 @@ export function hud(): GamePlugin {
       if (typeof window !== "undefined") window.__pianoArcadeHud = state;
     },
     draw(ctx, frame) {
-      drawHud(ctx, frame, state, card);
+      drawHud(ctx, frame, state, card, display);
     },
   };
 }

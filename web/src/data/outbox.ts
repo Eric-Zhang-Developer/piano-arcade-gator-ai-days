@@ -41,7 +41,11 @@ export function enqueue(storage: Storage, id: string, take: Take, now = new Date
 }
 
 /** Sends every unsent item in order. Stops at the first "retry" (offline or server down) to keep order. */
-export async function flush(storage: Storage, send: (item: OutboxItem) => Promise<SendResult>): Promise<number> {
+export async function flush(
+  storage: Storage,
+  send: (item: OutboxItem) => Promise<SendResult>,
+  onResult?: (id: string, result: SendResult) => void,
+): Promise<number> {
   let sent = 0;
   for (const item of readOutbox(storage).filter((i) => !i.sent)) {
     let r: SendResult;
@@ -50,6 +54,7 @@ export async function flush(storage: Storage, send: (item: OutboxItem) => Promis
     } catch {
       r = "retry";
     }
+    onResult?.(item.id, r);
     if (r === "retry") break;
     if (r === "later") continue;
     // "drop": the server rejected it for good (invalid take); keep it locally but stop resending

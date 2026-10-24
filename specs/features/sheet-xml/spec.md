@@ -70,7 +70,9 @@ Issue: #270
 - A wrong key costs a key signature, not a wrong pitch: a chart with no entry keeps the estimate.
 - Pickups (chopin-prelude-4, fur-elise, maple-leaf-rag, nocturne-op9-2 start after beat 0) print as a full bar of
   rests and the pickup, so bar numbers run one ahead of the printed score; an implicit bar 0 is a later fix.
-- No clef changes, beaming, tuplets, dynamics or pedal: sheet-view asks through `fix(sheet-xml)` (OSMD beams by
-  itself). Ornaments charted as main notes (minuet-g, nocturne-op9-2) print as those notes; moonlight-3's right hand
-  reaches G♯2 on the treble staff. A key or meter on the chart is a `contract:` PR; the table is the stopgap. Log
-  other choices in `specs/decisions/sheet-xml-*.md`.
+- Beams come from sheet-beams' `shouldBeam`: `<beam number="1">` begin, continue and end on each beamed chord's
+  first note (VexFlow draws the 16th lines itself). OSMD's own autoBeam splits runs at every eighth in n/8.
+- No clef changes, tuplets, dynamics or pedal: sheet-view asks through `fix(sheet-xml)`. Ornaments charted as main
+  notes (minuet-g, nocturne-op9-2) print as those notes; moonlight-3's right hand reaches G♯2 on the treble staff.
+  A key or meter on the chart is a `contract:` PR; the table is the stopgap. Log other choices in
+  `specs/decisions/sheet-xml-*.md`.

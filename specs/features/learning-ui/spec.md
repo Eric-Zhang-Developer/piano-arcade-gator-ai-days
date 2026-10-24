@@ -50,13 +50,14 @@ This is the frontend slice commissioned from the published `piano-learning` plan
 ## Defaults
 Preview state is local and disposable. Unknown student progress stays unknown. No auth, backend or model connection is implied.
 
-## Review-only brand prototypes
+## Review-only brand prototype
 
-`/learn/brand-preview` compares three unselected desktop directions grounded in
-[Product philosophy](../../../PRODUCT_PHILOSOPHY.md): Practice Room, Field Notes
-and After Hours. [BRAND_STUDY.md](BRAND_STUDY.md) records their visual, composition
-and motion differences plus verification scope. The comparison uses the real
-graph/lesson and isolated preview sessions, a neutral external review selector,
-replay/back and continuous gator accompaniment. It does not select a new brand,
-rename the product or replace `/learn`. Check both desktop sizes, real Start/
-Resume, arrival/caption clearance, lesson theming and accessible review controls.
+`/learn/brand-preview` proposes one task-first desktop interface grounded in
+[Product philosophy](../../../PRODUCT_PHILOSOPHY.md), official cross-industry
+research and the user-selected upright inviting alligator. It replaces the three
+rejected studies. [BRAND_STUDY.md](BRAND_STUDY.md) records source mechanisms,
+actual assets, composition, motion and verification limits. The study uses the
+real graph/lesson and isolated sessions, external provenance/reference controls,
+replay/back/stop and continuous guide identity. It does not rename the product
+or replace `/learn`. Check both desktop sizes, real Start/Resume, target/caption
+clearance, lesson theming and accessible review controls.

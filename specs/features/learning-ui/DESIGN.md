@@ -31,7 +31,9 @@ Screen-space labels preserve the accepted 18px/600 and 14px/500 system-ui roles,
 
 The director accepts the actual contextual href/target for every supported learning/retrieval activity. The current prepared fixture remains Hearing a phrase come home, with the same real layout-owned session state and explicit completed repeat. The guide is an authored frontend demonstration, not a live agent/model decision. No free map exploration, extra mode choice, full 3D engine or speculative integration is added.
 
-A separate [unselected brand study](BRAND_STUDY.md) at `/learn/brand-preview`
-compares Practice Room, Field Notes and After Hours against the frozen product
-philosophy. Its fonts, materials, layout and motion are scoped review options;
-none replace this incumbent direction until an explicit choice is made.
+A separate [working brand study](BRAND_STUDY.md) at `/learn/brand-preview`
+replaces the three rejected aesthetic options with one proposed task-first
+interface informed by official cross-industry research and the user-selected
+upright alligator. Its fonts, assets, composition and motion remain route-scoped;
+the selected character does not approve a canonical visual rollout. This incumbent
+system remains unchanged until the complete interface is reviewed.

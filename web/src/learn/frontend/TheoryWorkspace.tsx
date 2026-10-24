@@ -2,14 +2,15 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { type CSSProperties, useEffect, useRef, useState } from 'react';
+import { type CSSProperties, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { evaluateAnswer, questions, reviewQuestions, score, source } from './lesson';
 import { PhraseScore } from './Score';
 import { useTheorySession } from './LearningSessions';
 import { playPhrase } from './audio';
 import styles from './learning.module.css';
 
-export function TheoryWorkspace({ review = false, guide }: { review?: boolean; guide?: { instruction: string } }) {
+export function TheoryWorkspace({ review = false, guide }: { review?: boolean; guide?: { instruction: string; imageSrc?: string } }) {
+  const guided = Boolean(guide);
   const items = review ? reviewQuestions : questions;
   const { state, update, setPaneWidth } = useTheorySession(review);
   const { index, answer, checked, hint, tab, history, paneWidth } = state;
@@ -22,6 +23,13 @@ export function TheoryWorkspace({ review = false, guide }: { review?: boolean; g
   const questionBody = useRef<HTMLDivElement>(null);
   const materialBody = useRef<HTMLDivElement>(null);
   const materialScroll = useRef({ music: 0, page: 0 });
+  // A restored guided session opens at its current prompt, with earlier answers
+  // still available above it in this pane. Keep the workspace/page stationary.
+  useLayoutEffect(() => {
+    if (!guided) return;
+    const pane = questionBody.current, heading = questionHeading.current;
+    if (pane && heading) pane.scrollTop = Math.max(0, pane.scrollTop + heading.getBoundingClientRect().top - pane.getBoundingClientRect().top - 24);
+  }, [guided, index]);
   useEffect(() => {
     materialBody.current?.scrollTo({ top: materialScroll.current[tab] });
   }, [tab]);
@@ -64,7 +72,7 @@ export function TheoryWorkspace({ review = false, guide }: { review?: boolean; g
     <div ref={studio} className={styles.theoryStudio} style={{ '--question-width': `${paneWidth}%` } as CSSProperties}>
       <section className={styles.questionPane} aria-label="Current question">
         <header className={styles.lessonFocus}>
-          {guide ? <div className={styles.tutorHeading}><Image data-tutor-perch src="/learning/companion-gator.svg" alt="Your gator guide" width={56} height={56} unoptimized/><h1>{review ? 'Recall a sense of home' : 'Hearing a phrase come home'}</h1></div> : <h1>{review ? 'Recall a sense of home' : 'Hearing a phrase come home'}</h1>}
+          {guide ? <div className={styles.tutorHeading}><Image data-tutor-perch src={guide.imageSrc ?? "/learning/companion-gator.svg"} alt="Your gator guide" width={56} height={56} unoptimized/><h1 tabIndex={-1}>{review ? 'Recall a sense of home' : 'Hearing a phrase come home'}</h1></div> : <h1>{review ? 'Recall a sense of home' : 'Hearing a phrase come home'}</h1>}
           <p>{guide?.instruction ?? (review ? 'Review theory · Try each answer before opening the reference.' : 'Learn theory · Explore with the score and reference.')}</p>
           <span>{done ? 'Complete' : `Question ${index+1} of ${items.length}`}</span>
         </header>

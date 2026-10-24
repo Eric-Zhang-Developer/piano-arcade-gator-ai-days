@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { Chart } from "../../contracts";
 import { handColor } from "../hand-colors";
-import { fullRange, whiteIndex } from "../highway-zoom";
+import { whiteIndex } from "../highway-zoom";
 import { meterLayout } from "../fever-gauge";
-import { drawHighway, isBlack, judgmentPlace, makeLayout, type HighwayState } from "./highway";
+import { readFileSync } from "node:fs";
+import { drawHighway, isBlack, judgmentPlace, makeLayout, staticRange, type HighwayState } from "./highway";
 import { settings } from "./settings";
 
 const chart = (pitches: number[]): Chart => ({
@@ -16,16 +17,35 @@ const chart = (pitches: number[]): Chart => ({
   notes: pitches.map((pitch, i) => ({ id: String(i), pitch, beat: i, duration: 1, hand: "R" })),
 });
 
-describe("makeLayout", () => {
-  it("pads C4–A4 to one extra white key each side: B3..B4", () => {
-    const L = makeLayout(chart([60, 69]), 800, 600, 0);
-    expect([L.lowPitch, L.highPitch]).toEqual([59, 71]);
+const song = (id: string): Chart => JSON.parse(readFileSync(new URL(`../../../public/songs/${id}/chart.json`, import.meta.url), "utf8"));
+
+describe("the static keyboard (#384): one range per song, C to C", () => {
+  it("snaps to the C at or below the lowest note and the C at or above the highest", () => {
+    expect(staticRange(song("fur-elise"))).toEqual({ lowPitch: 36, highPitch: 96 }); // E2–E6 -> C2–C7
+    expect(staticRange(song("moonlight-3"))).toEqual({ lowPitch: 24, highPitch: 96 }); // A1–C#6 -> C1–C7
+    expect(staticRange(chart([50, 84]))).toEqual({ lowPitch: 48, highPitch: 84 }); // a top C ends the range on it
+    expect(staticRange(chart([61, 94]))).toEqual({ lowPitch: 60, highPitch: 96 }); // black ends snap to Cs too
   });
 
-  it("pads black-key ends to whole white keys first: C#4–A#4 gives B3..C5", () => {
-    const L = makeLayout(chart([61, 70]), 800, 600, 0);
-    expect([L.lowPitch, L.highPitch]).toEqual([59, 72]);
-    expect(isBlack(L.lowPitch) || isBlack(L.highPitch)).toBe(false);
+  it("is at least two octaves: Twinkle and the Minuet get C4–C6", () => {
+    expect(staticRange(song("twinkle"))).toEqual({ lowPitch: 60, highPitch: 84 }); // C4–A4 -> C4–C5 -> C4–C6
+    expect(staticRange(song("minuet-g"))).toEqual({ lowPitch: 60, highPitch: 84 }); // F#4–G5 -> C4–C6
+    expect(staticRange(chart([72]))).toEqual({ lowPitch: 72, highPitch: 96 }); // one C: two octaves up from it
+  });
+
+  it("keeps to the piano's 21–108", () => {
+    expect(staticRange(chart([21, 108]))).toEqual({ lowPitch: 21, highPitch: 108 });
+    expect(staticRange(chart([100, 105]))).toEqual({ lowPitch: 84, highPitch: 108 }); // no room above: it grows down
+  });
+
+  it("makeLayout lays exactly that range, white keys at both ends", () => {
+    for (const id of ["twinkle", "fur-elise", "maple-leaf-rag"]) {
+      const c = song(id);
+      const L = makeLayout(c, 1920, 1080, 0);
+      expect({ lowPitch: L.lowPitch, highPitch: L.highPitch }).toEqual(staticRange(c));
+      expect(L.keyX(L.lowPitch).x).toBeCloseTo(0);
+      expect(L.keyX(L.highPitch).x + L.keyX(L.highPitch).width).toBeCloseTo(1920);
+    }
   });
 
   it("lays keys left to right; black keys are narrower and straddle their neighbours", () => {
@@ -120,7 +140,7 @@ describe("makeLayout with a view (highway-zoom)", () => {
   const wide = chart([40, 61, 88]);
   it("a view of the whole range lays every key exactly as without one", () => {
     const plain = makeLayout(wide, 1280, 720, 0);
-    const viewed = makeLayout(wide, 1280, 720, 0, fullRange(wide));
+    const viewed = makeLayout(wide, 1280, 720, 0, { lo: whiteIndex(plain.lowPitch), hi: whiteIndex(plain.highPitch) + 1 });
     expect([viewed.lowPitch, viewed.highPitch, viewed.judgmentLineY]).toEqual([plain.lowPitch, plain.highPitch, plain.judgmentLineY]);
     for (let p = plain.lowPitch; p <= plain.highPitch; p++) {
       expect(viewed.keyX(p).x).toBeCloseTo(plain.keyX(p).x);
@@ -160,10 +180,10 @@ describe("keys outside the chart's range", () => {
   it("lie off-screen at finite positions, and every key in range is where it was", () => {
     const L = makeLayout(chart([60, 69]), 800, 600, 0);
     const w = L.keyX(60).width;
-    expect(L.keyX(57)).toEqual({ x: -w, width: w }); // A3, one white below the range's lowest key (B3)
+    expect(L.keyX(59)).toEqual({ x: -w, width: w }); // B3, one white below the range's lowest key (C4)
     expect(L.keyX(30).x).toBeLessThan(0);
     expect(Number.isFinite(L.keyX(30).x) && Number.isFinite(L.keyX(108).x) && Number.isFinite(L.keyX(54).x)).toBe(true);
-    expect(L.keyX(72).x).toBeGreaterThanOrEqual(800);
+    expect(L.keyX(86).x).toBeGreaterThanOrEqual(800); // D6, past the range's top (C6)
     for (let p = L.lowPitch, i = 0; p <= L.highPitch; p++) if (!isBlack(p)) expect(L.keyX(p).x).toBeCloseTo(i++ * w);
   });
 

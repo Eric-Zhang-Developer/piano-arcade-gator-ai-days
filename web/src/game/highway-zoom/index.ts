@@ -3,6 +3,7 @@
 // eases, and a black key sits on the boundary between its two white neighbours.
 import type { Chart } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
+import { staticRange } from "../core/range";
 import { GOOD_MS, settings } from "../core/settings";
 
 export const zoomSettings = {
@@ -25,10 +26,10 @@ export const whiteIndex = (p: number) => Math.floor(p / 12) * 7 + WHITE_IN_OCTAV
 // The white-key span a pitch needs: its own key, or both neighbours for a black key (it straddles them).
 const span = (p: number): Range => (isBlack(p) ? { lo: whiteIndex(p), hi: whiteIndex(p) + 2 } : { lo: whiteIndex(p), hi: whiteIndex(p) + 1 });
 
-// Today's whole-chart range, as makeLayout pads it: one white key past each end.
+// The whole-chart range: the static keyboard's (core's staticRange, #384), in white-key units.
 export function fullRange(chart: Chart): Range {
-  const pitches = chart.notes.map((n) => n.pitch);
-  return { lo: span(Math.min(...pitches)).lo - 1, hi: span(Math.max(...pitches)).hi + 1 };
+  const { lowPitch, highPitch } = staticRange(chart);
+  return { lo: whiteIndex(lowPitch), hi: whiteIndex(highPitch) + 1 };
 }
 
 export const zoomOn = (chart: Chart, params: URLSearchParams): boolean => {

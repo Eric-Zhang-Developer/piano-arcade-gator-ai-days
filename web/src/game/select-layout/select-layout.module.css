@@ -51,6 +51,9 @@
   animation: enter 200ms ease-out;
 }
 
+/* Keep intrinsic detail heights inside the scrolling region; a clipped title must not collapse. */
+.focus > * { flex-shrink: 0; }
+
 /* The left column: the focused song, then the footer pushed to the bottom. All in flow, so nothing in it can overlap;
    a tall song pushes the footer down rather than under it. */
 .left {

@@ -25,6 +25,7 @@ const COLORS = hudSettings.judgmentColors; // the HUD's, so a notehead means wha
 interface SheetHook {
   cursorMs: number | null;
   colored: Record<Judgment, number>;
+  beams: { should: number; beamed: number }; // sheet-beams: notes a score would beam, and how many OSMD did
 }
 declare global {
   interface Window {
@@ -90,10 +91,11 @@ export function SheetView() {
   const publish = () => {
     const colored = { PERFECT: 0, GREAT: 0, GOOD: 0, MISS: 0 };
     for (const j of paintedRef.current.values()) colored[j]++;
-    window.__pianoArcadeSheet = { cursorMs: clockRef.current, colored };
+    window.__pianoArcadeSheet = { cursorMs: clockRef.current, colored, beams: followerRef.current?.beams ?? { should: 0, beamed: 0 } };
   };
   const paint = (id: string, j: Judgment) => {
     if (followerRef.current?.paint(id, COLORS[j])) paintedRef.current.set(id, j);
+    followerRef.current?.paintBeam(id, judgedRef.current, COLORS, ink);
   };
   // The cursor to the chart clock; the page, not OSMD, scrolls, so reduced motion can make it a jump.
   const moveCursor = (nowMs: number) => {
@@ -149,7 +151,7 @@ export function SheetView() {
       if (!live) return;
       el.innerHTML = "";
       const osmd = new OpenSheetMusicDisplay(el, {
-        autoBeam: true,
+        autoBeam: false, // sheet-xml writes the beams (sheet-beams): OSMD's autoBeam splits runs at every eighth in n/8
         drawTitle: false,
         drawComposer: false,
         drawCredits: false,
@@ -196,7 +198,10 @@ export function SheetView() {
         clockRef.current = null;
         const osmd = osmdRef.current;
         if (osmd && shownRef.current && JSON.stringify(shownRef.current) === JSON.stringify(m.chart)) {
-          for (const id of paintedRef.current.keys()) followerRef.current?.paint(id, ink);
+          for (const id of paintedRef.current.keys()) {
+            followerRef.current?.paint(id, ink);
+            followerRef.current?.paintBeam(id, judgedRef.current, COLORS, ink); // judgedRef is empty: back to ink
+          }
           attach(osmd, shownRef.current); // the same score: clear the colors and reset the cursor, no re-render
         } else {
           // hands, loops or another song: render the chart as played, in its whole song's key

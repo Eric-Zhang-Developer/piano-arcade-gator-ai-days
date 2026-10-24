@@ -5,3 +5,10 @@
 # The learning lane's line goes here once its person is set:
 # /web/src/learn/     @<teammate>
 # /tools/             @<teammate>
+/supabase/                   @iKnow24
+/web/src/data/               @iKnow24
+/web/src/app/api/takes/      @iKnow24
+/web/src/app/api/progress/   @iKnow24
+/web/src/app/progress/       @iKnow24
+/web/src/app/auth/           @iKnow24
+/firmware/                   @iKnow24

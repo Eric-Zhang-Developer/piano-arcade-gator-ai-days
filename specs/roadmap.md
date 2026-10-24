@@ -13,11 +13,12 @@ the order only: `start` in `milestones.toml` is empty, so no deadlines are enfor
   that keeps the combo, early/late labels, and wrong notes that break it.
   Added after the first playtest (`specs/context/findings.md`): without it the game was unplayable.
 - **arcade:** `song-select` and `minuet-g` (a front door with two songs), `operator-board` (the team's live view of
-  the build, at `/operator`), `piano-sim`, `hud`, `juice-visual`, `juice-sound`, `midi-watchdog`. It feels like an
+  the build, at `/operator`), `piano-sim`, `hud`, `juice-visual`, `juice-sound`, `midi-watchdog`, and `fever-stage` (a three.js synthwave stage behind the highway). It feels like an
   arcade, MIDI features are testable without the piano, and the one known MIDI risk is handled. These run in parallel
   once `core-loop` merges.
 - **submission:** `bar-loop`, `piano-out`. The coach's drill can play, and the piano plays your take back.
-  `operator-replay` (`/attract`) shows judges the build, one merge per note of Twinkle, on the piano.
+  `operator-replay` (`/attract`) shows judges the build in 3D, a pillar rising per merge, one merge per note of
+  Twinkle, on the piano.
 
 ## Learning lane (provisional, not scheduled)
 `coach`, `practice-mode`, `chart-compiler`, `song-rip-spike`. Their specs record what was discussed; the learning

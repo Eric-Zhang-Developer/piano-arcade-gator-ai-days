@@ -1,4 +1,5 @@
 "use client";
+import styles from "./controls.module.css";
 import { usePathname } from "next/navigation";
 import { useSyncExternalStore } from "react";
 import { midiDevice } from "../core/input";
@@ -32,7 +33,7 @@ export function disablePianoMenu() {
 
 export function PianoMenuControls() {
   const state = useSyncExternalStore(subscribePianoMenu, pianoMenuSnapshot, () => serverSnapshot);
-  return <section aria-label="Piano menu controls" style={{ width: "100%", font: "12px/1.5 system-ui" }}>
+  return <section aria-label="Piano menu controls" className={styles.controls}>
     <button onClick={() => state.enabled ? disablePianoMenu() : void enablePianoMenu()}>{state.enabled ? "Disable piano menu" : "Enable piano menu"}</button>
     <span role="status" style={{ marginLeft: 8 }}>{state.status}</span>
     <div>B2 Home/close · C3 Previous · D3 Next · E3 Select</div>

@@ -1,0 +1,17 @@
+.controls {
+  width: 100%;
+  font: 12px/1.5 system-ui;
+}
+.controls button {
+  color: var(--pa-ink, #f2f2f5);
+  background: rgba(11, 2, 32, 0.85);
+  border: 1px solid rgba(39, 225, 255, 0.6);
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+.controls button:focus-visible {
+  outline: 2px solid #f33adc;
+  outline-offset: 2px;
+}
+.controls input { accent-color: #27e1ff; }

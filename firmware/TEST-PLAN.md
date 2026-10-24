@@ -67,6 +67,8 @@ numbers in `RESULTS.md`.
 | Brightness 70 vs 160 (setting 1), viewed from the player's seat | Note which one keeps hue at a glance; 160 tends to wash colors toward white at 144/m |
 | Bare LEDs vs white paper or parchment 5 to 10 mm in front | Note which one reads as one patch per key rather than separate dots |
 | Hint pulse 600 / 900 / 1400 ms (setting 5) | Note which period a player notices without it feeling frantic; keep it in `RESULTS.md` |
+| Ripple 400 / 700 / 1200 ms (setting 6), fast scale and a held chord | Each press visibly ripples both ways, every key's own light stays readable, no flicker; note the length you keep |
+| Plug and play: reload `tester.html`, then unplug and replug the board's USB | Board and piano reconnect with no clicks; keys light again within ~3 s of replugging |
 | Guide mode, Twinkle, played by someone who doesn't know the tune, with no help | They finish using only the lights; record the time and misses the tester logs |
 
 ## No level shifter

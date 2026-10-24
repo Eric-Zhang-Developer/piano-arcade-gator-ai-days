@@ -26,6 +26,7 @@
 
   <section>
     <h2>1. Connect</h2>
+    <p class="muted">Click both buttons once. After that this page connects by itself whenever it opens or the board is plugged in.</p>
     <div class="row">
       <button id="btnSerial">Connect LED board</button> <span id="serialState" class="muted">not connected</span>
     </div>
@@ -64,6 +65,7 @@
       <label>Brightness <input id="bright" type="number" min="0" max="255" value="160"></label>
       <label>Fade ms <input id="fade" type="number" min="0" max="2000" value="180"></label>
       <label>Hint pulse ms <input id="pulse" type="number" min="0" max="5000" value="900"></label>
+      <label>Ripple ms <input id="ripple" type="number" min="0" max="3000" value="700"></label>
     </div>
     <div class="row">
       <button data-preset="low">Low (brightness 70)</button>
@@ -82,6 +84,13 @@
     <div class="row">
       <label><input type="radio" name="mode" value="free" checked> Free play: keys light as you press them</label>
       <label><input type="radio" name="mode" value="guide"> Guide lights: Twinkle, the next key glows until you hit it</label>
+    </div>
+    <div class="row">
+      <label>Colors <select id="colors">
+        <option value="hands">Hands: left cyan, right pink</option>
+        <option value="rainbow">Rainbow by pitch</option>
+      </select></label>
+      <span class="muted">Every key press sends a ripple along the strip in its color (Ripple ms above; 0 turns it off).</span>
     </div>
     <p id="guideState" class="muted"></p>
   </section>
@@ -119,26 +128,44 @@ const param = (p, v) => { v = Math.max(0, Math.min(16383, Math.round(v))); send(
 const raw = (i, [r, g, b]) => send([0xC0, i & 127, i >> 7, c7(r), c7(g), c7(b)]);
 const clearAll = () => send([0xF0]);
 
-// Synthwave palette, 7-bit: left hand cyan, right hand pink, brighter with velocity.
+// 7-bit colors, brighter with velocity. Hands: left hand cyan, right hand pink (synthwave).
+// Rainbow: hue runs red to violet from A0 to C8, so a scale paints across the strip.
 function colorFor(note, vel) {
   const k = 0.35 + 0.65 * (vel / 127);
+  if ($('colors').value === 'rainbow') {
+    const h = (note - LOW) / (HIGH - LOW) * 5, f = h - Math.floor(h), i = Math.floor(h);
+    const rgb = [[1, f, 0], [1 - f, 1, 0], [0, 1, f], [0, 1 - f, 1], [f, 0, 1], [1, 0, 1]][i];
+    return rgb.map(c => 127 * c * k);
+  }
   return note < 60 ? [0, 90 * k, 127 * k] : [127 * k, 20 * k, 110 * k];
 }
 
 // ---- Serial
+// The first connect needs a click (Chrome's port picker). Chrome remembers the grant, so after that
+// the page opens the board on load and again whenever it's plugged back in.
+setInterval(() => send([0xFE]), 1000);  // heartbeat for the firmware watchdog
 $('btnSerial').onclick = async () => {
   if (!('serial' in navigator)) return log('No Web Serial: use desktop Chrome or Edge.');
-  try {
-    const port = await navigator.serial.requestPort();
-    await port.open({ baudRate: 115200 });
-    writer = port.writable.getWriter();
-    $('serialState').textContent = 'opened, waiting for the board (it resets on connect)...';
-    readLines(port);
-    // Opening the port resets most ESP32 dev boards; ask again in case the boot line was missed.
-    setTimeout(() => send([0xF1]), 1800);
-    setInterval(() => send([0xFE]), 1000);  // heartbeat for the firmware watchdog
-  } catch (e) { log('serial: ' + e); }
+  try { openPort(await navigator.serial.requestPort()); } catch (e) { log('serial: ' + e); }
 };
+
+let portBusy = false;  // load and plug-in can both try to open the same port
+async function openPort(port) {
+  if (portBusy) return;
+  portBusy = true;
+  try {
+    await port.open({ baudRate: 115200 });
+  } catch (e) {
+    portBusy = false;
+    return log('serial: ' + e + ' (is the Arduino serial monitor still open?)');
+  }
+  writer = port.writable.getWriter();
+  $('serialState').textContent = 'opened, waiting for the board (it resets on connect)...';
+  $('serialState').className = 'muted';
+  readLines(port);
+  // Opening the port resets most ESP32 dev boards; ask again in case the boot line was missed.
+  setTimeout(() => send([0xF1]), 1800);
+}
 
 async function readLines(port) {
   const decoder = new TextDecoderStream();
@@ -146,7 +173,8 @@ async function readLines(port) {
   const reader = decoder.readable.getReader();
   let buf = '';
   for (;;) {
-    const { value, done } = await reader.read();
+    let value, done;
+    try { ({ value, done } = await reader.read()); } catch { break; }  // unplugged
     if (done) break;
     buf += value;
     let i;
@@ -161,7 +189,12 @@ async function readLines(port) {
       }
     }
   }
-  $('serialState').textContent = 'disconnected'; $('serialState').className = 'bad';
+  // close() waits for both streams to unlock; then the same port can open again on the next plug-in.
+  try { writer.releaseLock(); } catch {}
+  writer = null;
+  await port.close().catch(() => {});
+  portBusy = false;
+  $('serialState').textContent = 'disconnected: plug the board back in and it reconnects'; $('serialState').className = 'bad';
 }
 
 function showCfg() {
@@ -172,12 +205,16 @@ function showCfg() {
   $('reverse').checked = !!cfg.reverse;
   $('bright').value = cfg.bright; $('fade').value = cfg.fade;
   if (cfg.pulse !== undefined) $('pulse').value = cfg.pulse;
+  if (cfg.ripple !== undefined) $('ripple').value = cfg.ripple;
 }
 
 // ---- MIDI
-$('btnMidi').onclick = async () => {
+let midiAccess = null;
+$('btnMidi').onclick = () => connectMidi();
+async function connectMidi() {
+  if (midiAccess) return;
   try {
-    const access = await navigator.requestMIDIAccess();
+    const access = midiAccess = await navigator.requestMIDIAccess();
     const hook = () => {
       const names = [];
       for (const input of access.inputs.values()) { input.onmidimessage = onMidi; names.push(input.name); }
@@ -185,8 +222,20 @@ $('btnMidi').onclick = async () => {
       $('midiState').className = names.length ? 'ok' : 'bad';
     };
     hook(); access.onstatechange = hook;  // replug the piano without reloading
-  } catch (e) { log('midi: ' + e); }
-};
+  } catch (e) { midiAccess = null; log('midi: ' + e); }
+}
+
+// ---- Plug and play
+(async () => {
+  if ('serial' in navigator) {
+    const [port] = await navigator.serial.getPorts();  // ports this page was granted before
+    if (port) openPort(port);
+    navigator.serial.onconnect = e => openPort(e.target);
+  }
+  // Only reconnect MIDI on load if Chrome already allowed it, so a first visit doesn't open with a prompt.
+  const midi = await navigator.permissions?.query({ name: 'midi' }).catch(() => null);
+  if (midi?.state === 'granted') connectMidi();
+})();
 
 function onMidi(e) {
   const [st, n, v] = e.data, type = st & 0xF0;
@@ -296,6 +345,7 @@ $('reverse').onchange = e => param(14, e.target.checked ? 1 : 0);
 $('bright').onchange = e => param(1, e.target.value);
 $('fade').onchange = e => param(2, e.target.value);
 $('pulse').onchange = e => param(5, e.target.value);
+$('ripple').onchange = e => param(6, e.target.value);
 document.querySelectorAll('[data-preset]').forEach(b => b.onclick = () => {
   const v = b.dataset.preset === "low" ? 70 : 160;
   $('bright').value = v; param(1, v);

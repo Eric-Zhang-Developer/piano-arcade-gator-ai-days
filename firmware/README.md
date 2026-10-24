@@ -59,6 +59,14 @@ and releases stuck keys if the browser goes quiet.
    the joint sit too far right, press **Joint gap +** until they line up. Measure the gap if you like: 1 LED = 6.94 mm.
 5. **Sweep all keys** and eyeball every key. Then **Save to board** (settings survive power off).
 
+## Plug and play
+
+After the first connect, there's nothing to click. Chrome remembers the board and the piano, so opening
+`tester.html` connects both by itself, and unplugging and replugging the board reconnects it. Free play is the default:
+every key lights over itself and sends a **ripple** of its color out along the strip, brighter for harder hits.
+**Colors** switches between the two-hands palette and a rainbow by pitch. **Ripple ms** sets how long a ripple lasts
+(default 700; 0 turns it off), and **Save to board** keeps it.
+
 The mapping spaces the 88 keys evenly by semitone, about 2 LEDs each. It assumes standard 23.5 mm white keys
 (52 × 23.5 mm = 1222 mm, which matches the DGX-660's ~1.22 m key span). At 144 LEDs/m the pitch is 6.94 mm, so an
 octave (164.5 mm) is 23.7 LEDs, or 1.97 per semitone. A light can sit up to ~6 mm off a key's
@@ -72,6 +80,8 @@ The game opens the port at 115200, waits for the line that starts `PAL1 leds=`, 
 - `[0x90, note, r, g, b]` when a note is played (colors 0-127), `[0x80, note]` on release;
 - `[0xA0, note, r, g, b]` to show a hint ("this key is next"), with `0, 0, 0` to clear it. This is the guide-lights
   layer: light the next key before the note arrives;
+- nothing extra for ripples: every `0x90` key on starts one in its color. `[0xB0, 6, lo, hi]` sets their length
+  in ms (0 = off), in case the game wants them off during a song;
 - `[0xF2, id]` to measure: the board answers `PONG id showMicros ledsDriven` at once;
 - `[0xFE]` every second as a heartbeat. After 2.5 s of silence the board releases every held key, so a stalled
   Chrome tab can't leave lights stuck on. After 15 s it plays a dim idle rainbow.

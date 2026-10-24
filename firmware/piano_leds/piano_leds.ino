@@ -23,7 +23,9 @@
 //   1 brightness 0-255     2 fadeMs           3 flash 0/1         4 attract 0/1
 //   5 hintPulseMs          hints breathe with this period (0 = steady). Motion catches the eye
 //                          and reads on camera; a steady dim LED looks like a stuck pixel
-//   10 calLow  x16         LED position under the center of A0 (MIDI 21), in 1/16 LED
+//   6 rippleMs             each key on sends a ripple out both ways along the strip in the
+//                          key's color, fading over this long (0 = off). Hits read from across the room
+//   10 calLow  x16        LED position under the center of A0 (MIDI 21), in 1/16 LED
 //   11 calHigh x16         LED position under the center of C8 (MIDI 108)
 //   12 jointIndex          first LED of the second strip (144 for two 1 m strips)
 //   13 jointGap x16        extra space at the joint, in 1/16 LED pitch (6.94 mm at 144/m)
@@ -51,6 +53,8 @@
 #define ATTRACT_MS 15000       // silence this long: idle animation
 #define FRAME_MS 10            // frame period while only animating (fades, pulses): 100 fps
 #define INPUT_FRAME_MS 2       // new input draws almost at once; the show() itself is ~5 ms
+#define MAX_RIPPLES 12         // a fast run reuses the oldest ripple
+#define RIPPLE_LEDS_PER_MS 0.09f  // ~62 cm/s: a hit spreads about two octaves before it fades
 
 const uint8_t LOW_NOTE = 21;   // A0
 const uint8_t HIGH_NOTE = 108; // C8
@@ -66,6 +70,7 @@ struct Settings {
   uint16_t jointIndex = 144;
   float jointGap = 0.0f;
   uint16_t reverse = 0;
+  uint16_t rippleMs = 700;      // last, so the saved-settings size check drops older saves cleanly
 };
 
 struct Key {
@@ -76,8 +81,17 @@ struct Key {
   CRGB hint;       // hint layer
 };
 
+struct Ripple {
+  float center;    // LED index under the key that started it
+  CRGB color;
+  uint32_t start;
+  bool on;
+};
+
 CRGB leds[NUM_LEDS];
 Key keys[128];
+Ripple ripples[MAX_RIPPLES];
+int nextRipple = 0;
 Settings cfg;
 Preferences prefs;
 
@@ -166,9 +180,9 @@ void updateActiveLeds() {
 
 void printHello() {
   Serial.printf("PAL1 leds=%d bright=%u fade=%u flash=%u attract=%u calLow=%.2f calHigh=%.2f "
-                "joint=%u gap=%.2f reverse=%u pulse=%u active=%d\n",
+                "joint=%u gap=%.2f reverse=%u pulse=%u ripple=%u active=%d\n",
                 NUM_LEDS, cfg.brightness, cfg.fadeMs, cfg.flash, cfg.attract, cfg.calLow, cfg.calHigh,
-                cfg.jointIndex, cfg.jointGap, cfg.reverse, cfg.hintPulseMs, activeLeds);
+                cfg.jointIndex, cfg.jointGap, cfg.reverse, cfg.hintPulseMs, cfg.rippleMs, activeLeds);
 }
 
 void setParam(uint8_t param, uint16_t v) {
@@ -178,6 +192,7 @@ void setParam(uint8_t param, uint16_t v) {
     case 3: cfg.flash = v ? 1 : 0; break;
     case 4: cfg.attract = v ? 1 : 0; break;
     case 5: cfg.hintPulseMs = v; break;
+    case 6: cfg.rippleMs = v; break;
     case 10: cfg.calLow = v / 16.0f; break;
     case 11: cfg.calHigh = v / 16.0f; break;
     case 12: cfg.jointIndex = min<uint16_t>(v, NUM_LEDS); break;
@@ -197,8 +212,19 @@ inline uint8_t scale7(uint8_t c) { return c >= 127 ? 255 : c << 1; }
 
 void clearAll() {
   for (auto &k : keys) k = Key();
+  for (auto &r : ripples) r.on = false;
   memset(rawLeds, 0, sizeof(rawLeds));
   if (anyRaw) { anyRaw = false; updateActiveLeds(); }
+}
+
+void startRipple(uint8_t note, CRGB color) {
+  if (!cfg.rippleMs) return;
+  float sum = 0;
+  int n = 0;
+  forEachLed(note, [&](int i) { sum += i; n++; });
+  if (!n) return;
+  ripples[nextRipple] = {sum / n, color, millis(), true};
+  nextRipple = (nextRipple + 1) % MAX_RIPPLES;
 }
 
 // Runs one complete message. buf[0] is the status byte.
@@ -210,6 +236,7 @@ void runMessage(const uint8_t *m) {
       k.level = 1.0f;
       k.held = true;
       k.flash = cfg.flash ? 1.0f : 0.0f;
+      startRipple(m[1], k.color);
       break;
     }
     case 0x80: keys[m[1]].held = false; if (cfg.fadeMs == 0) keys[m[1]].level = 0; break;
@@ -278,7 +305,31 @@ bool stepAnimations(float dtMs) {
       animating = true;
     }
   }
+  for (auto &r : ripples) if (r.on) { animating = true; break; }
   return animating;
+}
+
+// Two wavefronts per ripple, one each way, 2 LEDs wide on either side. They start at 55% and fade
+// quadratically, so the key itself stays the brightest thing and a chord's ripples add up without
+// washing out. A ripple turns off on the frame it expires, and that frame draws it dark.
+void renderRipples(uint32_t now) {
+  for (auto &r : ripples) {
+    if (!r.on) continue;
+    uint32_t age = now - r.start;
+    if (age >= cfg.rippleMs) { r.on = false; continue; }
+    float u = (float)age / cfg.rippleMs, amp = 0.55f * (1 - u) * (1 - u);
+    float radius = age * RIPPLE_LEDS_PER_MS;
+    for (int side = -1; side <= 1; side += 2) {
+      float p = r.center + side * radius;
+      for (int i = max(0, (int)floorf(p - 2)); i <= (int)ceilf(p + 2) && i < activeLeds; i++) {
+        float w = 1 - fabsf(i - p) / 2.0f;
+        if (w <= 0) continue;
+        CRGB c = r.color;
+        c.nscale8_video((uint8_t)(amp * w * 255));
+        leds[i] += c;  // saturating add
+      }
+    }
+  }
 }
 
 void renderKeys(uint32_t now) {
@@ -286,6 +337,7 @@ void renderKeys(uint32_t now) {
   uint8_t pulse = 255;
   if (cfg.hintPulseMs) pulse = 90 + scale8(sin8((uint32_t)(now % cfg.hintPulseMs) * 256 / cfg.hintPulseMs), 165);
   fill_solid(leds, NUM_LEDS, CRGB::Black);
+  renderRipples(now);  // under the keys: a lit key's own color wins on its LEDs
   for (int n = LOW_NOTE; n <= HIGH_NOTE; n++) {
     Key &k = keys[n];
     CRGB c = CRGB::Black;

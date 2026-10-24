@@ -24,10 +24,14 @@ static int fails = 0;
 std::vector<int> litFor(uint8_t n) { std::vector<int> v; forEachLed(n, [&](int i) { v.push_back(i); }); return v; }
 int countLit() { int c = 0; for (int i = 0; i < NUM_LEDS; i++) if (leds[i]) c++; return c; }
 void pump(int ms) { uint32_t end = millis() + ms; do { loop(); } while (millis() < end); }
+// Compiled defaults, but with ripples off: most checks below count exactly the LEDs under a key.
+void defaults() { Serial.feed({0xB0, 21, 0, 0, 0xB0, 6, 0, 0}); }
 
 int main() {
   setup();
   CHECK(Serial.out.find("PAL1 leds=288") == 0, "hello line: %s", Serial.out.c_str());
+  CHECK(Serial.out.find("ripple=700") != std::string::npos, "ripple on by default");
+  defaults(); pump(5);
 
   // Geometry: every key 2 LEDs, positions strictly increasing, no two keys share an LED.
   int prevLast = -1, minGap = 99, maxGap = 0, ones = 0;
@@ -82,7 +86,7 @@ int main() {
   Serial.feed({0xB0, 20, 0, 0}); pump(5);
   CHECK(Serial.out.find("saved") != std::string::npos, "saved");
   cfg = Settings(); loadSettings(); CHECK(cfg.reverse == 1 && cfg.calLow == 10.0f, "reload");
-  Serial.feed({0xB0, 21, 0, 0}); pump(5); CHECK(cfg.reverse == 0 && cfg.calLow == 4.0f, "defaults");
+  defaults(); pump(5); CHECK(cfg.reverse == 0 && cfg.calLow == 4.0f, "defaults");
   CHECK(litFor(60).size() == 2, "C4 has 2");
 
   // Joint gap of 2 LEDs: keys after LED 144 shift, nobody lands on the joint, still no overlaps.
@@ -93,7 +97,7 @@ int main() {
     CHECK(v.front() >= prevLast, "out of order at %d with gap", n); prevLast = v.back(); }
   std::printf("with 2-LED joint gap: C8 -> %d\n", litFor(108).back()); CHECK(litFor(108).back() >= 173 && litFor(108).back() <= 175, "gap shifts C8 back 2");
   for (int i = 0; i < NUM_LEDS; i++) { int owners = 0; for (int n = 21; n <= 108; n++) for (int j : litFor(n)) owners += j == i; CHECK(owners <= (i == 144 || i == 143 ? 2 : 1), "LED %d shared", i); }
-  Serial.feed({0xB0, 21, 0, 0}); pump(5);
+  defaults(); pump(5);
 
   // Raw test LED.
   Serial.feed({0xC0, 287 & 127, 287 >> 7, 0, 127, 0}); pump(10);
@@ -118,7 +122,7 @@ int main() {
   Serial.feed({0xF0}); pump(10);
   CHECK(activeLeds < NUM_LEDS && leds[287] == CRGB(0, 0, 0), "clear shrinks and blanks the tail");
   Serial.feed({0xB0, 14, 1, 0}); pump(5); CHECK(activeLeds == NUM_LEDS, "reverse drives all");
-  Serial.feed({0xB0, 21, 0, 0}); pump(5); CHECK(activeLeds < NUM_LEDS, "defaults trim again");
+  defaults(); pump(5); CHECK(activeLeds < NUM_LEDS, "defaults trim again");
 
   // Hints breathe between ~35% and 100%, and never go dark.
   Serial.feed({0xA0, 60, 0, 0, 127}); pump(5);
@@ -128,7 +132,26 @@ int main() {
   CHECK(lo >= 70 && lo <= 110 && hi >= 230, "pulse range %d..%d", lo, hi);
   Serial.feed({0xB0, 5, 0, 0}); pump(30);
   CHECK(leds[litFor(60)[0]].b >= 250, "steady hint when pulse off");
-  Serial.feed({0xF0, 0xB0, 21, 0, 0}); pump(5);
+  Serial.feed({0xF0}); defaults(); pump(5);
+
+  // Ripple: a key on sends light out both ways, the key keeps its own color, and it all clears.
+  Serial.feed({0xB0, 6, 700 & 127, 700 >> 7}); pump(5);
+  Serial.feed({0x90, 60, 0, 0, 127}); pump(150);
+  float mid = (litFor(60).front() + litFor(60).back()) / 2.0f;
+  int left = 0, right = 0, far = 0;
+  for (int i = 0; i < NUM_LEDS; i++) if (leds[i]) {
+    float d = i - mid;
+    if (d < -4) left++; if (d > 4) right++; if (fabsf(d) > 40) far++;
+  }
+  std::printf("ripple at 150 ms: %d LEDs left, %d right, %d past 40\n", left, right, far);
+  CHECK(left >= 2 && right >= 2 && far == 0, "ripple spreads both ways: %d %d %d", left, right, far);
+  CHECK(leds[litFor(60)[0]].b > 200 && leds[litFor(60)[0]].r < 60, "key keeps its color under the ripple");
+  CHECK(leds[(int)mid + 13].b < leds[litFor(60)[0]].b, "ripple dimmer than the key");
+  pump(700);
+  CHECK(countLit() == (int)litFor(60).size(), "ripple gone, held key stays: %d", countLit());
+  Serial.feed({0x80, 60, 0xB0, 6, 0, 0, 0x90, 62, 0, 127, 0}); pump(300);  // past key 60's fade
+  CHECK(countLit() == (int)litFor(62).size(), "ripple off: only the key: %d", countLit());
+  Serial.feed({0xF0}); defaults(); pump(5);
 
   std::printf(fails ? "%d FAILED\n" : "all checks passed\n", fails);
   return fails != 0;

@@ -9,8 +9,8 @@ assignee: "eric"
 
 A learn mode on `/play`: the highway stops at each note until you press it, and there's no score. Then you play the
 song judged. The first playtest asked for "a wait mode for learning a song before it's judged"
-(`specs/context/findings.md`). It's the game lane's by Eric's call (2026-10-24). Sheet music and the coach stay with
-the learning lane.
+(`specs/context/findings.md`). It's the game lane's by Eric's call (2026-10-24). The coach stays with the learning
+lane; sheet music moved to the game lane too, in a second window (`sheet-view`, Eric's call later the same day).
 
 ## Plan
 1. A pure `shouldHold(...)` in `web/src/game/wait-mode/`, with its tests.

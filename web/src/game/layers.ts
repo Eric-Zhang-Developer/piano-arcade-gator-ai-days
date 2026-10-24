@@ -11,6 +11,7 @@ import { scenes } from "./scenes";
 import { evenness } from "./evenness";
 import { eventSounds } from "./sound";
 import { simPlugin } from "./sim/plugin";
+import { weakBars } from "./weak-bars";
 import { feverStage } from "./stage";
 
 // Open file: each game feature registers its plugin here, one line each. /play draws every plugin's layer on its
@@ -25,6 +26,7 @@ export const plugins: GamePlugin[] = [
   midiWatchdog(), // reconnects a piano that goes silent mid-song
   pianoOut(), // records the take for "Replay on piano"
   feverStage(), // three.js stage behind the highway (background hook only, no 2D layer)
+  weakBars(), // results panel: accuracy per phrase, and a link to loop the weakest
   evenness(), // results panel: how even each hand's runs were
   eventSounds(), // laptop sounds at combo milestones, fever, full combo, rank and (optionally) misses
   feverGauge(), // late: its gauge sizes from the chart after every transformChart, as the judge does

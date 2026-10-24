@@ -341,16 +341,23 @@ export default function Play() {
     saveLatencyOffset(v);
   };
 
-  // Latency, sound and MIDI status: under the start screen, and under the details on the results screen.
+  // Latency, sound and MIDI status: under the start screen, and under the details on the results screen. Setup, not the
+  // game: ?capture=1 hides each of them (capture-mode); the SfxControls wrapper has no box, so nothing moves without it.
   const controls = (
     <>
-      <label style={{ marginTop: 24, display: "flex", gap: 8, alignItems: "center" }}>
+      <label data-capture-hide style={{ marginTop: 24, display: "flex", gap: 8, alignItems: "center" }}>
         Latency offset
         <input type="range" min={LATENCY_MIN} max={LATENCY_MAX} step={1} value={latency} onChange={(e) => onLatency(Number(e.target.value))} />
         <output style={{ width: 64 }}>{latency} ms</output>
       </label>
-      <SfxControls />
-      {!isTest && <p style={{ opacity: 0.6, fontSize: 14 }}>{midiStatus}</p>}
+      <div data-capture-hide style={{ display: "contents" }}>
+        <SfxControls />
+      </div>
+      {!isTest && (
+        <p data-capture-hide style={{ opacity: 0.6, fontSize: 14 }}>
+          {midiStatus}
+        </p>
+      )}
     </>
   );
 
@@ -385,7 +392,9 @@ export default function Play() {
           )}
           {phase === "ready" && (
             <>
-              <p style={{ opacity: 0.7 }}>Laptop keys: A S D F G H J K L ; (white) · W E T Y U O P (black)</p>
+              <p data-capture-hide style={{ opacity: 0.7 }}>
+                Laptop keys: A S D F G H J K L ; (white) · W E T Y U O P (black)
+              </p>
               <button style={button} onClick={start} autoFocus>
                 Start
               </button>
@@ -421,7 +430,7 @@ function TimingPanel({ timing, latency, onLatency }: { timing: TimingSummary; la
         <div key={line}>{line}</div>
       ))}
       {suggested !== null && suggested !== latency && (
-        <div style={{ marginTop: 8 }}>
+        <div data-capture-hide style={{ marginTop: 8 }}>
           <button style={{ ...button, fontSize: 15, padding: "6px 16px", background: "#ddd" }} onClick={() => onLatency(suggested)}>
             Set latency offset to {suggested} ms
           </button>
@@ -431,7 +440,9 @@ function TimingPanel({ timing, latency, onLatency }: { timing: TimingSummary; la
         </div>
       )}
       {suggested !== null && suggested === latency && (
-        <div style={{ fontSize: 13, opacity: 0.6, marginTop: 8 }}>Latency offset set to {latency} ms. Press Retry to use it.</div>
+        <div data-capture-hide style={{ fontSize: 13, opacity: 0.6, marginTop: 8 }}>
+          Latency offset set to {latency} ms. Press Retry to use it.
+        </div>
       )}
     </div>
   );

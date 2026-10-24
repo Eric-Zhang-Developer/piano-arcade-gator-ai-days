@@ -19,6 +19,8 @@ real piano, see exactly how they played it, and be told what to practice next.
 The project answers the event's challenge statement, "Fresh off the frontier": a technology, dataset or discovery
 first made public in the past 12 months, central to the project. **Which one is still open**; the learning lane
 decides (see the `needs-human` issue). Until then, nothing may claim to meet it.
+The AI around the playing loop is a candidate answer, and it bears on novelty ("how new the tools behind it are",
+`specs/context/event.md` section 2), but choosing it is #10, Eric's call.
 
 ## Non-negotiables
 - Never invent data. Unknown stays empty and visible. Any number shown to a user is a real count from a real take.
@@ -40,6 +42,9 @@ decides (see the `needs-human` issue). Until then, nothing may claim to meet it.
   `spikes/piano-midi/` is evidence, not a dependency: rebuild what you need.
 - Anything an LLM says about a take must be checked against the results data before it's shown. If a cited bar or
   number doesn't exist in the results, show the plain summary instead.
+- AI never in the playing loop, welcome everywhere around it: making levels, arranging and backing, coaching, the
+  results, sheet and practice, and `/how`. It never writes the notes a player is judged on: those come from a cited
+  source through the converter (decision 003). Never-invent-data applies to AI as to anyone.
 
 ## Not doing
 - A sound on every hit. Besides the piano, sounds are an accompaniment track that keeps time from the count-in to
@@ -48,7 +53,7 @@ decides (see the `needs-human` issue). Until then, nothing may claim to meet it.
 - Pixel art as the medium. The look is Synthesia's (dark, glowing notes aligned to the keys) plus an arcade layer.
 - Strong perspective on the highway: far notes shrink to slivers on 88 keys. At most mild depth, with the judgment
   line aligned to the keys.
-- AI in the core playing loop. AI lives in the learning lane.
+- AI in the playing loop: judging, timing and input stay plain code, the same every run.
 - Sheet music on the arcade screen (deferred to practice mode).
 - Required accounts: a player is an anonymous user, and linking Google is optional. An optional sign-in screen is
   allowed only with "Play as guest" on it, so nobody has to sign in to play. Also not doing: an online leaderboard,

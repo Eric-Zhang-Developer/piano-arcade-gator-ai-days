@@ -1,5 +1,6 @@
 import type { Chart, GamePlugin, InputEvent } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
+import { toast } from "../notice-toast";
 
 export const watchdogSettings = {
   stallMs: 3000, // spec: no message of any kind for 3 s while connected (once Active Sensing has been seen)
@@ -13,8 +14,11 @@ export interface WatchdogEntry {
   detail: string;
 }
 
-export const DISCONNECTED = "piano disconnected: laptop keys active";
-export const RECONNECTING = "reconnecting MIDI";
+// Toasts (notice-toast): one when a state starts and one when it ends.
+export const DISCONNECTED = "Piano disconnected: laptop keys active";
+export const CONNECTED = "Piano connected";
+export const RECONNECTING = "Reconnecting MIDI";
+export const RECONNECTED = "MIDI reconnected";
 
 // Chrome's MIDI input twice went silent for minutes in the spike (RESULTS.md, Unknowns). This wraps core's MIDI
 // device: on a stall it re-requests MIDI access and reopens the port by starting core's device again.
@@ -24,7 +28,7 @@ export function midiWatchdog(): GamePlugin & { log: WatchdogEntry[] } {
   const log: WatchdogEntry[] = []; // for the results screen
   let chart: Chart | null = null;
   let zeroPerf: number | null = null; // chart clock 0 in performance.now() time, while a song plays
-  let notice = "";
+  let notice = ""; // the lasting state: RECONNECTING, DISCONNECTED or none
   let paused = false; // play-slots' pause: silence is the player waiting, not a stall
   let resumedAt = -Infinity; // performance.now() of the last resume; silence before it doesn't count
 
@@ -55,13 +59,6 @@ export function midiWatchdog(): GamePlugin & { log: WatchdogEntry[] } {
       if (e.type === "resume") resumedAt = performance.now();
       if (e.type === "songStart" || e.type === "resume" || e.type === "quit") paused = false;
     },
-    draw(ctx, frame) {
-      if (!notice) return;
-      ctx.font = "16px system-ui, sans-serif";
-      ctx.textAlign = "left";
-      ctx.fillStyle = "rgba(255, 200, 80, 0.95)";
-      ctx.fillText(notice, 12, frame.judgmentLineY - 12);
-    },
     wrapInput(device) {
       if (device.kind !== "midi") return device;
       let access: MIDIAccess | null = null;
@@ -77,6 +74,7 @@ export function midiWatchdog(): GamePlugin & { log: WatchdogEntry[] } {
         if (notice !== RECONNECTING) return;
         notice = "";
         record("recovered", "a MIDI message arrived");
+        toast(RECONNECTED);
       };
       const onState = (e: Event) => {
         const p = (e as MIDIConnectionEvent).port;
@@ -84,10 +82,12 @@ export function midiWatchdog(): GamePlugin & { log: WatchdogEntry[] } {
         if (p.state === "disconnected" && notice !== DISCONNECTED) {
           notice = DISCONNECTED; // laptop keys are always on in /play; this says so
           record("disconnected", `${p.name} unplugged`);
+          toast(DISCONNECTED);
         } else if (p.state === "connected" && notice === DISCONNECTED) {
           notice = "";
           last = performance.now(); // silence while unplugged isn't a stall
           record("connected", `${p.name} plugged back in`);
+          toast(CONNECTED);
           void reconnect();
         }
       };
@@ -122,6 +122,7 @@ export function midiWatchdog(): GamePlugin & { log: WatchdogEntry[] } {
         const stalled = sensing ? silent >= watchdogSettings.stallMs : silent >= watchdogSettings.fallbackMs && notesDue(last, now);
         if (!stalled) return;
         record("stall", `no MIDI for ${Math.round(silent)} ms${sensing ? "" : " while notes were due"}; reconnecting`);
+        if (notice !== RECONNECTING) toast(RECONNECTING); // a still-silent port retries; it says so once
         notice = RECONNECTING;
         last = now; // a still-silent port retries after another full window
         void reconnect();

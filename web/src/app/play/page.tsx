@@ -6,12 +6,14 @@ import type { Chart, GameEvent, InputDevice, InputEvent, Results, Take } from ".
 import { validateChart } from "../../contracts";
 import { plugins } from "../../game/layers";
 import { drawHighway, makeLayout, type HighwayState, type Layout } from "../../game/core/highway";
+import { createZoom, zoomOn } from "../../game/highway-zoom";
 import { Judge, noteTimeMs } from "../../game/core/judge";
 import { keysDevice, midiDevice, testDevice } from "../../game/core/input";
 import { describeTiming, timingSummary, type TimingSummary } from "../../game/timing";
 import { SfxControls } from "../../game/sound/SfxControls";
 import { nextPause, pauseClock, type PauseAction, type PauseMode } from "../../game/play-slots";
 import { PauseOverlay, Slots } from "../../game/play-slots/ui";
+import { holdClock, isWaitMode } from "../../game/wait-mode";
 import {
   GOOD_MS,
   LATENCY_MAX,
@@ -34,6 +36,7 @@ interface TestHook {
   ready: boolean;
   chart: Chart | null;
   press(pitch: number, chartTimeMs: number, velocity?: number): void;
+  now?(): number; // the chart clock (holds and pauses taken out)
   results: Results | null;
 }
 declare global {
@@ -147,14 +150,21 @@ export default function Play() {
     // Zero is fixed here, after the stage and judge are built, so songStart's atMs is the chart time now and a plugin's
     // performance.now() - atMs is the same zero the judge uses. Fixed before the build, it trailed by the build (#173).
     const zeroPerf = performance.now() + settings.countInBeats * mpb; // chart clock 0 = beat 0 of bar 1
-    const clock = pauseClock(zeroPerf); // stands still while paused (play-slots)
+    const pauses = pauseClock(zeroPerf); // stands still while paused (play-slots)
+    // ?mode=wait: the chart clock also holds at each note until it's pressed, and nothing is a MISS (wait-mode).
+    const wait = isWaitMode(params) ? holdClock(chart, judge.noteState) : null;
+    const clock = {
+      now: (perf: number) => (wait ? wait.now(pauses.now(perf)) : pauses.now(perf)),
+      toPerf: (chartMs: number) => pauses.toPerf(wait ? wait.toOuter(chartMs) : chartMs),
+    };
     emit({ type: "songStart", atMs: hw.nowMs });
 
     // Input: every device feeds one handler; a key's judged time is its arrival minus the latency offset.
     let firstKind = true;
     const onInput = (kind: Take["inputDevice"]) => (e: InputEvent) => {
-      if (clock.paused) return; // keys while paused are neither judged nor recorded
-      const t = clock.now(e.timeMs) - latencyRef.current;
+      if (pauses.paused) return; // keys while paused are neither judged nor recorded
+      // A press during a hold lands on the held note's time; taking off the latency could put it outside GOOD.
+      const t = wait?.holding ? clock.now(e.timeMs) : clock.now(e.timeMs) - latencyRef.current;
       if (e.type === "on") {
         if (firstKind && !test) take.inputDevice = kind;
         firstKind = false;
@@ -177,9 +187,13 @@ export default function Play() {
     const ctx = canvas.getContext("2d")!;
     const layerCtxs = layerRefs.current.map((c) => c?.getContext("2d") ?? null);
     let layout: Layout | null = null;
+    // highway-zoom: on wide charts (or ?zoom=on) the layout follows the music, rebuilt each frame from its range.
+    const zoom = zoomOn(chart, params) ? createZoom(chart) : null;
+    let w = window.innerWidth;
+    let h = window.innerHeight;
     const resize = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
+      w = window.innerWidth;
+      h = window.innerHeight;
       const dpr = window.devicePixelRatio || 1;
       for (const c of [canvas, ...layerRefs.current]) {
         if (!c) continue;
@@ -205,7 +219,7 @@ export default function Play() {
       if (next === mode) return;
       const perf = performance.now();
       if (next === "menu") {
-        clock.pause(perf);
+        pauses.pause(perf);
         const at = clock.now(perf);
         emit({ type: "pause", atMs: at });
         // Held keys end at the pause: their releases arrive while paused, where input is ignored.
@@ -218,7 +232,7 @@ export default function Play() {
       }
       if (next === "countdown") countdownUntil = perf + chart.beatsPerBar * mpb;
       if (next === "playing") {
-        clock.resume(perf);
+        pauses.resume(perf);
         emit({ type: "resume", atMs: clock.now(perf) });
       }
       mode = next;
@@ -258,14 +272,17 @@ export default function Play() {
         if (left <= 0) act("countdownDone");
         else if (Math.ceil(left / mpb) !== shownCount) setCountdown((shownCount = Math.ceil(left / mpb)));
       }
-      const now = clock.now(performance.now());
+      const perf = performance.now();
+      wait?.update(pauses.now(perf));
+      const now = clock.now(perf);
       hw.nowMs = now;
       const beat = now < 0 ? Math.floor(now / mpb) + settings.countInBeats + 1 : 0;
       hw.countInBeat = beat > 0 ? beat : null;
       if (beat > lastBeat) emit({ type: "countInBeat", beat, atMs: (beat - 1 - settings.countInBeats) * mpb });
       lastBeat = beat;
-      judge.advance(now - Math.max(0, latencyRef.current) - INPUT_GRACE_MS);
+      if (!wait) judge.advance(now - Math.max(0, latencyRef.current) - INPUT_GRACE_MS);
 
+      if (zoom) layout = makeLayout(chart, w, h, perspective, zoom(now));
       drawHighway(ctx, layout!, chart, hw);
       const f = { ...layout!, nowMs: now };
       plugins.forEach((p, i) => {
@@ -298,6 +315,7 @@ export default function Play() {
         ready: true,
         results: null,
         press: (pitch: number, chartTimeMs: number, velocity = 80) => tester?.queue(pitch, clock.toPerf(chartTimeMs) + latencyRef.current, velocity),
+        now: () => clock.now(performance.now()),
       });
     }
   }, []);
@@ -359,7 +377,14 @@ export default function Play() {
             </>
           )}
           {phase === "results" && results && (
-            <ResultsScreen results={results} timing={timing} latency={latency} onLatency={onLatency} onRetry={start}>
+            <ResultsScreen
+              results={results}
+              timing={timing}
+              latency={latency}
+              onLatency={onLatency}
+              onRetry={start}
+              scored={!(loaded && isWaitMode(loaded.params))}
+            >
               {take && loaded && (
                 <Slots plugins={plugins} panel={(p) => p.resultsPanel?.({ ...loaded, take, results, retry: start })} />
               )}
@@ -384,6 +409,7 @@ function ResultsScreen({
   latency,
   onLatency,
   onRetry,
+  scored,
   children,
 }: {
   results: Results;
@@ -391,6 +417,7 @@ function ResultsScreen({
   latency: number;
   onLatency: (ms: number) => void;
   onRetry: () => void;
+  scored: boolean; // false in wait mode: no rank, counts or timing, just the panels and Retry
   children?: React.ReactNode; // the plugins' results panels, between the timing panel and Retry
 }) {
   const { counts } = results;
@@ -406,22 +433,27 @@ function ResultsScreen({
   ];
   return (
     <section data-testid="results" style={{ textAlign: "center" }}>
-      <div data-testid="rank" style={{ fontSize: 96, fontWeight: 800, color: settings.noteColor }}>
-        {results.rank}
-      </div>
-      <table style={{ margin: "0 auto", fontSize: 20, borderSpacing: "24px 4px" }}>
-        <tbody>
-          {rows.map(([label, id, value]) => (
-            <tr key={id}>
-              <td style={{ textAlign: "left" }}>{label}</td>
-              <td data-testid={id} style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
-                {value}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {timing && <TimingPanel timing={timing} latency={latency} onLatency={onLatency} />}
+      {!scored && <h2 data-testid="unscored">Wait mode: not scored</h2>}
+      {scored && (
+        <>
+          <div data-testid="rank" style={{ fontSize: 96, fontWeight: 800, color: settings.noteColor }}>
+            {results.rank}
+          </div>
+          <table style={{ margin: "0 auto", fontSize: 20, borderSpacing: "24px 4px" }}>
+            <tbody>
+              {rows.map(([label, id, value]) => (
+                <tr key={id}>
+                  <td style={{ textAlign: "left" }}>{label}</td>
+                  <td data-testid={id} style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
+                    {value}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {timing && <TimingPanel timing={timing} latency={latency} onLatency={onLatency} />}
+        </>
+      )}
       {children}
       <button style={{ ...button, marginTop: 24 }} onClick={onRetry} autoFocus>
         Retry

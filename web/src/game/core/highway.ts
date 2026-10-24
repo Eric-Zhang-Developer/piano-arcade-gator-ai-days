@@ -1,6 +1,7 @@
 // The highway: a flat-or-mildly-tilted lane per key, notes falling to the keyboard. Canvas 2D, no React.
 import type { Chart, Frame, Hand, Judgment } from "../../contracts";
 import { noteColorFor } from "../hand-colors";
+import { whiteIndex as whiteIndexOf, type Range } from "../highway-zoom";
 import { brightness, pillRect } from "../note-pills";
 import { msPerBeat, settings } from "./settings";
 
@@ -38,7 +39,12 @@ export const isBlack = (pitch: number) => [1, 3, 6, 8, 10].includes(((pitch % 12
 const whiteBelow = (p: number) => (isBlack(p - 1) ? p - 2 : p - 1);
 const whiteAbove = (p: number) => (isBlack(p + 1) ? p + 2 : p + 1);
 
-export function makeLayout(chart: Chart, width: number, height: number, perspective: number): Layout {
+const WHITE_IN_OCTAVE = [0, 2, 4, 5, 7, 9, 11];
+const whitePitch = (k: number) => Math.floor(k / 7) * 12 + WHITE_IN_OCTAVE[((k % 7) + 7) % 7]; // inverse of whiteIndex
+
+// view (highway-zoom): the visible range in white-key units, [lo, hi), fractional while it eases. The keyboard height
+// stays the whole chart's, so the judgment line never moves while the view pans and zooms. Without a view: today's.
+export function makeLayout(chart: Chart, width: number, height: number, perspective: number, view?: Range): Layout {
   const pitches = chart.notes.map((n) => n.pitch);
   const lo = Math.min(...pitches);
   const hi = Math.max(...pitches);
@@ -54,6 +60,27 @@ export function makeLayout(chart: Chart, width: number, height: number, perspect
   const judgmentLineY = height - keyboardHeight;
   const p = Math.max(0, Math.min(MAX_PERSPECTIVE, perspective));
   const cx = width / 2;
+
+  if (view) {
+    const vw = width / (view.hi - view.lo);
+    const vb = vw * BLACK_KEY_WIDTH;
+    const x = (pitch: number) => (whiteIndexOf(pitch) - view.lo) * vw;
+    return {
+      lowPitch: whitePitch(Math.floor(view.lo)),
+      highPitch: whitePitch(Math.ceil(view.hi) - 1),
+      judgmentLineY,
+      width,
+      height,
+      keyboardHeight,
+      perspective: p,
+      isBlack,
+      keyX: (pitch) => (isBlack(pitch) ? { x: x(pitch - 1) + vw - vb / 2, width: vb } : { x: x(pitch), width: vw }),
+      project(px, y) {
+        const t = Math.max(0, Math.min(1, y / judgmentLineY));
+        return cx + (px - cx) * (1 - p * (1 - t));
+      },
+    };
+  }
 
   return {
     lowPitch,

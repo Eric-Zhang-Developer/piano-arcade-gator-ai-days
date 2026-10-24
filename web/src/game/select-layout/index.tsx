@@ -3,6 +3,7 @@
 // click and Enter play natively; ↑/↓ move focus and keep the focused card centered in the list.
 import Link from "next/link";
 import { useState, type KeyboardEvent } from "react";
+import { useBestGrades } from "../records/best";
 import { SongCard } from "../song-card";
 import { SongJacket } from "../song-jacket/SongJacket";
 import type { Song } from "../song-select/load";
@@ -10,6 +11,7 @@ import styles from "./select-layout.module.css";
 
 export function MusicSelect({ songs }: { songs: Song[] }) {
   const [focused, setFocused] = useState(0);
+  const best = useBestGrades();
   const song = songs[focused];
 
   function onKeyDown(e: KeyboardEvent<HTMLOListElement>) {
@@ -65,6 +67,7 @@ export function MusicSelect({ songs }: { songs: Song[] }) {
                 {...s}
                 focused={i === focused}
                 jacket={<SongJacket id={s.id} title={s.title} composer={s.composer} />}
+                best={best[s.id]}
               />
             </Link>
           </li>

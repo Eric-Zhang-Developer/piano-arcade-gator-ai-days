@@ -1,4 +1,5 @@
-import type { Chart, Frame, GamePlugin, InputDevice } from "../../contracts";
+import type { Chart, Frame, GamePlugin, Hand, InputDevice } from "../../contracts";
+import { noteColorFor } from "../hand-colors";
 import { noteTimeMs } from "../core/judge";
 import { msPerBeat, settings } from "../core/settings";
 import { seededRandom } from "../sim/fake";
@@ -30,11 +31,13 @@ export function juiceVisual(): GamePlugin {
   let chart: Chart | null = null;
   let particles: Particle[] = [];
   let lastNow: number | null = null;
-  let pending: { pitch: number; judgment: Judgment }[] = [];
-  const flares: { pitch: number; atMs: number; bright: number }[] = [];
+  let pending: { pitch: number; judgment: Judgment; color: string }[] = [];
+  const flares: { pitch: number; atMs: number; bright: number; color: string }[] = [];
   const misses: { pitch: number; atMs: number }[] = [];
   const pressed = new Set<number>();
-  const heldHits = new Set<number>(); // pressed keys whose press hit a note: they stream sparks
+  const heldHits = new Map<number, string>(); // pressed keys whose press hit a note, with its hand color: they stream sparks
+  let handOf = new Map<string, Hand>();
+  let color: (hand: Hand) => string = () => settings.noteColor; // hand-colors: by hand on two-hand charts
   const hitIds = new Set<string>(); // played notes no longer need to be read, so effects may cover them
   let fever = false;
   let fullCombo = false;
@@ -63,6 +66,8 @@ export function juiceVisual(): GamePlugin {
     id: "juice-visual",
     transformChart(c) {
       chart = c;
+      handOf = new Map(c.notes.map((n) => [n.id, n.hand]));
+      color = noteColorFor(c);
       return c;
     },
     wrapInput(device): InputDevice {
@@ -93,9 +98,10 @@ export function juiceVisual(): GamePlugin {
       }
       if (e.type === "noteHit") {
         hitIds.add(e.noteId);
-        pending.push({ pitch: e.pitch, judgment: e.judgment });
-        flares.push({ pitch: e.pitch, atMs: e.atMs, bright: s.bright[e.judgment] });
-        if (pressed.has(e.pitch)) heldHits.add(e.pitch);
+        const c = color(handOf.get(e.noteId) ?? "R");
+        pending.push({ pitch: e.pitch, judgment: e.judgment, color: c });
+        flares.push({ pitch: e.pitch, atMs: e.atMs, bright: s.bright[e.judgment], color: c });
+        if (pressed.has(e.pitch)) heldHits.set(e.pitch, c);
       }
       if (e.type === "noteMiss") misses.push({ pitch: e.pitch, atMs: e.atMs });
       if (e.type === "feverStart") fever = true;
@@ -137,14 +143,14 @@ export function juiceVisual(): GamePlugin {
       // New hits become wisps; held hit notes stream sparks.
       for (const h of pending) {
         const { x, width } = f.keyX(h.pitch);
-        particles = spawn(particles, "wisp", s.wisps[h.judgment], x, width, line, s.bright[h.judgment], random);
+        particles = spawn(particles, "wisp", s.wisps[h.judgment], x, width, line, s.bright[h.judgment], random, h.color);
       }
       pending = [];
       sparkClock += dt;
       for (; sparkClock >= s.sparkEveryMs; sparkClock -= s.sparkEveryMs) {
-        for (const p of heldHits) {
+        for (const [p, c] of heldHits) {
           const { x, width } = f.keyX(p);
-          particles = spawn(particles, "spark", 1, x + width * 0.3, width * 0.4, line, 0.8, random);
+          particles = spawn(particles, "spark", 1, x + width * 0.3, width * 0.4, line, 0.8, random, c);
         }
       }
       particles = step(particles, dt);
@@ -157,8 +163,9 @@ export function juiceVisual(): GamePlugin {
         const { x, width } = f.keyX(p);
         const h = line * s.laneLightHeight;
         const g = ctx.createLinearGradient(0, line, 0, line - h);
-        g.addColorStop(0, hexAlpha(settings.keyLitColor, s.laneLightAlpha));
-        g.addColorStop(1, hexAlpha(settings.keyLitColor, 0));
+        const lit = heldHits.get(p) ?? settings.keyLitColor; // the hit note's hand, like the key itself
+        g.addColorStop(0, hexAlpha(lit, s.laneLightAlpha));
+        g.addColorStop(1, hexAlpha(lit, 0));
         ctx.fillStyle = g;
         ctx.fillRect(x, line - h, width, h);
       }
@@ -189,13 +196,13 @@ export function juiceVisual(): GamePlugin {
         const cx = x + width / 2;
         const g = ctx.createRadialGradient(cx, line, 0, cx, line, width * 1.4);
         g.addColorStop(0, `rgba(255, 255, 255, ${a})`);
-        g.addColorStop(0.35, hexAlpha(settings.noteColor, a * 0.7));
-        g.addColorStop(1, hexAlpha(settings.noteColor, 0));
+        g.addColorStop(0.35, hexAlpha(fl.color, a * 0.7));
+        g.addColorStop(1, hexAlpha(fl.color, 0));
         ctx.fillStyle = g;
         ctx.fillRect(cx - width * 1.4, line - width * 1.4, width * 2.8, width * 2.8);
         const pillar = ctx.createLinearGradient(0, line, 0, line - s.pillarPx);
-        pillar.addColorStop(0, hexAlpha(settings.noteColor, a * 0.45));
-        pillar.addColorStop(1, hexAlpha(settings.noteColor, 0));
+        pillar.addColorStop(0, hexAlpha(fl.color, a * 0.45));
+        pillar.addColorStop(1, hexAlpha(fl.color, 0));
         ctx.fillStyle = pillar;
         ctx.fillRect(x + width * 0.15, line - s.pillarPx, width * 0.7, s.pillarPx);
       }
@@ -203,7 +210,7 @@ export function juiceVisual(): GamePlugin {
       for (const p of particles) {
         const a = alphaOf(p);
         if (a <= 0.01) continue;
-        ctx.fillStyle = hexAlpha(p.bright > 0.9 ? "#ffffff" : settings.noteColor, a);
+        ctx.fillStyle = hexAlpha(p.bright > 0.9 ? "#ffffff" : (p.color ?? settings.noteColor), a);
         ctx.fillRect(p.x, p.y, p.size, p.size);
       }
       ctx.restore();

@@ -15,7 +15,7 @@ export const settings = {
   noteHeadPx: 6,
   noteGapPx: 8, // space at the end of each note, so repeated notes read as separate
   missColor: "#6b5560",
-  keyLitColor: "#ffffff", // a pressed key that hit no note (key-skin: plain white, never red)
+  keyLitColor: "#ff7a00", // saturated pressed fill, distinct from falling-note/hold colors
   stageBackdropAlpha: 0.55, // the highway's backdrop while a background layer (fever-stage) shows through
 };
 

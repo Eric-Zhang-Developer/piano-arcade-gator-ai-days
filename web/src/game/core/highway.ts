@@ -233,7 +233,7 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
   ctx.restore();
 
   // Keyboard (key-skin): whites, pressed whites (so their glow lies over their neighbours), then blacks on top. Its
-  // top edge is the judgment line. A key that hit a note lights in that note's color; one that hit nothing, white.
+  // top edge is the judgment line. Pressed fill/marker is distinct; matched-hand color supplies an accent/glow.
   const lit = (p: number) => {
     const hand = s.pressedHand?.get(p);
     return hand ? color(hand) : settings.keyLitColor;

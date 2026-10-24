@@ -1,5 +1,7 @@
+import { settings } from "../core/settings";
+
 // The drawn keyboard's look: white keys with a top-to-bottom sheen, black keys with a thin top highlight, and a
-// pressed key filled with its light and glowing. Positions and widths stay the highway's (keyX); this only paints.
+// pressed key filled in saturated orange with an outline and down-state marker. Positions and widths stay the highway's (keyX); this only paints.
 
 export const keySkinSettings = {
   white: { top: "#f4f4f7", bottom: "#d2d2da" }, // the sheen, around today's #e8e8ec
@@ -15,13 +17,13 @@ function shape(ctx: CanvasRenderingContext2D, r: Rect): void {
   ctx.roundRect(r.x, r.y, r.w, r.h, [0, 0, keySkinSettings.radiusPx, keySkinSettings.radiusPx]);
 }
 
-// A pressed key: its light as a solid fill (so the color is exact), glowing onto its neighbours, then shaded darker
-// toward the far end so it reads as pushed down.
+// Pressed state uses a saturated fill plus an outline and bottom marker on both key types.
+// The hand color remains a small top accent/glow; upcoming notes and hold targets keep their own colors.
 function pressed(ctx: CanvasRenderingContext2D, r: Rect, light: string): void {
   ctx.save();
   ctx.shadowColor = light;
   ctx.shadowBlur = keySkinSettings.glowPx;
-  ctx.fillStyle = light;
+  ctx.fillStyle = settings.keyLitColor;
   shape(ctx, r);
   ctx.fill();
   ctx.restore();
@@ -32,6 +34,18 @@ function pressed(ctx: CanvasRenderingContext2D, r: Rect, light: string): void {
   ctx.fillStyle = shade;
   shape(ctx, r);
   ctx.fill();
+  ctx.fillStyle = light; // retain matched-hand information without washing out the pressed fill
+  ctx.fillRect(r.x + 2, r.y + 2, Math.max(1, r.w - 4), Math.min(4, r.h * .05));
+  ctx.strokeStyle = "#151020";
+  ctx.lineWidth = 3;
+  shape(ctx, { x: r.x + 1.5, y: r.y + 1.5, w: Math.max(1, r.w - 3), h: Math.max(1, r.h - 3) });
+  ctx.stroke();
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  // A solid bar near the key end is a geometric down-state cue, independent of color.
+  ctx.fillStyle = "#151020";
+  ctx.fillRect(r.x + r.w * .23, r.y + r.h * .8, r.w * .54, Math.max(3, r.h * .06));
 }
 
 export function drawWhiteKey(ctx: CanvasRenderingContext2D, r: Rect, light: string | null): void {

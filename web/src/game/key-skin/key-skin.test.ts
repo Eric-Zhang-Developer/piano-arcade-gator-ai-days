@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Chart } from "../../contracts";
 import { isBlack, makeLayout } from "../core/highway";
 import { drawBlackKey, drawWhiteKey } from ".";
+import { settings } from "../core/settings";
 
 describe("keyX in a full 88-key layout", () => {
   // A0 and C8: the highway pads a whole white key past each end, so A0..C8 are all inside.
@@ -30,27 +31,42 @@ describe("keyX in a full 88-key layout", () => {
 describe("drawing", () => {
   const recorder = () => {
     const fills: string[] = [];
+    const strokes: string[] = [];
+    const bars: unknown[][] = [];
     const t: Record<string | symbol, unknown> = {};
     const ctx = new Proxy(t, {
-      get: (o, k) => (k in o ? o[k] : k === "fill" || k === "fillRect" ? () => fills.push(String(o.fillStyle)) : () => ({ addColorStop() {} })),
+      get: (o, k) => (k in o ? o[k] : k === "stroke" ? () => strokes.push(String(o.strokeStyle)) : k === "fillRect" ? (...args: unknown[]) => { fills.push(String(o.fillStyle)); if (o.fillStyle === "#151020") bars.push(args); } : k === "fill" ? () => fills.push(String(o.fillStyle)) : () => ({ addColorStop() {} })),
       set: (o, k, v) => ((o[k] = v), true),
     }) as unknown as CanvasRenderingContext2D;
-    return { ctx, fills };
+    return { ctx, fills, strokes, bars };
   };
   const r = { x: 0, y: 0, w: 20, h: 100 };
 
-  it("a pressed key fills with exactly its light", () => {
+  it("both pressed key types have saturated fill, contrasting outline and geometric marker", () => {
     for (const draw of [drawWhiteKey, drawBlackKey]) {
-      const { ctx, fills } = recorder();
+      const { ctx, fills, strokes, bars } = recorder();
       draw(ctx, r, "#6aa8ff");
-      expect(fills).toContain("#6aa8ff");
+      expect(fills[0]).toBe(settings.keyLitColor);
+      expect(fills).toContain("#6aa8ff"); // hand accent remains
+      expect(strokes).toEqual(["#151020", "#ffffff"]);
+      expect(bars).toHaveLength(1);
+      const [x, y, w, h] = bars[0] as number[];
+      expect(x).toBeGreaterThan(r.x);
+      expect(y).toBeGreaterThan(r.h / 2);
+      expect(w).toBeGreaterThan(0);
+      expect(h).toBeGreaterThan(0);
+      expect(x + w).toBeLessThan(r.w);
+      expect(y + h).toBeLessThan(r.h);
     }
   });
 
   it("an unpressed key never fills with a light", () => {
     for (const draw of [drawWhiteKey, drawBlackKey]) {
-      const { ctx, fills } = recorder();
+      const { ctx, fills, strokes, bars } = recorder();
       draw(ctx, r, null);
+      expect(fills).not.toContain(settings.keyLitColor);
+      expect(strokes).toEqual([]);
+      expect(bars).toEqual([]);
       expect(fills).not.toContain("#6aa8ff");
       expect(fills).not.toContain("#ffffff");
     }

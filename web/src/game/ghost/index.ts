@@ -1,9 +1,10 @@
 // Ghost (spec: ghost): your last take on this chart, drawn as dashed outlines where you actually played, while you
 // play it again. Kept in memory for the page's lifetime; a quit take never replaces it.
 import type { Chart, Frame, GamePlugin } from "../../contracts";
+import { isBlack } from "../core/highway";
 import { settings } from "../core/settings";
 import { ink } from "../ui-tokens";
-import { GHOST_KEY, emptyGhost, ghostKey, ghostOff, ghostSettings, recordGhost, yAt, type Ghost } from "./ghost";
+import { GHOST_KEY, emptyGhost, ghostKey, ghostOff, ghostOutline, ghostSettings, recordGhost, yAt, type Ghost } from "./ghost";
 
 export { ghostKey, recordGhost, yAt } from "./ghost";
 
@@ -30,9 +31,10 @@ function draw(ctx: CanvasRenderingContext2D, f: Frame, g: Ghost): void {
     const bottom = y(h.atMs);
     const top = y(h.atMs + h.durationMs);
     if (bottom < 0 || top > line || h.pitch < f.lowPitch || h.pitch > f.highPitch) continue;
-    const k = f.keyX(h.pitch);
-    const inset = k.width * 0.08; // the highway's own note inset
-    ctx.strokeRect(k.x + inset, top, k.width - 2 * inset, bottom - top); // never filled: the real note reads through
+    const o = ghostOutline(f.keyX(h.pitch), isBlack(h.pitch), top, bottom);
+    ctx.beginPath();
+    ctx.roundRect(o.x, top, o.width, bottom - top, o.radius);
+    ctx.stroke(); // never filled: the real note reads through
   }
   for (const x of g.extras) {
     const at = y(x.atMs);

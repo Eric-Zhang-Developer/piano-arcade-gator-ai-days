@@ -1,6 +1,7 @@
 // The highway: a flat-or-mildly-tilted lane per key, notes falling to the keyboard. Canvas 2D, no React.
 import type { Chart, Frame, Hand, Judgment } from "../../contracts";
 import { drawBarLines, type BarLine } from "../bar-lines";
+import { drawBlackKeyLanes } from "../black-key-lanes";
 import { noteColorFor } from "../hand-colors";
 import { hitLinePath } from "../hit-line";
 import { meterLayout } from "../fever-gauge";
@@ -166,6 +167,7 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
   if (alpha < 1) ctx.clearRect(0, 0, L.width, L.height); // a translucent fill would smear last frame
   ctx.fillStyle = alpha < 1 ? `rgba(0,0,0,${alpha})` : "#000";
   ctx.fillRect(0, 0, L.width, L.height);
+  drawBlackKeyLanes(ctx, L); // the lanes under black keys a shade lighter, under everything else
 
   // Faint octave lines at each C, so the lanes read against the keys.
   ctx.strokeStyle = "rgba(255,255,255,0.08)";

@@ -45,7 +45,10 @@ export function firstRun(): GamePlugin & { cue(nowMs: number): Cue | null } {
     startPanel: ({ params }) => (isFirstRun(params) ? <StartLine /> : null),
     onEvent(e) {
       if (!chart) return;
-      if (e.type === "songStart") events = seen = [];
+      if (e.type === "songStart") {
+        events = [];
+        seen = [];
+      }
       events.push(e);
       cues = cuesFor(chart, events);
       if (e.type === "songEnd" || e.type === "quit") lastCtx?.clearRect(0, 0, lastCtx.canvas.width, lastCtx.canvas.height);

@@ -59,7 +59,7 @@ describe("drawHighway backdrop", () => {
     const state: Record<string | symbol, unknown> = {};
     const ctx = new Proxy(state, {
       get: (t, k) =>
-        k in t ? t[k] : k === "fillRect" ? () => calls.push(`fillRect ${String(t.fillStyle)}`) : k === "clearRect" ? () => calls.push("clearRect") : () => ({ width: 0 }),
+        k in t ? t[k] : k === "fillRect" ? () => calls.push(`fillRect ${String(t.fillStyle)}`) : k === "clearRect" ? () => calls.push("clearRect") : () => ({ width: 0, addColorStop() {} }),
       set: (t, k, v) => ((t[k] = v), true),
     }) as unknown as CanvasRenderingContext2D;
     return { ctx, calls };
@@ -87,7 +87,7 @@ describe("drawHighway hand colors (hand-colors)", () => {
     const fills: string[] = [];
     const state: Record<string | symbol, unknown> = {};
     const ctx = new Proxy(state, {
-      get: (t, k) => (k in t ? t[k] : k === "fill" || k === "fillRect" ? () => fills.push(String(t.fillStyle)) : () => ({ width: 0 })),
+      get: (t, k) => (k in t ? t[k] : k === "fill" || k === "fillRect" ? () => fills.push(String(t.fillStyle)) : () => ({ width: 0, addColorStop() {} })), // measureText, gradients
       set: (t, k, v) => ((t[k] = v), true),
     }) as unknown as CanvasRenderingContext2D;
     return { ctx, fills };

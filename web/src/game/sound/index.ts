@@ -84,7 +84,7 @@ export function soundsFor(events: GameEvent[], audioAtZero: number, missCue = tr
   });
 }
 
-function tone(ctx: AudioContext, out: AudioNode, type: OscillatorType, hz: number, t: number, len: number, level: number) {
+export function tone(ctx: AudioContext, out: AudioNode, type: OscillatorType, hz: number, t: number, len: number, level: number) {
   const osc = ctx.createOscillator();
   const g = ctx.createGain();
   osc.type = type;
@@ -97,7 +97,7 @@ function tone(ctx: AudioContext, out: AudioNode, type: OscillatorType, hz: numbe
   return osc;
 }
 
-function noise(ctx: AudioContext, out: AudioNode, t: number, len: number, level: number) {
+export function noise(ctx: AudioContext, out: AudioNode, t: number, len: number, level: number) {
   const buf = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * len), ctx.sampleRate);
   const d = buf.getChannelData(0);
   for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;

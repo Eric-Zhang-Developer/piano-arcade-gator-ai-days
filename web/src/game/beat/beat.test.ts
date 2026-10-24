@@ -114,3 +114,16 @@ test("?mode=wait plays no beat: the clock stops at every note", () => {
   plugin.onEvent!({ type: "songStart", atMs: -count * mpb });
   expect(AudioContext).not.toHaveBeenCalled();
 });
+
+test("?capture=1: draw writes no Beat: text, and the beat still plays", () => {
+  const texts: string[] = [];
+  const ctx = { fillText: (t: string) => void texts.push(t) } as unknown as CanvasRenderingContext2D;
+  const plugin = beatTrack();
+  plugin.transformChart!(chart, new URLSearchParams("beat=off"));
+  plugin.draw!(ctx, { nowMs: 0, width: 800 } as Frame);
+  expect(texts).toEqual(["Beat: off"]); // without capture: today's status text
+  vi.stubGlobal("document", { documentElement: { hasAttribute: (a: string) => a === "data-capture" } });
+  texts.length = 0;
+  plugin.draw!(ctx, { nowMs: 0, width: 800 } as Frame);
+  expect(texts).toEqual([]);
+});

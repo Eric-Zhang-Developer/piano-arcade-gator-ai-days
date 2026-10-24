@@ -1,6 +1,7 @@
 import type { GamePlugin } from "../contracts";
 import { beatTrack } from "./beat";
 import { hud } from "./hud";
+import { juiceVisual } from "./juice";
 import { midiWatchdog } from "./midi-watchdog";
 import { simPlugin } from "./sim/plugin";
 
@@ -8,6 +9,7 @@ import { simPlugin } from "./sim/plugin";
 // own canvas above the highway, forwards every GameEvent, and applies transformChart and wrapInput in this order.
 export const plugins: GamePlugin[] = [
   simPlugin, // piano-sim: /play?midi=sim only. First, so later plugins asking for MIDI get the fake piano.
+  juiceVisual(), // under the HUD: wisps and flares never cover the score
   hud(), // before beat-track, so beat-track's status line draws over the HUD's top panel
   beatTrack(),
   midiWatchdog(), // reconnects a piano that goes silent mid-song

@@ -15,7 +15,9 @@ too loud or too soft. It's a `resultsPanel` (play-slots).
 1. **First:** the overnight `contract:` batch (#143) must be on `main`. If `ChartNote` in
    `web/src/contracts/index.ts` has no `velocity`, this feature is blocked: take the next ready feature.
 2. **A `fix(song-pack-1)` PR:** the converter (`game-tools/midi-to-chart/convert.py`) writes each note's `velocity`
-   from its note-on, and the three song-pack-1 charts are re-exported with it from the same sources and bar ranges.
+   from its note-on, or, when every note-on has the same velocity, from the CC7 volume in force at each note-on
+   (decided on #181; else no `velocity`), and the three song-pack-1 charts are re-exported with it from the same
+   sources and bar ranges.
    The note count, pitches and beats don't change, and the library test still passes. Write in the done note which
    charts turned out to have more than one velocity.
 3. The pure grading and the panel in `web/src/game/dynamics/`.

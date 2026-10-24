@@ -457,7 +457,8 @@ const overlay: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  justifyContent: "center",
+  justifyContent: "safe center", // centered while it fits; once results panels make it taller, it starts at the top
+  overflowY: "auto", // … and scrolls, so the rank and counts are never cut off above the window
   background: "rgba(0,0,0,0.75)",
 };
 const button: React.CSSProperties = {

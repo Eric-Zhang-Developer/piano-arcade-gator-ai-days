@@ -15,6 +15,9 @@
   - **Look.** Dark panel `rgba(12,12,16,0.72)` across the top, system-ui, heavy weights for numbers. Counter colors
     match core's highway (PERFECT `#ffe27a`, GREAT `#5ef2c4`, MISS `#c98a9a`). Tier colors are Guitar Hero 3's:
     x1 white, x2 orange `#ff9f43`, x3 green `#8ee05e`, x4 purple `#c47cff`.
+  - **GOOD and WRONG colors.** The spec (amended by #67) adds GOOD and WRONG counters; core has no colors for
+    them yet. Following judging-tiers' defaults: GOOD a calm blue `#7cb7ff`, WRONG a strong red `#ff4d5e`. If
+    judging-tiers picks other hexes, match them.
   - **Beat-track's status line** ("Beat: piano", 13px, top-right). The HUD registers before `beatTrack()`, so the
     status draws over the panel, and the score cluster keeps a 120px gutter clear of it.
   - **Mid-song screenshot.** `web/e2e/` is core-loop's, so the HUD has its own `web/src/game/hud/verify-hud.mjs`

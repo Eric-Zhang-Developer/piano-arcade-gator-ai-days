@@ -4,7 +4,7 @@ import type { Chart, Frame, GameEvent, GamePlugin } from "../../contracts";
 
 export const hudSettings = {
   comboFrom: 5, // the combo number shows from this combo
-  points: { PERFECT: 100, GREAT: 50 },
+  points: { PERFECT: 100, GREAT: 50, GOOD: 25 },
   // Guitar Hero 3's tier colors: white, orange, green, purple (decision hud-look).
   tiers: [
     { from: 0, mult: 1, color: "#e8e8ec" },
@@ -12,7 +12,8 @@ export const hudSettings = {
     { from: 20, mult: 3, color: "#8ee05e" },
     { from: 30, mult: 4, color: "#c47cff" },
   ],
-  judgmentColors: { PERFECT: "#ffe27a", GREAT: "#5ef2c4", MISS: "#c98a9a", extra: "#8a8f9c" }, // as core's highway
+  // PERFECT, GREAT and MISS as core's highway; GOOD and WRONG per judging-tiers' defaults (calm blue, strong red).
+  judgmentColors: { PERFECT: "#ffe27a", GREAT: "#5ef2c4", GOOD: "#7cb7ff", MISS: "#c98a9a", wrong: "#ff4d5e" },
   statusGutterPx: 120, // beat-track's status line ("Beat: piano", 13px) sits in the top-right corner
   safeFraction: 0.6, // nothing below this fraction of the judgment line: the lowest 40% is where notes land
   panelBg: "rgba(12,12,16,0.72)",
@@ -30,14 +31,16 @@ export const hudSettings = {
 export interface HudState {
   PERFECT: number;
   GREAT: number;
+  GOOD: number;
   MISS: number;
-  extra: number;
+  wrong: number;
+  extra: number; // not shown (the spec counts WRONG notes); verify-hud checks it
   combo: number;
   score: number;
   milestone: { count: number; atMs: number } | null;
 }
 
-export const emptyHud = (): HudState => ({ PERFECT: 0, GREAT: 0, MISS: 0, extra: 0, combo: 0, score: 0, milestone: null });
+export const emptyHud = (): HudState => ({ PERFECT: 0, GREAT: 0, GOOD: 0, MISS: 0, wrong: 0, extra: 0, combo: 0, score: 0, milestone: null });
 
 export const tierFor = (combo: number) => hudSettings.tiers.findLast((t) => combo >= t.from)!;
 
@@ -64,6 +67,8 @@ export function reduceHud(s: HudState, e: GameEvent): HudState {
       return { ...s, MISS: s.MISS + 1, combo: 0 };
     case "extra":
       return { ...s, extra: s.extra + 1 };
+    case "wrongNote": // sent after its extra; breaks the combo like a MISS
+      return { ...s, wrong: s.wrong + 1, combo: 0 };
     case "comboMilestone":
       return { ...s, milestone: { count: e.count, atMs: e.atMs } };
     default:
@@ -144,16 +149,16 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Car
   ctx.textBaseline = "middle";
 
   // Left: the song card.
-  const third = f.width / 3;
+  const cardW = f.width * 0.3;
   if (card) {
     ctx.textAlign = "left";
     ctx.save();
     ctx.translate(pad, h * 0.36);
     ctx.fillStyle = "#ffffff";
-    fitText(ctx, card.title, third - pad * 1.5, h * 0.3, "700");
+    fitText(ctx, card.title, cardW - pad * 1.5, h * 0.3, "700");
     ctx.translate(0, h * 0.34);
     ctx.fillStyle = "rgba(255,255,255,0.6)";
-    fitText(ctx, card.line2, third - pad * 1.5, h * 0.2);
+    fitText(ctx, card.line2, cardW - pad * 1.5, h * 0.2);
     ctx.restore();
   }
 
@@ -161,13 +166,14 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Car
   const counters: [string, keyof typeof hudSettings.judgmentColors][] = [
     ["PERFECT", "PERFECT"],
     ["GREAT", "GREAT"],
+    ["GOOD", "GOOD"],
     ["MISS", "MISS"],
-    ["EXTRA", "extra"],
+    ["WRONG", "wrong"],
   ];
-  const cw = third / counters.length;
+  const cw = (f.width * 0.34) / counters.length;
   ctx.textAlign = "center";
   counters.forEach(([label, key], i) => {
-    const x = third + cw * (i + 0.5);
+    const x = cardW + cw * (i + 0.5);
     ctx.fillStyle = hudSettings.judgmentColors[key];
     ctx.font = `800 ${Math.round(h * 0.34)}px ${hudSettings.font}`;
     ctx.fillText(String(s[key]), x, h * 0.4);

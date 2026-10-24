@@ -65,6 +65,15 @@ describe("reduceHud", () => {
     expect(reduceHud(s, { type: "songStart", atMs: 0 })).toEqual(emptyHud());
   });
 
+  it("GOOD keeps the combo and scores 25 x the multiplier; a WRONG note breaks the combo", () => {
+    let s = hits("PERFECT", 12, 0).reduce(reduceHud, emptyHud()); // combo 12: x2
+    s = reduceHud(s, { type: "noteHit", noteId: "g", pitch: 60, judgment: "GOOD", offsetMs: 80, atMs: 13 });
+    s = reduceHud(s, { type: "combo", count: 13, atMs: 13 });
+    expect(s).toMatchObject({ GOOD: 1, combo: 13, score: 10 * 100 + 2 * 200 + 25 * 2 });
+    s = reduceHud(reduceHud(s, { type: "extra", pitch: 30, atMs: 14 }), { type: "wrongNote", pitch: 30, atMs: 14 });
+    expect(s).toMatchObject({ extra: 1, wrong: 1, combo: 0 });
+  });
+
   it("tiers: x1 from 0, x2 from 10, x3 from 20, x4 from 30, each its own color", () => {
     expect([0, 9, 10, 19, 20, 29, 30, 99].map((c) => tierFor(c).mult)).toEqual([1, 1, 2, 2, 3, 3, 4, 4]);
     expect(new Set([0, 10, 20, 30].map((c) => tierFor(c).color)).size).toBe(4);

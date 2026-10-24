@@ -1,4 +1,4 @@
-// Headless proof of the HUD: play Twinkle with one missed note and one extra key, screenshot the HUD mid-song just
+// Headless proof of the HUD: play Twinkle with one missed note and one extra key in the count-in, screenshot the HUD mid-song just
 // after the combo-25 milestone, and fail unless the HUD's numbers match the results screen and a score recomputed
 // here from the judgments. ?beat=off keeps the laptop click out of it.
 // Usage: node web/src/game/hud/verify-hud.mjs --out <dir>
@@ -53,7 +53,7 @@ function expectedScore(judgments) {
       continue;
     }
     const mult = combo >= 30 ? 4 : combo >= 20 ? 3 : combo >= 10 ? 2 : 1;
-    score += (j.judgment === "PERFECT" ? 100 : 50) * mult;
+    score += { PERFECT: 100, GREAT: 50, GOOD: 25 }[j.judgment] * mult;
     combo++;
   }
   return { score, combo };
@@ -82,7 +82,7 @@ try {
     ([notes, mpb, missed]) => {
       // Alternate PERFECT (+5 ms) and GREAT (+35 ms); skip one note; one extra key, far from any note.
       notes.forEach((n, i) => i !== missed && window.__pianoArcade.press(n.pitch, n.beat * mpb + (i % 2 ? 35 : 5)));
-      window.__pianoArcade.press(30, 1.5 * mpb);
+      window.__pianoArcade.press(30, -2 * mpb); // in the count-in: an extra, never a WRONG note
     },
     [chart.notes, mpb, MISSED],
   );
@@ -101,8 +101,11 @@ try {
   // Judgments in chart order are time order for Twinkle (one note at a time).
   const exp = expectedScore(results.judgments);
   const fail = [];
-  for (const k of ["PERFECT", "GREAT", "MISS", "extra"]) if (hud[k] !== results.counts[k]) fail.push(`${k}: HUD ${hud[k]}, results ${results.counts[k]}`);
-  if (results.counts.MISS !== 1 || results.counts.extra !== 1) fail.push(`take didn't go as scripted: ${JSON.stringify(results.counts)}`);
+  for (const k of ["PERFECT", "GREAT", "GOOD", "MISS", "wrong", "extra"]) {
+    const want = results.counts[k] ?? 0; // GOOD and wrong are absent until judging-tiers lands
+    if (hud[k] !== want) fail.push(`${k}: HUD ${hud[k]}, results ${want}`);
+  }
+  if (results.counts.MISS !== 1 || results.counts.extra !== 1 || (results.counts.wrong ?? 0) !== 0) fail.push(`take didn't go as scripted: ${JSON.stringify(results.counts)}`);
   if (hud.score !== exp.score) fail.push(`score: HUD ${hud.score}, expected ${exp.score}`);
   if (hud.combo !== exp.combo) fail.push(`combo: HUD ${hud.combo}, expected ${exp.combo}`);
   if (mid.milestone?.count !== 25) fail.push(`milestone: ${JSON.stringify(mid.milestone)}`);

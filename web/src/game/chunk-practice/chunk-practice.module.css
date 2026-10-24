@@ -65,8 +65,38 @@
 }
 
 .clear {
+  font-size: 28px;
+  font-weight: 900;
   color: var(--pa-gold);
   text-transform: uppercase;
+  text-shadow: 0 0 16px rgb(255 226 122 / 0.45);
+}
+
+/* How far a take fell short: the fill is its accuracy, the gold tick the gate. */
+.meter {
+  position: relative;
+  width: 280px;
+  height: 8px;
+  border-radius: 4px;
+  background: rgb(242 242 245 / 0.14);
+}
+
+.fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--acc) * 100%);
+  border-radius: 4px;
+  background: var(--pa-miss);
+}
+
+.gate {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  left: calc(var(--gate) * 100%);
+  width: 3px;
+  border-radius: 1px;
+  background: var(--pa-gold);
 }
 
 .dim {

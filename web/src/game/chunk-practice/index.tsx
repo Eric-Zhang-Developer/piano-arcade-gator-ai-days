@@ -1,6 +1,6 @@
 // Chunk practice (spec: chunk-practice): walk a song 4 bars at a time, learn each in wait mode, then play it judged at
 // 70%, and move on at 85%. Every step is a URL bar-loop and wait-mode already read; this plugin only links them.
-import { createElement, useEffect, useRef } from "react";
+import { createElement, useEffect, useRef, type CSSProperties } from "react";
 import type { GamePlugin, Results } from "../../contracts";
 import { barsLabel, chunkSettings, chunksOf, isPlainTake, nextAfter, practiceStep, stepUrl, wholeSongUrl, type Chunk, type Step } from "./chunks";
 import styles from "./chunk-practice.module.css";
@@ -64,10 +64,13 @@ function StepLine({ index, of, step }: { index: number; of: number; step: Step }
 function AfterPlay({ params, results, list, index }: { params: URLSearchParams; results: Results; list: Chunk[]; index: number }) {
   const go = nextAfter(list, index, results.accuracy);
   const ref = useRef<HTMLAnchorElement>(null);
-  // An effect runs after Retry's autoFocus, so the way on takes focus and Enter moves on.
+  // An effect runs after Retry's autoFocus, so the way on takes focus and Enter moves on. Focus alone would scroll the
+  // link to the screen's edge, under the HUD; the panel is centred instead, its verdict in view.
   const moveOn = go !== null;
   useEffect(() => {
-    if (moveOn) ref.current?.focus();
+    if (!moveOn || !ref.current) return;
+    ref.current.focus({ preventScroll: true });
+    ref.current.parentElement?.scrollIntoView({ block: "center" });
   }, [moveOn]);
   const pct = `${(results.accuracy * 100).toFixed(1)}%`;
   const gate = `${Math.round(chunkSettings.passAccuracy * 100)}%`;
@@ -87,6 +90,10 @@ function AfterPlay({ params, results, list, index }: { params: URLSearchParams; 
       <p className={styles.verdict}>
         <span data-testid="chunk-accuracy">{pct}</span> <span className={styles.dim}>· {gate} moves you on</span>
       </p>
+      <div className={styles.meter} aria-hidden style={{ "--acc": results.accuracy, "--gate": chunkSettings.passAccuracy } as CSSProperties}>
+        <span className={styles.fill} />
+        <span className={styles.gate} />
+      </div>
       <a data-testid="chunk-again" className={styles.ghost} href={stepUrl(params, list[index], "learn")}>
         Learn {barsLabel(list[index])} again
       </a>

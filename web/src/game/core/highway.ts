@@ -4,7 +4,13 @@ import { msPerBeat, settings } from "./settings";
 
 const JUDGMENT_SHOW_MS = 600;
 // Keyed by name, not Record<Judgment>, so a judgment added to the contract doesn't break the build first.
-const JUDGMENT_COLORS: Record<string, string> = { PERFECT: "#ffe27a", GREAT: "#5ef2c4", MISS: "#c98a9a" };
+const JUDGMENT_COLORS: Record<string, string> = {
+  PERFECT: "#ffe27a",
+  GREAT: "#5ef2c4",
+  GOOD: "#7ab8ff",
+  MISS: "#c98a9a",
+  WRONG: "#ff3b4e",
+};
 const BLACK_KEY_WIDTH = 0.6; // × white key width
 const MAX_PERSPECTIVE = 0.3;
 
@@ -19,7 +25,7 @@ export interface HighwayState {
   nowMs: number; // chart clock
   noteState: Map<string, Judgment>; // judged notes
   pressed: Set<number>; // pitches held right now
-  latest: { judgment: Judgment; offsetMs: number | null; atMs: number } | null;
+  latest: { judgment: Judgment | "WRONG"; offsetMs: number | null; atMs: number } | null;
   countInBeat: number | null; // 1..countInBeats while counting in, else null
 }
 
@@ -107,7 +113,7 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
   ctx.clip();
   for (const n of chart.notes) {
     const state = s.noteState.get(n.id);
-    if (state === "PERFECT" || state === "GREAT") continue; // consumed on hit
+    if (state && state !== "MISS") continue; // consumed on hit
     const startMs = n.beat * beatMs;
     const yBottom = line - (startMs - s.nowMs) * pxPerMs;
     const yTop = line - (startMs + n.duration * beatMs - s.nowMs) * pxPerMs;
@@ -161,7 +167,10 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
     if (offsetMs !== null) {
       const ms = Math.round(offsetMs);
       ctx.font = `${Math.round(size * 0.55)}px system-ui, sans-serif`;
-      ctx.fillText(`${ms > 0 ? "+" : ""}${ms} ms`, L.width / 2, line - size * 0.9);
+      const signed = `${ms > 0 ? "+" : ""}${ms} ms`;
+      // GREAT and GOOD say which way you were off; PERFECT just shows the ms.
+      const label = judgment === "PERFECT" ? signed : `${offsetMs < 0 ? "EARLY" : "LATE"} ${signed}`;
+      ctx.fillText(label, L.width / 2, line - size * 0.9);
     }
   }
 }

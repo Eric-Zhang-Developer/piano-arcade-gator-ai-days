@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Chart, GameEvent, InputDevice, InputEvent, Results, Take } from "../../contracts";
 import { validateChart } from "../../contracts";
@@ -9,7 +10,7 @@ import { Judge, noteTimeMs } from "../../game/core/judge";
 import { keysDevice, midiDevice, testDevice } from "../../game/core/input";
 import { describeTiming, timingSummary, type TimingSummary } from "../../game/timing";
 import {
-  GREAT_MS,
+  GOOD_MS,
   LATENCY_MAX,
   LATENCY_MIN,
   loadLatencyOffset,
@@ -18,7 +19,9 @@ import {
   settings,
 } from "../../game/core/settings";
 
-const CHART_URL = "/songs/twinkle/chart.json";
+const DEFAULT_SONG = "twinkle";
+// A song id is its folder under web/public/songs/ (it may have subfolders, like library/...).
+const SONG_ID = /^[a-z0-9][a-z0-9_-]*(\/[a-z0-9][a-z0-9_-]*)*$/i;
 const END_TAIL_MS = 1000; // after the last note's window closes, before the results screen
 const INPUT_GRACE_MS = 50; // input can arrive this late after its timestamp; don't call a MISS before it could land
 
@@ -59,8 +62,12 @@ export default function Play() {
     paramsRef.current = params;
     latencyRef.current = loadLatencyOffset();
     let live = true; // StrictMode mounts twice in dev: only the live mount's load may set state
-    fetch(CHART_URL)
-      .then((r) => r.json())
+    const song = params.get("song") || DEFAULT_SONG;
+    (SONG_ID.test(song) ? fetch(`/songs/${song}/chart.json`) : Promise.reject(new Error(`No song called "${song}".`)))
+      .then((r) => {
+        if (!r.ok) throw new Error(`No song called "${song}".`);
+        return r.json();
+      })
       .then((raw: unknown) => {
         if (!live) return;
         const problems = validateChart(raw);
@@ -109,6 +116,7 @@ export default function Play() {
     const emit = (e: GameEvent) => {
       if (e.type === "noteHit") hw.latest = { judgment: e.judgment, offsetMs: e.offsetMs, atMs: e.atMs };
       if (e.type === "noteMiss") hw.latest = { judgment: "MISS", offsetMs: null, atMs: e.atMs };
+      if (e.type === "wrongNote") hw.latest = { judgment: "WRONG", offsetMs: null, atMs: e.atMs };
       for (const p of plugins) p.onEvent?.(e);
     };
     const judge = new Judge(chart, emit);
@@ -185,7 +193,7 @@ export default function Play() {
         p.draw(lc, f);
       });
 
-      if (now > lastNoteMs + GREAT_MS + Math.max(0, latencyRef.current) + INPUT_GRACE_MS + END_TAIL_MS) return finish(now);
+      if (now > lastNoteMs + GOOD_MS + Math.max(0, latencyRef.current) + INPUT_GRACE_MS + END_TAIL_MS) return finish(now);
       if (!done) raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
@@ -229,7 +237,14 @@ export default function Play() {
       {phase !== "playing" && (
         <div style={overlay}>
           {phase === "loading" && <p>Loading chart…</p>}
-          {phase === "error" && <p role="alert">{error}</p>}
+          {phase === "error" && (
+            <>
+              <p role="alert">{error}</p>
+              <Link href="/" style={{ color: settings.noteColor }}>
+                Back to the song list
+              </Link>
+            </>
+          )}
           {phase === "ready" && (
             <>
               <h1 style={{ margin: 0 }}>{title}</h1>
@@ -271,8 +286,10 @@ function ResultsScreen({
   const rows: [string, string, number | string][] = [
     ["PERFECT", "count-PERFECT", counts.PERFECT],
     ["GREAT", "count-GREAT", counts.GREAT],
+    ["GOOD", "count-GOOD", counts.GOOD ?? 0],
     ["MISS", "count-MISS", counts.MISS],
-    ["Extras", "count-extra", counts.extra],
+    ["Wrong notes", "count-wrong", counts.wrong ?? 0],
+    ["Extra presses", "count-extra", counts.extra],
     ["Accuracy", "accuracy", `${(results.accuracy * 100).toFixed(1)}%`],
     ["Max combo", "max-combo", results.maxCombo],
   ];

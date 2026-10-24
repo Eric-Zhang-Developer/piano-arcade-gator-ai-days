@@ -1,10 +1,10 @@
 // Timing feedback: how early or late a take was, from its Take and Results (spec: timing-feedback). Pure.
 import type { Chart, Results, Take } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
-import { LATENCY_MAX, LATENCY_MIN } from "../core/settings";
+import { LATENCY_MAX, LATENCY_MIN, NEAR_MISS_MS } from "../core/settings";
 
-export const NEAR_MISS_MS = 150; // osu!'s outermost window at OD 5
-export const CLOSE_MISS_MS = 100;
+// A near miss: a MISS note with a same-pitch press within NEAR_MISS_MS (150 ms, osu!'s outermost window at OD 5).
+// Since judging-tiers, a press within GOOD_MS (100 ms) is a GOOD hit, so near misses lie between 100 and 150 ms.
 export const MIN_TIMED = 3; // fewer timed presses: no numbers
 export const MIN_TIMED_FOR_SUGGESTION = 10;
 export const SUGGEST_FROM_MS = 10; // |mean| at least this before suggesting a latency change
@@ -16,8 +16,7 @@ export interface TimingSummary {
   early: number;
   late: number;
   misses: number;
-  nearMissWithin100: number;
-  nearMissWithin150: number;
+  nearMisses: number;
   suggestedLatencyMs: number | null;
 }
 
@@ -58,8 +57,7 @@ export function timingSummary(chart: Chart, take: Take, results: Results, curren
     early: all.filter((x) => x < 0).length,
     late: all.filter((x) => x > 0).length,
     misses: missed.length,
-    nearMissWithin100: near.filter((d) => Math.abs(d) <= CLOSE_MISS_MS).length,
-    nearMissWithin150: near.length,
+    nearMisses: near.length,
     suggestedLatencyMs: suggest ? Math.min(LATENCY_MAX, Math.max(LATENCY_MIN, round(currentLatencyMs + mean))) : null,
   };
 }
@@ -72,8 +70,7 @@ export function describeTiming(s: TimingSummary): string[] {
   const lines = [`${avg}, spread ±${s.sdMs} ms`, `${s.early} early · ${s.late} late`];
   if (s.misses > 0)
     lines.push(
-      `${s.nearMissWithin100} of ${s.misses} ${s.misses === 1 ? "miss was" : "misses were"} within ${CLOSE_MISS_MS} ms` +
-        ` (${s.nearMissWithin150} within ${NEAR_MISS_MS} ms)`,
+      `${s.nearMisses} of ${s.misses} ${s.misses === 1 ? "miss was" : "misses were"} within ${NEAR_MISS_MS} ms`,
     );
   return lines;
 }

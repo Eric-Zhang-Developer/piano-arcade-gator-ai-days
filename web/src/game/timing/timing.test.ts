@@ -29,21 +29,26 @@ test("Late40: late by 40, suggests a latency offset of 40", () => {
   expect(describeTiming(s)[0]).toBe("Late by 40 ms on average, spread ±0 ms");
 });
 
-test("a press 120 ms late is a near miss within 150 but not 100, and counts toward the mean", () => {
+test("a press 120 ms late is a near miss and counts toward the mean", () => {
   const s = play((i) => (i === 4 ? 120 : 0));
-  expect(s).toMatchObject({ timed: N, misses: 1, nearMissWithin100: 0, nearMissWithin150: 1, late: 1 });
+  expect(s).toMatchObject({ timed: N, misses: 1, nearMisses: 1, late: 1 });
   expect(s.meanMs).toBe(Math.round(120 / N));
-  expect(describeTiming(s)[2]).toBe("0 of 1 miss was within 100 ms (1 within 150 ms)");
+  expect(describeTiming(s)[2]).toBe("1 of 1 miss was within 150 ms");
+});
+
+test("a press 80 ms late is a GOOD hit, not a near miss", () => {
+  const s = play((i) => (i === 4 ? 80 : 0));
+  expect(s).toMatchObject({ timed: N, misses: 0, nearMisses: 0, late: 1 });
 });
 
 test("a press 200 ms late is a miss with no near miss, left out of the mean", () => {
   const s = play((i) => (i === 4 ? 200 : 0));
-  expect(s).toMatchObject({ timed: N - 1, meanMs: 0, misses: 1, nearMissWithin150: 0 });
+  expect(s).toMatchObject({ timed: N - 1, meanMs: 0, misses: 1, nearMisses: 0 });
 });
 
 test("a wrong-pitch press is never timed", () => {
   const s = play(() => 0, (i) => (i === 4 ? 1 : 0));
-  expect(s).toMatchObject({ timed: N - 1, misses: 1, nearMissWithin150: 0 });
+  expect(s).toMatchObject({ timed: N - 1, misses: 1, nearMisses: 0 });
 });
 
 test("two presses near one missed note: only the nearest counts", () => {
@@ -53,11 +58,11 @@ test("two presses near one missed note: only the nearest counts", () => {
     (i) => (i === 20 ? null : 0),
     () => 0,
     [
-      { pitch: n.pitch, velocity: 80, timeMs: t + 120, offTimeMs: null },
-      { pitch: n.pitch, velocity: 80, timeMs: t - 70, offTimeMs: null },
+      { pitch: n.pitch, velocity: 80, timeMs: t + 140, offTimeMs: null },
+      { pitch: n.pitch, velocity: 80, timeMs: t - 120, offTimeMs: null },
     ],
   );
-  expect(s).toMatchObject({ timed: N, misses: 1, nearMissWithin100: 1, nearMissWithin150: 1, early: 1 });
+  expect(s).toMatchObject({ timed: N, misses: 1, nearMisses: 1, early: 1 });
 });
 
 test("fewer than 3 timed presses: no numbers", () => {

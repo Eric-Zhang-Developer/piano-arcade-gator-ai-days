@@ -38,7 +38,7 @@ export type Inputs = {
 };
 
 export type State = "done" | "in flight" | "ready" | "blocked" | "backlog" | "cut" | "unknown";
-export type Feature = { slug: string; name: string; state: State; milestone: string | null; assignee: string };
+export type Feature = { slug: string; name: string; state: State; milestone: string | null; assignee: string; pr: string | null };
 export type NeedItem = { kind: string; text: string; url: string | null };
 export type CrewPr = { number: number; title: string; url: string; ci: Ci; isDraft: boolean };
 export type Board = {
@@ -138,9 +138,12 @@ function median(xs: number[]): number | null {
 
 export function buildBoard(i: Inputs): Board {
   const done = new Set(i.done);
-  const inFlight = i.openPrs
-    ? new Set(i.openPrs.map((p) => titleType(p.title)).filter((t) => t?.type === "feat" && t.scope).map((t) => t!.scope!))
-    : null;
+  const prOf = new Map<string, string>(); // slug -> its open feat PR's URL
+  for (const p of i.openPrs ?? []) {
+    const t = titleType(p.title);
+    if (t?.type === "feat" && t.scope) prOf.set(t.scope, p.url);
+  }
+  const inFlight = i.openPrs ? new Set(prOf.keys()) : null;
   const milestoneOf = (slug: string) => i.milestones?.find((m) => m.features.includes(slug))?.name ?? null;
   const features = i.specs.map((s) => ({
     slug: s.slug,
@@ -148,6 +151,7 @@ export function buildBoard(i: Inputs): Board {
     state: featureState(s, done, i.milestones, inFlight),
     milestone: milestoneOf(s.slug),
     assignee: s.assignee,
+    pr: prOf.get(s.slug) ?? null,
   }));
 
   let crew: Board["crew"] = null;

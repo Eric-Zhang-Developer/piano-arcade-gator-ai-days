@@ -143,6 +143,7 @@ export default function OperatorPage() {
         </div>
       )}
 
+      {board && <Totals board={board} />}
       {!board && !note && <p className={styles.loading}>INSERT COIN… loading the books</p>}
       {board && (
         <>
@@ -152,6 +153,30 @@ export default function OperatorPage() {
         </>
       )}
     </main>
+  );
+}
+
+// The cabinet's coin counter: the four numbers worth a glance before reading anything else.
+function Totals({ board }: { board: Board }) {
+  const done = board.features.filter((f) => f.state === "done").length;
+  const flying = board.features.filter((f) => f.state === "in flight").length;
+  const merged = board.books.mergedByType?.reduce((n, [, k]) => n + k, 0);
+  const waiting = board.needs.length;
+  const cells: [string, string][] = [
+    ["NEEDS A PERSON", board.needsUnknown.length ? `${waiting}+?` : String(waiting)],
+    ["FEATURES DONE", `${done} / ${board.features.length}`],
+    ["IN FLIGHT", board.crew === null ? "?" : String(flying)],
+    ["PRS MERGED", merged === undefined ? "?" : String(merged)],
+  ];
+  return (
+    <dl className={styles.totals}>
+      {cells.map(([k, v]) => (
+        <div key={k}>
+          <dt>{k}</dt>
+          <dd>{v}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
@@ -194,7 +219,15 @@ function Needs({ board }: { board: Board }) {
 }
 
 function Crew({ board, heartbeats, now }: { board: Board; heartbeats: Heartbeat[] | null; now: number }) {
-  const names = [...new Set([...(board.crew ?? []).map((c) => c.worker), ...(heartbeats ?? []).map((h) => h.worker)])].sort();
+  const fresh = (w: string) => {
+    const beat = heartbeats?.find((h) => h.worker === w);
+    return !!beat && now - Date.parse(beat.at) < FRESH_MIN * 60_000;
+  };
+  const busy = (w: string) => !!board.crew?.find((c) => c.worker === w)?.prs.length;
+  const rank = (w: string) => (busy(w) ? 0 : fresh(w) ? 1 : 2); // open PRs first, then whoever just ran
+  const names = [...new Set([...(board.crew ?? []).map((c) => c.worker), ...(heartbeats ?? []).map((h) => h.worker)])].sort(
+    (a, b) => rank(a) - rank(b) || a.localeCompare(b),
+  );
   return (
     <Screen n={2} title="CREW">
       {board.crew === null && <p className={styles.empty}>? open PRs unknown (no GitHub data)</p>}
@@ -203,14 +236,13 @@ function Crew({ board, heartbeats, now }: { board: Board; heartbeats: Heartbeat[
         {names.map((w) => {
           const prs = board.crew?.find((c) => c.worker === w)?.prs ?? [];
           const beat = heartbeats?.find((h) => h.worker === w);
-          const fresh = beat && now - Date.parse(beat.at) < FRESH_MIN * 60_000;
           return (
             <div key={w} className={styles.worker}>
               <div className={styles.workerHead}>
                 <span className={styles.workerName}>{w}</span>
                 {heartbeats && (
-                  <span className={fresh ? styles.fresh : styles.idle}>
-                    {beat ? (fresh ? `● ran ${ago(beat.at, now)}` : `○ idle · last ${ago(beat.at, now)}`) : "○ no heartbeat"}
+                  <span className={fresh(w) ? styles.fresh : styles.idle}>
+                    {beat ? (fresh(w) ? `● ran ${ago(beat.at, now)}` : `○ idle · last ${ago(beat.at, now)}`) : "○ no heartbeat"}
                   </span>
                 )}
               </div>
@@ -264,18 +296,27 @@ function Books({ board }: { board: Board }) {
                 {Number.isNaN(m.done) ? "—" : `${m.done} / ${m.planned}`}
                 {m.planned > 0 && (
                   <span className={styles.meter} aria-hidden="true">
-                    {"█".repeat(m.done)}
-                    <span className={styles.meterEmpty}>{"░".repeat(m.planned - m.done)}</span>
+                    {Array.from({ length: m.planned }, (_, k) => (
+                      <span key={k} className={k < m.done ? styles.pip : styles.pipEmpty} />
+                    ))}
                   </span>
                 )}
                 {m.cut > 0 && <span className={styles.dim}> ({m.cut} cut)</span>}
               </td>
               <td>
-                {m.features.map((f) => (
-                  <span key={f.slug} className={`${styles.chip} ${styles[`st_${f.state.replace(" ", "_")}`]}`} title={`${f.name} · ${f.state}`}>
-                    {STATE_GLYPH[f.state]} {f.slug}
-                  </span>
-                ))}
+                {m.features.map((f) => {
+                  const cls = `${styles.chip} ${styles[`st_${f.state.replace(" ", "_")}`]}`;
+                  const label = `${STATE_GLYPH[f.state]} ${f.slug}`;
+                  return f.pr ? (
+                    <a key={f.slug} className={cls} href={f.pr} target="_blank" rel="noreferrer" title={`${f.name} · ${f.state}: open its PR`}>
+                      {label}
+                    </a>
+                  ) : (
+                    <span key={f.slug} className={cls} title={`${f.name} · ${f.state}`}>
+                      {label}
+                    </span>
+                  );
+                })}
               </td>
             </tr>
           ))}

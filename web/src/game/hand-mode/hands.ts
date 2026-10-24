@@ -42,6 +42,25 @@ export function playbackBetween(chart: Chart, notes: ChartNote[], fromMs: number
     .filter((p) => p.atMs >= fromMs && p.atMs < toMs);
 }
 
+export interface WaitSend {
+  type: "on" | "off";
+  p: Playback;
+}
+
+// Wait mode (wait-hands): the clock holds at each of your notes, so nothing is queued ahead. Each frame sends what the
+// held clock passed in [fromMs, toMs): note-ons by start, note-offs by end, in time order. At one time a note-off goes
+// first, so a pitch that ends as it starts again isn't cut by its own note-off. The clock holds at a note's own time,
+// which [from, to) leaves out, so a note there goes on the first frame past it, never during the hold.
+export function waitSends(chart: Chart, notes: ChartNote[], fromMs: number, toMs: number): WaitSend[] {
+  const due: (WaitSend & { at: number })[] = [];
+  for (const p of playbackBetween(chart, notes, -Infinity, Infinity)) {
+    if (p.atMs >= fromMs && p.atMs < toMs) due.push({ type: "on", p, at: p.atMs });
+    if (p.endMs >= fromMs && p.endMs < toMs) due.push({ type: "off", p, at: p.endMs });
+  }
+  const rank = (e: WaitSend) => (e.type === "off" ? 0 : 1);
+  return due.sort((a, b) => a.at - b.at || rank(a) - rank(b)).map(({ type, p }) => ({ type, p }));
+}
+
 // Remembers what we sent, so the piano's echo of it isn't judged as an extra.
 export function echoGuard(windowMs = handModeSettings.echoMs) {
   const sent: { pitch: number; atPerf: number }[] = [];

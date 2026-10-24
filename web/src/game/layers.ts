@@ -6,6 +6,7 @@ import { easyCharts } from "./easy-charts";
 import { beatTrack } from "./beat";
 import { handColors } from "./hand-colors";
 import { ghost } from "./ghost";
+import { keyPreview } from "./key-preview";
 import { handMode } from "./hand-mode";
 import { hud } from "./hud";
 import { firstRun } from "./first-run";
@@ -53,6 +54,7 @@ export const plugins: GamePlugin[] = [
   scenes(), // ?bot=<name>: after bar-loop, so the bot plays the looped chart
   simPlugin, // piano-sim: /play?midi=sim only. First, so later plugins asking for MIDI get the fake piano.
   ghost(), // the last take, dashed: under every layer that draws, after every plugin that changes the chart
+  keyPreview(), // ?keypreview=0 off: keys glow before their notes; after ghost (the final chart), under the octave wash and labels
   laptopOctaves(), // Z and X: after scenes and the sim (their bots aren't laptop keys), before note-labels (shifted pitches)
   noteLabels(), // after bar-loop, scenes and the sim: it labels the final chart and sees which device really played
   waitHint(), // ?mode=wait: after 3 s on a note, its key pulses, it sounds once and its name shows; after noteLabels, on the final chart

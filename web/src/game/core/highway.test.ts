@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Chart } from "../../contracts";
-import { isBlack, makeLayout } from "./highway";
+import { drawHighway, isBlack, makeLayout, type HighwayState } from "./highway";
 
 const chart = (pitches: number[]): Chart => ({
   id: "t",
@@ -46,5 +46,34 @@ describe("makeLayout", () => {
       expect(L.project(x, 0) - cx).toBeCloseTo((x - cx) * 0.7);
     }
     expect(makeLayout(chart([60]), 1000, 600, 0.9).perspective).toBe(0.3);
+  });
+});
+
+describe("drawHighway backdrop", () => {
+  // A 2D context that records the fill style of each fillRect and ignores everything else.
+  const recorder = () => {
+    const calls: string[] = [];
+    const state: Record<string | symbol, unknown> = {};
+    const ctx = new Proxy(state, {
+      get: (t, k) =>
+        k in t ? t[k] : k === "fillRect" ? () => calls.push(`fillRect ${String(t.fillStyle)}`) : k === "clearRect" ? () => calls.push("clearRect") : () => ({ width: 0 }),
+      set: (t, k, v) => ((t[k] = v), true),
+    }) as unknown as CanvasRenderingContext2D;
+    return { ctx, calls };
+  };
+  const state = (backdropAlpha?: number): HighwayState => ({ nowMs: 0, noteState: new Map(), pressed: new Set(), latest: null, countInBeat: null, backdropAlpha });
+
+  it("is opaque black with no background layer, as before", () => {
+    const c = chart([60, 72]);
+    const { ctx, calls } = recorder();
+    drawHighway(ctx, makeLayout(c, 800, 600, 0), c, state());
+    expect(calls[0]).toBe("fillRect #000");
+  });
+
+  it("clears, then fills at the given alpha while a background layer is mounted", () => {
+    const c = chart([60, 72]);
+    const { ctx, calls } = recorder();
+    drawHighway(ctx, makeLayout(c, 800, 600, 0), c, state(0.55));
+    expect(calls.slice(0, 2)).toEqual(["clearRect", "fillRect rgba(0,0,0,0.55)"]);
   });
 });

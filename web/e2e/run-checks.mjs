@@ -35,9 +35,7 @@ const CHECK_TIMEOUT_MS = 8 * 60_000;
 // row that include the fix (one green run can be luck).
 // Decision ci-browser-known-red.md.
 export const KNOWN_RED = {
-  "web/src/game/cabinet/verify-cabinet.mjs": 429,
   "web/src/game/capture-mode/verify-capture.mjs": 431,
-  "web/src/game/demo-reset/verify-reset.mjs": 478,
   "web/src/game/learn-from-select/verify-learn.mjs": 485,
   "web/src/game/notice-toast/verify-toast.mjs": 432,
   "web/src/game/options-panel/verify-options.mjs": 447,

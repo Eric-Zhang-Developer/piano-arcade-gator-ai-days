@@ -1,6 +1,7 @@
 // Arcade HUD: song card, live counters, score and multiplier up top, and a giant translucent combo (spec: hud).
 // Driven only by GameEvents; reduceHud and hudLayout are pure so tests can pin them.
 import type { Chart, Frame, GameEvent, GamePlugin } from "../../contracts";
+import { isWaitMode } from "../wait-mode";
 import { bg, gold, good, miss, panel, tierX1, tierX2, tierX3, tierX4, whenDisplayFontReady, wrong } from "../ui-tokens";
 
 export const hudSettings = {
@@ -114,21 +115,22 @@ function fitText(ctx: CanvasRenderingContext2D, text: string, maxW: number, px: 
   ctx.fillText(t, 0, 0);
 }
 
-function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Card | null, display: string): void {
+// wait: a wait-mode take isn't scored, so the band holds the song card only (wait-hud draws its own count into it).
+function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Card | null, display: string, wait = false): void {
   const l = hudLayout(f.width, f.judgmentLineY);
   const { h } = l.panel;
   const pad = Math.max(10, h * 0.25);
-  const tier = tierFor(s.combo);
+  const tier = wait ? hudSettings.tiers[0] : tierFor(s.combo);
 
   // The giant combo first, so the panel draws over its top edge if they ever meet.
-  if (s.milestone) {
+  if (!wait && s.milestone) {
     const t = f.nowMs - s.milestone.atMs;
     if (t >= 0 && t < hudSettings.ghostMs) {
       const k = t / hudSettings.ghostMs;
       drawCombo(ctx, l, String(s.milestone.count), 1 + (hudSettings.ghostScale - 1) * k, hudSettings.ghostAlpha * (1 - k), tier.color, display);
     }
   }
-  if (s.combo >= hudSettings.comboFrom) {
+  if (!wait && s.combo >= hudSettings.comboFrom) {
     const t = s.milestone ? f.nowMs - s.milestone.atMs : Infinity;
     const swell = t >= 0 && t < hudSettings.swellMs ? 1 + (hudSettings.swellScale - 1) * Math.sin((Math.PI * t) / hudSettings.swellMs) : 1;
     drawCombo(ctx, l, String(s.combo), swell, hudSettings.comboAlpha, "#ffffff", display);
@@ -165,6 +167,8 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Car
     fitText(ctx, card.line2, cardW - pad * 1.5, h * 0.2);
     ctx.restore();
   }
+
+  if (wait) return;
 
   // Middle: the counters.
   const counters: [string, keyof typeof hudSettings.judgmentColors][] = [
@@ -231,6 +235,7 @@ declare global {
 export function hud(): GamePlugin {
   let state = emptyHud();
   let card: Card | null = null;
+  let wait = false;
   // Body face until the display face has loaded (or 1 s has passed), so the HUD never draws a half-loaded font.
   let display = hudSettings.font;
   if (typeof document !== "undefined")
@@ -240,7 +245,8 @@ export function hud(): GamePlugin {
     });
   return {
     id: "hud",
-    transformChart(chart: Chart) {
+    transformChart(chart: Chart, params: URLSearchParams) {
+      wait = isWaitMode(params);
       card = { title: chart.title, line2: [chart.composer, chart.catalog].filter(Boolean).join(" · ") };
       return chart;
     },
@@ -249,7 +255,7 @@ export function hud(): GamePlugin {
       if (typeof window !== "undefined") window.__pianoArcadeHud = state;
     },
     draw(ctx, frame) {
-      drawHud(ctx, frame, state, card, display);
+      drawHud(ctx, frame, state, card, display, wait);
     },
   };
 }

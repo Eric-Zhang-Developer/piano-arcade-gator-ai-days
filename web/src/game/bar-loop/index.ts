@@ -1,5 +1,6 @@
 import type { Chart, GamePlugin } from "../../contracts";
 import { GOOD_WEIGHT, msPerBeat } from "../core/settings";
+import { isWaitMode } from "../wait-mode";
 
 export const barLoopSettings = {
   defaultPasses: 4, // /play can't be stopped mid-song yet, so a loop is a set number of passes (decision bar-loop-passes)
@@ -72,6 +73,7 @@ export function barLoop(): GamePlugin & { passes(): number[] } {
   let plan: LoopPlan | null = null;
   let bpm = 0;
   let tally: Pass[] = [];
+  let wait = false; // wait mode isn't scored: no Passes list (every learn step would read 100.0%)
   const passOf = (noteId: string) => Number(/^p(\d+)-/.exec(noteId)?.[1] ?? 0) - 1;
   const accuracies = () => (plan ? tally.map((p) => passAccuracy(p, plan!.notesPerPass)) : []);
 
@@ -79,6 +81,7 @@ export function barLoop(): GamePlugin & { passes(): number[] } {
     id: "bar-loop",
     passes: accuracies,
     transformChart(c, params) {
+      wait = isWaitMode(params);
       const r = loopChart(c, params);
       plan = r?.plan ?? null;
       bpm = r?.chart.bpm ?? c.bpm;
@@ -96,7 +99,7 @@ export function barLoop(): GamePlugin & { passes(): number[] } {
         const k = Math.floor(e.atMs / (plan.passBeats * msPerBeat(bpm)));
         if (tally[k]) tally[k].wrong++;
       }
-      if (e.type === "songEnd") showPasses(accuracies());
+      if (e.type === "songEnd" && !wait) showPasses(accuracies());
     },
   };
 }

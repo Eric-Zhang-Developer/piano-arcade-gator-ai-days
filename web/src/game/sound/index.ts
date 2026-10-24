@@ -1,6 +1,7 @@
 // Event sounds: short laptop sounds at game events, mixed under the piano (spec: juice-sound). All synthesized here,
 // so web/public/sounds/ holds no files and needs no licenses yet.
 import type { GameEvent, GamePlugin } from "../../contracts";
+import { isWaitMode } from "../wait-mode";
 
 export type Sound = "stinger" | "sweep" | "fanfare" | "drumroll" | "rankHit" | "miss";
 
@@ -147,10 +148,16 @@ function play(ctx: AudioContext, out: AudioNode, sound: Sound, t: number) {
 export function eventSounds(): GamePlugin {
   let audio: AudioContext | null = null;
   let zeroPerf = 0; // performance.now() at chart time 0
+  let wait = false; // wait mode isn't scored: no drumroll or rank hit at the end (the judge sends no other moments)
 
   return {
     id: "juice-sound",
+    transformChart(chart, params) {
+      wait = isWaitMode(params);
+      return chart;
+    },
     onEvent(e) {
+      if (wait && e.type === "songEnd") return;
       if (e.type === "songStart") {
         zeroPerf = performance.now() - e.atMs;
         try {

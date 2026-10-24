@@ -3,6 +3,7 @@
 import type { Frame, GamePlugin } from "../../contracts";
 import { hudLayout, hudSettings } from "../hud";
 import { bg } from "../ui-tokens";
+import { isWaitMode } from "../wait-mode";
 import { type Gauge, emptyGauge, reduceGauge } from "./gauge";
 
 export const meterSettings = {
@@ -56,12 +57,14 @@ declare global {
 export function feverGauge(): GamePlugin {
   let notes = 0;
   let gauge = emptyGauge(0);
+  let wait = false; // wait mode isn't scored: no meter
   const publish = () => {
     if (typeof window !== "undefined") window.__pianoArcadeFeverGauge = gauge;
   };
   return {
     id: "fever-gauge",
-    transformChart(chart) {
+    transformChart(chart, params) {
+      wait = isWaitMode(params);
       notes = chart.notes.length;
       gauge = emptyGauge(notes);
       publish();
@@ -72,7 +75,7 @@ export function feverGauge(): GamePlugin {
       publish();
     },
     draw(ctx, frame) {
-      drawMeter(ctx, frame, gauge);
+      if (!wait) drawMeter(ctx, frame, gauge);
     },
   };
 }

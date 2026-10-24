@@ -23,7 +23,7 @@ export function LearningShell({ children }: { children: React.ReactNode }) {
   return <div className={styles.app}>
     <a href="#learning-content" className={styles.skip}>Skip to activity</a>
     <aside className={styles.rail}>
-      <Link href="/learn" className={styles.brand} aria-label="Piano Arcade learning home"><svg viewBox="0 0 28 30" aria-hidden="true"><path d="M2 2h24v26H2zM10 2v26M18 2v26"/><path d="M7 2h6v15H7zM15 2h6v15h-6z" fill="currentColor"/></svg><span>Piano<br/>Arcade</span></Link>
+      <Link href="/learn" className={styles.brand} aria-label="Piano Arcade learning home"><span>Piano<br/>Arcade</span></Link>
       <nav aria-label="Learning activities">{activityGroups.map((group) => <div key={group.title} className={styles.navGroup}><h2>{group.title}</h2>{group.links.map(([href, label]) => <Link key={href} href={href} aria-label={`${group.title} ${label.toLowerCase()}`} aria-current={pathname === href || (pathname === '/learn' && href.endsWith('/understand')) ? 'page' : undefined}><span>{label}</span></Link>)}</div>)}</nav>
       <div className={styles.railBottom}><span className={styles.preview}>Frontend preview</span><details><summary>About this preview</summary><p>Example activities. Answers stay in this browser tab and reset when you leave the activity. No account, progress sync or AI grading is connected.</p><p>The full learning service will require internet and carry acknowledged history between devices.</p></details><Link href="/">Back to arcade <span aria-hidden="true">↗</span></Link></div>
     </aside>

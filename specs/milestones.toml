@@ -17,6 +17,12 @@ features = ["core-loop"]
 cut = []
 
 [[milestone]]
+name = "audible"
+ship = ""
+features = ["beat-track"]
+cut = []
+
+[[milestone]]
 name = "arcade"
 ship = ""
 features = ["hud", "juice-visual", "juice-sound", "midi-watchdog"]

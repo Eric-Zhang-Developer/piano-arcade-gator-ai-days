@@ -7,6 +7,8 @@ import type { Chart, GameEvent, InputDevice, InputEvent, Results, Take } from ".
 import { validateChart } from "../../contracts";
 import { plugins } from "../../game/layers";
 import { barLines } from "../../game/bar-lines";
+import { coreGuard, createGuard } from "../../game/crash-guard";
+import { toast } from "../../game/notice-toast";
 import { drawHighway, makeLayout, staticRange, type HighwayState, type KeyRange, type Layout } from "../../game/core/highway";
 import { createZoom, zoomOn } from "../../game/highway-zoom";
 import { Judge, noteTimeMs } from "../../game/core/judge";
@@ -145,6 +147,15 @@ export default function Play() {
       backdropAlpha: background ? settings.stageBackdropAlpha : 1,
       barLines: barLines(chart, params), // the chart /play plays: a loop's bars carry the song's numbers
     };
+    // crash-guard: one plugin's throw turns that plugin off for this take (its layer cleared once, a toast says so) and
+    // the game goes on; Retry's new guard brings it back. Core's own throws are logged once and the frame goes on.
+    const guard = createGuard((id) => {
+      toast(`${id} stopped after an error. The game goes on.`);
+      const c = layerRefs.current[plugins.findIndex((p) => p.id === id)];
+      c?.getContext("2d")?.clearRect(0, 0, c.width, c.height);
+    });
+    const core = coreGuard();
+    const bgId = plugins.find((p) => p.background)?.id ?? "";
     const handOf = new Map(chart.notes.map((n) => [n.id, n.hand]));
     let hud = emptyHud(); // rebuilt with the HUD's own reducer, as records does
     const emit = (e: GameEvent) => {
@@ -153,7 +164,7 @@ export default function Play() {
       if (e.type === "noteHit") hw.latest = { judgment: e.judgment, offsetMs: e.offsetMs, atMs: e.atMs };
       if (e.type === "noteMiss") hw.latest = { judgment: "MISS", offsetMs: null, atMs: e.atMs };
       if (e.type === "wrongNote") hw.latest = { judgment: "WRONG", offsetMs: null, atMs: e.atMs };
-      for (const p of plugins) p.onEvent?.(e);
+      for (const p of plugins) if (p.onEvent) guard.run(p.id, "onEvent", () => p.onEvent!(e));
     };
     const judge = new Judge(chart, emit, { scored: !isWaitMode(params) }); // wait mode: no score moments
     hw.noteState = judge.noteState;
@@ -266,7 +277,7 @@ export default function Play() {
     if (!test) window.addEventListener("keydown", onKey); // ?input=test never pauses
     // After the take, the background keeps animating behind the results screen until the next take or unmount.
     const idle = () => {
-      background?.frame({ ...layout!, nowMs: clock.now(performance.now()) });
+      if (background) guard.run(bgId, "background", () => background.frame({ ...layout!, nowMs: clock.now(performance.now()) }));
       idleRaf = requestAnimationFrame(idle);
     };
     const finish = (now: number) => {
@@ -282,6 +293,13 @@ export default function Play() {
       setPhase("results");
     };
     const frame = () => {
+      try {
+        step();
+      } finally {
+        if (!done) raf = requestAnimationFrame(frame); // whatever threw, the clock runs on to the results
+      }
+    };
+    const step = () => {
       if (mode === "countdown") {
         const left = countdownUntil - performance.now();
         if (left <= 0) act("countdownDone");
@@ -295,21 +313,20 @@ export default function Play() {
       hw.countInBeat = beat > 0 ? beat : null;
       if (beat > lastBeat) emit({ type: "countInBeat", beat, atMs: (beat - 1 - settings.countInBeats) * mpb });
       lastBeat = beat;
-      if (!wait) judge.advance(now - Math.max(0, latencyRef.current) - INPUT_GRACE_MS);
+      if (!wait) core("the judge", () => judge.advance(now - Math.max(0, latencyRef.current) - INPUT_GRACE_MS));
 
       if (zoom) layout = makeLayout(chart, w, h, perspective, zoom(now));
-      drawHighway(ctx, layout!, chart, hw);
+      core("drawHighway", () => drawHighway(ctx, layout!, chart, hw));
       const f = { ...layout!, nowMs: now };
       plugins.forEach((p, i) => {
         const lc = layerCtxs[i];
-        if (!lc || !p.draw) return;
+        if (!lc || !p.draw || guard.off(p.id)) return;
         lc.clearRect(0, 0, f.width, f.height);
-        p.draw(lc, f);
+        guard.run(p.id, "draw", () => p.draw!(lc, f));
       });
-      background?.frame(f);
+      if (background) guard.run(bgId, "background", () => background.frame(f));
 
-      if (now > lastNoteMs + GOOD_MS + Math.max(0, latencyRef.current) + INPUT_GRACE_MS + END_TAIL_MS) return finish(now);
-      if (!done) raf = requestAnimationFrame(frame);
+      if (now > lastNoteMs + GOOD_MS + Math.max(0, latencyRef.current) + INPUT_GRACE_MS + END_TAIL_MS) finish(now);
     };
     raf = requestAnimationFrame(frame);
 

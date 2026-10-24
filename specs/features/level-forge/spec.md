@@ -1,7 +1,7 @@
 ---
 name: "Level forge spike: an in-app agent turns a public-domain source into a playable level, priced per level"
 depends_on: ["song-pack-1", "chart-lint", "piano-sim"]
-owns: ["specs/features/level-forge/", "changes/level-forge.md", "web/src/app/api/forge/", "web/src/app/forge/", "spikes/level-forge/", "specs/decisions/level-forge-"]
+owns: ["specs/features/level-forge/", "changes/level-forge.md", "game-tools/forge/", "web/src/app/api/forge/", "web/src/app/forge/", "spikes/level-forge/", "specs/decisions/level-forge-"]
 assignee: "eric"
 ---
 
@@ -13,33 +13,58 @@ piece's name, and an agent finds a public-domain source, runs our converter and 
 you can play. It overlaps the provisional learning-lane `chart-compiler` spec; Eric is claiming it for his lane, the
 same move as `song-rip-spike`. A spike follows the spike guideline (#493): one question, findings at the end.
 
+## Two phases
+Eric, 2026-10-24: "the forge spike's phase 1 is a local agent session using the same convert/check/save scripts, no
+API spend; the in-app API route is phase 2."
+- **Phase 1 (local, no API spend):** a worker's own Claude Code session plays the agent. It searches Mutopia and
+  IMSLP, picks a source and bars, and runs the scripts: `download`, `convert`, `check`, `save`
+  (`game-tools/forge/`). This is the spike's question and its FINDINGS.md.
+- **Phase 2 (in-app, API key):** the `/api/forge` route and `/forge` page below call the same scripts, unchanged,
+  with a budget set from phase 1's numbers. It starts only when Eric says go.
+
 ## The question
-Can an in-app agent make a correct, playable level from a public-domain source in **under 2 minutes**, and what does
-one level cost?
+Phase 1 answers it; phase 2 repeats it in the app. Can an agent make a correct, playable level from a public-domain
+source in **under 2 minutes**, and what does one level cost?
 - **Yes:** at least 4 of 5 test pieces (below) end in a saved level that passes every check, each in under 2 minutes,
   with the cost of each measured.
 - **No:** fewer than 4 pass, or a passing level takes over 2 minutes. FINDINGS.md says which step failed.
-- **Time box:** 3 hours of building after the key works. Then FINDINGS.md, whatever the state.
+- **Time box:** 3 hours for phase 1. Then FINDINGS.md, whatever the state.
 
 ## Plan
-1. **Key, done by Eric.** He creates an Anthropic API key, sets a $5–10 spend limit on its workspace in the Console,
-   and pastes it into the main checkout's `web/.env.local` as `ANTHROPIC_API_KEY` (`web/.env.example` shows the
-   name). In the worktree that builds this spike, symlink that file: `ln -s <main>/web/.env.local web/.env.local`, so
-   the key lives in one file. Agents never create, print, copy or commit the key, and never use a `NEXT_PUBLIC_`
-   name.
-2. **Dependencies.** `@anthropic-ai/sdk` and `zod` go into `web/package.json`, which is frozen: a `contract:` PR adds
+1. **Phase 1 scripts**, `game-tools/forge/`: `download`, `convert`, `check` and `save`, plain commands with the
+   behavior under Requirements, Tools. Each prints JSON. Phase 2 calls them as they are.
+2. **Phase 1 runs**: the five pieces under Validation, from a worker's session, then FINDINGS.md in
+   `spikes/level-forge/`. No API key, no new `web/` dependency.
+3. **Phase 2, on Eric's go only.**
+4. **Key, done by Eric** (added 2026-10-24 to `web/.env.local`, which is the only file Next reads; the Console's
+   $5–10 spend limit isn't confirmed yet). In the worktree that builds phase 2, symlink that file
+   (`ln -s <main>/web/.env.local web/.env.local`) so the key lives in one place. Agents never create, print, copy or
+   commit the key, and never use a `NEXT_PUBLIC_` name. Phase 1 doesn't touch it.
+5. **Dependencies.** `@anthropic-ai/sdk` and `zod` go into `web/package.json`, which is frozen: a `contract:` PR adds
    just those two, first.
-3. **The route**, `web/src/app/api/forge/route.ts`, then the page `/forge`, then the five test runs, then FINDINGS.md.
+6. **The route**, `web/src/app/api/forge/route.ts`, then the page `/forge`, then the five runs again in the app.
 
 ## Requirements
-**The agent**
+**Tools** (phase 1 scripts; phase 2 exposes the same ones to the model)
+- `download`, `convert`, `check` and `save`, as described for phase 2 below. They are code, so their refusals hold
+  in both phases.
+- `check` runs the library test's rules and the perfect bot over one chart. If those live in TypeScript, `check` is a
+  small vitest file run by name, never a copy of the rules.
+
+**Phase 1 measures**, per piece, into FINDINGS.md:
+- pass or fail;
+- minutes from the request to a saved level;
+- the failing step and its message;
+- the tokens the session spent on it, from the session's own usage, as an estimate for phase 2.
+
+**Phase 2: the agent**
 - Official TypeScript SDK, Tool Runner (`client.beta.messages.toolRunner` with `betaZodTool` tools), model
   `claude-opus-5-5`, `output_config.effort` `"low"` (the runs compare `"medium"` too).
 - Refusal fallback on: beta `server-side-fallback-2026-07-01` with `fallbacks: "default"`. Check `stop_reason`
   before reading content; a refusal ends the forge with its reason on screen.
 - Opus 5.5 rejects forced `tool_choice`: keep `auto` and name the tool order in the prompt.
 
-**Tools** (the only ones it gets)
+**Phase 2: tools** (the only ones the model gets)
 - `web_search` (`web_search_20260209`) and `web_fetch` (`web_fetch_20260209`), both with
   `allowed_domains: ["mutopiaproject.org", "imslp.org"]`. Web fetch only opens URLs already in the conversation.
 - `download(url)`: our code fetches the file, because web fetch hands content to the model, not a file to us.
@@ -83,20 +108,27 @@ one level cost?
   fallback.
 
 ## Validation
-1. `pnpm -C web exec vitest run --passWithNoTests src/app/api/forge`:
+Phase 1:
+1. Each script's refusals, with no network: `download` refuses another host, another extension and a file over
+   5 MB. `save` refuses a chart `convert` didn't write in this forge.
+2. Five forges from a worker's session (the pieces in step 4), one at a time, through the scripts only. Each gets the
+   measures above.
+
+Phase 2 (on Eric's go):
+3. `pnpm -C web exec vitest run --passWithNoTests src/app/api/forge`:
    - `save` refuses a chart whose hash isn't from this forge's `convert`;
    - `download` refuses another host, another extension and a file over 5 MB;
    - the route returns 404 without the key;
    - the cap refuses once the log total reaches `FORGE_CAP_USD`.
    - No network: the SDK client is a fake.
-2. Five real forges from `/forge`, one at a time, at effort `"low"`, then the two slowest again at `"medium"`:
+4. Five real forges from `/forge`, one at a time, at effort `"low"`, then the two slowest again at `"medium"`:
    - Twinkle (a control: Mutopia has it);
    - Bach's Prelude BWV 846 (Mutopia 5);
    - Joplin's The Entertainer (Mutopia 263);
    - Chopin's Minute Waltz (Mutopia 483);
    - one piece Eric names on the day.
    For each: pass or fail, seconds, tokens, dollars, and whether the level plays from song select.
-3. One forge with wifi off: the page shows the forged list and no error.
+5. One forge with wifi off: the page shows the forged list and no error.
 
 ## Gaps (accepted)
 - OpenRouter is Eric's alternative. It's not in this spike: the Anthropic server tools may not pass through a

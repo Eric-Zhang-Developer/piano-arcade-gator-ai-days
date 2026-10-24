@@ -102,9 +102,9 @@ features = [
 cut = []
 
 # polish: Eric's 25 polish features (2026-10-24), ranked by a hackathon-coach pass for the 90-second video and the
-# judges' hands-on demo: quick practice mode first, then what protects and lights up the video. Ten more are specced
-# in backlog (wait-hands, wait-hint, select-to-stage, score-rollup, ui-sounds, pause-skin, options-panel,
-# notice-toast, black-key-lanes, pill-match); the planner promotes them when this queue runs low.
+# judges' hands-on demo: quick practice mode first, then what protects and lights up the video. The last six were
+# promoted from backlog when the queue ran low (closest to the video and practice first). Still in backlog:
+# options-panel, notice-toast, black-key-lanes, pill-match.
 [[milestone]]
 name = "polish"
 ship = ""
@@ -124,6 +124,12 @@ features = [
   "sheet-view",
   "bar-lines",
   "select-stage",
+  "select-to-stage",
+  "ui-sounds",
+  "score-rollup",
+  "wait-hint",
+  "wait-hands",
+  "pause-skin",
 ]
 cut = []
 

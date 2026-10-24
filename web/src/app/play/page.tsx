@@ -18,6 +18,7 @@ import { SfxControls } from "../../game/sound/SfxControls";
 import { nextPause, pauseClock, type PauseAction, type PauseMode } from "../../game/play-slots";
 import { Slots } from "../../game/play-slots/ui";
 import { PauseMenu } from "../../game/pause-skin";
+import { beatTiming } from "../../game/beat/timing";
 import { ResultsLayout } from "../../game/results-layout";
 import { emptyHud, reduceHud } from "../../game/hud";
 import { barStep, holdClock, isWaitMode } from "../../game/wait-mode";
@@ -125,6 +126,7 @@ export default function Play() {
     const test = params.get("input") === "test";
     const perspective = Math.min(0.3, Math.max(0, Number(params.get("perspective")) || settings.perspective));
     const mpb = msPerBeat(chart.bpm);
+    const pulse = beatTiming(chart);
     const lastNoteMs = Math.max(...chart.notes.map((n) => noteTimeMs(chart, n)));
 
     const take: Take = {
@@ -138,7 +140,7 @@ export default function Play() {
     const bgEl = backgroundRef.current;
     const background = bgEl ? (plugins.find((p) => p.background)?.background?.(bgEl) ?? null) : null;
     const hw: HighwayState = {
-      nowMs: -settings.countInBeats * mpb,
+      nowMs: -pulse.countInBeats * mpb,
       noteState: new Map(),
       pressed: new Set(),
       pressedHand: new Map(),
@@ -170,7 +172,7 @@ export default function Play() {
     hw.noteState = judge.noteState;
     // Zero is fixed here, after the stage and judge are built, so songStart's atMs is the chart time now and a plugin's
     // performance.now() - atMs is the same zero the judge uses. Fixed before the build, it trailed by the build (#173).
-    const zeroPerf = performance.now() + settings.countInBeats * mpb; // chart clock 0 = beat 0 of bar 1
+    const zeroPerf = performance.now() + pulse.countInBeats * mpb; // chart clock 0 = beat 0 of bar 1
     const pauses = pauseClock(zeroPerf); // stands still while paused (play-slots)
     // ?mode=wait: the chart clock also holds at each note until it's pressed, and nothing is a MISS (wait-mode).
     const wait = isWaitMode(params) ? holdClock(chart, judge.noteState) : null;
@@ -178,7 +180,7 @@ export default function Play() {
       now: (perf: number) => (wait ? wait.now(pauses.now(perf)) : pauses.now(perf)),
       toPerf: (chartMs: number) => pauses.toPerf(wait ? wait.toOuter(chartMs) : chartMs),
     };
-    emit({ type: "songStart", atMs: hw.nowMs });
+    emit({ type: "songStart", atMs: clock.now(performance.now()) });
 
     // Input: every device feeds one handler; a key's judged time is its arrival minus the latency offset.
     let firstKind = true;
@@ -257,7 +259,7 @@ export default function Play() {
       }
       if (next === "countdown") {
         countdownUntil = perf + chart.beatsPerBar * mpb;
-        setCountdown((shownCount = chart.beatsPerBar)); // the countdown's first render has its full count (pause-skin)
+        setCountdown((shownCount = pulse.pulsesPerBar));
       }
       if (next === "playing") {
         pauses.resume(perf);
@@ -326,15 +328,15 @@ export default function Play() {
       if (mode === "countdown") {
         const left = countdownUntil - performance.now();
         if (left <= 0) act("countdownDone");
-        else if (Math.ceil(left / mpb) !== shownCount) setCountdown((shownCount = Math.ceil(left / mpb)));
+        else if (Math.ceil(left / pulse.pulseMs) !== shownCount) setCountdown((shownCount = Math.ceil(left / pulse.pulseMs)));
       }
       const perf = performance.now();
       wait?.update(pauses.now(perf));
       const now = clock.now(perf);
       hw.nowMs = now;
-      const beat = now < 0 ? Math.floor(now / mpb) + settings.countInBeats + 1 : 0;
+      const beat = now < 0 ? Math.floor(now / pulse.pulseMs) + pulse.countInPulses + 1 : 0;
       hw.countInBeat = beat > 0 ? beat : null;
-      if (beat > lastBeat) emit({ type: "countInBeat", beat, atMs: (beat - 1 - settings.countInBeats) * mpb });
+      if (beat > lastBeat) emit({ type: "countInBeat", beat, atMs: (beat - 1 - pulse.countInPulses) * pulse.pulseMs });
       lastBeat = beat;
       if (!wait) core("the judge", () => judge.advance(now - Math.max(0, latencyRef.current) - INPUT_GRACE_MS));
 
@@ -425,7 +427,7 @@ export default function Play() {
         <PauseMenu
           mode={pauseMode}
           count={countdown}
-          beatMs={loaded ? msPerBeat(loaded.chart.bpm) : 500}
+          beatMs={loaded ? beatTiming(loaded.chart).pulseMs : 500}
           onResume={() => pauseRef.current("resume")}
           onRetry={() => pauseRef.current("retry")}
           onQuit={() => pauseRef.current("quit")}

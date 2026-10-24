@@ -1,7 +1,8 @@
 // The WARNING card (spec: difficulty, catalog G05): at level 13 or above, a full-width card with the level shows
 // during the first bar of the count-in. /play?warn=1 shows it on any song, for testing. No siren (mission.md).
 import type { Chart, Frame, GamePlugin } from "../../contracts";
-import { settings, msPerBeat } from "../core/settings";
+import { msPerBeat } from "../core/settings";
+import { countInBeats } from "../beat/timing";
 import { meterLayout } from "../fever-gauge";
 import { ink, inkDim, magenta, panel, whenDisplayFontReady } from "../ui-tokens";
 import { difficulty, difficultySettings } from "./difficulty";
@@ -11,8 +12,8 @@ export { difficulty, difficultyInputs, difficultySettings } from "./difficulty";
 // Chart time of the count-in's first bar: from the first count-in beat to the start of the second bar.
 export function firstCountInBar(chart: Pick<Chart, "bpm" | "beatsPerBar">): { fromMs: number; toMs: number } {
   const mpb = msPerBeat(chart.bpm);
-  const fromMs = -settings.countInBeats * mpb;
-  return { fromMs, toMs: fromMs + Math.min(chart.beatsPerBar, settings.countInBeats) * mpb };
+  const fromMs = -countInBeats(chart) * mpb;
+  return { fromMs, toMs: fromMs + chart.beatsPerBar * mpb };
 }
 
 // A band across the playfield, between the fever meter's label and the count-in digit, which core draws at 0.45 of

@@ -1,7 +1,8 @@
 // Beat track: a drum beat on the piano from the count-in to the end, so players hear the time (spec: beat-track).
 import type { Chart, GameEvent, GamePlugin } from "../../contracts";
 import { captureOn } from "../capture-mode";
-import { msPerBeat, settings as core } from "../core/settings";
+import { msPerBeat } from "../core/settings";
+import { beatTiming, countInBeats as countInFor } from "./timing";
 
 // General MIDI drums, channel 10.
 const SIDE_STICK = 37;
@@ -71,32 +72,39 @@ export function endBeat(chart: Chart): number {
 }
 
 // Every drum hit with fromMs <= atMs < toMs, on the chart clock. With a style's pattern, the count-in is unchanged.
-export function beatHits(chart: Chart, fromMs: number, toMs: number, countInBeats = core.countInBeats, style: string | null = null): Hit[] {
-  const mpb = msPerBeat(chart.bpm);
+export function beatHits(chart: Chart, fromMs: number, toMs: number, countInBeats = countInFor(chart), style: string | null = null): Hit[] {
+  const { pulseBeats, pulseMs, pulsesPerBar } = beatTiming(chart);
   const pattern = patternFor(chart, style);
   const hits: Hit[] = [];
-  const first = Math.max(-countInBeats, Math.floor(fromMs / mpb)) + 0; // + 0 turns -0 into 0
-  const last = Math.min(endBeat(chart), Math.ceil(toMs / mpb)); // exclusive
-  for (let b = first; b < last; b++) {
-    const atMs = b * mpb;
-    const accent = (((b + countInBeats) % chart.beatsPerBar) + chart.beatsPerBar) % chart.beatsPerBar === 0;
-    if (b < 0) {
-      if (atMs >= fromMs) hits.push({ atMs, note: SIDE_STICK, velocity: beatSettings.stickVelocity, accent });
+  // At reduced tempos a boundary can divide back to -7.999999999999999
+  // instead of -8. Use the same rounding on both ends of adjacent windows.
+  const ceilPulse = (value: number) => Math.ceil(value - 1e-9);
+  const end = endBeat(chart);
+  const first = Math.max(ceilPulse(-countInBeats / pulseBeats), ceilPulse(fromMs / pulseMs)) + 0;
+  const last = Math.min(ceilPulse(end / pulseBeats), ceilPulse(toMs / pulseMs));
+  for (let pulse = first; pulse < last; pulse++) {
+    const atMs = pulse * pulseMs;
+    const accent = pulse % pulsesPerBar === 0;
+    if (pulse < 0) {
+      hits.push({ atMs, note: SIDE_STICK, velocity: beatSettings.stickVelocity, accent });
       continue;
     }
-    if (pattern) {
-      const cycle = pattern.beatsPerBar ?? chart.beatsPerBar;
-      const pos = b % cycle;
+    if (pattern) continue; // a style's hits sit on quarter-note beats, below
+    if (accent) hits.push({ atMs, note: KICK, velocity: beatSettings.kickVelocity, accent: true });
+    hits.push({ atMs, note: HI_HAT, velocity: beatSettings.hatVelocity, accent });
+  }
+  if (pattern) {
+    const mpb = pulseMs / pulseBeats;
+    const cycle = pattern.beatsPerBar ?? chart.beatsPerBar;
+    for (let start = Math.max(0, Math.floor(fromMs / mpb / cycle)) * cycle; start < end && start * mpb < toMs; start += cycle) {
       for (const h of pattern.hits) {
-        if (Math.floor(h.at) !== pos) continue;
-        const t = (b + h.at - pos) * mpb + 0;
-        if (t >= fromMs && t < toMs) hits.push({ atMs: t, note: h.note, velocity: h.velocity, accent: accent && h.at === pos });
+        const beat = start + h.at;
+        const t = beat * mpb + 0; // + 0 turns -0 into 0
+        if (beat < end && t >= fromMs && t < toMs)
+          hits.push({ atMs: t, note: h.note, velocity: h.velocity, accent: beat % chart.beatsPerBar === 0 });
       }
-      continue;
     }
-    if (atMs < fromMs) continue;
-    if (b % chart.beatsPerBar === 0) hits.push({ atMs, note: KICK, velocity: beatSettings.kickVelocity, accent: true });
-    hits.push({ atMs, note: HI_HAT, velocity: beatSettings.hatVelocity, accent: b % chart.beatsPerBar === 0 });
+    hits.sort((x, y) => x.atMs - y.atMs); // stable: same-time hits keep the pattern's order
   }
   return hits;
 }
@@ -142,7 +150,7 @@ export function beatTrack(): GamePlugin {
   const schedule = (nowMs: number) => {
     if (!active || !chart) return;
     const until = nowMs + beatSettings.lookaheadMs;
-    for (const h of beatHits(chart, scheduledUntil, until, core.countInBeats, output ? style : null)) play(h);
+    for (const h of beatHits(chart, scheduledUntil, until, countInFor(chart), output ? style : null)) play(h);
     scheduledUntil = until;
     if (scheduledUntil >= endBeat(chart) * msPerBeat(chart.bpm)) stop();
   };
@@ -165,8 +173,8 @@ export function beatTrack(): GamePlugin {
   };
 
   // From chart time atMs on: songStart, or resume after a pause (the clock stood still, so atMs maps to now).
-  const begin = (atMs: number) => {
-    zero = performance.now() - atMs;
+  const begin = (atMs: number, eventPerf: number) => {
+    zero = eventPerf - atMs;
     if (audio) {
       bus = audio.createGain();
       bus.connect(audio.destination);
@@ -195,10 +203,13 @@ export function beatTrack(): GamePlugin {
       return c;
     },
     onEvent(e: GameEvent) {
+      // Initialization can take time. Keep the event's mapping instead of
+      // moving the song's entire pulse to the end of AudioContext startup.
+      const eventPerf = performance.now();
       if (e.type === "songEnd") return stop();
       if (e.type === "pause" || e.type === "quit") return silence();
       if (off || !chart) return;
-      if (e.type === "resume") return begin(e.atMs);
+      if (e.type === "resume") return begin(e.atMs, eventPerf);
       if (e.type !== "songStart") return;
       silence();
       if (!output) {
@@ -214,7 +225,7 @@ export function beatTrack(): GamePlugin {
         where += patternFor(chart, style)
           ? ` · ${style}`
           : ` · default (${beatPatterns[style] ? `${style} doesn't fit ${chart.beatsPerBar} beats a bar` : `no ${style} pattern`})`;
-      begin(e.atMs);
+      begin(e.atMs, eventPerf);
     },
     draw(ctx, frame) {
       schedule(frame.nowMs);

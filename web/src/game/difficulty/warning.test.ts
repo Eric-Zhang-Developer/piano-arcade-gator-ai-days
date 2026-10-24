@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, test } from "vitest";
 import type { Chart, Frame } from "../../contracts";
 import { hudLayout } from "../hud";
 import { meterLayout } from "../fever-gauge";
@@ -54,4 +54,9 @@ describe("WARNING card", () => {
       expect(b.h).toBeGreaterThan(40);
     }
   });
+});
+
+
+test("Nocturne warning follows the first bar of its two-bar 12/8 count-in", () => {
+  expect(firstCountInBar(load("nocturne-op9-2"))).toEqual({ fromMs: -12000, toMs: -6000 });
 });

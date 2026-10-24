@@ -3,7 +3,7 @@ The song preview on `/` shows one quiet line under its row: "Source: Mutopia ↗
 ## Where it lives
 `web/src/game/song-sources/` (`sourceLink`, `SongSource`, tests, `verify-sources.mjs`; #470) · `web/src/game/song-preview/index.tsx` mounts it (#483) · screens in `specs/features/song-sources/screens/`
 ## How to check it
-`node web/src/game/song-sources/verify-sources.mjs --out <dir>` prints `verify-sources: pass`: all ten songs' links match their first non-license URL, and Twinkle's click opens the `oldid=1378689555` page (stubbed). `verify-preview.mjs` passes unchanged. `verify.py --slug song-sources`: see the PR.
+`node web/src/game/song-sources/verify-sources.mjs --out <dir>` prints `verify-sources: pass`: all ten songs' links match their first non-license URL, and Twinkle's click opens the `oldid=1378689555` page (stubbed). `verify-preview.mjs` passes unchanged. `verify.py --slug song-sources`: pass at 4225fc3 (42/42 PERFECT with test input and on /sim).
 ## Gaps
 - **Not looked at by Eric:** on `/` at the booth screen, the line reads and doesn't crowd LEARN or PRACTICE 70%.
 - At 1280×720 the bottom-left corner overlapped until #492 (the select's in-flow footer); the 720p screen here is retaken after it lands.

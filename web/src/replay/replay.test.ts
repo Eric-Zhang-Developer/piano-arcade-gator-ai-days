@@ -114,11 +114,14 @@ test("piano: picks Portable Grand over another output; stop sends CC 123 on all 
   const out = pickOutput(access)!;
   expect(out).toBe(grand);
   expect(pickOutput({ outputs: new Map([["1", other]]) } as unknown as MIDIAccess)).toBeNull();
+  // A clock value where (now + 600) - now isn't exactly 600 in floating point: about 2% of real values are.
+  const clock = vi.spyOn(performance, "now").mockReturnValue(519.8459128728183);
   const voice = pianoVoice(out);
   voice.note(60, 600);
+  clock.mockRestore();
   expect(grand.send.mock.calls[0][0]).toEqual([0x90, 60, 80]);
   expect(grand.send.mock.calls[1][0]).toEqual([0x80, 60, 0]);
-  expect(grand.send.mock.calls[1][1] - grand.send.mock.calls[0][1]).toBe(600);
+  expect(grand.send.mock.calls[1][1] - grand.send.mock.calls[0][1]).toBeCloseTo(600, 9);
   grand.send.mockClear();
   voice.stop();
   expect(grand.send.mock.calls.map((c) => c[0])).toEqual(Array.from({ length: 16 }, (_, ch) => [0xb0 | ch, 123, 0]));

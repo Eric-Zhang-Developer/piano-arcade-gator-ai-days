@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { validateChart, type Chart } from "../../contracts";
 import { judgeTake } from "../../game/core/judge";
-import { getSession, linkGoogle, type Session } from "../../data/auth";
+import { getSession, linkGoogle, signInWithGoogle, signOut, type Session } from "../../data/auth";
 import { isConfigured } from "../../data/config";
 import { takeRows } from "../../data/mapping";
 import { readOutbox } from "../../data/outbox";
@@ -73,10 +73,25 @@ export default function ProgressPage() {
       <h1 style={{ margin: "0 0 4px" }}>Your progress</h1>
       <p style={{ opacity: 0.7, marginTop: 0 }}>
         {songId} · {source === "account" ? "saved to your account" : "on this device"}
-        {session?.is_anonymous && isConfigured() && (
-          <button style={linkButton} onClick={() => void linkGoogle().catch((e) => setNote(String(e.message ?? e)))}>
-            Keep my progress with Google
-          </button>
+        {isConfigured() && (!session || session.is_anonymous) && (
+          <>
+            {session && (
+              <button style={linkButton} onClick={() => void linkGoogle().catch((e) => setNote(String(e.message ?? e)))}>
+                Keep my progress with Google
+              </button>
+            )}
+            <button style={plainButton} onClick={() => void signInWithGoogle()}>
+              Already have an account? Sign in with Google
+            </button>
+          </>
+        )}
+        {session && !session.is_anonymous && (
+          <span data-testid="signed-in" style={{ marginLeft: 16 }}>
+            Signed in with Google{session.email ? ` as ${session.email}` : ""}
+            <button style={plainButton} onClick={() => void signOut().then(() => window.location.reload())}>
+              Sign out
+            </button>
+          </span>
         )}
       </p>
       {note && <p role="status" style={{ opacity: 0.8 }}>{note}</p>}
@@ -140,4 +155,5 @@ const h2: React.CSSProperties = { fontSize: 18, marginTop: 32 };
 const table: React.CSSProperties = { borderCollapse: "collapse", fontVariantNumeric: "tabular-nums" };
 const th: React.CSSProperties = { textAlign: "left", padding: "6px 16px 6px 0", opacity: 0.7, fontWeight: 500 };
 const td: React.CSSProperties = { padding: "6px 16px 6px 0" };
+const plainButton: React.CSSProperties = { marginLeft: 12, padding: 0, border: 0, background: "transparent", color: "#9aa", textDecoration: "underline", cursor: "pointer" };
 const linkButton: React.CSSProperties = { marginLeft: 16, padding: "4px 12px", borderRadius: 6, border: "1px solid #5ef2c4", background: "transparent", color: "#5ef2c4", cursor: "pointer" };

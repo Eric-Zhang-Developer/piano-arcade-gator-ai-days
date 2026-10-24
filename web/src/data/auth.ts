@@ -1,5 +1,6 @@
 // Browser sessions on Supabase Auth, over its REST API (no SDK). A player becomes an anonymous user on their first
 // save, with no sign-in screen; "Keep my progress" links Google to that same user, so their history stays.
+// On another device, "Sign in with Google" returns to that account, and the device's anonymous takes move into it.
 import { isConfigured, publishableKey, supabaseUrl } from "./config";
 
 export interface Session {
@@ -8,9 +9,12 @@ export interface Session {
   expires_at: number; // unix seconds
   user_id: string;
   is_anonymous: boolean;
+  email?: string;
 }
 
 export const SESSION_KEY = "pianoArcade.session";
+/** The anonymous session to merge after a Google sign-in on this device (its refresh token survives the redirect). */
+const MERGE_KEY = "pianoArcade.mergeFrom";
 
 function load(): Session | null {
   try {
@@ -106,9 +110,57 @@ export async function linkGoogle(): Promise<void> {
   window.location.assign(url);
 }
 
-/** On /auth/callback: read the tokens Supabase put in the URL hash. Returns an error message, or null on success. */
+/** Sends the player to Google to sign in to an existing account. This device's anonymous takes follow them there. */
+export async function signInWithGoogle(): Promise<void> {
+  const current = await getSession().catch(() => null);
+  try {
+    if (current?.is_anonymous) localStorage.setItem(MERGE_KEY, current.refresh_token);
+  } catch {
+    // storage blocked: sign-in still works, this device's anonymous takes stay with the old user
+  }
+  const q = new URLSearchParams({ provider: "google", redirect_to: `${window.location.origin}/auth/callback` });
+  window.location.assign(new URL(`/auth/v1/authorize?${q}`, supabaseUrl).href); // Supabase, then Google
+}
+
+/** Forgets this device's session. The next save starts a new anonymous player; the account keeps its takes. */
+export async function signOut(): Promise<void> {
+  const s = load();
+  store(null);
+  if (s) await authFetch("/logout", { method: "POST" }, s.access_token).catch(() => undefined);
+}
+
+/** Moves the remembered anonymous session's takes into the signed-in account, then forgets it. */
+async function mergeRemembered(into: string): Promise<string | null> {
+  let refreshToken: string | null = null;
+  try {
+    refreshToken = localStorage.getItem(MERGE_KEY);
+    localStorage.removeItem(MERGE_KEY);
+  } catch {
+    return null;
+  }
+  if (!refreshToken) return null;
+  const res = await authFetch("/token?grant_type=refresh_token", { method: "POST", body: JSON.stringify({ refresh_token: refreshToken }) });
+  if (!res.ok) return null; // the old anonymous session is gone: nothing to move
+  const old = (await res.json()) as TokenResponse;
+  const merge = await fetch("/auth/merge", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${into}` },
+    body: JSON.stringify({ fromToken: old.access_token }),
+  });
+  return merge.ok ? null : "Signed in, but this device's earlier takes couldn't be moved to your account.";
+}
+
+/**
+ * On /auth/callback: read the tokens Supabase put in the URL hash. Returns null on success, "redirecting" when it
+ * sent the player on to Google sign-in, or an error message.
+ */
 export async function finishRedirect(hash: string): Promise<string | null> {
   const p = new URLSearchParams(hash.replace(/^#/, ""));
+  if (p.get("error_code") === "identity_already_exists") {
+    // This Google account already belongs to a player (linked on another device): sign in to it instead.
+    await signInWithGoogle();
+    return "redirecting";
+  }
   const err = p.get("error_description") ?? p.get("error");
   if (err) return err;
   const access = p.get("access_token");
@@ -116,13 +168,14 @@ export async function finishRedirect(hash: string): Promise<string | null> {
   if (!access || !refreshToken) return "Sign-in didn't return a session.";
   const res = await authFetch("/user", { method: "GET" }, access);
   if (!res.ok) return `Couldn't read the signed-in user (${res.status}).`;
-  const user = (await res.json()) as { id: string; is_anonymous?: boolean };
+  const user = (await res.json()) as { id: string; is_anonymous?: boolean; email?: string };
   store({
     access_token: access,
     refresh_token: refreshToken,
     expires_at: Number(p.get("expires_at")) || Math.floor(Date.now() / 1000) + Number(p.get("expires_in") || 3600),
     user_id: user.id,
     is_anonymous: user.is_anonymous ?? false,
+    email: user.email,
   });
-  return null;
+  return user.is_anonymous ? null : mergeRemembered(access);
 }

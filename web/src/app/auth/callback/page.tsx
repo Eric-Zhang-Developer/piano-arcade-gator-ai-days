@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import { finishRedirect } from "../../../data/auth";
 
-// Google sends the player back here after "Keep my progress". The session arrives in the URL hash.
+// Google sends the player back here after "Keep my progress" or "Sign in with Google". The session arrives in the URL hash.
 export default function AuthCallback() {
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     void finishRedirect(window.location.hash).then((err) => {
+      if (err === "redirecting") return; // on to Google sign-in
       if (err) setError(err);
       else window.location.replace("/progress");
     });

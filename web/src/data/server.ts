@@ -27,15 +27,15 @@ async function rest(path: string, init: RequestInit & { userToken?: string } = {
 }
 
 /** The user behind a session token, or null if the token is missing, expired or forged. */
-export async function userFromToken(token: string | null): Promise<{ id: string } | null> {
+export async function userFromToken(token: string | null): Promise<{ id: string; isAnonymous: boolean } | null> {
   if (!token) return null;
   const res = await fetch(`${supabaseUrl}/auth/v1/user`, {
     headers: { apikey: publishableKey || secretKey(), Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
   if (!res.ok) return null;
-  const u = (await res.json()) as { id?: string };
-  return u.id ? { id: u.id } : null;
+  const u = (await res.json()) as { id?: string; is_anonymous?: boolean };
+  return u.id ? { id: u.id, isAnonymous: u.is_anonymous === true } : null;
 }
 
 export async function upsertSong(row: SongRow): Promise<void> {
@@ -68,4 +68,15 @@ export async function readProgress(userToken: string, songId: string) {
     rest(`/rest/v1/bar_trends?song_id=eq.${song}&order=bar.asc`, { userToken }).then((r) => r.json()),
   ]);
   return { history, bars };
+}
+
+/** Moves an anonymous player's takes and coach notes to another player, in one transaction. */
+export async function mergePlayer(from: string, to: string): Promise<number> {
+  const res = await rest("/rest/v1/rpc/merge_player", { method: "POST", body: JSON.stringify({ p_from: from, p_to: to }) });
+  return res.json();
+}
+
+/** Deletes an Auth user (admin API, secret key). Their players row cascades. */
+export async function deleteAuthUser(id: string): Promise<void> {
+  await rest(`/auth/v1/admin/users/${encodeURIComponent(id)}`, { method: "DELETE" });
 }

@@ -93,7 +93,18 @@ t = take(); await refused("a pitch off the piano", t, [note(t, "PERFECT", 1, { p
 t = take({ latency_offset_ms: 200 }); await refused("latency over 150 ms", t, [note(t, "PERFECT", 1)]);
 t = take({ input_device: "test" }); await refused("a test take", t, [note(t, "PERFECT", 1)]);
 
+// A second device's anonymous takes move to the Google account, and the anonymous player row goes away.
+const other = randomUUID();
+await db.exec(`insert into auth.users(id) values ('${other}'); insert into players(id) values ('${other}');`);
+const t3 = { ...take(), player_id: other };
+assert.equal(await save(t3, [note(t3, "PERFECT", 2)]), "saved");
+assert.equal((await rows(`select merge_player('${other}', '${player}') as n`))[0].n, 1);
+assert.equal((await rows(`select count(*)::int as n from takes where player_id = '${other}'`))[0].n, 0);
+assert.equal((await rows(`select count(*)::int as n from players where id = '${other}'`))[0].n, 0);
+assert.equal((await rows(`select merge_player('${player}', '${player}') as n`))[0].n, 0);
+say("ok  merge_player moves a device's takes to the signed-in player");
+
 const [trend] = await rows(`select notes, misses from bar_trends where player_id = '${player}'`);
-assert.deepEqual([Number(trend.notes), Number(trend.misses)], [3, 1]);
+assert.deepEqual([Number(trend.notes), Number(trend.misses)], [4, 1]);
 say("ok  bar_trends counts the saved notes");
 say(`pass: ${files.length} migrations apply and keep the rules`);

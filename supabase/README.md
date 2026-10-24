@@ -14,10 +14,11 @@ run locally, and a take that can't be saved waits in the browser's outbox. Owner
 | `bar_trends` | view | per bar over a player's last 5 takes of a song: notes, misses, mean offset, spread | that player |
 | `take_history` | view | one row per take, for the progress chart | that player |
 | `save_take(take, notes)` | function | saves a take and its notes in one transaction; answers `saved`, `duplicate` or `conflict` | server only |
+| `merge_player(from, to)` | function | moves an anonymous device's takes and coach notes into a Google account (`/auth/merge`) | server only |
 | `rls_auto_enable` | Supabase's own | turns RLS on for new tables automatically; not ours, leave it | nobody |
 
 Only Next.js server routes write, with `SUPABASE_SECRET_KEY`. The browser holds the publishable key and the player's
-own session, so it can read that player's rows and nothing else. Auth: anonymous sign-ins on; Google off for now.
+own session, so it can read that player's rows and nothing else. Auth: anonymous sign-ins on; Google for "Keep my progress" and "Sign in with Google" (setup below).
 
 ## Keys (all in `web/.env.local`, which git ignores)
 | Variable | Where it's used | Where to find it |
@@ -59,7 +60,15 @@ CLI doesn't run it again: `npx -y supabase@2.122.0 migration repair --status app
       (`migration repair`, Oct 24 2026). `supabase/push.sh --status` shows local and remote matching.
 - [ ] CAPTCHA (Turnstile or hCaptcha) on anonymous sign-ins: Supabase's advice, since every visitor becomes a user row.
 - [ ] Email sign-up is on but unused: turn it off unless the coach lane needs it.
-- [ ] Google provider, for "Keep my progress".
+- [ ] Google sign-in:
+  1. Google Cloud console: OAuth consent screen (External, Testing; add every player's Gmail as a test user), then
+     a **Web application** OAuth client with origin `http://localhost:3000` and redirect URI
+     `https://umswmcehegvggcfcjdfy.supabase.co/auth/v1/callback`.
+  2. Supabase > Authentication > Sign In / Providers > Google: on, with that client's ID and secret (never in git).
+  3. Same page: **Allow manual linking** on (needed to link Google to an anonymous player).
+  4. Authentication > URL Configuration: Site URL `http://localhost:3000`; Redirect URLs `http://localhost:3000/auth/callback`
+     (add the deployed URL's `/auth/callback` when there is one).
+  5. `supabase/push.sh` to apply `merge_player` (0004).
 
 ## Things to know about the free plan
 - A project with no traffic for 7 days is paused; restoring takes a minute from the dashboard. Open the app (or the

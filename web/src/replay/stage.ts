@@ -260,6 +260,17 @@ export function createStage(
   });
   observer.observe(host);
 
+  // For the headless verify: where a pillar's middle is on screen, so a real click can raycast it.
+  (window as Window & { __attract?: unknown }).__attract = {
+    screenOf(slug: string) {
+      const p = pillars.get(slug);
+      if (!p) return null;
+      const v = p.group.position.clone().setY(p.body.scale.y / 2).project(camera);
+      const r = renderer.domElement.getBoundingClientRect();
+      return { x: r.left + ((v.x + 1) / 2) * r.width, y: r.top + ((1 - v.y) / 2) * r.height };
+    },
+  };
+
   let raf = 0;
   let last = performance.now();
   const frame = (now: number) => {

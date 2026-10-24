@@ -14,6 +14,7 @@ import styles from "./attract.module.css";
 const SNAPSHOT_URL = "/operator/snapshot.json";
 const CHART_URL = "/songs/twinkle/chart.json";
 const LEAD_MS = 600; // from Play to the first step
+const MAX_LATE_MS = 150;
 
 const isBoard = (b: unknown): b is Board => {
   const x = b as Board | null;
@@ -47,6 +48,7 @@ export default function AttractPage() {
   const voice = useRef<Voice | null>(null);
   const audio = useRef<AudioContext | null>(null);
   const shownK = useRef(-1);
+  const origin = useRef(0); // performance.now() of step time 0, so steps don't drift by each timer's lateness
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -104,18 +106,24 @@ export default function AttractPage() {
     shownK.current = k;
   }, [k, data]);
 
-  // The clock: each step fires after the previous one, spaced by the chart's beats (or the merges' wall clock).
+  const time = (i: number) => (data ? (wall ? data.ss[i].wallMs : data.ss[i].atMs) : 0);
+  // Step k is "now": anchor the clock there (on play, scrub or a wall-clock switch).
+  const anchor = (at: number) => (origin.current = performance.now() - (at >= 0 ? time(at) : -LEAD_MS));
+
+  // The clock: step i fires at origin + its time on the chart's beats (or on the merges' wall clock).
   useEffect(() => {
     if (!playing || !data) return;
     const { ss } = data;
     const next = k + 1;
-    const time = (i: number) => (wall ? ss[i].wallMs : ss[i].atMs);
-    const delay = next >= ss.length ? 0 : next === 0 ? LEAD_MS : time(next) - time(k);
+    const delay = next >= ss.length ? 0 : origin.current + (wall ? ss[next].wallMs : ss[next].atMs) - performance.now();
     const t = setTimeout(() => {
       if (next >= ss.length) {
         voice.current?.stop();
         return setPlaying(false);
       }
+      // Badly late (a stalled tab, the first WebGL frames): move the clock on rather than rush notes to catch up.
+      const late = performance.now() - (origin.current + (wall ? ss[next].wallMs : ss[next].atMs));
+      if (late > MAX_LATE_MS) origin.current += late;
       if (!wall) voice.current?.note(ss[next].note.pitch, ss[next].noteMs);
       setK(next);
     }, Math.max(0, delay));
@@ -140,7 +148,9 @@ export default function AttractPage() {
       }
     }
     await audio.current?.resume();
-    if (data && k >= data.ss.length - 1) setK(-1);
+    const from = data && k >= data.ss.length - 1 ? -1 : k;
+    setK(from);
+    anchor(from);
     setPlaying(true);
   }
   const toggleRef = useRef(toggle);
@@ -243,14 +253,25 @@ export default function AttractPage() {
               min={-1}
               max={data.ss.length - 1}
               value={k}
-              onChange={(e) => setK(Number(e.target.value))}
+              onChange={(e) => {
+                const at = Number(e.target.value);
+                setK(at);
+                anchor(at);
+              }}
               aria-label="Step"
             />
             <span className={styles.stepNo}>
               {k + 1} / {data.ss.length}
             </span>
             <label className={styles.toggle}>
-              <input type="checkbox" checked={wall} onChange={(e) => setWall(e.target.checked)} /> wall clock (no notes)
+              <input
+                type="checkbox"
+                checked={wall}
+                onChange={(e) => {
+                  setWall(e.target.checked);
+                  if (data && k >= 0) origin.current = performance.now() - (e.target.checked ? data.ss[k].wallMs : data.ss[k].atMs);
+                }}
+              /> wall clock (no notes)
             </label>
             {voiceName && <span className={op.dim}>{voiceName}</span>}
           </div>

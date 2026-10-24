@@ -44,6 +44,7 @@ export type Inputs = {
   heartbeats: Heartbeat[] | null;
   gh: Gh;
   banner: string[]; // what's missing, in words
+  songRequests?: { number: number; createdAt: string }[] | null; // issues labeled song-request, any state
 };
 
 export type State = "done" | "in flight" | "ready" | "blocked" | "backlog" | "cut" | "unknown";
@@ -77,8 +78,25 @@ export type Board = {
     medianMergeMin: number | null;
     longest: { number: number; title: string; url: string; minutes: number }[] | null;
     firstPrAt: string | null;
+    songRequests?: SongRequestTime[] | null; // absent in snapshots older than song-requests
   };
 };
+export type SongRequestTime = { issue: number; pr: number; url: string; minutes: number };
+
+const CLOSES = /\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)/gi;
+
+// song-requests: each merged PR that closed a song-request issue, timed from the issue's creation to the merge.
+export function songRequestTimes(merged: AnyPr[], requests: { number: number; createdAt: string }[]): SongRequestTime[] {
+  const created = new Map(requests.map((r) => [r.number, r.createdAt]));
+  return merged
+    .flatMap((p) =>
+      [...(p.body ?? "").matchAll(CLOSES)]
+        .map((m) => Number(m[1]))
+        .filter((n) => created.has(n))
+        .map((n) => ({ issue: n, pr: p.number, url: p.url, minutes: Math.round(minutesBetween(created.get(n)!, p.mergedAt!)) })),
+    )
+    .sort((a, b) => a.issue - b.issue);
+}
 
 export const STALE_DRAFT_MIN = 45; // the watchdog's stale_claim_minutes
 
@@ -228,6 +246,7 @@ export function buildBoard(i: Inputs): Board {
       medianMergeMin: merged && mergeMins.length ? Math.round(median(mergeMins)!) : null,
       longest,
       firstPrAt: firstPr,
+      songRequests: merged && i.songRequests ? songRequestTimes(merged, i.songRequests) : null,
     },
   };
 }

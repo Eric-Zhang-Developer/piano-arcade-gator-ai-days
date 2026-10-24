@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "vitest";
-import { buildBoard, featureState, needsPerson, parseFrontmatter, parseMilestones, specFrom, titleType, toSnapshot, workerOf, type Inputs, type OpenPr } from "./board";
+import { buildBoard, featureState, songRequestTimes, needsPerson, parseFrontmatter, parseMilestones, specFrom, titleType, toSnapshot, workerOf, type Inputs, type OpenPr } from "./board";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
 const AT = "2026-10-24T12:00:00.000Z";
@@ -194,4 +194,19 @@ test("every PR, oldest first, with its worker and no body", () => {
     { number: 2, title: "plan: y", state: "MERGED", createdAt: minsBefore(20), mergedAt: minsBefore(10), closedAt: minsBefore(10), url: "u2", worker: "planner" },
     { number: 3, title: "feat(a): x", state: "CLOSED", createdAt: minsBefore(9), mergedAt: null, closedAt: minsBefore(1), url: "u3", worker: "eric-1" },
   ]);
+});
+
+test("song requests: a merged PR closing a song-request issue is timed from the issue to the merge", () => {
+  const merged = (number: number, body: string, mergedAt: string | null) => ({
+    number, title: `chore(song-requests): chart ${number}`, body, state: mergedAt ? "MERGED" : "OPEN", url: `p${number}`,
+    createdAt: minsBefore(50), mergedAt, closedAt: mergedAt,
+  });
+  const requests = [{ number: 41, createdAt: minsBefore(90) }, { number: 42, createdAt: minsBefore(30) }];
+  const prs = [merged(3, "Closes #41", minsBefore(10)), merged(4, "fixes #99 (not a request)", minsBefore(5)), merged(5, "resolves #42", AT)];
+  expect(songRequestTimes(prs, requests)).toEqual([
+    { issue: 41, pr: 3, url: "p3", minutes: 80 },
+    { issue: 42, pr: 5, url: "p5", minutes: 30 },
+  ]);
+  expect(buildBoard(inputs({ allPrs: prs, songRequests: requests })).books.songRequests).toHaveLength(2);
+  expect(buildBoard(inputs({ allPrs: prs, songRequests: null })).books.songRequests).toBeNull();
 });

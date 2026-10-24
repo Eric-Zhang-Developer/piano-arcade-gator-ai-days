@@ -6,6 +6,7 @@ import { useState, type KeyboardEvent } from "react";
 import { useBestGrades } from "../records/best";
 import { SongCard } from "../song-card";
 import { SongJacket } from "../song-jacket/SongJacket";
+import { SongPreview } from "../song-preview";
 import type { Song } from "../song-select/load";
 import styles from "./select-layout.module.css";
 
@@ -51,6 +52,7 @@ export function MusicSelect({ songs }: { songs: Song[] }) {
               <dd>{song.noteCount}</dd>
             </div>
           </dl>
+          <SongPreview id={song.id} best={best[song.id]} />
         </section>
       )}
       <ol className={styles.list} onKeyDown={onKeyDown}>
@@ -62,6 +64,7 @@ export function MusicSelect({ songs }: { songs: Song[] }) {
               className={styles.link}
               data-testid={`song-${s.id}`}
               onFocus={() => setFocused(i)}
+              onMouseEnter={(e) => e.currentTarget.focus({ preventScroll: true })} // hover highlights too (song-preview)
             >
               <SongCard
                 {...s}

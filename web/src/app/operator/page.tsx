@@ -365,6 +365,23 @@ function Books({ board }: { board: Board }) {
             </td>
           </tr>
           <tr>
+            <th scope="row">Song requests</th>
+            <td>
+              {!books.songRequests
+                ? "unknown"
+                : books.songRequests.length === 0
+                  ? "none yet"
+                  : books.songRequests.map((r) => (
+                      <div key={`${r.issue}-${r.pr}`}>
+                        <a href={r.url} target="_blank" rel="noreferrer">
+                          song request #{r.issue}
+                        </a>
+                        : <span className={styles.num}>{r.minutes}</span> min from issue to merge
+                      </div>
+                    ))}
+            </td>
+          </tr>
+          <tr>
             <th scope="row">First PR</th>
             <td className={styles.num}>{books.firstPrAt ? clock(books.firstPrAt) : "unknown"}</td>
           </tr>

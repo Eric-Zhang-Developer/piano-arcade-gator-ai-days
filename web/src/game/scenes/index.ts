@@ -128,10 +128,17 @@ export function scenes(): GamePlugin {
     },
     onEvent(e) {
       if (e.type === "songStart" || e.type === "resume") {
-        zeroPerf = performance.now() - e.atMs;
+        // Chart zero comes from the next frame, not from now - atMs: /play builds the stage between fixing its zero
+        // and emitting songStart, so that estimate runs late by the build time (~20 ms, a GREAT turned GOOD).
+        zeroPerf = null;
         fromMs = e.type === "resume" ? e.atMs : -Infinity;
-        play();
+        cancel();
       } else if (e.type === "pause" || e.type === "quit" || e.type === "songEnd") cancel();
+    },
+    draw(_ctx, f) {
+      if (!bot || zeroPerf !== null) return;
+      zeroPerf = performance.now() - f.nowMs;
+      play();
     },
     wrapInput(device) {
       if (!bot || device.kind !== "keys") return device;
@@ -140,7 +147,7 @@ export function scenes(): GamePlugin {
         async start(onEvent) {
           out = audible ? await pianoOutput() : null;
           emit = onEvent;
-          play(); // /play emits songStart before it starts the devices
+          play(); // in case the first frame came first
         },
         stop() {
           cancel();
@@ -169,7 +176,7 @@ function notice(text: string) {
   el.textContent = text;
   Object.assign(el.style, {
     position: "fixed",
-    left: "16px",
+    right: "16px",
     bottom: "16px",
     padding: "8px 12px",
     background: "rgba(0, 0, 0, 0.85)",

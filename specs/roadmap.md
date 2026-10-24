@@ -59,6 +59,11 @@ shows. In order: `replay-view`, `wait-mode`, `highway-zoom`, `ghost`, `chord-syn
 `song-requests` (an issue labeled `song-request` becomes a chart; `AGENTS.md`, Song requests), `piano-voice`,
 `take-midi`, and last `versus` and `cabinet`, which are made for the booth.
 
+## Extras
+Milestone **extras**, after `judging`: ten backlog specs Eric promoted on 2026-10-24 to keep the queue fed while he
+was away, in his order: `help-overlay`, `watch-demo`, `phone-guard`, `sheet-beams`, `sheet-pickups`, `key-preview`,
+`song-options`, `sheet-review`, `rewind`, `score-card`. `song-options` waits on `easy-charts`.
+
 ## Open
 - The challenge statement's technology (first public in the past 12 months, central to the project) isn't chosen.
 - The learning lane's person and GitHub handle, for `AGENTS.md` Lanes and `.github/CODEOWNERS`.

@@ -26,7 +26,7 @@ API spend; the in-app API route is phase 2."
 Phase 1 answers it; phase 2 repeats it in the app. Can an agent make a correct, playable level from a public-domain
 source in **under 2 minutes**, and what does one level cost?
 - **Yes:** at least 4 of 5 test pieces (below) end in a saved level that passes every check, each in under 2 minutes,
-  with the cost of each measured.
+  with the cost of each measured, and the two library re-forges match at least 95% of their committed notes.
 - **No:** fewer than 4 pass, or a passing level takes over 2 minutes. FINDINGS.md says which step failed.
 - **Time box:** 3 hours for phase 1. Then FINDINGS.md, whatever the state.
 
@@ -111,8 +111,14 @@ source in **under 2 minutes**, and what does one level cost?
 Phase 1:
 1. Each script's refusals, with no network: `download` refuses another host, another extension and a file over
    5 MB. `save` refuses a chart `convert` didn't write in this forge.
-2. Five forges from a worker's session (the pieces in step 4), one at a time, through the scripts only. Each gets the
-   measures above.
+2. Five forges from a worker's session, one at a time, through the scripts only. Each gets the measures above.
+   - **Accuracy, against songs already in the library** (Eric, 2026-10-24): Für Elise and Ode to Joy, asked for by
+     name only. Diff each forged chart against the committed one (`web/public/songs/<id>/chart.json`) over the bars
+     both cover: the share of committed notes matched on pitch, hand and beat (within 1/12 beat), the forged notes
+     with no match, and whether the forge found the same source (both are Mutopia: 931 and 528). The diff is a
+     script in `game-tools/forge/`, and its numbers go in FINDINGS.md.
+   - **Pass rate, on new pieces:** Bach's Prelude BWV 846 (Mutopia 5), Joplin's The Entertainer (Mutopia 263) and
+     Chopin's Minute Waltz (Mutopia 483).
 
 Phase 2 (on Eric's go):
 3. `pnpm -C web exec vitest run --passWithNoTests src/app/api/forge`:
@@ -121,13 +127,9 @@ Phase 2 (on Eric's go):
    - the route returns 404 without the key;
    - the cap refuses once the log total reaches `FORGE_CAP_USD`.
    - No network: the SDK client is a fake.
-4. Five real forges from `/forge`, one at a time, at effort `"low"`, then the two slowest again at `"medium"`:
-   - Twinkle (a control: Mutopia has it);
-   - Bach's Prelude BWV 846 (Mutopia 5);
-   - Joplin's The Entertainer (Mutopia 263);
-   - Chopin's Minute Waltz (Mutopia 483);
-   - one piece Eric names on the day.
-   For each: pass or fail, seconds, tokens, dollars, and whether the level plays from song select.
+4. The same five forges from `/forge`, one at a time, at effort `"low"`, then the two slowest again at `"medium"`,
+   plus one piece Eric names on the day. For each: pass or fail, seconds, tokens, dollars, the accuracy diff where
+   it applies, and whether the level plays from song select.
 5. One forge with wifi off: the page shows the forged list and no error.
 
 ## Gaps (accepted)
@@ -137,6 +139,7 @@ Phase 2 (on Eric's go):
 - IMSLP mostly serves PDFs, which the converter can't read. A piece only on IMSLP likely fails, and that's a finding.
 
 ## Defaults
+- The 95% accuracy bar for the library re-forges is the planner's pick (Eric set no number). Change it here.
 - Effort `"low"` first because a forge is mostly picking and checking; `"medium"` is the comparison.
 - Saved to `local/`, not the committed library: a forged level is committed later, through a normal chart PR, if
   Eric wants it.

@@ -144,6 +144,7 @@ name = "judging"
 ship = ""
 features = [
   "ci-browser",
+  "build-stamp",
   "crash-guard",
   "offline-ready",
   "demo-reset",

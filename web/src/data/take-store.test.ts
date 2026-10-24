@@ -6,7 +6,7 @@ import { judgeTake, noteTimeMs } from "../game/core/judge";
 import { barOf, takeRows } from "./mapping";
 import { enqueue, flush, readOutbox } from "./outbox";
 import { barTrends, takeHistory, weakestBars } from "./progress";
-import { createSavePlugin, sameChart, unsavableReason, type LoadChart } from "./save-plugin";
+import { createSavePlugin, report, sameChart, unsavableReason, type LoadChart } from "./save-plugin";
 
 const chart: Chart = JSON.parse(readFileSync(new URL("../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
 const N = chart.notes.length;
@@ -216,6 +216,32 @@ describe("save plugin", () => {
 
   it("doesn't save when the committed chart can't be loaded (offline, unknown song)", async () => {
     expect(await playOnce("", chart, async () => null)).toBe(0);
+  });
+
+  async function statusAfter(params: string, opts: { kind?: InputDevice["kind"]; played?: Chart; send?: "ok" | "later" | "done" } = {}) {
+    let sentId = "";
+    const p = createSavePlugin((id) => void (sentId = id), committed);
+    p.transformChart!(opts.played ?? chart, new URLSearchParams(params));
+    const dev = fakeDevice(opts.kind ?? "keys");
+    void p.wrapInput!(dev).start(() => {});
+    p.onEvent!({ type: "songStart", atMs: 0 } as GameEvent);
+    dev.fire({ type: "on", pitch: 60, velocity: 80, timeMs: 1 });
+    p.onEvent!({ type: "songEnd", atMs: 1 } as GameEvent);
+    await new Promise((r) => setTimeout(r, 0));
+    if (opts.send === "done") report({ id: sentId, done: true });
+    else if (opts.send) report({ id: sentId, result: opts.send });
+    return p.status.get();
+  }
+
+  it("tells the results screen what happened to the take", async () => {
+    expect(await statusAfter("")).toEqual({ state: "sending" });
+    expect(await statusAfter("", { send: "ok" })).toEqual({ state: "saved" });
+    expect((await statusAfter("", { send: "later" }))?.state).toBe("waiting");
+    expect((await statusAfter("", { send: "done" }))?.state).toBe("waiting"); // offline: flush ended, nothing sent
+    expect(await statusAfter("level=easy")).toEqual({ state: "skipped", why: "Easy level: only the full chart counts" });
+    expect(await statusAfter("", { kind: "test" })).toEqual({ state: "skipped", why: "test input" });
+    const looped = { ...chart, notes: chart.notes.slice(0, 5) };
+    expect((await statusAfter("", { played: looped }))?.state).toBe("skipped");
   });
 
   it("sameChart compares notes, tempo and meter", () => {

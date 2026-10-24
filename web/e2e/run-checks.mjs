@@ -38,6 +38,7 @@ export const KNOWN_RED = {
   "web/src/game/cabinet/verify-cabinet.mjs": 429,
   "web/src/game/capture-mode/verify-capture.mjs": 431,
   "web/src/game/demo-reset/verify-reset.mjs": 478,
+  "web/src/game/learn-from-select/verify-learn.mjs": 485,
   "web/src/game/notice-toast/verify-toast.mjs": 432,
   "web/src/game/options-panel/verify-options.mjs": 447,
   "web/src/game/song-preview/verify-preview.mjs": 428,
@@ -77,10 +78,14 @@ export function shard(checks, i, n) {
   return checks.filter((_, k) => k % n === i - 1);
 }
 
-// One check in its own process group, so a server it leaves behind (on a timeout, say) is stopped too.
+// One check in its own process group, so a server it leaves behind (on a timeout, say) is stopped too. Its output
+// comes through pipes of ours, not our own stdout and stderr: a check's detached `next dev` inherits stderr, and one
+// that outlives its check held the CI step's pipe open until the job timed out (#415, run 6).
 function runOnce(root, check, out) {
   return new Promise((done) => {
-    const p = spawn(process.execPath, [check, "--out", out], { cwd: root, stdio: "inherit", detached: true });
+    const p = spawn(process.execPath, [check, "--out", out], { cwd: root, stdio: ["ignore", "pipe", "pipe"], detached: true });
+    p.stdout.pipe(process.stdout, { end: false });
+    p.stderr.pipe(process.stderr, { end: false });
     const kill = (sig) => {
       try {
         process.kill(-p.pid, sig);
@@ -95,7 +100,17 @@ function runOnce(root, check, out) {
     p.on("exit", (code) => {
       clearTimeout(timer);
       kill("SIGTERM");
-      done(code === 0);
+      // Let what it wrote drain, then let go of pipes a leftover server may still hold.
+      const release = () => {
+        p.stdout.destroy();
+        p.stderr.destroy();
+        done(code === 0);
+      };
+      const grace = setTimeout(release, 2000);
+      p.on("close", () => {
+        clearTimeout(grace);
+        release();
+      });
     });
   });
 }

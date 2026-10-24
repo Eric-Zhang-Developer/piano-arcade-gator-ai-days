@@ -96,17 +96,19 @@ export function MusicSelect({ songs }: { songs: Song[] }) {
             {song.composer}
             {song.catalog && ` · ${song.catalog}`}
           </p>
-          <dl className={styles.stats}>
-            <div className={styles.level}>
-              <dt>Level</dt>
-              <dd>{song.level}</dd>
-            </div>
-            <div>
-              <dt>Notes</dt>
-              <dd>{song.noteCount}</dd>
-            </div>
-          </dl>
-          <LevelToggle normal={song.level} chart={chart?.id === song.id ? chart.chart : null} />
+          <div className={styles.statsRow}>
+            <dl className={styles.stats}>
+              <div className={styles.level}>
+                <dt>Level</dt>
+                <dd>{song.level}</dd>
+              </div>
+              <div>
+                <dt>Notes</dt>
+                <dd>{song.noteCount}</dd>
+              </div>
+            </dl>
+            <LevelToggle normal={song.level} chart={chart?.id === song.id ? chart.chart : null} />
+          </div>
           <SongPreview id={song.id} best={bestOf(song.id)} />
         </section>
       )}

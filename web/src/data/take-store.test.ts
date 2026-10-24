@@ -6,7 +6,7 @@ import { judgeTake, noteTimeMs } from "../game/core/judge";
 import { barOf, takeRows } from "./mapping";
 import { enqueue, flush, readOutbox } from "./outbox";
 import { barTrends, takeHistory, weakestBars } from "./progress";
-import { createSavePlugin } from "./save-plugin";
+import { createSavePlugin, sameChart, unsavableReason, type LoadChart } from "./save-plugin";
 
 const chart: Chart = JSON.parse(readFileSync(new URL("../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
 const N = chart.notes.length;
@@ -136,10 +136,12 @@ describe("save plugin", () => {
     return { kind, start: (on: (e: InputEvent) => void) => void (emit = on), stop() {}, fire: (e: InputEvent) => emit(e) };
   }
 
-  it("rebuilds the Take on the chart clock and hands it over at songEnd", () => {
+  const committed: LoadChart = async () => chart; // the chart file as committed
+
+  it("rebuilds the Take on the chart clock and hands it over at songEnd", async () => {
     const now = vi.spyOn(performance, "now").mockReturnValue(1000);
     const sink = vi.fn();
-    const p = createSavePlugin(sink);
+    const p = createSavePlugin(sink, committed);
     p.transformChart!(chart, new URLSearchParams());
     const dev = fakeDevice("midi");
     const wrapped = p.wrapInput!(dev);
@@ -150,16 +152,16 @@ describe("save plugin", () => {
     dev.fire({ type: "off", pitch: 60, velocity: 0, timeMs: 3700 });
     p.onEvent!({ type: "songEnd", atMs: 5000 } as GameEvent);
     expect(seen).toHaveLength(2); // the game still gets every event
-    expect(sink).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => expect(sink).toHaveBeenCalledTimes(1));
     const take = sink.mock.calls[0][1] as Take;
     expect(take).toMatchObject({ chartId: chart.id, inputDevice: "midi", latencyOffsetMs: 0 });
     expect(take.events).toEqual([{ pitch: 60, velocity: 100, timeMs: 10, offTimeMs: 300 }]);
     now.mockRestore();
   });
 
-  it("never saves test takes, empty takes or drills", () => {
+  it("never saves test takes, empty takes or drills", async () => {
     const sink = vi.fn();
-    const p = createSavePlugin(sink);
+    const p = createSavePlugin(sink, committed);
     p.transformChart!(chart, new URLSearchParams());
     const dev = fakeDevice("test");
     void p.wrapInput!(dev).start(() => {});
@@ -168,12 +170,56 @@ describe("save plugin", () => {
     p.onEvent!({ type: "songEnd", atMs: 1 } as GameEvent);
     p.onEvent!({ type: "songStart", atMs: 0 } as GameEvent);
     p.onEvent!({ type: "songEnd", atMs: 1 } as GameEvent);
-    p.transformChart!(chart, new URLSearchParams("from=2&to=3"));
+    const looped = { ...chart, notes: chart.notes.slice(4, 12) }; // what bar-loop hands on for ?from=2&to=3
+    p.transformChart!(looped, new URLSearchParams("from=2&to=3"));
     const keys = fakeDevice("keys");
     void p.wrapInput!(keys).start(() => {});
     p.onEvent!({ type: "songStart", atMs: 0 } as GameEvent);
     keys.fire({ type: "on", pitch: 60, velocity: 80, timeMs: 1 });
     p.onEvent!({ type: "songEnd", atMs: 1 } as GameEvent);
+    await new Promise((r) => setTimeout(r, 0));
     expect(sink).not.toHaveBeenCalled();
+  });
+
+  async function playOnce(params: string, played: Chart = chart, load = committed) {
+    const sink = vi.fn();
+    const p = createSavePlugin(sink, load);
+    p.transformChart!(played, new URLSearchParams(params));
+    const keys = fakeDevice("keys");
+    void p.wrapInput!(keys).start(() => {});
+    p.onEvent!({ type: "songStart", atMs: 0 } as GameEvent);
+    keys.fire({ type: "on", pitch: 60, velocity: 80, timeMs: 1 });
+    p.onEvent!({ type: "songEnd", atMs: 1 } as GameEvent);
+    await new Promise((r) => setTimeout(r, 0));
+    return sink.mock.calls.length;
+  }
+
+  it("saves a plain take, and one with options that don't change the play (zoom, labels, ghost)", async () => {
+    expect(await playOnce("song=twinkle")).toBe(1);
+    expect(await playOnce("song=twinkle&zoom=on&labels=1&ghost=1&stage=2")).toBe(1);
+  });
+
+  it("never saves a take played on a changed chart: one hand, a chunk, another tempo", async () => {
+    const leftOnly = { ...chart, notes: chart.notes.filter((n) => n.hand === "L") };
+    const slower = { ...chart, bpm: chart.bpm * 0.75 };
+    const shifted = { ...chart, notes: chart.notes.map((n, i) => (i === 3 ? { ...n, beat: n.beat + 0.5 } : n)) };
+    for (const played of [leftOnly, slower, shifted]) expect(await playOnce("", played)).toBe(0);
+  });
+
+  it("never saves bots, the fake piano, versus, wait mode or local songs", async () => {
+    for (const q of ["bot=s", "midi=sim", "versus=1", "mode=wait", "song=local/my-song"]) {
+      expect(unsavableReason(new URLSearchParams(q))).not.toBeNull();
+      expect(await playOnce(q)).toBe(0);
+    }
+    expect(unsavableReason(new URLSearchParams("song=fur-elise&mode=play"))).toBeNull();
+  });
+
+  it("doesn't save when the committed chart can't be loaded (offline, unknown song)", async () => {
+    expect(await playOnce("", chart, async () => null)).toBe(0);
+  });
+
+  it("sameChart compares notes, tempo and meter", () => {
+    expect(sameChart(chart, structuredClone(chart))).toBe(true);
+    expect(sameChart(chart, { ...chart, beatsPerBar: chart.beatsPerBar + 1 })).toBe(false);
   });
 });

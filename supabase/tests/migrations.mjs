@@ -86,6 +86,16 @@ say("ok  save_take saves, and a retry is a duplicate");
 const t2 = take({ rank: "A+" });
 assert.equal(await save(t2, [note(t2, "GOOD", 70)]), "saved");
 say("ok  a judgment and rank the contract adds later save with no migration");
+const t4 = take({ good: 2, wrong: 1 });
+assert.equal(await save(t4, [note(t4, "GOOD", 60)]), "saved");
+const t5 = take(); // a take from code that predates the good/wrong columns
+assert.equal(await save(t5, [note(t5, "PERFECT", 1)]), "saved");
+const counts = await rows(`select id, good, wrong from takes where id in ('${t4.id}', '${t5.id}') order by good desc`);
+assert.deepEqual(counts.map((r) => [r.good, r.wrong]), [[2, 1], [0, 0]]);
+say("ok  GOOD and WRONG counts are stored, and older payloads without them still save");
+await db.exec(`insert into songs(id, title, composer, bpm, beats_per_bar, note_count, chart_sha256) values ('fur-elise','Fur Elise','Beethoven',72,4.5,1,'x'), ('chopin','Prelude','Chopin',60,1.5,1,'x');`);
+await assert.rejects(() => db.exec(`insert into songs(id, title, composer, bpm, beats_per_bar, note_count, chart_sha256) values ('zero','z','z',60,0,1,'x');`));
+say("ok  songs in compound meters (4.5 and 1.5 beats per bar) are stored; zero is refused");
 let t = take(); await refused("a MISS with an offset", t, [note(t, "MISS", 10)]);
 t = take(); await refused("a hit without an offset", t, [note(t, "GREAT", null)]);
 t = take(); await refused("an offset of 5 seconds", t, [note(t, "GOOD", 5000)]);
@@ -105,6 +115,6 @@ assert.equal((await rows(`select merge_player('${player}', '${player}') as n`))[
 say("ok  merge_player moves a device's takes to the signed-in player");
 
 const [trend] = await rows(`select notes, misses from bar_trends where player_id = '${player}'`);
-assert.deepEqual([Number(trend.notes), Number(trend.misses)], [4, 1]);
+assert.deepEqual([Number(trend.notes), Number(trend.misses)], [6, 1]);
 say("ok  bar_trends counts the saved notes");
 say(`pass: ${files.length} migrations apply and keep the rules`);

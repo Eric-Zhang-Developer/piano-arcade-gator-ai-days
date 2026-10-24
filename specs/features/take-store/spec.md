@@ -36,6 +36,11 @@ The game never waits on any of this. Judging, rendering, sound and LEDs stay loc
   within ±1000. Judgment and rank are any upper-case name, so a judgment or rank the contract adds later saves with
   no migration. A take the database still refuses is kept in the outbox and resent later, never dropped.
 - `save_take(take, notes)` writes a take and its notes in one transaction and does nothing on a retry of the same id.
+- Only takes the server can re-judge are saved: a person playing a committed song on the chart as committed. Not test
+  input, bots, the fake piano, versus, wait mode, local songs (decision 003), or a chart a plugin changed (loops, one
+  hand, chunks, tempo), checked by comparing the played chart with the committed file.
+- Every committed chart saves: `beats_per_bar` is numeric (compound meters like 3/8 = 1.5), and `takes` keeps the
+  GOOD and WRONG counts the judging tiers added.
 
 **Access:**
 - RLS on every table. The publishable key (`anon`) reads `songs` only. A signed-in player (anonymous or Google) reads

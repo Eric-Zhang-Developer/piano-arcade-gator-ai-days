@@ -25,26 +25,34 @@ describe("the static keyboard (#384): one range per song, C to C", () => {
   it("snaps to the C at or below the lowest note and the C at or above the highest", () => {
     expect(staticRange(song("fur-elise"))).toEqual({ lowPitch: 36, highPitch: 96 }); // E2–E6 -> C2–C7
     expect(staticRange(song("moonlight-3"))).toEqual({ lowPitch: 24, highPitch: 96 }); // A1–C#6 -> C1–C7
-    expect(staticRange(chart([50, 84]))).toEqual({ lowPitch: 48, highPitch: 84 }); // a top C ends the range on it
-    expect(staticRange(chart([61, 94]))).toEqual({ lowPitch: 60, highPitch: 96 }); // black ends snap to Cs too
+    expect(staticRange(song("nocturne-op9-2"))).toEqual({ lowPitch: 24, highPitch: 96 }); // A#1–D6 -> C1–C7
+    expect(staticRange(chart([50, 96]))).toEqual({ lowPitch: 48, highPitch: 96 }); // a top C ends the range on it
+    expect(staticRange(chart([37, 94]))).toEqual({ lowPitch: 36, highPitch: 96 }); // black ends snap to Cs too
   });
 
-  it("is at least two octaves, the missing ones split with the odd one above", () => {
-    expect(staticRange(song("twinkle"))).toEqual({ lowPitch: 60, highPitch: 84 }); // C4–A4 -> C4–C5 -> C4–C6
-    expect(staticRange(song("minuet-g"))).toEqual({ lowPitch: 60, highPitch: 84 }); // F#4–G5 -> C4–C6
-    expect(staticRange(chart([60]))).toEqual({ lowPitch: 48, highPitch: 72 }); // only C4: one octave each side
+  it("a chart inside C2–C6 gets C2–C6: four octaves, the same keyboard for most songs", () => {
+    expect(staticRange(song("twinkle"))).toEqual({ lowPitch: 36, highPitch: 84 }); // C4–A4, inside C2–C6
+    expect(staticRange(song("minuet-g"))).toEqual({ lowPitch: 36, highPitch: 84 }); // F#4–G5, inside C2–C6
+    expect(staticRange(song("ode-to-joy"))).toEqual({ lowPitch: 36, highPitch: 84 }); // G2–D5
+    expect(staticRange(chart([60]))).toEqual({ lowPitch: 36, highPitch: 84 });
+    expect(staticRange(chart([36, 84]))).toEqual({ lowPitch: 36, highPitch: 84 });
   });
 
-  it("keeps to the piano's 21–108 and still two octaves wide", () => {
+  it("outside C2–C6, under four octaves: the missing ones split with the odd one above", () => {
+    expect(staticRange(chart([72, 90]))).toEqual({ lowPitch: 60, highPitch: 108 }); // C5–C7 is 24: one below, one above
+    expect(staticRange(chart([61, 94]))).toEqual({ lowPitch: 60, highPitch: 108 }); // C4–C7 is 36: the odd one above
+  });
+
+  it("keeps to the piano's 21–108 and still four octaves wide", () => {
     expect(staticRange(chart([21, 108]))).toEqual({ lowPitch: 21, highPitch: 108 });
-    expect(staticRange(chart([100, 105]))).toEqual({ lowPitch: 84, highPitch: 108 }); // no room above: it goes below
-    expect(staticRange(chart([108]))).toEqual({ lowPitch: 84, highPitch: 108 });
-    expect(staticRange(chart([21, 30]))).toEqual({ lowPitch: 21, highPitch: 48 }); // A0–C3 is 15: an octave above
+    expect(staticRange(chart([100, 105]))).toEqual({ lowPitch: 60, highPitch: 108 }); // no room above: all go below
+    expect(staticRange(chart([108]))).toEqual({ lowPitch: 60, highPitch: 108 });
+    expect(staticRange(chart([21, 30]))).toEqual({ lowPitch: 21, highPitch: 72 }); // A0–C3 is 15: three octaves above
     for (const c of [chart([21]), chart([22, 23]), chart([107, 108])]) {
       const r = staticRange(c);
       expect(r.lowPitch).toBeGreaterThanOrEqual(21);
       expect(r.highPitch).toBeLessThanOrEqual(108);
-      expect(r.highPitch - r.lowPitch).toBeGreaterThanOrEqual(24);
+      expect(r.highPitch - r.lowPitch).toBeGreaterThanOrEqual(48);
     }
   });
 
@@ -217,7 +225,7 @@ describe("keys outside the chart's range", () => {
   it("lie off-screen at finite positions, and every key in range is where it was", () => {
     const L = makeLayout(chart([60, 69]), 800, 600, 0);
     const w = L.keyX(60).width;
-    expect(L.keyX(59)).toEqual({ x: -w, width: w }); // B3, one white below the range's lowest key (C4)
+    expect(L.keyX(35)).toEqual({ x: -w, width: w }); // B1, one white below the range's lowest key (C2)
     expect(L.keyX(30).x).toBeLessThan(0);
     expect(Number.isFinite(L.keyX(30).x) && Number.isFinite(L.keyX(108).x) && Number.isFinite(L.keyX(54).x)).toBe(true);
     expect(L.keyX(86).x).toBeGreaterThanOrEqual(800); // D6, past the range's top (C6)

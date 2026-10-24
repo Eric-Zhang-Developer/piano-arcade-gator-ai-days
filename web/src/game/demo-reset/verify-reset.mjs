@@ -115,8 +115,11 @@ try {
   check(offs.size === 16, `All Notes Off on ${offs.size} of 16 channels`);
   await page.screenshot({ path: join(out, "1-reset-home.png") });
   await goto(page, "/play?song=twinkle");
-  const latency = await page.locator("label output").first().innerText({ timeout: 30_000 });
-  check(latency === "37 ms", `the latency offset survives: ${latency}`);
+  // /play shows 0 until its effect has read the stored offset, so wait for it rather than read the first render.
+  await page.locator("label output").first().filter({ hasText: "37 ms" }).waitFor({ timeout: 30_000 }).catch(() => {});
+  const latency = await page.locator("label output").first().innerText();
+  const stored = await page.evaluate(() => localStorage.getItem("pianoArcade.latencyOffsetMs"));
+  check(latency === "37 ms" && stored === "37", `the latency offset survives: ${latency} (stored ${stored})`);
   await page.close();
 
   // 2. Idle on the results.

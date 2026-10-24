@@ -1,6 +1,8 @@
 ## What shipped
 Three songs from public-domain Mutopia notation MIDI: `ode-to-joy` (soprano R + bass L of the SATB setting, 16 bars, 80 BPM, 122 notes, pitch 43–74), `chopin-prelude-4` (pickup + bars 1–12, 44 BPM, 305 notes, 47–74), `fur-elise` (bars 1–23 with both repeats written out, 66 BPM, 294 notes, 40–88). A MIDI-to-chart converter with voices, pickups, spans for repeats, grace-note skipping and a self-test; one library test over every chart. Note counts from the scans equal the charts' (Ode 62+60, Chopin 38+267, Für Elise 186+108, counted bar by bar off the Mutopia PDFs).
 
+Dynamics (#181): `chopin-prelude-4` carries velocities from the source's CC7 volume (34–106). `ode-to-joy` and `fur-elise` carry none: neither their note-on velocities nor their CC7 vary.
+
 ## Where it lives
 `web/public/songs/{ode-to-joy,chopin-prelude-4,fur-elise}/chart.json`, `game-tools/midi-to-chart/` (`convert.py`, README with the exact commands), `web/src/game/songs/library.test.ts`, `specs/decisions/song-pack-1-excerpts.md`, `specs/features/song-pack-1/fur-elise-highway.png`
 

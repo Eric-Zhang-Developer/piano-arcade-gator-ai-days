@@ -38,12 +38,15 @@ test("gh not installed or offline: failed, with the reason", async () => {
 test("against a fake gh: no more than 5 calls, and the data lands on the board", async () => {
   const seen: string[][] = [];
   const now = new Date("2026-10-24T12:00:00Z");
+  // Any scheduled feature that isn't done yet: a fixed slug would break the day it ships.
+  const filesOnly = await collect({ root, gh: async () => ({ code: 4, stdout: "", stderr: "gh auth login" }) });
+  const slug = filesOnly.features.find((f) => f.state === "unknown")?.slug ?? "none-left";
   const gh: GhRun = async (args) => {
     seen.push(args);
     const key = `${args[0]} ${args[3]}`; // "pr open", "pr all", "issue open", "run main"
     const data: Record<string, unknown> = {
       "pr open": [
-        { number: 9, title: "feat(operator-board): x", body: "Worker: eric-foreman-agent", isDraft: true, url: "p9",
+        { number: 9, title: `feat(${slug}): x`, body: "Worker: eric-foreman-agent", isDraft: true, url: "p9",
           createdAt: "2026-10-24T10:00:00Z", updatedAt: "2026-10-24T11:00:00Z",
           statusCheckRollup: [{ status: "COMPLETED", conclusion: "SUCCESS" }] },
         { number: 8, title: "plan: y", body: "", isDraft: false, url: "p8", createdAt: "2026-10-24T10:00:00Z",
@@ -59,7 +62,7 @@ test("against a fake gh: no more than 5 calls, and the data lands on the board",
   expect(seen.length).toBeLessThanOrEqual(5);
   expect(b.gh).toEqual({ status: "ok", calls: seen.length });
   expect(b.banner.filter((x) => /unknown/.test(x))).toEqual([]);
-  expect(b.features.find((f) => f.slug === "operator-board")?.state).toBe("in flight");
+  expect(b.features.find((f) => f.slug === slug)?.state).toBe("in flight");
   expect(b.crew?.map((c) => c.worker)).toEqual(["eric-foreman-agent", "planner"]);
   expect(b.crew?.[0].prs[0].ci).toBe("pass");
   expect(b.needs.map((n) => n.kind)).toEqual(["plan PR", "stale draft", "needs-human"]);

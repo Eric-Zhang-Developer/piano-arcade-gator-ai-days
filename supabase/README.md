@@ -25,7 +25,7 @@ own session, so it can read that player's rows and nothing else. Auth: anonymous
 | `NEXT_PUBLIC_SUPABASE_URL` | browser + server | Project Settings > API: Project URL (`https://<ref>.supabase.co`, not a dashboard link) |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | browser + server | Project Settings > API Keys: `sb_publishable_...` |
 | `SUPABASE_SECRET_KEY` | server only | Project Settings > API Keys: `sb_secret_...`. Never in a `NEXT_PUBLIC_` variable. |
-| `SUPABASE_DB_URL` | `supabase/push.sh` only | Connect > Session pooler URI, with the database password filled in |
+| `SUPABASE_DB_URL` | `supabase/push.sh` only | Connect > Direct > Session pooler URI, with the database password filled in: `postgresql://postgres.umswmcehegvggcfcjdfy:<password>@aws-0-us-east-1.pooler.supabase.com:5432/postgres`. Not the direct `db.<ref>.supabase.co` one: it's IPv6-only and refused on most networks. |
 
 ## Adding something (a column, a table, a view, seed rows)
 1. **Make the file:** `npx -y supabase@2.122.0 migration new <what_it_does>` creates
@@ -55,8 +55,8 @@ CLI doesn't run it again: `npx -y supabase@2.122.0 migration repair --status app
 - [x] Migrations 0001–0003 applied by hand in the SQL Editor (Oct 24 2026).
 - [x] Anonymous sign-ins on (Authentication > Sign In / Providers).
 - [x] "Automatically expose new tables" off; RLS auto-enable on.
-- [ ] `SUPABASE_DB_URL` in `web/.env.local`, then record 0001–0003 as applied (they ran by hand):
-      `npx -y supabase@2.122.0 migration repair --status applied 20261024000001 20261024000002 20261024000003 --db-url "$SUPABASE_DB_URL"`
+- [x] `SUPABASE_DB_URL` in Sharan's `web/.env.local`, and 0001–0003 recorded as applied in the CLI's history
+      (`migration repair`, Oct 24 2026). `supabase/push.sh --status` shows local and remote matching.
 - [ ] CAPTCHA (Turnstile or hCaptcha) on anonymous sign-ins: Supabase's advice, since every visitor becomes a user row.
 - [ ] Email sign-up is on but unused: turn it off unless the coach lane needs it.
 - [ ] Google provider, for "Keep my progress".

@@ -13,8 +13,8 @@ anonymous Supabase users with an optional Google link, and `/progress` shows eac
 Live project: `node supabase/tests/live-smoke.mjs` pass, 8/8 (anonymous sign-in, save_take, a later GOOD, own-row reads, RLS).
 
 ## Gaps
-Migrations 0001–0003 were applied by hand, so the CLI's history is empty until someone adds `SUPABASE_DB_URL` and runs
-the `migration repair` line in `supabase/README.md`. CAPTCHA on anonymous sign-ins not set up.
+CAPTCHA on anonymous sign-ins not set up. (Migrations 0001–0003 ran by hand and are recorded in the CLI's history;
+`supabase/push.sh --status` matches and a dry run says the live database is up to date.)
 Google linking untested (needs the
 Google provider set up). Drills aren't saved. Charts must live at `public/songs/<id>/chart.json`, read from disk: on Vercel that needs file tracing for
 `public/songs` (local demo is fine). No per-player rate limit on saves.

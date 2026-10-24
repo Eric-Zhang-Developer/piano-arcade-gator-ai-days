@@ -52,9 +52,11 @@ Two PRs.
   `verify-wait-hands: pass` and exits 0, or names each failed step and exits 1. On
   `/play?song=fur-elise&hands=R&mode=wait&midi=sim&input=test`, with the stand-in output's `send` wrapped in the
   page to log the chart clock (`__pianoArcade.now()`) at each call:
-  1. Press the first 8 right-hand notes on their holds, then wait 3 s at the 9th (beat 3, A4), where the left
+  1. Press the first 8 right-hand notes on their holds, then wait 4 s at the 9th (beat 3, A4), where the left
      hand's A2 starts with it and E3 a quarter beat later -> at the end of the wait, neither has been sent.
-     `origin/main` has sent both by then, ahead of their time.
+     `origin/main` has sent both by then, ahead of their time. 4 s is clearly past wait-hint's 3 s
+     (`waitHintSettings.afterMs`), so wait-hint's A4 is sent exactly once in the wait, 3–4 s in, and isn't counted
+     as a left-hand note. (A 3 s wait raced the hint: #430.)
   2. Then press each right-hand note 1 s after its hold begins, through bar 8 -> each of the 15 left-hand notes in
      bars 1–8 has one note-on, in chart order, logged with the chart clock at or past its start and less than 50 ms
      after it, and one note-off logged at or past its end and less than 50 ms after it.

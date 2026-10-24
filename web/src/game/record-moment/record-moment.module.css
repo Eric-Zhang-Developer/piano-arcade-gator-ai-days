@@ -1,0 +1,91 @@
+/* NEW RECORD in Saira 900 italic gold, stamped on rank-stamp's curve; the cells rise in under it. Times come from
+   timing.ts as custom properties, measured from the results showing (when this panel mounts). */
+.moment {
+  display: grid;
+  justify-items: center;
+  gap: clamp(6px, 1.2vh, 14px);
+  color: var(--pa-ink);
+}
+
+.stamp {
+  font: italic 900 clamp(40px, 7vh, 76px) var(--pa-font-display), system-ui, sans-serif;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--pa-gold);
+  text-shadow: 0 0 24px rgb(255 226 122 / 0.45);
+  animation: record-moment-stamp var(--rm-stamp) linear var(--rm-start) both;
+}
+
+.entry {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  animation: record-moment-rise var(--rm-rise) ease-out var(--rm-cells) both;
+}
+
+.cells {
+  display: flex;
+  gap: 0.35em;
+  font: italic 900 clamp(28px, 5vh, 54px) var(--pa-font-display), system-ui, sans-serif;
+}
+
+.cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 1.25em;
+  height: 1.45em;
+  border: 2px solid rgb(242 242 245 / 0.22);
+  border-radius: 6px;
+  background: var(--pa-panel);
+}
+
+.lit {
+  border-color: var(--pa-magenta);
+  box-shadow: 0 0 16px rgb(255 47 208 / 0.45);
+}
+
+/* The cursor: the one thing that blinks once the moment has settled. */
+.lit::after {
+  content: "";
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  bottom: 14%;
+  height: 0.08em;
+  background: var(--pa-ink);
+  animation: record-moment-blink 1s steps(2, jump-none) infinite;
+}
+
+.hint {
+  color: var(--pa-ink-dim);
+  font: clamp(12px, 1.5vh, 16px) system-ui, sans-serif;
+}
+
+.saved {
+  font: italic 800 clamp(22px, 3.4vh, 36px) var(--pa-font-display), system-ui, sans-serif;
+  letter-spacing: 0.06em;
+  color: var(--pa-ink);
+}
+
+@keyframes record-moment-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@keyframes record-moment-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Reduced motion: the stamp and the cells in their end state at once; the cursor a static underline. */
+@media (prefers-reduced-motion: reduce) {
+  .stamp,
+  .entry,
+  .lit::after {
+    animation: none;
+  }
+}

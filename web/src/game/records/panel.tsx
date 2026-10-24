@@ -1,15 +1,12 @@
 "use client";
-// The records results panel: NEW RECORD, the initials entry and the top 5 (spec: records).
-import { useEffect, useState } from "react";
-import { browserStorage, loadRecords, NO_INITIALS, saveRecords, setInitials, type Entry } from "./store";
+// The records results panel: the initials entry and the top 5 (spec: records). NEW RECORD is record-moment's.
+import { useInitials } from "./initials";
+import { NO_INITIALS, type Entry } from "./store";
 
 export type Outcome =
   | { kind: "practice" }
   | { kind: "blocked" }
   | { kind: "recorded"; chartId: string; date: string; newRecord: boolean; inTop: boolean; top: Entry[] };
-
-const A = "A".charCodeAt(0);
-const cycle = (letter: string | undefined, step: number) => String.fromCharCode(A + (((letter ?? "A").charCodeAt(0) - A + step + 26) % 26));
 
 export function RecordsPanel({ outcome }: { outcome: Outcome }) {
   if (outcome.kind === "practice") return <Line>Practice takes aren&apos;t recorded</Line>;
@@ -17,47 +14,16 @@ export function RecordsPanel({ outcome }: { outcome: Outcome }) {
   return <Recorded {...outcome} />;
 }
 
-function Recorded({ chartId, date, newRecord, inTop, top: initialTop }: Extract<Outcome, { kind: "recorded" }>) {
-  const [top, setTop] = useState(initialTop);
-  const [letters, setLetters] = useState<string[]>([]);
-  const [entering, setEntering] = useState(inTop);
-
-  useEffect(() => {
-    if (!entering) return;
-    // Capture phase, so Enter saves the initials instead of pressing the focused Retry button.
-    const onKey = (e: KeyboardEvent) => {
-      const k = e.key;
-      if (/^[a-z]$/i.test(k)) setLetters(letters.length < 3 ? [...letters, k.toUpperCase()] : letters);
-      else if (k === "ArrowUp" || k === "ArrowDown") {
-        const step = k === "ArrowUp" ? 1 : -1;
-        setLetters(letters.length ? [...letters.slice(0, -1), cycle(letters.at(-1), step)] : [cycle(undefined, step === 1 ? 0 : -1)]);
-      } else if (k === "Backspace") setLetters(letters.slice(0, -1));
-      else if (k === "Enter") {
-        if (letters.length === 3) {
-          const storage = browserStorage();
-          const stored = loadRecords(storage);
-          if (stored) {
-            const next = setInitials(stored, chartId, date, letters.join(""));
-            if (saveRecords(storage, next)) setTop(next[chartId]?.top ?? top);
-          }
-          setEntering(false);
-        }
-      } else return;
-      e.preventDefault();
-      e.stopPropagation();
-    };
-    window.addEventListener("keydown", onKey, { capture: true });
-    return () => window.removeEventListener("keydown", onKey, { capture: true });
-  }, [entering, letters, chartId, date, top]);
+function Recorded({ chartId, date, newRecord, inTop, top }: Extract<Outcome, { kind: "recorded" }>) {
+  // A NEW RECORD take's entry is record-moment's: the card then shows only the top 5, with the letters as they're
+  // typed there. Any other top-5 take keeps its entry here.
+  const { letters, done, saved } = useInitials(chartId, date, inTop && !newRecord);
+  const entering = inTop && !done;
+  const initials = (t: Entry) => (t.date !== date ? t.initials : entering ? letters.join("").padEnd(3, "_") : saved ? letters.join("") : t.initials);
 
   return (
     <div data-testid="records" style={{ fontSize: 16, lineHeight: 1.6 }}>
-      {newRecord && (
-        <div data-testid="new-record" style={{ fontSize: 28, fontWeight: 800, color: "#ffd84a", animation: "records-flash 0.5s steps(2) infinite" }}>
-          NEW RECORD
-        </div>
-      )}
-      {entering && (
+      {entering && !newRecord && (
         <div data-testid="initials-entry">
           Your initials:{" "}
           <span style={{ fontFamily: "monospace", fontSize: 24, letterSpacing: 6 }}>
@@ -75,7 +41,7 @@ function Recorded({ chartId, date, newRecord, inTop, top: initialTop }: Extract<
           {top.map((t, i) => (
             <tr key={t.date} data-testid={t.date === date ? "top5-this-take" : undefined} style={{ fontWeight: t.date === date ? 700 : 400, opacity: t.date === date ? 1 : 0.7 }}>
               <td>{i + 1}.</td>
-              <td style={{ fontFamily: "monospace" }}>{t.date === date && entering ? letters.join("").padEnd(3, "_") : t.initials || NO_INITIALS}</td>
+              <td style={{ fontFamily: "monospace" }}>{initials(t) || NO_INITIALS}</td>
               <td style={{ textAlign: "right" }}>{t.score.toLocaleString("en-US")}</td>
               <td>{t.rank}</td>
               <td style={{ textAlign: "right" }}>{(t.accuracy * 100).toFixed(1)}%</td>
@@ -84,7 +50,6 @@ function Recorded({ chartId, date, newRecord, inTop, top: initialTop }: Extract<
           ))}
         </tbody>
       </table>
-      <style>{"@keyframes records-flash { 50% { opacity: 0.3 } }"}</style>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-// Arcade HUD: song card, live counters, score and multiplier up top, and a giant translucent combo (spec: hud).
+// Arcade HUD: song card, live counters, the combo, score and multiplier in the band up top (specs: hud, combo-hud).
 // Driven only by GameEvents; reduceHud and hudLayout are pure so tests can pin them.
 import type { Chart, Frame, GameEvent, GamePlugin } from "../../contracts";
 import { isWaitMode } from "../wait-mode";
@@ -20,7 +20,7 @@ export const hudSettings = {
   statusGutterPx: 120, // beat-track's status line ("Beat: piano", 13px) sits in the top-right corner
   safeFraction: 0.6, // nothing below this fraction of the judgment line: the lowest 40% is where notes land
   panelBg: panel,
-  comboAlpha: 0.2, // drawn over the notes, so faint enough that they read through (decision hud-look)
+  swellFrom: 50, // milestones from this count swell the combo (25 only gets juice-sound's stinger)
   swellMs: 250,
   swellScale: 1.25,
   ghostMs: 1000,
@@ -81,23 +81,38 @@ export function reduceHud(s: HudState, e: GameEvent): HudState {
 
 // ---------- layout (CSS px) ----------
 
+export interface HudSlot {
+  x0: number;
+  x1: number;
+}
+
 export interface HudLayout {
   panel: { h: number };
-  combo: { cx: number; cy: number; size: number }; // digits' em size; they reach about ±size/2 around cy
+  // Left to right: the song card, PERFECT/GREAT/GOOD, the combo, MISS/WRONG, then score and multiplier up to
+  // beat-track's gutter. The combo sits between what builds it and what breaks it (spec: combo-hud).
+  slots: { card: HudSlot; hits: HudSlot; combo: HudSlot; breaks: HudSlot; score: HudSlot };
+  combo: { cx: number; cy: number; size: number; labelY: number }; // digits' em size; inside the band
   safeY: number; // nothing drawn below this
 }
 
 export function hudLayout(width: number, judgmentLineY: number): HudLayout {
   const L = judgmentLineY;
   const h = Math.max(44, Math.min(84, L * 0.11));
-  const size = Math.min(L * 0.26, width * 0.22);
-  return { panel: { h }, combo: { cx: width / 2, cy: h + size * 0.62, size }, safeY: L * hudSettings.safeFraction };
+  const at = (f: number) => width * f;
+  const slots = {
+    card: { x0: 0, x1: at(0.28) },
+    hits: { x0: at(0.28), x1: at(0.44) },
+    combo: { x0: at(0.44), x1: at(0.56) },
+    breaks: { x0: at(0.56), x1: at(0.66) },
+    score: { x0: at(0.66), x1: width - hudSettings.statusGutterPx },
+  };
+  // The band's biggest number: bigger than the multiplier's h × 0.5.
+  return { panel: { h }, slots, combo: { cx: width / 2, cy: h * 0.4, size: h * 0.62, labelY: h * 0.83 }, safeY: L * hudSettings.safeFraction };
 }
 
-// The lowest point anything reaches: the ghost at full scale, and the COMBO label under the number.
+// The lowest point the HUD reaches: its band. The combo, its swell and its ghost stay inside it.
 export function hudBottom(l: HudLayout): number {
-  const { cy, size } = l.combo;
-  return Math.max(l.panel.h, cy + (size * hudSettings.ghostScale) / 2, cy + size * 0.5 + size * 0.22);
+  return l.panel.h;
 }
 
 // ---------- drawing ----------
@@ -115,37 +130,17 @@ function fitText(ctx: CanvasRenderingContext2D, text: string, maxW: number, px: 
   ctx.fillText(t, 0, 0);
 }
 
+const reducedMotion = () => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 // wait: a wait-mode take isn't scored, so the band holds the song card only (wait-hud draws its own count into it).
 function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Card | null, display: string, wait = false): void {
   const l = hudLayout(f.width, f.judgmentLineY);
   const { h } = l.panel;
+  const { slots } = l;
   const pad = Math.max(10, h * 0.25);
   const tier = wait ? hudSettings.tiers[0] : tierFor(s.combo);
 
-  // The giant combo first, so the panel draws over its top edge if they ever meet.
-  if (!wait && s.milestone) {
-    const t = f.nowMs - s.milestone.atMs;
-    if (t >= 0 && t < hudSettings.ghostMs) {
-      const k = t / hudSettings.ghostMs;
-      drawCombo(ctx, l, String(s.milestone.count), 1 + (hudSettings.ghostScale - 1) * k, hudSettings.ghostAlpha * (1 - k), tier.color, display);
-    }
-  }
-  if (!wait && s.combo >= hudSettings.comboFrom) {
-    const t = s.milestone ? f.nowMs - s.milestone.atMs : Infinity;
-    const swell = t >= 0 && t < hudSettings.swellMs ? 1 + (hudSettings.swellScale - 1) * Math.sin((Math.PI * t) / hudSettings.swellMs) : 1;
-    drawCombo(ctx, l, String(s.combo), swell, hudSettings.comboAlpha, "#ffffff", display);
-    ctx.globalAlpha = 0.45;
-    ctx.fillStyle = "#ffffff";
-    ctx.font = `600 ${Math.round(l.combo.size * 0.16)}px ${hudSettings.font}`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.letterSpacing = `${Math.round(l.combo.size * 0.04)}px`;
-    ctx.fillText("COMBO", l.combo.cx, l.combo.cy + l.combo.size * 0.6);
-    ctx.letterSpacing = "0px";
-    ctx.globalAlpha = 1;
-  }
-
-  // Top panel, over an opaque band: notes and labels below draw from y = 0, and the panel is only 72% opaque (#243).
+  // The band, opaque under the 72%-opaque panel: notes and labels below draw from y = 0 (#243).
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, f.width, h);
   ctx.fillStyle = hudSettings.panelBg;
@@ -155,8 +150,8 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Car
   ctx.textBaseline = "middle";
 
   // Left: the song card.
-  const cardW = f.width * 0.3;
   if (card) {
+    const cardW = slots.card.x1 - slots.card.x0;
     ctx.textAlign = "left";
     ctx.save();
     ctx.translate(pad, h * 0.36);
@@ -170,24 +165,52 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Car
 
   if (wait) return;
 
-  // Middle: the counters.
-  const counters: [string, keyof typeof hudSettings.judgmentColors][] = [
+  // The counters: what builds the combo left of it, what breaks it right of it.
+  const counters = (slot: HudSlot, keys: [string, keyof typeof hudSettings.judgmentColors][]) => {
+    const cw = (slot.x1 - slot.x0) / keys.length;
+    ctx.textAlign = "center";
+    keys.forEach(([label, key], i) => {
+      const x = slot.x0 + cw * (i + 0.5);
+      ctx.fillStyle = hudSettings.judgmentColors[key];
+      ctx.font = `italic 800 ${Math.round(Math.min(h * 0.34, cw * 0.42))}px ${display}`;
+      ctx.fillText(String(s[key]), x, h * 0.4);
+      ctx.font = `600 ${Math.round(Math.min(h * 0.16, cw * 0.15))}px ${hudSettings.font}`;
+      ctx.fillText(label, x, h * 0.76);
+    });
+  };
+  counters(slots.hits, [
     ["PERFECT", "PERFECT"],
     ["GREAT", "GREAT"],
     ["GOOD", "GOOD"],
+  ]);
+  counters(slots.breaks, [
     ["MISS", "MISS"],
     ["WRONG", "wrong"],
-  ];
-  const cw = (f.width * 0.34) / counters.length;
-  ctx.textAlign = "center";
-  counters.forEach(([label, key], i) => {
-    const x = cardW + cw * (i + 0.5);
-    ctx.fillStyle = hudSettings.judgmentColors[key];
-    ctx.font = `italic 800 ${Math.round(h * 0.34)}px ${display}`;
-    ctx.fillText(String(s[key]), x, h * 0.4);
-    ctx.font = `600 ${Math.round(Math.min(h * 0.16, cw * 0.15))}px ${hudSettings.font}`;
-    ctx.fillText(label, x, h * 0.76);
-  });
+  ]);
+
+  // Center: the combo, from comboFrom; a milestone from swellFrom swells it and fades a ghost in the tier color.
+  if (s.combo >= hudSettings.comboFrom) {
+    const still = reducedMotion();
+    const m = s.milestone && s.milestone.count >= hudSettings.swellFrom && !still ? s.milestone : null;
+    const t = m ? f.nowMs - m.atMs : Infinity;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(slots.combo.x0, 0, slots.combo.x1 - slots.combo.x0, h);
+    ctx.clip();
+    if (m && t >= 0 && t < hudSettings.ghostMs) {
+      const k = t / hudSettings.ghostMs;
+      drawCombo(ctx, l, String(m.count), 1 + (hudSettings.ghostScale - 1) * k, hudSettings.ghostAlpha * (1 - k), tier.color, display);
+    }
+    const swell = t >= 0 && t < hudSettings.swellMs ? 1 + (hudSettings.swellScale - 1) * Math.sin((Math.PI * t) / hudSettings.swellMs) : 1;
+    drawCombo(ctx, l, String(s.combo), swell, 1, "#ffffff", display);
+    ctx.restore();
+    ctx.fillStyle = "rgba(255,255,255,0.55)";
+    ctx.font = `600 ${Math.round(h * 0.15)}px ${hudSettings.font}`;
+    ctx.textAlign = "center";
+    ctx.letterSpacing = `${Math.round(h * 0.03)}px`;
+    ctx.fillText("COMBO", l.combo.cx, l.combo.labelY);
+    ctx.letterSpacing = "0px";
+  }
 
   // Right: score, then the multiplier and its pips.
   const right = f.width - pad - hudSettings.statusGutterPx;
@@ -206,20 +229,32 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Car
     ctx.fill();
   }
   ctx.globalAlpha = 1;
+  const scoreRight = right - badgeW - pad;
   ctx.fillStyle = "#ffffff";
-  ctx.font = `italic 800 ${Math.round(h * 0.42)}px ${display}`;
-  ctx.fillText(s.score.toLocaleString("en-US"), right - badgeW - pad, h * 0.42);
+  const score = s.score.toLocaleString("en-US");
+  let px = h * 0.42;
+  ctx.font = `italic 800 ${Math.round(px)}px ${display}`;
+  const room = scoreRight - slots.score.x0 - pad;
+  const w = ctx.measureText(score).width;
+  if (w > room) ctx.font = `italic 800 ${Math.round((px *= room / w))}px ${display}`;
+  ctx.fillText(score, scoreRight, h * 0.42);
   ctx.fillStyle = "rgba(255,255,255,0.55)";
   ctx.font = `600 ${Math.round(h * 0.16)}px ${hudSettings.font}`;
-  ctx.fillText("SCORE", right - badgeW - pad, h * 0.8);
+  ctx.fillText("SCORE", scoreRight, h * 0.8);
 }
 
+// The combo's number, shrunk to its slot if three digits would overflow it.
 function drawCombo(ctx: CanvasRenderingContext2D, l: HudLayout, text: string, scale: number, alpha: number, color: string, display: string): void {
   ctx.globalAlpha = alpha;
   ctx.fillStyle = color;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.font = `italic 900 ${Math.round(l.combo.size * scale)}px ${display}`;
+  let px = l.combo.size;
+  ctx.font = `italic 900 ${Math.round(px)}px ${display}`;
+  const room = (l.slots.combo.x1 - l.slots.combo.x0) * 0.92;
+  const w = ctx.measureText(text.length < 3 ? "888" : text).width; // sized for three digits, so it doesn't jump at 100
+  if (w > room) px *= room / w;
+  ctx.font = `italic 900 ${Math.round(px * scale)}px ${display}`;
   ctx.fillText(text, l.combo.cx, l.combo.cy);
   ctx.globalAlpha = 1;
 }

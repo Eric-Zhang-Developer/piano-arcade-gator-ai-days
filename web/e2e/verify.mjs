@@ -1,4 +1,5 @@
-// Verify: start the app, play Twinkle headless as the Perfect player, fail unless every note is PERFECT.
+// Verify: start the app, play Twinkle headless as the Perfect player, fail unless every note is PERFECT. Twice: with
+// the test input, then on /sim through the MIDI path (raw bytes from the fake piano into core's real MIDI input).
 // Usage: pnpm -C web verify --out <dir>
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -104,7 +105,27 @@ async function main() {
     if (results?.counts?.MISS !== 0 || results?.counts?.extra !== 0) fail.push("results has MISS or extras");
     if (results?.counts?.GOOD !== 0 || results?.counts?.wrong !== 0) fail.push("results has GOOD or wrong");
     if (fail.length) throw new Error(fail.join("; "));
-    say(`verify: pass, ${n}/${n} PERFECT (evidence: ${out})`);
+    say(`verify: test input pass, ${n}/${n} PERFECT`);
+
+    await page.goto(`${base}/sim`);
+    await page.getByRole("button", { name: "Watch the bot" }).click({ timeout: 60_000 }); // enabled once the game is ready
+    const game = page.frameLocator('iframe[title="game"]');
+    await game.locator('[data-testid="results"]').waitFor({ timeout: lastBeat * msPerBeat + 30_000 });
+    const sim = {};
+    for (const k of ["PERFECT", "GREAT", "MISS", "extra"]) {
+      sim[k] = Number(await game.locator(`[data-testid="count-${k}"]`).textContent());
+    }
+    const midiStatus = await game.locator("main").textContent();
+    const types = await page.locator('[data-testid="midi-log"] tbody tr td:nth-child(4)').allTextContents();
+    const keyMessages = types.filter((t) => t === "note_on" || t === "release(v0)").length;
+    await page.screenshot({ path: join(out, "sim-results.png") });
+    writeFileSync(join(out, "sim-results.json"), JSON.stringify({ dom: sim, keyMessages }, null, 2));
+
+    if (sim.PERFECT !== n || sim.MISS !== 0 || sim.extra !== 0) fail.push(`/sim screen ${JSON.stringify(sim)}, want ${n} PERFECT`);
+    if (!midiStatus?.includes("MIDI: Portable Grand")) fail.push("/sim: the game didn't pick the fake Portable Grand");
+    if (keyMessages !== 2 * n) fail.push(`/sim log shows ${keyMessages} key messages, want ${2 * n}`);
+    if (fail.length) throw new Error(fail.join("; "));
+    say(`verify: pass, ${n}/${n} PERFECT with test input and through the MIDI path on /sim (evidence: ${out})`);
   } catch (e) {
     await page.screenshot({ path: join(out, "failure.png"), fullPage: true }).catch(() => {});
     throw e;

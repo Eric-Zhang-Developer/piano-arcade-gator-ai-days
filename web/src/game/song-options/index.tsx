@@ -56,19 +56,20 @@ export function SongOptions({ id, chart }: { id: string; chart: Chart | null }) 
   );
 }
 
-// easy-charts' LevelToggle halves, side by side: the setting in force lit in cyan (cabinet chrome: selection).
-const row: CSSProperties = { display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5em 1.4em", marginTop: "0.8vh" };
+// easy-charts' LevelToggle halves, side by side and a size smaller (two rows under LEARN must clear the footer at
+// 1280×720): the setting in force lit in cyan (cabinet chrome: selection).
+const row: CSSProperties = { display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.4em 1.2em", marginTop: "0.6vh" };
 const group: CSSProperties = { display: "inline-flex", alignItems: "center", gap: "0.35em" };
 const label: CSSProperties = { marginRight: "0.3em", fontSize: "clamp(12px, 0.8vw, 16px)", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--pa-ink-dim)" };
 const kbd: CSSProperties = { font: "inherit", padding: "0 0.35em", borderRadius: 3, border: "1px solid rgba(242, 242, 245, 0.2)" };
 const half: CSSProperties = {
-  padding: "0.25em 0.75em",
+  padding: "0.2em 0.6em",
   borderRadius: 4,
   border: "1px solid rgba(242, 242, 245, 0.2)",
   background: "none",
   color: "var(--pa-ink-dim)",
   font: "inherit",
-  fontSize: "clamp(14px, 1.25vw, 24px)",
+  fontSize: "clamp(13px, 1vw, 20px)",
   fontWeight: 700,
   letterSpacing: "0.08em",
   cursor: "pointer",

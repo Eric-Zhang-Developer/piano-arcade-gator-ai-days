@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { Chart, Frame, InputDevice, InputEvent } from "../../contracts";
 import { keyMap } from "../core/input";
-import { noteLabels } from ".";
+import { noteLabels, setLaptopShift } from ".";
 import { fitsLane, labelMode, labelSetting, laptopLetters, nextSetting, noteName } from "./labels";
 
 const twinkle: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
@@ -73,5 +73,17 @@ describe("note labels", () => {
     expect(drawn(plugin, 12)).toEqual([]);
     plugin.transformChart!(twinkle, new URLSearchParams("labels=off"));
     expect(drawn(plugin, 40)).toEqual([]);
+  });
+
+  it("moves the laptop letters with setLaptopShift, and back at 0", () => {
+    const plugin = noteLabels();
+    plugin.transformChart!(twinkle, new URLSearchParams("labels=keys"));
+    expect(drawn(plugin)).toEqual(["A", "W"]);
+    setLaptopShift(-12); // the map an octave down: C4 and C♯4 are now K and O
+    expect(drawn(plugin)).toEqual(["K", "O"]);
+    setLaptopShift(12); // an octave up: nothing at C4
+    expect(drawn(plugin)).toEqual([]);
+    setLaptopShift(0);
+    expect(drawn(plugin)).toEqual(["A", "W"]);
   });
 });

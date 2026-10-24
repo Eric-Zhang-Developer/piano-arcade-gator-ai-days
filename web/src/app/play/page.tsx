@@ -113,9 +113,6 @@ export default function Play() {
     const test = params.get("input") === "test";
     const perspective = Math.min(0.3, Math.max(0, Number(params.get("perspective")) || settings.perspective));
     const mpb = msPerBeat(chart.bpm);
-    const startPerf = performance.now();
-    const zeroPerf = startPerf + settings.countInBeats * mpb; // chart clock 0 = beat 0 of bar 1
-    const clock = pauseClock(zeroPerf); // stands still while paused (play-slots)
     const lastNoteMs = Math.max(...chart.notes.map((n) => noteTimeMs(chart, n)));
 
     const take: Take = {
@@ -144,6 +141,10 @@ export default function Play() {
     };
     const judge = new Judge(chart, emit);
     hw.noteState = judge.noteState;
+    // Zero is fixed here, after the stage and judge are built, so songStart's atMs is the chart time now and a plugin's
+    // performance.now() - atMs is the same zero the judge uses. Fixed before the build, it trailed by the build (#173).
+    const zeroPerf = performance.now() + settings.countInBeats * mpb; // chart clock 0 = beat 0 of bar 1
+    const clock = pauseClock(zeroPerf); // stands still while paused (play-slots)
     emit({ type: "songStart", atMs: hw.nowMs });
 
     // Input: every device feeds one handler; a key's judged time is its arrival minus the latency offset.

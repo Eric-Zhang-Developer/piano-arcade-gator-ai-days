@@ -1,7 +1,5 @@
 <!doctype html>
-<!-- Band player: plays a Standard MIDI File's channels to a MIDI output (the DGX) over Web MIDI.
-     ?file=<url of a .mid, relative to this page>  ?port=<part of the output's name, default "Portable Grand">
-     ?mute=<channels 1-16, comma-separated: left out, e.g. 1 for the piano you play yourself> -->
+<!-- Band player: plays a Standard MIDI File's channels to a MIDI output (the DGX) over Web MIDI. See README.md. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -22,6 +20,7 @@
   button:disabled { opacity: .4; cursor: default; }
   .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   #status { font-variant-numeric: tabular-nums; min-height: 1.4em; }
+  ul { margin: 0; padding-left: 1.2em; color: var(--dim); }
   progress { width: 100%; accent-color: var(--magenta); }
 </style>
 </head>
@@ -29,9 +28,8 @@
 <main>
   <h1>Band player</h1>
   <p id="file">No file: add <code>?file=</code> or pick one.</p>
-  <div class="row">
-    <input id="pick" type="file" accept=".mid,.midi,audio/midi">
-  </div>
+  <div class="row"><input id="pick" type="file" accept=".mid,.midi,audio/midi"></div>
+  <ul id="parts"></ul>
   <div class="row">
     <button id="play" disabled>Play</button>
     <button id="stop">Stop (All Notes Off)</button>
@@ -40,97 +38,6 @@
   <p id="status">Asking for MIDI…</p>
   <progress id="bar" value="0" max="1"></progress>
 </main>
-<script>
-const q = new URLSearchParams(location.search);
-const PORT = q.get("port") || "Portable Grand";
-const MUTE = new Set((q.get("mute") || "").split(",").filter(Boolean).map((c) => Number(c) - 1)); // 0-based channels
-const $ = (id) => document.getElementById(id);
-let output = null, events = null, name = "", play = null, countIn = true;
-
-// A Standard MIDI File (format 0 or 1), all tracks merged, as [{t: seconds, data: [...]}] through its tempo map.
-function parse(buf) {
-  const d = new DataView(buf); let p = 0;
-  const u32 = () => (p += 4, d.getUint32(p - 4)), u16 = () => (p += 2, d.getUint16(p - 2)), u8 = () => d.getUint8(p++);
-  const vlq = () => { let v = 0, b; do { b = u8(); v = (v << 7) | (b & 0x7f); } while (b & 0x80); return v; };
-  if (u32() !== 0x4d546864) throw new Error("not a MIDI file");
-  p = 10; const ntrk = u16(), tpq = u16(); p = 14;
-  if (tpq & 0x8000) throw new Error("SMPTE time division isn't supported");
-  const raw = [], tempos = [];
-  for (let k = 0; k < ntrk; k++) {
-    p += 4; const len = u32(), end = p + len; let tick = 0, status = 0;
-    while (p < end) {
-      tick += vlq();
-      if (d.getUint8(p) & 0x80) status = u8();
-      if (status === 0xff) { const type = u8(), ln = vlq();
-        if (type === 0x51) tempos.push({ tick, us: (d.getUint8(p) << 16) | (d.getUint8(p + 1) << 8) | d.getUint8(p + 2) });
-        p += ln; }
-      else if (status === 0xf0 || status === 0xf7) p += vlq();
-      else { const kind = status & 0xf0, n = kind === 0xc0 || kind === 0xd0 ? 1 : 2;
-        const data = [status]; for (let i = 0; i < n; i++) data.push(u8()); raw.push({ tick, data }); }
-    }
-  }
-  tempos.sort((a, b) => a.tick - b.tick); if (!tempos.length || tempos[0].tick) tempos.unshift({ tick: 0, us: 500000 });
-  const sec = (tick) => { let s = 0; for (let i = 0; i < tempos.length; i++) {
-      const t0 = tempos[i].tick, t1 = i + 1 < tempos.length ? tempos[i + 1].tick : Infinity;
-      if (tick <= t0) break; s += (Math.min(tick, t1) - t0) / tpq * tempos[i].us / 1e6; }
-    return s; };
-  return raw.map((e) => ({ t: sec(e.tick), data: e.data })).sort((a, b) => a.t - b.t);
-}
-
-const clock = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
-
-function load(buf, label) {
-  try { events = parse(buf).filter((e) => !MUTE.has(e.data[0] & 0x0f)); } catch (e) { $("file").textContent = `${label}: ${e.message}`; events = null; }
-  if (events) { name = label; $("file").textContent = `${label}: ${events.length} events, ${clock(events.at(-1)?.t ?? 0)}${MUTE.size ? `, channel ${[...MUTE].map((c) => c + 1).join(", ")} muted` : ""}`; }
-  $("play").disabled = !events?.length;
-}
-
-function stop(msg) {
-  if (play) { clearInterval(play.timer); output?.clear?.(); play = null; }
-  if (output) for (let ch = 0; ch < 16; ch++) { output.send([0xb0 | ch, 64, 0]); output.send([0xb0 | ch, 123, 0]); }
-  $("play").classList.remove("on");
-  $("status").textContent = msg || "Stopped.";
-}
-
-function start() {
-  stop();
-  if (!output) { $("status").textContent = `No MIDI output named like "${PORT}". Plug it in, then reload.`; return; }
-  output.send([0xf0, 0x7e, 0x7f, 0x09, 0x01, 0xf7]); // GM System On
-  const t0 = performance.now() + 300;
-  if (countIn) for (let i = 0; i < 4; i++) output.send([0x99, 37, i ? 70 : 100], t0 + i * 600); // side stick
-  const end = events.at(-1).t;
-  play = { k: 0, start: t0 + (countIn ? 2400 : 0) };
-  $("play").classList.add("on");
-  play.timer = setInterval(() => { // a 400 ms lookahead, so Stop is quick
-    const now = performance.now();
-    while (play.k < events.length && play.start + events[play.k].t * 1000 < now + 400) {
-      const e = events[play.k++]; output.send(e.data, play.start + e.t * 1000);
-    }
-    const at = Math.max(0, (now - play.start) / 1000);
-    $("bar").value = Math.min(1, at / end);
-    $("status").textContent = `${name}: ${clock(at)} / ${clock(end)}`;
-    if (play.k >= events.length && now > play.start + end * 1000 + 1500) stop("Done.");
-  }, 100);
-}
-
-$("play").onclick = start;
-$("stop").onclick = () => stop();
-$("countin").onclick = (e) => {
-  countIn = !countIn; e.currentTarget.textContent = `Count-in: ${countIn ? "on" : "off"}`;
-  e.currentTarget.classList.toggle("on", countIn); e.currentTarget.setAttribute("aria-pressed", countIn);
-};
-$("pick").onchange = async (e) => { const f = e.target.files[0]; if (f) load(await f.arrayBuffer(), f.name); };
-addEventListener("pagehide", () => stop());
-addEventListener("keydown", (e) => e.key === "Escape" && stop());
-window.__parse = parse; // for a dry-run check from the console
-
-if (q.get("file")) fetch(q.get("file")).then((r) => r.ok ? r.arrayBuffer() : Promise.reject(new Error(`HTTP ${r.status}`)))
-  .then((b) => load(b, q.get("file")), (e) => ($("file").textContent = `${q.get("file")}: ${e.message}`));
-if (!navigator.requestMIDIAccess) $("status").textContent = "This browser has no Web MIDI. Use Chrome.";
-else navigator.requestMIDIAccess({ sysex: true }).then((m) => {
-  output = [...m.outputs.values()].find((o) => o.name.toLowerCase().includes(PORT.toLowerCase())) || null;
-  $("status").textContent = output ? `Ready: ${output.name}.` : `No MIDI output named like "${PORT}". Plug it in, then reload. (?port= picks another)`;
-}, (e) => ($("status").textContent = `MIDI refused: ${e.message}`));
-</script>
+<script type="module" src="player.mjs"></script>
 </body>
 </html>

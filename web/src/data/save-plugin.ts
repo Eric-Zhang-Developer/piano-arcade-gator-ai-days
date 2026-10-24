@@ -92,7 +92,7 @@ export function createSavePlugin(sink: TakeSink, loadChart: LoadChart = loadComm
     if (e.id !== current || status?.state !== "sending") return;
     if ("done" in e) return setStatus({ state: "waiting", why: "offline or the server is busy: it sends next time" });
     if (e.result === "ok") setStatus({ state: "saved" });
-    else if (e.result === "later") setStatus({ state: "waiting", why: "the database can't take it yet: it retries later" });
+    else if (e.result === "later") setStatus({ state: "waiting", why: "kept on this device; it sends again in a few minutes" });
     else if (e.result === "drop") setStatus({ state: "skipped", why: "the server refused this take" });
   });
   let rec: Recording | null = null;
@@ -167,6 +167,16 @@ export function createSavePlugin(sink: TakeSink, loadChart: LoadChart = loadComm
   };
 }
 
+/** What the outbox does with a take, given /api/takes' answer. */
+export function sendResultFor(status: number): SendResult {
+  if (status >= 200 && status < 300) return "ok";
+  // 424: the database refused a take the game accepted (resend after a migration). 429: saving too fast (0008's
+  // limit). Either way the take is fine: keep it and move on to the next one.
+  if (status === 424 || status === 429) return "later";
+  if ([400, 409, 413, 422].includes(status)) return "drop"; // the take itself is bad: resending won't help
+  return "retry"; // offline, 401 (session expired), 5xx, or not configured on the server
+}
+
 /** POST one take; maps the answer to what the outbox should do with it. */
 export async function sendTake(item: OutboxItem): Promise<SendResult> {
   const session = await ensureSession();
@@ -175,10 +185,7 @@ export async function sendTake(item: OutboxItem): Promise<SendResult> {
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
     body: JSON.stringify({ id: item.id, take: item.take }),
   });
-  if (res.ok) return "ok";
-  if (res.status === 424) return "later"; // the database refused a take the game accepted: resend after a migration
-  if ([400, 409, 413, 422].includes(res.status)) return "drop"; // the take itself is bad: resending won't help
-  return "retry"; // offline, 401 (session expired), 5xx, or not configured on the server
+  return sendResultFor(res.status);
 }
 
 export function flushOutbox(): Promise<number> {

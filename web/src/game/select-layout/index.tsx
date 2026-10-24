@@ -2,7 +2,8 @@
 // The music select (/): the focused song large on the left, the song cards on the right. Each card is a link, so
 // click and Enter play (the focused jacket moving into the stage card, select-to-stage); ↑/↓ move focus and keep the
 // focused card centered in the list; L learns the focused song in wait mode (learn-from-select); E switches Normal and
-// Easy (easy-charts), and every href and best grade follows the level.
+// Easy (easy-charts), and every href and best grade follows the level. Hrefs and L also carry the song's Hands and
+// Speed (song-options).
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
@@ -14,6 +15,7 @@ import { SongCard } from "../song-card";
 import { SongJacket } from "../song-jacket/SongJacket";
 import { SelectStage } from "../select-stage";
 import { isLearnKey, learnUrl, SongPreview } from "../song-preview";
+import { useSongOptions, withOptions } from "../song-options";
 import { uiSound } from "../ui-sounds";
 import type { Song } from "../song-select/load";
 import { goToStage } from "./go-to-stage";
@@ -24,6 +26,7 @@ import styles from "./select-layout.module.css";
 export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNode }) {
   const [focused, setFocused] = useState(0);
   const best = useBestGrades();
+  const options = useSongOptions();
   const router = useRouter();
   const song = songs[focused];
   const [level, setLevel] = useLevel();
@@ -57,7 +60,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
   function onKeyDown(e: KeyboardEvent<HTMLOListElement>) {
     if (isLearnKey(e) && song) {
       e.preventDefault();
-      return router.push(withLevel(learnUrl(song.id), level));
+      return router.push(withOptions(withLevel(learnUrl(song.id), level), options[song.id]));
     }
     const step = e.key === "ArrowDown" ? 1 : e.key === "ArrowUp" ? -1 : 0;
     if (!step) return;
@@ -121,7 +124,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
         {songs.map((s, i) => (
           <li key={s.id}>
             <Link
-              href={withLevel(`/play?song=${s.id}`, level)}
+              href={withOptions(withLevel(`/play?song=${s.id}`, level), options[s.id])}
               autoFocus={i === 0}
               className={styles.link}
               data-testid={`song-${s.id}`}

@@ -24,6 +24,7 @@ import { tempoCurve } from "./tempo-curve";
 import { weakBars } from "./weak-bars";
 import { feverStage } from "./stage";
 import { takeGraph } from "./take-graph";
+import { versus } from "./versus";
 import { waitMode } from "./wait-mode/plugin";
 
 // Open file: each game feature registers its plugin here, one line each. /play draws every plugin's layer on its
@@ -31,6 +32,7 @@ import { waitMode } from "./wait-mode/plugin";
 export const plugins: GamePlugin[] = [
   barLoop(), // first: every later plugin (the sim's bot included) sees the looped chart
   handMode(), // ?hands=R|L: before scenes and the sim, so their bots and the judge get only the played hand
+  versus(), // ?versus=1: before scenes and the sim, so their bots and the judge get both players' copies
   scenes(), // ?bot=<name>: after bar-loop, so the bot plays the looped chart
   simPlugin, // piano-sim: /play?midi=sim only. First, so later plugins asking for MIDI get the fake piano.
   ghost(), // the last take, dashed: under every layer that draws, after every plugin that changes the chart

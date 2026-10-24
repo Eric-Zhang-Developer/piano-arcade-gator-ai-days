@@ -40,6 +40,34 @@ ship = ""
 features = ["led-strip", "led-game"]
 cut = []
 
+# showcase: what the 3-minute video shows, ranked for it (decision of 2026-10-24). encore: the rest, by dependency.
+[[milestone]]
+name = "showcase"
+ship = ""
+features = [
+  "play-slots",
+  "scenes",
+  "fever-gauge",
+  "difficulty",
+  "hand-colors",
+  "note-labels",
+  "calibration",
+  "hand-mode",
+]
+cut = []
+
+[[milestone]]
+name = "encore"
+ship = ""
+features = [
+  "wait-mode",
+  "highway-zoom",
+  "ghost",
+  "piano-voice",
+  "versus",
+]
+cut = []
+
 [[milestone]]
 name = "submission"
 ship = ""

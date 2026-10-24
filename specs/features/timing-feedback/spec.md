@@ -20,7 +20,8 @@ decisions: whether to add a GOOD tier, and whether the latency offset is wrong.
   press of the same pitch within ±`NEAR_MISS_MS` (150 ms, osu!'s outermost window at OD 5) of it. Each extra counts
   for at most one note, the nearest; each MISS note takes at most one extra. Wrong-pitch extras are never timed.
 - **The summary:** the number of timed presses; the mean signed offset (negative is early) and the standard
-  deviation, in whole ms; how many presses were early and how many late (exactly 0 counts as neither); and of the
+  deviation, in whole ms; how many presses were early and how many late (counted from the offset rounded to whole ms, like the mean, so
+  sub-ms clock noise is neither: −0.4 ms is on time, −0.6 ms is early); and of the
   MISS notes, how many had a near miss within 100 ms and within 150 ms.
 - **On the results screen**, under the counts: one line in words ("Late by 38 ms on average, spread ±21 ms"), the
   early/late counts, and the near-miss line ("5 of 6 misses were within 100 ms"). With fewer than 3 timed presses,

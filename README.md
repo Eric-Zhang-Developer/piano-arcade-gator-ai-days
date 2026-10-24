@@ -6,7 +6,8 @@ played it: PERFECT, GREAT, MISS and extras, how early or late, combo and rank. A
 and tell you what to practice next.
 
 Built at Gator Hack V (UF AI Days, Oct 23 to 25, 2026). Why we're building it and what's out of scope:
-[`specs/mission.md`](specs/mission.md).
+[`specs/mission.md`](specs/mission.md). Product, UI and code decisions start with the frozen
+[Product philosophy](PRODUCT_PHILOSOPHY.md).
 
 ## Run it
 

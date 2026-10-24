@@ -7,6 +7,11 @@ assignee: ""
 
 # Learning frontend
 
+Read the frozen [Product philosophy](../../../PRODUCT_PHILOSOPHY.md) before
+product, UI or code decisions. This surface must carry its promise of a
+reassuring personal tutor, useful challenge and growing independence; the
+implementation choices below serve that promise.
+
 This is the frontend slice commissioned from the published `piano-learning` plan on `seeko/work`. It does not deliver the complete learner engine, authentication, inference, scheduling, or cloud persistence. Explicit task authorization selects this bounded work independently of automatic milestone picking.
 
 ## Plan

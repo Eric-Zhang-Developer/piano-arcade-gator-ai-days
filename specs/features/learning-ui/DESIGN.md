@@ -1,5 +1,10 @@
 # Learning room
 
+Read the frozen [Product philosophy](../../../PRODUCT_PHILOSOPHY.md) before
+product, UI or code decisions. This surface must carry its promise of a
+reassuring personal tutor, useful challenge and growing independence; the
+implementation choices below serve that promise.
+
 Mode: Operate. Desktop/laptop only. The accepted Spark question/workspace arrangement remains the session layout. The current increment makes the graph home gator-guided: one prepared next activity, a short reason, and one primary Start/Resume action. It enters the matching activity directly with the skill and musical example already selected. The learner need not choose Learn/Review, Theory/Procedure or a graph node first. The prepared skill chooses the graph domain; datasets remain separate and the map is read-only. Existing Learn/Review hub URLs redirect to the map. The brand returns to the agent/map home. No dashboard metrics, invented mastery or automatic session entry.
 
 Visual authority is Eric-authored main `5c1bb0e641a3a40cd1968a70ba05c488d597fbcb`: `specs/context/visual-direction.md`, root `globals.css`/`layout.tsx`, and select-layout, song-card, options-panel and pause-skin CSS. Saira is loaded once by the existing root Next font. The wordmark and activity headings use italic 900; song titles, menu/navigation and main actions use italic 800; questions, labels and reading use system-ui. In particular, procedural action styles outrank the shell's generic button font reset. Fonts were checked against the rendered shared select on this branch, whose font declarations match current main, and document.fonts/width metrics verify the actual loaded faces rather than a similarly named fallback. The newest open [pause integration](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/404), head `ed58c9a909bb40dfe725e7872514cba4eb2191d6`, changes only the play route and introduces no replacement font system.

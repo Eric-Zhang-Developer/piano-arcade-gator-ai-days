@@ -3,7 +3,7 @@
 
 .card {
   --size: clamp(16px, 2.2223vh, 24px);
-  width: min(60em, 94vw);
+  width: min(68em, 94vw);
   max-height: 94vh;
   margin: auto;
   padding: calc(var(--size) * 1.1) calc(var(--size) * 1.4) calc(var(--size) * 1.3);

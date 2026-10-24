@@ -34,13 +34,13 @@ export const helpGroups: HelpGroup[] = [
     lines: [
       { keys: ["↑", "↓"], what: "choose a song", source: [SELECT], match: ["ArrowUp", "ArrowDown"] },
       { keys: ["Enter"], what: "play it" },
-      { keys: ["L"], what: "learn it in wait mode: the song waits for each note", source: [SELECT] },
+      { keys: ["L"], what: "learn it: the song waits for each note", source: [SELECT] },
       { keys: ["E"], what: "switch Normal and Easy", source: [SELECT], match: ["e"] },
-      { keys: ["F"], what: "your first song, guided, about 30 seconds", source: ["game/first-run/index.tsx"], match: ["f"] },
-      { keys: ["O"], what: "Options: latency, effects volume, labels", source: [OPTIONS], match: ["o"] },
+      { keys: ["F"], what: "a guided first song, 30 seconds", source: ["game/first-run/index.tsx"], match: ["f"] },
+      { keys: ["O"], what: "Options: latency, volume, labels", source: [OPTIONS], match: ["o"] },
       {
         keys: ["↑", "↓", "←", "→", "Enter"],
-        what: "move between rows, change a value, tick a box",
+        what: "rows, values, boxes",
         where: "in Options",
         source: [OPTIONS],
         match: ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Enter"],
@@ -53,11 +53,11 @@ export const helpGroups: HelpGroup[] = [
       { keys: ["Enter"], what: "start" },
       { keys: laptopWhites, what: "the white keys, from middle C", source: ["game/core/input.ts"] },
       { keys: laptopBlacks, what: "the black keys", source: ["game/core/input.ts"] },
-      { keys: ["Z", "X"], what: "move the laptop keys an octave down / up", source: ["game/laptop-octaves/index.tsx"], match: ["KeyZ", "KeyX"] },
+      { keys: ["Z", "X"], what: "laptop keys an octave down / up", source: ["game/laptop-octaves/index.tsx"], match: ["KeyZ", "KeyX"] },
       {
         keys: ["−", "+"],
         what: "zoom the score",
-        where: "in Sheet music ↗, the score in its own window",
+        where: "in Sheet music ↗",
         source: ["game/sheet-view/SheetView.tsx"],
         match: ["-", "_", "+", "="],
       },
@@ -67,14 +67,14 @@ export const helpGroups: HelpGroup[] = [
     screen: "Playing",
     lines: [
       { keys: ["Esc"], what: "pause, and again to resume", source: ["app/play/page.tsx", PAUSE], match: ["Escape"] },
-      { keys: ["↑", "↓", "Enter"], what: "Resume, Retry or Quit", where: "in the pause menu", source: [PAUSE], match: ["ArrowUp", "ArrowDown"] },
+      { keys: ["↑", "↓", "Enter"], what: "Resume, Retry or Quit", where: "paused", source: [PAUSE], match: ["ArrowUp", "ArrowDown"] },
     ],
   },
   {
     screen: "Results",
     lines: [
       { keys: ["Enter"], what: "retry" },
-      { keys: ["A–Z"], what: "type your initials for a new record", source: [RECORDS] },
+      { keys: ["A–Z"], what: "initials for a new record", source: [RECORDS] },
       { keys: ["↑", "↓"], what: "change the last letter", source: [RECORDS], match: ["ArrowUp", "ArrowDown"] },
       { keys: ["Backspace"], what: "erase a letter", source: [RECORDS], match: ["Backspace"] },
       { keys: ["Enter"], what: "save the initials", source: [RECORDS], match: ["Enter"] },

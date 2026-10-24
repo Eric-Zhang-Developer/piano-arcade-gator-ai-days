@@ -1,3 +1,18 @@
+-- Compound meters: beatsPerBar counts quarter notes, so 3/8 is 1.5 (Fur Elise) and 9/8 is 4.5 (Clair de Lune).
+-- The column was int, so every save of those songs failed. Any positive number up to 32 now; the old 1–16 integer
+-- check goes with the type.
+do $$
+declare c record;
+begin
+  for c in select conname from pg_constraint
+           where conrelid = 'public.songs'::regclass and contype = 'c' and pg_get_constraintdef(oid) ~ 'beats_per_bar'
+  loop
+    execute format('alter table public.songs drop constraint %I', c.conname);
+  end loop;
+end $$;
+alter table public.songs alter column beats_per_bar type numeric;
+alter table public.songs add constraint songs_beats_per_bar_positive check (beats_per_bar > 0 and beats_per_bar <= 32);
+
 -- judging-tiers added GOOD and WRONG to Results.counts. Both were already kept in takes.results (JSON);
 -- columns make them queryable like perfect/great/miss. Older takes have neither: 0.
 alter table public.takes add column good  int not null default 0 check (good  >= 0);

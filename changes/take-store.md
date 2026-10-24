@@ -11,12 +11,14 @@ verify: `pnpm -C /Users/sharan/.worktrees/pa/take-store/web verify --out /Users/
 42/42 PERFECT with test input and through the piano-sim MIDI path (test takes are never sent). Local stack: Chrome laptop-keys take, rank S with 1 MISS, one
 `takes` row and 42 `note_judgments`, missed bar first on `/progress`, no duplicate after reload. 14/14 abuse checks
 (`supabase/tests/local-stack/attacks.mjs`: forged tokens, lying scores, id hijack, cross-player reads). Vitest 588 passed, 1 skipped (whole app). `node supabase/tests/migrations.mjs`: pass, 3 migrations apply and keep the rules (18 checks).
-Live project: `node supabase/tests/live-smoke.mjs` pass, 8/8 (anonymous sign-in, save_take, a later GOOD, own-row reads, RLS).
+Every song: `node supabase/tests/every-song.mjs` (Oct 24, before 0005: 8 of 10 songs saved and read back; Fur Elise and
+Clair de Lune refused, fixed by 0005's numeric beats_per_bar). Live project: `node supabase/tests/live-smoke.mjs` pass, 8/8 (anonymous sign-in, save_take, a later GOOD, own-row reads, RLS).
 
 ## Gaps
 CAPTCHA on anonymous sign-ins not set up. (Migrations 0001–0003 ran by hand and are recorded in the CLI's history;
 `supabase/push.sh --status` matches and a dry run says the live database is up to date.)
 Google sign-in (link, sign in on another device, merge that device's takes, sign out) is built and unit-tested
 (`merge.test.ts`, 5/5) and `merge_player` is live (checked with two throwaway players), and Sharan signed in with Google on `/progress`
-(Oct 24 2026: one Google user in Auth). Linking an anonymous player and the second-device merge not yet tried by a person. Drills aren't saved. Charts must live at `public/songs/<id>/chart.json`, read from disk: on Vercel that needs file tracing for
+(Oct 24 2026: one Google user in Auth). Linking an anonymous player and the second-device merge not yet tried by a person. Drills, one-hand, chunk, versus, wait-mode, bot and fake-piano takes aren't saved (the server can't re-judge them yet);
+the player isn't told. Charts must live at `public/songs/<id>/chart.json`, read from disk: on Vercel that needs file tracing for
 `public/songs` (local demo is fine). No per-player rate limit on saves.

@@ -52,5 +52,6 @@ export function readInputs(webDir = process.cwd()): Inputs {
     runChecksNow: read(join(root, "web/e2e/run-checks.mjs")),
     codeowners: read(join(root, ".github/CODEOWNERS")),
     agentsMd: read(join(root, "AGENTS.md")),
+    remote: git(root, "config", "--get", "remote.origin.url"),
   };
 }

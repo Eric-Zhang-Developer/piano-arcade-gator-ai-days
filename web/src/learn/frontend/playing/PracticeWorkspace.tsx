@@ -1,15 +1,17 @@
 'use client';
-import { useEffect, useReducer, useState } from 'react';
-import { initialPractice, music, passageBeats, practiceReducer, targetTempo } from './model';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { music, passageBeats, targetTempo } from './model';
 import { Score, ScoreSource } from './Score';
+import { useLearningSessions } from '../LearningSessions';
 import { usePlayback } from './usePlayback';
 import styles from './playing.module.css';
 
 export function PracticeWorkspace() {
-  const [state, dispatch] = useReducer(practiceReducer, initialPractice);
+  const { practice: state, dispatchPractice: dispatch } = useLearningSessions();
   const [demo, setDemo] = useState(false);
   const playback = usePlayback();
-  useEffect(() => () => { setDemo(false); dispatch({ type: 'stop' }); }, []);
+  useEffect(() => () => { setDemo(false); dispatch({ type: 'stop' }); }, [dispatch]);
   const locked = state.busy || demo;
   async function hear() {
     if (locked) return;
@@ -53,7 +55,7 @@ export function PracticeWorkspace() {
         {locked ? <button type="button" className={styles.secondary} onClick={stop}>Stop {demo ? 'demo' : 'preview'}</button>
           : state.stage === 'feedback' ? <button type="button" className={styles.primary} onClick={() => dispatch({ type: 'drill' })}>Practise the held note</button>
           : state.stage === 'drill' ? <button type="button" className={styles.primary} onClick={() => dispatch({ type: 'repeat' })}>I played it</button>
-          : state.stage === 'complete' ? <a className={styles.primary} href="/learn/play-through">Go to Play-through</a>
+          : state.stage === 'complete' ? <Link className={styles.primary} href="/learn/play-through">Go to Play-through</Link>
           : <button type="button" className={styles.primary} onClick={take}>{takeLabel}</button>}
         {!locked && state.stage !== 'complete' && <button type="button" className={styles.secondary} onClick={hear}>Hear the opening</button>}
       </div>

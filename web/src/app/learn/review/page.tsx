@@ -1,2 +1,2 @@
-import { TheoryWorkspace } from '@/learn/frontend/TheoryWorkspace';
-export default function Page() { return <TheoryWorkspace review/>; }
+import { LearningLanding } from '@/learn/frontend/LearningLanding';
+export default function Page() { return <LearningLanding group="Review"/>; }

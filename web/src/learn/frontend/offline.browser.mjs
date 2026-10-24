@@ -11,7 +11,7 @@ async function open(path) {
       constructor(...args) { super(...args); contexts.push(this); }
     };
     const flush = () => new Promise(resolve => setTimeout(resolve, 50));
-    const text = () => document.querySelector('main').innerText;
+    const text = () => document.querySelector('main').textContent;
     function assert(value, message) { if (!value) throw new Error(message); }
     async function until(predicate, message) {
       const end = Date.now() + 10000;
@@ -84,7 +84,7 @@ await page.eval(async () => {
   assert(text().includes('That’s the idea.'), 'Completed Understand reset');
 });
 
-await open('review');
+await open('review/theory');
 await page.eval(async () => {
   const { assert, text, click, choose, recover } = window.learningOfflineTest;
   const reference = () => [...document.querySelectorAll('button')].find(b => b.textContent.startsWith('Reference'));

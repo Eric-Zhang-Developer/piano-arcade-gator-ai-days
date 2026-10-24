@@ -6,8 +6,10 @@ import { cachedBoard, repoRoot } from "../../../../operator/collect";
 
 export const dynamic = "force-dynamic";
 
-export async function POST() {
+export async function POST(req: Request) {
   if (process.env.NODE_ENV === "production") return new Response("Not found", { status: 404 });
+  const origin = req.headers.get("origin");
+  if (origin && new URL(origin).host !== req.headers.get("host")) return new Response("Forbidden", { status: 403 });
   const dir = join(await repoRoot(), "web/public/operator");
   const snapshot = toSnapshot(await cachedBoard());
   await mkdir(dir, { recursive: true });

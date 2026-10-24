@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "vitest";
-import { buildBoard, featureState, needsPerson, parseMilestones, specFrom, toSnapshot, workerOf, type Inputs, type OpenPr } from "./board";
+import { buildBoard, featureState, needsPerson, parseFrontmatter, parseMilestones, specFrom, titleType, toSnapshot, workerOf, type Inputs, type OpenPr } from "./board";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
 const AT = "2026-10-24T12:00:00.000Z";
@@ -139,4 +139,44 @@ test("a snapshot has no heartbeat data and round-trips into the same board", () 
   expect(JSON.stringify(snap)).not.toContain(AT.slice(0, 16) + ":00.000Z\"}]"); // no heartbeat row left behind
   expect(JSON.parse(JSON.stringify(snap))).toEqual(snap);
   expect({ ...snap, heartbeats: b.heartbeats }).toEqual(b);
+});
+
+test("frontmatter reads every form lib.py reads: quoted, unquoted, `- item` lists, trailing comments", () => {
+  const fm = (body: string) => parseFrontmatter(`---\n${body}\n---\n# x`);
+  expect(fm('depends_on: ["core-loop"]').depends_on).toEqual(["core-loop"]);
+  expect(fm("depends_on: [core-loop, hud]").depends_on).toEqual(["core-loop", "hud"]);
+  expect(fm("depends_on:\n  - core-loop\n  - hud").depends_on).toEqual(["core-loop", "hud"]);
+  expect(fm('depends_on: ["core-loop"]  # note').depends_on).toEqual(["core-loop"]);
+  expect(fm("depends_on: []").depends_on).toEqual([]);
+  expect(fm('name: "Hi: there # not a comment"').name).toBe("Hi: there # not a comment");
+  expect(specFrom("x", "---\ndepends_on:\n  - a\n---").dependsOn).toEqual(["a"]);
+});
+
+test("a Worker: line never borrows the next line", () => {
+  expect(workerOf({ title: "feat(a): x", body: "Worker:\nCloses #12" })).toBe("unnamed");
+});
+
+test("titles: only parse_title's types count, and a feat must name its feature", () => {
+  expect(titleType("feat(a): x")).toEqual({ type: "feat", scope: "a" });
+  expect(titleType("feat: x")).toBeNull();
+  expect(titleType("build: x")).toBeNull();
+  expect(titleType('Revert "feat(a): x"')).toEqual({ type: "revert", scope: null });
+});
+
+test("main CI is red on any conclusion but success, neutral or skipped", () => {
+  const red = (conclusion: string) => needsPerson(inputs({ mainRun: { conclusion, url: "r", updatedAt: AT } })).needs.length;
+  expect([red("failure"), red("timed_out"), red("cancelled"), red("startup_failure")]).toEqual([1, 1, 1, 1]);
+  expect([red("success"), red("neutral"), red("skipped")]).toEqual([0, 0, 0]);
+});
+
+test("unreadable milestones: every feature that isn't done is unknown, not backlog", () => {
+  const b = buildBoard(inputs({ specs: [spec("a"), spec("b")], done: ["a"], milestones: null }));
+  expect(b.features.map((f) => f.state)).toEqual(["done", "unknown"]);
+  expect(b.books.milestones).toEqual([]);
+});
+
+test("STOP links to the file on main when any PR says where the repo is", () => {
+  const url = (more: Partial<Inputs>) => needsPerson(inputs({ stop: true, ...more })).needs[0].url;
+  expect(url({ openPrs: [pr(1, "feat(a): x")] })).toBe("https://github.com/o/r/blob/main/STOP");
+  expect(url({ openPrs: null, allPrs: null })).toBeNull();
 });

@@ -25,6 +25,16 @@ function duration(min: number): string {
   return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${m % 60} min`;
 }
 
+// Enough of the shape to render: an old or hand-edited snapshot shows a banner, never a crash.
+function isBoard(b: unknown): b is Board {
+  const x = b as Board | null;
+  return (
+    !!x && typeof x.at === "string" && !!x.gh && Array.isArray(x.banner) && Array.isArray(x.features) &&
+    Array.isArray(x.needs) && Array.isArray(x.needsUnknown) && (x.crew === null || Array.isArray(x.crew)) &&
+    !!x.books && Array.isArray(x.books.milestones)
+  );
+}
+
 const clock = (iso: string) => new Date(iso).toLocaleString(undefined, { weekday: "short", hour: "numeric", minute: "2-digit", second: "2-digit" });
 
 export default function OperatorPage() {
@@ -42,16 +52,20 @@ export default function OperatorPage() {
       const r = await fetch(SNAPSHOT_URL, { cache: "no-store" }).catch(() => null);
       if (stopped) return;
       setMode("SNAPSHOT");
-      if (r?.ok) setBoard(await r.json());
-      else setNote("No snapshot frozen yet: run pnpm dev, open /operator and press Freeze snapshot.");
+      if (!r?.ok) return setNote("No snapshot frozen yet: run pnpm dev, open /operator and press Freeze snapshot.");
+      const b = await r.json().catch(() => null);
+      if (isBoard(b)) setBoard(b);
+      else setNote("The snapshot file isn't a board this page can read: freeze a new one.");
     };
     const loadLive = async () => {
       const r = await fetch("/api/operator", { cache: "no-store" }).catch(() => null);
       if (stopped) return;
       if (r?.status === 404) return loadSnapshot(); // a production build has no live data
       setMode("LIVE");
-      if (r?.ok) {
-        setBoard(await r.json());
+      const b = r?.ok ? await r.json().catch(() => null) : null;
+      if (stopped) return;
+      if (isBoard(b)) {
+        setBoard(b);
         setFetchedAt(Date.now());
         setNote("");
       } else setNote(`Live fetch failed (${r ? `HTTP ${r.status}` : "server unreachable"}); showing the last board.`);
@@ -200,7 +214,11 @@ function Crew({ board, heartbeats, now }: { board: Board; heartbeats: Heartbeat[
                   </span>
                 )}
               </div>
-              {prs.length === 0 && <p className={styles.dim}>no open PRs</p>}
+              {board.crew === null ? (
+                <p className={styles.dim}>? open PRs unknown</p>
+              ) : (
+                prs.length === 0 && <p className={styles.dim}>no open PRs</p>
+              )}
               <ul className={styles.list}>
                 {prs.map((p) => (
                   <li key={p.number}>
@@ -225,7 +243,7 @@ function Books({ board }: { board: Board }) {
   const backlog = board.features.filter((f) => !f.milestone);
   const rows = [
     ...books.milestones.map((m) => ({ ...m, features: board.features.filter((f) => f.milestone === m.name) })),
-    ...(backlog.length ? [{ name: "backlog", done: NaN, planned: NaN, cut: 0, features: backlog }] : []),
+    ...(backlog.length ? [{ name: books.milestones.length ? "backlog" : "milestones unknown", done: NaN, planned: NaN, cut: 0, features: backlog }] : []),
   ];
   return (
     <Screen n={3} title="BOOKKEEPING">
@@ -244,6 +262,12 @@ function Books({ board }: { board: Board }) {
               <th scope="row">{m.name}</th>
               <td className={styles.num}>
                 {Number.isNaN(m.done) ? "—" : `${m.done} / ${m.planned}`}
+                {m.planned > 0 && (
+                  <span className={styles.meter} aria-hidden="true">
+                    {"█".repeat(m.done)}
+                    <span className={styles.meterEmpty}>{"░".repeat(m.planned - m.done)}</span>
+                  </span>
+                )}
                 {m.cut > 0 && <span className={styles.dim}> ({m.cut} cut)</span>}
               </td>
               <td>

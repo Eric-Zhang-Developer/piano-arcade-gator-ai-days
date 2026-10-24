@@ -13,7 +13,8 @@ const run = (cmd: string, args: string[], cwd: string): Promise<GhResult> =>
   new Promise((res) =>
     execFile(cmd, args, { cwd, timeout: 30_000, maxBuffer: 64 << 20 }, (err, stdout, stderr) => {
       const code = err ? (typeof err.code === "number" ? err.code : -1) : 0;
-      res({ code, stdout, stderr: err && err.code === "ENOENT" ? `${cmd}: not installed` : stderr || String(err ?? "") });
+      const e = !err ? "" : err.code === "ENOENT" ? `${cmd}: not installed` : err.killed ? `${cmd}: timed out` : stderr || String(err);
+      res({ code, stdout, stderr: e });
     }),
   );
 
@@ -51,7 +52,7 @@ async function heartbeats(root: string): Promise<Inputs["heartbeats"]> {
   if (!common) return null;
   const dir = join(resolve(root, common), "agent-heartbeats");
   try {
-    const names = await readdir(dir);
+    const names = (await readdir(dir)).filter((n) => !n.startsWith("."));
     const rows = await Promise.all(names.map(async (worker) => ({ worker, at: (await stat(join(dir, worker))).mtime.toISOString() })));
     return rows.sort((a, b) => a.worker.localeCompare(b.worker));
   } catch {
@@ -73,11 +74,11 @@ export async function collect(opts: { root: string; gh?: GhRun; now?: Date }): P
   const done = (await readdir(join(root, "changes")).catch(() => [] as string[]))
     .filter((f) => f.endsWith(".md"))
     .map((f) => f.slice(0, -3));
-  let milestones: Inputs["milestones"] = [];
+  let milestones: Inputs["milestones"] = null;
   try {
     milestones = parseMilestones(await readFile(join(root, "specs/milestones.toml"), "utf8"));
   } catch (e) {
-    banner.push(`Milestones unknown: ${(e as Error).message}`);
+    banner.push(`Milestones unknown, so feature states are too: ${(e as Error).message}`);
   }
   const [sha, mainSha, beats] = await Promise.all([
     git(root, "rev-parse", "--short", "HEAD"),
@@ -152,7 +153,10 @@ export function cachedBoard(): Promise<Board> {
   if (!g.__operatorCache || now - g.__operatorCache.at >= CACHE_MS) {
     const started = now;
     const board = repoRoot().then((root) => collect({ root }));
-    board.then((b) => console.info(`operator: collected in ${Date.now() - started} ms, gh: ${b.gh.status} · ${b.gh.calls} calls`));
+    board.then(
+      (b) => console.info(`operator: collected in ${Date.now() - started} ms, gh: ${b.gh.status} · ${b.gh.calls} calls`),
+      () => (g.__operatorCache = undefined), // collect shouldn't throw; if it does, don't serve the failure for a minute
+    );
     g.__operatorCache = { at: now, board };
   }
   return g.__operatorCache.board;

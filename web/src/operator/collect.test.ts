@@ -29,6 +29,8 @@ test("gh not installed or offline: failed, with the reason", async () => {
   expect(missing.banner[0]).toMatch(/^gh isn't installed/);
   const offline = await collect({ root, gh: async () => ({ code: 1, stdout: "", stderr: "error connecting to api.github.com" }) });
   expect(offline.banner[0]).toMatch(/^GitHub couldn't be reached/);
+  const slow = await collect({ root, gh: async () => ({ code: -1, stdout: "", stderr: "gh: timed out" }) });
+  expect(slow.banner[0]).toMatch(/^GitHub couldn't be reached/);
   const thrown = await collect({ root, gh: async () => ({ code: 0, stdout: "<html>", stderr: "" }) });
   expect(thrown.gh.status).toBe("failed");
 });

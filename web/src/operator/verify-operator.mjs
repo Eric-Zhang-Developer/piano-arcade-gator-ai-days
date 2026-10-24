@@ -132,6 +132,11 @@ try {
     const focused = await offline.evaluate(() => document.activeElement?.id);
     check(focused === `screen-${k}`, `key ${k} -> screen ${k}`);
   }
+  // A snapshot from an older board shape shows a banner, not a crash or an endless load.
+  writeFileSync(snapFile, JSON.stringify({ at: "2026-10-24T00:00:00Z", features: "old shape" }));
+  await offline.reload();
+  const bad = await offline.locator("[role=status]").innerText({ timeout: 10_000 }).catch(() => "");
+  check(/isn't a board/.test(bad), "a snapshot of the wrong shape shows a banner");
   check(errors.length === 0, `no page errors${errors.length ? `: ${errors.join(" | ")}` : ""}`);
 } catch (e) {
   check(false, String(e?.stack ?? e));

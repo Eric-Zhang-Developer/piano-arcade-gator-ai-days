@@ -246,7 +246,7 @@
 
 .tag {
   display: inline-block;
-  min-width: 11ch;
+  min-width: 14ch;
   color: var(--amber);
   text-transform: uppercase;
   font-size: 13px;
@@ -379,4 +379,14 @@
   margin: 0 0 18px;
   color: var(--dim);
   font-size: 13px;
+}
+
+.meter {
+  display: block;
+  color: var(--magenta);
+  letter-spacing: 1px;
+}
+
+.meterEmpty {
+  color: var(--dim);
 }

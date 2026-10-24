@@ -26,7 +26,7 @@ export type Inputs = {
   mainSha: string | null; // origin/main, when git knows it
   specs: Spec[];
   done: string[]; // slugs with changes/<slug>.md
-  milestones: Milestone[];
+  milestones: Milestone[] | null; // null: milestones.toml couldn't be read
   stop: boolean;
   openPrs: OpenPr[] | null; // null: no PR data
   allPrs: AnyPr[] | null;
@@ -64,12 +64,16 @@ export type Board = {
 export const STALE_DRAFT_MIN = 45; // the watchdog's stale_claim_minutes
 
 const TITLE = /^([a-z]+)(?:\(([^)]*)\))?!?:\s*\S/;
+const TYPES = ["feat", "fix", "refactor", "perf", "test", "chore", "style", "docs", "contract", "plan", "revert"];
 
-// Conventional Commits type and scope, as lib.py's parse_title reads them. GitHub's revert button writes 'Revert "..."'.
+// Conventional Commits type and scope, exactly as lib.py's parse_title accepts them (a feat must name its feature).
+// GitHub's revert button writes 'Revert "..."'.
 export function titleType(title: string): { type: string; scope: string | null } | null {
-  if (title.startsWith('Revert "')) return { type: "revert", scope: null };
+  if (title.trim().startsWith('Revert "')) return { type: "revert", scope: null };
   const m = TITLE.exec(title.trim());
-  return m ? { type: m[1], scope: m[2]?.trim() || null } : null;
+  if (!m || !TYPES.includes(m[1])) return null;
+  const scope = m[2]?.trim() || null;
+  return m[1] === "feat" && !scope ? null : { type: m[1], scope };
 }
 
 // Precedence: done, then cut and backlog (they hold with or without PR data), then in flight / ready / blocked,
@@ -77,10 +81,11 @@ export function titleType(title: string): { type: string; scope: string | null }
 export function featureState(
   spec: Spec,
   done: Set<string>,
-  milestones: Milestone[],
+  milestones: Milestone[] | null, // null: milestones.toml couldn't be read
   inFlight: Set<string> | null,
 ): State {
   if (done.has(spec.slug)) return "done";
+  if (milestones === null) return "unknown";
   if (milestones.some((m) => m.cut.includes(spec.slug))) return "cut";
   if (!milestones.some((m) => m.features.includes(spec.slug))) return "backlog";
   if (!inFlight) return "unknown";
@@ -89,7 +94,7 @@ export function featureState(
 }
 
 export function workerOf(pr: { title: string; body: string }): string {
-  const m = /^\s*Worker:\s*([A-Za-z0-9][\w-]*)/im.exec(pr.body || "");
+  const m = /^[ \t]*Worker:[ \t]*([A-Za-z0-9][\w-]*)/im.exec(pr.body || "");
   if (m) return m[1];
   const t = titleType(pr.title)?.type;
   return t === "plan" || t === "contract" ? "planner" : "unnamed";
@@ -100,9 +105,11 @@ const minutesBetween = (a: string, b: string) => (Date.parse(b) - Date.parse(a))
 export function needsPerson(i: Inputs): { needs: NeedItem[]; needsUnknown: string[] } {
   const needs: NeedItem[] = [];
   const needsUnknown: string[] = [];
-  if (i.stop) needs.push({ kind: "STOP", text: "STOP file present: agents must stop", url: null });
+  const repo = (i.openPrs ?? i.allPrs ?? [])[0]?.url.match(/^https:\/\/github\.com\/[^/]+\/[^/]+/)?.[0];
+  if (i.stop) needs.push({ kind: "STOP", text: "STOP file present: agents must stop", url: repo ? `${repo}/blob/main/STOP` : null });
   if (i.mainRun === null) needsUnknown.push("main CI");
-  else if (i.mainRun.conclusion === "failure") needs.push({ kind: "main CI", text: "main CI is red", url: i.mainRun.url });
+  else if (!["success", "neutral", "skipped"].includes(i.mainRun.conclusion))
+    needs.push({ kind: "main CI", text: `main CI is red (${i.mainRun.conclusion})`, url: i.mainRun.url });
   if (i.openPrs === null) needsUnknown.push("PRs");
   for (const pr of i.openPrs ?? []) {
     const t = titleType(pr.title)?.type;
@@ -134,7 +141,7 @@ export function buildBoard(i: Inputs): Board {
   const inFlight = i.openPrs
     ? new Set(i.openPrs.map((p) => titleType(p.title)).filter((t) => t?.type === "feat" && t.scope).map((t) => t!.scope!))
     : null;
-  const milestoneOf = (slug: string) => i.milestones.find((m) => m.features.includes(slug))?.name ?? null;
+  const milestoneOf = (slug: string) => i.milestones?.find((m) => m.features.includes(slug))?.name ?? null;
   const features = i.specs.map((s) => ({
     slug: s.slug,
     name: s.name,
@@ -183,7 +190,7 @@ export function buildBoard(i: Inputs): Board {
     crew,
     heartbeats: i.heartbeats,
     books: {
-      milestones: i.milestones.map((m) => ({
+      milestones: (i.milestones ?? []).map((m) => ({
         name: m.name,
         done: m.features.filter((s) => done.has(s)).length,
         planned: m.features.length,
@@ -202,26 +209,48 @@ export function toSnapshot(b: Board): Board {
   return { ...b, heartbeats: null };
 }
 
-// --- readers for the repo's own file shapes (no YAML or TOML dependency) --------------------------------------------
+// --- readers for the repo's own file shapes (no YAML or TOML dependency); ports of lib.py's -------------------------
 
-function value(raw: string): unknown {
+function scalar(raw: string): unknown {
   const v = raw.trim();
-  try {
-    return JSON.parse(v.replace(/,\s*]$/, "]"));
-  } catch {
-    return v.replace(/^["']|["']$/g, "");
-  }
+  if (v.startsWith("[") && v.endsWith("]"))
+    return v.slice(1, -1).split(",").filter((x) => x.trim()).map(scalar);
+  if (v.length >= 2 && v[0] === v.at(-1) && `"'`.includes(v[0])) return v.slice(1, -1);
+  if (v === "true" || v === "false") return v === "true";
+  if (/^-?\d+$/.test(v)) return Number(v);
+  return v;
 }
 
-const strings = (v: unknown) => (Array.isArray(v) ? v.map(String) : []);
+function stripComment(line: string): string {
+  let quote: string | null = null;
+  for (let k = 0; k < line.length; k++) {
+    const ch = line[k];
+    if (quote) quote = ch === quote ? null : quote;
+    else if (ch === '"' || ch === "'") quote = ch;
+    else if (ch === "#") return line.slice(0, k).trimEnd();
+  }
+  return line.trimEnd();
+}
 
-// A spec's `---` frontmatter: one `key: value` per line, values as the specs write them (JSON-style strings and lists).
+const strings = (v: unknown) => (Array.isArray(v) ? v.map(String) : v === "" || v == null ? [] : [String(v)]);
+
+// A spec's `---` frontmatter, as lib.py's front_matter reads it: `key: value`, `key: [a, b]` (quoted or not), and
+// `key:` followed by `  - item` lines.
 export function parseFrontmatter(text: string): Record<string, unknown> {
   const m = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text);
   const out: Record<string, unknown> = {};
-  for (const line of m?.[1].split(/\r?\n/) ?? []) {
-    const kv = /^([A-Za-z_][\w-]*):\s*(.*)$/.exec(line);
-    if (kv) out[kv[1]] = value(kv[2]);
+  let current: string | null = null;
+  for (const raw of m?.[1].split(/\r?\n/) ?? []) {
+    const line = stripComment(raw);
+    if (!line.trim()) continue;
+    if (!/^[ \t]/.test(line)) {
+      const k = line.indexOf(":");
+      const [key, val] = k < 0 ? [line, ""] : [line.slice(0, k), line.slice(k + 1)];
+      current = key.trim();
+      out[current] = val.trim() ? scalar(val) : [];
+    } else if (current !== null && line.trim().startsWith("- ") && Array.isArray(out[current])) {
+      (out[current] as unknown[]).push(scalar(line.trim().slice(2)));
+    }
   }
   return out;
 }
@@ -230,15 +259,6 @@ export function specFrom(slug: string, text: string): Spec {
   const fm = parseFrontmatter(text);
   return { slug, name: String(fm.name ?? ""), dependsOn: strings(fm.depends_on), assignee: String(fm.assignee ?? "") };
 }
-
-const stripComment = (line: string) => {
-  let inStr = false;
-  for (let k = 0; k < line.length; k++) {
-    if (line[k] === '"' && line[k - 1] !== "\\") inStr = !inStr;
-    else if (line[k] === "#" && !inStr) return line.slice(0, k);
-  }
-  return line;
-};
 
 // specs/milestones.toml's own shape: top-level keys, then [[milestone]] tables of strings, booleans and string lists
 // (a list may span lines). Throws on a line it doesn't understand, so a new shape is noticed, not misread.
@@ -260,7 +280,7 @@ export function parseMilestones(text: string): Milestone[] {
       continue;
     }
     pending = "";
-    cur[kv[1]] = value(kv[2]);
+    cur[kv[1]] = scalar(kv[2]);
   }
   return tables.map((t) => ({ name: String(t.name ?? ""), features: strings(t.features), cut: strings(t.cut) }));
 }

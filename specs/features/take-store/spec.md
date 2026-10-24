@@ -54,8 +54,8 @@ The game never waits on any of this. Judging, rendering, sound and LEDs stay loc
 - `?input=test` takes are never sent.
 
 **Accounts:**
-- On the first save, the browser calls `signInAnonymously()`. No sign-in screen; the player just plays.
-- A "Keep my progress" button calls `linkIdentity({ provider: 'google' })`: same user id, history kept. Optional for
+- On the first save, the browser signs up anonymously (Auth `POST /signup`). No sign-in screen; the player just plays.
+- A "Keep my progress" button links Google (Auth `/user/identities/authorize`): same user id, history kept. Optional for
   the demo; the game is complete without it.
 - "Sign in with Google" on another device returns to that account. If the device had played anonymously, its takes
   move into the account (`merge_player`, via `/auth/merge`, which only ever merges an anonymous user into a Google

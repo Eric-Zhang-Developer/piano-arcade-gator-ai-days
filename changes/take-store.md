@@ -7,7 +7,8 @@ anonymous Supabase users with an optional Google link, and `/progress` shows eac
 `web/src/app/api/progress/`, `web/src/app/progress/`, `web/src/app/auth/callback/`, one line in `web/src/game/layers.ts`.
 
 ## How to check it
-`verify: ... pass at c16236f` (42/42 PERFECT, test input and the piano-sim MIDI path) (42/42 PERFECT; test takes not sent). Local stack: Chrome laptop-keys take, rank S with 1 MISS, one
+verify: `pnpm -C /Users/sharan/.worktrees/pa/take-store/web verify --out /Users/sharan/Documents/GitHub/piano-arcade-gator-ai-days/.git/agent-evidence/take-store/20261024T152537Z && node /Users/sharan/.worktrees/pa/take-store/web/src/game/sim/verify-sim.mjs --out /Users/sharan/Documents/GitHub/piano-arcade-gator-ai-days/.git/agent-evidence/take-store/20261024T152537Z/sim` pass at c16236f (evidence: /Users/sharan/Documents/GitHub/piano-arcade-gator-ai-days/.git/agent-evidence/take-store/20261024T152537Z)
+42/42 PERFECT with test input and through the piano-sim MIDI path (test takes are never sent). Local stack: Chrome laptop-keys take, rank S with 1 MISS, one
 `takes` row and 42 `note_judgments`, missed bar first on `/progress`, no duplicate after reload. 14/14 abuse checks
 (`supabase/tests/local-stack/attacks.mjs`: forged tokens, lying scores, id hijack, cross-player reads). Vitest 588 passed, 1 skipped (whole app). `node supabase/tests/migrations.mjs`: pass, 3 migrations apply and keep the rules (18 checks).
 Live project: `node supabase/tests/live-smoke.mjs` pass, 8/8 (anonymous sign-in, save_take, a later GOOD, own-row reads, RLS).

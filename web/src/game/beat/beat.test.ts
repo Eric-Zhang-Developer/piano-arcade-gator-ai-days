@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
-import { expect, test } from "vitest";
+import { afterEach, expect, test, vi } from "vitest";
 import type { Chart } from "../../contracts";
 import { settings } from "../core/settings";
-import { beatHits, endBeat } from "./index";
+import { beatHits, beatTrack, endBeat } from "./index";
 
 const chart: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
 const mpb = 60000 / chart.bpm;
@@ -33,4 +33,37 @@ test("consecutive windows return every hit exactly once", () => {
 test("a window returns only the hits inside it", () => {
   expect(beatHits(chart, 0, mpb).map((h) => h.note)).toEqual([36, 42]);
   expect(beatHits(chart, 1, mpb)).toEqual([]);
+});
+
+// Chrome before the audio starts: currentTime is 0 and there's no output timestamp yet. AudioParam and start/stop
+// reject a negative time with a RangeError, as Chrome does. Its first click comes at songStart itself.
+class NotYetRunningAudio {
+  currentTime = 0;
+  destination = {};
+  times: number[] = [];
+  private at = (t: number) => {
+    if (!Number.isFinite(t) || t < 0) throw new RangeError(`Time must be a finite non-negative number: ${t}`);
+    this.times.push(t);
+  };
+  getOutputTimestamp = () => ({ contextTime: 0, performanceTime: 0 });
+  resume = () => Promise.resolve();
+  createGain = () => ({ gain: { setValueAtTime: (_: number, t: number) => this.at(t), exponentialRampToValueAtTime: (_: number, t: number) => this.at(t) }, connect: (d: unknown) => d });
+  createOscillator = () => ({ frequency: { value: 0 }, connect: (g: unknown) => g, start: (t: number) => this.at(t), stop: (t: number) => this.at(t) });
+}
+
+afterEach(() => vi.unstubAllGlobals());
+
+test("laptop clicks: songStart before the audio runs schedules at non-negative times instead of throwing", () => {
+  const audio = new NotYetRunningAudio();
+  vi.stubGlobal("AudioContext", function () {
+    return audio;
+  });
+  let now = 1000;
+  vi.spyOn(performance, "now").mockImplementation(() => (now += 2)); // time passes between readings, as it does live
+  const plugin = beatTrack();
+  plugin.transformChart!(chart, new URLSearchParams());
+  expect(() => plugin.onEvent!({ type: "songStart", atMs: -count * mpb })).not.toThrow();
+  expect(audio.times.length).toBeGreaterThan(0);
+  expect(Math.min(...audio.times)).toBeGreaterThanOrEqual(0);
+  vi.restoreAllMocks();
 });

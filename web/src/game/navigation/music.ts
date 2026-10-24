@@ -68,7 +68,7 @@ export class LobbyPlayer {
 }
 
 const player = new LobbyPlayer();
-const initial = { enabled: false, volume: lobbySettings.defaultVolume, playing: false, status: "Off · starts only when you press Play" };
+const initial = { enabled: false, volume: lobbySettings.defaultVolume, playing: false, status: "Off · switch on to start browser audio" };
 let snapshot = initial;
 let attempt = 0;
 const listeners = new Set<() => void>();
@@ -80,7 +80,7 @@ function persist() { try { localStorage.setItem(LOBBY_KEY, JSON.stringify({ enab
 export function hydrateLobby() {
   try {
     const value = JSON.parse(localStorage.getItem(LOBBY_KEY) ?? "null");
-    if (value) update({ ...snapshot, enabled: value.enabled === true, volume: typeof value.volume === "number" && Number.isFinite(value.volume) ? Math.max(0, Math.min(1, value.volume)) : lobbySettings.defaultVolume, playing: false, status: value.enabled ? "Enabled · press Play to start browser audio" : initial.status });
+    if (value) update({ ...snapshot, enabled: value.enabled === true, volume: typeof value.volume === "number" && Number.isFinite(value.volume) ? Math.max(0, Math.min(1, value.volume)) : lobbySettings.defaultVolume, playing: false, status: value.enabled ? "Preference saved · switch on to start browser audio" : initial.status });
   } catch { /* Keep truthful defaults. */ }
 }
 export async function playLobbyMusic() {
@@ -89,14 +89,14 @@ export async function playLobbyMusic() {
   try {
     const playing = await player.start(snapshot.volume);
     if (run !== attempt) return;
-    update({ ...snapshot, playing, status: playing ? "Playing · original browser instrumental" : "Audio needs a browser click · press Play" });
+    update({ ...snapshot, playing, status: playing ? "Playing · original browser instrumental" : "Audio needs a browser click · switch on to retry" });
   } catch {
-    if (run === attempt) update({ ...snapshot, playing: false, status: "Audio could not start · press Play to retry" });
+    if (run === attempt) update({ ...snapshot, playing: false, status: "Audio could not start · switch on to retry" });
   }
 }
 export function stopLobbyMusic(disable = false) {
   attempt++; player.stop();
-  update({ ...snapshot, enabled: disable ? false : snapshot.enabled, playing: false, status: disable ? "Off" : snapshot.enabled ? "Paused outside lobby · press Play here to restart" : initial.status });
+  update({ ...snapshot, enabled: disable ? false : snapshot.enabled, playing: false, status: disable ? "Off" : snapshot.enabled ? "Paused outside lobby · switch on here to restart" : initial.status });
   if (disable) persist();
 }
 export function setLobbyVolume(volume: number) {

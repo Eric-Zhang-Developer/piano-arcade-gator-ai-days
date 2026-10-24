@@ -3,6 +3,7 @@ import { noteTimeMs } from "../core/judge";
 import { KEYS_VELOCITY, loadLatencyOffset } from "../core/settings";
 import { gaugeSize } from "../fever-gauge/gauge";
 import { seededRandom } from "../sim/fake";
+import { toast } from "../notice-toast";
 
 export const scenesSettings = {
   seed: 118,
@@ -125,7 +126,7 @@ export function scenes(): GamePlugin {
       bot = isBot(name) ? name : null;
       audible = params.get("audible") === "1";
       zeroPerf = null;
-      if (name !== null && !bot) notice(`Unknown bot "${name}". Bots: ${BOTS.join(", ")}. Playing normally.`);
+      if (name !== null && !bot) toast(`Unknown bot "${name}". Bots: ${BOTS.join(", ")}. Playing normally.`);
       chart = bot === "fever" ? feverChart(c) : c;
       return chart;
     },
@@ -169,25 +170,4 @@ async function pianoOutput(): Promise<MIDIOutput | null> {
   } catch {
     return null;
   }
-}
-
-function notice(text: string) {
-  if (typeof document === "undefined") return;
-  document.querySelector('[data-testid="scenes-notice"]')?.remove();
-  const el = document.createElement("div");
-  el.setAttribute("data-testid", "scenes-notice");
-  el.textContent = text;
-  Object.assign(el.style, {
-    position: "fixed",
-    right: "16px",
-    bottom: "16px",
-    padding: "8px 12px",
-    background: "rgba(0, 0, 0, 0.85)",
-    border: "1px solid #a66",
-    borderRadius: "6px",
-    color: "#fcc",
-    font: "14px system-ui, sans-serif",
-    zIndex: "900",
-  });
-  document.body.appendChild(el);
 }

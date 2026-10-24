@@ -7,6 +7,8 @@ import { msPerBeat, settings as core } from "../core/settings";
 const SIDE_STICK = 37;
 const KICK = 36;
 const HI_HAT = 42;
+const SNARE = 38;
+const CLAP = 39;
 
 export const beatSettings = {
   lookaheadMs: 300, // beats are queued this far ahead; stopping leaves at most this much queued
@@ -21,6 +23,40 @@ export const beatSettings = {
   lateClickS: 0.01, // laptop clicks later than this are dropped (the audio device can start after the count-in)
 };
 
+// ?beat=<style>: one bar of hits at beat offsets, for a bar of `beatsPerBar` (null: any meter, one cycle per bar).
+// A chart whose bar isn't a whole number of the pattern's plays the default. Starting points, to be tuned by ear.
+type Pattern = { beatsPerBar: number | null; hits: { at: number; note: number; velocity: number }[] };
+const eighths = (n: number, velocity: number) => Array.from({ length: n * 2 }, (_, i) => ({ at: i / 2, note: HI_HAT, velocity }));
+export const beatPatterns: Record<string, Pattern> = {
+  ragtime: {
+    beatsPerBar: 2,
+    hits: [{ at: 0, note: KICK, velocity: 80 }, { at: 1, note: SNARE, velocity: 70 }, ...eighths(2, 45)],
+  },
+  waltz: {
+    beatsPerBar: 3,
+    hits: [
+      { at: 0, note: KICK, velocity: 80 },
+      { at: 1, note: HI_HAT, velocity: 50 },
+      { at: 2, note: HI_HAT, velocity: 50 },
+    ],
+  },
+  trap: {
+    beatsPerBar: 4,
+    hits: [
+      { at: 0, note: KICK, velocity: 85 },
+      { at: 2, note: CLAP, velocity: 75 },
+      ...Array.from({ length: 16 }, (_, i) => ({ at: i / 4, note: HI_HAT, velocity: i % 4 ? 35 : 50 })),
+    ],
+  },
+  lullaby: { beatsPerBar: null, hits: [{ at: 0, note: SIDE_STICK, velocity: 40 }] },
+};
+
+// The pattern a chart plays for ?beat=<style>, or null for the default (no style, an unknown one, or another meter).
+export function patternFor(chart: Chart, style: string | null): Pattern | null {
+  const p = style ? beatPatterns[style] : undefined;
+  return p && (p.beatsPerBar === null || chart.beatsPerBar % p.beatsPerBar === 0) ? p : null;
+}
+
 export interface Hit {
   atMs: number;
   note: number;
@@ -34,19 +70,31 @@ export function endBeat(chart: Chart): number {
   return (Math.floor(lastEnd / chart.beatsPerBar) + 1) * chart.beatsPerBar;
 }
 
-// Every drum hit with fromMs <= atMs < toMs, on the chart clock.
-export function beatHits(chart: Chart, fromMs: number, toMs: number, countInBeats = core.countInBeats): Hit[] {
+// Every drum hit with fromMs <= atMs < toMs, on the chart clock. With a style's pattern, the count-in is unchanged.
+export function beatHits(chart: Chart, fromMs: number, toMs: number, countInBeats = core.countInBeats, style: string | null = null): Hit[] {
   const mpb = msPerBeat(chart.bpm);
+  const pattern = patternFor(chart, style);
   const hits: Hit[] = [];
-  const first = Math.max(-countInBeats, Math.ceil(fromMs / mpb)) + 0; // + 0 turns -0 into 0
+  const first = Math.max(-countInBeats, Math.floor(fromMs / mpb)) + 0; // + 0 turns -0 into 0
   const last = Math.min(endBeat(chart), Math.ceil(toMs / mpb)); // exclusive
   for (let b = first; b < last; b++) {
     const atMs = b * mpb;
     const accent = (((b + countInBeats) % chart.beatsPerBar) + chart.beatsPerBar) % chart.beatsPerBar === 0;
     if (b < 0) {
-      hits.push({ atMs, note: SIDE_STICK, velocity: beatSettings.stickVelocity, accent });
+      if (atMs >= fromMs) hits.push({ atMs, note: SIDE_STICK, velocity: beatSettings.stickVelocity, accent });
       continue;
     }
+    if (pattern) {
+      const cycle = pattern.beatsPerBar ?? chart.beatsPerBar;
+      const pos = b % cycle;
+      for (const h of pattern.hits) {
+        if (Math.floor(h.at) !== pos) continue;
+        const t = (b + h.at - pos) * mpb + 0;
+        if (t >= fromMs && t < toMs) hits.push({ atMs: t, note: h.note, velocity: h.velocity, accent: accent && h.at === pos });
+      }
+      continue;
+    }
+    if (atMs < fromMs) continue;
     if (b % chart.beatsPerBar === 0) hits.push({ atMs, note: KICK, velocity: beatSettings.kickVelocity, accent: true });
     hits.push({ atMs, note: HI_HAT, velocity: beatSettings.hatVelocity, accent: b % chart.beatsPerBar === 0 });
   }
@@ -63,6 +111,7 @@ export function beatTrack(): GamePlugin {
   let scheduledUntil = 0;
   let active = false;
   let where = "Beat: off";
+  let style: string | null = null; // ?beat=<style>, on the piano only: the laptop clicks the beats
 
   const play = (h: Hit) => {
     const perf = zero + h.atMs;
@@ -93,7 +142,7 @@ export function beatTrack(): GamePlugin {
   const schedule = (nowMs: number) => {
     if (!active || !chart) return;
     const until = nowMs + beatSettings.lookaheadMs;
-    for (const h of beatHits(chart, scheduledUntil, until)) play(h);
+    for (const h of beatHits(chart, scheduledUntil, until, core.countInBeats, output ? style : null)) play(h);
     scheduledUntil = until;
     if (scheduledUntil >= endBeat(chart) * msPerBeat(chart.bpm)) stop();
   };
@@ -132,6 +181,7 @@ export function beatTrack(): GamePlugin {
     transformChart(c, params) {
       chart = c;
       off = params.get("beat") === "off" || params.get("mode") === "wait"; // wait mode stops the clock at every note
+      style = params.get("beat") && params.get("beat") !== "off" ? params.get("beat") : null;
       if (!off && typeof navigator !== "undefined" && navigator.requestMIDIAccess) {
         navigator
           .requestMIDIAccess()
@@ -160,6 +210,10 @@ export function beatTrack(): GamePlugin {
         }
       }
       where = output ? "Beat: piano" : audio ? "Beat: laptop" : "Beat: unavailable";
+      if (style && output)
+        where += patternFor(chart, style)
+          ? ` · ${style}`
+          : ` · default (${beatPatterns[style] ? `${style} doesn't fit ${chart.beatsPerBar} beats a bar` : `no ${style} pattern`})`;
       begin(e.atMs);
     },
     draw(ctx, frame) {

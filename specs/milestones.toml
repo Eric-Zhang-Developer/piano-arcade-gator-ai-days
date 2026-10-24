@@ -158,6 +158,6 @@ cut = []
 name = "submission"
 ship = ""
 final = true
-features = ["bar-loop", "piano-out", "operator-replay"]
+features = ["bar-loop", "piano-out", "operator-replay", "take-store"]
 cut = []
 allow = []

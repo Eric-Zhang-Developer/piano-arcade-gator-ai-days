@@ -59,7 +59,9 @@ The game never waits on any of this. Judging, rendering, sound and LEDs stay loc
 - `?input=test` takes are never sent.
 
 **Accounts:**
-- On the first save, the browser signs up anonymously (Auth `POST /signup`). No sign-in screen; the player just plays.
+- On the first save, the browser signs up anonymously (Auth `POST /signup`). Nobody has to sign in: the player just plays.
+- An optional front door, `/auth/login`: "Sign in with Google" or "Play as guest", then the menu (or `?next=`, a path on
+  this site only). `AccountChip` (`web/src/app/auth/AccountChip.tsx`) shows who's playing, for the menu to mount.
 - A "Keep my progress" button links Google (Auth `/user/identities/authorize`): same user id, history kept. Optional for
   the demo; the game is complete without it.
 - "Sign in with Google" on another device returns to that account. If the device had played anonymously, its takes
@@ -90,5 +92,5 @@ The game never waits on any of this. Judging, rendering, sound and LEDs stay loc
 ## Defaults
 - Prefer the `localStorage` store if Supabase is unreachable or not configured; the game must not care which one runs.
 - Store raw, derive on read. Add a stored aggregate only with a measured slow query.
-- No ORM, no `@supabase/ssr`, no extra auth screens, and no new dependency: Auth and PostgREST are called over
+- No ORM, no `@supabase/ssr`, one optional sign-in screen, and no new dependency: Auth and PostgREST are called over
   `fetch` (decision `take-store-rest-client`). Swap in `@supabase/supabase-js` later through a `contract:` PR if needed.

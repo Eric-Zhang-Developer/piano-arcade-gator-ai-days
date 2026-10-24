@@ -129,14 +129,20 @@ async function main() {
       sim[k] = Number(await game.locator(`[data-testid="count-${k}"]`).textContent());
     }
     const midiStatus = await game.locator("main").textContent();
+    // The sim bot presses exactly on the clock songStart implies, so its mean offset is how far that clock sits from
+    // the judge's. It read 8–9 ms late while /play fixed zero before building the stage (#173).
+    const mean = midiStatus?.match(/On time on average|(Late|Early) by (\d+) ms on average/);
+    const meanMs = mean?.[1] ? (mean[1] === "Late" ? 1 : -1) * Number(mean[2]) : 0;
     const types = await page.locator('[data-testid="midi-log"] tbody tr td:nth-child(4)').allTextContents();
     const keyMessages = types.filter((t) => t === "note_on" || t === "release(v0)").length;
     await page.screenshot({ path: join(out, "sim-results.png") });
-    writeFileSync(join(out, "sim-results.json"), JSON.stringify({ dom: sim, keyMessages }, null, 2));
+    writeFileSync(join(out, "sim-results.json"), JSON.stringify({ dom: sim, keyMessages, mean: mean?.[0] ?? null }, null, 2));
 
     if (sim.PERFECT !== n || sim.MISS !== 0 || sim.extra !== 0) fail.push(`/sim screen ${JSON.stringify(sim)}, want ${n} PERFECT`);
     if (!midiStatus?.includes("MIDI: Portable Grand")) fail.push("/sim: the game didn't pick the fake Portable Grand");
     if (keyMessages !== 2 * n) fail.push(`/sim log shows ${keyMessages} key messages, want ${2 * n}`);
+    if (!mean) fail.push("/sim results: no mean timing line");
+    else if (Math.abs(meanMs) > 4) fail.push(`/sim bot's mean offset is ${meanMs} ms, want within ±4: songStart's clock is off the judge's`);
     // play-slots: piano-out's "Replay on piano" is a results panel now, in its own slot.
     if ((await game.locator('[data-testid="slot-piano-out"] [data-testid="replay"]').count()) !== 1) {
       fail.push('/sim results: no "Replay on piano" inside slot-piano-out');

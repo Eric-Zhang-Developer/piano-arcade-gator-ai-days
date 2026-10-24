@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { Chart } from "../../contracts";
 import { chartToMusicXml, DIVISIONS, keyAndMeter, placeNotes } from ".";
 import { overrides } from "./overrides";
+import { shouldBeam } from "../sheet-beams";
 
 const songs = new URL("../../../public/songs/", import.meta.url);
 const charts: Chart[] = readdirSync(songs)
@@ -128,6 +129,15 @@ describe.each(charts.map((c) => [c.id, c] as const))("%s", (_, chart) => {
 
   it("is the same string every time", () => {
     expect(chartToMusicXml(chart)).toBe(xml);
+  });
+
+  it("writes sheet-beams' beams: one begin … end run per beam, on each chord's first note only", () => {
+    const marks = [...xml.matchAll(/<beam number="1">(\w+)<\/beam>/g)].map((m) => m[1]);
+    const beams = shouldBeam(placeNotes(chart), keyAndMeter(chart).meter);
+    expect(marks.filter((m) => m === "begin")).toHaveLength(beams.length);
+    expect(marks.join(" ")).toMatch(/^(begin( continue)* end ?)*$/); // a beam is one voice in one bar, so it's contiguous
+    const chords = beams.reduce((n, ids) => n + new Set(ids.map((id) => placeNotes(chart).find((p) => p.id === id)!.onset)).size, 0);
+    expect(marks).toHaveLength(chords);
   });
 });
 

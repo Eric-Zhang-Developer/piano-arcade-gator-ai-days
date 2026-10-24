@@ -10,6 +10,8 @@ the order only: `start` in `milestones.toml` is empty, so no deadlines are enfor
   screen. The skeleton and the shared formats everyone builds on.
 - **arcade:** `hud`, `juice-visual`, `juice-sound`, `midi-watchdog`. It feels like an arcade, and the one known MIDI
   risk is handled. These run in parallel once `core-loop` merges.
+- **lights:** `led-strip` (Sharan) and `led-game`. The keys light up: the next note glows before it arrives, and
+  every hit shows on the piano itself. `led-strip` needs no game and can start now.
 - **submission:** `bar-loop`, `piano-out`, `song-select`. The coach's drill can play, the piano plays your take back,
   and there's a front door for the library.
 
@@ -24,5 +26,5 @@ lane's person fills them in, sets an `assignee` and adds them to a milestone. Th
 - Flat or mild perspective: Eric decides after playing both (`core-loop`'s perspective setting).
 
 ## Not doing
-See `mission.md` Not doing. Also out for now: the mascot (a Maybe if there's time), the LED strip, the in-app camera
+See `mission.md` Not doing. Also out for now: the mascot (a Maybe if there's time), the in-app camera
 overlay (the overhead hands shot is made in the video edit), and "Golden" unless `song-rip-spike` passes.

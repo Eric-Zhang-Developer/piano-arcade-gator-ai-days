@@ -23,6 +23,12 @@ features = ["hud", "juice-visual", "juice-sound", "midi-watchdog"]
 cut = []
 
 [[milestone]]
+name = "lights"
+ship = ""
+features = ["led-strip", "led-game"]
+cut = []
+
+[[milestone]]
 name = "submission"
 ship = ""
 final = true

@@ -9,6 +9,9 @@ arrangement before the game plays it. Nothing imports from here; backing-track r
   - Stop, Esc and leaving the page send pedal-up and All Notes Off on all 16 channels.
   - `?file=` names the `.mid` to play, relative to this page; without it, pick a file.
   - `?port=` picks the output by part of its name. The default is "Portable Grand", the DGX's port.
+  - `?mute=` leaves channels out, 1–16, comma-separated: `?mute=1` drops the piano so Eric plays it.
+    backing-track's in-game player will skip the player's channel by the same rule, so a separate minus-piano file is
+    optional.
 - `midi.py`: a dependency-free Python reader and writer for Standard MIDI Files, for scripts that write arrangements.
 
 ```bash

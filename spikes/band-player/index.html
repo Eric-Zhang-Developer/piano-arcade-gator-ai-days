@@ -1,6 +1,7 @@
 <!doctype html>
 <!-- Band player: plays a Standard MIDI File's channels to a MIDI output (the DGX) over Web MIDI.
-     ?file=<url of a .mid, relative to this page>  ?port=<part of the output's name, default "Portable Grand"> -->
+     ?file=<url of a .mid, relative to this page>  ?port=<part of the output's name, default "Portable Grand">
+     ?mute=<channels 1-16, comma-separated: left out, e.g. 1 for the piano you play yourself> -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -42,6 +43,7 @@
 <script>
 const q = new URLSearchParams(location.search);
 const PORT = q.get("port") || "Portable Grand";
+const MUTE = new Set((q.get("mute") || "").split(",").filter(Boolean).map((c) => Number(c) - 1)); // 0-based channels
 const $ = (id) => document.getElementById(id);
 let output = null, events = null, name = "", play = null, countIn = true;
 
@@ -78,8 +80,8 @@ function parse(buf) {
 const clock = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
 function load(buf, label) {
-  try { events = parse(buf); } catch (e) { $("file").textContent = `${label}: ${e.message}`; events = null; }
-  if (events) { name = label; $("file").textContent = `${label}: ${events.length} events, ${clock(events.at(-1)?.t ?? 0)}`; }
+  try { events = parse(buf).filter((e) => !MUTE.has(e.data[0] & 0x0f)); } catch (e) { $("file").textContent = `${label}: ${e.message}`; events = null; }
+  if (events) { name = label; $("file").textContent = `${label}: ${events.length} events, ${clock(events.at(-1)?.t ?? 0)}${MUTE.size ? `, channel ${[...MUTE].map((c) => c + 1).join(", ")} muted` : ""}`; }
   $("play").disabled = !events?.length;
 }
 

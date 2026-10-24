@@ -53,7 +53,26 @@ function saveZoom(z: number) {
   }
 }
 
-type State = { phase: "loading" } | { phase: "error"; error: string } | { phase: "ready"; chart: Chart };
+// `chart` is what the score shows (the take as played); `song` is the whole chart its key comes from (sheet-xml).
+type State = { phase: "loading" } | { phase: "error"; error: string } | { phase: "ready"; chart: Chart; song: Chart };
+
+// The whole song behind a transformed chart (one hand, a loop): transforms keep the id. A song that can't be loaded
+// by its id (a local rip under another path) gives its key from the chart as played.
+const songs = new Map<string, Chart>();
+async function songFor(chart: Chart): Promise<Chart> {
+  const known = songs.get(chart.id);
+  if (known) return known;
+  try {
+    if (!SONG_ID.test(chart.id)) return chart;
+    const r = await fetch(`/songs/${chart.id}/chart.json`);
+    const raw: unknown = r.ok ? await r.json() : null;
+    if (!raw || validateChart(raw).length) return chart;
+    songs.set(chart.id, raw as Chart);
+    return raw as Chart;
+  } catch {
+    return chart;
+  }
+}
 
 export function SheetView() {
   const [state, setState] = useState<State>({ phase: "loading" });
@@ -109,7 +128,8 @@ export function SheetView() {
         if (problems.length) throw new Error(`Bad chart: ${problems.join("; ")}`);
         if (!live) return;
         setZoom(loadZoom()); // here, not at first render: the server has no localStorage
-        setState((s) => (s.phase === "loading" ? { phase: "ready", chart: raw as Chart } : s)); // a take may have come first
+        songs.set((raw as Chart).id, raw as Chart);
+        setState((s) => (s.phase === "loading" ? { phase: "ready", chart: raw as Chart, song: raw as Chart } : s)); // a take may have come first
       })
       .catch((e: Error) => live && setState({ phase: "error", error: e.message }));
     return () => {
@@ -119,6 +139,7 @@ export function SheetView() {
 
   // Render the score once the chart is in. OSMD touches the DOM, so it's imported in the browser only.
   const chart = state.phase === "ready" ? state.chart : null;
+  const song = state.phase === "ready" ? state.song : null;
   useEffect(() => {
     const el = scoreRef.current;
     if (!chart || !el) return;
@@ -140,7 +161,7 @@ export function SheetView() {
       // The page's padding sets the edges, so the score lines up with the title; the left keeps room for the brace.
       osmd.EngravingRules.PageLeftMargin = 2;
       osmd.EngravingRules.PageRightMargin = 1; // at 0 the last barline of a system clips
-      await osmd.load(chartToMusicXml(chart));
+      await osmd.load(chartToMusicXml(chart, song ?? chart));
       if (!live) return;
       osmd.Zoom = loadZoom();
       osmd.render();
@@ -153,7 +174,7 @@ export function SheetView() {
       live = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- attach only reads refs
-  }, [chart]);
+  }, [chart, song]);
 
   // Zoom: re-render at the new size and remember it.
   useEffect(() => {
@@ -178,7 +199,8 @@ export function SheetView() {
           for (const id of paintedRef.current.keys()) followerRef.current?.paint(id, ink);
           attach(osmd, shownRef.current); // the same score: clear the colors and reset the cursor, no re-render
         } else {
-          setState({ phase: "ready", chart: m.chart }); // hands, loops or another song: render the chart as played
+          // hands, loops or another song: render the chart as played, in its whole song's key
+          void songFor(m.chart).then((song) => setState({ phase: "ready", chart: m.chart, song }));
         }
       }
       if (m.type === "clock") {

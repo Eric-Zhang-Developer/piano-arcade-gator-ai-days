@@ -5,7 +5,7 @@
 // Easy (easy-charts), and every href and best grade follows the level.
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type KeyboardEvent, type MouseEvent } from "react";
+import { useEffect, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
 import type { Chart } from "../../contracts";
 import { LevelToggle, useLevel, withLevel } from "../easy-charts";
 import { useBestGrades } from "../records/best";
@@ -19,7 +19,9 @@ import type { Song } from "../song-select/load";
 import { goToStage } from "./go-to-stage";
 import styles from "./select-layout.module.css";
 
-export function MusicSelect({ songs }: { songs: Song[] }) {
+// footer: the left column's last row, in flow under the focused song (the Options button, first-run's link). Outside the
+// per-song section, so it isn't remounted on every ↑/↓.
+export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNode }) {
   const [focused, setFocused] = useState(0);
   const best = useBestGrades();
   const router = useRouter();
@@ -86,32 +88,35 @@ export function MusicSelect({ songs }: { songs: Song[] }) {
           <b>↑ ↓</b> choose · <b>Enter</b> play · <b>L</b> learn · <b>E</b> easy
         </p>
       </header>
-      {song && (
-        <section className={styles.focus} key={song.id} aria-live="polite">
-          <div className={styles.jacket} style={{ viewTransitionName: "stage-jacket" }}>
-            <SongJacket id={song.id} title={song.title} composer={song.composer} />
-          </div>
-          <h2 className={styles.title}>{song.title}</h2>
-          <p className={styles.composer}>
-            {song.composer}
-            {song.catalog && ` · ${song.catalog}`}
-          </p>
-          <div className={styles.statsRow}>
-            <dl className={styles.stats}>
-              <div className={styles.level}>
-                <dt>Level</dt>
-                <dd>{song.level}</dd>
-              </div>
-              <div>
-                <dt>Notes</dt>
-                <dd>{song.noteCount}</dd>
-              </div>
-            </dl>
-            <LevelToggle normal={song.level} chart={chart?.id === song.id ? chart.chart : null} />
-          </div>
-          <SongPreview id={song.id} best={bestOf(song.id)} />
-        </section>
-      )}
+      <div className={styles.left}>
+        {song && (
+          <section className={styles.focus} key={song.id} aria-live="polite">
+            <div className={styles.jacket} style={{ viewTransitionName: "stage-jacket" }}>
+              <SongJacket id={song.id} title={song.title} composer={song.composer} />
+            </div>
+            <h2 className={styles.title}>{song.title}</h2>
+            <p className={styles.composer}>
+              {song.composer}
+              {song.catalog && ` · ${song.catalog}`}
+            </p>
+            <div className={styles.statsRow}>
+              <dl className={styles.stats}>
+                <div className={styles.level}>
+                  <dt>Level</dt>
+                  <dd>{song.level}</dd>
+                </div>
+                <div>
+                  <dt>Notes</dt>
+                  <dd>{song.noteCount}</dd>
+                </div>
+              </dl>
+              <LevelToggle normal={song.level} chart={chart?.id === song.id ? chart.chart : null} />
+            </div>
+            <SongPreview id={song.id} best={bestOf(song.id)} />
+          </section>
+        )}
+        {footer && <div className={styles.footer}>{footer}</div>}
+      </div>
       <ol className={styles.list} onKeyDown={onKeyDown}>
         {songs.map((s, i) => (
           <li key={s.id}>

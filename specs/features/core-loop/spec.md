@@ -69,7 +69,7 @@ backdrop is drawn at the stage's backdrop alpha instead of opaque. With none, no
   `pianoArcade.latencyOffsetMs`. A key's judged time is its arrival time minus the offset.
 
 **Judging** (pure functions, no React): exactly the rule in `mission.md`. Superseded in part by `judging-tiers`
-(GOOD, WRONG notes, the new accuracy); the original rule follows for history. Match each key press to the nearest
+(GOOD, WRONG notes, the new accuracy) and by `fever-gauge` (when fever starts); the original rule follows for history. Match each key press to the nearest
 unmatched chart note of the same pitch within ±50 ms. Combo counts consecutive PERFECT and GREAT; a MISS resets it;
 extras don't. Fever starts at a combo of 50 and ends at the next MISS. Accuracy = (PERFECT + 0.5 × GREAT) / notes.
 Rank: S ≥ 95%, A ≥ 90%, B ≥ 80%, C ≥ 70%, else D.

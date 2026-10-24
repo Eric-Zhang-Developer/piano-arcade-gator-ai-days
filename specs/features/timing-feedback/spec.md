@@ -29,6 +29,8 @@ decisions: whether to add a GOOD tier, and whether the latency offset is wrong.
   to N ms" (N = the current offset + the mean, rounded, clamped to −150…150). It saves the offset like the slider
   does; the player presses Retry to use it. The screen says it shifts every press, so it also hides a player's own
   habit of rushing or dragging.
+- **Since `judging-tiers`:** a right-key press within 100 ms is a GOOD hit, so a near miss lies between 100 and
+  150 ms and "within 100 ms" is always 0. The near-miss line becomes "N of M misses were within 150 ms".
 - Tuning numbers (`NEAR_MISS_MS`, the 100 ms line, the 3 and 10 press minimums, the 10 ms threshold) are named
   constants in `web/src/game/timing/` (decision 000 D1).
 - `/play` keeps the `Take` of the last song so the results screen can pass it in. No other change to the play loop.

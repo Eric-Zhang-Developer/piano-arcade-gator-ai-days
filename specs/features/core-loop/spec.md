@@ -58,7 +58,8 @@ for Eric. Eric checks it by playing.
 - Latency offset: a slider from -150 to +150 ms in 1 ms steps, saved in `localStorage` as
   `pianoArcade.latencyOffsetMs`. A key's judged time is its arrival time minus the offset.
 
-**Judging** (pure functions, no React): exactly the rule in `mission.md`. Match each key press to the nearest
+**Judging** (pure functions, no React): exactly the rule in `mission.md`. Superseded in part by `judging-tiers`
+(GOOD, WRONG notes, the new accuracy); the original rule follows for history. Match each key press to the nearest
 unmatched chart note of the same pitch within ±50 ms. Combo counts consecutive PERFECT and GREAT; a MISS resets it;
 extras don't. Fever starts at a combo of 50 and ends at the next MISS. Accuracy = (PERFECT + 0.5 × GREAT) / notes.
 Rank: S ≥ 95%, A ≥ 90%, B ≥ 80%, C ≥ 70%, else D.
@@ -87,8 +88,10 @@ draws each plugin's layer on its own canvas above the highway, forwards every `G
   - Perfect player: every note at offset 0 gives all PERFECT, accuracy 100%, rank S.
   - Skipper: drops notes 3 and 10 gives exactly 2 MISS, 0 extras.
   - Late40: every note at +40 ms gives all GREAT.
-  - Boundary: +25 ms gives PERFECT, -50 ms gives GREAT, +51 ms gives a MISS plus an extra.
-  - Wrong pitch: one note a semitone off gives a MISS plus an extra.
+  - Boundary: +25 ms gives PERFECT, -50 ms gives GREAT, +51 ms gives a MISS plus an extra (GOOD since
+    `judging-tiers`; that spec's Validation replaces this line).
+  - Wrong pitch: one note a semitone off gives a MISS plus an extra (since `judging-tiers` that extra is also a
+    WRONG note).
 - `[verify].command`: `pnpm -C {worktree}/web verify --out {out}`. It starts the app, opens `/play?input=test`
   headless, plays the Perfect player, and fails unless the results screen shows every note PERFECT. It saves a
   screenshot of the results screen to `{out}`.

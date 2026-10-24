@@ -39,7 +39,7 @@ export interface Take {
   events: TakeEvent[];
 }
 
-export type Judgment = "PERFECT" | "GREAT" | "MISS";
+export type Judgment = "PERFECT" | "GREAT" | "GOOD" | "MISS";
 export type Rank = "S" | "A" | "B" | "C" | "D";
 
 export interface NoteJudgment {
@@ -53,8 +53,9 @@ export interface Results {
   chartId: string;
   judgments: NoteJudgment[];
   extras: { eventIndex: number }[];
-  counts: { PERFECT: number; GREAT: number; MISS: number; extra: number };
-  accuracy: number; // 0–1: (PERFECT + 0.5 × GREAT) / notes
+  wrong?: { eventIndex: number }[]; // the extras that are WRONG notes (judging-tiers); absent in older results
+  counts: { PERFECT: number; GREAT: number; GOOD?: number; MISS: number; extra: number; wrong?: number };
+  accuracy: number; // 0–1: (PERFECT + 0.5 × GREAT + 0.25 × GOOD) / (notes + wrong)
   maxCombo: number;
   rank: Rank;
 }
@@ -64,9 +65,10 @@ export type GameEvent = At &
   (
     | { type: "songStart" }
     | { type: "countInBeat"; beat: number }
-    | { type: "noteHit"; noteId: string; pitch: number; judgment: "PERFECT" | "GREAT"; offsetMs: number }
+    | { type: "noteHit"; noteId: string; pitch: number; judgment: "PERFECT" | "GREAT" | "GOOD"; offsetMs: number }
     | { type: "noteMiss"; noteId: string; pitch: number }
     | { type: "extra"; pitch: number }
+    | { type: "wrongNote"; pitch: number } // an extra that breaks the combo (judging-tiers)
     | { type: "combo"; count: number }
     | { type: "comboMilestone"; count: number }
     | { type: "feverStart" }
@@ -157,7 +159,7 @@ export function validateResults(r: unknown): string[] {
   if (!Array.isArray(o.judgments)) p.push("judgments missing");
   else
     o.judgments.forEach((j, i) => {
-      if (!["PERFECT", "GREAT", "MISS"].includes(j.judgment)) p.push(`judgment ${i}: invalid`);
+      if (!["PERFECT", "GREAT", "GOOD", "MISS"].includes(j.judgment)) p.push(`judgment ${i}: invalid`);
       if ((j.judgment === "MISS") !== (j.offsetMs === null)) p.push(`judgment ${i}: offsetMs must be null iff MISS`);
     });
   if (!Array.isArray(o.extras)) p.push("extras missing");

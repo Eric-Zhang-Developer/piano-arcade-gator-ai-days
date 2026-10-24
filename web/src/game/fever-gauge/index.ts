@@ -2,6 +2,7 @@
 // full while it lasts. It runs the judge's own reducer over the events it receives, so the two always agree.
 import type { Frame, GamePlugin } from "../../contracts";
 import { hudLayout, hudSettings } from "../hud";
+import { bg } from "../ui-tokens";
 import { type Gauge, emptyGauge, reduceGauge } from "./gauge";
 
 export const meterSettings = {
@@ -22,6 +23,9 @@ export function meterLayout(width: number, judgmentLineY: number) {
 
 function drawMeter(ctx: CanvasRenderingContext2D, f: Frame, g: Gauge): void {
   const { bar, label } = meterLayout(f.width, f.judgmentLineY);
+  // Opaque under the faint track, as the HUD's band is: notes draw from y = 0 and must not cross the strip (#243).
+  ctx.fillStyle = bg;
+  ctx.fillRect(bar.x, bar.y, bar.w, bar.h);
   ctx.fillStyle = meterSettings.track;
   ctx.fillRect(bar.x, bar.y, bar.w, bar.h);
   if (g.fever) {

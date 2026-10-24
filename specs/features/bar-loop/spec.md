@@ -17,6 +17,8 @@ links to it; this feature makes it play. Register with `transformChart` in `web/
   improvement is visible.
 - Bars are 1-based and inclusive. `tempo` is from 25 to 150; default 100. A bar range outside the chart shows an
   error, not an empty highway.
+- `tempo` with no `from` or `to` plays the whole song once at that tempo (bars 1 to the chart's last), with no
+  passes panel: song-options' Speed (#361).
 
 ## Validation
 - Vitest: the pure `transformChart` keeps exactly the notes in the bar range, re-timed for the tempo, and rejects a

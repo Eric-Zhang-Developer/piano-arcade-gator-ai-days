@@ -21,9 +21,10 @@ the order only: `start` in `milestones.toml` is empty, so no deadlines are enfor
   Twinkle, on the piano.
 
 ## Learning lane (provisional, not scheduled)
-`coach`, `practice-mode`, `chart-compiler`, `song-rip-spike`. Their specs record what was discussed; the learning
-lane's person fills them in, sets an `assignee` and adds them to a milestone. The game lane provides `Results`,
-`Take` and `Chart` (`web/src/contracts/`) and the `bar-loop` link.
+`coach`, `practice-mode`, `chart-compiler`. Their specs record what was discussed; the learning lane's person fills
+them in, sets an `assignee` and adds them to a milestone. The game lane provides `Results`, `Take` and `Chart`
+(`web/src/contracts/`) and the `bar-loop` link. `song-rip-spike` moved to Eric's lane on 2026-10-24: a spike, in no
+milestone, scored against the Flower Dance MIDI.
 
 ## Lights
 Milestone **lights**, between `arcade` and `submission`: `led-strip` (Sharan) and `led-game` (Eric). The keys light

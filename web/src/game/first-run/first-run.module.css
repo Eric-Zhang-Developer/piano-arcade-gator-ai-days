@@ -1,0 +1,34 @@
+/* First run: the start line in the body face, ink-dim; the link on / small and quiet, above the Options button. */
+.start {
+  max-width: 36em;
+  margin: 12px auto 0;
+  color: var(--pa-ink);
+  font: clamp(16px, 2vh, 22px) system-ui, sans-serif;
+  text-align: center;
+}
+
+.link {
+  position: fixed;
+  left: 52px; /* the Options button's column, clear of the song list */
+  bottom: calc(24px + clamp(16px, 2.222vh, 24px) * 2.4);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--pa-ink-dim);
+  font: clamp(13px, 1.6vh, 18px) system-ui, sans-serif;
+  text-decoration: none;
+}
+
+.link:hover {
+  color: var(--pa-ink);
+}
+
+.kbd {
+  min-width: 1.4em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgb(242 242 245 / 0.12);
+  font: 700 1em system-ui, sans-serif;
+  text-align: center;
+}

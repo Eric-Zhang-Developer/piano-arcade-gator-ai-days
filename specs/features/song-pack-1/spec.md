@@ -21,8 +21,9 @@ adds five harder songs with both.
 ## Plan
 1. **The converter** in `game-tools/midi-to-chart/`: Python with `mido`, in a venv that isn't committed (as
    `spikes/twinkle-13/` did). Input: a MIDI file, a track or channel, a bar range, a `bpm`. Output: a chart JSON in
-   the `Chart` format. It reads the file's ticks per beat and time signature, writes `beat` and `duration` in
-   quarter notes from beat 0 of the first chosen bar, sets every note's `hand` to `"R"`, and fills `id`s in order.
+   the `Chart` format. It takes a right-hand and a left-hand track or channel (notation MIDI has one per staff),
+   reads the file's ticks per beat and time signature, writes `beat` and `duration` in quarter notes from beat 0 of
+   the first chosen bar, sets each note's `hand` from its staff, and fills `id`s in time order.
 2. **The library test**, `web/src/game/songs/library.test.ts`, over every `chart.json` under `web/public/songs/`
    (Twinkle and the Minuet included), so a new song needs a folder and no new test code.
 3. **The three charts**, one commit each, each from its own cited source.
@@ -41,22 +42,27 @@ adds five harder songs with both.
 - If no allowed source can be reached for a song, file a `needs-human` issue for that song and ship the others.
 
 **What to chart:**
-- The **right hand**, every note `hand: "R"`. Where the melody passes to the left hand, chart the melody line and
-  say where in the done note.
+- **Both hands**, as printed: treble-staff notes `hand: "R"`, bass-staff notes `hand: "L"`. Where the score
+  crosses hands, follow its fingering or stem directions, and say where in the done note. The game already judges
+  and draws every note by pitch whatever its hand.
+- **Unisons:** when both hands play the same pitch at once, keep one note (the judge can't tell two apart) and log
+  it.
 - **An excerpt**, not the whole piece: the opening section, up to its first double bar or a natural cadence, between
   about 30 and 90 seconds at the chart's `bpm`. Record the bar range in the done note.
 - Repeats written out if the score repeats the chosen bars.
 - Ornaments: the main note only. Grace notes are skipped. Log each kind skipped in the done note.
 - `beatsPerBar` from the score's meter, in quarter notes (3/8 is 1.5).
-- **Chords** in the right hand are charted as separate notes at the same `beat`.
-- **Range:** report each chart's lowest and highest pitch, and whether it fits the laptop keys (`keyMap` in
-  `web/src/game/core/input.ts` spans 10 white keys from the chart's lowest). Prefer an excerpt that fits for
-  the Easy rung.
+- **Chords** are charted as separate notes at the same `beat`.
+- **Range:** report each chart's lowest and highest pitch. Two-hand charts won't fit the laptop keys (`keyMap` in
+  `web/src/game/core/input.ts` spans 10 white keys from the chart's lowest): these songs are for the DGX. The
+  highway shows the chart's whole range, so a wide chart has narrow lanes; keep a screenshot of the widest one in
+  the PR.
 - **Tempo:** `bpm` is a playability setting, not the score's marking: Easy and Easy-medium slower than marked,
   Medium near it. Say in the done note that Eric tunes it.
 
 **The library test**, for every chart under `web/public/songs/`:
 - It passes `validateChart`; its folder name equals its `id`; ids are unique across the library.
+- Notes are in time order, and every `hand` is `"R"` or `"L"`.
 - Every note has `duration > 0`, and no two notes of the same pitch overlap (the judge can't tell them apart).
 - A Perfect player (every note pressed at offset 0, through `web/src/game/core/judge.ts`) gives all PERFECT,
   accuracy 100%, rank S.
@@ -75,10 +81,10 @@ adds five harder songs with both.
 - `pnpm -C web test`: the library test passes for all five charts (Twinkle, Minuet if merged, and these three).
   Break one on purpose (a duplicate same-pitch note) -> the test names that chart; then revert.
 - `python3 game-tools/midi-to-chart/convert.py --self-test` -> passes.
-- In Chrome: open `/play?song=<id>` for each of the three -> it loads, the count-in plays, notes fall in the right
-  lanes. With `?input=test`, the Perfect player finishes all PERFECT.
-- On the piano (Eric; mark it in the done note): play each song once -> it's the piece you know, and the rung feels
-  right (Ode to Joy easiest, Für Elise hardest of the three). Say which `bpm` needs tuning.
+- In Chrome: open `/play?song=<id>` for each of the three -> it loads, the count-in plays, both hands' notes fall in
+  the right lanes. With `?input=test`, the Perfect player finishes all PERFECT.
+- On the piano (Eric; mark it in the done note): play each song once with both hands -> it's the piece you know,
+  the lanes are readable, and the rung feels right (Ode to Joy easiest, Für Elise hardest of the three). Say which `bpm` needs tuning.
 
 ## Defaults
 - Prefer the smaller option: a shorter excerpt over a longer one.

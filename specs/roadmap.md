@@ -33,7 +33,7 @@ can start now.
 Milestone **library**, between `arcade` and `lights`: `song-pack-1` (Ode to Joy, Chopin's Prelude Op. 28 No. 4,
 Für Elise, plus a MIDI-to-chart converter and one test over every chart), then `song-pack-2` (Gymnopédie No. 1,
 Clair de lune, Nocturne Op. 9 No. 2, Maple Leaf Rag, Moonlight's 3rd movement). With Twinkle and the Minuet, ten
-songs from easy to expert, each from a cited source.
+songs from easy to expert, both hands, each from a cited source.
 
 ## Open
 - The challenge statement's technology (first public in the past 12 months, central to the project) isn't chosen.

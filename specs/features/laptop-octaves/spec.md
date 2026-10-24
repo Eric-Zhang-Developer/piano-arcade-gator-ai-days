@@ -23,7 +23,7 @@ Issue: #273
    their tests, and a plugin, one line in `layers.ts` right before `noteLabels()`: after scenes and the sim, whose
    bots replace the keys device with one of kind `test`, and before note-labels, so note-labels sees the shifted
    pitches. `wrapInput` shifts laptop-key events and listens for Z and X from the device's start to its stop; `draw`
-   follows the frame's range and draws the highlight; whenever k changes, the plugin calls `setLaptopShift(12 × k)`;
+   records the frame's range and draws the highlight; whenever k changes, the plugin calls `setLaptopShift(12 × k)`;
    `startPanel` is the hint line. Core's key map doesn't change.
 
 ## Requirements
@@ -33,26 +33,24 @@ Issue: #273
 - **Z and X:** k − 1 and k + 1, only to a position with `n ≥ 5` whose keys all stay in 21–108; otherwise nothing
   happens. Ignored with Meta or Ctrl held, on key repeat, and while paused. The listener lives only while the keys
   device runs, so the results screen (records' initials) never sees it.
-- **Following:** each frame, if `n(k) < 5`, k moves to the position with the largest n (ties: nearest to k, then the
-  lower). On charts that don't zoom (Twinkle, Ode to Joy, the Minuet, Chopin) the view is fixed and k never moves by
-  itself. A planning simulation of this rule against highway-zoom at 2e1c3fd moved k at most twice per wide song
-  (Für Elise once, in the count-in; gymnopedie-1 and maple-leaf-rag twice within a second, mid-song, as the view
-  eased) and raised Für Elise's notes under the map when they land from 64 to 190 of 294.
+- **No following:** k never moves by itself; only Z and X move it (`static-keyboard`: the keyboard holds still for
+  the whole take, so the map does too). This replaces the earlier rule that moved k to the position with the most
+  keys on screen whenever `n(k) < 5`.
 - **Held keys:** a release always releases the pitch its press played, even when k changed in between.
 - **Laptop keys only:** devices of kind `keys`. MIDI, `?input=test` and scenes' bots pass through untouched.
 - **The highlight:** a `--pa-cyan` bar (cabinet chrome: selection) along the mapped keys, on the plugin's own layer,
   clipped to the visible range, with "Z" and "X" at its ends when that move is allowed. Letters stay note-labels'.
   None after the first MIDI note-on since the page loaded, as note-labels' `auto` switches, so piano takes (the
   video) don't carry it.
-- **The hint:** "Z / X: octave down / up" under Start, only when a move is allowed from k = 0 over the chart's whole
-  range (at 2e1c3fd: not on twinkle or minuet-g, nor with `hands=R` on ode-to-joy, gymnopedie-1 or
-  chopin-prelude-4), with `data-capture-hide`.
+- **The hint:** "Z / X: octave down / up" under Start, only when the chart's own pitches don't all fit the map at
+  k = 0 (`static-keyboard`; at 198c902: not on twinkle or minuet-g, on the other eight songs), with
+  `data-capture-hide`.
 - **Settings:** the 5-key threshold lives in `octaveSettings`.
 
 ## Validation
-- `pnpm -C web test`: on Twinkle's range k stays 0 and Z and X are refused; on a synthetic view that jumps from C2 to
-  C6, k follows and every frame ends with `n ≥ 5`; a press, then a follow, then the release gives an off on the
-  pressed pitch; a MIDI device's events pass unchanged, and after its first note-on `draw` draws nothing.
+- `pnpm -C web test`: on Twinkle's range k stays 0 and Z and X are refused; on frames whose range jumps from C2 to
+  C6, k stays put; a press, then an X, then the release gives an off on the pressed pitch; the hint shows on
+  fur-elise and not on twinkle or minuet-g; a MIDI device's events pass unchanged, and after its first note-on `draw` draws nothing.
 - `verify.py --slug laptop-octaves` passes, Twinkle unchanged.
 - In Chrome, laptop keys, `/play?song=fur-elise`: the highlight and its letters stay on screen through the take
   (screenshots at the count-in, the right hand alone and both hands). On `/play?song=chopin-prelude-4`, press X, then
@@ -68,6 +66,4 @@ in the PR.
 
 ## Defaults
 - No sound or flash on a refused Z or X.
-- If the map moving by itself confuses the stranger, keep Z and X and drop the following, and say so in the done
-  note.
 - Log choices the spec doesn't make in `specs/decisions/laptop-octaves-*.md`.

@@ -185,3 +185,44 @@ describe("keys outside the chart's range", () => {
     expect(() => drawHighway(ctx, L, chart([60, 69]), s)).not.toThrow();
   });
 });
+
+describe("drawHighway bar lines (bar-lines)", () => {
+  // Records strokes and fills with their style, so the order of octave lines, bar lines and notes shows.
+  const recorder = () => {
+    const calls: string[] = [];
+    const t: Record<string | symbol, unknown> = {};
+    const ctx = new Proxy(t, {
+      get: (o, k) =>
+        k in o
+          ? o[k]
+          : k === "stroke"
+            ? () => calls.push(`stroke ${String(o.strokeStyle)}`)
+            : k === "fill"
+              ? () => calls.push(`fill ${String(o.fillStyle)}`)
+              : () => ({ width: 0, addColorStop() {} }),
+      set: (o, k, v) => ((o[k] = v), true),
+    }) as unknown as CanvasRenderingContext2D;
+    return { ctx, calls };
+  };
+  const c = chart([60, 72]); // C4 and C5: octave lines at both
+  const draw = (barLines?: { atMs: number; label: number | null }[]) => {
+    const { ctx, calls } = recorder();
+    drawHighway(ctx, makeLayout(c, 800, 600, 0), c, { nowMs: 0, noteState: new Map(), pressed: new Set(), latest: null, countInBeat: null, barLines });
+    return calls;
+  };
+
+  it("strokes the bar lines after the octave lines and before the first note's fill", () => {
+    const calls = draw([{ atMs: 0, label: 1 }, { atMs: 600, label: 2 }]);
+    const octave = calls.lastIndexOf("stroke rgba(255,255,255,0.08)");
+    const bars = calls.flatMap((x, i) => (x === "stroke rgba(255,255,255,0.12)" ? [i] : []));
+    const note = calls.findIndex((x) => x.startsWith("fill"));
+    expect(bars).toHaveLength(2);
+    expect(octave).toBeLessThan(bars[0]);
+    expect(bars[1]).toBeLessThan(note);
+  });
+
+  it("without a list, nothing changes: no bar-line strokes, the same calls as an empty list", () => {
+    expect(draw().some((x) => x.includes("0.12"))).toBe(false);
+    expect(draw()).toEqual(draw([]));
+  });
+});

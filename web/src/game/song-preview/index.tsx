@@ -1,6 +1,7 @@
 "use client";
 // Song preview (spec: song-preview): the highlighted song's notes per second, best grade and PRACTICE 70%, and its
-// opening on the piano or as quiet tones. Mount it keyed by song id: each mount is one highlight.
+// opening on the piano or as quiet tones, and the song's Hands and Speed (song-options). Mount it keyed by song id:
+// each mount is one highlight.
 import { useEffect, useState, useSyncExternalStore, type CSSProperties } from "react";
 import type { Chart, Rank } from "../../contracts";
 import { difficultyInputs } from "../difficulty";
@@ -8,6 +9,8 @@ import { pickOutput } from "../../replay/piano";
 import { modeUrl } from "../wait-mode/plugin";
 import { opening, openingMs, playAsTones, playOnPiano, practiceUrl, previewSettings } from "./opening";
 import { SongSource } from "../song-sources";
+import { useLevel, withLevel } from "../easy-charts";
+import { SongOptions, useSongOptions, withOptions } from "../song-options";
 
 // The music select's L (learn-from-select): plain l or L, no Ctrl, Meta or Alt (Cmd+L stays the browser's), no repeat.
 export const isLearnKey = (e: Pick<KeyboardEvent, "key" | "ctrlKey" | "metaKey" | "altKey" | "repeat">) =>
@@ -44,6 +47,8 @@ export function SongPreview({ id, best }: { id: string; best?: { rank: Rank; acc
   const isArmed = useSyncExternalStore(subscribe, () => armed, () => false);
   const [chart, setChart] = useState<Chart | null>(null);
   const [voice, setVoice] = useState<"piano" | "tones" | null>(null);
+  const [level] = useLevel();
+  const options = useSongOptions()[id];
 
   useEffect(() => {
     let stop: (() => void) | null = null;
@@ -100,16 +105,18 @@ export function SongPreview({ id, best }: { id: string; best?: { rank: Rank; acc
           <b data-testid="preview-best">{best ? `${best.rank} · ${(best.accuracy * 100).toFixed(1)}%` : ""}</b>
         </span>
         <span style={actions}>
-          <a data-testid="preview-learn" href={learnUrl(id)} style={action}>
+          <a data-testid="preview-learn" href={withOptions(withLevel(learnUrl(id), level), options)} style={action}>
             LEARN
           </a>
+          {/* PRACTICE keeps its own 70% whatever Speed says; it takes the song's level and hands */}
           {chart && (
-            <a data-testid="preview-practice" href={practiceUrl(id, chart)} style={action}>
+            <a data-testid="preview-practice" href={withOptions(withLevel(practiceUrl(id, chart), level), { hands: options?.hands ?? "both", speed: 70 })} style={action}>
               PRACTICE 70%
             </a>
           )}
         </span>
       </div>
+      <SongOptions id={id} chart={chart} />
       {/* song-sources: the cited score, one click away; the proof, not setup, so ?capture=1 keeps it */}
       {chart && <SongSource source={chart.source} />}
       <p data-testid="preview-status" data-capture-hide style={status}>

@@ -5,6 +5,7 @@ import { hud } from "./hud";
 import { juiceVisual } from "./juice";
 import { midiWatchdog } from "./midi-watchdog";
 import { pianoOut } from "./piano-out";
+import { scenes } from "./scenes";
 import { eventSounds } from "./sound";
 import { simPlugin } from "./sim/plugin";
 import { feverStage } from "./stage";
@@ -13,6 +14,7 @@ import { feverStage } from "./stage";
 // own canvas above the highway, forwards every GameEvent, and applies transformChart and wrapInput in this order.
 export const plugins: GamePlugin[] = [
   barLoop(), // first: every later plugin (the sim's bot included) sees the looped chart
+  scenes(), // ?bot=<name>: after bar-loop, so the bot plays the looped chart
   simPlugin, // piano-sim: /play?midi=sim only. First, so later plugins asking for MIDI get the fake piano.
   juiceVisual(), // under the HUD: wisps and flares never cover the score
   hud(), // before beat-track, so beat-track's status line draws over the HUD's top panel

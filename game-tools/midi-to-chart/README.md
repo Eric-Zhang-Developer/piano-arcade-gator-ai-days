@@ -26,6 +26,7 @@ List the tracks first (notation MIDI has one per staff), then convert:
 - `--bars` is 1-based and inclusive; a pickup bar is bar 1. Beats start at 0 on the first chosen bar.
 - `--by-channel` reads `--rh`/`--lh` as MIDI channels across all tracks instead of track indices.
 - `beatsPerBar` comes from the file's time signature at the first chosen bar (3/8 gives 1.5).
+- Each note's `velocity` is its note-on's (dynamics grades against it). Volume changes (CC7) are not read.
 
 ## The song pack's commands
 Sources (public domain, Mutopia): `curl -O` each into `source/`:

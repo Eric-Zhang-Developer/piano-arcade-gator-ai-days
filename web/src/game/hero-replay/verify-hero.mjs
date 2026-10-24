@@ -59,6 +59,12 @@ async function take(path, { download = false, shotAtMs = null, shot = null } = {
   const context = await browser.newContext({ viewport: { width: 1920, height: 1080 }, acceptDownloads: true });
   await context.addInitScript(() => {
     window.__pianoArcade = { ready: false, chart: null, press: () => {}, results: null };
+    // Every toast's text, as it appears: a take file is read at Start, so its toast comes after the start screen.
+    window.__toasts = [];
+    new MutationObserver(() => {
+      for (const t of document.querySelectorAll('[data-testid="toast"]'))
+        if (!window.__toasts.includes(t.textContent)) window.__toasts.push(t.textContent);
+    }).observe(document, { subtree: true, childList: true, characterData: true });
   });
   if (takeBytes) await context.route("**/takes/*.mid", (r) => r.fulfill({ status: 200, contentType: "audio/midi", body: takeBytes }));
   const page = await context.newPage();
@@ -74,15 +80,14 @@ async function take(path, { download = false, shotAtMs = null, shot = null } = {
   }
   const start = page.getByRole("button", { name: "Start", exact: true });
   await start.waitFor({ timeout: 90_000 });
-  await page.waitForTimeout(1000); // the bot device reads its take before Start
-  const toasts = await page.getByTestId("toast").allTextContents();
-  await start.click();
+  await start.click(); // /play starts its input devices here, so the bot device reads its take now
   if (shotAtMs !== null) {
     await page.waitForFunction((t) => (window.__pianoArcade.now?.() ?? -Infinity) >= t, shotAtMs, { timeout: 60_000, polling: 5 });
     await page.screenshot({ path: join(out, shot) });
   }
   await page.getByTestId("results").waitFor({ timeout: 120_000 });
   const results = await page.evaluate(() => window.__pianoArcade.results);
+  const toasts = await page.evaluate(() => window.__toasts);
   const sent = await page.evaluate(async () => {
     try {
       const access = await navigator.requestMIDIAccess();
@@ -123,7 +128,8 @@ const pressVelocities = [];
     const st = b[i++];
     if (st === 0xff) {
       i++;
-      i += num();
+      const len = num(); // read first: `i += num()` would add to i as it was before num() moved it
+      i += len;
     } else {
       if ((st & 0xf0) === 0x90 && b[i + 1] > 0) pressVelocities.push(b[i + 1]);
       i += 2;

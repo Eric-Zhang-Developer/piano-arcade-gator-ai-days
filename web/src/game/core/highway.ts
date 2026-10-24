@@ -113,8 +113,15 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
     if (yBottom < 0 || yTop > line) continue;
     const k = L.keyX(n.pitch);
     const inset = k.width * 0.08;
+    const x1 = k.x + inset;
+    const x2 = k.x + k.width - inset;
+    const top = Math.min(yTop + settings.noteGapPx, yBottom - settings.noteHeadPx * 2);
     ctx.fillStyle = state === "MISS" ? settings.missColor : settings.noteColor;
-    bar(ctx, L, k.x + inset, k.x + k.width - inset, yTop + 1, yBottom - 1);
+    bar(ctx, L, x1, x2, top, yBottom - 1);
+    if (state !== "MISS") {
+      ctx.fillStyle = settings.noteHeadColor;
+      bar(ctx, L, x1, x2, yBottom - 1 - settings.noteHeadPx, yBottom - 1);
+    }
   }
   ctx.restore();
 

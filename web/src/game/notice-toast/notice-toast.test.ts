@@ -36,6 +36,19 @@ describe("notice-toast", () => {
     expect(s.all()).toEqual([]);
   });
 
+  it("is still gone at 4 s when the fade's timer fires late: the fade is cut short, not the deadline moved (#432)", () => {
+    const s = setup();
+    s.push("a");
+    vi.advanceTimersByTime(toastSettings.ms - toastSettings.leaveMs - 1);
+    vi.setSystemTime(Date.now() + 70); // a busy machine: the leave timer fires 70 ms late
+    vi.advanceTimersByTime(1);
+    expect(s.visible()).toEqual([]);
+    vi.advanceTimersByTime(toastSettings.leaveMs - 70 - 1);
+    expect(s.all()).toEqual(["a"]);
+    vi.advanceTimersByTime(1);
+    expect(s.all()).toEqual([]); // at 4000 ms on the clock, 130 ms of fade
+  });
+
   it("under reduced motion it stays the full 4 s and leaves at once, with no fade", () => {
     const s = setup(true);
     s.push("a");

@@ -6,5 +6,5 @@ Chunk practice. A plain take's start screen has "Practice in chunks". It walks t
 `node web/src/game/chunk-practice/verify-chunks.mjs --out <dir>` prints `verify-chunks: pass` (screens in `specs/features/chunk-practice/screens/`). `verify.py --slug chunk-practice`: pass at a5a6ad7.
 ## Gaps
 - **Not tried on the piano.** That check is Eric's: Für Elise's first chunk, learned, played at 70%, then moving on at 85%.
-- **The results panel is a card in results-layout's details, not in the first view.** On a pass, focus scrolls past the rank to centre "Next". On a fail, "Learn bars 1–4 again" sits below the fold while Retry keeps focus. Moving it up needs `chunk-practice` in `resultsLayoutSettings` (`featured` or `actions`): that's a results-layout change, filed as an issue.
+- The results panel is featured in results-layout's first view on a practice take (#294), so Next or "Learn again" shows with the rank at 1280×720.
 - **Starting values.** 4 bars, 70% and 85% are starting values for Eric to tune. The panels add no motion, so reduced motion looks the same.

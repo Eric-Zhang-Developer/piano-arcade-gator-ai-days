@@ -1,11 +1,15 @@
 "use client";
 // The music select (/): the focused song large on the left, the song cards on the right. Each card is a link, so
 // click and Enter play (the focused jacket moving into the stage card, select-to-stage); ↑/↓ move focus and keep the
-// focused card centered in the list; L learns the focused song in wait mode (learn-from-select).
+// focused card centered in the list; L learns the focused song in wait mode (learn-from-select); E switches Normal and
+// Easy (easy-charts), and every href and best grade follows the level.
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type KeyboardEvent, type MouseEvent } from "react";
+import { useEffect, useState, type KeyboardEvent, type MouseEvent } from "react";
+import type { Chart } from "../../contracts";
+import { LevelToggle, useLevel, withLevel } from "../easy-charts";
 import { useBestGrades } from "../records/best";
+import { recordKey } from "../records/store";
 import { SongCard } from "../song-card";
 import { SongJacket } from "../song-jacket/SongJacket";
 import { SelectStage } from "../select-stage";
@@ -20,11 +24,38 @@ export function MusicSelect({ songs }: { songs: Song[] }) {
   const best = useBestGrades();
   const router = useRouter();
   const song = songs[focused];
+  const [level, setLevel] = useLevel();
+  const levelParams = new URLSearchParams(level === "easy" ? "level=easy" : "");
+  const bestOf = (id: string) => best[recordKey(id, levelParams)];
+  const [chart, setChart] = useState<{ id: string; chart: Chart } | null>(null); // the focused song's, for its Easy level
+
+  useEffect(() => {
+    if (!song) return;
+    let live = true;
+    fetch(`/songs/${song.id}/chart.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((c: Chart | null) => live && c && setChart({ id: song.id, chart: c }))
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [song]);
+
+  // E anywhere on the select (not while typing), no modifiers, no repeat.
+  useEffect(() => {
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (e.key.toLowerCase() !== "e" || e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.target instanceof HTMLElement && e.target.closest("input, textarea, [contenteditable]")) return;
+      setLevel(level === "easy" ? "normal" : "easy");
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [level, setLevel]);
 
   function onKeyDown(e: KeyboardEvent<HTMLOListElement>) {
     if (isLearnKey(e) && song) {
       e.preventDefault();
-      return router.push(learnUrl(song.id));
+      return router.push(withLevel(learnUrl(song.id), level));
     }
     const step = e.key === "ArrowDown" ? 1 : e.key === "ArrowUp" ? -1 : 0;
     if (!step) return;
@@ -52,7 +83,7 @@ export function MusicSelect({ songs }: { songs: Song[] }) {
       <header className={styles.top}>
         <h1 className={styles.wordmark}>Piano Arcade</h1>
         <p className={styles.hint}>
-          <b>↑ ↓</b> choose · <b>Enter</b> play · <b>L</b> learn
+          <b>↑ ↓</b> choose · <b>Enter</b> play · <b>L</b> learn · <b>E</b> easy
         </p>
       </header>
       {song && (
@@ -75,14 +106,15 @@ export function MusicSelect({ songs }: { songs: Song[] }) {
               <dd>{song.noteCount}</dd>
             </div>
           </dl>
-          <SongPreview id={song.id} best={best[song.id]} />
+          <LevelToggle normal={song.level} chart={chart?.id === song.id ? chart.chart : null} />
+          <SongPreview id={song.id} best={bestOf(song.id)} />
         </section>
       )}
       <ol className={styles.list} onKeyDown={onKeyDown}>
         {songs.map((s, i) => (
           <li key={s.id}>
             <Link
-              href={`/play?song=${s.id}`}
+              href={withLevel(`/play?song=${s.id}`, level)}
               autoFocus={i === 0}
               className={styles.link}
               data-testid={`song-${s.id}`}
@@ -94,7 +126,7 @@ export function MusicSelect({ songs }: { songs: Song[] }) {
                 {...s}
                 focused={i === focused}
                 jacket={<SongJacket id={s.id} title={s.title} composer={s.composer} />}
-                best={best[s.id]}
+                best={bestOf(s.id)}
               />
             </Link>
           </li>

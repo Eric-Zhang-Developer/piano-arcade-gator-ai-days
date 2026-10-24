@@ -19,11 +19,10 @@ foundation on the current app, not a final brand or a replacement application; b
 3. Connect loading, error, retry and empty-state presentation to real chart requests and existing device callbacks.
 4. Run the app checks, behavioral regression tests, live screen inspection and retained visual evidence below.
 
-**Coordination:** judging-tiers currently owns the play page and existing e2e folder. This plan must not merge until
-its done note is on main: the ownership lint must pass without removing any path from that feature. Its completion
-is also an implementation dependency. UI tests live separately in `web/ui-e2e/`; existing verify scripts remain
-unchanged. Core-loop, timing-feedback and piano-sim are already done, so their presentation paths can be claimed
-without changing their specs. The assignee is empty: this spec claims no person or lane.
+**Coordination:** judging-tiers is done on main (its done note is in `changes/`); its play-page and existing e2e
+behavior must be preserved, and no path is removed from its spec. UI tests live separately in `web/ui-e2e/`; existing
+verify scripts remain unchanged. Core-loop, timing-feedback, piano-sim and judging-tiers are done, so their
+presentation paths can be claimed without changing their specs. The assignee is empty: this spec claims no person or lane.
 
 The owned play/sim paths permit additive presentation and chart-request recovery only. Keep the existing
 `?song`, `?input=test`, MIDI simulation parameters, test IDs, Start/Retry controls and simulator's first-button
@@ -70,7 +69,7 @@ letter-key UI shortcuts or global handlers that swallow gameplay input. Any anim
 
 **Preservation:** keep highway sizing/rendering, judging/timing/scoring, MIDI/audio scheduling, input mapping,
 simulator protocol/faults and timing-feedback calculations/latency suggestions unchanged. Keep all results rows and
-their real values, including GOOD/WRONG after judging-tiers lands. No dependencies, framework migration, final name,
+their real values, including judging-tiers' GOOD/WRONG. No dependencies, framework migration, final name,
 logo, paid services, teaching logic, authentication, invented catalog, metrics or dashboard.
 
 ## Validation

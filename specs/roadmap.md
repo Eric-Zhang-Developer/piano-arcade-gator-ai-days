@@ -16,7 +16,7 @@ the order only: `start` in `milestones.toml` is empty, so no deadlines are enfor
   the build, at `/operator`), `piano-sim`, `hud`, `juice-visual`, `juice-sound`, `midi-watchdog`. It feels like an
   arcade, MIDI features are testable without the piano, and the one known MIDI risk is handled. These run in parallel
   once `core-loop` merges. `ui-foundation` adds a consistent shell and truthful loading/recovery to play and the
-  simulator, after `judging-tiers` releases the play presentation path; song-select keeps the front door.
+  simulator on top of the shipped `judging-tiers` play page; song-select keeps the front door.
 - **submission:** `bar-loop`, `piano-out`. The coach's drill can play, and the piano plays your take back.
   `operator-replay` (`/attract`) shows judges the build, one merge per note of Twinkle, on the piano.
 

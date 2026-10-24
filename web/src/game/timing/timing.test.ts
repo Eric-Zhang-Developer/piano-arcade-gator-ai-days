@@ -77,3 +77,10 @@ test("the suggestion adds the mean to the current offset and stays within -150â€
   expect(timingSummary(chart, take, judgeTake(chart, take), -140).suggestedLatencyMs).toBe(-150);
   expect(timingSummary(chart, take, judgeTake(chart, take), 20).suggestedLatencyMs).toBe(-10);
 });
+
+test("sub-ms clock noise is neither early nor late; a press that rounds to -1 ms is early", () => {
+  const noise = [0.4, -0.4, 0.49, -0.3, 0.2];
+  const s = play((i) => noise[i % noise.length]);
+  expect(s).toMatchObject({ timed: N, meanMs: 0, sdMs: 0, early: 0, late: 0 });
+  expect(play((i) => (i === 0 ? -0.6 : 0))).toMatchObject({ early: 1, late: 0 });
+});

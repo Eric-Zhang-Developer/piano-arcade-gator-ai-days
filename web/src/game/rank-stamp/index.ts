@@ -3,7 +3,6 @@
 
 export const stampSettings = {
   afterTallyMs: 1200, // the stamp starts when the results tally ends (results-tally's totalMs; a test pins it)
-  afterBannerMs: 2000, // …or when juice-visual's FULL COMBO banner clears (its fullComboMs; a test pins it)
   from: 1.6,
   durationMs: 300,
   flashMs: 420, // the gold ring, from impact
@@ -24,9 +23,8 @@ export function stampScale(t: number): number {
 export const impactT = 1 - c1 / c3;
 
 // When the stamp starts and when it hits, in ms after the results show (songEnd).
-export const stampStartMs = (fullCombo: boolean) =>
-  fullCombo ? Math.max(stampSettings.afterTallyMs, stampSettings.afterBannerMs) : stampSettings.afterTallyMs;
-export const stampImpactMs = (fullCombo: boolean) => stampStartMs(fullCombo) + Math.round(impactT * stampSettings.durationMs);
+export const stampStartMs = () => stampSettings.afterTallyMs;
+export const stampImpactMs = () => stampStartMs() + Math.round(impactT * stampSettings.durationMs);
 
 // The stamp as CSS keyframes, sampled from stampScale, so the page and the tests share one curve.
 export function stampKeyframes(name: string, steps = 12): string {

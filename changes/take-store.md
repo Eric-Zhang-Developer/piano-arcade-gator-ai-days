@@ -3,7 +3,8 @@ Every finished take is saved to Supabase in the background (re-judged on the ser
 anonymous Supabase users with an optional Google link, and `/progress` shows each take plus the bars to practice.
 
 ## Where it lives
-`supabase/` (migrations, `README.md` for adding anything, `push.sh`, tests, local end-to-end stack), `web/src/data/`, `web/src/app/api/takes/`,
+`supabase/` (migrations, `README.md` for adding anything, `push.sh`, tests, local end-to-end stack); `/progress` is the
+player's profile: every session across songs (when, how long, rank, hits), totals, and per song the bars to practice, `web/src/data/`, `web/src/app/api/takes/`,
 `web/src/app/api/progress/`, `web/src/app/progress/`, `web/src/app/auth/callback/`, one line in `web/src/game/layers.ts`.
 
 ## How to check it

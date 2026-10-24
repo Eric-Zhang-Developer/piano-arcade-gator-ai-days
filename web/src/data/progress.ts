@@ -83,3 +83,66 @@ export function weakestBars(bars: BarTrendRow[], n = 3): BarTrendRow[] {
     .sort((a, b) => b.misses - a.misses || (b.spread_ms ?? 0) - (a.spread_ms ?? 0))
     .slice(0, n);
 }
+
+/** One row of the session_history view: a take, when it was played, for how long, and how it went. */
+export interface SessionRow {
+  take_id: string;
+  song_id: string;
+  title: string;
+  composer: string;
+  created_at: string;
+  duration_ms: number;
+  accuracy: number;
+  rank: string;
+  perfect: number;
+  great: number;
+  good: number;
+  miss: number;
+  wrong: number;
+  max_combo: number;
+  input_device: string;
+}
+
+/** The same rows, computed locally from takes (offline, or a guest without the server). Newest first. */
+export function sessionsFrom(takes: { take: TakeRow; title: string; composer: string }[]): SessionRow[] {
+  return takes
+    .map(({ take, title, composer }) => ({
+      take_id: take.id,
+      song_id: take.song_id,
+      title,
+      composer,
+      created_at: take.created_at ?? take.started_at,
+      duration_ms: Math.max(0, Math.round(Math.max(0, ...take.take.events.map((e) => Math.max(e.timeMs, e.offTimeMs ?? 0))))),
+      accuracy: take.accuracy,
+      rank: take.rank,
+      perfect: take.perfect,
+      great: take.great,
+      good: take.good,
+      miss: take.miss,
+      wrong: take.wrong,
+      max_combo: take.max_combo,
+      input_device: take.input_device,
+    }))
+    .sort((a, b) => b.created_at.localeCompare(a.created_at));
+}
+
+const RANKS = ["S", "A", "B", "C", "D"];
+
+/** Totals for the top of the profile: how many sessions, how long in all, how many songs, the best rank. */
+export function sessionSummary(rows: SessionRow[]) {
+  return {
+    sessions: rows.length,
+    totalMs: rows.reduce((a, r) => a + r.duration_ms, 0),
+    songs: new Set(rows.map((r) => r.song_id)).size,
+    bestRank: rows.length ? RANKS.find((k) => rows.some((r) => r.rank === k)) ?? rows[0].rank : null,
+  };
+}
+
+/** 61500 -> "1:02"; 3723000 -> "1:02:03". */
+export function formatDuration(ms: number): string {
+  const s = Math.round(ms / 1000);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const ss = String(s % 60).padStart(2, "0");
+  return h ? `${h}:${String(m).padStart(2, "0")}:${ss}` : `${m}:${ss}`;
+}

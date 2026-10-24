@@ -40,7 +40,7 @@ export default function Play() {
   const [error, setError] = useState("");
   const [results, setResults] = useState<Results | null>(null);
   const [latency, setLatency] = useState(0);
-  const [midiStatus, setMidiStatus] = useState("MIDI: connecting…");
+  const [midiStatus, setMidiStatus] = useState("MIDI: connects when you press Start");
   const [isTest, setIsTest] = useState(false);
   const [title, setTitle] = useState("");
 

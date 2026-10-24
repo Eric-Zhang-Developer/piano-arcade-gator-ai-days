@@ -12,13 +12,15 @@ New dependencies only through a `contract:` PR (`web/package.json` and `web/pnpm
 | Data / database | Supabase Postgres (free tier) for take history only (`take-store`). Written only by Next.js server routes with the secret key; migrations in `supabase/migrations/`. Charts stay JSON files in `web/public/songs/`; settings (latency offset) stay in `localStorage`. The game is fully playable with the database unreachable: nothing in the playing loop touches the network. |
 | Accounts | Supabase Auth. A player becomes an anonymous user on their first save, with no sign-in screen. Linking Google (`linkIdentity`) is optional and keeps the same user id. |
 | Hosting | Local only for now (`pnpm dev`). A Vercel deploy is a later, deliberate step. |
-| Tests | Vitest for pure functions, with synthetic players; Playwright for `[verify].command`. |
+| Tests | Vitest for pure functions, with synthetic players; Playwright for `[verify].command`. Database: `supabase/tests/migrations.mjs` on PGlite (its own `supabase/tests/package.json`, not part of `web/`) and `supabase/tests/live-smoke.mjs` for the live project. |
 | Learning lane | Provisional: decided by its person. The coach is expected to run on Gemini behind one Next.js route. |
 
 ## Environment
 `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (browser), `SUPABASE_SECRET_KEY` (server only,
-never `NEXT_PUBLIC_`). They live in `web/.env.local`, which is never committed. Without them, the take store falls back
-to `localStorage`. `@supabase/supabase-js` is added to `web/package.json` by a `contract:` PR once `core-loop` creates it.
+never `NEXT_PUBLIC_`), and `SUPABASE_DB_URL` (only for `supabase/push.sh`, which applies migrations). They live in
+`web/.env.local`, which is never committed. Without the first three, the take store falls back to `localStorage`.
+No Supabase SDK: Auth and PostgREST are called over `fetch` (decision `take-store-rest-client`). Migrations are applied
+with the Supabase CLI through `npx`, pinned to one version, never added to `web/package.json`.
 
 ## Layout
 Created by the bootstrap feature (`core-loop`).
@@ -46,6 +48,7 @@ python3 .agents/scripts/check_ownership.py --title "<PR title>" --base origin/ma
 python3 .agents/scripts/check_gates.py --title "<PR title>" --base origin/main
 python3 .agents/scripts/check_markers.py --base origin/main
 pnpm -C web lint && pnpm -C web typecheck && pnpm -C web test && pnpm -C web build
+npm --prefix supabase/tests ci && node supabase/tests/migrations.mjs   # when supabase/ changed
 ```
 The bootstrap feature adds the `pnpm` scripts and replaces CI's placeholder "Project checks" step with that last line.
 

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { evaluateAnswer, questions, reviewQuestions, score, source } from './lesson';
 import { PhraseScore } from './Score';
@@ -8,7 +9,7 @@ import { useTheorySession } from './LearningSessions';
 import { playPhrase } from './audio';
 import styles from './learning.module.css';
 
-export function TheoryWorkspace({ review = false }: { review?: boolean }) {
+export function TheoryWorkspace({ review = false, guide }: { review?: boolean; guide?: { instruction: string } }) {
   const items = review ? reviewQuestions : questions;
   const { state, update, setPaneWidth } = useTheorySession(review);
   const { index, answer, checked, hint, tab, history, paneWidth } = state;
@@ -63,8 +64,8 @@ export function TheoryWorkspace({ review = false }: { review?: boolean }) {
     <div ref={studio} className={styles.theoryStudio} style={{ '--question-width': `${paneWidth}%` } as CSSProperties}>
       <section className={styles.questionPane} aria-label="Current question">
         <header className={styles.lessonFocus}>
-          <h1>{review ? 'Recall a sense of home' : 'Hearing a phrase come home'}</h1>
-          <p>{review ? 'Review theory · Try each answer before opening the reference.' : 'Learn theory · Explore with the score and reference.'}</p>
+          {guide ? <div className={styles.tutorHeading}><Image data-tutor-perch src="/learning/companion-gator.svg" alt="Your gator guide" width={56} height={56} unoptimized/><h1>{review ? 'Recall a sense of home' : 'Hearing a phrase come home'}</h1></div> : <h1>{review ? 'Recall a sense of home' : 'Hearing a phrase come home'}</h1>}
+          <p>{guide?.instruction ?? (review ? 'Review theory · Try each answer before opening the reference.' : 'Learn theory · Explore with the score and reference.')}</p>
           <span>{done ? 'Complete' : `Question ${index+1} of ${items.length}`}</span>
         </header>
         <div ref={questionBody} className={styles.questionBody}>

@@ -30,3 +30,8 @@ Screen-space labels preserve the accepted 18px/600 and 14px/500 system-ui roles,
 `GuidedEntry.tsx` lives in the persistent learning layout, outside route children and offline Activity effects. One overlay image survives the route and fades only as the ready activity materializes from the arrival location. The original perched copy is hidden at launch. There is no empty handoff or generated-video navigation. A run token locks double entry and cancels stale RAF/timers; offline or explicit navigation cancels the journey and restores the prepared home. After reveal, focus moves to the new activity heading. Reduced motion enters directly and skips travel/clip animation. No audio or take starts automatically.
 
 The director accepts the actual contextual href/target for every supported learning/retrieval activity. The current prepared fixture remains Hearing a phrase come home, with the same real layout-owned session state and explicit completed repeat. The guide is an authored frontend demonstration, not a live agent/model decision. No free map exploration, extra mode choice, full 3D engine or speculative integration is added.
+
+A separate [unselected brand study](BRAND_STUDY.md) at `/learn/brand-preview`
+compares Practice Room, Field Notes and After Hours against the frozen product
+philosophy. Its fonts, materials, layout and motion are scoped review options;
+none replace this incumbent direction until an explicit choice is made.

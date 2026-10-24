@@ -137,3 +137,6 @@
 @keyframes activity-materialize { from { opacity:.15; clip-path:circle(8% at var(--arrival-x) var(--arrival-y)); } to { opacity:1; clip-path:circle(150% at var(--arrival-x) var(--arrival-y)); } }
 .content[data-reduced=true] { animation:none; }
 @media (prefers-reduced-motion:reduce) { .content[data-guided-reveal=true] { animation:none; } }
+
+.tutorHeading { display:flex; align-items:center; gap:14px; }
+.tutorHeading img { width:56px; height:56px; flex:none; }

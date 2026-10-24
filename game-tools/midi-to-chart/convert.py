@@ -46,9 +46,25 @@ def bar_starts(mid, upto_bar, pickup=0):
     return starts, lengths
 
 
+def volumes(mid):
+    """channel -> [(tick, CC7 value)] in tick order, across all tracks: the score's dynamics, where an exporter (LilyPond)
+    writes them as channel volume rather than note velocity."""
+    out = {}
+    for track in mid.tracks:
+        t = 0
+        for msg in track:
+            t += msg.time
+            if msg.type == "control_change" and msg.control == 7:
+                out.setdefault(msg.channel, []).append((t, msg.value))
+    return {ch: sorted(v) for ch, v in out.items()}
+
+
 def notes_of(mid, which, by_channel):
-    """(on_tick, off_tick, pitch, velocity) for one track index, or one channel across all tracks."""
+    """(on_tick, off_tick, pitch, velocity, volume) for one track index, or one channel across all tracks. volume is
+    the CC7 value in force on the note's channel at its note-on, or None if none was set yet."""
     tracks = mid.tracks if by_channel else [mid.tracks[which]]
+    vol = volumes(mid)
+    in_force = lambda ch, t: next((v for at, v in reversed(vol.get(ch, [])) if at <= t), None)
     out = []
     for track in tracks:
         t, held = 0, {}
@@ -58,10 +74,10 @@ def notes_of(mid, which, by_channel):
                 continue
             key = (msg.channel, msg.note)
             if msg.type == "note_on" and msg.velocity > 0:
-                held.setdefault(key, []).append((t, msg.velocity))
+                held.setdefault(key, []).append((t, msg.velocity, in_force(msg.channel, t)))
             elif held.get(key):
-                on, velocity = held[key].pop(0)
-                out.append((on, t, msg.note, velocity))
+                on, velocity, volume = held[key].pop(0)
+                out.append((on, t, msg.note, velocity, volume))
     return out
 
 
@@ -99,7 +115,7 @@ def convert(mid, rh, lh=None, bars=(1, 1), by_channel=False, rh_voice="all", lh_
             inside = [n for n in notes_of(mid, which, by_channel) if lo <= n[0] < hi]
             # Notation MIDI plays a grace note as a sliver just before its main note: off the grid and under 1/8 beat.
             grace = [n for n in inside if (n[0] * GRID) % tpb and (n[1] - n[0]) * 8 <= tpb]
-            for on, _, p, _ in grace:
+            for on, _, p, _, _ in grace:
                 log.append(f"grace note skipped: {hand} pitch {p} before beat {snap(on - lo) + shift}")
             inside = outer_voice([n for n in inside if n not in grace], voice)
             # Onsets must sit on the grid; releases are snapped, since engravers' MIDI shortens some by a tick.
@@ -107,12 +123,12 @@ def convert(mid, rh, lh=None, bars=(1, 1), by_channel=False, rh_voice="all", lh_
             if off_grid:
                 raise Refused(f"{len(off_grid)} of {len(inside)} {hand} notes start off the 1/{GRID}-beat grid: a performance, not notation")
             snapped = 0
-            for on, off, p, velocity in inside:
+            for on, off, p, velocity, volume in inside:
                 beat = Fraction(on - lo, tpb)
                 end = snap(min(off, hi) - lo)  # a note held past the segment's end ends at it
                 snapped += end != Fraction(min(off, hi) - lo, tpb)
                 if end > beat:
-                    picked.append({"hand": hand, "pitch": p, "beat": beat + shift, "duration": end - beat, "velocity": velocity})
+                    picked.append({"hand": hand, "pitch": p, "beat": beat + shift, "duration": end - beat, "velocity": velocity, "volume": volume})
             if snapped:
                 log.append(f"{snapped} {hand} releases snapped to the 1/{GRID}-beat grid")
         shift += Fraction(hi - lo, tpb)
@@ -127,6 +143,7 @@ def convert(mid, rh, lh=None, bars=(1, 1), by_channel=False, rh_voice="all", lh_
             log.append(f"unison kept once: pitch {n['pitch']} at beat {n['beat']} ({same[0]['hand']} and {n['hand']})")
             same[0]["duration"] = max(same[0]["duration"], n["duration"])
             same[0]["velocity"] = max(same[0]["velocity"], n["velocity"])
+            same[0]["volume"] = max(same[0]["volume"] or 0, n["volume"] or 0) or None
             continue
         notes.append(n)
     last_of = {}
@@ -136,8 +153,20 @@ def convert(mid, rh, lh=None, bars=(1, 1), by_channel=False, rh_voice="all", lh_
             log.append(f"trimmed: pitch {n['pitch']} at beat {prev['beat']} now ends at beat {n['beat']}")
             prev["duration"] = n["beat"] - prev["beat"]
         last_of[n["pitch"]] = n
+    # Dynamics (decided on #181): note-on velocities if they vary; else the CC7 volume in force at each note-on if that
+    # varies and every note has one; else none, and the chart marks no dynamics.
+    if len({n["velocity"] for n in notes}) > 1:
+        log.append("velocity: from note-on velocities")
+        loudness = lambda n: n["velocity"]
+    elif all(n["volume"] is not None for n in notes) and len({n["volume"] for n in notes}) > 1:
+        log.append("velocity: from CC7 volume (the note-on velocities are all equal)")
+        loudness = lambda n: min(127, max(1, n["volume"]))
+    else:
+        log.append("velocity: none (neither note-on velocities nor CC7 volume vary): the chart marks no dynamics")
+        loudness = None
     out = [
-        {"id": f"n{i + 1}", "pitch": n["pitch"], "beat": num(n["beat"]), "duration": num(n["duration"]), "hand": n["hand"], "velocity": n["velocity"]}
+        {"id": f"n{i + 1}", "pitch": n["pitch"], "beat": num(n["beat"]), "duration": num(n["duration"]), "hand": n["hand"]}
+        | ({"velocity": loudness(n)} if loudness else {})
         for i, n in enumerate(notes)
     ]
     return out, num(meter), log
@@ -178,6 +207,7 @@ def self_test():
         (72, 3, 3, "L"),
     ], got
     assert [n["id"] for n in notes] == ["n1", "n2", "n3", "n4", "n5", "n6"]
+    log = [line for line in log if not line.startswith("velocity:")]
     assert len(log) == 1 and log[0].startswith("unison"), log
 
     perf = mido.MidiFile(ticks_per_beat=480)
@@ -225,6 +255,24 @@ def self_test():
     play(l, [(480, 480, 64, 70)])
     notes, _, _ = convert(dy, rh=0, lh=1, bars=(1, 1))
     assert [(n["pitch"], n["velocity"]) for n in notes] == [(60, 40), (64, 100)], notes
+    # Equal note-on velocities, two CC7 levels: the volume in force at each note-on becomes its velocity (0 clamps to 1).
+    cc = mido.MidiFile(ticks_per_beat=480)
+    cc.tracks.append(mido.MidiTrack())
+    t0 = cc.tracks[0]
+    t0.append(mido.Message("control_change", control=7, value=50, time=0))
+    t0.append(mido.Message("note_on", note=60, velocity=90, time=0))
+    t0.append(mido.Message("note_off", note=60, velocity=0, time=480))
+    t0.append(mido.Message("control_change", control=7, value=0, time=0))
+    t0.append(mido.Message("note_on", note=62, velocity=90, time=0))
+    t0.append(mido.Message("note_off", note=62, velocity=0, time=480))
+    notes, _, log = convert(cc, rh=0, bars=(1, 1))
+    assert [n["velocity"] for n in notes] == [50, 1] and any("CC7" in line for line in log), (notes, log)
+    # Neither varies: no velocity on any note.
+    flat = mido.MidiFile(ticks_per_beat=480)
+    flat.tracks.append(mido.MidiTrack())
+    play(flat.tracks[0], [(0, 480, 60, 90), (480, 480, 62, 90)])
+    notes, _, log = convert(flat, rh=0, bars=(1, 1))
+    assert all("velocity" not in n for n in notes) and any("none" in line for line in log), (notes, log)
     print("self-test: ok")
 
 

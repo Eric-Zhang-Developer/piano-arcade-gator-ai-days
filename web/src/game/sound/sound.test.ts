@@ -43,14 +43,9 @@ test("wait mode: songEnd schedules no drumroll or rank hit", () => {
       apply: () => node(),
       set: () => true,
     });
-  vi.stubGlobal(
-    "AudioContext",
-    class {
-      constructor() {
-        return node();
-      }
-    },
-  );
+  vi.stubGlobal("AudioContext", function () {
+    return node();
+  });
   const ending = (params: string) => {
     const p = eventSounds();
     p.transformChart!({} as never, new URLSearchParams(params));

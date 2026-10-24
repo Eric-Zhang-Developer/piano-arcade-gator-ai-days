@@ -148,7 +148,7 @@ export default function Play() {
       if (e.type === "wrongNote") hw.latest = { judgment: "WRONG", offsetMs: null, atMs: e.atMs };
       for (const p of plugins) p.onEvent?.(e);
     };
-    const judge = new Judge(chart, emit);
+    const judge = new Judge(chart, emit, { scored: !isWaitMode(params) }); // wait mode: no score moments
     hw.noteState = judge.noteState;
     // Zero is fixed here, after the stage and judge are built, so songStart's atMs is the chart time now and a plugin's
     // performance.now() - atMs is the same zero the judge uses. Fixed before the build, it trailed by the build (#173).

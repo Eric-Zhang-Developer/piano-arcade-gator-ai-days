@@ -171,3 +171,31 @@ describe("live judging", () => {
     expect(r.judgments.map((j) => j.judgment)).toEqual(["MISS", "PERFECT"]);
   });
 });
+
+describe("scored: false (wait mode): no score moments", () => {
+  const types = (opts?: { scored?: boolean }, wrongAfter?: number) => {
+    const events: GameEvent[] = [];
+    const judge = new Judge(chart, (e) => events.push(e), opts);
+    chart.notes.forEach((n, i) => {
+      judge.press(n.pitch, noteTimeMs(chart, n), i);
+      if (i === wrongAfter) judge.press(1, noteTimeMs(chart, n) + 10, 1000); // a key far from any note: WRONG
+    });
+    judge.finish(1e6);
+    return events.map((e) => e.type);
+  };
+
+  it("all-PERFECT Twinkle sends a milestone, fever and a full combo by default, and none of them unscored", () => {
+    for (const t of ["comboMilestone", "feverStart", "fullCombo"] as const) {
+      expect(types()).toContain(t);
+      expect(types({ scored: false })).not.toContain(t);
+    }
+    expect(types({ scored: false })).toContain("songEnd");
+    expect(types({ scored: false }).filter((t) => t === "noteHit")).toHaveLength(chart.notes.length);
+  });
+
+  it("a WRONG during fever ends it by default only", () => {
+    expect(types(undefined, 20)).toContain("feverEnd");
+    expect(types({ scored: false }, 20)).toContain("wrongNote");
+    expect(types({ scored: false }, 20)).not.toContain("feverEnd");
+  });
+});

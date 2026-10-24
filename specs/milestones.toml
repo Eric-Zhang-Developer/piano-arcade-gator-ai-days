@@ -108,6 +108,7 @@ cut = []
 name = "polish"
 ship = ""
 features = [
+  "static-keyboard",
   "learn-from-select",
   "wait-hud",
   "chunk-practice",

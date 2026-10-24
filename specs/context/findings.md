@@ -2,6 +2,20 @@
 
 What we learned from running the thing. Specs cite this file; new findings go on top, dated.
 
+## 2026-10-24: playtest with the beat track (Eric, DGX-660, Chrome)
+
+**Setup.** The local playtest build: core-loop plus `beat-track` (PR #50: piano drums from the count-in to the end)
+and the core-loop fix (PR #53: two-bar count-in, separated repeated notes). Latency offset 0.
+
+**Score.** 71.4%, rank C: 24 PERFECT, 12 GREAT, 6 MISS, 7 extras, max combo 20, up from 10–40% without the beat.
+Eric: "much much better", "it feels a lot better". He asked whether Twinkle is 3/4 or 4/4 (the chart is 4/4; the
+kick marks each bar's beat 1).
+
+**What it shows.** 6 MISS with 7 extras: nearly every miss was the right key pressed just outside ±50 ms. The
+results screen can't say early or late, so neither the player nor we can tell latency from timing habit. Next:
+`timing-feedback` (early/late summary on the results screen), then decide the GOOD tier and latency from its data.
+The second player hasn't played this build yet.
+
 ## 2026-10-24: first human playtest of core-loop (Eric and his roommate, DGX-660, Chrome)
 
 **Setup.** `/play` from core-loop (PR #36): Twinkle, one hand, 100 BPM, silent 4-beat count-in, no audio besides the

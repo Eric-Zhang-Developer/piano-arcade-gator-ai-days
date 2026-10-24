@@ -38,6 +38,7 @@ import { demoReset } from "./demo-reset";
 import { versus } from "./versus";
 import { takeMidi } from "./take-midi";
 import { waitMode } from "./wait-mode/plugin";
+import { rewind } from "./rewind";
 import { waitHint } from "./wait-hint";
 import { sheetView } from "./sheet-view/plugin";
 import { createSavePlugin, queueAndSend } from "../data/save-plugin";
@@ -67,6 +68,7 @@ export const plugins: GamePlugin[] = [
   beatTrack(),
   midiWatchdog(), // reconnects a piano that goes silent mid-song
   waitMode(), // start panel: Learn it first; results panel after a wait-mode take: Play it judged, on top
+  rewind(), // wait mode's start panel: ← → back or ahead a bar, under wait mode's line
   records(), // results panel: NEW RECORD, initials and the top 5, first under the score
   dynamics(), // results panel: how loud you played against the score, above "Replay on piano"
   replayView(), // results panel: Watch replay, the take on the highway in time with piano-out

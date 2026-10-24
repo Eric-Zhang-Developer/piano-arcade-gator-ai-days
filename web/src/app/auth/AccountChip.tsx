@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { googleSession, signOut, type Session } from "../../data/auth";
 import { isConfigured } from "../../data/config";
 
-// Who's playing, for a menu corner: "Sign in" for guests, or the Google player with links to progress and sign-out.
+// Who's playing, for a menu corner: "Sign in" for guests, or the Google player (click the name for the profile:
+// every session, when and for how long) with History and Sign out.
 // One line to mount (`<AccountChip />`); it hides itself when Supabase isn't configured and in capture mode.
 export function AccountChip() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
@@ -19,11 +20,11 @@ export function AccountChip() {
       {session ? (
         <>
           <span style={{ color: "var(--pa-cyan)" }}>●</span>
-          <span style={name} title={session.email}>
-            {session.email?.split("@")[0] ?? "Signed in"}
-          </span>
+          <Link href="/progress" style={{ ...item, ...name, color: "var(--pa-ink)" }} title={`${session.email ?? ""}: your profile`} data-testid="account-profile">
+            {session.email?.split("@")[0] ?? "Profile"}
+          </Link>
           <Link href="/progress" style={item}>
-            Progress
+            History
           </Link>
           <button style={item} onClick={() => void signOut().then(() => setSession(null))}>
             Sign out
@@ -35,7 +36,7 @@ export function AccountChip() {
             Sign in
           </Link>
           <Link href="/progress" style={item}>
-            Progress
+            History
           </Link>
         </>
       )}

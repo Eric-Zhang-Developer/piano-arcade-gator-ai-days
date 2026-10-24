@@ -25,7 +25,7 @@ export const laptopBlacks = laptop.filter(([, p]) => isBlack(p)).map(([c]) => le
 
 const SELECT = "game/select-layout/index.tsx";
 const OPTIONS = "game/options-panel/index.tsx";
-const RECORDS = "game/records/panel.tsx";
+const RECORDS = "game/records/initials.ts"; // the entry's keys, shared with record-moment (#495, #499)
 const PAUSE = "game/pause-skin/index.tsx";
 
 export const helpGroups: HelpGroup[] = [

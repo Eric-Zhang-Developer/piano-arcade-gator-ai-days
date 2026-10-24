@@ -22,7 +22,7 @@ export function Score({ whole = false, beat = -1, hints = false }: { whole?: boo
             const nx = x(n.beat) + 24;
             const ny = y + 40 - (letterSteps[n.pitch] ?? 0) * 5;
             return <g key={n.id}>
-              {ny > y + 40 && <line x1={nx - 12} x2={nx + 12} y1={y + 50} y2={y + 50} stroke="currentColor" />}
+              {n.pitch === 60 && <line x1={nx - 12} x2={nx + 12} y1={y + 50} y2={y + 50} stroke="currentColor" />}
               <ellipse cx={nx} cy={ny} rx="7" ry="4.8" transform={`rotate(-18 ${nx} ${ny})`} fill={n.duration === 2 ? 'var(--learn-paper, #f2ecdf)' : 'currentColor'} stroke="currentColor" strokeWidth="1.7" />
               <line x1={nx + 6} x2={nx + 6} y1={ny} y2={ny - 29} stroke="currentColor" strokeWidth="1.6" />
               {hints && <text x={nx} y={y + 82} textAnchor="middle" fontSize="14" opacity=".7">{['C', 'D', 'E', 'F', 'G', 'A', 'B'][(letterSteps[n.pitch] + 2) % 7]}</text>}

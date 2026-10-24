@@ -26,6 +26,25 @@ pnpm dev            # http://localhost:3000 redirects to /play
 
 Web MIDI works in Chrome only. Laptop keys always work, so the game is playable with the piano unplugged.
 
+### Learning preview
+
+Open `/learn` on a desktop or laptop. Four links are grouped by purpose; existing bookmarks still work:
+
+| Group | Activity | Route | What to expect |
+|---|---|---|---|
+| Learn | Theory | `/learn` or `/learn/understand` | Explore questions with hints, music and reference available. |
+| Learn | Practice | `/learn/practice` | Rehearse a short passage with gradually reduced support. |
+| Review | Theory | `/learn/review` | Submit each answer before opening its reference. |
+| Review | Practice | `/learn/play-through` | Play through the melody with the score; example feedback follows the take. |
+
+In theory, the task stays above scrolling answer history and the answer controls stay below it. Music and
+Reference occupy a separate pane. Drag the divider, or focus it and press Left/Right, to resize the panes.
+Completing theory leads to practice in the same group.
+
+This is a frontend preview: answers are local and disposable, and practice takes and feedback are scripted,
+not recorded or graded piano performances. There is no account sync, saved progress or AI grading.
+Implementation requirements and validation live in the [learning frontend spec](specs/features/learning-ui/spec.md).
+
 ## How it works
 
 ```

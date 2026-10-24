@@ -11,11 +11,11 @@ This is the frontend slice commissioned from the published `piano-learning` plan
 
 ## Plan
 1. Port the accepted split-pane learning layout to Next.js routes.
-2. Integrate focused Practice and Play-through components.
+2. Integrate focused Learn practice and Review practice components.
 3. Compare the first working baseline with mlhacky.com and apply evidenced visual principles in a piano-specific identity.
 
 ## Requirements
-- Desktop/laptop routes stay bookmark-compatible: `/learn` and `/learn/understand` are Learn theory, `/learn/practice` is Learn practice, `/learn/review` is Review theory, and `/learn/play-through` is Review practice. Four direct anchors sit under visible Learn and Review headings, with distinct accessible names and the correct active state.
+- Preserve the desktop/laptop route mapping in [Learning preview](../../../README.md#learning-preview). Four direct anchors sit under visible Learn and Review headings, with distinct accessible names and the correct active state.
 - Theory uses a flat full-height question/reference split, initially 40/60, based on the current Spark encoding workspace. A persistent musical-task header sits above independently scrolling question/answer history, with the current answer and one primary Check/Continue action anchored below. The material pane scrolls independently; its selected source stays open while Learn questions progress. A pointer and keyboard accessible divider respects minimum pane widths. No fake chat or duplicate navigation.
 - Learn theory permits the reference; Review theory unlocks it only after submitting the current answer. Closed answers get computed feedback; open explanations compare with a reference, never fabricated semantic grading.
 - Learn practice fades support; Review practice retains the score and gives feedback after a performance. Preview takes and observations are visibly illustrative, with no invented mastery or saved account claims.

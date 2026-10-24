@@ -1,6 +1,7 @@
 /* Simon Says (spec: simon-says-spike): visual-direction.md's tokens, one quiet page over the sky. */
 .page {
-  min-height: 100vh;
+  box-sizing: border-box;
+  height: 100vh;
   display: grid;
   grid-template-rows: auto 1fr auto;
   gap: 2vh;

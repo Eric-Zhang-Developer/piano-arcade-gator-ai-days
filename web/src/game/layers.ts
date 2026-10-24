@@ -7,6 +7,7 @@ import { ghost } from "./ghost";
 import { handMode } from "./hand-mode";
 import { hud } from "./hud";
 import { warningCard } from "./difficulty";
+import { stageCard } from "./stage-card";
 import { feverGauge } from "./fever-gauge";
 import { juiceVisual } from "./juice";
 import { midiWatchdog } from "./midi-watchdog";
@@ -60,5 +61,6 @@ export const plugins: GamePlugin[] = [
   eventSounds(), // laptop sounds at combo milestones, fever, full combo, rank and (optionally) misses
   feverGauge(), // late: its gauge sizes from the chart after every transformChart, as the judge does
   warningCard(), // after every transformChart too: the level is the chart the player gets; WARNING at Lv 13+
+  stageCard(), // start panel: ARE YOU READY, the jacket, title and level, above Start
   cabinet(), // ?cabinet=1 returns a finished game to /cabinet; ?cabinet=demo starts the demo and reports it
 ];

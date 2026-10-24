@@ -1,0 +1,110 @@
+/* The card leads the start screen: its slot moves above the title and Start (the overlay is a flex column). */
+:global([data-testid="slot-stage-card"]) {
+  order: -1;
+  width: 100%;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3vh;
+  margin-bottom: 2vh;
+  color: var(--pa-ink);
+}
+
+.band {
+  width: 100%;
+  padding: 1.4vh 0;
+  background: var(--pa-sky);
+  border-block: 2px solid var(--pa-magenta);
+  text-align: center;
+  animation: sweep 220ms ease-out;
+}
+
+@keyframes sweep {
+  from {
+    transform: scaleX(0.6);
+    opacity: 0;
+  }
+}
+
+.ready {
+  margin: 0;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(44px, 5.2vw, 100px);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  gap: 2vw;
+  max-width: min(90vw, 1100px);
+}
+
+.jacket {
+  flex: none;
+  width: clamp(88px, 15vh, 170px);
+  aspect-ratio: 1;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.text {
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: clamp(28px, 2.6vw, 52px);
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.composer {
+  margin: 0.4em 0 0;
+  font-size: clamp(16px, 1.25vw, 24px);
+  color: var(--pa-ink-dim);
+}
+
+.level {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 5.5em;
+  padding: 0.6em 0.8em;
+  border: 1px solid rgba(39, 225, 255, 0.5);
+  border-radius: 4px;
+  background: rgba(11, 2, 32, 0.8);
+}
+
+.label {
+  font-size: clamp(12px, 0.8vw, 16px);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pa-ink-dim);
+}
+
+.number {
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(36px, 3.2vw, 60px);
+  line-height: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .band {
+    animation: none;
+  }
+}

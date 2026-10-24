@@ -10,6 +10,7 @@ import { SongCard } from "../song-card";
 import { SongJacket } from "../song-jacket/SongJacket";
 import { SelectStage } from "../select-stage";
 import { isLearnKey, learnUrl, SongPreview } from "../song-preview";
+import { uiSound } from "../ui-sounds";
 import type { Song } from "../song-select/load";
 import { goToStage } from "./go-to-stage";
 import styles from "./select-layout.module.css";
@@ -29,10 +30,12 @@ export function MusicSelect({ songs }: { songs: Song[] }) {
     if (!step) return;
     e.preventDefault();
     const links = [...e.currentTarget.querySelectorAll("a")];
-    const next = links[Math.min(links.length - 1, Math.max(0, focused + step))];
-    next?.focus();
+    const next = links[focused + step];
+    if (!next) return; // at the list's ends: no move, no sound
+    uiSound("move");
+    next.focus();
     const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    next?.scrollIntoView({ block: "center", behavior: still ? "auto" : "smooth" });
+    next.scrollIntoView({ block: "center", behavior: still ? "auto" : "smooth" });
   }
 
   // A plain click or Enter (a click with detail 0) moves into the stage; modifier and middle clicks stay links.
@@ -84,6 +87,7 @@ export function MusicSelect({ songs }: { songs: Song[] }) {
               data-testid={`song-${s.id}`}
               onClick={onPlay}
               onFocus={() => setFocused(i)}
+              onClick={() => uiSound("confirm")} // Enter on a link clicks it too
               onMouseEnter={(e) => e.currentTarget.focus({ preventScroll: true })} // hover highlights too (song-preview)
             >
               <SongCard

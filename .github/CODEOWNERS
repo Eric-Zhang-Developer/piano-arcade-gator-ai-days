@@ -1,0 +1,7 @@
+# Who has the final say over each lane (see "Lanes" in AGENTS.md). Agents wait for a person only when a PR
+# touches a path assigned to someone other than their own person.
+/web/src/game/        @Eric-Zhang-Developer
+/web/src/contracts/   @Eric-Zhang-Developer
+# The learning lane's line goes here once its person is set:
+# /web/src/learn/     @<teammate>
+# /tools/             @<teammate>

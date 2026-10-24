@@ -15,8 +15,21 @@ The spec is the source of truth. Chat and memory aren't. Everything you need is 
 - A feature is **done** when `changes/<slug>.md` is on `main`. Nothing else counts.
 - A feature is **ready** when everything in `depends_on` is done and no open PR is titled `feat(<slug>): ...`.
 - Take the **first ready feature in `specs/milestones.toml` order** (milestones top to bottom, skipping ones whose
-  ship time has passed; features left to right) whose `assignee` is you or empty. Specs in no milestone are backlog:
-  don't pick them. `python3 .agents/scripts/status.py --out -` prints the order.
+  ship time has passed; features left to right) whose `assignee` is your worker name, your person (see Lanes), or
+  empty. Never take a feature assigned to another person. Specs in no milestone are backlog: don't pick them.
+  `python3 .agents/scripts/status.py --out -` prints the order, but it ignores `assignee`: apply that filter yourself.
+
+## Lanes
+Each person owns a lane: their features, their folder, and the final say over both. A worker is named
+`<person>-<n>` (for example `eric-1`); the part before the first `-` is its person. Workers serve only their person.
+
+| Person | GitHub | Lane | Folder |
+|---|---|---|---|
+| `eric` | `@Eric-Zhang-Developer` | game: playing, highway, judging, HUD, juice, MIDI in and out | `web/src/game/` |
+| not set yet | not set yet | learning: coach, practice mode, chart compiler, song ripping | `web/src/learn/`, `tools/` |
+
+- The shared formats in `web/src/contracts/` are frozen: change them only through a `contract:` PR, which both people see.
+- Never change another lane's folder. If you need something from it, file a `needs-human` issue for its person.
 - **Blocked?** Don't wait. File a `needs-human` issue (below), note it on your PR, and take the next ready feature.
 - **Nothing ready?** Say so in your PR or in an issue and stop. Never invent scope.
 
@@ -36,8 +49,9 @@ The spec is the source of truth. Chat and memory aren't. Everything you need is 
    Validation step you skipped, with the reason). A person follows the release from these.
 6. Wait for CI, check GitHub's whole verdict, then squash-merge it yourself:
    `gh pr checks --watch && python3 .agents/scripts/pr_ready.py && gh pr merge --squash --delete-branch`.
-   Not for `plan:` PRs, `contract:` PRs that change `AGENTS.md` (rules bind every future agent), or PRs a
-   CODEOWNERS rule assigns to a person: those wait for a human.
+   Not for `plan:` PRs, `contract:` PRs that change `AGENTS.md` (rules bind every future agent), or PRs that touch a
+   path `.github/CODEOWNERS` assigns to a person other than your own: those wait for that person. Paths assigned to
+   your own person don't stop you; that's your lane.
 
 **PR titles** ([Conventional Commits](https://www.conventionalcommits.org/)); CI checks the files against the title:
 

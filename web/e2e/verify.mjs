@@ -1,5 +1,6 @@
-// Verify: start the app, play Twinkle headless as the Perfect player, fail unless every note is PERFECT. Twice: with
-// the test input, then on /sim through the MIDI path (raw bytes from the fake piano into core's real MIDI input).
+// Verify: start the app, pick Twinkle on the song list at /, then play it headless as the Perfect player, failing
+// unless every note is PERFECT. Twice: with the test input, then on /sim through the MIDI path (raw bytes from the
+// fake piano into core's real MIDI input).
 // Usage: pnpm -C web verify --out <dir>
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -75,6 +76,14 @@ async function main() {
   page.on("pageerror", (e) => consoleLines.push(`pageerror: ${e.message}`));
 
   try {
+    // The front door: Enter on Twinkle's row opens it. (Playing needs ?input=test, so the run below reloads with it.)
+    await page.goto(`${base}/`);
+    await page.getByTestId("song-twinkle").focus();
+    await page.keyboard.press("Enter");
+    await page.waitForURL(/\/play\?song=twinkle$/, { timeout: 60_000 });
+    await page.getByRole("heading", { name: "Twinkle, Twinkle, Little Star" }).waitFor({ timeout: 60_000 });
+    say("verify: / lists Twinkle, Enter opens /play?song=twinkle");
+
     await page.goto(url);
     await page.waitForFunction(() => window.__pianoArcade?.ready === true, null, { timeout: 60_000 });
     const chart = await page.evaluate(() => window.__pianoArcade.chart);

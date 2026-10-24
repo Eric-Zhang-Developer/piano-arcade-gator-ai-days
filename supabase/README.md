@@ -60,7 +60,7 @@ CLI doesn't run it again: `npx -y supabase@2.122.0 migration repair --status app
       (`migration repair`, Oct 24 2026). `supabase/push.sh --status` shows local and remote matching.
 - [ ] CAPTCHA (Turnstile or hCaptcha) on anonymous sign-ins: Supabase's advice, since every visitor becomes a user row.
 - [ ] Email sign-up is on but unused: turn it off unless the coach lane needs it.
-- [ ] Google sign-in:
+- [x] Google sign-in (provider on, manual linking on, redirect URL set; Oct 24 2026):
   1. Google Cloud console: OAuth consent screen (External, Testing; add every player's Gmail as a test user), then
      a **Web application** OAuth client with origin `http://localhost:3000` and redirect URI
      `https://umswmcehegvggcfcjdfy.supabase.co/auth/v1/callback`.
@@ -68,7 +68,7 @@ CLI doesn't run it again: `npx -y supabase@2.122.0 migration repair --status app
   3. Same page: **Allow manual linking** on (needed to link Google to an anonymous player).
   4. Authentication > URL Configuration: Site URL `http://localhost:3000`; Redirect URLs `http://localhost:3000/auth/callback`
      (add the deployed URL's `/auth/callback` when there is one).
-  5. `supabase/push.sh` to apply `merge_player` (0004).
+  5. `merge_player` (0004) is live and recorded (Oct 24 2026).
 
 ## Things to know about the free plan
 - A project with no traffic for 7 days is paused; restoring takes a minute from the dashboard. Open the app (or the

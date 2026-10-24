@@ -6,6 +6,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 CLI="npx -y supabase@2.122.0"
+# The CLI never reads the keyboard here (its spinner and npx can swallow typed input); only the y/N question does.
+cli() { $CLI "$@" </dev/null; }
 
 DB_URL="$(grep -E '^SUPABASE_DB_URL=' web/.env.local 2>/dev/null | head -1 | cut -d= -f2- | sed -E "s/^[\"']|[\"']$//g" || true)"
 if [[ -z "$DB_URL" ]]; then
@@ -16,7 +18,7 @@ if [[ -z "$DB_URL" ]]; then
 fi
 
 if [[ "${1:-}" == "--status" ]]; then
-  $CLI migration list --db-url "$DB_URL"
+  cli migration list --db-url "$DB_URL"
   exit 0
 fi
 
@@ -25,12 +27,19 @@ echo "== 1/4 every migration on a throwaway Postgres"
 node supabase/tests/migrations.mjs
 
 echo "== 2/4 what the live project would run"
-$CLI migration list --db-url "$DB_URL"
-$CLI db push --dry-run --db-url "$DB_URL"
+cli migration list --db-url "$DB_URL"
+dry="$(cli db push --dry-run --db-url "$DB_URL" 2>&1)"
+echo "$dry"
+if grep -qi "up to date" <<<"$dry"; then
+  echo "== nothing to apply; checking the live project"
+  node supabase/tests/live-smoke.mjs
+  exit 0
+fi
 
-read -r -p "== 3/4 apply these to the live project? [y/N] " answer
+answer=""
+read -r -p "== 3/4 apply these to the live project? [y/N] " answer </dev/tty || true
 [[ "$answer" == "y" || "$answer" == "Y" ]] || { echo "nothing applied"; exit 0; }
-$CLI db push --db-url "$DB_URL"
+cli db push --db-url "$DB_URL"
 
 echo "== 4/4 the live project, end to end"
 node supabase/tests/live-smoke.mjs

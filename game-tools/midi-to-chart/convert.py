@@ -47,7 +47,7 @@ def bar_starts(mid, upto_bar, pickup=0):
 
 
 def notes_of(mid, which, by_channel):
-    """(on_tick, off_tick, pitch) for one track index, or one channel across all tracks."""
+    """(on_tick, off_tick, pitch, velocity) for one track index, or one channel across all tracks."""
     tracks = mid.tracks if by_channel else [mid.tracks[which]]
     out = []
     for track in tracks:
@@ -58,9 +58,10 @@ def notes_of(mid, which, by_channel):
                 continue
             key = (msg.channel, msg.note)
             if msg.type == "note_on" and msg.velocity > 0:
-                held.setdefault(key, []).append(t)
+                held.setdefault(key, []).append((t, msg.velocity))
             elif held.get(key):
-                out.append((held[key].pop(0), t, msg.note))
+                on, velocity = held[key].pop(0)
+                out.append((on, t, msg.note, velocity))
     return out
 
 
@@ -95,10 +96,10 @@ def convert(mid, rh, lh=None, bars=(1, 1), by_channel=False, rh_voice="all", lh_
     picked = []
     for lo, hi in segments:
         for hand, which, voice in hands:
-            inside = [(on, off, p) for (on, off, p) in notes_of(mid, which, by_channel) if lo <= on < hi]
+            inside = [n for n in notes_of(mid, which, by_channel) if lo <= n[0] < hi]
             # Notation MIDI plays a grace note as a sliver just before its main note: off the grid and under 1/8 beat.
             grace = [n for n in inside if (n[0] * GRID) % tpb and (n[1] - n[0]) * 8 <= tpb]
-            for on, _, p in grace:
+            for on, _, p, _ in grace:
                 log.append(f"grace note skipped: {hand} pitch {p} before beat {snap(on - lo) + shift}")
             inside = outer_voice([n for n in inside if n not in grace], voice)
             # Onsets must sit on the grid; releases are snapped, since engravers' MIDI shortens some by a tick.
@@ -106,12 +107,12 @@ def convert(mid, rh, lh=None, bars=(1, 1), by_channel=False, rh_voice="all", lh_
             if off_grid:
                 raise Refused(f"{len(off_grid)} of {len(inside)} {hand} notes start off the 1/{GRID}-beat grid: a performance, not notation")
             snapped = 0
-            for on, off, p in inside:
+            for on, off, p, velocity in inside:
                 beat = Fraction(on - lo, tpb)
                 end = snap(min(off, hi) - lo)  # a note held past the segment's end ends at it
                 snapped += end != Fraction(min(off, hi) - lo, tpb)
                 if end > beat:
-                    picked.append({"hand": hand, "pitch": p, "beat": beat + shift, "duration": end - beat})
+                    picked.append({"hand": hand, "pitch": p, "beat": beat + shift, "duration": end - beat, "velocity": velocity})
             if snapped:
                 log.append(f"{snapped} {hand} releases snapped to the 1/{GRID}-beat grid")
         shift += Fraction(hi - lo, tpb)
@@ -125,6 +126,7 @@ def convert(mid, rh, lh=None, bars=(1, 1), by_channel=False, rh_voice="all", lh_
         if same:
             log.append(f"unison kept once: pitch {n['pitch']} at beat {n['beat']} ({same[0]['hand']} and {n['hand']})")
             same[0]["duration"] = max(same[0]["duration"], n["duration"])
+            same[0]["velocity"] = max(same[0]["velocity"], n["velocity"])
             continue
         notes.append(n)
     last_of = {}
@@ -135,7 +137,7 @@ def convert(mid, rh, lh=None, bars=(1, 1), by_channel=False, rh_voice="all", lh_
             prev["duration"] = n["beat"] - prev["beat"]
         last_of[n["pitch"]] = n
     out = [
-        {"id": f"n{i + 1}", "pitch": n["pitch"], "beat": num(n["beat"]), "duration": num(n["duration"]), "hand": n["hand"]}
+        {"id": f"n{i + 1}", "pitch": n["pitch"], "beat": num(n["beat"]), "duration": num(n["duration"]), "hand": n["hand"], "velocity": n["velocity"]}
         for i, n in enumerate(notes)
     ]
     return out, num(meter), log
@@ -153,10 +155,10 @@ def self_test():
     mid.tracks += [meta, rh, lh]
     meta.append(mido.MetaMessage("time_signature", numerator=3, denominator=4, time=0))
 
-    def play(track, events):  # (start_tick, length_ticks, pitch), in order, no overlaps
+    def play(track, events):  # (start_tick, length_ticks, pitch[, velocity]), in order, no overlaps
         t = 0
-        for start, length, pitch in events:
-            track.append(mido.Message("note_on", note=pitch, velocity=80, time=start - t))
+        for start, length, pitch, *velocity in events:
+            track.append(mido.Message("note_on", note=pitch, velocity=velocity[0] if velocity else 80, time=start - t))
             track.append(mido.Message("note_off", note=pitch, velocity=0, time=length))
             t = start + length
 
@@ -215,6 +217,14 @@ def self_test():
     play(sp.tracks[0], [(0, 480, 60), (480, 480, 62), (960, 480, 64)])  # C D E: body C D, first ending D, second E
     notes, bpb, _ = convert(sp, rh=0, spans=[(0, 2), (0, 1), (2, 3)])
     assert bpb == 4 and [(n["pitch"], n["beat"]) for n in notes] == [(60, 0), (62, 1), (60, 2), (64, 3)], notes
+    # Each note's velocity is its note-on's (dynamics); a unison keeps the louder.
+    dy = mido.MidiFile(ticks_per_beat=480)
+    r, l = mido.MidiTrack(), mido.MidiTrack()
+    dy.tracks += [r, l]
+    play(r, [(0, 480, 60, 40), (480, 480, 64, 100)])
+    play(l, [(480, 480, 64, 70)])
+    notes, _, _ = convert(dy, rh=0, lh=1, bars=(1, 1))
+    assert [(n["pitch"], n["velocity"]) for n in notes] == [(60, 40), (64, 100)], notes
     print("self-test: ok")
 
 

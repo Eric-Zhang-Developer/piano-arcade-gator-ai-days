@@ -98,7 +98,12 @@ try {
   // 1. Shift+Esc mid-take.
   let page = await fresh();
   await goto(page, "/play?song=twinkle");
-  await page.locator('input[type="range"]').first().fill("37");
+  const output = page.locator("label output").first();
+  for (let i = 0; i < 20 && (await output.innerText({ timeout: 30_000 })) !== "37 ms"; i++) {
+    await page.locator('input[type="range"]').first().fill("37"); // again until hydrated: before, React resets it to 0
+    await page.waitForTimeout(500);
+  }
+  check((await output.innerText()) === "37 ms", `the latency offset is set to ${await output.innerText()} on /play`);
   await goto(page, twinkle);
   await start(page);
   await page.waitForTimeout(6000);

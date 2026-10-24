@@ -29,7 +29,7 @@ Two PRs.
 - **LEARN:** the focused song's preview row shows a LEARN link (`data-testid="preview-learn"`) to the same URL. It
   shows as soon as the row does, because it doesn't need the chart, unlike PRACTICE 70%.
 - **Enter and click are unchanged:** both still open `/play?song=<id>`, judged.
-- **The hint** reads exactly `↑ ↓ choose · Enter play · L learn`.
+- **The hint** reads exactly `↑ ↓ choose · Enter play · L learn · E easy` (easy-charts added `E easy`).
 - **The preview stops:** leaving with L stops the opening at once (the queue cleared, All Notes Off on the
   piano), as Enter does, under the same rule as L above.
 

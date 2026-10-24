@@ -41,11 +41,19 @@ function audio(): { ctx: AudioContext; out: GainNode } {
 // a busy Mac, which froze the first ↓ (specs/decisions/ui-sounds-warm-context.md). It starts suspended and silent.
 if (typeof window !== "undefined" && typeof AudioContext !== "undefined") window.requestIdleCallback?.(() => audio());
 
-// Plays a UI sound delayMs from now. Dropped, never queued, before the page's first key press or click (Chrome
-// starts audio only after one), and when muted.
+// The page's own first key or pointer press. Not navigator.userActivation: Chromium can report it on a load nobody
+// touched (headless Linux in CI, and next dev), which played the stage card's sting on a direct /play load (#465).
+// A select-to-stage move is a client navigation, so the Enter that chose the song still counts on /play.
+let pressed = false;
+if (typeof window !== "undefined")
+  for (const type of ["keydown", "pointerdown"])
+    window.addEventListener?.(type, (e) => void (pressed ||= e.isTrusted), { capture: true, passive: true });
+
+// Plays a UI sound delayMs from now. Dropped, never queued, before that first press (Chrome starts audio only after
+// one), and when muted.
 export function uiSound(name: UiSound, delayMs = 0): void {
   if (typeof window === "undefined" || typeof AudioContext === "undefined") return;
-  if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;
+  if (!pressed) return;
   if (getPrefs().muted) return;
   const { ctx: c, out: o } = audio();
   if (c.state === "suspended") void c.resume(); // allowed now: there has been a gesture

@@ -20,19 +20,26 @@ function fakeAudio() {
 }
 
 let audio: ReturnType<typeof fakeAudio>;
-const activation = { hasBeenActive: true };
+// A window that keeps its listeners, so a test can send the page a key or pointer press.
+let listeners: Record<string, ((e: { isTrusted: boolean }) => void)[]>;
+const press = (type: string, isTrusted = true) => listeners[type]?.forEach((f) => f({ isTrusted }));
 
 beforeEach(() => {
   vi.resetModules(); // the module keeps one context for the page's life: a fresh module per test
   audio = fakeAudio();
-  vi.stubGlobal("window", {});
+  listeners = {};
+  vi.stubGlobal("window", { addEventListener: (t: string, f: (e: { isTrusted: boolean }) => void) => (listeners[t] ??= []).push(f) });
   vi.stubGlobal("AudioContext", audio.FakeContext);
-  vi.stubGlobal("navigator", { userActivation: activation });
-  activation.hasBeenActive = true;
+  vi.stubGlobal("navigator", { userActivation: { hasBeenActive: true } });
 });
 afterEach(() => vi.unstubAllGlobals());
 
-const load = async () => ({ ...(await import(".")), sound: await import("../sound") });
+// The module, after the page's first key press unless `pressed` is false.
+const load = async (pressed = true) => {
+  const m = { ...(await import(".")), sound: await import("../sound") };
+  if (pressed) press("keydown");
+  return m;
+};
 
 describe("ui sounds", () => {
   it("each sound starts nodes and stops every one, and no level is above the preview tone's peak", async () => {
@@ -61,12 +68,14 @@ describe("ui sounds", () => {
     expect(master.value).toBe(0.3);
   });
 
-  it("drops a sound asked for before the page's first user activation", async () => {
-    const { uiSound } = await load();
-    activation.hasBeenActive = false;
+  it("drops a sound before the page's own first press, even when the browser reports activation (#465)", async () => {
+    const { uiSound } = await load(false); // navigator.userActivation.hasBeenActive is true, as on CI's direct load
     uiSound("sting");
     expect(audio.log.starts).toBe(0);
-    activation.hasBeenActive = true;
+    press("keydown", false); // a synthetic event doesn't count
+    uiSound("sting");
+    expect(audio.log.starts).toBe(0);
+    press("pointerdown");
     uiSound("sting");
     expect(audio.log.starts).toBeGreaterThan(0);
   });

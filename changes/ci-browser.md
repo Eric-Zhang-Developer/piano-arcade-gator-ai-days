@@ -5,4 +5,4 @@ DRAFT (claim #427; finished last). A `browser` CI job runs the headless checks o
 ## How to check it
 All-checks runs on #415: 4 shards, 35 checks: 516/824/1125/576 s; 8 shards, 39 checks: jobs 2m42s–12m47s (sheet-view 429 s sets the slowest). Ordinary-PR job time and the flaky count over 10 PRs: not measured yet.
 ## Gaps
-Pending: test(core-loop), the local side (verify.py lock, `--cmd`, `[verify].command`), the throwaway-PR validations, 3 real PRs' times.
+Known red when the job landed, each with its issue and a 2-green-runs rule to leave: #428, #429, #430, #431, #432, #447, #465, #478, #485 (three found as main moved under #415's six runs). Pending: test(core-loop), the local side (verify.py lock, `--cmd`, `[verify].command`), the throwaway-PR validations, 3 real PRs' times.

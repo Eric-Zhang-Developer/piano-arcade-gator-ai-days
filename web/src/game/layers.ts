@@ -23,9 +23,11 @@ import { noteLabels } from "./note-labels";
 import { pianoOut } from "./piano-out";
 import { pianoVoice } from "./piano-voice";
 import { scenes } from "./scenes";
+import { watchDemo } from "./watch-demo";
 import { evenness } from "./evenness";
 import { dynamics } from "./dynamics";
 import { records } from "./records";
+import { recordMoment } from "./record-moment";
 import { replayView } from "./replay-view";
 import { eventSounds } from "./sound";
 import { simPlugin } from "./sim/plugin";
@@ -65,11 +67,13 @@ export const plugins: GamePlugin[] = [
   hud(), // before beat-track, so beat-track's status line draws over the HUD's top panel
   firstRun(), // ?firstrun=1: its text cues draw over the HUD's layer, between the band and the 1 s mark
   waitHud(), // wait mode: LEARN and note n / N in the HUD's band, where the counters and score were
+  watchDemo(), // ?demo=1 (W on the select): after scenes, and over the HUD band, where its DEMO badge draws; back to / after the results
   feverMoment(), // fever's start: the edge flash and a FEVER banner over the HUD band, under beat-track's status line
   beatTrack(),
   midiWatchdog(), // reconnects a piano that goes silent mid-song
   waitMode(), // start panel: Learn it first; results panel after a wait-mode take: Play it judged, on top
-  records(), // results panel: NEW RECORD, initials and the top 5, first under the score
+  records(), // results panel: initials and the top 5, first under the score (a NEW RECORD take's entry is record-moment's)
+  recordMoment(), // results panel: NEW RECORD stamps after the rank, with the high-score entry; after records, which sets the outcome
   dynamics(), // results panel: how loud you played against the score, above "Replay on piano"
   replayView(), // results panel: Watch replay, the take on the highway in time with piano-out
   pianoOut(), // records the take for "Replay on piano"

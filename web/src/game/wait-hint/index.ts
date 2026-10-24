@@ -56,9 +56,12 @@ export function waitHint(): GamePlugin {
   let voice: Voice | null = null;
   let audio: AudioContext | null = null;
   let sounded = false;
+  let pausedAt: number | null = null;
+  let floor = -Infinity; // a rewind's bar start: notes before it aren't waited for (the clock's own floor)
 
   const clear = () => {
     hits.clear();
+    floor = -Infinity;
     timer.reset();
     sounded = false;
     setHook(null);
@@ -77,12 +80,18 @@ export function waitHint(): GamePlugin {
       if (!wait) return;
       if (e.type === "noteHit") hits.set(e.noteId, e.judgment);
       if (e.type === "pause") {
+        pausedAt = e.atMs;
         timer.pause();
         setHook(null);
       }
       if (e.type === "resume") {
         timer.resume(performance.now());
         sounded = false;
+        // A resume somewhere else is a rewind (wait mode's ← →): notes from its bar start on are unjudged again.
+        if (chart && e.atMs !== pausedAt) {
+          floor = e.atMs;
+          for (const n of chart.notes) if (noteTimeMs(chart, n) >= e.atMs - 1e-6) hits.delete(n.id);
+        }
       }
       if (e.type === "quit" || e.type === "songEnd") clear();
       if (e.type !== "songStart") return;
@@ -105,7 +114,7 @@ export function waitHint(): GamePlugin {
     },
     draw(ctx, frame) {
       if (!wait || !chart) return;
-      const notes = waitingNotes(chart, hits, frame.nowMs);
+      const notes = waitingNotes(chart, hits, frame.nowMs, floor);
       const now = performance.now();
       const r = timer.frame(notes.length ? String(noteTimeMs(chart, notes[0])) : "", now);
       if (!r.show) return setHook(null);

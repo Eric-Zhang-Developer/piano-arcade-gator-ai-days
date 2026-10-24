@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { Chart, GameEvent } from "../../contracts";
 import { makeLayout } from "../core/highway";
 import { Judge } from "../core/judge";
@@ -150,5 +150,107 @@ describe("the HUD in wait mode", () => {
     const wait = texts("mode=wait");
     expect(wait).toContain("Twinkle");
     for (const s of ["PERFECT", "SCORE", "COMBO", "x1", "x4", "30"]) expect(wait).not.toContain(s);
+  });
+});
+
+describe("the combo in the band (combo-hud)", () => {
+  const chart: Chart = {
+    id: "t",
+    title: "Twinkle, Twinkle, Little Star",
+    composer: "t",
+    source: "test",
+    bpm: 100,
+    beatsPerBar: 4,
+    notes: [60, 62, 64, 65, 67, 69, 71, 72].map((pitch, i) => ({ id: `n${i}`, pitch, beat: i, duration: 1, hand: "R" as const })),
+  };
+  const sizes = [
+    [1024, 768],
+    [1280, 720],
+    [1920, 1080],
+  ] as const;
+
+  it.each(sizes)("at %ix%i the slots don't overlap, in order, and the combo's is centered", (w, h) => {
+    const l = hudLayout(w, makeLayout(chart, w, h, 0).judgmentLineY);
+    const order = [l.slots.card, l.slots.hits, l.slots.combo, l.slots.breaks, l.slots.score];
+    order.forEach((s, i) => {
+      expect(s.x1).toBeGreaterThan(s.x0);
+      if (i > 0) expect(s.x0).toBeGreaterThanOrEqual(order[i - 1].x1);
+    });
+    expect((l.slots.combo.x0 + l.slots.combo.x1) / 2).toBeCloseTo(w / 2);
+    expect(l.combo.cx).toBe(w / 2);
+    expect(l.combo.size).toBeGreaterThan(l.panel.h * 0.5); // bigger than the multiplier
+  });
+
+  // A fake context that records every fill with where its bottom lands, through translate, save and restore.
+  function record() {
+    const fills: { kind: string; text?: string; x: number; bottom: number; alpha: number; px: number }[] = [];
+    const t: Record<string | symbol, unknown> = { globalAlpha: 1, font: "10px x", textBaseline: "alphabetic" };
+    let dy = 0;
+    const stack: number[] = [];
+    const px = () => Number(/(\d+(?:\.\d+)?)px/.exec(String(t.font))?.[1] ?? 0);
+    const ctx = new Proxy(t, {
+      get: (o, k) => {
+        if (k in o) return o[k];
+        if (k === "save") return () => stack.push(dy);
+        if (k === "restore") return () => (dy = stack.pop() ?? 0);
+        if (k === "translate") return (_x: number, y: number) => (dy += y);
+        if (k === "measureText") return (s: string) => ({ width: s.length * px() * 0.6 });
+        if (k === "fillRect")
+          return (x: number, y: number, _w: number, hh: number) => fills.push({ kind: "rect", x, bottom: dy + y + hh, alpha: o.globalAlpha as number, px: 0 });
+        if (k === "fillText")
+          return (s: string, x: number, y: number) =>
+            fills.push({ kind: "text", text: s, x, bottom: dy + y + (o.textBaseline === "middle" ? px() / 2 : 0), alpha: o.globalAlpha as number, px: px() });
+        return () => {};
+      },
+      set: (o, k, v) => ((o[k] = v), true),
+    }) as unknown as CanvasRenderingContext2D;
+    return { ctx, fills };
+  }
+  const drawAt = (combo: number, milestone: number | null, sinceMs: number, w = 1280, h = 720) => {
+    const r = record();
+    const p = hud();
+    p.transformChart!(chart, new URLSearchParams());
+    p.onEvent!({ type: "combo", count: combo, atMs: 0 });
+    if (milestone !== null) p.onEvent!({ type: "comboMilestone", count: milestone, atMs: 1000 });
+    const line = makeLayout(chart, w, h, 0).judgmentLineY;
+    p.draw!(r.ctx, { width: w, height: h, judgmentLineY: line, nowMs: 1000 + sinceMs } as never);
+    return { ...r, band: hudLayout(w, line).panel.h, w };
+  };
+  const comboFills = (d: ReturnType<typeof drawAt>, n: number) => d.fills.filter((f) => f.text === String(n) && f.x === d.w / 2);
+
+  it.each(sizes)("at %ix%i, combo 120 just after the 100 milestone: every fill stays in the band, the combo at full strength", (w, h) => {
+    const d = drawAt(120, 100, 100, w, h);
+    for (const f of d.fills) expect(f.bottom).toBeLessThanOrEqual(d.band + 0.01);
+    const n = comboFills(d, 120);
+    expect(n).toHaveLength(1);
+    expect(n[0].alpha).toBe(1);
+    expect(d.fills.some((f) => f.alpha === 0.2)).toBe(false);
+    expect(comboFills(d, 100)).toHaveLength(1); // the ghost
+  });
+
+  it("a milestone at 25 doesn't swell the combo; one at 50 does", () => {
+    const still = comboFills(drawAt(30, null, 100), 30)[0].px;
+    expect(comboFills(drawAt(30, 25, 125), 30)[0].px).toBe(still);
+    expect(comboFills(drawAt(30, 25, 125), 25)).toHaveLength(0); // no ghost either
+    expect(comboFills(drawAt(55, 50, 125), 55)[0].px).toBeGreaterThan(comboFills(drawAt(55, null, 125), 55)[0].px);
+  });
+
+  it("under reduced motion: no swell and no ghost", () => {
+    vi.stubGlobal("matchMedia", () => ({ matches: true }));
+    try {
+      const d = drawAt(120, 100, 125);
+      expect(comboFills(d, 120)[0].px).toBe(comboFills(drawAt(120, null, 125), 120)[0].px);
+      expect(comboFills(d, 100)).toHaveLength(0);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("Twinkle's title fits its card at 1280x720 and 1920x1080 without shrinking (at 0.6 em per glyph)", () => {
+    for (const [w, h] of [sizes[1], sizes[2]]) {
+      const d = drawAt(0, null, 0, w, h);
+      const title = d.fills.find((f) => f.text === chart.title);
+      expect(title?.px).toBe(Math.round(d.band * 0.3));
+    }
   });
 });

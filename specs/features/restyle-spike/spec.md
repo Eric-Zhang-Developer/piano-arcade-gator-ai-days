@@ -111,4 +111,6 @@ Für Elise is the long one (186 melody notes). Eric may swap a row; log it in a 
 - Restyles exist only in the worker's worktree. Eric copies one into his checkout to listen.
 
 ## Defaults
+- Until Eric rules on #506: restyles are played and judged with `hands=R` only. Planner default, 2026-10-24; the
+  smaller, reversible option.
 - The smaller option; log choices the spec doesn't make in `specs/decisions/restyle-spike-*.md`.

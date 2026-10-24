@@ -20,6 +20,14 @@
   cursor: pointer;
 }
 
+/* On short screens the preview's lines above reach the bottom (song-sources' line made it one taller): lower and slimmer. */
+@media (max-height: 800px) {
+  .open {
+    bottom: 8px;
+    padding: 3px 6px 3px 12px;
+  }
+}
+
 .kbd {
   min-width: 1.4em;
   padding: 1px 6px;

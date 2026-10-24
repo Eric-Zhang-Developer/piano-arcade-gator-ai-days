@@ -29,7 +29,7 @@ look). Copy the spike's lessons, not its code.
 **Shared formats** (`web/src/contracts/`, frozen once merged; both lanes read them):
 - `Chart`: `{ id, title, composer, catalog?, source, bpm, beatsPerBar, notes: ChartNote[] }`. `ChartNote`:
   `{ id, pitch (MIDI 21–108), beat (start, from beat 0 of bar 1), duration (beats), hand: "R" | "L" }`. `source`
-  is the public-domain score the notes came from (a URL or citation), or `"Eric"`.
+  is the score the notes came from (a URL or citation; licenses per decision 003), or `"Eric"`.
 - `Take`: `{ chartId, startedAt (ISO), latencyOffsetMs, inputDevice: "midi" | "keys" | "test", events: TakeEvent[] }`.
   `TakeEvent`: `{ pitch, velocity (1–127; laptop keys use 80), timeMs, offTimeMs | null }`, with times in ms on the
   chart clock (0 is beat 0 of bar 1).
@@ -45,7 +45,7 @@ look). Copy the spike's lessons, not its code.
   position, so a layer can draw aligned to keys.
 
 **Chart:** Twinkle, the first verse (all six phrases), right hand, at 100 BPM in 4/4, in
-`web/public/songs/twinkle/chart.json`. The notes come from a public-domain score of the melody; put the citation in
+`web/public/songs/twinkle/chart.json`. The notes come from a cited score of the melody (decision 003); put the citation in
 `source`. Don't write the notes from memory. If you can't get a source, file a `needs-human` issue and leave the chart
 for Eric. Eric checks it by playing.
 

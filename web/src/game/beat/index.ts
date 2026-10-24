@@ -1,5 +1,6 @@
 // Beat track: a drum beat on the piano from the count-in to the end, so players hear the time (spec: beat-track).
 import type { Chart, GameEvent, GamePlugin } from "../../contracts";
+import { captureOn } from "../capture-mode";
 import { msPerBeat, settings as core } from "../core/settings";
 
 // General MIDI drums, channel 10.
@@ -163,6 +164,7 @@ export function beatTrack(): GamePlugin {
     },
     draw(ctx, frame) {
       schedule(frame.nowMs);
+      if (captureOn()) return; // ?capture=1: the beat plays, its status text stays out of the video (capture-mode)
       ctx.font = "13px system-ui, sans-serif";
       ctx.textAlign = "right";
       ctx.fillStyle = "rgba(255,255,255,0.45)";

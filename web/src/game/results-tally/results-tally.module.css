@@ -1,0 +1,9 @@
+/* The final number: read by scripts and screen readers, not drawn (the tallying number beside it is). */
+.final {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

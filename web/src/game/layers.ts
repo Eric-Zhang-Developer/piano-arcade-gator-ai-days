@@ -1,5 +1,6 @@
 import type { GamePlugin } from "../contracts";
 import { barLoop } from "./bar-loop";
+import { chordSync } from "./chord-sync";
 import { beatTrack } from "./beat";
 import { handColors } from "./hand-colors";
 import { ghost } from "./ghost";
@@ -45,6 +46,7 @@ export const plugins: GamePlugin[] = [
   feverStage(), // three.js stage behind the highway (background hook only, no 2D layer)
   weakBars(), // results panel: accuracy per phrase, and a link to loop the weakest
   evenness(), // results panel: how even each hand's runs were
+  chordSync(), // results panel: chords rolled by more than 30 ms, per hand
   takeGraph(), // results panel: every note's timing over the song
   eventSounds(), // laptop sounds at combo milestones, fever, full combo, rank and (optionally) misses
   feverGauge(), // late: its gauge sizes from the chart after every transformChart, as the judge does

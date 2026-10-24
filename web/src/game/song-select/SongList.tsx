@@ -30,7 +30,7 @@ export function SongList({ songs }: { songs: Song[] }) {
             <span style={{ textAlign: "right", opacity: 0.7, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
               {s.noteCount} notes
               <br />
-              Difficulty —
+              Lv {s.level}
             </span>
           </Link>
         </li>

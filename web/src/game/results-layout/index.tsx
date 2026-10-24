@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type { GamePlugin, Results } from "../../contracts";
 import { Slots } from "../play-slots/ui";
+import { Tally } from "../results-tally";
 import styles from "./results-layout.module.css";
 
 export const resultsLayoutSettings = {
@@ -75,10 +76,12 @@ export function ResultsLayout({
             </div>
             <div className={styles.tally}>
               <dl className={styles.counts}>
-                {countRows(results).map((r) => (
+                {countRows(results).map((r, i, rows) => (
                   <div key={r.id} className={styles.count} style={{ "--tone": r.tone } as React.CSSProperties}>
                     <dt>{r.label}</dt>
-                    <dd data-testid={r.id}>{r.value}</dd>
+                    <dd>
+                      <Tally value={r.value} index={i} of={rows.length} testid={r.id} />
+                    </dd>
                   </div>
                 ))}
               </dl>

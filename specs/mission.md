@@ -37,7 +37,9 @@ decides (see the `needs-human` issue). Until then, nothing may claim to meet it.
   number doesn't exist in the results, show the plain summary instead.
 
 ## Not doing
-- A sound on every hit. Sounds play at events only (count-in, milestones, fever, full combo, rank, a quiet miss cue).
+- A sound on every hit. Besides the piano, sounds are an accompaniment track that keeps time from the count-in to
+  the end (`beat-track`; decision `beat-track-accompaniment.md`) and event sounds (milestones, fever, full combo,
+  rank, a quiet miss cue).
 - Pixel art as the medium. The look is Synthesia's (dark, glowing notes aligned to the keys) plus an arcade layer.
 - Strong perspective on the highway: far notes shrink to slivers on 88 keys. At most mild depth, with the judgment
   line aligned to the keys.

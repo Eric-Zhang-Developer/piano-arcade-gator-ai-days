@@ -41,7 +41,8 @@ export default function OperatorPage() {
   const [mode, setMode] = useState<"LIVE" | "SNAPSHOT" | null>(null);
   const [board, setBoard] = useState<Board | null>(null);
   const [fetchedAt, setFetchedAt] = useState(0);
-  const [note, setNote] = useState("");
+  const [note, setNote] = useState(""); // why there's no (fresh) board
+  const [frozen, setFrozen] = useState(""); // the last freeze's result; polls don't clear it
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -94,10 +95,10 @@ export default function OperatorPage() {
   }, []);
 
   async function freeze() {
-    setNote("Freezing…");
+    setFrozen("Freezing…");
     const r = await fetch("/api/operator/snapshot", { method: "POST" }).catch(() => null);
-    const j = r?.ok ? await r.json() : null;
-    setNote(j ? `Snapshot frozen at ${clock(j.at)} (${j.sha}) → web/public/operator/snapshot.json. Commit it for judges.` : "Freeze failed.");
+    const j = r?.ok ? await r.json().catch(() => null) : null;
+    setFrozen(j ? `Snapshot frozen at ${clock(j.at)} (${j.sha}) → web/public/operator/snapshot.json. Commit it for judges.` : "Freeze failed.");
   }
 
   const gh = board ? (board.gh.status === "ok" ? `gh: ok · ${board.gh.calls} calls` : `gh: ${board.gh.status}`) : "";
@@ -136,10 +137,11 @@ export default function OperatorPage() {
         </nav>
       </header>
 
-      {(note || board?.banner.length) && (
+      {(note || frozen || board?.banner.length) && (
         <div className={styles.banner} role="status">
           {board?.banner.map((b) => <p key={b}>⚠ {b}</p>)}
           {note && <p>{note}</p>}
+          {frozen && <p>❄ {frozen}</p>}
         </div>
       )}
 
@@ -158,13 +160,15 @@ export default function OperatorPage() {
 
 // The cabinet's coin counter: the four numbers worth a glance before reading anything else.
 function Totals({ board }: { board: Board }) {
-  const done = board.features.filter((f) => f.state === "done").length;
+  const ms = board.books.milestones; // planned = in a milestone, as the bookkeeping counts it
+  const planned = ms.reduce((n, m) => n + m.planned, 0);
+  const done = ms.reduce((n, m) => n + m.done, 0);
   const flying = board.features.filter((f) => f.state === "in flight").length;
   const merged = board.books.mergedByType?.reduce((n, [, k]) => n + k, 0);
   const waiting = board.needs.length;
   const cells: [string, string][] = [
     ["NEEDS A PERSON", board.needsUnknown.length ? `${waiting}+?` : String(waiting)],
-    ["FEATURES DONE", `${done} / ${board.features.length}`],
+    ["FEATURES DONE", ms.length ? `${done} / ${planned}` : "?"],
     ["IN FLIGHT", board.crew === null ? "?" : String(flying)],
     ["PRS MERGED", merged === undefined ? "?" : String(merged)],
   ];

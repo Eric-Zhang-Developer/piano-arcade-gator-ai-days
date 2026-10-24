@@ -101,6 +101,7 @@ try {
   const liveBooks = await text(page, "screen-3");
   await page.getByRole("button", { name: /Freeze snapshot/ }).click();
   await page.getByText(/Snapshot frozen at/).waitFor({ timeout: 30_000 });
+  const frozeAt = Date.now();
   const snap = JSON.parse(readFileSync(snapFile, "utf8"));
   check(snap.heartbeats === null && !JSON.stringify(snap).includes("agent-heartbeats"), "snapshot.json has no heartbeats");
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
@@ -137,6 +138,9 @@ try {
   await offline.reload();
   const bad = await offline.locator("[role=status]").innerText({ timeout: 10_000 }).catch(() => "");
   check(/isn't a board/.test(bad), "a snapshot of the wrong shape shows a banner");
+  // Back on the live page: the freeze message outlives the next 15 s poll.
+  await sleep(Math.max(0, 16_000 - (Date.now() - frozeAt)));
+  check(await page.getByText(/Snapshot frozen at/).isVisible(), "the freeze message survives a re-fetch");
   check(errors.length === 0, `no page errors${errors.length ? `: ${errors.join(" | ")}` : ""}`);
 } catch (e) {
   check(false, String(e?.stack ?? e));

@@ -43,9 +43,11 @@ export function meterFor(beatsPerBar: number): Meter {
   throw new Error(`beatsPerBar ${beatsPerBar} isn't a whole number of 16ths`);
 }
 
-export function keyAndMeter(chart: Chart): { key: Key; meter: Meter } {
-  const o: Override = overrides[chart.id] ?? {};
-  const est = estimateKey(chart);
+// `song` is the whole chart the key comes from: /play's transforms (one hand, a loop) keep the id but not every note,
+// and a key estimated from part of a song can be wrong (Für Elise's right hand alone reads as E minor).
+export function keyAndMeter(chart: Chart, song: Chart = chart): { key: Key; meter: Meter } {
+  const o: Override = overrides[song.id] ?? {};
+  const est = estimateKey(song);
   const key: Key = { fifths: o.fifths ?? est.fifths, mode: o.mode ?? est.mode };
   const rule = meterFor(chart.beatsPerBar);
   const meter = { beats: o.beats ?? rule.beats, beatType: o.beatType ?? rule.beatType };
@@ -105,10 +107,10 @@ function voices(placed: Placed[], staff: 1 | 2): Chord[] {
   return chords;
 }
 
-export function chartToMusicXml(chart: Chart): string {
+export function chartToMusicXml(chart: Chart, song: Chart = chart): string {
   const barLen = DIVISIONS * chart.beatsPerBar;
   if (!Number.isInteger(barLen)) throw new Error(`${chart.id}: a bar of ${chart.beatsPerBar} beats isn't a whole number of 16ths`);
-  const { key, meter } = keyAndMeter(chart);
+  const { key, meter } = keyAndMeter(chart, song);
   const table = spellingFor(key);
   const placed = placeNotes(chart);
   const bars = Math.max(1, Math.ceil(Math.max(0, ...placed.map((p) => p.end)) / barLen));

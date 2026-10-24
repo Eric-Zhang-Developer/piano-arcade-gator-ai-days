@@ -10,6 +10,7 @@ import { hud } from "./hud";
 import { waitHud } from "./wait-hud";
 import { warningCard } from "./difficulty";
 import { stageCard } from "./stage-card";
+import { clearCard } from "./clear-card";
 import { feverGauge } from "./fever-gauge";
 import { feverMoment } from "./fever-moment";
 import { juiceVisual } from "./juice";
@@ -68,6 +69,7 @@ export const plugins: GamePlugin[] = [
   takeGraph(), // results panel: every note's timing over the song
   eventSounds(), // laptop sounds at combo milestones, fever, full combo, rank and (optionally) misses
   feverGauge(), // late: its gauge sizes from the chart after every transformChart, as the judge does
+  clearCard(), // over the HUD and the meter: ALL PERFECT, FULL COMBO or CLEAR from the last note to the results
   warningCard(), // after every transformChart too: the level is the chart the player gets; WARNING at Lv 13+
   stageCard(), // start panel: ARE YOU READY, the jacket, title and level, above Start
   cabinet(), // ?cabinet=1 returns a finished game to /cabinet; ?cabinet=demo starts the demo and reports it

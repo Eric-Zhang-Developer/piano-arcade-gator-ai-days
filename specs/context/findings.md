@@ -2,6 +2,11 @@
 
 What we learned from running the thing. Specs cite this file; new findings go on top, dated.
 
+## 2026-10-24: how Eric checks on the piano (Eric)
+
+- Eric checks on the DGX about once every 1 to a few hours, and his checks are about feel and direction, so workers
+  batch "Eric's piano check" items into their done notes' Gaps instead of waiting on him.
+
 ## 2026-10-24: playtest with the beat track (Eric, DGX-660, Chrome)
 
 **Setup.** The local playtest build: core-loop plus `beat-track` (PR #50: piano drums from the count-in to the end)

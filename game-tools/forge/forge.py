@@ -230,6 +230,13 @@ def save(forge, cid):
 # ---------- diff ----------
 
 
+def mutopia_ids(source):
+    """The Mutopia piece numbers a source line names: "Mutopia 931" or piece-info.cgi?id=931."""
+    import re
+
+    return set(re.findall(r"(?:Mutopia |piece-info\.cgi\?id=)(\d+)", source))
+
+
 def diff(forged_path, committed_path):
     forged, committed = json.load(open(forged_path)), json.load(open(committed_path))
     end = min(max(n["beat"] + n["duration"] for n in c["notes"]) for c in (forged, committed))
@@ -251,7 +258,7 @@ def diff(forged_path, committed_path):
         "matched": matched,
         "share": round(matched / len(a), 4) if a else 0,
         "forged_unmatched": len(b) - len(used),
-        "same_source": forged.get("source", "").split(",")[0].strip() == committed.get("source", "").split(",")[0].strip(),
+        "same_source": bool(mutopia_ids(forged.get("source", "")) & mutopia_ids(committed.get("source", ""))),
     }
 
 

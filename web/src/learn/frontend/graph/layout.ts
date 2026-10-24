@@ -1,41 +1,109 @@
 import { skills, type Domain, type Skill } from './data';
-export type Point = { x: number; y: number; node: Skill; depth: number };
-export const mapSize = { width: 920, height: 600 };
-/** Stable broad anchors and leaf-weighted outward fans, inspired by Spark's semantic map.
- * No learner state, randomness, force loop or node dragging participates in layout. */
-export function layoutGraph(domain: Domain): Point[] {
-  const nodes = skills.filter((node) => node.domain === domain);
-  const roots = nodes.filter((node) => !node.parentId);
-  const children = (id: string) => nodes.filter((node) => node.parentId === id);
-  const weight = (id: string): number => Math.max(1, children(id).reduce((sum, n) => sum + weight(n.id), 0));
-  const positions = [{ x: 230, y: 175, angle: -2.5 }, { x: 690, y: 175, angle: -.64 }, { x: 230, y: 425, angle: 2.5 }, { x: 690, y: 425, angle: .64 }];
-  const result: Point[] = [];
+
+/** Subject geography, independent of the learner overlay and any rendering technology. */
+export type WorldPosition = { x: number; y: number; z: number };
+export type Point = WorldPosition & { node: Skill; depth: number; fanAngle: number };
+export type RootRelationship = { from: string; to: string; kind: 'supports' | 'applies' | 'explains'; label: string };
+const precise = (value: number) => Number(value.toFixed(3));
+
+/** Spark course-graph.ts: broad-idea relaxation and complete-branch footprint reservation. */
+function anchorPositions(roots: readonly Skill[], relationships: readonly RootRelationship[], radii: number[]) {
+  const spacing = Math.max(...radii) * 2 + 240;
+  const indices = new Map(roots.map((node, index) => [node.id, index]));
+  const neighbors = roots.map(() => new Set<number>());
+  for (const edge of relationships) {
+    const a = indices.get(edge.from), b = indices.get(edge.to);
+    if (a !== undefined && b !== undefined && a !== b) { neighbors[a].add(b); neighbors[b].add(a); }
+  }
+  const points = roots.map((_, index) => ({ x: Math.cos(index * Math.PI * 2 / roots.length - 2.5) * spacing, y: Math.sin(index * Math.PI * 2 / roots.length - 2.5) * spacing }));
+  for (let step = 0; step < 180; step++) {
+    const moves = points.map(() => ({ x: 0, y: 0 }));
+    for (let a = 0; a < points.length; a++) for (let b = a + 1; b < points.length; b++) {
+      const dx = points[b].x - points[a].x, dy = points[b].y - points[a].y, distance = Math.max(1, Math.hypot(dx, dy));
+      const force = spacing * spacing / distance - (neighbors[a].has(b) ? distance * distance / spacing : 0);
+      moves[a].x -= dx / distance * force; moves[a].y -= dy / distance * force;
+      moves[b].x += dx / distance * force; moves[b].y += dy / distance * force;
+    }
+    const limit = spacing * .07 * (1 - step / 180);
+    points.forEach((point, index) => { const length = Math.hypot(moves[index].x, moves[index].y) || 1; point.x += moves[index].x / length * Math.min(limit, length * .03); point.y += moves[index].y / length * Math.min(limit, length * .03); });
+  }
+  const mean = points.reduce((sum, point) => ({ x: sum.x + point.x / points.length, y: sum.y + point.y / points.length }), { x: 0, y: 0 });
+  const covariance = points.reduce((sum, point) => ({ xx: sum.xx + (point.x - mean.x) ** 2, yy: sum.yy + (point.y - mean.y) ** 2, xy: sum.xy + (point.x - mean.x) * (point.y - mean.y) }), { xx: 0, yy: 0, xy: 0 });
+  const rotation = -.5 * Math.atan2(precise(2 * covariance.xy), precise(covariance.xx - covariance.yy)) - .6;
+  points.forEach(point => { const x = point.x - mean.x, y = point.y - mean.y; point.x = x * Math.cos(rotation) - y * Math.sin(rotation); point.y = x * Math.sin(rotation) + y * Math.cos(rotation); });
+  if (points.length > 1 && points[0].x > points.at(-1)!.x) points.forEach(point => { point.x *= -1; point.y *= -1; });
+  if (points.length > 2) {
+    const width = Math.max(...points.map(point => point.x)) - Math.min(...points.map(point => point.x));
+    const height = Math.max(...points.map(point => point.y)) - Math.min(...points.map(point => point.y));
+    points.forEach(point => { point.y *= Math.min(1, width / Math.max(1, height) / 1.9); });
+  }
+  for (let pass = 0; pass < 80; pass++) {
+    let moved = false;
+    for (let a = 0; a < points.length; a++) for (let b = a + 1; b < points.length; b++) {
+      const dx = points[b].x - points[a].x, dy = points[b].y - points[a].y, distance = Math.hypot(dx, dy) || 1;
+      const overlap = radii[a] + radii[b] + 240 - distance;
+      if (overlap <= .1) continue;
+      points[a].x -= dx / distance * overlap / 2; points[a].y -= dy / distance * overlap / 2;
+      points[b].x += dx / distance * overlap / 2; points[b].y += dy / distance * overlap / 2; moved = true;
+    }
+    if (!moved) break;
+  }
+  // Keep complete local fans intact while spreading broad anchors into a desktop-wide geography.
+  const spanX = Math.max(...points.map(p => p.x)) - Math.min(...points.map(p => p.x));
+  const spanY = Math.max(...points.map(p => p.y)) - Math.min(...points.map(p => p.y));
+  const footprint = Math.max(...radii) * 2;
+  const spread = Math.max(1, (1.95 * (spanY + footprint) - footprint) / Math.max(1, spanX));
+  points.forEach(point => { point.x *= spread; });
+  return points.map((point, index) => {
+    const directions = [...neighbors[index]].map(other => (Math.atan2(points[other].y - point.y, points[other].x - point.x) + Math.PI * 2) % (Math.PI * 2)).sort((a, b) => a - b);
+    let start = -Math.PI / 2, sweep = Math.PI * 2;
+    if (directions.length) {
+      const gap = directions.map((angle, index) => ({ start: angle, sweep: (directions[index + 1] ?? directions[0] + Math.PI * 2) - angle })).sort((a, b) => b.sweep - a.sweep)[0];
+      sweep = Math.min(Math.PI * 1.25, gap.sweep * .76); start = gap.start + (gap.sweep - sweep) / 2;
+    }
+    return { ...point, start, sweep };
+  });
+}
+
+export function layoutGraph(domain: Domain, relationships: readonly RootRelationship[] = []): Point[] {
+  const nodes = skills.filter(node => node.domain === domain), roots = nodes.filter(node => !node.parentId);
+  if (!roots.length) return [];
+  const children = (id: string) => nodes.filter(node => node.parentId === id);
+  const weight = (id: string): number => Math.max(1, children(id).reduce((sum, node) => sum + weight(node.id), 0));
+  const rootOf = (node: Skill): Skill => node.parentId ? rootOf(nodes.find(parent => parent.id === node.parentId) ?? { ...node, parentId: undefined }) : node;
+  const groups = roots.map(root => nodes.filter(node => rootOf(node).id === root.id));
+  const radii = roots.map((root, index) => {
+    const neighbors = new Set(relationships.flatMap(edge => edge.from === root.id ? [edge.to] : edge.to === root.id ? [edge.from] : []));
+    const minimumSweep = neighbors.size ? Math.min(Math.PI * 1.25, Math.PI * 2 / neighbors.size * .76) : Math.PI * 2;
+    return Math.max(800, groups[index].filter(node => !children(node.id).length).length * 28 / minimumSweep);
+  });
+  const centers = anchorPositions(roots, relationships, radii), result: Point[] = [];
   roots.forEach((root, index) => {
-    const center = positions[index];
-    result.push({ ...center, node: root, depth: 0 });
-    const place = (parent: Skill, start: number, end: number, depth: number) => {
-      const list = children(parent.id), total = list.reduce((sum, n) => sum + weight(n.id), 0);
+    const center = centers[index];
+    const depthOf = (node: Skill): number => node.parentId ? 1 + depthOf(nodes.find(parent => parent.id === node.parentId)!) : 0;
+    const levels = Math.max(1, ...groups[index].map(depthOf));
+    function place(node: Skill, start: number, end: number, depth: number, reach = 1) {
+      const angle = (start + end) / 2, radius = depth ? radii[index] * (.65 + .35 * (depth - 1) / Math.max(1, levels - 1)) * reach : 0;
+      result.push({ x: precise(center.x + Math.cos(angle) * radius), y: precise(center.y + Math.sin(angle) * radius), z: 0, node, depth, fanAngle: precise(angle) });
+      const descendants = children(node.id), total = descendants.reduce((sum, child) => sum + weight(child.id), 0);
       let cursor = start;
-      list.forEach((node) => {
-        const stop = cursor + (end - start) * weight(node.id) / total;
-        const angle = (cursor + stop) / 2;
-        const radius = depth === 1 ? 100 : 155;
-        // Quantize SVG coordinates so server/client trig rounding cannot change hydration attributes.
-        result.push({ x: Number((center.x + Math.cos(angle) * radius).toFixed(3)), y: Number((center.y + Math.sin(angle) * radius).toFixed(3)), node, depth });
-        place(node, cursor, stop, depth + 1); cursor = stop;
-      });
-    };
-    place(root, center.angle - 1.35, center.angle + 1.35, 1);
+      for (const child of descendants) {
+        const childWeight = weight(child.id), stop = cursor + (end - start) * childWeight / total;
+        const branchReach = depth ? reach : .85 + childWeight / Math.max(...descendants.map(child => weight(child.id))) * .15;
+        place(child, cursor, stop, depth + 1, branchReach); cursor = stop;
+      }
+    }
+    place(root, center.start, center.start + center.sweep, 0);
   });
   return result;
 }
-/** Directional keys select the closest node in the requested half-plane. */
+
 export function neighbor(points: Point[], selected: string, key: string): string {
-  const origin = points.find((p) => p.node.id === selected);
+  const origin = points.find(point => point.node.id === selected);
   if (!origin) return points[0]?.node.id ?? selected;
   const direction: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
-  const d = direction[key]; if (!d) return selected;
-  return points.filter((p) => (p.x - origin.x) * d[0] + (p.y - origin.y) * d[1] > 1)
-    .map((p) => ({ p, cost: Math.hypot(p.x - origin.x, p.y - origin.y) + Math.abs((p.x - origin.x) * d[1] - (p.y - origin.y) * d[0]) * 1.2 }))
-    .sort((a, b) => a.cost - b.cost)[0]?.p.node.id ?? selected;
+  const axis = direction[key]; if (!axis) return selected;
+  return points.filter(point => (point.x - origin.x) * axis[0] + (point.y - origin.y) * axis[1] > 1)
+    .map(point => ({ point, cost: Math.hypot(point.x - origin.x, point.y - origin.y) + Math.abs((point.x - origin.x) * axis[1] - (point.y - origin.y) * axis[0]) * 1.2 }))
+    .sort((a, b) => a.cost - b.cost)[0]?.point.node.id ?? selected;
 }

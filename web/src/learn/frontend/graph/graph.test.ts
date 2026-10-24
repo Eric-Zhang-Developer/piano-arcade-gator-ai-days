@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { actionFor, byId, demoGoal, demoLearner, recommendation, skills } from './data';
-import { layoutGraph, mapSize, neighbor } from './layout';
+import { actionFor, byId, demoGoal, demoLearner, recommendation, rootRelationships, skills } from './data';
+import { layoutGraph, neighbor } from './layout';
+import { mapSize, placeLabels, presentation, projectGraph } from './projection';
 
 describe('demo graph activity choices', () => {
   it('selects goal-related reachable activities that match available lesson content', () => {
@@ -29,13 +30,29 @@ describe('demo graph activity choices', () => {
 describe('stable subject layout and navigation', () => {
   it('places every node once, with readable broad clusters and separate hierarchy/prerequisites', () => {
     for (const domain of ['theory', 'procedure'] as const) {
-      const points = layoutGraph(domain);
+      const points = layoutGraph(domain, rootRelationships);
       expect(new Set(points.map((p) => p.node.id)).size).toBe(skills.filter((s) => s.domain === domain).length);
-      expect(points.filter((p) => p.depth === 0)).toHaveLength(4);
+      expect(points.filter((p) => p.depth === 0)).toHaveLength(6);
+      expect(points.length).toBeGreaterThanOrEqual(54);
       expect(points.some((p) => p.depth === 2)).toBe(true);
-      expect(points.every((p) => p.x > 20 && p.x < mapSize.width - 20 && p.y > 20 && p.y < mapSize.height - 20)).toBe(true);
-      expect(layoutGraph(domain)).toEqual(points);
+      expect(points.every(p => Number.isFinite(p.x) && Number.isFinite(p.y) && p.z === 0)).toBe(true);
+      const projected = projectGraph(points);
+      expect(projected.every(p => p.screenX > 20 && p.screenX < mapSize.width - 20 && p.screenY > 20 && p.screenY < mapSize.height - 20)).toBe(true);
+      expect(projected.map(({ x, y, z }) => ({ x, y, z }))).toEqual(points.map(({ x, y, z }) => ({ x, y, z })));
+      expect(layoutGraph(domain, rootRelationships)).toEqual(points);
       for (const node of skills) for (const id of [...node.prerequisites, ...(node.parentId ? [node.parentId] : [])]) expect(byId.has(id)).toBe(true);
+    }
+  });
+
+  it('keeps Procedure captions clear of satellites, including faint previews at laptop size', () => {
+    const points = projectGraph(layoutGraph('procedure', rootRelationships), 1232, 636);
+    const { visible, preview } = presentation(points, null, 1232, 636);
+    const labels = placeLabels(points, visible, preview, null, null, 1, 1232, 636);
+    expect(labels.filter(label => label.root)).toHaveLength(6);
+    for (const label of labels) for (const point of points.filter(point => visible.has(point.node.id))) {
+      const radius = point.depth === 0 ? 9 : point.depth === 1 ? 4.5 : 2.8;
+      const overlaps = point.screenX + radius > label.x && point.screenX - radius < label.x + label.width && point.screenY + radius > label.y && point.screenY - radius < label.y + label.height;
+      expect(overlaps, `${label.text} obscures ${point.node.title}`).toBe(false);
     }
   });
   it('moves selection spatially without changing learner state', () => {

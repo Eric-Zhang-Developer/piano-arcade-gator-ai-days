@@ -5,7 +5,7 @@ import type { Chart, GameEvent, InputDevice, InputEvent, Take } from "../contrac
 import { judgeTake, noteTimeMs } from "../game/core/judge";
 import { barOf, takeRows } from "./mapping";
 import { enqueue, flush, readOutbox } from "./outbox";
-import { barTrends, takeHistory, weakestBars } from "./progress";
+import { barTrends, formatDuration, sessionsFrom, sessionSummary, takeHistory, weakestBars } from "./progress";
 import { createSavePlugin, report, sameChart, unsavableReason, type LoadChart } from "./save-plugin";
 
 const chart: Chart = JSON.parse(readFileSync(new URL("../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
@@ -247,5 +247,37 @@ describe("save plugin", () => {
   it("sameChart compares notes, tempo and meter", () => {
     expect(sameChart(chart, structuredClone(chart))).toBe(true);
     expect(sameChart(chart, { ...chart, beatsPerBar: chart.beatsPerBar + 1 })).toBe(false);
+  });
+});
+
+describe("profile sessions", () => {
+  const row = (n: number, song: string, at: string, rank: string, events: Take["events"]) => {
+    const take = { ...play(() => 0), events };
+    const r = takeRows(ids(n), chart, take, judgeTake(chart, take));
+    return { take: { ...r.take, song_id: song, rank: rank as TakeRowRank, created_at: at }, title: song, composer: "-" };
+  };
+  type TakeRowRank = ReturnType<typeof takeRows>["take"]["rank"];
+  const ev = (t: number, off: number | null) => ({ pitch: 60, velocity: 80, timeMs: t, offTimeMs: off });
+
+  it("lists every session newest first, with how long it was played", () => {
+    const rows = sessionsFrom([
+      row(1, "twinkle", "2026-10-24T10:00:00Z", "C", [ev(500, 900), ev(30000, 30400)]),
+      row(2, "minuet-g", "2026-10-24T12:00:00Z", "D", [ev(1000, null), ev(61500, null)]),
+    ]);
+    expect(rows.map((r) => [r.song_id, r.duration_ms])).toEqual([["minuet-g", 61500], ["twinkle", 30400]]);
+  });
+
+  it("totals sessions, time, songs and the best rank", () => {
+    const rows = sessionsFrom([
+      row(1, "twinkle", "2026-10-24T10:00:00Z", "C", [ev(0, 30000)]),
+      row(2, "twinkle", "2026-10-24T11:00:00Z", "A", [ev(0, 30000)]),
+      row(3, "minuet-g", "2026-10-24T12:00:00Z", "D", [ev(0, 61500)]),
+    ]);
+    expect(sessionSummary(rows)).toEqual({ sessions: 3, totalMs: 121500, songs: 2, bestRank: "A" });
+    expect(sessionSummary([])).toEqual({ sessions: 0, totalMs: 0, songs: 0, bestRank: null });
+  });
+
+  it("formats durations as m:ss and h:mm:ss", () => {
+    expect([formatDuration(0), formatDuration(61500), formatDuration(3723000)]).toEqual(["0:00", "1:02", "1:02:03"]);
   });
 });

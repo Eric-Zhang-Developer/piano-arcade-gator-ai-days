@@ -1,16 +1,28 @@
 # Roadmap
 
-<!-- The why and the shape of the plan, for people. What ships when, and in what order, lives in
-specs/milestones.toml; each feature is a folder in specs/features/. Keep the scheduled work at about 2x what agents
-can finish before the next milestone. -->
-
 ## Where this is going
-<!-- 3–5 lines: the end state, and what each milestone proves on the way there. -->
+A real piano that plays like an arcade machine, and actually teaches you. The game lane (Eric) makes playing feel
+great and judges every note; the learning lane (teammate) reads your takes and tells you what to fix. Milestones set
+the order only: `start` in `milestones.toml` is empty, so no deadlines are enforced (decision 001, row 15).
 
 ## Milestones
-<!-- One line per milestone in milestones.toml: what's true when it ships. Hackathon: stage the ambition so the big
-idea never risks the safe one (safe demo, core, ambitious target, one stretch). -->
--
+- **playable:** `core-loop`. Twinkle plays on the real piano and on laptop keys, every note judged, with a results
+  screen. The skeleton and the shared formats everyone builds on.
+- **arcade:** `hud`, `juice-visual`, `juice-sound`, `midi-watchdog`. It feels like an arcade, and the one known MIDI
+  risk is handled. These run in parallel once `core-loop` merges.
+- **submission:** `bar-loop`, `piano-out`, `song-select`. The coach's drill can play, the piano plays your take back,
+  and there's a front door for the library.
+
+## Learning lane (provisional, not scheduled)
+`coach`, `practice-mode`, `chart-compiler`, `song-rip-spike`. Their specs record what was discussed; the learning
+lane's person fills them in, sets an `assignee` and adds them to a milestone. The game lane provides `Results`,
+`Take` and `Chart` (`web/src/contracts/`) and the `bar-loop` link.
+
+## Open
+- The challenge statement's technology (first public in the past 12 months, central to the project) isn't chosen.
+- The learning lane's person and GitHub handle, for `AGENTS.md` Lanes and `.github/CODEOWNERS`.
+- Flat or mild perspective: Eric decides after playing both (`core-loop`'s perspective setting).
 
 ## Not doing
--
+See `mission.md` Not doing. Also out for now: the mascot (a Maybe if there's time), the LED strip, the in-app camera
+overlay (the overhead hands shot is made in the video edit), and "Golden" unless `song-rip-spike` passes.

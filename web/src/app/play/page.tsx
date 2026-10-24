@@ -10,6 +10,7 @@ import { Judge, noteTimeMs } from "../../game/core/judge";
 import { keysDevice, midiDevice, testDevice } from "../../game/core/input";
 import { describeTiming, timingSummary, type TimingSummary } from "../../game/timing";
 import { SfxControls } from "../../game/sound/SfxControls";
+import { ReplayOnPiano } from "../../game/piano-out/ReplayOnPiano";
 import {
   GOOD_MS,
   LATENCY_MAX,
@@ -53,6 +54,7 @@ export default function Play() {
   const chartRef = useRef<Chart | null>(null);
   const paramsRef = useRef<URLSearchParams | null>(null);
   const latencyRef = useRef(0);
+  const backgroundRef = useRef<HTMLDivElement>(null);
   const highwayRef = useRef<HTMLCanvasElement>(null);
   const layerRefs = useRef<(HTMLCanvasElement | null)[]>([]);
   const stopRef = useRef<() => void>(() => {});
@@ -113,7 +115,17 @@ export default function Play() {
       inputDevice: test ? "test" : "keys",
       events: [],
     };
-    const hw: HighwayState = { nowMs: -settings.countInBeats * mpb, noteState: new Map(), pressed: new Set(), latest: null, countInBeat: null };
+    // The first plugin with a background gets an empty element behind the highway, once per take.
+    const bgEl = backgroundRef.current;
+    const background = bgEl ? (plugins.find((p) => p.background)?.background?.(bgEl) ?? null) : null;
+    const hw: HighwayState = {
+      nowMs: -settings.countInBeats * mpb,
+      noteState: new Map(),
+      pressed: new Set(),
+      latest: null,
+      countInBeat: null,
+      backdropAlpha: background ? settings.stageBackdropAlpha : 1,
+    };
     const emit = (e: GameEvent) => {
       if (e.type === "noteHit") hw.latest = { judgment: e.judgment, offsetMs: e.offsetMs, atMs: e.atMs };
       if (e.type === "noteMiss") hw.latest = { judgment: "MISS", offsetMs: null, atMs: e.atMs };
@@ -165,12 +177,19 @@ export default function Play() {
     window.addEventListener("resize", resize);
 
     let raf = 0;
+    let idleRaf = 0;
     let lastBeat = 0;
     let done = false;
+    // After the take, the background keeps animating behind the results screen until the next take or unmount.
+    const idle = () => {
+      background?.frame({ ...layout!, nowMs: performance.now() - zeroPerf });
+      idleRaf = requestAnimationFrame(idle);
+    };
     const finish = (now: number) => {
       done = true;
       const r = judge.finish(now);
       stop();
+      if (background) idleRaf = requestAnimationFrame(idle);
       if (window.__pianoArcade) window.__pianoArcade.results = r;
       setResults(r);
       setTiming(timingSummary(chart, take, r, latencyRef.current));
@@ -193,6 +212,7 @@ export default function Play() {
         lc.clearRect(0, 0, f.width, f.height);
         p.draw(lc, f);
       });
+      background?.frame(f);
 
       if (now > lastNoteMs + GOOD_MS + Math.max(0, latencyRef.current) + INPUT_GRACE_MS + END_TAIL_MS) return finish(now);
       if (!done) raf = requestAnimationFrame(frame);
@@ -204,7 +224,11 @@ export default function Play() {
       window.removeEventListener("resize", resize);
       for (const d of devices) d.stop();
     }
-    stopRef.current = stop;
+    stopRef.current = () => {
+      stop();
+      cancelAnimationFrame(idleRaf);
+      background?.dispose();
+    };
 
     if (window.__pianoArcade) {
       Object.assign(window.__pianoArcade, {
@@ -230,6 +254,7 @@ export default function Play() {
 
   return (
     <main style={{ position: "fixed", inset: 0, overflow: "hidden" }}>
+      <div ref={backgroundRef} style={canvasStyle} />
       <canvas ref={highwayRef} style={canvasStyle} />
       {plugins.map((p, i) => (
         <canvas key={p.id} ref={(c) => void (layerRefs.current[i] = c)} style={canvasStyle} />
@@ -316,6 +341,7 @@ function ResultsScreen({
       <button style={{ ...button, marginTop: 24 }} onClick={onRetry} autoFocus>
         Retry
       </button>
+      <ReplayOnPiano style={{ ...button, marginTop: 24, marginLeft: 12, background: "#ddd" }} />
     </section>
   );
 }

@@ -137,6 +137,10 @@ async function main() {
     if (sim.PERFECT !== n || sim.MISS !== 0 || sim.extra !== 0) fail.push(`/sim screen ${JSON.stringify(sim)}, want ${n} PERFECT`);
     if (!midiStatus?.includes("MIDI: Portable Grand")) fail.push("/sim: the game didn't pick the fake Portable Grand");
     if (keyMessages !== 2 * n) fail.push(`/sim log shows ${keyMessages} key messages, want ${2 * n}`);
+    // play-slots: piano-out's "Replay on piano" is a results panel now, in its own slot.
+    if ((await game.locator('[data-testid="slot-piano-out"] [data-testid="replay"]').count()) !== 1) {
+      fail.push('/sim results: no "Replay on piano" inside slot-piano-out');
+    }
     if (fail.length) throw new Error(fail.join("; "));
     say(`verify: pass, ${n}/${n} PERFECT with test input and through the MIDI path on /sim (evidence: ${out})`);
   } catch (e) {

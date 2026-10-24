@@ -3,7 +3,8 @@
 Read [Product philosophy](../../../PRODUCT_PHILOSOPHY.md) first. The three
 previous Practice Room, Field Notes and After Hours directions were rejected.
 This replaces their review implementation with one proposed Operate interface;
-canonical `/learn` keeps the incumbent DESIGN and behavior until review.
+canonical `/learn` keeps its incumbent branding. Its prepared theory handoff
+also receives the scoped rendering repair described below.
 The user selected the center upright inviting alligator, not a complete brand.
 
 ## Task and visual system
@@ -12,7 +13,10 @@ Open `/learn/brand-preview` on desktop. A compact product header leads to a
 foreground assignment rail beside the actual read-only mastery graph. The real
 song, key, phrase count and three questions make Start concrete. The selected
 capable guide travels to the actual phrase-endings target, then settles into a
-portrait beside the real TheoryWorkspace. Stop during travel and Back to map
+reserved 112px full-body slot beside the real TheoryWorkspace. One image and size
+persist throughout. The map fades during a 550ms settle before a 200ms lesson
+reveal; the guide never crosses visible teaching content or changes crops.
+Stop during travel/docking and Back to map
 preserve deliberate control; actual local Resume retains answer, history and
 reference state. Replay explicitly resets only this isolated study session.
 No new model, progress inference or task-planning behavior is implied.
@@ -26,7 +30,8 @@ answer feet share a restrained piano-key shape. No marketing hero, decorative
 keyboard wall, palette collage or stock card grid is used.
 
 Neutral review chrome contains the authored-demo/sample-learner/local-session
-disclosure, Replay, Current version and a reference/application panel. These
+disclosure, Replay, an explicit Prior UI link and a reference/application panel.
+The incumbent header identifies Prior UI and links back to Proposed preview. These
 controls are outside the student UI. Opening references makes the student flow
 inert so covered controls cannot receive focus. No main-product rollout, rename
 or publication is authorized by this study.
@@ -57,21 +62,30 @@ helper, then the selected center was cropped and background-removed. A known
 white-matte edge was cleaned without changing alpha or identity. Guide SHA256:
 `49c9ac5ce5483b5c6e933d85cb1f422f4c92ab849d8bd74499fec1091d59e9b2`;
 avatar: `f6240bd553c093adba9cb15136b430dd1f4d08d5eaddbb4eae1fda7a824e85c4`.
-Only these true-alpha PNGs ship in the study. This is one still pose with code-
-driven travel and a full-body-to-portrait handoff, not a generated animation,
-motion rig or additional listening/feedback poses.
+The full guide is the only image rendered in the corrected handoff; the earlier
+portrait asset remains historical and is not crossfaded into it. This is one
+illustrated still pose with code-driven position changes, not a generated
+animation, motion rig, stride or additional listening/feedback poses.
 
 ## Verification scope
 
-One bounded visible CFT desktop batch at actual 1440x900 and 1280x800 covers
-home/real lesson, loaded font families, actual map target and all six roots,
-double-entry guard and question-two draft/history/Reference Resume. One correction
-batch removes redundant copy, moves provenance into review chrome, replaces the
-preliminary edged cutout with the cleaned guide/portrait and shields the student
-flow while review references are open. The commissioned exact-path confirmation passes: current question fully visible
-after restored history, exact draft and Reference retained, and blue focus.
-Native keyboard, reduced-motion execution, audio, offline interruption and full
-completion remain untested here; no CI or production acceptance is implied.
+The initial frozen/end-state study checks did not establish motion quality. The
+reported failure was reproduced at normal speed in visible CFT on both prior
+and proposed paths: proposed crop ghosts/title overlap, prior score overlap and
+no settled tutor. Removing one crop alone still overlapped the title, confirming
+that reveal timing/placement also needed correction. Native browser trace frames
+and irregular full-size captures record the before/after without RAF or duration
+changes. The independent normal-speed correction pass at 1440x900/1280x800
+confirms one guide, no teaching-content overlap, persistent accompaniment and
+exact Q2 draft/history/Reference Resume with the full prompt visible.
+
+Scoped checks cover duplicate Start, Stop during docking with no delayed entry,
+offline cancellation/reconnect and the simulated reduced-motion code branch.
+The actual OS reduced-motion setting, native keyboard activation, audio and full
+completion were not tested. Programmatic heading focus remains semantic without
+a control-shaped outline; keyboard control rings remain. The standing pose and
+transformed-raster softness remain limitations. No CI, publication or broader
+animation-quality acceptance is implied.
 
 Source: `web/src/learn/frontend/brand-preview/`, its Next route and the optional
 lesson tutor hook. Desktop only. No mobile implementation or testing.

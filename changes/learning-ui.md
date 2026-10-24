@@ -1,8 +1,8 @@
 ## What shipped
-Local review-only `/learn/brand-preview` replaces three rejected studies with one task-first assignment/map/real-lesson prototype, actual fonts and the user-selected upright gator. Canonical `/learn` stays unchanged.
+Local rendering repair: proposed guide keeps one 112px full-body silhouette and settles into a reserved slot before lesson reveal; prior UI retains its existing guide beside the question. No crop ghost, racing shrink or score/title crossing. Prior/proposed navigation is explicit.
 ## Where it lives
-`web/src/learn/frontend/brand-preview/`, its Next route, two true-alpha `web/public/learning/mentor-gator` PNGs and optional guided lesson hook. `specs/features/learning-ui/BRAND_STUDY.md` records six official references, transfer boundaries and asset provenance.
+`web/src/learn/frontend/brand-preview/`, shared guided entry/lesson shell and `/learn/understand`; `specs/features/learning-ui/BRAND_STUDY.md` records actual motion evidence and limitations. Branding remains a proposal.
 ## How to check it
-Scoped eslint/typecheck and 15 graph/study cases pass. Visible CFT 1440x900/1280x800 verifies loaded fonts, real travel/arrival, double-entry guard and exact Q2 draft/history/Reference Resume. Final affected-case confirmation passes fully visible restored prompt and blue focus; no page overflow. Full suite/build not repeated for this bounded study.
+Scoped eslint/typecheck and 15 graph/study cases pass. Independent normal-speed CFT Start/Resume at1440/1280 confirms coherent guide, persistent tutor and exact Q2 draft/history/Reference with visible prompt. Stop during docking, duplicate Start, offline cleanup/reconnect and simulated reduced-motion branch pass. Native trace filmstrips preserve real timing.
 ## Gaps
-Interface remains a proposal; only mascot is selected. One still pose with code-driven travel, no generated animation. Authored sample state and local sessions, no connected tutor or progress inference. Native keyboard/reduced-motion execution, audio, offline interruption and completion not browser-tested. Desktop only; no publication, CI or canonical rollout claim.
+Single illustrated pose with positional motion, no rigged flight/stride or new render. Transformed raster can soften while moving; no persistent source/aspect defect established. Actual OS reduced motion, native keyboard activation, audio and completion untested. Desktop only; no publication, CI or canonical branding rollout.

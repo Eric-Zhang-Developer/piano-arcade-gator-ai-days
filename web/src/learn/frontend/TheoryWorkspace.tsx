@@ -9,7 +9,7 @@ import { useTheorySession } from './LearningSessions';
 import { playPhrase } from './audio';
 import styles from './learning.module.css';
 
-export function TheoryWorkspace({ review = false, guide }: { review?: boolean; guide?: { instruction: string; imageSrc?: string } }) {
+export function TheoryWorkspace({ review = false, guide }: { review?: boolean; guide?: { instruction: string; imageSrc?: string; size?: number } }) {
   const guided = Boolean(guide);
   const items = review ? reviewQuestions : questions;
   const { state, update, setPaneWidth } = useTheorySession(review);
@@ -72,7 +72,7 @@ export function TheoryWorkspace({ review = false, guide }: { review?: boolean; g
     <div ref={studio} className={styles.theoryStudio} style={{ '--question-width': `${paneWidth}%` } as CSSProperties}>
       <section className={styles.questionPane} aria-label="Current question">
         <header className={styles.lessonFocus}>
-          {guide ? <div className={styles.tutorHeading}><Image data-tutor-perch src={guide.imageSrc ?? "/learning/companion-gator.svg"} alt="Your gator guide" width={56} height={56} unoptimized/><h1 tabIndex={-1}>{review ? 'Recall a sense of home' : 'Hearing a phrase come home'}</h1></div> : <h1>{review ? 'Recall a sense of home' : 'Hearing a phrase come home'}</h1>}
+          {guide ? <div className={styles.tutorHeading}><Image data-tutor-perch src={guide.imageSrc ?? "/learning/companion-gator.svg"} alt="Your gator guide" width={guide.size ?? 56} height={guide.size ?? 56} style={{width:guide.size ?? 56,height:guide.size ?? 56}} unoptimized/><h1 tabIndex={-1}>{review ? 'Recall a sense of home' : 'Hearing a phrase come home'}</h1></div> : <h1>{review ? 'Recall a sense of home' : 'Hearing a phrase come home'}</h1>}
           <p>{guide?.instruction ?? (review ? 'Review theory · Try each answer before opening the reference.' : 'Learn theory · Explore with the score and reference.')}</p>
           <span>{done ? 'Complete' : `Question ${index+1} of ${items.length}`}</span>
         </header>

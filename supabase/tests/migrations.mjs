@@ -123,6 +123,11 @@ const [empty] = await rows(`select duration_ms from session_history where take_i
 assert.equal(empty.duration_ms, 0);
 say("ok  session_history lists each take with its song title and how long it was played");
 
+// hand_stats: per player, song and hand, every judged note.
+const hs = await rows(`select hand, notes, perfect, great, good, miss, mean_offset_ms from hand_stats where player_id = '${player}' and song_id = 'twinkle' order by hand`);
+assert.ok(hs.length >= 1 && hs.every((h) => Number(h.notes) === Number(h.perfect) + Number(h.great) + Number(h.good) + Number(h.miss)), "every note is one judgment");
+say("ok  hand_stats counts each hand's notes by judgment, with timing");
+
 const [trend] = await rows(`select notes, misses from bar_trends where player_id = '${player}' and song_id = 'twinkle'`);
 assert.deepEqual([Number(trend.notes), Number(trend.misses)], [6, 1]);
 say("ok  bar_trends counts the saved notes");

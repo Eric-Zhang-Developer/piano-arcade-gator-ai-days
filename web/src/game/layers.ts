@@ -26,6 +26,7 @@ import { scenes } from "./scenes";
 import { evenness } from "./evenness";
 import { dynamics } from "./dynamics";
 import { records } from "./records";
+import { recordMoment } from "./record-moment";
 import { replayView } from "./replay-view";
 import { eventSounds } from "./sound";
 import { simPlugin } from "./sim/plugin";
@@ -68,7 +69,8 @@ export const plugins: GamePlugin[] = [
   beatTrack(),
   midiWatchdog(), // reconnects a piano that goes silent mid-song
   waitMode(), // start panel: Learn it first; results panel after a wait-mode take: Play it judged, on top
-  records(), // results panel: NEW RECORD, initials and the top 5, first under the score
+  records(), // results panel: initials and the top 5, first under the score (a NEW RECORD take's entry is record-moment's)
+  recordMoment(), // results panel: NEW RECORD stamps after the rank, with the high-score entry; after records, which sets the outcome
   dynamics(), // results panel: how loud you played against the score, above "Replay on piano"
   replayView(), // results panel: Watch replay, the take on the highway in time with piano-out
   pianoOut(), // records the take for "Replay on piano"

@@ -1,6 +1,8 @@
 // Piano out: replay the last take on the piano (spec: piano-out). The plugin records the take from the input it
 // wraps; ReplayOnPiano (on the results screen) plays it back through the piano's MIDI output.
+import { createElement, type CSSProperties } from "react";
 import type { GamePlugin, InputDevice, Take, TakeEvent } from "../../contracts";
+import { ReplayOnPiano } from "./ReplayOnPiano";
 
 export const pianoOutSettings = {
   leadMs: 200, // from pressing Replay to the first note
@@ -94,9 +96,20 @@ export function stopReplay(): void {
   set({ playing: false });
 }
 
+const replayStyle: CSSProperties = {
+  padding: "12px 32px",
+  fontSize: 20,
+  borderRadius: 8,
+  border: "none",
+  background: "#ddd",
+  color: "#000",
+  cursor: "pointer",
+};
+
 export function pianoOut(): GamePlugin {
   let events: TakeEvent[] = [];
-  let zero = 0; // performance.now() at songStart
+  let zero = 0; // performance.now() at songStart, moved later by each pause so the replay has no gap
+  let pausedAt = 0;
   let recording = false;
   let chartId = "";
   let inputKind: Take["inputDevice"] = "keys";
@@ -145,11 +158,22 @@ export function pianoOut(): GamePlugin {
         recording = true;
         set({ take: null, canReplay: false });
       }
+      // play-slots: keys while paused aren't part of the take, and the pause isn't replayed as silence.
+      if (e.type === "pause" || e.type === "quit") {
+        recording = false;
+        pausedAt = performance.now();
+      }
+      if (e.type === "resume") {
+        zero += performance.now() - pausedAt;
+        recording = true;
+      }
       if (e.type === "songEnd") {
         recording = false;
         const take: Take = { chartId, startedAt: new Date().toISOString(), latencyOffsetMs: 0, inputDevice: inputKind, events };
         set({ take, canReplay: !!output && events.length > 0 });
       }
     },
+    // "Replay on piano" on the results screen, only when there's a piano to replay on.
+    resultsPanel: () => (state.canReplay ? createElement(ReplayOnPiano, { style: replayStyle }) : null),
   };
 }

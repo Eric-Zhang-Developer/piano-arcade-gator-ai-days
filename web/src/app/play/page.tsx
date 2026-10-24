@@ -10,7 +10,6 @@ import { Judge, noteTimeMs } from "../../game/core/judge";
 import { keysDevice, midiDevice, testDevice } from "../../game/core/input";
 import { describeTiming, timingSummary, type TimingSummary } from "../../game/timing";
 import { SfxControls } from "../../game/sound/SfxControls";
-import { ReplayOnPiano } from "../../game/piano-out/ReplayOnPiano";
 import { nextPause, pauseClock, type PauseAction, type PauseMode } from "../../game/play-slots";
 import { PauseOverlay, Slots } from "../../game/play-slots/ui";
 import {
@@ -421,7 +420,6 @@ function ResultsScreen({
       <button style={{ ...button, marginTop: 24 }} onClick={onRetry} autoFocus>
         Retry
       </button>
-      <ReplayOnPiano style={{ ...button, marginTop: 24, marginLeft: 12, background: "#ddd" }} />
     </section>
   );
 }

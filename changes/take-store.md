@@ -19,6 +19,6 @@ CAPTCHA on anonymous sign-ins not set up. (Migrations 0001–0003 ran by hand an
 `supabase/push.sh --status` matches and a dry run says the live database is up to date.)
 Google sign-in (link, sign in on another device, merge that device's takes, sign out) is built and unit-tested
 (`merge.test.ts`, 5/5) and `merge_player` is live (checked with two throwaway players), and Sharan signed in with Google on `/progress`
-(Oct 24 2026: one Google user in Auth). Linking an anonymous player and the second-device merge not yet tried by a person. Drills, one-hand, chunk, versus, wait-mode, bot and fake-piano takes aren't saved (the server can't re-judge them yet);
-the player isn't told. Charts must live at `public/songs/<id>/chart.json`, read from disk: on Vercel that needs file tracing for
+(Oct 24 2026: one Google user in Auth). Linking an anonymous player and the second-device merge not yet tried by a person. Drills, Easy, one-hand, chunk, versus, wait-mode, bot and fake-piano takes aren't saved (the server can't re-judge them
+yet); the results screen says so, in the Details section (where /play puts plugin panels), not next to the score. Charts must live at `public/songs/<id>/chart.json`, read from disk: on Vercel that needs file tracing for
 `public/songs` (local demo is fine). No per-player rate limit on saves.

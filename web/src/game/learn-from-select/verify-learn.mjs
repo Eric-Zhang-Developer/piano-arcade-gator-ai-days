@@ -71,7 +71,7 @@ async function home() {
 await home();
 const ids = await page.locator("ol a").evaluateAll((as) => as.map((a) => new URL(a.href).searchParams.get("song")));
 const hint = await page.getByText("choose ·").textContent();
-check(hint === "↑ ↓ choose · Enter play · L learn", `the hint reads "${hint}"`);
+check(hint === "↑ ↓ choose · Enter play · L learn · E easy", `the hint reads "${hint}"`);
 
 // 1. ↓ then L: the second song in wait mode.
 await page.keyboard.press("ArrowDown");

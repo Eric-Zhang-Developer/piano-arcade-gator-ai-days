@@ -21,9 +21,10 @@ the order only: `start` in `milestones.toml` is empty, so no deadlines are enfor
   Twinkle, on the piano.
 
 ## Learning lane (provisional, not scheduled)
-`coach`, `practice-mode`, `chart-compiler`, `song-rip-spike`. Their specs record what was discussed; the learning
-lane's person fills them in, sets an `assignee` and adds them to a milestone. The game lane provides `Results`,
-`Take` and `Chart` (`web/src/contracts/`) and the `bar-loop` link.
+`coach`, `practice-mode`, `chart-compiler`. Their specs record what was discussed; the learning lane's person fills
+them in, sets an `assignee` and adds them to a milestone. The game lane provides `Results`, `Take` and `Chart`
+(`web/src/contracts/`) and the `bar-loop` link. `song-rip-spike` moved to Eric's lane on 2026-10-24: a spike, in no
+milestone, scored against the Flower Dance MIDI.
 
 ## Lights
 Milestone **lights**, between `arcade` and `submission`: `led-strip` (Sharan) and `led-game` (Eric). The keys light
@@ -58,6 +59,17 @@ Milestone **encore**, after `showcase`: the rest of the overnight batch, by depe
 shows. In order: `replay-view`, `wait-mode`, `highway-zoom`, `ghost`, `chord-sync`, `tempo-curve`, `song-preview`,
 `song-requests` (an issue labeled `song-request` becomes a chart; `AGENTS.md`, Song requests), `piano-voice`,
 `take-midi`, and last `versus` and `cabinet`, which are made for the booth.
+
+## Extras
+Milestone **extras**, after `judging`: ten backlog specs Eric promoted on 2026-10-24 to keep the queue fed while he
+was away, in his order: `help-overlay`, `watch-demo`, `phone-guard`, `sheet-beams`, `sheet-pickups`, `key-preview`,
+`song-options`, `sheet-review`, `rewind`, `score-card`. `song-options` waits on `easy-charts`.
+Ahead of them, on his word: `level-forge` phase 1 (a local agent session makes a level from a public-domain source,
+no API spend), then `veritas` (`/veritas`: the judge catching planted mistakes, live) and `veritas-polish`.
+
+## Spikes
+Milestone **spikes**, after `extras`: `simon-says-spike`, then `restyle-spike`. About 3 hours each, findings whatever
+the state, never on the demo path by themselves, no new spike work after Sunday noon.
 
 ## Open
 - The challenge statement's technology (first public in the past 12 months, central to the project) isn't chosen.

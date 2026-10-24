@@ -64,13 +64,11 @@ function StepLine({ index, of, step }: { index: number; of: number; step: Step }
 function AfterPlay({ params, results, list, index }: { params: URLSearchParams; results: Results; list: Chunk[]; index: number }) {
   const go = nextAfter(list, index, results.accuracy);
   const ref = useRef<HTMLAnchorElement>(null);
-  // An effect runs after Retry's autoFocus, so the way on takes focus and Enter moves on. Focus alone would scroll the
-  // link to the screen's edge, under the HUD; the panel is centred instead, its verdict in view.
+  // An effect runs after Retry's autoFocus, so the way on takes focus and Enter moves on. The panel is featured in the
+  // first view on a practice take (results-layout, #294), so focus scrolls nothing.
   const moveOn = go !== null;
   useEffect(() => {
-    if (!moveOn || !ref.current) return;
-    ref.current.focus({ preventScroll: true });
-    ref.current.parentElement?.scrollIntoView({ block: "center" });
+    if (moveOn) ref.current?.focus();
   }, [moveOn]);
   const pct = `${(results.accuracy * 100).toFixed(1)}%`;
   const gate = `${Math.round(chunkSettings.passAccuracy * 100)}%`;

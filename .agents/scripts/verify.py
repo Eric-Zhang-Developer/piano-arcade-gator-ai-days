@@ -13,9 +13,11 @@ outside the repo's files, kept after the run. Everything the command started is 
 ([verify].timeout seconds), so a server it launched can't leak into the next run.
 --cmd runs a feature check instead of [verify].command, with the same placeholders, timeout, cleanup and evidence.
 One headless check at a time per machine: every run first takes <git common dir>/verify.lock (a directory: mkdir
-takes it, rmdir frees it, the same lock as the shell loop `until mkdir "$L"; do ...; done`). While another run holds
-it, this one prints `verify: waiting for another check`; the wait doesn't count toward the timeout. A lock older than
-LOCK_STALE_S is taken over: no run holds it that long, since [verify].timeout is lower.
+takes it, rmdir frees it, the same lock as the shell loop `until mkdir "$L"; do ...; done`). The holder writes its pid
+to verify.lock/pid. While another run holds it, this one prints `verify: waiting for another check`; the wait doesn't
+count toward the timeout. A lock is taken over only when its pid is dead, or when it has no pid (a shell holder) and is
+older than LOCK_STALE_S. A live holder is never robbed, however long it runs: a hung check ends at its own timeout.
+(A shell loop's stale `rmdir "$L"` fails on a lock with a pid in it, so it can't rob verify.py either.)
 Exit codes: 0 pass or not set up, 1 fail, timeout or a broken command template, 2 usage.
 """
 
@@ -41,6 +43,28 @@ def evidence_dir(root: Path, slug: str) -> Path:
 LOCK_STALE_S = 600
 
 
+def holder_gone(lock: Path) -> bool:
+    """Whether the lock's holder has died without freeing it; see the module doc."""
+    try:
+        pid = int((lock / "pid").read_text())
+    except FileNotFoundError:
+        return time.time() - lock.stat().st_mtime > LOCK_STALE_S
+    except ValueError:
+        return False  # being written
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return True
+    except PermissionError:
+        pass  # alive, another user's
+    return False
+
+
+def free(lock: Path) -> None:
+    (lock / "pid").unlink(missing_ok=True)
+    lock.rmdir()
+
+
 @contextmanager
 def machine_lock(root: Path):
     """Hold <git common dir>/verify.lock while the body runs; see the module doc."""
@@ -49,11 +73,12 @@ def machine_lock(root: Path):
     while True:
         try:
             lock.mkdir()
+            (lock / "pid").write_text(str(os.getpid()))
             break
         except FileExistsError:
             try:
-                if time.time() - lock.stat().st_mtime > LOCK_STALE_S:
-                    lock.rmdir()  # stale: its holder died without freeing it
+                if holder_gone(lock):
+                    free(lock)
                     continue
             except FileNotFoundError:
                 continue  # freed between mkdir and stat
@@ -67,7 +92,7 @@ def machine_lock(root: Path):
         yield
     finally:
         try:
-            lock.rmdir()
+            free(lock)
         except FileNotFoundError:
             pass
 

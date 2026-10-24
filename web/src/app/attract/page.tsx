@@ -124,7 +124,10 @@ export default function AttractPage() {
         return setPlaying(false);
       }
       // Badly late (a stalled tab, the first WebGL frames): move the clock on rather than rush notes to catch up.
-      const late = performance.now() - (origin.current + (wall ? ss[next].wallMs : ss[next].atMs));
+      const dueMs = origin.current + (wall ? ss[next].wallMs : ss[next].atMs);
+      const late = performance.now() - dueMs;
+      // The clock's own record of each step, for verify-replay: when it was due and how late its timer fired.
+      performance.mark("attract-step", { detail: { step: next, dueMs, late, reanchored: late > MAX_LATE_MS } });
       if (late > MAX_LATE_MS) origin.current += late;
       if (!wall) {
         const left = noteLeftMs(origin.current, ss[next], performance.now());

@@ -33,14 +33,16 @@ const TONES: Record<string, string> = {
 
 const LOOP_SUFFIX = / · bars \d+–\d+ at \d+%$/; // bar-loop's title suffix
 
-/** What the take was, when it wasn't the plain song: bar loop or tempo, one hand, versus. Null for the whole song. */
-export function practiceLine(params: URLSearchParams): string | null {
+/**
+ * What the take was, when it wasn't the plain song: a bar loop, one hand, versus. Null for the whole song. Only what
+ * /play applied: tempo without from/to changes nothing until #547 lands, and a one-hand chart ignores `hands`.
+ */
+export function practiceLine(params: URLSearchParams, chart?: Chart): string | null {
   const parts: string[] = [];
-  const tempo = params.get("tempo") ?? "100";
-  if (params.has("from") || params.has("to")) parts.push(`Bars ${params.get("from")}–${params.get("to")} at ${tempo}%`);
-  else if (params.has("tempo")) parts.push(`Whole song at ${tempo}%`);
+  if (params.has("from") || params.has("to")) parts.push(`Bars ${params.get("from")}–${params.get("to")} at ${params.get("tempo") ?? "100"}%`);
   const hands = params.get("hands");
-  if (hands === "R" || hands === "L") parts.push(hands === "R" ? "Right hand" : "Left hand");
+  const twoHands = !chart || (chart.notes.some((n) => n.hand === "L") && chart.notes.some((n) => n.hand === "R"));
+  if ((hands === "R" || hands === "L") && twoHands) parts.push(hands === "R" ? "Right hand" : "Left hand");
   if (params.get("versus") === "1") parts.push("Versus");
   return parts.length ? parts.join(" · ") : null;
 }
@@ -54,7 +56,7 @@ export function cardModel(chart: Chart, results: Results, score: number, date: D
   return {
     title,
     composer: chart.composer,
-    practice: practiceLine(params),
+    practice: practiceLine(params, chart),
     rank: results.rank,
     score: score.toLocaleString("en-US"),
     accuracy: `${(results.accuracy * 100).toFixed(1)}%`,

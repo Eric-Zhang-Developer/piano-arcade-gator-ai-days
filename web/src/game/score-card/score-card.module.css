@@ -1,4 +1,11 @@
 /* A secondary action beside Retry and Songs: results-layout's Songs look. */
+.wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
 .button {
   padding: 12px 36px;
   border-radius: 6px;
@@ -22,4 +29,9 @@
 .button:focus-visible {
   outline: 2px solid var(--pa-magenta);
   outline-offset: 3px;
+}
+
+.failed {
+  color: var(--pa-miss);
+  font-size: 14px;
 }

@@ -37,9 +37,17 @@ describe("cardModel", () => {
 
   it("names the other practice takes", () => {
     expect(practiceLine(new URLSearchParams("hands=R"))).toBe("Right hand");
-    expect(practiceLine(new URLSearchParams("tempo=80&hands=L"))).toBe("Whole song at 80% · Left hand");
-    expect(practiceLine(new URLSearchParams("versus=1"))).toBe("Versus");
+    expect(practiceLine(new URLSearchParams("versus=1&hands=L"))).toBe("Left hand · Versus");
     expect(practiceLine(new URLSearchParams("hands=both&bot=perfect"))).toBeNull();
+  });
+
+  it("names only what /play applied", () => {
+    // tempo alone plays the whole song at 100% (bar-loop needs from/to; #547 isn't in), so the card says nothing
+    expect(practiceLine(new URLSearchParams("tempo=80"))).toBeNull();
+    // a one-hand chart ignores hands (hand-mode's splitHands)
+    expect(twinkle.notes.every((n) => n.hand === "R")).toBe(true);
+    expect(practiceLine(new URLSearchParams("hands=L"), twinkle)).toBeNull();
+    expect(practiceLine(new URLSearchParams("hands=L"), { ...twinkle, notes: [...twinkle.notes, { ...twinkle.notes[0], id: "l1", hand: "L" }] })).toBe("Left hand");
   });
 
   it("names the file after the song, the day and the rank", () => {

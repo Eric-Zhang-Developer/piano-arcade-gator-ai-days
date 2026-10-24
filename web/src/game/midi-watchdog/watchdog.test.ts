@@ -1,10 +1,13 @@
 // The watchdog around core's real MIDI input, driven by piano-sim's fake piano on a fake clock.
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { Chart, Frame, InputEvent } from "../../contracts";
+import type { Chart, InputEvent } from "../../contracts";
 import { midiDevice } from "../core/input";
 import { createSimMidiAccess, keyOff, keyOn, type SimProfile, type TimelineEntry } from "../sim/fake";
-import { DISCONNECTED, midiWatchdog, RECONNECTING } from ".";
+import { toast } from "../notice-toast";
+import { CONNECTED, DISCONNECTED, midiWatchdog, RECONNECTED, RECONNECTING } from ".";
+
+vi.mock("../notice-toast", () => ({ toast: vi.fn() }));
 
 const chart: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
 const SENSING = { activeSensingMs: 300 }; // a test setting: whether the DGX-660's 0xFE reaches Chrome is unmeasured
@@ -28,13 +31,9 @@ async function connect(profile: Partial<SimProfile> = {}) {
   const events: InputEvent[] = [];
   await device.start((e) => events.push(e));
   const stalls = () => wd.log.filter((l) => l.kind === "stall").length;
-  const notice = () => {
-    const texts: string[] = [];
-    const ctx = { fillText: (t: string) => texts.push(t) } as unknown as CanvasRenderingContext2D;
-    wd.draw!(ctx, { judgmentLineY: 500 } as Frame);
-    return texts[0] ?? "";
-  };
-  return { sim, wd, device, events, stalls, notice, requestMIDIAccess };
+  vi.mocked(toast).mockClear();
+  const toasts = () => vi.mocked(toast).mock.calls.map((c) => c[0]);
+  return { sim, wd, device, events, stalls, toasts, requestMIDIAccess };
 }
 
 // Keys every 100 ms from t0 to t0 + ms, alternating note-on and release.
@@ -49,7 +48,7 @@ describe("with Active Sensing (the 3 s rule)", () => {
   });
 
   it("stall(3000) triggers exactly one reconnect, then recovers", async () => {
-    const { sim, wd, stalls, notice, requestMIDIAccess } = await connect(SENSING);
+    const { sim, wd, stalls, toasts, requestMIDIAccess } = await connect(SENSING);
     await vi.advanceTimersByTimeAsync(1000);
     const before = requestMIDIAccess.mock.calls.length;
     sim.stall(3000);
@@ -59,17 +58,18 @@ describe("with Active Sensing (the 3 s rule)", () => {
     await vi.advanceTimersByTimeAsync(10_000);
     expect(stalls()).toBe(1);
     expect(wd.log.map((l) => l.kind)).toEqual(["stall", "recovered"]);
-    expect(notice()).toBe("");
+    expect(toasts()).toEqual([RECONNECTING, RECONNECTED]);
   });
 
-  it("shows the reconnecting notice until a message arrives", async () => {
-    const { sim, notice } = await connect(SENSING);
+  it("toasts RECONNECTING once on a stall, however many retries, and RECONNECTED when a message arrives", async () => {
+    const { sim, toasts, stalls } = await connect(SENSING);
     await vi.advanceTimersByTimeAsync(1000);
     sim.stall(10_000);
     await vi.advanceTimersByTimeAsync(4000);
-    expect(notice()).toBe(RECONNECTING);
+    expect(toasts()).toEqual([RECONNECTING]);
     await vi.advanceTimersByTimeAsync(8000);
-    expect(notice()).toBe("");
+    expect(stalls()).toBeGreaterThan(1); // it retried while still silent
+    expect(toasts()).toEqual([RECONNECTING, RECONNECTED]);
   });
 
   it("no key event is lost or duplicated across the reconnect", async () => {
@@ -113,16 +113,16 @@ describe("with Active Sensing (the 3 s rule)", () => {
 });
 
 describe("unplug", () => {
-  it("unplug() shows laptop keys active and stops reconnecting; replug() clears it", async () => {
-    const { sim, wd, stalls, notice } = await connect(SENSING);
+  it("unplug() toasts laptop keys active and stops reconnecting; replug() toasts connected", async () => {
+    const { sim, wd, stalls, toasts } = await connect(SENSING);
     await vi.advanceTimersByTimeAsync(1000);
     sim.unplug();
-    expect(notice()).toBe(DISCONNECTED);
+    expect(toasts()).toEqual([DISCONNECTED]);
     await vi.advanceTimersByTimeAsync(10_000);
     expect(stalls()).toBe(0);
     sim.replug();
     await vi.advanceTimersByTimeAsync(1000);
-    expect(notice()).toBe("");
+    expect(toasts()).toEqual([DISCONNECTED, CONNECTED]);
     expect(wd.log.map((l) => l.kind)).toEqual(["disconnected", "connected"]);
   });
 });

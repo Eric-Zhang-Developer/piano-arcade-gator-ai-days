@@ -1,5 +1,5 @@
 // Headless proof of attract mode, the spec's Chrome steps that don't need the piano: (1) Space plays, pillars rise,
-// counters climb, a chapter captions, and steps land on Twinkle's rhythm with the laptop tone; (3) clicking a done
+// counters climb, a chapter captions, with the laptop tone (the rhythm is timed in step 6); (3) clicking a done
 // pillar opens its spec, PR and done note; (4) a timeline bar's tooltip; (5) ?snapshot with every non-local request
 // blocked still plays; (6) with WebGL disabled the flat list shows and still plays. Step 2 is Eric's, on the piano.
 // A snapshot.json that was already there is put back afterwards.
@@ -72,25 +72,12 @@ try {
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
 
-  // 1. Space plays: steps on the chart's rhythm, the laptop tone, counters, a raised pillar, a chapter.
+  // 1. Space plays: the laptop tone, counters, a raised pillar, a chapter.
   await page.goto(`${base}/attract`);
   await page.getByText("● LIVE").waitFor({ timeout: 60_000 });
   await page.locator("canvas").waitFor({ timeout: 30_000 });
-  // Step times are taken in the page (a MutationObserver on the step number), not by polling from here.
-  await page.evaluate(() => {
-    const el = [...document.querySelectorAll("span")].find((x) => /^\d+ \/ \d+$/.test(x.textContent));
-    window.__steps = [];
-    new MutationObserver(() => window.__steps.push({ k: Number(el.textContent.split(" / ")[0]), t: performance.now() })).observe(el, {
-      childList: true, characterData: true, subtree: true,
-    });
-  });
   await page.keyboard.press("Space");
   await sleep(9_000);
-  const seen = await page.evaluate(() => window.__steps);
-  const gaps = seen.slice(2).map((s, i) => ({ got: s.t - seen[i + 1].t, k: s.k }));
-  const beat = 60_000 / chart.bpm;
-  const off = gaps.map(({ got, k }) => Math.abs(got - (chart.notes[k - 1].beat - chart.notes[k - 2].beat) * beat));
-  check(gaps.length >= 8 && Math.max(...off) < 120, `steps land on Twinkle's beats (${gaps.length} gaps, worst ${Math.round(Math.max(...off))} ms off)`);
   check(await page.getByText(/laptop tone/).isVisible(), "no piano attached: the laptop tone plays");
   const [merged, step] = await page.evaluate(() => [
     Number([...document.querySelectorAll("dt")].find((d) => d.textContent === "PRS MERGED").nextElementSibling.textContent),
@@ -152,8 +139,22 @@ try {
   await fp.goto(`${base}/attract?snapshot`);
   await fp.getByText(/No WebGL here/).waitFor({ timeout: 30_000 });
   check((await fp.locator("canvas").count()) === 0, "without WebGL: no canvas, the flat list instead");
+  // The rhythm is timed here: headless WebGL is software-rendered, and its 200-500 ms frames on a loaded machine
+  // stall every timer on the page, which says nothing about the clock. Step times come from inside the page.
+  await fp.evaluate(() => {
+    const el = [...document.querySelectorAll("span")].find((x) => /^\d+ \/ \d+$/.test(x.textContent));
+    window.__steps = [];
+    new MutationObserver(() => window.__steps.push({ k: Number(el.textContent.split(" / ")[0]), t: performance.now() })).observe(el, {
+      childList: true, characterData: true, subtree: true,
+    });
+  });
   await fp.keyboard.press("Space");
-  await sleep(4_000);
+  await sleep(9_000);
+  const seen = await fp.evaluate(() => window.__steps);
+  const gaps = seen.slice(2).map((s, i) => ({ got: s.t - seen[i + 1].t, k: s.k }));
+  const beat = 60_000 / chart.bpm;
+  const off = gaps.map(({ got, k }) => Math.abs(got - (chart.notes[k - 1].beat - chart.notes[k - 2].beat) * beat));
+  check(gaps.length >= 8 && Math.max(...off) < 120, `steps land on Twinkle's beats (${gaps.length} gaps, worst ${Math.round(Math.max(...off))} ms off)`);
   check((await stepOf(fp)) >= 4 && (await fp.getByText(/^▲ /).count()) >= 1, `without WebGL the replay still steps and raises (step ${await stepOf(fp)})`);
   await fp.screenshot({ path: join(out, "attract-no-webgl.png") });
   await flat.close();

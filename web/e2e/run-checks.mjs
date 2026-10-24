@@ -38,6 +38,7 @@ export const KNOWN_RED = {
   "web/src/game/cabinet/verify-cabinet.mjs": 429,
   "web/src/game/capture-mode/verify-capture.mjs": 431,
   "web/src/game/demo-reset/verify-reset.mjs": 478,
+  "web/src/game/learn-from-select/verify-learn.mjs": 485,
   "web/src/game/notice-toast/verify-toast.mjs": 432,
   "web/src/game/options-panel/verify-options.mjs": 447,
   "web/src/game/song-preview/verify-preview.mjs": 428,

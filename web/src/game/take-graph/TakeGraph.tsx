@@ -4,6 +4,7 @@
 import { useState } from "react";
 import type { Chart, Results, Take } from "../../contracts";
 import { GOOD_MS, GREAT_MS, PERFECT_MS } from "../core/settings";
+import { handColor } from "../hand-colors";
 import { hudSettings } from "../hud";
 import { bg, gold, ink, inkDim } from "../ui-tokens";
 import { describePoint, graphPoints, sensesVelocity, wrongMarks, type GraphPoint } from "./graph";
@@ -41,7 +42,8 @@ export function TakeGraph({ chart, take, results }: { chart: Chart; take: Take; 
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
         <span style={{ color: inkDim }}>
-          Timing per note · ● right hand ■ left hand{velocity ? " · line: velocity" : " · laptop keys sense no velocity"}
+          Timing per note · <span style={{ color: handColor("R") }}>●</span> right hand{" "}
+          <span style={{ color: handColor("L") }}>■</span> left hand{velocity ? " · line: velocity" : " · laptop keys sense no velocity"}
         </span>
         <button type="button" onClick={() => setTable((t) => !t)} aria-pressed={table}>
           {table ? "Show as graph" : "Show as table"}
@@ -119,7 +121,7 @@ export function TakeGraph({ chart, take, results }: { chart: Chart; take: Take; 
             }
             const cy = y(p.offsetMs);
             return (
-              <g key={p.noteId} tabIndex={0} role="img" aria-label={label} fill={ink}>
+              <g key={p.noteId} tabIndex={0} role="img" aria-label={label} fill={handColor(p.hand)}>
                 <title>{label}</title>
                 {p.hand === "R" ? <circle cx={cx} cy={cy} r={3.5} /> : <rect x={cx - 3.5} y={cy - 3.5} width={7} height={7} />}
               </g>

@@ -2,6 +2,7 @@
 // notes, drawn on the plugin's own layer. Core doesn't change: it reads the frame, the chart and the input devices.
 import { createElement } from "react";
 import type { Chart, Frame, GamePlugin, InputDevice } from "../../contracts";
+import { isBlack } from "../core/highway";
 import { msPerBeat, settings } from "../core/settings";
 import { LabelToggle } from "./LabelToggle";
 import {
@@ -12,6 +13,7 @@ import {
   labelSetting,
   labelSettings,
   laptopLetters,
+  noteLane,
   noteName,
   type LabelSetting,
 } from "./labels";
@@ -86,7 +88,7 @@ export function noteLabels(): GamePlugin {
       if (!s) continue;
       const k = f.keyX(p);
       const px = fontPxFor(k.width);
-      const black = [1, 3, 6, 8, 10].includes(p % 12);
+      const black = isBlack(p);
       const bottom = black ? f.judgmentLineY + kbH * 0.62 : f.height; // a black key is 62% of the keyboard's height
       text(ctx, s, k.x + k.width / 2, bottom - px * 0.9, k.width, px, black && !pressed.has(p) ? LIGHT : DARK);
     }
@@ -108,7 +110,7 @@ export function noteLabels(): GamePlugin {
       const yTop = line - (startMs + n.duration * beatMs - f.nowMs) * pxPerMs;
       if (yBottom < 0 || yTop > line) continue;
       const k = f.keyX(n.pitch);
-      const lane = k.width * 0.84; // the highway insets each note 8% each side
+      const lane = noteLane(k, isBlack(n.pitch)); // the pill the highway draws
       if (lane < labelSettings.minLaneForNotesPx) continue;
       const s = label(n.pitch);
       if (!s) continue;

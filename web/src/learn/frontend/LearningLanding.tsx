@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { MasteryGraphHome } from './graph/MasteryGraphHome';
-import { byId, type GraphAction } from './graph/data';
+import { type GraphAction } from './graph/data';
+import { contextualActivity, preparedActivity } from './graph/prepared';
 import { activities, isSessionComplete, useLearningSessions } from './LearningSessions';
 import styles from './learning.module.css';
 
@@ -11,17 +12,26 @@ export function LearningLanding({ group }: { group?: 'Learn' | 'Review' }) {
   const sessions = useLearningSessions();
   const router = useRouter();
   function openGraphActivity(action: GraphAction) {
-    // Only these skills have a truthful mapping to the existing Twinkle demonstrations.
-    const supported = ['theory.tonal-center', 'theory.phrase-endings', 'procedure.steady-pulse', 'procedure.held-endings', 'procedure.short-phrase-coordination'];
-    const skill = byId.get(action.skillId);
-    if (!supported.includes(action.skillId) || !skill?.activity || skill.domain !== action.domain) return;
-    const targetGroup = action.intent === 'learn' ? 'Learn' : 'Review';
-    const targetTitle = action.domain === 'theory' ? 'Theory' : 'Practice';
-    const activity = activities.find(item => item.group === targetGroup && item.title === targetTitle)!;
-    sessions.setGraphContext({ activityId: activity.id, group: targetGroup, title: skill.title, demoActivity: skill.activity });
-    router.push(targetGroup === 'Learn' ? '/learn/explore' : '/learn/review');
+    const target = contextualActivity(action);
+    if (!target) return;
+    sessions.setGraphContext(target.context);
+    if (isSessionComplete(target.activity.id, sessions)) sessions.restart(target.activity.id);
+    router.push(target.activity.href);
   }
-  if (!group) return <div className={styles.graphHome}><MasteryGraphHome onAction={openGraphActivity} companion={{ collapsed: sessions.companionCollapsed, onCollapsedChange: sessions.setCompanionCollapsed }}/></div>;
+  function activityActionLabel(action: GraphAction) {
+    const target = contextualActivity(action);
+    if (!target) return '';
+    return isSessionComplete(target.activity.id, sessions) ? 'Start again' : sessions.started[target.activity.id] ? 'Resume activity' : 'Start activity';
+  }
+  const preparedComplete = isSessionComplete(preparedActivity.activityId, sessions);
+  if (!group) return <div className={styles.graphHome}><MasteryGraphHome onAction={openGraphActivity} actionLabel={activityActionLabel} guide={{
+    activity: preparedActivity,
+    actionLabel: preparedComplete ? 'Start again' : sessions.started[preparedActivity.activityId] ? 'Resume' : 'Start',
+    complete: preparedComplete,
+    onStart: () => openGraphActivity(preparedActivity.action),
+    collapsed: sessions.companionCollapsed,
+    onCollapsedChange: sessions.setCompanionCollapsed,
+  }}/></div>;
   const choices = activities.filter(activity => activity.group === group);
   const mapContext = sessions.graphContext?.group === group ? sessions.graphContext : null;
   const preferred = choices.find(activity => activity.id === mapContext?.activityId) ?? choices.find(activity => activity.id === sessions.last) ?? choices[0];

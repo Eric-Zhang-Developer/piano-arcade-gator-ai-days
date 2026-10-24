@@ -31,7 +31,7 @@ export function PracticeWorkspace() {
     : state.stage === 'feedback' ? ['Let the last G ring', 'Example feedback: the ending was cut short. Hold the G in bar 2 for two full beats.']
     : state.stage === 'drill' ? ['Give G two full beats', 'Play the opening two bars on your piano. Count “one, two” on the final G.']
     : state.stage === 'fade' ? state.hints ? ['Read from the staff', 'The next preview removes note names. Keep the score in view.'] : state.tempo < targetTempo ? ['Bring it up to tempo', `The next preview runs at ${targetTempo} bpm.`] : ['Keep the ending steady', 'Play both bars once more.']
-    : state.stage === 'complete' ? ['Connect the whole melody', 'The practice example is complete. Try a continuous play-through next.']
+    : state.stage === 'complete' ? ['Connect the whole melody', 'The practice example is complete. Return to your learning map.']
     : ['Give the ending room', 'Play the opening two bars. Hold the final G for two full beats.'];
   const takeLabel = state.stage === 'fade' ? state.hints ? 'Preview without note names' : state.tempo < targetTempo ? `Preview at ${targetTempo} bpm` : 'Start preview take' : 'Start preview take';
   return <section className={styles.workspace} aria-label="Guided practice">
@@ -55,7 +55,7 @@ export function PracticeWorkspace() {
         {locked ? <button type="button" className={styles.secondary} onClick={stop}>Stop {demo ? 'demo' : 'preview'}</button>
           : state.stage === 'feedback' ? <button type="button" className={styles.primary} onClick={() => dispatch({ type: 'drill' })}>Practise the held note</button>
           : state.stage === 'drill' ? <button type="button" className={styles.primary} onClick={() => dispatch({ type: 'repeat' })}>I played it</button>
-          : state.stage === 'complete' ? <Link className={styles.primary} href="/learn/play-through">Go to Play-through</Link>
+          : state.stage === 'complete' ? <Link className={styles.primary} href="/learn">Back to map</Link>
           : <button type="button" className={styles.primary} onClick={take}>{takeLabel}</button>}
         {!locked && state.stage !== 'complete' && <button type="button" className={styles.secondary} onClick={hear}>Hear the opening</button>}
       </div>

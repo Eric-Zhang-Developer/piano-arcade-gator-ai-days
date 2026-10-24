@@ -141,9 +141,9 @@ await page.eval(async () => {
   await click('I played it');
   await click('I played it');
   await click('Preview at');
-  await until(() => text().includes('Go to Play-through'), 'Practice support fading did not finish');
+  await until(() => !!document.querySelector('main a[href="/learn"]'), 'Practice support fading did not finish');
   await recover();
-  assert(text().includes('Go to Play-through') && document.querySelector('main').textContent.includes('2 example takes'), 'Completed practice reset');
+  assert(!!document.querySelector('main a[href="/learn"]') && document.querySelector('main').textContent.includes('2 example takes'), 'Completed practice reset');
 });
 
 await open('play-through');

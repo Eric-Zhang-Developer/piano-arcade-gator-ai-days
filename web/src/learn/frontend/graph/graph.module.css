@@ -72,3 +72,8 @@
 .home .focusGroup { font:inherit; font-size:12px; padding:8px 12px; margin:0 0 16px; border:1px solid var(--graph-rule); background:none; color:var(--graph-ink); cursor:pointer; }
 
 .recommended { fill:none; stroke:var(--graph-action); stroke-width:1.2; stroke-dasharray:2 4; opacity:.65; pointer-events:none; }
+
+.exploreMenu { position:relative; color:var(--graph-muted); font-size:12px; }
+.exploreMenu summary { cursor:pointer; }
+.exploreMenu .tabs { position:absolute; z-index:5; left:0; top:28px; gap:20px; padding:0 16px; height:48px; border:1px solid var(--graph-rule); border-radius:4px; background:var(--graph-panel); }
+.home .recover { color:var(--graph-action); background:none; border:0; padding:6px 0; font:13px system-ui,sans-serif; cursor:pointer; }

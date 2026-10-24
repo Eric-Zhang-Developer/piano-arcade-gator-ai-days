@@ -24,14 +24,12 @@ function LearningChrome({ children }: { children: React.ReactNode }) {
     window.addEventListener('offline', update);
     return () => { window.removeEventListener('online', update); window.removeEventListener('offline', update); };
   }, []);
-  const inLearn = ['/learn/explore', '/learn/understand', '/learn/practice'].includes(pathname);
-  const inReview = pathname.startsWith('/learn/review') || pathname === '/learn/play-through';
   return <div className={styles.app}>
     <a href="#learning-content" className={styles.skip}>Skip to content</a>
     <header className={styles.topbar}>
       <Link href="/learn" className={styles.brand} aria-label="Piano Arcade learning home">Piano Arcade</Link>
-      <nav aria-label="Learning navigation"><Link href="/learn/explore" aria-current={inLearn ? 'page' : undefined}>Learn</Link><Link href="/learn/review" aria-current={inReview ? 'page' : undefined}>Review</Link></nav>
-      <details className={styles.previewInfo}><summary>Frontend preview</summary><div><p>Example activities. Sessions remain while you navigate learning pages. Refreshing or leaving learning clears them.</p><p>Practice takes and feedback are scripted demonstrations; no performance is recorded or graded. No account, progress sync or AI grading is connected.</p><Link href="/">Back to arcade <span aria-hidden="true">↗</span></Link></div></details>
+      {pathname !== '/learn' && <nav aria-label="Learning navigation"><Link href="/learn">Back to map</Link></nav>}
+      <details className={styles.previewInfo}><summary>Frontend preview</summary><div><p>Example activities. Sessions remain while you navigate learning pages. Refreshing or leaving learning clears them.</p><p>Practice takes and feedback are scripted demonstrations; no performance is recorded or graded. The prepared activity is an authored demo, not a live agent decision. No account, progress sync or AI grading is connected.</p><Link href="/">Back to arcade <span aria-hidden="true">↗</span></Link></div></details>
     </header>
     <div className={styles.main}>
       {offline && <section className={styles.offline} role="alert"><h1>You’re offline</h1><p>Reconnect to continue. This preview has no account sync; nothing has been uploaded.</p><button onClick={() => setOffline(!navigator.onLine)}>Check connection</button></section>}

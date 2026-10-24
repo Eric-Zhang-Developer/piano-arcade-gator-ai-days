@@ -1,17 +1,20 @@
 'use client';
 
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { actionFor, byId, demoGoal, recommendation, rootRelationships, stateOf, type Domain, type GraphAction } from './data';
+import { actionFor, byId, demoGoal, rootRelationships, stateOf, type Domain, type GraphAction } from './data';
 import { layoutGraph, neighbor } from './layout';
 import { branchCurve, curve, mapSize, overviewCamera, placeLabels, presentation, projectGraph, viewPoints } from './projection';
 import styles from './graph.module.css';
 import { GraphCompanion, type CompanionControl } from './GraphCompanion';
+import type { preparedActivity } from './prepared';
 
-export type MasteryGraphHomeProps = { onAction: (action: GraphAction) => void; companion?: CompanionControl };
+export type MasteryGraphHomeProps = { onAction: (action: GraphAction) => void; actionLabel: (action: GraphAction) => string; guide: CompanionControl & { activity: typeof preparedActivity; actionLabel: string; complete: boolean; onStart: () => void } };
 const masteryWords = { mastered: 'Established', developing: 'Developing', unknown: 'Unknown' };
 const relationships = rootRelationships;
 
-export function MasteryGraphHome({ onAction, companion }: MasteryGraphHomeProps) {
+export function MasteryGraphHome({ onAction, actionLabel, guide }: MasteryGraphHomeProps) {
+  const [exploring, setExploring] = useState(false);
+  const recoverButton = useRef<HTMLButtonElement>(null), exploreMenu = useRef<HTMLDetailsElement>(null);
   const [domain, setDomain] = useState<Domain>('theory');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hover, setHover] = useState<string | null>(null);
@@ -30,10 +33,8 @@ export function MasteryGraphHome({ onAction, companion }: MasteryGraphHomeProps)
   const points = viewPoints(projected, camera, viewport.width, viewport.height);
   const pointById = new Map(points.map(point => [point.node.id, point]));
   const { visible, preview } = presentation(points, selectedId, viewport.width, viewport.height);
-  const suggestion = recommendation(domain);
-  const suggestionPolicy = suggestion ? actionFor(suggestion) : undefined;
-  const showCompanion = !!companion && !selectedId && camera.scale === 1 && camera.x === 0 && camera.y === 0 && !!suggestionPolicy?.action;
-  const recommendedId = showCompanion && !companion!.collapsed ? suggestion?.id : undefined;
+  const showCompanion = !exploring && !guide.collapsed && !selectedId && camera.scale === 1 && camera.x === 0 && camera.y === 0;
+  const recommendedId = showCompanion && domain === guide.activity.domain ? guide.activity.skillId : undefined;
   const labels = placeLabels(points, visible, preview, selectedId, hover ?? recommendedId ?? null, camera.scale, viewport.width, viewport.height);
   const selected = selectedId ? byId.get(selectedId) : undefined;
   const selectedPoint = selectedId ? pointById.get(selectedId) : undefined;
@@ -42,16 +43,26 @@ export function MasteryGraphHome({ onAction, companion }: MasteryGraphHomeProps)
   const backbone = relationships.filter(edge => pointById.has(edge.from) && pointById.has(edge.to));
   function select(id: string) {
     const node = byId.get(id); if (!node) return;
-    setDomain(node.domain); setSelectedId(id);
+    setExploring(true); setDomain(node.domain); setSelectedId(id);
   }
-  function switchDomain(next: Domain) { setDomain(next); setSelectedId(null); setHover(null); setCamera(overviewCamera); }
+  function switchDomain(next: Domain) { setExploring(true); setDomain(next); setSelectedId(null); setHover(null); setCamera(overviewCamera); }
+  function recover() {
+    setExploring(false); guide.onCollapsedChange(false); setDomain(guide.activity.domain);
+    setSelectedId(null); setHover(null); setCamera(overviewCamera);
+    if (exploreMenu.current) exploreMenu.current.open = false;
+    requestAnimationFrame(() => stage.current?.querySelector<HTMLButtonElement>('aside[aria-label="Your next activity"] button')?.focus());
+  }
+  function dismissGuide() {
+    guide.onCollapsedChange(true);
+    requestAnimationFrame(() => recoverButton.current?.focus());
+  }
   function move(from: string, key: string) {
     const id = neighbor(world, from, key); select(id);
     requestAnimationFrame(() => svg.current?.querySelector<SVGElement>(`[data-skill="${id}"]`)?.focus());
   }
   function close() { setSelectedId(null); setCamera(overviewCamera); svg.current?.focus(); }
   function fit() { close(); setCamera(overviewCamera); }
-  function zoom(factor: number) { setCamera(current => ({...current,scale:Math.max(1,Math.min(4,current.scale*factor))})); }
+  function zoom(factor: number) { setExploring(true); setCamera(current => ({...current,scale:Math.max(1,Math.min(4,current.scale*factor))})); }
   function focusGroup(id: string) {
     const ids = new Set([id]); let grew = true;
     while (grew) { grew = false; for (const point of projected) if (point.node.parentId && ids.has(point.node.parentId) && !ids.has(point.node.id)) { ids.add(point.node.id); grew = true; } }
@@ -63,19 +74,20 @@ export function MasteryGraphHome({ onAction, companion }: MasteryGraphHomeProps)
   return <section className={styles.home} aria-labelledby={`${uid}-title`}>
     <div className={styles.toolbar}>
       <h1 id={`${uid}-title`}>Learning map</h1>
-      <div className={styles.tabs} role="tablist" aria-label="Skill domain">{(['theory', 'procedure'] as const).map(part => <button type="button" role="tab" key={part} aria-selected={domain === part} aria-controls={`${uid}-map`} id={`${uid}-${part}`} tabIndex={domain === part ? 0 : -1} onClick={() => switchDomain(part)} onKeyDown={event => {
+      {!showCompanion && <button ref={recoverButton} type="button" className={styles.recover} onClick={recover}>Your next activity <span aria-hidden="true">↗</span></button>}
+      <details ref={exploreMenu} className={styles.exploreMenu} onToggle={event => { if (event.currentTarget.open) setExploring(true); }}><summary>Explore map</summary><div className={styles.tabs} role="tablist" aria-label="Skill domain">{(['theory', 'procedure'] as const).map(part => <button type="button" role="tab" key={part} aria-selected={domain === part} aria-controls={`${uid}-map`} id={`${uid}-${part}`} tabIndex={domain === part ? 0 : -1} onClick={() => switchDomain(part)} onKeyDown={event => {
         if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); const next = part === 'theory' ? 'procedure' : 'theory'; switchDomain(next); event.currentTarget.parentElement?.querySelector<HTMLButtonElement>(`[id="${uid}-${next}"]`)?.focus(); }
-      }}>{part === 'theory' ? 'Theory' : 'Procedure'}</button>)}</div>
+      }}>{part === 'theory' ? 'Theory' : 'Procedure'}</button>)}</div></details>
       <div className={styles.legend} aria-label="Learner state legend"><span><i data-state="mastered"/>Established</span><span><i data-state="developing"/>Developing</span><span><i data-state="unknown"/>Unknown</span><span><i className={styles.dueKey}/>Review due</span></div>
       <span className={styles.demo}>Demo learner</span>
     </div>
     <div ref={stage} className={styles.mapStage} role="tabpanel" id={`${uid}-map`} aria-labelledby={`${uid}-${domain}`}>
       <svg ref={svg} className={styles.map} viewBox={`0 0 ${viewport.width} ${viewport.height}`} role="group" tabIndex={0} aria-label={`${domain === 'theory' ? 'Theory' : 'Procedure'} skill map. Select a node to explore.`} onClick={event => { if (suppressClick.current) { suppressClick.current=false; return; } if (event.target === event.currentTarget) close(); }}
         onPointerDown={event => { if(event.button!==0)return; drag.current={x:event.clientX,y:event.clientY,camera,moved:false,skillId:(event.target as Element).closest("[data-skill]")?.getAttribute("data-skill")??null}; event.currentTarget.setPointerCapture(event.pointerId); }}
-        onPointerMove={event => { const start=drag.current;if(!start)return;const dx=event.clientX-start.x,dy=event.clientY-start.y;if(Math.hypot(dx,dy)>4){start.moved=true;setCamera({...start.camera,x:start.camera.x+dx,y:start.camera.y+dy});} }}
+        onPointerMove={event => { const start=drag.current;if(!start)return;const dx=event.clientX-start.x,dy=event.clientY-start.y;if(Math.hypot(dx,dy)>4){start.moved=true;setExploring(true);setCamera({...start.camera,x:start.camera.x+dx,y:start.camera.y+dy});} }}
         onPointerUp={event => { const start=drag.current;suppressClick.current=!!start&&(start.moved||!!start.skillId);if(start&&!start.moved&&start.skillId)select(start.skillId);drag.current=null;if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId); }}
         onPointerCancel={() => {drag.current=null;}}
-        onKeyDown={event => { if(event.key==='Escape'){event.preventDefault();close();}if(event.key==='0'){event.preventDefault();fit();}if(event.key==='+'||event.key==='='){event.preventDefault();zoom(1.25);}if(event.key==='-'){event.preventDefault();zoom(.8);}if(event.target===event.currentTarget&&event.key.startsWith('Arrow')){event.preventDefault();setCamera(c=>({...c,x:c.x+(event.key==='ArrowLeft'?40:event.key==='ArrowRight'?-40:0),y:c.y+(event.key==='ArrowUp'?40:event.key==='ArrowDown'?-40:0)}));} }}>
+        onKeyDown={event => { if(event.key==='Escape'){event.preventDefault();close();}if(event.key==='0'){event.preventDefault();fit();}if(event.key==='+'||event.key==='='){event.preventDefault();zoom(1.25);}if(event.key==='-'){event.preventDefault();zoom(.8);}if(event.target===event.currentTarget&&event.key.startsWith('Arrow')){event.preventDefault();setExploring(true);setCamera(c=>({...c,x:c.x+(event.key==='ArrowLeft'?40:event.key==='ArrowRight'?-40:0),y:c.y+(event.key==='ArrowUp'?40:event.key==='ArrowDown'?-40:0)}));} }}>
         <defs><marker id={`${uid}-arrow`} markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1L7 4L1 7Z" className={styles.arrowhead}/></marker></defs>
         <g aria-hidden="true" pointerEvents="none">
           {points.map(point => {
@@ -103,8 +115,8 @@ export function MasteryGraphHome({ onAction, companion }: MasteryGraphHomeProps)
         })}
         {labels.map(label => <g key={`label-${label.id}`} pointerEvents="none"><rect className={styles.labelClearance} x={label.x} y={label.y} width={label.width} height={label.height}/><text x={label.x+label.width/2} y={label.y+label.height-6} textAnchor="middle" className={label.root?styles.groupLabel:styles.nodeLabel}>{label.text}</text></g>)}
       </svg>
-      {showCompanion && companion && suggestion && suggestionPolicy?.action && <GraphCompanion {...companion} skill={suggestion} action={suggestionPolicy.action} reason={`This helps you ${demoGoal.title.toLowerCase()}.`} onAction={onAction}/>}
-      <div className={styles.cameraControls} aria-label="Map view"><button type="button" aria-label="Zoom out" disabled={camera.scale<=1} onClick={()=>zoom(.8)}>−</button><output aria-label="Map zoom">{Math.round(camera.scale*100)}%</output><button type="button" aria-label="Zoom in" disabled={camera.scale>=4} onClick={()=>zoom(1.25)}>+</button><button type="button" onClick={fit}>Fit map</button></div>
+      {showCompanion && <GraphCompanion title={guide.activity.title} reason={guide.activity.reason} actionLabel={guide.actionLabel} complete={guide.complete} onStart={guide.onStart} onDismiss={dismissGuide}/>}
+      {exploring && <div className={styles.cameraControls} aria-label="Map view"><button type="button" aria-label="Zoom out" disabled={camera.scale<=1} onClick={()=>zoom(.8)}>−</button><output aria-label="Map zoom">{Math.round(camera.scale*100)}%</output><button type="button" aria-label="Zoom in" disabled={camera.scale>=4} onClick={()=>zoom(1.25)}>+</button><button type="button" onClick={fit}>Fit map</button></div>}
       {selected && status && policy && <aside className={styles.inspector} aria-label="Selected skill" data-side={selectedPoint && selectedPoint.screenX > viewport.width * .58 ? 'left' : 'right'}>
         <header><h2>{selected.title}</h2><button type="button" onClick={close} aria-label="Close skill details"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
         <div className={styles.detail} aria-live="polite">
@@ -113,7 +125,7 @@ export function MasteryGraphHome({ onAction, companion }: MasteryGraphHomeProps)
           {selected.prerequisites.length > 0 && <div className={styles.foundations}><h3>Builds on</h3>{selected.prerequisites.map(id => <button key={id} type="button" onClick={() => select(id)}><span>{byId.get(id)!.title}</span><small>{masteryWords[stateOf(id).mastery]}</small></button>)}</div>}
           {points.some(point => point.node.parentId === selected.id) && <div className={styles.foundations}><h3>Explore skills</h3>{points.filter(point => point.node.parentId === selected.id).map(point => <button key={point.node.id} type="button" onClick={event => {event.stopPropagation();if(!suppressClick.current)select(point.node.id);suppressClick.current=false;}}>{point.node.title}</button>)}</div>}
         </div>
-        {policy.action && <div className={styles.action}><p>{selected.activity}</p><button type="button" onClick={() => onAction(policy.action!)}>{policy.action.intent === 'learn' ? 'Learn this skill' : 'Review this skill'}<span aria-hidden="true">→</span></button></div>}
+        {policy.action && <div className={styles.action}><p>{selected.activity}</p><button type="button" onClick={() => onAction(policy.action!)}>{actionLabel(policy.action)}<span aria-hidden="true">→</span></button></div>}
       </aside>}
     </div>
     <div className={styles.mapFoot}><span>Goal: {demoGoal.title}</span><span>Drag to move · + / − zoom · Arrow keys explore</span><details><summary>About this map</summary><p>Illustrative foundations, fictional learner states and a sample goal. This is not an assessment or a complete validated curriculum. Broad curves express subject relationships; local branches express grouping. Prerequisites appear only for the selected skill. Faint points preview deeper levels, not weaker mastery.</p></details></div>

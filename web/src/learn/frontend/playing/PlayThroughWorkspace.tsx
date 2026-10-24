@@ -50,7 +50,7 @@ export function PlayThroughWorkspace() {
       <div className={styles.actions}>
         {phase === 'ready' && <button type="button" className={styles.primary} onClick={begin}>Start preview take</button>}
         {running && <button type="button" className={styles.secondary} onClick={() => { stop(); send('stop'); }}>Stop preview</button>}
-        {phase === 'result' && <><Link className={styles.primary} href="/learn/practice">Practise the phrase ending</Link><button type="button" className={styles.secondary} onClick={() => send('again')}>Play again</button></>}
+        {phase === 'result' && <><Link className={styles.primary} href="/learn">Back to map</Link><button type="button" className={styles.secondary} onClick={() => send('again')}>Play again</button></>}
       </div>
     </aside>
   </section>;

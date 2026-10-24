@@ -13,6 +13,7 @@ import { stageCard } from "./stage-card";
 import { feverGauge } from "./fever-gauge";
 import { feverMoment } from "./fever-moment";
 import { juiceVisual } from "./juice";
+import { laptopOctaves } from "./laptop-octaves";
 import { midiWatchdog } from "./midi-watchdog";
 import { noteLabels } from "./note-labels";
 import { pianoOut } from "./piano-out";
@@ -43,6 +44,7 @@ export const plugins: GamePlugin[] = [
   scenes(), // ?bot=<name>: after bar-loop, so the bot plays the looped chart
   simPlugin, // piano-sim: /play?midi=sim only. First, so later plugins asking for MIDI get the fake piano.
   ghost(), // the last take, dashed: under every layer that draws, after every plugin that changes the chart
+  laptopOctaves(), // Z and X: after scenes and the sim (their bots aren't laptop keys), before note-labels (shifted pitches)
   noteLabels(), // after bar-loop, scenes and the sim: it labels the final chart and sees which device really played
   juiceVisual(), // under the HUD: wisps and flares never cover the score
   handColors(), // the L/R legend during the count-in, two-hand charts only

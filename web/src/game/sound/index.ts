@@ -59,12 +59,10 @@ export function savePrefs(p: Prefs): void {
 }
 
 // Pure: which sounds a list of events makes, and when on the audio clock. audioAtZero is the audio time (s) of
-// chart time 0. The rank hit lands when rank-stamp's stamp hits, which is later after a full combo (its banner):
-// fullCombo says one came earlier than these events.
-export function soundsFor(events: GameEvent[], audioAtZero: number, missCue = true, fullCombo = false): { sound: Sound; startTime: number }[] {
+// chart time 0. The rank hit lands when rank-stamp's stamp hits.
+export function soundsFor(events: GameEvent[], audioAtZero: number, missCue = true): { sound: Sound; startTime: number }[] {
   const at = (ms: number) => audioAtZero + ms / 1000;
   const { fanfareAfterHitMs } = soundSettings;
-  let fc = fullCombo;
   return events.flatMap((e): { sound: Sound; startTime: number }[] => {
     switch (e.type) {
       case "comboMilestone":
@@ -74,12 +72,11 @@ export function soundsFor(events: GameEvent[], audioAtZero: number, missCue = tr
       case "noteMiss":
         return missCue ? [{ sound: "miss", startTime: at(e.atMs) }] : [];
       case "fullCombo":
-        fc = true;
-        return [{ sound: "fanfare", startTime: at(e.atMs + stampImpactMs(true) + fanfareAfterHitMs) }];
+        return [{ sound: "fanfare", startTime: at(e.atMs + stampImpactMs() + fanfareAfterHitMs) }];
       case "songEnd":
         return [
           { sound: "drumroll", startTime: at(e.atMs) },
-          { sound: "rankHit", startTime: at(e.atMs + stampImpactMs(fc)) },
+          { sound: "rankHit", startTime: at(e.atMs + stampImpactMs()) },
         ];
       default:
         return [];
@@ -132,8 +129,8 @@ function play(ctx: AudioContext, out: AudioNode, sound: Sound, t: number) {
       [0, 4, 7].forEach((s, i) => tone(ctx, out, "square", semis(s), t + i * 0.1, 0.12, L * 0.5));
       [0, 4, 7, 12].forEach((s) => tone(ctx, out, "triangle", semis(s), t + 0.3, 0.9, L));
       return;
-    case "drumroll": // noise taps, crescendo, filling the gap before the rank hit (the stamp's, without a banner)
-      for (let i = 0, n = Math.floor(stampImpactMs(false) / 40); i < n; i++) noise(ctx, out, t + i * 0.04, 0.03, L * (0.3 + (0.7 * i) / n));
+    case "drumroll": // noise taps, crescendo, filling the gap before the rank hit (the stamp's)
+      for (let i = 0, n = Math.floor(stampImpactMs() / 40); i < n; i++) noise(ctx, out, t + i * 0.04, 0.03, L * (0.3 + (0.7 * i) / n));
       return;
     case "rankHit": {
       const osc = tone(ctx, out, "sine", 150, t, 0.5, L);
@@ -152,7 +149,6 @@ export function eventSounds(): GamePlugin {
   let audio: AudioContext | null = null;
   let zeroPerf = 0; // performance.now() at chart time 0
   let wait = false; // wait mode isn't scored: no drumroll or rank hit at the end (the judge sends no other moments)
-  let fullCombo = false; // this take's, for when the rank hit lands
 
   return {
     id: "juice-sound",
@@ -163,7 +159,6 @@ export function eventSounds(): GamePlugin {
     onEvent(e) {
       if (wait && e.type === "songEnd") return;
       if (e.type === "songStart") {
-        fullCombo = false;
         zeroPerf = performance.now() - e.atMs;
         try {
           audio ??= new AudioContext(); // songStart comes from the Start press, so Chrome lets audio start
@@ -176,13 +171,12 @@ export function eventSounds(): GamePlugin {
         }
         return;
       }
-      if (e.type === "fullCombo") fullCombo = true;
       if (!audio || !master) return;
       // Map the chart clock to the audio clock with a matched pair of readings, as beat-track does.
       const stamp = audio.getOutputTimestamp?.();
       const [ctxT, perfT] = stamp?.performanceTime ? [stamp.contextTime ?? 0, stamp.performanceTime] : [audio.currentTime, performance.now()];
       const audioAtZero = ctxT + (zeroPerf - perfT) / 1000;
-      for (const s of soundsFor([e], audioAtZero, getPrefs().missCue, fullCombo)) play(audio, master, s.sound, Math.max(s.startTime, audio.currentTime));
+      for (const s of soundsFor([e], audioAtZero, getPrefs().missCue)) play(audio, master, s.sound, Math.max(s.startTime, audio.currentTime));
     },
   };
 }

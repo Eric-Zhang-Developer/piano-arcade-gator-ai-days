@@ -1,5 +1,5 @@
 'use client';
-import { useReducer, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { initialPractice, music, passageBeats, practiceReducer, targetTempo } from './model';
 import { Score, ScoreSource } from './Score';
 import { usePlayback } from './usePlayback';
@@ -9,6 +9,7 @@ export function PracticeWorkspace() {
   const [state, dispatch] = useReducer(practiceReducer, initialPractice);
   const [demo, setDemo] = useState(false);
   const playback = usePlayback();
+  useEffect(() => () => { setDemo(false); dispatch({ type: 'stop' }); }, []);
   const locked = state.busy || demo;
   async function hear() {
     if (locked) return;

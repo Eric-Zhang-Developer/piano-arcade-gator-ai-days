@@ -42,7 +42,8 @@ export function practiceReducer(s: PracticeState, e: PracticeEvent): PracticeSta
 
 export type TakePhase = 'ready' | 'countin' | 'playing' | 'result';
 export function takeTransition(phase: TakePhase, event: 'start' | 'counted' | 'finish' | 'stop' | 'again'): TakePhase {
-  if (event === 'stop' || event === 'again') return 'ready';
+  if (event === 'again') return 'ready';
+  if (event === 'stop') return phase === 'countin' || phase === 'playing' ? 'ready' : phase;
   if (phase === 'ready' && event === 'start') return 'countin';
   if (phase === 'countin' && event === 'counted') return 'playing';
   if (phase === 'playing' && event === 'finish') return 'result';

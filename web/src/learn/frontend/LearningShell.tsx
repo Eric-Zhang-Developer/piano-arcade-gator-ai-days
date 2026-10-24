@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Activity, useEffect, useState } from 'react';
 import styles from './learning.module.css';
 
 const activities = [
@@ -30,7 +30,8 @@ export function LearningShell({ children }: { children: React.ReactNode }) {
       <div className={styles.railBottom}><span className={styles.preview}>Frontend preview</span><details><summary>About this preview</summary><p>Example activities. Answers stay in this browser tab and reset when you leave the activity. No account, progress sync or AI grading is connected.</p><p>The full learning service will require internet and carry acknowledged history between devices.</p></details><Link href="/">Back to arcade <span aria-hidden="true">↗</span></Link></div>
     </aside>
     <div className={styles.main}>
-      {offline ? <section className={styles.offline} role="alert"><h1>You’re offline</h1><p>Reconnect to continue. This preview has no account sync; nothing has been uploaded.</p><button onClick={() => setOffline(!navigator.onLine)}>Check connection</button></section> : <main id="learning-content" className={styles.content}>{children}</main>}
+      {offline && <section className={styles.offline} role="alert"><h1>You’re offline</h1><p>Reconnect to continue. This preview has no account sync; nothing has been uploaded.</p><button onClick={() => setOffline(!navigator.onLine)}>Check connection</button></section>}
+      <Activity mode={offline ? 'hidden' : 'visible'}><main id="learning-content" className={styles.content}>{children}</main></Activity>
     </div>
   </div>;
 }

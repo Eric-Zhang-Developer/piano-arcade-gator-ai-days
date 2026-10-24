@@ -11,6 +11,7 @@ export function PlayThroughWorkspace() {
   const [error, setError] = useState<string | null>(null);
   const playback = usePlayback();
   const { start, stop } = playback;
+  useEffect(() => () => send('stop'), []);
   useEffect(() => {
     if (phase !== 'countin') return;
     let remaining = 4;

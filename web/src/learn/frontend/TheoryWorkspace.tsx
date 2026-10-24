@@ -21,7 +21,7 @@ export function TheoryWorkspace({ review = false }: { review?: boolean }) {
   const stopAudio = useRef<(() => void) | null>(null);
   const audioTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const questionHeading = useRef<HTMLHeadingElement>(null);
-  useEffect(() => () => { stopAudio.current?.(); if (audioTimer.current) clearTimeout(audioTimer.current); }, []);
+  useEffect(() => () => { stopAudio.current?.(); if (audioTimer.current) clearTimeout(audioTimer.current); setPlaying(null); }, []);
   const done = index >= items.length;
   const question = items[Math.min(index, items.length-1)];
   const outcome = evaluateAnswer(question, answer);

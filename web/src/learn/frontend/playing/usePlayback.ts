@@ -18,11 +18,10 @@ export function usePlayback() {
     setActive(false); setBeat(-1);
   }, []);
   useEffect(() => () => {
-    generation.current++;
-    if (timer.current) clearInterval(timer.current);
-    voices.current.forEach((o) => { try { o.stop(); } catch { /* Voice already ended. */ } });
+    stop();
     void context.current?.close();
-  }, []);
+    context.current = null;
+  }, [stop]);
   const start = useCallback(async ({ tempo, beats, sound, onEnd }: { tempo: number; beats: number; sound: boolean; onEnd: () => void }) => {
     stop();
     const run = generation.current;

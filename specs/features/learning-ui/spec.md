@@ -20,13 +20,14 @@ This is the frontend slice commissioned from the published `piano-learning` plan
 - Understand permits the reference; theory review unlocks it only after submitting the current answer. Closed answers get computed feedback; open explanations compare with a reference, never fabricated semantic grading.
 - Practice fades support; Play-through retains the score and gives feedback after a performance. Preview takes and observations are visibly illustrative, with no invented mastery or saved account claims.
 - Existing cited repository score data is reused, with provenance retained. Original teaching summaries distinguish melodic closure from harmonic cadence evidence.
-- Offline recovery names the connection problem and sync limits. The anonymous arcade, game loop, root styles, frozen contracts and dependencies stay unchanged.
+- Offline recovery names the connection problem and sync limits, preserves in-memory answers, history, practice settings and completed results, and cancels active audio, count-ins and preview takes. The anonymous arcade, game loop, root styles, frozen contracts and dependencies stay unchanged.
 
 ## Validation
 - `pnpm -C web test`: question feedback, phrase selection and procedural state checks.
 - `pnpm -C web lint`, `pnpm -C web typecheck`, `pnpm -C web build` pass.
 - In visible Chrome, open each route at 1440x900 and 1280x800. Navigate all four activities; check a correct/incorrect answer, compare an explanation, use hints and audio, complete review, and confirm reference is locked before each review answer.
 - Start a procedural preview take, fade support, play through, and verify feedback occurs after completion. Keep four desktop stills and laptop evidence outside the repository.
+- With an owned background learning tab selected in visible Chrome, run `chrome-devtools-axi run < web/src/learn/frontend/offline.browser.mjs` to check offline recovery across all four activities, cancellation and fresh playback.
 - Run repository ownership, gate and marker checks. The repository's game verification is separate from learning-route verification.
 
 ## Defaults

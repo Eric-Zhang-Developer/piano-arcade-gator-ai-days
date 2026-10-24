@@ -12,6 +12,7 @@ import { juiceVisual } from "./juice";
 import { midiWatchdog } from "./midi-watchdog";
 import { noteLabels } from "./note-labels";
 import { pianoOut } from "./piano-out";
+import { pianoVoice } from "./piano-voice";
 import { scenes } from "./scenes";
 import { evenness } from "./evenness";
 import { dynamics } from "./dynamics";
@@ -44,6 +45,7 @@ export const plugins: GamePlugin[] = [
   dynamics(), // results panel: how loud you played against the score, above "Replay on piano"
   replayView(), // results panel: Watch replay, the take on the highway in time with piano-out
   pianoOut(), // records the take for "Replay on piano"
+  pianoVoice(), // the chart's GM voice on the DGX for the take (and its replay), then grand piano again
   feverStage(), // three.js stage behind the highway (background hook only, no 2D layer)
   tempoCurve(), // results panel: a rubato score beside the strict one
   weakBars(), // results panel: accuracy per phrase, and a link to loop the weakest

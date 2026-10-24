@@ -52,6 +52,7 @@ features = [
   "evenness",
   "take-graph",
   "weak-bars",
+  "records",
   "difficulty",
   "hand-colors",
   "note-labels",
@@ -70,9 +71,12 @@ features = [
   "ghost",
   "chord-sync",
   "tempo-curve",
+  "song-preview",
+  "song-requests",
   "piano-voice",
   "take-midi",
   "versus",
+  "cabinet",
 ]
 cut = []
 

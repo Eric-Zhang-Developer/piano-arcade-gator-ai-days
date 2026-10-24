@@ -22,6 +22,12 @@ const DARK = "#16161a"; // on white keys, lit keys and notes (both hand colors a
 const LIGHT = "#e8e8ec"; // on unlit black keys
 const FONT = "system-ui, sans-serif";
 
+// Semitones the laptop map sits above core's keyMap. laptop-octaves moves it with Z and X; 0 is today's map.
+let laptopShift = 0;
+export function setLaptopShift(semitones: number): void {
+  laptopShift = semitones;
+}
+
 declare global {
   interface Window {
     __pianoArcadeLabels?: { setting: LabelSetting; mode: string }; // read by verify-labels.mjs
@@ -57,7 +63,9 @@ export function noteLabels(): GamePlugin {
   let midiPlayed = false;
   let perspective = false;
   let chart: Chart | null = null;
+  let lowest = 0;
   let letters = new Map<number, string>();
+  let lettersShift = 0;
   const hit = new Set<string>();
   const pressed = new Set<number>();
 
@@ -65,7 +73,11 @@ export function noteLabels(): GamePlugin {
   const publish = () => {
     if (typeof window !== "undefined") window.__pianoArcadeLabels = { setting, mode: mode() };
   };
-  const label = (pitch: number) => (mode() === "notes" ? noteName(pitch) : (letters.get(pitch) ?? ""));
+  const label = (pitch: number) => {
+    if (mode() === "notes") return noteName(pitch);
+    if (lettersShift !== laptopShift) [letters, lettersShift] = [laptopLetters(lowest + laptopShift), laptopShift];
+    return letters.get(pitch) ?? "";
+  };
 
   function drawKeys(ctx: CanvasRenderingContext2D, f: Frame): void {
     const kbH = f.height - f.judgmentLineY;
@@ -115,7 +127,8 @@ export function noteLabels(): GamePlugin {
       chart = c;
       setting = labelSetting(params.get("labels"), readStored());
       perspective = Number(params.get("perspective")) > 0;
-      letters = laptopLetters(Math.min(...c.notes.map((n) => n.pitch))); // the same lowest pitch /play gives keysDevice
+      lowest = Math.min(...c.notes.map((n) => n.pitch)); // the same lowest pitch /play gives keysDevice
+      [letters, lettersShift] = [laptopLetters(lowest + laptopShift), laptopShift];
       publish();
       return c;
     },

@@ -93,6 +93,12 @@ try {
   await page.getByTestId("records").screenshot({ path: join(out, "records-second.png") });
   await page.goto(`${base}/`);
   const s2 = await stored(page);
+  // Song select: Twinkle's card shows the best grade (take 1's S at 100%), and no other card shows one.
+  const bestText = (await page.getByTestId("song-twinkle").locator('[data-testid="best"]').innerText()).replace(/\s+/g, " ");
+  const bestCards = await page.locator('[data-testid="best"]').count();
+  say(`verify-records: song select -> Twinkle "${bestText}", ${bestCards} card(s) with a grade`);
+  if (!/BEST 100\.0% S/i.test(bestText) || bestCards !== 1) fail.push(`song select: "${bestText}" on ${bestCards} cards`);
+  await page.screenshot({ path: join(out, "song-select.png") });
   const top = s2.twinkle?.top ?? [];
   say(`verify-records: take 2 -> NEW RECORD shown ${newRecord2 > 0}, top 5 ${top.map((t) => `${t.initials} ${t.score}`).join(", ")}`);
   if (newRecord2) fail.push("2: NEW RECORD on a worse take");

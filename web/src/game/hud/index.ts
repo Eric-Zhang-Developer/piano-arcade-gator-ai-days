@@ -1,7 +1,7 @@
 // Arcade HUD: song card, live counters, score and multiplier up top, and a giant translucent combo (spec: hud).
 // Driven only by GameEvents; reduceHud and hudLayout are pure so tests can pin them.
 import type { Chart, Frame, GameEvent, GamePlugin } from "../../contracts";
-import { gold, good, miss, panel, tierX1, tierX2, tierX3, tierX4, whenDisplayFontReady, wrong } from "../ui-tokens";
+import { bg, gold, good, miss, panel, tierX1, tierX2, tierX3, tierX4, whenDisplayFontReady, wrong } from "../ui-tokens";
 
 export const hudSettings = {
   comboFrom: 5, // the combo number shows from this combo
@@ -143,7 +143,9 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Car
     ctx.globalAlpha = 1;
   }
 
-  // Top panel.
+  // Top panel, over an opaque band: notes and labels below draw from y = 0, and the panel is only 72% opaque (#243).
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, f.width, h);
   ctx.fillStyle = hudSettings.panelBg;
   ctx.fillRect(0, 0, f.width, h);
   ctx.fillStyle = tier.color;

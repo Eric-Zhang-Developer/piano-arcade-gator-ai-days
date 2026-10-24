@@ -3,7 +3,7 @@ import type { Chart, GameEvent } from "../../contracts";
 import { makeLayout } from "../core/highway";
 import { Judge } from "../core/judge";
 import { GOOD_MS, msPerBeat } from "../core/settings";
-import { emptyHud, hudBottom, hudLayout, reduceHud, tierFor, tierProgress } from ".";
+import { emptyHud, hud, hudBottom, hudLayout, reduceHud, tierFor, tierProgress } from ".";
 
 // What the judge sends for a hit: noteHit, then combo, then comboMilestone at 25.
 function hits(judgment: "PERFECT" | "GREAT", n: number, comboBefore: number): GameEvent[] {
@@ -103,5 +103,28 @@ describe("hudLayout", () => {
     const l = hudLayout(w, line);
     expect(hudBottom(l)).toBeLessThanOrEqual(l.safeY);
     expect(l.safeY).toBeCloseTo(line * 0.6);
+  });
+});
+
+describe("the HUD panel", () => {
+  // Notes and labels draw from y = 0 on the layers below; a see-through panel showed a pill behind the counts (#243).
+  it("covers its band with an opaque fill, so nothing below shows through", () => {
+    const rects: { style: string; alpha: number; x: number; y: number; w: number; h: number }[] = [];
+    const t: Record<string | symbol, unknown> = { globalAlpha: 1 };
+    const ctx = new Proxy(t, {
+      get: (o, k) =>
+        k in o
+          ? o[k]
+          : k === "fillRect"
+            ? (x: number, y: number, w: number, h: number) => rects.push({ style: String(o.fillStyle), alpha: o.globalAlpha as number, x, y, w, h })
+            : () => ({ width: 0 }),
+      set: (o, k, v) => ((o[k] = v), true),
+    }) as unknown as CanvasRenderingContext2D;
+    const width = 1280;
+    const judgmentLineY = 560;
+    hud().draw!(ctx, { width, height: 720, judgmentLineY, nowMs: 0 } as never);
+    const band = hudLayout(width, judgmentLineY).panel.h;
+    const opaque = (s: string) => /^#[0-9a-f]{6}$/i.test(s) || /^rgba?\([^)]*,\s*1\)$/.test(s) || /^rgb\(/.test(s);
+    expect(rects.some((r) => r.x <= 0 && r.y <= 0 && r.w >= width && r.h >= band && r.alpha === 1 && opaque(r.style))).toBe(true);
   });
 });

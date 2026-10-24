@@ -87,8 +87,14 @@ try {
   const height = await sloppy.graph.evaluate((el) => el.getBoundingClientRect().height);
   if (width < 880) fail.push(`graph is ${width} px wide at 1280×720, want 900`);
   if (height > 240) fail.push(`graph is ${height} px tall, over results-layout's 240 px`);
-  const clip = await sloppy.page.getByTestId("results").evaluate((el) => Math.round(el.getBoundingClientRect().top));
-  say(`verify-take-graph: panel ${Math.round(width)}×${Math.round(height)} px; results screen top at ${clip} px`);
+  // With the graph added the results screen is taller than 720 px: scrolled to the top, the rank must be on screen.
+  const top = await sloppy.page.getByTestId("results").evaluate((el) => {
+    for (let a = el.parentElement; a; a = a.parentElement) a.scrollTop = 0;
+    return Math.round(el.getBoundingClientRect().top);
+  });
+  if (top < 0) fail.push(`results screen's top is at ${top} px after scrolling up: the rank is cut off`);
+  say(`verify-take-graph: panel ${Math.round(width)}×${Math.round(height)} px; results top at ${top} px when scrolled up`);
+  await sloppy.graph.scrollIntoViewIfNeeded();
   const dot = sloppy.graph.locator('svg g[role="img"]').first();
   await dot.hover();
   const title = await dot.locator("title").textContent();

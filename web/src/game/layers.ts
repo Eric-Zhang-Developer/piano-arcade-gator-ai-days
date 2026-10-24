@@ -8,6 +8,7 @@ import { handColors } from "./hand-colors";
 import { ghost } from "./ghost";
 import { handMode } from "./hand-mode";
 import { hud } from "./hud";
+import { firstRun } from "./first-run";
 import { waitHud } from "./wait-hud";
 import { warningCard } from "./difficulty";
 import { stageCard } from "./stage-card";
@@ -58,6 +59,7 @@ export const plugins: GamePlugin[] = [
   juiceVisual(), // under the HUD: wisps and flares never cover the score
   handColors(), // the L/R legend during the count-in, two-hand charts only
   hud(), // before beat-track, so beat-track's status line draws over the HUD's top panel
+  firstRun(), // ?firstrun=1: its text cues draw over the HUD's layer, between the band and the 1 s mark
   waitHud(), // wait mode: LEARN and note n / N in the HUD's band, where the counters and score were
   feverMoment(), // fever's start: the edge flash and a FEVER banner over the HUD band, under beat-track's status line
   beatTrack(),

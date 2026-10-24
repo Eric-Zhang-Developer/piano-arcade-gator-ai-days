@@ -11,8 +11,8 @@ verify: `pnpm -C /Users/sharan/.worktrees/pa/take-store/web verify --out /Users/
 42/42 PERFECT with test input and through the piano-sim MIDI path (test takes are never sent). Local stack: Chrome laptop-keys take, rank S with 1 MISS, one
 `takes` row and 42 `note_judgments`, missed bar first on `/progress`, no duplicate after reload. 14/14 abuse checks
 (`supabase/tests/local-stack/attacks.mjs`: forged tokens, lying scores, id hijack, cross-player reads). Vitest 588 passed, 1 skipped (whole app). `node supabase/tests/migrations.mjs`: pass, 3 migrations apply and keep the rules (18 checks).
-Every song: `node supabase/tests/every-song.mjs` (Oct 24: before 0005, 8 of 10 songs saved and read back, Fur Elise and
-Clair de Lune refused; after 0005, Clair de Lune passes, the rest of that run stopped at Auth's sign-up limit). Live project: `node supabase/tests/live-smoke.mjs` pass, 8/8 (anonymous sign-in, save_take, a later GOOD, own-row reads, RLS).
+Every song: `node supabase/tests/every-song.mjs` → `pass: all 10 songs save and read back` (Oct 24, live, after 0005;
+before it, Fur Elise and Clair de Lune were refused). Live project: `node supabase/tests/live-smoke.mjs` pass, 8/8 (anonymous sign-in, save_take, a later GOOD, own-row reads, RLS).
 
 ## Gaps
 CAPTCHA on anonymous sign-ins not set up. (Migrations 0001–0003 ran by hand and are recorded in the CLI's history;

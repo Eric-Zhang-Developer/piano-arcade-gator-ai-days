@@ -24,6 +24,7 @@ import { tempoCurve } from "./tempo-curve";
 import { weakBars } from "./weak-bars";
 import { feverStage } from "./stage";
 import { takeGraph } from "./take-graph";
+import { cabinet } from "./cabinet/plugin";
 import { versus } from "./versus";
 import { takeMidi } from "./take-midi";
 import { waitMode } from "./wait-mode/plugin";
@@ -59,4 +60,5 @@ export const plugins: GamePlugin[] = [
   eventSounds(), // laptop sounds at combo milestones, fever, full combo, rank and (optionally) misses
   feverGauge(), // late: its gauge sizes from the chart after every transformChart, as the judge does
   warningCard(), // after every transformChart too: the level is the chart the player gets; WARNING at Lv 13+
+  cabinet(), // ?cabinet=1 returns a finished game to /cabinet; ?cabinet=demo starts the demo and reports it
 ];

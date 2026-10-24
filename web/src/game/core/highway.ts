@@ -3,6 +3,7 @@ import type { Chart, Frame, Hand, Judgment } from "../../contracts";
 import { noteColorFor } from "../hand-colors";
 import { hitLinePath } from "../hit-line";
 import { whiteIndex as whiteIndexOf, type Range } from "../highway-zoom";
+import { drawBlackKey, drawWhiteKey } from "../key-skin";
 import { brightness, pillRect } from "../note-pills";
 import { msPerBeat, settings } from "./settings";
 
@@ -184,24 +185,23 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
   }
   ctx.restore();
 
-  // Keyboard: whites, then blacks on top. Its top edge is the judgment line. A key that hit a note lights in that
-  // note's color; a key that hit nothing lights as before.
+  // Keyboard (key-skin): whites, pressed whites (so their glow lies over their neighbours), then blacks on top. Its
+  // top edge is the judgment line. A key that hit a note lights in that note's color; one that hit nothing, white.
   const lit = (p: number) => {
     const hand = s.pressedHand?.get(p);
     return hand ? color(hand) : settings.keyLitColor;
   };
   const kbH = L.keyboardHeight;
-  for (let p = L.lowPitch; p <= L.highPitch; p++) {
-    if (L.isBlack(p)) continue;
-    const k = L.keyX(p);
-    ctx.fillStyle = s.pressed.has(p) ? lit(p) : "#e8e8ec";
-    ctx.fillRect(k.x + 0.5, line, k.width - 1, kbH);
-  }
+  for (const down of [false, true])
+    for (let p = L.lowPitch; p <= L.highPitch; p++) {
+      if (L.isBlack(p) || s.pressed.has(p) !== down) continue;
+      const k = L.keyX(p);
+      drawWhiteKey(ctx, { x: k.x + 0.5, y: line, w: k.width - 1, h: kbH }, down ? lit(p) : null);
+    }
   for (let p = L.lowPitch; p <= L.highPitch; p++) {
     if (!L.isBlack(p)) continue;
     const k = L.keyX(p);
-    ctx.fillStyle = s.pressed.has(p) ? lit(p) : "#16161a";
-    ctx.fillRect(k.x, line, k.width, kbH * 0.62);
+    drawBlackKey(ctx, { x: k.x, y: line, w: k.width, h: kbH * 0.62 }, s.pressed.has(p) ? lit(p) : null);
   }
   // The hit line (hit-line): a gently moving white stroke with a soft glow, brighter over each pressed key in that
   // key's light. Flat under reduced motion.

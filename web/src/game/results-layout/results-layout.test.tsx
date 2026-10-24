@@ -68,6 +68,14 @@ test("a chunk-practice step features chunk practice's panel, and the graph moves
   expect(between(plain, 'data-testid="results"', 'id="results-details"')).toContain("GRAPH");
 });
 
+test("a watch-demo take features its way back, and the graph moves to the details", () => {
+  const all = [...plugins, plugin("watch-demo", "BACK")];
+  const html = render({ plugins: all, params: new URLSearchParams("song=twinkle&bot=perfect&audible=1&demo=1") });
+  const ceremony = between(html, 'data-testid="results"', 'id="results-details"');
+  expect(ceremony).toContain("BACK");
+  expect(ceremony).not.toContain("GRAPH");
+});
+
 test("wait mode shows no rank or counts", () => {
   const html = render({ scored: false });
   expect(html).toContain('data-testid="unscored"');

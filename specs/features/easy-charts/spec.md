@@ -63,10 +63,9 @@ Follow `specs/context/visual-direction.md`. Build with the `frontend-design` ski
 step 8, "Look": 1280×720 and 1920×1080, plus reduced motion. Before and after screenshots go in the PR.
 
 ## Defaults
-- **The static keyboard (#384):** its fixed C-to-C range should come from the chart /play plays (after every
-  `transformChart`), so an Easy take shows the Easy chart's range for the whole song and the laptop map starts at the
-  Easy chart's lowest pitch. Check it once both have landed; a mismatch is a `fix(core-loop)` issue, not a change
-  here. Nothing here zooms or follows. A planner's scratch run of these rules on `c10fc30` left four Easy charts wider
+- **The static keyboard (#384):** an Easy take keeps the song's own keyboard, the range of the chart as loaded, the
+  same at either level (`specs/decisions/easy-charts-keyboard.md`). The laptop map starts at the Easy chart's lowest
+  pitch, as /play builds the keys device from the chart it plays. Nothing here zooms or follows. A planner's scratch run of these rules on `c10fc30` left four Easy charts wider
   than the laptop map (clair-de-lune, maple-leaf-rag, moonlight-3, nocturne-op9-2): those need Z / X.
   Narrowing them to the laptop is not this spec.
 - **4 notes per second is a starting value,** not a finding. The left hand keeps its top note too, as asked. If its

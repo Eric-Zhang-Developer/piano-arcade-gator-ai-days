@@ -11,7 +11,7 @@ export const ghostSettings = {
 };
 
 export const GHOST_KEY = "pianoArcade.ghost";
-const CHART_PARAMS = ["song", "from", "to", "tempo", "hands"]; // the URL params that change the chart
+const CHART_PARAMS = ["song", "from", "to", "tempo", "hands", "level"]; // the URL params that change the chart
 
 export interface Ghost {
   hits: { pitch: number; atMs: number; durationMs: number }[]; // atMs: when it was played (note time + offset)

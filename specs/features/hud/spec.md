@@ -19,8 +19,9 @@ highway, never in the lanes (`specs/context/references/*/README.md`). Register a
 
 ## Requirements
 - Everything is driven by `GameEvent`s only; the HUD never reads judging internals.
-- The counters show PERFECT, GREAT, MISS and extras, and update on every `noteHit`, `noteMiss` and `extra`.
-- Score: PERFECT = 100 × multiplier, GREAT = 50 × multiplier, MISS = 0. Multiplier tiers: x1 from a combo of 0, x2
+- The counters show PERFECT, GREAT, GOOD, MISS and WRONG, and update on every `noteHit`, `noteMiss` and
+  `wrongNote` (`judging-tiers`). A `wrongNote` resets the combo like a MISS.
+- Score: PERFECT = 100 × multiplier, GREAT = 50 × multiplier, GOOD = 25 × multiplier, MISS and WRONG = 0. Multiplier tiers: x1 from a combo of 0, x2
   from 10, x3 from 20, x4 from 30. Each tier has its own color, and the pips show progress to the next tier.
 - The combo number only shows from a combo of 5. On each `comboMilestone` it swells and a translucent ghost of the
   number fades out behind it over about 1 s.

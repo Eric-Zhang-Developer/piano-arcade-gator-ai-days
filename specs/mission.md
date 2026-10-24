@@ -25,8 +25,13 @@ decides (see the `needs-human` issue). Until then, nothing may claim to meet it.
 - Chart notes come from a cited score (cite the source in the chart) or from Eric. Never from an agent's memory.
   Which sources may be committed, and what stays local, is decision 003 (loose on purpose).
 - Judging is against the chart's clock, after the latency offset: PERFECT when |offset| ≤ 25 ms, GREAT when
-  25 ms < |offset| ≤ 50 ms, MISS when no matching key arrives within 50 ms. Exactly 25 ms counts as PERFECT; exactly
-  50 ms counts as GREAT. A key press that matches no chart note is an extra: counted, never a MISS.
+  25 ms < |offset| ≤ 50 ms, GOOD when 50 ms < |offset| ≤ the GOOD window (100 ms, a named setting), MISS when no
+  matching key arrives within the GOOD window. Each bound counts as the better judgment (exactly 25 ms is PERFECT).
+  Punish what a listener hears as wrong: PERFECT, GREAT and GOOD keep the combo; a MISS breaks it, and so does a
+  WRONG note (decision `judging-tiers-punish-what-sounds-wrong.md`).
+- A key press that matches no chart note is an extra: counted, never a MISS. An extra is a WRONG note unless a note
+  of the same pitch is within 150 ms of it (part of that note's timing) or it falls before the first note's window
+  opens or after the last one's closes.
 - A note matches a key press only if they're the same pitch. Each key press matches at most one chart note, and
   each chart note at most one key press.
 - MIDI input runs on Chrome's Web MIDI only. Laptop keys always work as a fallback, so the game is playable with the

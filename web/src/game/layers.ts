@@ -25,6 +25,7 @@ import { weakBars } from "./weak-bars";
 import { feverStage } from "./stage";
 import { takeGraph } from "./take-graph";
 import { versus } from "./versus";
+import { takeMidi } from "./take-midi";
 import { waitMode } from "./wait-mode/plugin";
 
 // Open file: each game feature registers its plugin here, one line each. /play draws every plugin's layer on its
@@ -48,6 +49,7 @@ export const plugins: GamePlugin[] = [
   replayView(), // results panel: Watch replay, the take on the highway in time with piano-out
   pianoOut(), // records the take for "Replay on piano"
   pianoVoice(), // the chart's GM voice on the DGX for the take (and its replay), then grand piano again
+  takeMidi(), // results panel: Download MIDI, the take as a .mid file
   feverStage(), // three.js stage behind the highway (background hook only, no 2D layer)
   tempoCurve(), // results panel: a rubato score beside the strict one
   weakBars(), // results panel: accuracy per phrase, and a link to loop the weakest

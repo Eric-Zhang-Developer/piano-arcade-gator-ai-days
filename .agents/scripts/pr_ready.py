@@ -3,6 +3,9 @@
 
   pr_ready.py [PR]          PR number, URL or branch (default: the PR for the current branch)
 
+Only the newest run of each check counts: a PR body edit reruns the workflow and cancels the run already going, and
+that CANCELLED entry stays in the rollup beside the newer result.
+
 Checks in this order and stops at the first blocker:
   exit 3  closed, merged, or still a draft
   exit 4  merge conflicts: rebase on origin/main
@@ -26,6 +29,7 @@ THREADS = """query($owner: String!, $repo: String!, $number: Int!) {
     reviewThreads(first: 100) { nodes { isResolved } } } } }"""
 FAIL = {"FAILURE", "ERROR", "CANCELLED", "TIMED_OUT", "ACTION_REQUIRED", "STARTUP_FAILURE", "STALE"}
 PASS = {"SUCCESS", "NEUTRAL", "SKIPPED"}
+NOT_YET = "0001-01-01T00:00:00Z"  # GitHub's time for something that hasn't happened yet
 
 
 def check_state(c: dict) -> str:
@@ -35,6 +39,20 @@ def check_state(c: dict) -> str:
     else:  # CheckRun: a conclusion only once status is COMPLETED
         state = c.get("conclusion") if c.get("status") == "COMPLETED" else None
     return "fail" if state in FAIL else "pass" if state in PASS else "pending"
+
+
+def newest_runs(checks: list[dict]) -> list[dict]:
+    """The newest entry per check (workflow + name, or a status's context), by its start, else its end. One with
+    neither yet is queued, so it's the newest."""
+    def when(c: dict) -> str:
+        return next((t for t in (c.get("startedAt"), c.get("completedAt")) if t and t != NOT_YET), "9999")
+
+    newest: dict = {}
+    for c in checks:
+        key = c.get("context") or (c.get("workflowName"), c.get("name"))
+        if key not in newest or when(c) >= when(newest[key]):
+            newest[key] = c
+    return list(newest.values())
 
 
 def unresolved_threads(root, pr: dict) -> int | None:
@@ -64,7 +82,7 @@ def verdict(root, pr: dict) -> tuple[int, str]:
         return 1, "could not read review threads (gh api graphql failed; try `gh auth status`)"
     if open_threads:
         return 6, f"{open_threads} unresolved review thread(s): answer or resolve them"
-    checks = pr.get("statusCheckRollup") or []
+    checks = newest_runs(pr.get("statusCheckRollup") or [])
     for code, kind in ((7, "fail"), (8, "pending")):
         if hit := [c.get("name") or c.get("context") or "?" for c in checks if check_state(c) == kind]:
             return code, f"{'failing' if kind == 'fail' else 'pending'} checks: {', '.join(hit)}"

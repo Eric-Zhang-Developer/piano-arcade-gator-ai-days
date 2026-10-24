@@ -2,6 +2,7 @@
 // right hand on the treble staff, the left on the bass; bars, ties, chords, voices and a spelled key. Pure: the same
 // chart gives the same string. placeNotes is what sheet-view uses to find a judged note's notehead.
 import type { Chart, ChartNote } from "../../contracts";
+import { shouldBeam } from "../sheet-beams";
 import { estimateKey, spell, spellingFor, type Key } from "./key";
 import { overrides, type Override } from "./overrides";
 
@@ -113,14 +114,25 @@ export function chartToMusicXml(chart: Chart, song: Chart = chart): string {
   const { key, meter } = keyAndMeter(chart, song);
   const table = spellingFor(key);
   const placed = placeNotes(chart);
+  // Each beamed chord's place in its beam (sheet-beams), by its first note's id. A beamable chord is one printed
+  // value inside one beat group, so it's always one <note> per pitch. VexFlow draws the 16th lines itself.
+  const onsetOf = new Map(placed.map((p) => [p.id, p.onset]));
+  const beamAt = new Map<string, "begin" | "continue" | "end">();
+  for (const ids of shouldBeam(placed, meter)) {
+    const onsets = [...new Set(ids.map((id) => onsetOf.get(id)))];
+    for (const id of ids) {
+      const i = onsets.indexOf(onsetOf.get(id));
+      beamAt.set(id, i === 0 ? "begin" : i === onsets.length - 1 ? "end" : "continue");
+    }
+  }
   const bars = Math.max(1, Math.ceil(Math.max(0, ...placed.map((p) => p.end)) / barLen));
   const staves: [1 | 2, Chord[]][] = [
     [1, voices(placed, 1)],
     [2, voices(placed, 2)],
   ];
 
-  const note = (staff: number, voice: number, len: number, type: string, dot: boolean, body: string, ties = "", tied = "") =>
-    `<note>${body}<duration>${len}</duration>${ties}<voice>${voice}</voice><type>${type}</type>${dot ? "<dot/>" : ""}<staff>${staff}</staff>${tied ? `<notations>${tied}</notations>` : ""}</note>`;
+  const note = (staff: number, voice: number, len: number, type: string, dot: boolean, body: string, ties = "", tied = "", beam = "") =>
+    `<note>${body}<duration>${len}</duration>${ties}<voice>${voice}</voice><type>${type}</type>${dot ? "<dot/>" : ""}<staff>${staff}</staff>${beam ? `<beam number="1">${beam}</beam>` : ""}${tied ? `<notations>${tied}</notations>` : ""}</note>`;
   const rests = (staff: number, voice: number, len: number) =>
     pieces(len).map(([d, type, dot]) => note(staff, voice, d, type, dot, "<rest/>")).join("");
   const forward = (staff: number, voice: number, len: number) => `<forward><duration>${len}</duration><voice>${voice}</voice><staff>${staff}</staff></forward>`;
@@ -156,7 +168,7 @@ export function chartToMusicXml(chart: Chart, song: Chart = chart): string {
             c.pitches.forEach((p, j) => {
               const s = spell(p, table);
               const pitch = `<pitch><step>${s.step}</step>${s.alter ? `<alter>${s.alter}</alter>` : ""}<octave>${s.octave}</octave></pitch>`;
-              out += note(staff, v, d, type, dot, `${j ? "<chord/>" : ""}${pitch}`, ties, tied);
+              out += note(staff, v, d, type, dot, `${j ? "<chord/>" : ""}${pitch}`, ties, tied, j ? "" : (beamAt.get(c.first) ?? ""));
             });
           });
           at = to;

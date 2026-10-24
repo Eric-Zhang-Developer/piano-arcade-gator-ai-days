@@ -85,7 +85,13 @@ for (const [w, h] of [
   const box = await link.boundingBox();
   const others = {
     list: await page.locator("ol").first().boundingBox(),
-    focus: await page.locator("section[aria-live]").first().boundingBox(),
+    // The focus panel is a grid cell down to the screen's bottom, so its own box holds the Options button too: what
+    // it covers is what it draws, the union of its children's boxes.
+    focus: await page.locator("section[aria-live]").first().evaluate((el) => {
+      const r = [...el.querySelectorAll("*")].map((c) => c.getBoundingClientRect()).filter((b) => b.width && b.height);
+      const x = Math.min(...r.map((b) => b.left)), y = Math.min(...r.map((b) => b.top));
+      return { x, y, width: Math.max(...r.map((b) => b.right)) - x, height: Math.max(...r.map((b) => b.bottom)) - y };
+    }),
     options: await page.getByTestId("options-open").boundingBox(),
   };
   const covered = Object.entries(others).filter(([, b]) => overlaps(box, b)).map(([k]) => k);

@@ -13,6 +13,6 @@ result itself.
 **Context.** The spec says the page plays "every channel of the file". The plugin skips channel 1 entirely, and the
 planner asked for the page to match by default.
 **Options.** A: `?mute=` defaults to `1`, and `?mute=` alone plays every channel. B: every channel by default.
-**Choice.** A. The page is how Eric hears what the game will play, so it should sound like the game. A Flower Dance
-file with its piano on channel 1 then needs no minus-piano copy.
+**Choice.** A. The page is how Eric hears what the game will play, so it should sound like the game. An arrangement
+with its piano on channel 1 then needs no minus-piano copy.
 **Undo.** Default `MUTE` to empty in `spikes/band-player/player.mjs`.

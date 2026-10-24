@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { validateChart, type Chart } from "../../contracts";
 import { judgeTake } from "../../game/core/judge";
@@ -70,7 +71,10 @@ export default function ProgressPage() {
   const weak = data ? weakestBars(data.bars) : [];
   return (
     <main style={page}>
-      <h1 style={{ margin: "0 0 4px" }}>Your progress</h1>
+      <Link href="/" style={{ color: "#9aa", textDecoration: "none", fontSize: 14 }}>
+        ← Menu
+      </Link>
+      <h1 style={{ margin: "8px 0 4px" }}>Your progress</h1>
       <p style={{ opacity: 0.7, marginTop: 0 }}>
         {songId} · {source === "account" ? "saved to your account" : "on this device"}
         {isConfigured() && (!session || session.is_anonymous) && (
@@ -98,7 +102,7 @@ export default function ProgressPage() {
       {!data && <p>Loading…</p>}
       {data && data.history.length === 0 && (
         <p data-testid="no-takes">
-          No takes yet. <a href={`/play`} style={{ color: "#5ef2c4" }}>Play a song</a> and your takes show up here.
+          No takes yet. <Link href={`/play`} style={{ color: "#5ef2c4" }}>Play a song</Link> and your takes show up here.
         </p>
       )}
       {data && data.history.length > 0 && (

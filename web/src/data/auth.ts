@@ -15,6 +15,47 @@ export interface Session {
 export const SESSION_KEY = "pianoArcade.session";
 /** The anonymous session to merge after a Google sign-in on this device (its refresh token survives the redirect). */
 const MERGE_KEY = "pianoArcade.mergeFrom";
+/** Where to land after Google sends the player back (a path on this site). Kept outside the redirect URL, which
+ * Supabase matches exactly against its allow-list. */
+const NEXT_KEY = "pianoArcade.afterSignIn";
+
+/** A path on this site, or "/". Never another origin: "//evil.example" and "https://..." become "/". */
+export function safeNext(next: string | null | undefined): string {
+  return next && next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\") ? next : "/";
+}
+
+function rememberNext(next: string | undefined): void {
+  try {
+    localStorage.setItem(NEXT_KEY, safeNext(next ?? window.location.pathname + window.location.search));
+  } catch {
+    // storage blocked: the player lands on the menu
+  }
+}
+
+function peekNext(): string {
+  try {
+    return safeNext(localStorage.getItem(NEXT_KEY));
+  } catch {
+    return "/";
+  }
+}
+
+/** The page to open once sign-in finishes (the menu unless something else asked), and forget it. */
+export function takeNext(): string {
+  try {
+    const next = localStorage.getItem(NEXT_KEY);
+    localStorage.removeItem(NEXT_KEY);
+    return safeNext(next);
+  } catch {
+    return "/";
+  }
+}
+
+/** The signed-in Google player, or null for guests and when signed out. */
+export async function googleSession(): Promise<Session | null> {
+  const s = await getSession().catch(() => null);
+  return s && !s.is_anonymous ? s : null;
+}
 
 function load(): Session | null {
   try {
@@ -99,9 +140,10 @@ export async function ensureSession(): Promise<Session> {
   return next;
 }
 
-/** Sends the player to Google; they come back to /auth/callback signed in as the same user. */
-export async function linkGoogle(): Promise<void> {
+/** Sends the player to Google; they come back to /auth/callback signed in as the same user, then to `next`. */
+export async function linkGoogle(next?: string): Promise<void> {
   const s = await ensureSession();
+  rememberNext(next);
   const redirectTo = `${window.location.origin}/auth/callback`;
   const q = new URLSearchParams({ provider: "google", redirect_to: redirectTo, skip_http_redirect: "true" });
   const res = await authFetch(`/user/identities/authorize?${q}`, { method: "GET" }, s.access_token);
@@ -111,7 +153,8 @@ export async function linkGoogle(): Promise<void> {
 }
 
 /** Sends the player to Google to sign in to an existing account. This device's anonymous takes follow them there. */
-export async function signInWithGoogle(): Promise<void> {
+export async function signInWithGoogle(next?: string): Promise<void> {
+  rememberNext(next);
   const current = await getSession().catch(() => null);
   try {
     if (current?.is_anonymous) localStorage.setItem(MERGE_KEY, current.refresh_token);
@@ -158,7 +201,7 @@ export async function finishRedirect(hash: string): Promise<string | null> {
   const p = new URLSearchParams(hash.replace(/^#/, ""));
   if (p.get("error_code") === "identity_already_exists") {
     // This Google account already belongs to a player (linked on another device): sign in to it instead.
-    await signInWithGoogle();
+    await signInWithGoogle(peekNext());
     return "redirecting";
   }
   const err = p.get("error_description") ?? p.get("error");

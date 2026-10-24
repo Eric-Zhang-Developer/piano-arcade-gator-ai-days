@@ -155,3 +155,33 @@ describe("the judgment word (#244)", () => {
     expect(((line - p.bottom) / line) * settings.lookaheadMs).toBeGreaterThan(1000);
   });
 });
+
+describe("keys outside the chart's range", () => {
+  it("lie off-screen at finite positions, and every key in range is where it was", () => {
+    const L = makeLayout(chart([60, 69]), 800, 600, 0);
+    const w = L.keyX(60).width;
+    expect(L.keyX(57)).toEqual({ x: -w, width: w }); // A3, one white below the range's lowest key (B3)
+    expect(L.keyX(30).x).toBeLessThan(0);
+    expect(Number.isFinite(L.keyX(30).x) && Number.isFinite(L.keyX(108).x) && Number.isFinite(L.keyX(54).x)).toBe(true);
+    expect(L.keyX(72).x).toBeGreaterThanOrEqual(800);
+    for (let p = L.lowPitch, i = 0; p <= L.highPitch; p++) if (!isBlack(p)) expect(L.keyX(p).x).toBeCloseTo(i++ * w);
+  });
+
+  it("a pressed key below the range draws without throwing", () => {
+    const L = makeLayout(chart([60, 69]), 800, 600, 0);
+    const ctx = new Proxy({} as Record<string | symbol, unknown>, {
+      get: (o, k) =>
+        k in o
+          ? o[k]
+          : k === "createRadialGradient" || k === "createLinearGradient"
+            ? (...a: number[]) => {
+                if (!a.every(Number.isFinite)) throw new TypeError("non-finite");
+                return { addColorStop: () => {} };
+              }
+            : () => ({ width: 0 }),
+      set: (o, k, v) => ((o[k] = v), true),
+    }) as unknown as CanvasRenderingContext2D;
+    const s: HighwayState = { nowMs: 0, noteState: new Map(), pressed: new Set([30, 60]), latest: null, countInBeat: null };
+    expect(() => drawHighway(ctx, L, chart([60, 69]), s)).not.toThrow();
+  });
+});

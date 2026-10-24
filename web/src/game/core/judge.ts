@@ -29,9 +29,12 @@ export class Judge {
   private gauge: Gauge;
   private results: Results | null = null;
 
+  // scored: false (wait mode) judges as usual but sends none of the score's moments: no combo milestones, no fever
+  // and no full combo. songEnd still goes out, since records, piano-out and the rest need it.
   constructor(
     private readonly chart: Chart,
     private readonly onEvent: (e: GameEvent) => void = () => {},
+    private readonly opts: { scored?: boolean } = {},
   ) {
     this.times = chart.notes.map((n) => noteTimeMs(chart, n));
     this.byTime = chart.notes.map((_, i) => i).sort((a, b) => this.times[a] - this.times[b]);
@@ -61,6 +64,7 @@ export class Judge {
     this.gauge = reduceGauge(this.gauge, hit);
     this.onEvent(hit);
     this.onEvent({ type: "combo", count: this.combo, atMs: timeMs });
+    if (!this.scored) return;
     if (isMilestone(this.combo)) this.onEvent({ type: "comboMilestone", count: this.combo, atMs: timeMs });
     if (this.gauge.fever && !wasFever) this.onEvent({ type: "feverStart", atMs: timeMs });
   }
@@ -91,7 +95,7 @@ export class Judge {
       maxCombo: this.maxCombo,
       rank: rankFor(accuracy),
     };
-    if (counts.MISS === 0 && this.wrong.length === 0) this.onEvent({ type: "fullCombo", atMs });
+    if (this.scored && counts.MISS === 0 && this.wrong.length === 0) this.onEvent({ type: "fullCombo", atMs });
     this.onEvent({ type: "songEnd", results: this.results, atMs });
     return this.results;
   }
@@ -123,7 +127,11 @@ export class Judge {
     this.combo = 0;
     const wasFever = this.gauge.fever;
     this.gauge = reduceGauge(this.gauge, e);
-    if (wasFever) this.onEvent({ type: "feverEnd", atMs: e.atMs });
+    if (wasFever && this.scored) this.onEvent({ type: "feverEnd", atMs: e.atMs });
+  }
+
+  private get scored(): boolean {
+    return this.opts.scored !== false;
   }
 }
 

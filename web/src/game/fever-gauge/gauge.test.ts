@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { GameEvent } from "../../contracts";
-import { meterLayout } from ".";
+import { feverGauge, meterLayout } from ".";
 import { hudLayout } from "../hud";
 import { emptyGauge, gaugeSize, reduceGauge } from "./gauge";
 
@@ -43,5 +43,24 @@ describe("fever meter", () => {
       expect(l.bar.y).toBe(hudLayout(w, line).panel.h);
       expect(l.bottom).toBeLessThan(hudLayout(w, line).safeY);
     }
+  });
+});
+
+describe("the meter in wait mode", () => {
+  it("draws nothing", () => {
+    const calls: string[] = [];
+    const ctx = new Proxy({} as Record<string | symbol, unknown>, {
+      get: (o, k) => (k in o ? o[k] : () => calls.push(String(k))),
+      set: (o, k, v) => ((o[k] = v), true),
+    }) as unknown as CanvasRenderingContext2D;
+    const draw = (params: string) => {
+      calls.length = 0;
+      const p = feverGauge();
+      p.transformChart!({ notes: Array(42).fill({}) } as never, new URLSearchParams(params));
+      p.draw!(ctx, { width: 1280, height: 720, judgmentLineY: 560, nowMs: 0 } as never);
+      return [...calls];
+    };
+    expect(draw("")).toContain("fillRect");
+    expect(draw("mode=wait")).toEqual([]);
   });
 });

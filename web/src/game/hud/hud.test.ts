@@ -128,3 +128,27 @@ describe("the HUD panel", () => {
     expect(rects.some((r) => r.x <= 0 && r.y <= 0 && r.w >= width && r.h >= band && r.alpha === 1 && opaque(r.style))).toBe(true);
   });
 });
+
+describe("the HUD in wait mode", () => {
+  const texts = (params: string) => {
+    const out: string[] = [];
+    const t: Record<string | symbol, unknown> = { globalAlpha: 1 };
+    const ctx = new Proxy(t, {
+      get: (o, k) => (k in o ? o[k] : k === "fillText" ? (s: string) => out.push(s) : () => ({ width: 10 })),
+      set: (o, k, v) => ((o[k] = v), true),
+    }) as unknown as CanvasRenderingContext2D;
+    const p = hud();
+    const twinkle = { id: "t", title: "Twinkle", composer: "trad", source: "x", bpm: 100, beatsPerBar: 4, notes: [] } as unknown as Chart;
+    p.transformChart!(twinkle, new URLSearchParams(params));
+    for (let i = 0; i < 30; i++) p.onEvent!({ type: "combo", count: i + 1, atMs: i * 100 });
+    p.draw!(ctx, { width: 1280, height: 720, judgmentLineY: 560, nowMs: 3000 } as never);
+    return out;
+  };
+
+  it("draws the song card only: no counters, score, multiplier or combo", () => {
+    expect(texts("")).toEqual(expect.arrayContaining(["PERFECT", "SCORE", "COMBO"]));
+    const wait = texts("mode=wait");
+    expect(wait).toContain("Twinkle");
+    for (const s of ["PERFECT", "SCORE", "COMBO", "x1", "x4", "30"]) expect(wait).not.toContain(s);
+  });
+});

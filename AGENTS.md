@@ -6,7 +6,8 @@ The spec is the source of truth. Chat and memory aren't. Everything you need is 
 1. `git fetch origin`. If a `STOP` file exists on `origin/main`, stop: comment on your open PR and push nothing.
 2. Write your heartbeat: `d="$(git rev-parse --git-common-dir)/agent-heartbeats"; mkdir -p "$d"; pwd > "$d/<your-worker-name>"`.
 3. Read from `origin/main`: `specs/mission.md`, `specs/tech-stack.md`, `specs/roadmap.md`, `specs/milestones.toml`,
-   then your feature's `specs/features/<slug>/spec.md`.
+   then your feature's `specs/features/<slug>/spec.md`. Planning, or writing a done note, the story or pitch
+   material? Also read "For agents" in `specs/context/event.md` (what judges score).
 4. Finish your own open PRs first (fix red ones). Then pick new work.
 5. Before re-taking a feature with earlier PRs, read its open and closed PRs: `gh pr list --search "<slug> in:title" --state all`.
 

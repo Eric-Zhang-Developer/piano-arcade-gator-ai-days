@@ -79,3 +79,15 @@ test("card names come from plugin ids unless the settings name them", () => {
   expect(panelName("chord-sync")).toBe("Chord sync");
   expect(panelName("take-midi")).toBe("MIDI");
 });
+
+test("a NEW RECORD take features record-moment alone, and the graph moves to the details for that take", () => {
+  const all = [...plugins, plugin("record-moment", "NEW RECORD")];
+  const html = render({ plugins: all, newRecord: true });
+  const ceremony = between(html, 'data-testid="results"', 'id="results-details"');
+  const details = html.slice(html.indexOf('id="results-details"'));
+  expect(ceremony).toContain("NEW RECORD");
+  expect(ceremony).not.toContain("GRAPH");
+  expect(details).toContain('aria-label="Take graph"');
+  const plain = render({ plugins: all, newRecord: false });
+  expect(between(plain, 'data-testid="results"', 'id="results-details"')).toContain("GRAPH");
+});

@@ -1,0 +1,17 @@
+.companion { position:absolute; left:24px; top:24px; display:flex; align-items:flex-start; gap:12px; max-width:352px; color:var(--pa-ink); }
+.character { flex:none; padding-top:8px; }
+.pet { display:block; width:76px; height:76px; }
+.message { min-width:0; max-width:220px; padding:5px 16px 0 0; }
+.message h2 { margin:0 0 8px; font:italic 800 18px/1.2 var(--pa-font-display),system-ui,sans-serif; text-wrap:balance; }
+.message p { margin:0 0 12px; color:var(--pa-ink-dim); font:12px/1.55 system-ui,sans-serif; }
+.companion .action { display:flex; align-items:center; gap:20px; padding:7px 12px; color:var(--pa-bg); background:var(--pa-cyan); border:0; border-radius:4px; font:italic 800 14px var(--pa-font-display),system-ui,sans-serif; cursor:pointer; }
+.companion .action:hover { background:#85edff; }
+.companion .collapse { position:absolute; right:0; top:0; display:grid; place-items:center; width:24px; height:24px; padding:3px; background:none; color:var(--pa-ink-dim); border:0; cursor:pointer; }
+.collapse svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.5; }
+.companion .collapse:hover { color:var(--pa-ink); }
+.companion .restore { border:0; padding:0; background:none; cursor:pointer; border-radius:4px; }
+.companion button:focus-visible { outline:2px solid var(--pa-magenta); outline-offset:4px; }
+@media (prefers-reduced-motion:no-preference) { .pet[data-idle=true] { animation:companion-idle 6s ease-in-out infinite; } }
+@keyframes companion-idle { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-2px); } }
+@media (prefers-reduced-motion:reduce) { .pet { animation:none; transform:none; } }
+@media (max-width:1300px) { .companion { left:16px; top:18px; max-width:328px; gap:10px; } .message { max-width:210px; } }

@@ -70,3 +70,5 @@
 .home .cameraControls button { min-width:28px; height:28px; padding:4px 8px; background:none; border:0; color:var(--graph-ink); font:13px system-ui,sans-serif; cursor:pointer; }
 .cameraControls output { min-width:44px; text-align:center; color:var(--graph-muted); font-size:11px; font-variant-numeric:tabular-nums; }
 .home .focusGroup { font:inherit; font-size:12px; padding:8px 12px; margin:0 0 16px; border:1px solid var(--graph-rule); background:none; color:var(--graph-ink); cursor:pointer; }
+
+.recommended { fill:none; stroke:var(--graph-action); stroke-width:1.2; stroke-dasharray:2 4; opacity:.65; pointer-events:none; }

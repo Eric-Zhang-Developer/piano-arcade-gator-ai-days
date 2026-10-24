@@ -21,7 +21,7 @@ export function LearningLanding({ group }: { group?: 'Learn' | 'Review' }) {
     sessions.setGraphContext({ activityId: activity.id, group: targetGroup, title: skill.title, demoActivity: skill.activity });
     router.push(targetGroup === 'Learn' ? '/learn/explore' : '/learn/review');
   }
-  if (!group) return <div className={styles.graphHome}><MasteryGraphHome onAction={openGraphActivity}/></div>;
+  if (!group) return <div className={styles.graphHome}><MasteryGraphHome onAction={openGraphActivity} companion={{ collapsed: sessions.companionCollapsed, onCollapsedChange: sessions.setCompanionCollapsed }}/></div>;
   const choices = activities.filter(activity => activity.group === group);
   const mapContext = sessions.graphContext?.group === group ? sessions.graphContext : null;
   const preferred = choices.find(activity => activity.id === mapContext?.activityId) ?? choices.find(activity => activity.id === sessions.last) ?? choices[0];

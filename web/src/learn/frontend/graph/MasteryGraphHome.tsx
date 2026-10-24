@@ -1,16 +1,17 @@
 'use client';
 
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { actionFor, byId, demoGoal, rootRelationships, stateOf, type Domain, type GraphAction } from './data';
+import { actionFor, byId, demoGoal, recommendation, rootRelationships, stateOf, type Domain, type GraphAction } from './data';
 import { layoutGraph, neighbor } from './layout';
 import { branchCurve, curve, mapSize, overviewCamera, placeLabels, presentation, projectGraph, viewPoints } from './projection';
 import styles from './graph.module.css';
+import { GraphCompanion, type CompanionControl } from './GraphCompanion';
 
-export type MasteryGraphHomeProps = { onAction: (action: GraphAction) => void };
+export type MasteryGraphHomeProps = { onAction: (action: GraphAction) => void; companion?: CompanionControl };
 const masteryWords = { mastered: 'Established', developing: 'Developing', unknown: 'Unknown' };
 const relationships = rootRelationships;
 
-export function MasteryGraphHome({ onAction }: MasteryGraphHomeProps) {
+export function MasteryGraphHome({ onAction, companion }: MasteryGraphHomeProps) {
   const [domain, setDomain] = useState<Domain>('theory');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hover, setHover] = useState<string | null>(null);
@@ -29,7 +30,11 @@ export function MasteryGraphHome({ onAction }: MasteryGraphHomeProps) {
   const points = viewPoints(projected, camera, viewport.width, viewport.height);
   const pointById = new Map(points.map(point => [point.node.id, point]));
   const { visible, preview } = presentation(points, selectedId, viewport.width, viewport.height);
-  const labels = placeLabels(points, visible, preview, selectedId, hover, camera.scale, viewport.width, viewport.height);
+  const suggestion = recommendation(domain);
+  const suggestionPolicy = suggestion ? actionFor(suggestion) : undefined;
+  const showCompanion = !!companion && !selectedId && camera.scale === 1 && camera.x === 0 && camera.y === 0 && !!suggestionPolicy?.action;
+  const recommendedId = showCompanion && !companion!.collapsed ? suggestion?.id : undefined;
+  const labels = placeLabels(points, visible, preview, selectedId, hover ?? recommendedId ?? null, camera.scale, viewport.width, viewport.height);
   const selected = selectedId ? byId.get(selectedId) : undefined;
   const selectedPoint = selectedId ? pointById.get(selectedId) : undefined;
   const policy = selected ? actionFor(selected) : undefined;
@@ -84,12 +89,13 @@ export function MasteryGraphHome({ onAction }: MasteryGraphHomeProps) {
           const group = point.depth === 0, chosen = point.node.id === selectedId, learner = stateOf(point.node.id);
           const radius = group ? 9 : point.depth === 1 ? 4.5 : 2.8;
 
-          return <g key={point.node.id} role="button" tabIndex={chosen || !selectedId && point === points[0] ? 0 : -1} data-skill={point.node.id} aria-label={`${point.node.title}, ${group ? 'skill group' : masteryWords[learner.mastery]}${learner.due ? ', review due' : ''}`} aria-pressed={chosen} className={styles.node} data-state={group ? 'group' : learner.mastery} data-preview={preview.has(point.node.id)} data-selected={chosen} onClick={event => {event.stopPropagation();if(!suppressClick.current)select(point.node.id);suppressClick.current=false;}} onMouseEnter={() => setHover(point.node.id)} onMouseLeave={() => setHover(null)} onKeyDown={event => {
+          return <g key={point.node.id} role="button" tabIndex={chosen || !selectedId && point === points[0] ? 0 : -1} data-skill={point.node.id} aria-label={`${point.node.title}, ${group ? 'skill group' : masteryWords[learner.mastery]}${learner.due ? ', review due' : ''}${point.node.id === recommendedId ? ', suggested next' : ''}`} aria-pressed={chosen} className={styles.node} data-state={group ? 'group' : learner.mastery} data-preview={preview.has(point.node.id)} data-selected={chosen} data-recommended={point.node.id === recommendedId} onClick={event => {event.stopPropagation();if(!suppressClick.current)select(point.node.id);suppressClick.current=false;}} onMouseEnter={() => setHover(point.node.id)} onMouseLeave={() => setHover(null)} onKeyDown={event => {
             if (event.key.startsWith('Arrow')) { event.preventDefault(); event.stopPropagation(); move(point.node.id, event.key); }
             if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); select(point.node.id); }
             if (event.key === 'Escape') { event.preventDefault(); close(); }
           }}>
             <title>{point.node.title}</title><circle cx={point.screenX} cy={point.screenY} r="15" className={styles.hit}/>
+            {point.node.id === recommendedId && <circle cx={point.screenX} cy={point.screenY} r={radius + 7} className={styles.recommended}/>}
             {chosen && <circle cx={point.screenX} cy={point.screenY} r={radius + 6} className={styles.selection}/>}
             <circle cx={point.screenX} cy={point.screenY} r={radius} className={styles.dot}/>
             {!group && learner.due && <circle cx={point.screenX + radius + 2} cy={point.screenY - radius - 2} r="2.8" className={styles.due}/>}
@@ -97,6 +103,7 @@ export function MasteryGraphHome({ onAction }: MasteryGraphHomeProps) {
         })}
         {labels.map(label => <g key={`label-${label.id}`} pointerEvents="none"><rect className={styles.labelClearance} x={label.x} y={label.y} width={label.width} height={label.height}/><text x={label.x+label.width/2} y={label.y+label.height-6} textAnchor="middle" className={label.root?styles.groupLabel:styles.nodeLabel}>{label.text}</text></g>)}
       </svg>
+      {showCompanion && companion && suggestion && suggestionPolicy?.action && <GraphCompanion {...companion} skill={suggestion} action={suggestionPolicy.action} reason={`This helps you ${demoGoal.title.toLowerCase()}.`} onAction={onAction}/>}
       <div className={styles.cameraControls} aria-label="Map view"><button type="button" aria-label="Zoom out" disabled={camera.scale<=1} onClick={()=>zoom(.8)}>−</button><output aria-label="Map zoom">{Math.round(camera.scale*100)}%</output><button type="button" aria-label="Zoom in" disabled={camera.scale>=4} onClick={()=>zoom(1.25)}>+</button><button type="button" onClick={fit}>Fit map</button></div>
       {selected && status && policy && <aside className={styles.inspector} aria-label="Selected skill" data-side={selectedPoint && selectedPoint.screenX > viewport.width * .58 ? 'left' : 'right'}>
         <header><h2>{selected.title}</h2><button type="button" onClick={close} aria-label="Close skill details"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>

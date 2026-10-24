@@ -48,6 +48,10 @@ features = [
   "play-slots",
   "scenes",
   "fever-gauge",
+  "dynamics",
+  "evenness",
+  "take-graph",
+  "weak-bars",
   "difficulty",
   "hand-colors",
   "note-labels",
@@ -60,10 +64,14 @@ cut = []
 name = "encore"
 ship = ""
 features = [
+  "replay-view",
   "wait-mode",
   "highway-zoom",
   "ghost",
+  "chord-sync",
+  "tempo-curve",
   "piano-voice",
+  "take-midi",
   "versus",
 ]
 cut = []

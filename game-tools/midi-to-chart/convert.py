@@ -22,8 +22,9 @@ class Refused(Exception):
     pass
 
 
-def bar_starts(mid, upto_bar):
-    """Tick of each bar's start (1-based list index 0 = bar 1) and each bar's length in quarter notes."""
+def bar_starts(mid, upto_bar, pickup=0):
+    """Tick of each bar's start (list index 0 = bar 1) and the meter there, in quarter notes. With a pickup (in ticks),
+    bar 1 is the pickup and bar 2 starts after it."""
     sigs = []
     for track in mid.tracks:
         t = 0
@@ -41,7 +42,7 @@ def bar_starts(mid, upto_bar):
         length = Fraction(num * 4, den)
         starts.append(tick)
         lengths.append(length)
-        tick += int(length * tpb)
+        tick += pickup if pickup and len(starts) == 1 else int(length * tpb)
     return starts, lengths
 
 
@@ -63,27 +64,60 @@ def notes_of(mid, which, by_channel):
     return out
 
 
-def convert(mid, rh, lh=None, bars=(1, 1), by_channel=False):
-    """Returns (notes, beatsPerBar, log). Notes are dicts in time order with ids."""
-    first, last = bars
-    starts, lengths = bar_starts(mid, last)
-    lo, hi = starts[first - 1], starts[last]
+def outer_voice(notes, voice):
+    """The top (or bottom) voice of a staff: a note stays unless another note sounding at its onset is higher (lower)."""
+    if voice == "all":
+        return notes
+    other = (lambda q, p: q > p) if voice == "top" else (lambda q, p: q < p)
+    return [n for n in notes if not any(m is not n and m[0] <= n[0] < m[1] and other(m[2], n[2]) for m in notes)]
+
+
+def convert(mid, rh, lh=None, bars=(1, 1), by_channel=False, rh_voice="all", lh_voice="all", pickup=0, spans=None, start_beat=0):
+    """Returns (notes, beatsPerBar, log). Notes are dicts in time order with ids. pickup is in quarter notes.
+
+    spans, in place of bars: (from, to) ranges in quarter notes from the file's start, played one after another from
+    beat start_beat. That writes out repeats and volta endings, which notation MIDI plays only once."""
     tpb = mid.ticks_per_beat
+    snap = lambda t: Fraction(round(Fraction(t, tpb) * GRID), GRID)  # ticks -> quarter notes on the grid
+    if spans:
+        segments = [(int(Fraction(a) * tpb), int(Fraction(b) * tpb)) for a, b in spans]
+        shift, meter, where = Fraction(start_beat), bar_starts(mid, 1)[1][0], f"spans {spans}"
+    else:
+        first, last = bars
+        pickup_ticks = int(Fraction(pickup) * tpb)
+        starts, lengths = bar_starts(mid, last, pickup_ticks)
+        segments = [(starts[first - 1], starts[last])]
+        # A charted pickup sits at the end of a silent bar, so beat 0 stays a downbeat (beat-track's kick, bar lines).
+        shift = lengths[0] - Fraction(pickup_ticks, tpb) if pickup_ticks and first == 1 else 0
+        meter, where = lengths[first], f"bars {first}-{last}"  # the meter of the first full bar
     log = []
-    hands = [("R", rh)] + ([("L", lh)] if lh is not None else [])
+    hands = [("R", rh, rh_voice)] + ([("L", lh, lh_voice)] if lh is not None else [])
     picked = []
-    for hand, which in hands:
-        inside = [(on, off, p) for (on, off, p) in notes_of(mid, which, by_channel) if lo <= on < hi]
-        if not inside:
-            raise Refused(f"{hand} hand ({'channel' if by_channel else 'track'} {which}) has no notes in bars {first}-{last}")
-        off_grid = [n for n in inside if (n[0] * GRID) % tpb or (min(n[1], hi) * GRID) % tpb]
-        if off_grid:
-            raise Refused(f"{len(off_grid)} of {len(inside)} {hand} notes are off the 1/{GRID}-beat grid: a performance, not notation")
-        for on, off, p in inside:
-            beat = Fraction(on - lo, tpb)
-            dur = Fraction(min(off, hi) - on, tpb)  # a note held past the last bar ends at it
-            if dur > 0:
-                picked.append({"hand": hand, "pitch": p, "beat": beat, "duration": dur})
+    for lo, hi in segments:
+        for hand, which, voice in hands:
+            inside = [(on, off, p) for (on, off, p) in notes_of(mid, which, by_channel) if lo <= on < hi]
+            # Notation MIDI plays a grace note as a sliver just before its main note: off the grid and under 1/8 beat.
+            grace = [n for n in inside if (n[0] * GRID) % tpb and (n[1] - n[0]) * 8 <= tpb]
+            for on, _, p in grace:
+                log.append(f"grace note skipped: {hand} pitch {p} before beat {snap(on - lo) + shift}")
+            inside = outer_voice([n for n in inside if n not in grace], voice)
+            # Onsets must sit on the grid; releases are snapped, since engravers' MIDI shortens some by a tick.
+            off_grid = [n for n in inside if (n[0] * GRID) % tpb]
+            if off_grid:
+                raise Refused(f"{len(off_grid)} of {len(inside)} {hand} notes start off the 1/{GRID}-beat grid: a performance, not notation")
+            snapped = 0
+            for on, off, p in inside:
+                beat = Fraction(on - lo, tpb)
+                end = snap(min(off, hi) - lo)  # a note held past the segment's end ends at it
+                snapped += end != Fraction(min(off, hi) - lo, tpb)
+                if end > beat:
+                    picked.append({"hand": hand, "pitch": p, "beat": beat + shift, "duration": end - beat})
+            if snapped:
+                log.append(f"{snapped} {hand} releases snapped to the 1/{GRID}-beat grid")
+        shift += Fraction(hi - lo, tpb)
+    for hand, which, _ in hands:
+        if not any(n["hand"] == hand for n in picked):
+            raise Refused(f"{hand} hand ({'channel' if by_channel else 'track'} {which}) has no notes in {where}")
     picked.sort(key=lambda n: (n["beat"], n["pitch"], n["hand"]))
     notes = []
     for n in picked:
@@ -104,7 +138,7 @@ def convert(mid, rh, lh=None, bars=(1, 1), by_channel=False):
         {"id": f"n{i + 1}", "pitch": n["pitch"], "beat": num(n["beat"]), "duration": num(n["duration"]), "hand": n["hand"]}
         for i, n in enumerate(notes)
     ]
-    return out, num(lengths[first - 1]), log
+    return out, num(meter), log
 
 
 def num(f):
@@ -153,6 +187,34 @@ def self_test():
             raise AssertionError(f"should refuse: {needle}")
         except Refused as e:
             assert needle in str(e), e
+    # Two voices on one staff: the top voice keeps the long C and the B that starts under nothing higher; the alto's
+    # E (under C) and its own D (under B) go. The bottom voice is the mirror.
+    duet = mido.MidiFile(ticks_per_beat=480)
+    a, b = mido.MidiTrack(), mido.MidiTrack()
+    duet.tracks += [a, b]
+    play(a, [(0, 960, 72), (960, 960, 71)])  # soprano: C half, B half
+    play(b, [(0, 480, 64), (480, 480, 67), (960, 960, 62)])  # alto: E, G, D (G starts under C: alto)
+    merged = mido.merge_tracks(duet.tracks)
+    staff = mido.MidiFile(ticks_per_beat=480)
+    staff.tracks.append(merged)
+    top, _, _ = convert(staff, rh=0, bars=(1, 1), rh_voice="top")
+    bottom, _, _ = convert(staff, rh=0, bars=(1, 1), rh_voice="bottom")
+    assert [n["pitch"] for n in top] == [72, 71], top
+    assert [n["pitch"] for n in bottom] == [64, 67, 62], bottom
+    # A 1-quarter pickup in 4/4 with a grace note and a release a tick short: the pickup lands on beat 3, the grace
+    # note goes, the release snaps.
+    pk = mido.MidiFile(ticks_per_beat=480)
+    pk.tracks.append(mido.MidiTrack())
+    play(pk.tracks[0], [(0, 480, 67), (480 + 1920 - 30, 30, 74), (480 + 1920, 159, 72)])
+    notes, bpb, log = convert(pk, rh=0, bars=(1, 3), pickup=1)
+    assert bpb == 4 and [(n["pitch"], n["beat"], n["duration"]) for n in notes] == [(67, 3, 1), (72, 8, round(1 / 3, 6))], notes
+    assert any("grace" in line for line in log) and any("snapped" in line for line in log), log
+    # Spans write out a volta repeat: body (C D), first ending (D), body again (C), second ending (E).
+    sp = mido.MidiFile(ticks_per_beat=480)
+    sp.tracks.append(mido.MidiTrack())
+    play(sp.tracks[0], [(0, 480, 60), (480, 480, 62), (960, 480, 64)])  # C D E: body C D, first ending D, second E
+    notes, bpb, _ = convert(sp, rh=0, spans=[(0, 2), (0, 1), (2, 3)])
+    assert bpb == 4 and [(n["pitch"], n["beat"]) for n in notes] == [(60, 0), (62, 1), (60, 2), (64, 3)], notes
     print("self-test: ok")
 
 
@@ -162,8 +224,13 @@ def main():
     ap.add_argument("--self-test", action="store_true")
     ap.add_argument("--rh", type=int, help="right-hand track index (or channel with --by-channel)")
     ap.add_argument("--lh", type=int, help="left-hand track index (or channel)")
+    ap.add_argument("--rh-voice", choices=["all", "top"], default="all", help="top: only the staff's highest voice")
+    ap.add_argument("--lh-voice", choices=["all", "bottom"], default="all", help="bottom: only the staff's lowest voice")
     ap.add_argument("--by-channel", action="store_true", help="--rh/--lh are MIDI channels (0-15), not tracks")
     ap.add_argument("--bars", help="first-last, 1-based, inclusive (a pickup bar counts as bar 1)")
+    ap.add_argument("--spans", help="in place of --bars: a-b,c-d,... in quarter notes from the file start, played in order")
+    ap.add_argument("--start-beat", type=Fraction, default=0, help="with --spans: the chart beat of the first span's start")
+    ap.add_argument("--pickup", type=Fraction, default=0, help="length of a pickup bar in quarter notes (bar 1 is then the pickup)")
     ap.add_argument("--bpm", type=float)
     for k in ("id", "title", "composer", "catalog", "source"):
         ap.add_argument(f"--{k}")
@@ -171,12 +238,15 @@ def main():
     a = ap.parse_args()
     if a.self_test:
         return self_test()
-    missing = [k for k in ("midi", "rh", "bars", "bpm", "id", "title", "composer", "source", "out") if getattr(a, k) is None]
-    if missing:
-        ap.error("missing: " + ", ".join(missing))
-    first, last = (int(x) for x in a.bars.split("-"))
+    missing = [k for k in ("midi", "rh", "bpm", "id", "title", "composer", "source", "out") if getattr(a, k) is None]
+    if missing or not (a.bars or a.spans):
+        ap.error("missing: " + ", ".join(missing or ["--bars or --spans"]))
+    spans = [tuple(Fraction(x) for x in r.split("-")) for r in a.spans.split(",")] if a.spans else None
+    bars = tuple(int(x) for x in a.bars.split("-")) if a.bars else (1, 1)
     try:
-        notes, bpb, log = convert(mido.MidiFile(a.midi), a.rh, a.lh, (first, last), a.by_channel)
+        notes, bpb, log = convert(
+            mido.MidiFile(a.midi), a.rh, a.lh, bars, a.by_channel, a.rh_voice, a.lh_voice, a.pickup, spans, a.start_beat
+        )
     except Refused as e:
         sys.exit(f"refused: {e}")
     chart = {"id": a.id, "title": a.title, "composer": a.composer}
@@ -189,7 +259,8 @@ def main():
     for line in log:
         print(line, file=sys.stderr)
     lo, hi = min(n["pitch"] for n in notes), max(n["pitch"] for n in notes)
-    print(f"{a.out}: {len(notes)} notes, bars {first}-{last}, beatsPerBar {bpb}, pitch {lo}-{hi}", file=sys.stderr)
+    end = max(n["beat"] + n["duration"] for n in notes)
+    print(f"{a.out}: {len(notes)} notes, {a.spans or a.bars}, beatsPerBar {bpb}, pitch {lo}-{hi}, ends at beat {end:g} ({end * 60 / a.bpm:.0f} s)", file=sys.stderr)
 
 
 if __name__ == "__main__":

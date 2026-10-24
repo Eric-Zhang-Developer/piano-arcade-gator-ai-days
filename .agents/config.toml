@@ -10,9 +10,9 @@ reports = "reports"              # deploy receipts, final report
 
 [ownership]
 # Only `contract:` PRs may change these path prefixes.
-frozen = ["AGENTS.md", "CLAUDE.md", ".agents/", ".github/"]
+frozen = ["AGENTS.md", "CLAUDE.md", ".agents/", ".github/", "web/src/contracts/", "web/package.json", "web/pnpm-lock.yaml"]
 # Any PR may change these.
-open = []
+open = ["web/src/game/layers.ts"]   # one line per game feature that plugs a layer into the play screen
 
 [agents]
 max_parallel = 3      # agents running at once on one machine

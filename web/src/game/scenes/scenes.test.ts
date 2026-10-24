@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { Chart, GameEvent } from "../../contracts";
 import { Judge } from "../core/judge";
 import { gaugeSize } from "../fever-gauge/gauge";
-import { BOTS, botPresses, feverChart, scenes, type BotName } from ".";
+import { BOTS, botPresses, feverChart, scenes, TAKE_FILE, takePresses, type BotName } from ".";
 
 const twinkle: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
 
@@ -81,5 +81,25 @@ describe("the plugin", () => {
   it("?bot=fever lengthens a short chart", () => {
     const short: Chart = { ...twinkle, notes: twinkle.notes.slice(0, 7) };
     expect(scenes().transformChart!(short, params("bot=fever")).notes.length).toBeGreaterThan(7);
+  });
+});
+
+describe("bot=take", () => {
+  it("takes only a plain .mid name, so nothing outside /takes/ is fetched", () => {
+    expect(TAKE_FILE.test("fur-elise-20261024-1900.mid")).toBe(true);
+    expect(TAKE_FILE.test("verify.mid")).toBe(true);
+    for (const bad of ["../x.mid", "a/b.mid", "x.midi", "", "https://example.com/x.mid", "x.mid?y"]) expect(TAKE_FILE.test(bad), bad).toBe(false);
+  });
+
+  it("presses each note with its own velocity and hold, in time order", () => {
+    expect(
+      takePresses([
+        { pitch: 64, velocity: 30, timeMs: 500, offTimeMs: 650 },
+        { pitch: 60, velocity: 110, timeMs: -120, offTimeMs: 200 },
+      ]),
+    ).toEqual([
+      { pitch: 60, timeMs: -120, holdMs: 320, velocity: 110 },
+      { pitch: 64, timeMs: 500, holdMs: 150, velocity: 30 },
+    ]);
   });
 });

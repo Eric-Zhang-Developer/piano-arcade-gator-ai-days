@@ -1,6 +1,7 @@
 // The ghost's logic (spec: ghost): what a take leaves behind, and where it draws. Pure, from GameEvents only.
 import type { Chart, GameEvent } from "../../contracts";
 import { msPerBeat } from "../core/settings";
+import { pillRect } from "../note-pills";
 
 export const ghostSettings = {
   alpha: 0.4, // lower this first if the ghost gets in the way
@@ -40,3 +41,11 @@ export const yAt = (atMs: number, nowMs: number, judgmentLineY: number, lookahea
   judgmentLineY - (atMs - nowMs) * (judgmentLineY / lookaheadMs);
 
 export const ghostOff = (param: string | null, stored: string | null) => param === "off" || stored === "off";
+
+// A hit's outline: the pill the highway draws for that key (note-pills), with the highway's corner rule (`bar` in
+// core/highway.ts: the pill's radius, at most a third of the width and half the height). Top and bottom are the
+// caller's: when you played it.
+export function ghostOutline(key: { x: number; width: number }, isBlack: boolean, top: number, bottom: number) {
+  const pill = pillRect(key, isBlack);
+  return { x: pill.x, width: pill.width, radius: Math.min(pill.radius, pill.width / 3, (bottom - top) / 2) };
+}

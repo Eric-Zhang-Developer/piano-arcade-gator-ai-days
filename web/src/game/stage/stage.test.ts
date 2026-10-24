@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Chart, GameEvent } from "../../contracts";
+import { blackKeyLaneSettings } from "../black-key-lanes";
+import { settings as core } from "../core/settings";
 import { hudSettings, tierFor } from "../hud";
-import { emptyStage, feverStage, frameBudget, gridPhase, look, reduceStage, STAGE_KEY, stageSettings } from ".";
+import { emptyStage, feverStage, frameBudget, gridPhase, look, reduceStage, STAGE_KEY, stageOpacity, stageSettings } from ".";
 
 const run = (events: GameEvent[]) => events.reduce(reduceStage, emptyStage());
 const combo = (count: number, atMs = 0): GameEvent => ({ type: "combo", count, atMs });
@@ -102,6 +104,17 @@ describe("frameBudget", () => {
     const over = frameBudget(20, 1000, 1000);
     over(0);
     expect(over(900)).toBe(false); // one 900 ms frame while shaders compile
+  });
+});
+
+describe("stageOpacity", () => {
+  const worst = (tint: number) => tint + (1 - tint) * stageOpacity(tint) * (1 - core.stageBackdropAlpha);
+  it("keeps a black key's lane at or under maxLaneLuma at the default tint", () => {
+    expect(worst(blackKeyLaneSettings.tint)).toBeLessThanOrEqual(stageSettings.maxLaneLuma + 1e-12);
+    expect(stageOpacity()).toBeCloseTo(0.72, 2);
+  });
+  it("gives back the old cap at tint 0", () => {
+    expect(stageOpacity(0)).toBeCloseTo(0.35 / 0.45, 12);
   });
 });
 

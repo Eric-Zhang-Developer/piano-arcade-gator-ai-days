@@ -3,12 +3,12 @@ import { describe, expect, it } from "vitest";
 import type { Chart, Frame, InputDevice, InputEvent } from "../../contracts";
 import { keyMap } from "../core/input";
 import { noteLabels, setLaptopShift } from ".";
-import { fitsLane, labelMode, labelSetting, laptopLetters, nextSetting, noteName } from "./labels";
+import { fitsLane, labelMode, labelSetting, laptopLetters, nextSetting, noteLane, noteName } from "./labels";
 
 const twinkle: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
 
 // Draws one frame of the plugin and returns what it wrote. Lanes are `width` px; notes are off screen (nowMs far back).
-function drawn(plugin: ReturnType<typeof noteLabels>, width = 40): string[] {
+function drawn(plugin: ReturnType<typeof noteLabels>, width = 40, nowMs = -10_000): string[] {
   const written: string[] = [];
   const ctx = new Proxy({} as Record<string, unknown>, {
     get: (t, k) =>
@@ -16,7 +16,7 @@ function drawn(plugin: ReturnType<typeof noteLabels>, width = 40): string[] {
     set: (t, k, v) => ((t[k as string] = v), true),
   }) as unknown as CanvasRenderingContext2D;
   const frame: Frame = {
-    nowMs: -10_000, lowPitch: 60, highPitch: 61, judgmentLineY: 500, width: 2 * width, height: 600,
+    nowMs, lowPitch: 60, highPitch: 61, judgmentLineY: 500, width: 2 * width, height: 600,
     keyX: (p) => ({ x: (p - 60) * width, width }),
   };
   plugin.draw!(ctx, frame);
@@ -85,5 +85,17 @@ describe("note labels", () => {
     expect(drawn(plugin)).toEqual([]);
     setLaptopShift(0);
     expect(drawn(plugin)).toEqual(["A", "W"]);
+  });
+
+  it("sizes a falling note's label to its pill: 0.84 of a white key, about 0.784 of a black key", () => {
+    expect(noteLane({ x: 0, width: 100 }, false)).toBeCloseTo(84);
+    expect(noteLane({ x: 0, width: 100 }, true)).toBeCloseTo(78.4);
+
+    // A C♯ note in view on 20 px lanes: "C♯" (14 px) fits 84% (16.8 px) but not the pill (15.7 px), so only the key's
+    // own label is written.
+    const plugin = noteLabels();
+    const chart: Chart = { ...twinkle, notes: [{ ...twinkle.notes[0], id: "cs", pitch: 61, beat: 0, duration: 1 }] };
+    plugin.transformChart!(chart, new URLSearchParams("labels=notes"));
+    expect(drawn(plugin, 20, -500).filter((s) => s === "C♯")).toHaveLength(1);
   });
 });

@@ -24,8 +24,8 @@ now. `Frame` already carries `lowPitch`, `highPitch` and `keyX` per frame, so pl
   narrows the range past a note that's on screen.
 - **Easing:** the range moves toward its target with a time constant of about 400 ms (`zoomSettings.easeMs`), and
   never jumps.
-- **When it's on:** automatically for charts wider than `zoomSettings.minWhiteKeys`, default 22 white keys (about
-  three octaves). `?zoom=off` or `?zoom=on` overrides that. Twinkle is narrow, so it never zooms.
+- **When it's on:** only with `?zoom=on` (#384, `specs/decisions/highway-zoom-static.md`). By default, and with
+  `?zoom=off`, the keyboard is static: core's one range per song, C to C. Zoom pans inside that range.
 - **The keyboard drawing** follows the same range. Laptop keys stay mapped from the chart's lowest pitch, as today.
 - **Cost:** the range takes O(notes in the window) per frame, using the chart's notes in time order.
 
@@ -34,8 +34,8 @@ now. `Frame` already carries `lowPitch`, `highPitch` and `keyX` per frame, so pl
   between `nowMs - GOOD_MS` and `nowMs + lookaheadMs`. The width never drops under 15 white keys. Across a jump, the
   range moves over several frames, not in one. A narrow chart gives exactly `makeLayout`'s range.
 - `verify.py --slug highway-zoom` passes, Twinkle unchanged.
-- In Chrome: on `/play?song=fur-elise`, the lanes widen while the right hand plays alone and pan out when the left
-  hand comes in. No note appears cut off at an edge. `?zoom=off` shows today's full range. Keep a screenshot of
+- In Chrome: on `/play?song=fur-elise&zoom=on`, the lanes widen while the right hand plays alone and pan out when the left
+  hand comes in. No note appears cut off at an edge. `?zoom=off` (or no `zoom`) shows the static range. Keep a screenshot of
   each in the PR.
 - On the piano (Eric; mark it in the done note): play Für Elise and say whether the motion helps or distracts.
 

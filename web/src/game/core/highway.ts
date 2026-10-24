@@ -1,6 +1,7 @@
 // The highway: a flat-or-mildly-tilted lane per key, notes falling to the keyboard. Canvas 2D, no React.
 import type { Chart, Frame, Hand, Judgment } from "../../contracts";
 import { drawBarLines, type BarLine } from "../bar-lines";
+import { drawBlackKeyLanes } from "../black-key-lanes";
 import { noteColorFor } from "../hand-colors";
 import { hitLinePath } from "../hit-line";
 import { meterLayout } from "../fever-gauge";
@@ -8,10 +9,10 @@ import { whiteIndex as whiteIndexOf, type Range } from "../highway-zoom";
 import { drawBlackKey, drawWhiteKey } from "../key-skin";
 import { brightness, pillRect } from "../note-pills";
 import { gold, good, handR, miss, whenDisplayFontReady, wrong } from "../ui-tokens";
-import { staticRange } from "./range";
+import { staticRange, type KeyRange } from "./range";
 import { msPerBeat, settings } from "./settings";
 
-export { staticRange } from "./range";
+export { staticRange, type KeyRange } from "./range";
 
 const JUDGMENT_SHOW_MS = 600;
 // Keyed by name, not Record<Judgment>, so a judgment added to the contract doesn't break the build first.
@@ -75,8 +76,17 @@ const whitePitch = (k: number) => Math.floor(k / 7) * 12 + WHITE_IN_OCTAVE[((k %
 
 // view (highway-zoom): the visible range in white-key units, [lo, hi), fractional while it eases. The keyboard height
 // stays the whole chart's, so the judgment line never moves while the view pans and zooms. Without a view: today's.
-export function makeLayout(chart: Chart, width: number, height: number, perspective: number, view?: Range): Layout {
-  const { lowPitch, highPitch } = staticRange(chart);
+// `keys` is the take's static range. /play passes the one from the chart as loaded, so `hands=` or a loop, which
+// leave fewer notes, keep the song's keyboard (spec: static-keyboard).
+export function makeLayout(
+  chart: Chart,
+  width: number,
+  height: number,
+  perspective: number,
+  view?: Range,
+  keys: KeyRange = staticRange(chart),
+): Layout {
+  const { lowPitch, highPitch } = keys;
 
   const whiteIndex = new Map<number, number>();
   for (let p = lowPitch; p <= highPitch; p++) if (!isBlack(p)) whiteIndex.set(p, whiteIndex.size);
@@ -157,6 +167,7 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
   if (alpha < 1) ctx.clearRect(0, 0, L.width, L.height); // a translucent fill would smear last frame
   ctx.fillStyle = alpha < 1 ? `rgba(0,0,0,${alpha})` : "#000";
   ctx.fillRect(0, 0, L.width, L.height);
+  drawBlackKeyLanes(ctx, L); // the lanes under black keys a shade lighter, under everything else
 
   // Faint octave lines at each C, so the lanes read against the keys.
   ctx.strokeStyle = "rgba(255,255,255,0.08)";

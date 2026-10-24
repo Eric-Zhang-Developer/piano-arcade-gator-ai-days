@@ -1,5 +1,6 @@
 // Note labels' logic (spec: note-labels). Pure, so it tests without a page.
 import { keyMap } from "../core/input";
+import { pillRect } from "../note-pills";
 
 export type LabelMode = "notes" | "keys" | "off";
 export type LabelSetting = LabelMode | "auto";
@@ -45,3 +46,6 @@ export const fontPxFor = (laneWidth: number) =>
 
 // A label shows only if it fits its lane, with a pixel to spare each side; otherwise it hides rather than overlap.
 export const fitsLane = (textWidth: number, laneWidth: number) => textWidth <= laneWidth - 2;
+
+// A falling note's label lane: the width of the pill the highway draws for that key (note-pills).
+export const noteLane = (key: { x: number; width: number }, isBlack: boolean) => pillRect(key, isBlack).width;

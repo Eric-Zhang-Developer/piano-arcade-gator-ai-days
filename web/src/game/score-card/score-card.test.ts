@@ -42,8 +42,11 @@ describe("cardModel", () => {
   });
 
   it("names only what /play applied", () => {
-    // tempo alone plays the whole song at 100% (bar-loop needs from/to; #547 isn't in), so the card says nothing
-    expect(practiceLine(new URLSearchParams("tempo=80"))).toBeNull();
+    // tempo alone plays the whole song once at that tempo (#547): the card says so, with the song's own title
+    const params = new URLSearchParams("tempo=80");
+    const slow = loopChart(twinkle, params)!.chart;
+    expect(slow.title).not.toBe(twinkle.title);
+    expect(cardModel(slow, results, 0, day, params)).toMatchObject({ title: twinkle.title, practice: "Whole song at 80%" });
     // a one-hand chart ignores hands (hand-mode's splitHands)
     expect(twinkle.notes.every((n) => n.hand === "R")).toBe(true);
     expect(practiceLine(new URLSearchParams("hands=L"), twinkle)).toBeNull();

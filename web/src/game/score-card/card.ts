@@ -31,15 +31,17 @@ const TONES: Record<string, string> = {
   "var(--pa-ink-dim)": inkDim,
 };
 
-const LOOP_SUFFIX = / · bars \d+–\d+ at \d+%$/; // bar-loop's title suffix
+const LOOP_SUFFIX = / · (bars \d+–\d+ at )?\d+%$/; // bar-loop's title suffixes: " · bars 5–8 at 70%", " · 80%"
 
 /**
- * What the take was, when it wasn't the plain song: a bar loop, one hand, versus. Null for the whole song. Only what
- * /play applied: tempo without from/to changes nothing until #547 lands, and a one-hand chart ignores `hands`.
+ * What the take was, when it wasn't the plain song: a bar loop or a slower whole song, one hand, versus. Null for the
+ * whole song at 100%. Only what /play applied: a one-hand chart ignores `hands`.
  */
 export function practiceLine(params: URLSearchParams, chart?: Chart): string | null {
   const parts: string[] = [];
-  if (params.has("from") || params.has("to")) parts.push(`Bars ${params.get("from")}–${params.get("to")} at ${params.get("tempo") ?? "100"}%`);
+  const tempo = params.get("tempo") ?? "100";
+  if (params.has("from") || params.has("to")) parts.push(`Bars ${params.get("from")}–${params.get("to")} at ${tempo}%`);
+  else if (params.has("tempo")) parts.push(`Whole song at ${tempo}%`); // tempo alone: the whole song once (#547)
   const hands = params.get("hands");
   const twoHands = !chart || (chart.notes.some((n) => n.hand === "L") && chart.notes.some((n) => n.hand === "R"));
   if ((hands === "R" || hands === "L") && twoHands) parts.push(hands === "R" ? "Right hand" : "Left hand");

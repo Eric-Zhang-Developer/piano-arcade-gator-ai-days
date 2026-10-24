@@ -25,7 +25,7 @@ cut = []
 [[milestone]]
 name = "arcade"
 ship = ""
-features = ["operator-board", "piano-sim", "hud", "juice-visual", "juice-sound", "midi-watchdog"]
+features = ["song-select", "minuet-g", "operator-board", "piano-sim", "hud", "juice-visual", "juice-sound", "midi-watchdog"]
 cut = []
 
 [[milestone]]
@@ -38,6 +38,6 @@ cut = []
 name = "submission"
 ship = ""
 final = true
-features = ["bar-loop", "piano-out", "song-select", "operator-replay"]
+features = ["bar-loop", "piano-out", "operator-replay"]
 cut = []
 allow = []

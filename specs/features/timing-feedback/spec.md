@@ -37,8 +37,8 @@ decisions: whether to add a GOOD tier, and whether the latency offset is wrong.
 - `pnpm -C web test`, against the Twinkle chart with synthetic takes:
   - Perfect player: 42 timed presses, mean 0, SD 0, 0 early, 0 late, no misses.
   - Late40: mean +40, SD 0, 42 late; the suggestion is "set latency to 40" from an offset of 0.
-  - Near miss: one note at +72 ms → that note is a MISS with one near miss within 150 ms but not within 100 ms; mean
-    and SD include +72.
+  - Near miss: one note at +120 ms → that note is a MISS with one near miss within 150 ms but not within 100 ms;
+    mean and SD include +120.
   - Far miss: one note at +200 ms → MISS, no near miss, +200 not in the mean.
   - Wrong pitch: one note a semitone off at 0 ms → MISS, no near miss.
   - Two presses near one missed note: only the nearest counts.

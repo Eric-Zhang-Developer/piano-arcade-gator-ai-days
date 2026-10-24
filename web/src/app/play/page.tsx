@@ -7,6 +7,7 @@ import { plugins } from "../../game/layers";
 import { drawHighway, makeLayout, type HighwayState, type Layout } from "../../game/core/highway";
 import { Judge, noteTimeMs } from "../../game/core/judge";
 import { keysDevice, midiDevice, testDevice } from "../../game/core/input";
+import { describeTiming, timingSummary, type TimingSummary } from "../../game/timing";
 import {
   GREAT_MS,
   LATENCY_MAX,
@@ -39,6 +40,7 @@ export default function Play() {
   const [phase, setPhase] = useState<Phase>("loading");
   const [error, setError] = useState("");
   const [results, setResults] = useState<Results | null>(null);
+  const [timing, setTiming] = useState<TimingSummary | null>(null);
   const [latency, setLatency] = useState(0);
   const [midiStatus, setMidiStatus] = useState("MIDI: connects when you press Start");
   const [isTest, setIsTest] = useState(false);
@@ -162,6 +164,7 @@ export default function Play() {
       stop();
       if (window.__pianoArcade) window.__pianoArcade.results = r;
       setResults(r);
+      setTiming(timingSummary(chart, take, r, latencyRef.current));
       setPhase("results");
     };
     const frame = () => {
@@ -236,7 +239,9 @@ export default function Play() {
               </button>
             </>
           )}
-          {phase === "results" && results && <ResultsScreen results={results} onRetry={start} />}
+          {phase === "results" && results && (
+            <ResultsScreen results={results} timing={timing} latency={latency} onLatency={onLatency} onRetry={start} />
+          )}
           <label style={{ marginTop: 24, display: "flex", gap: 8, alignItems: "center" }}>
             Latency offset
             <input type="range" min={LATENCY_MIN} max={LATENCY_MAX} step={1} value={latency} onChange={(e) => onLatency(Number(e.target.value))} />
@@ -249,7 +254,19 @@ export default function Play() {
   );
 }
 
-function ResultsScreen({ results, onRetry }: { results: Results; onRetry: () => void }) {
+function ResultsScreen({
+  results,
+  timing,
+  latency,
+  onLatency,
+  onRetry,
+}: {
+  results: Results;
+  timing: TimingSummary | null;
+  latency: number;
+  onLatency: (ms: number) => void;
+  onRetry: () => void;
+}) {
   const { counts } = results;
   const rows: [string, string, number | string][] = [
     ["PERFECT", "count-PERFECT", counts.PERFECT],
@@ -276,10 +293,36 @@ function ResultsScreen({ results, onRetry }: { results: Results; onRetry: () => 
           ))}
         </tbody>
       </table>
+      {timing && <TimingPanel timing={timing} latency={latency} onLatency={onLatency} />}
       <button style={{ ...button, marginTop: 24 }} onClick={onRetry} autoFocus>
         Retry
       </button>
     </section>
+  );
+}
+
+// How early or late the take was (timing-feedback). Only numbers computed from this take.
+function TimingPanel({ timing, latency, onLatency }: { timing: TimingSummary; latency: number; onLatency: (ms: number) => void }) {
+  const suggested = timing.suggestedLatencyMs;
+  return (
+    <div data-testid="timing" style={{ marginTop: 16, fontSize: 16, lineHeight: 1.6 }}>
+      {describeTiming(timing).map((line) => (
+        <div key={line}>{line}</div>
+      ))}
+      {suggested !== null && suggested !== latency && (
+        <div style={{ marginTop: 8 }}>
+          <button style={{ ...button, fontSize: 15, padding: "6px 16px", background: "#ddd" }} onClick={() => onLatency(suggested)}>
+            Set latency offset to {suggested} ms
+          </button>
+          <div style={{ fontSize: 13, opacity: 0.6, marginTop: 4 }}>
+            Shifts every press, so it also hides a habit of rushing or dragging.
+          </div>
+        </div>
+      )}
+      {suggested !== null && suggested === latency && (
+        <div style={{ fontSize: 13, opacity: 0.6, marginTop: 8 }}>Latency offset set to {latency} ms. Press Retry to use it.</div>
+      )}
+    </div>
   );
 }
 

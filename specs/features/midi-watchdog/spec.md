@@ -1,6 +1,6 @@
 ---
 name: MIDI watchdog: reconnect when Chrome's input goes silent
-depends_on: ["core-loop"]
+depends_on: ["core-loop", "piano-sim"]
 owns: ["web/src/game/midi-watchdog/"]
 assignee: "eric"
 ---
@@ -12,7 +12,8 @@ The spike's one open risk: twice, Chrome stopped receiving keys for minutes, cau
 `web/src/game/layers.ts`.
 
 ## Requirements
-- The DGX-660 sends Active Sensing (`0xFE`) constantly, so silence on the port means a stall, not a quiet player.
+- The DGX-660 sends Active Sensing (`0xFE`) per its MIDI Reference, so silence on the port means a stall, not a quiet
+  player.
   A stall is: no MIDI message of any kind for 3000 ms while the piano's input port is connected.
 - On a stall: re-request MIDI access, reopen the same port, and show a small "reconnecting MIDI" notice until a
   message arrives. Log each stall and recovery with times to the console and to a list the results screen can show.
@@ -23,7 +24,10 @@ The spike's one open risk: twice, Chrome stopped receiving keys for minutes, cau
 ## Validation
 - Vitest: with a fake clock and a fake port, 3 s of silence triggers exactly one reconnect; messages every 300 ms
   trigger none.
+- Vitest, through `piano-sim`'s fake Web MIDI: `stall(3000)` triggers exactly one reconnect and no key event is
+  lost or duplicated across it; `unplug()` switches to laptop keys.
 - On the piano (Eric): play for 10 minutes with two Chrome tabs open, then close one. Record any stall and recovery.
 
 ## Defaults
-- If Active Sensing turns out not to arrive in Chrome, fall back to: no key event for 10 s while notes are due.
+- `piano-sim`'s record mode measures whether Active Sensing reaches Chrome. Until then it's unmeasured. If it doesn't
+  arrive, fall back to: no key event for 10 s while notes are due.

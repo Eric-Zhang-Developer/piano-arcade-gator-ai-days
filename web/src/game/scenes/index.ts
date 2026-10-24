@@ -1,6 +1,7 @@
 import type { Chart, GamePlugin, InputEvent } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
-import { FEVER_COMBO, KEYS_VELOCITY, loadLatencyOffset } from "../core/settings";
+import { KEYS_VELOCITY, loadLatencyOffset } from "../core/settings";
+import { gaugeSize } from "../fever-gauge/gauge";
 import { seededRandom } from "../sim/fake";
 
 export const scenesSettings = {
@@ -16,7 +17,7 @@ export const scenesSettings = {
     "rank-c": { GREAT: 0.1, MISS: 0.2 }, // ≈ 0.75
     "rank-d": { GREAT: 0.1, MISS: 0.4 }, // ≈ 0.55
   } as Record<string, Partial<Record<"GREAT" | "GOOD" | "MISS", number>>>,
-  feverExtra: 10, // `fever` repeats the chart until it holds the fever threshold plus this many notes
+  feverExtra: 10, // `fever` repeats the chart until it holds the fever gauge's size plus this many notes
 };
 
 export const BOTS = ["perfect", "late", "sloppy", "rank-a", "rank-b", "rank-c", "rank-d", "fever"] as const;
@@ -29,11 +30,13 @@ export interface Press {
 }
 
 // `fever`: the chart end to end, each copy starting on the bar after the last one ends, until it is long enough to
-// start fever and hold it. Only existing notes, re-timed.
+// fill the fever gauge and hold fever. Only existing notes, re-timed; most charts need no copy.
 export function feverChart(chart: Chart): Chart {
   const bars = Math.ceil(Math.max(...chart.notes.map((n) => n.beat + n.duration)) / chart.beatsPerBar);
   const copyBeats = bars * chart.beatsPerBar;
-  const copies = Math.ceil((FEVER_COMBO + scenesSettings.feverExtra) / chart.notes.length);
+  const n = chart.notes.length;
+  let copies = 1;
+  while (copies * n < gaugeSize(copies * n) + scenesSettings.feverExtra) copies++;
   const notes = Array.from({ length: copies }, (_, k) =>
     chart.notes.map((n) => ({ ...n, id: k ? `${n.id}~${k + 1}` : n.id, beat: n.beat + k * copyBeats })),
   ).flat();

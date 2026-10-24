@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { Chart, GameEvent } from "../../contracts";
 import { Judge } from "../core/judge";
-import { FEVER_COMBO } from "../core/settings";
+import { gaugeSize } from "../fever-gauge/gauge";
 import { BOTS, botPresses, feverChart, scenes, type BotName } from ".";
 
 const twinkle: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
@@ -43,14 +43,21 @@ describe("bots on Twinkle, judged by the real judge", () => {
     expect(counts.wrong).toBe(3);
   });
 
-  it("fever repeats the chart past the fever threshold, adds no new pitches, and reaches feverStart", () => {
-    const chart = feverChart(twinkle);
-    expect(chart.notes.length).toBeGreaterThanOrEqual(FEVER_COMBO + 10);
-    expect(new Set(chart.notes.map((n) => n.pitch))).toEqual(new Set(twinkle.notes.map((n) => n.pitch)));
-    expect(new Set(chart.notes.map((n) => n.id)).size).toBe(chart.notes.length);
-    const { events, results } = judge(chart, "fever");
+  it("fever reaches feverStart on Twinkle and holds it to an S, with no copy needed", () => {
+    expect(feverChart(twinkle).notes).toEqual(twinkle.notes);
+    const { events, results } = judge(twinkle, "fever");
     expect(events.some((e) => e.type === "feverStart")).toBe(true);
+    expect(events.some((e) => e.type === "feverEnd")).toBe(false);
     expect(results.rank).toBe("S");
+  });
+
+  it("fever repeats a chart too short to fill the gauge, adding no new pitches", () => {
+    const short: Chart = { ...twinkle, notes: twinkle.notes.slice(0, 7) };
+    const chart = feverChart(short);
+    expect(chart.notes.length).toBeGreaterThanOrEqual(gaugeSize(chart.notes.length) + 10);
+    expect(new Set(chart.notes.map((n) => n.pitch))).toEqual(new Set(short.notes.map((n) => n.pitch)));
+    expect(new Set(chart.notes.map((n) => n.id)).size).toBe(chart.notes.length);
+    expect(judge(chart, "fever").events.some((e) => e.type === "feverStart")).toBe(true);
   });
 });
 
@@ -71,7 +78,8 @@ describe("the plugin", () => {
     expect(p.wrapInput!({ kind: "keys", start() {}, stop() {} }).kind).toBe("test");
   });
 
-  it("?bot=fever lengthens the chart", () => {
-    expect(scenes().transformChart!(twinkle, params("bot=fever")).notes.length).toBeGreaterThan(twinkle.notes.length);
+  it("?bot=fever lengthens a short chart", () => {
+    const short: Chart = { ...twinkle, notes: twinkle.notes.slice(0, 7) };
+    expect(scenes().transformChart!(short, params("bot=fever")).notes.length).toBeGreaterThan(7);
   });
 });

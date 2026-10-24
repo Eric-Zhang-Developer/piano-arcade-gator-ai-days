@@ -1,122 +1,282 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { googleSession, safeNext, signInWithGoogle, signOut, type Session } from "../../../data/auth";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { SelectStage } from "@/game/select-stage";
+import { fetchHandle, fetchUserDetails, HANDLE_MAX, saveHandle, type UserDetails } from "../../../data/account";
+import { getSession, linkGoogle, safeNext, signInWithGoogle, signOut, type Session } from "../../../data/auth";
 import { isConfigured } from "../../../data/config";
+import styles from "./login.module.css";
 
-// The front door: sign in with Google so your takes follow you, or play as a guest (takes still save, on this
-// device's player). Either way the next stop is the menu, or the page in ?next=. Optional: the game never requires it.
+// The front door, optional: sign in with Google so your takes follow you, or play as a guest (takes still save, on
+// this device's anonymous player). A guest who has played can set a handle and keep their progress by linking Google;
+// a Google player sees their name, email and avatar as Google gives them. Then the menu, or the page in ?next=.
+
+// Real lines, each from the file named next to it.
+const QUOTES = [
+  { text: "yup it worked!", who: "Eric, the first time the laptop played the piano (docs/story.md)" },
+  { text: "much much better", who: "Eric, after the piano started playing drums (specs/context/findings.md)" },
+  { text: "it feels a lot better", who: "Eric, same playtest (specs/context/findings.md)" },
+];
+const LINES = QUOTES.map((q) => q.text);
+
+const reducedMotion = (onChange: () => void) => {
+  const m = window.matchMedia("(prefers-reduced-motion: reduce)");
+  m.addEventListener("change", onChange);
+  return () => m.removeEventListener("change", onChange);
+};
+
+// Types a line out, holds it, then moves to the next. Reduced motion shows each line whole.
+function useTypewriter(lines: string[]) {
+  const still = useSyncExternalStore(
+    reducedMotion,
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    () => true,
+  );
+  const [i, setI] = useState(0);
+  const [n, setN] = useState(0);
+  const line = lines[i];
+  useEffect(() => {
+    const done = still || n >= line.length;
+    const t = setTimeout(
+      () => {
+        if (done) {
+          setI((i + 1) % lines.length);
+          setN(0);
+        } else setN(n + 1);
+      },
+      done ? 3200 : 70,
+    );
+    return () => clearTimeout(t);
+  }, [i, n, line, lines.length, still]);
+  return { shown: still ? line : line.slice(0, n), index: i };
+}
+
+type View = { kind: "checking" } | { kind: "none" } | { kind: "guest"; session: Session } | { kind: "google"; session: Session };
+
 export default function Login() {
   const [next, setNext] = useState("/");
-  const [session, setSession] = useState<Session | null | undefined>(undefined); // undefined = still checking
+  const [view, setView] = useState<View>({ kind: "checking" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const quote = useTypewriter(LINES);
 
   useEffect(() => {
     const target = safeNext(new URLSearchParams(window.location.search).get("next"));
-    void googleSession().then((s) => {
-      setNext(target);
-      setSession(s);
-    });
+    void getSession()
+      .catch(() => null)
+      .then((s) => {
+        setNext(target);
+        setView(!s ? { kind: "none" } : s.is_anonymous ? { kind: "guest", session: s } : { kind: "google", session: s });
+      });
   }, []);
 
-  const signIn = () => {
+  const toGoogle = (go: (next: string) => Promise<void>) => () => {
     setBusy(true);
-    void signInWithGoogle(next).catch((e) => {
+    void go(next).catch((e) => {
       setBusy(false);
       setError(String(e?.message ?? e));
     });
   };
 
   return (
-    <main style={page}>
-      <div style={card}>
-        <h1 style={title}>Piano Arcade</h1>
-        {session === undefined ? (
-          <p style={dim}>Checking…</p>
-        ) : session ? (
-          <>
-            <p style={lead} data-testid="login-signed-in">
-              Signed in{session.email ? ` as ${session.email}` : ""}
+    <main className={styles.page}>
+      <SelectStage />
+
+      <section className={styles.form}>
+        <Link href="/" className={styles.wordmark}>
+          Piano Arcade
+        </Link>
+
+        <div className={styles.inner}>
+          {view.kind === "checking" ? (
+            <p className={styles.sub}>Checking…</p>
+          ) : view.kind === "google" ? (
+            <SignedIn session={view.session} next={next} onSignOut={() => setView({ kind: "none" })} />
+          ) : (
+            <>
+              <div className={styles.head}>
+                <h1 className={styles.title}>Player 1</h1>
+                <p className={styles.sub}>
+                  {view.kind === "guest"
+                    ? "Playing as a guest on this browser."
+                    : "Sign in to keep your scores and progress on any computer."}
+                </p>
+              </div>
+
+              {view.kind === "guest" && <HandleEntry session={view.session} />}
+
+              <Link className={styles.play} href={next} data-testid="login-guest">
+                Play as guest
+              </Link>
+
+              {isConfigured() ? (
+                <>
+                  <div className={styles.divider}>
+                    <span>{view.kind === "guest" ? "or keep your progress everywhere" : "or keep your records everywhere"}</span>
+                  </div>
+                  {view.kind === "guest" ? (
+                    <>
+                      <button type="button" className={styles.google} onClick={toGoogle(linkGoogle)} disabled={busy} data-testid="login-keep">
+                        <GoogleMark />
+                        {busy ? "Opening Google…" : "Keep my progress"}
+                      </button>
+                      <button type="button" className={styles.textButton} onClick={toGoogle(signInWithGoogle)} disabled={busy}>
+                        Already linked Google on another computer? Sign in
+                      </button>
+                    </>
+                  ) : (
+                    <button type="button" className={styles.google} onClick={toGoogle(signInWithGoogle)} disabled={busy} data-testid="login-google">
+                      <GoogleMark />
+                      {busy ? "Opening Google…" : "Sign in with Google"}
+                    </button>
+                  )}
+                  <p className={styles.note}>
+                    {view.kind === "guest"
+                      ? "Same player, same takes: Google just remembers you."
+                      : "Guests' takes stay with this browser. Sign in later and they come with you."}
+                  </p>
+                </>
+              ) : (
+                <p className={styles.note}>Sign-in isn&apos;t set up on this computer.</p>
+              )}
+            </>
+          )}
+          {error && (
+            <p role="alert" className={styles.refused}>
+              {error}
             </p>
-            <Link href={next} style={primary}>
-              Continue
-            </Link>
-            <button style={link} onClick={() => void signOut().then(() => setSession(null))}>
-              Not you? Sign out
-            </button>
-          </>
-        ) : (
-          <>
-            <p style={lead}>Sign in to keep your scores and progress on any computer.</p>
-            {isConfigured() ? (
-              <button style={primary} onClick={signIn} disabled={busy} data-testid="login-google">
-                {busy ? "Opening Google…" : "Sign in with Google"}
-              </button>
-            ) : (
-              <p style={dim}>Sign-in isn&apos;t set up on this computer.</p>
-            )}
-            <Link href={next} style={secondary} data-testid="login-guest">
-              Play as guest
-            </Link>
-            <p style={dim}>Guests&apos; takes stay with this browser. Sign in later and they come with you.</p>
-          </>
-        )}
-        {error && (
-          <p role="alert" style={{ ...dim, color: "var(--pa-magenta)" }}>
-            {error}
+          )}
+        </div>
+      </section>
+
+      <aside className={styles.visual} aria-label="Quotes from our playtests">
+        <blockquote className={styles.quote}>
+          <p>
+            &ldquo;{quote.shown}
+            <span className={styles.cursor} aria-hidden="true">
+              |
+            </span>
+            &rdquo;
           </p>
-        )}
-      </div>
+          <cite>— {QUOTES[quote.index].who}</cite>
+        </blockquote>
+      </aside>
     </main>
   );
 }
 
-const page: React.CSSProperties = {
-  minHeight: "100vh",
-  display: "grid",
-  placeItems: "center",
-  padding: 24,
-  background: "radial-gradient(ellipse at 50% 110%, rgba(255,47,208,0.28), transparent 60%), var(--pa-bg)",
-  color: "var(--pa-ink)",
-  fontFamily: "system-ui, sans-serif",
-};
-const card: React.CSSProperties = {
-  width: "min(420px, 100%)",
-  display: "flex",
-  flexDirection: "column",
-  gap: 14,
-  padding: "36px 32px",
-  background: "var(--pa-panel)",
-  border: "1px solid rgba(242,242,245,0.18)",
-  borderRadius: 12,
-  textAlign: "center",
-};
-const title: React.CSSProperties = {
-  margin: "0 0 4px",
-  fontFamily: "var(--pa-font-display), system-ui, sans-serif",
-  fontStyle: "italic",
-  fontWeight: 900,
-  fontSize: 44,
-  textTransform: "uppercase",
-  letterSpacing: 1,
-};
-const lead: React.CSSProperties = { margin: "0 0 8px", fontSize: 17 };
-const dim: React.CSSProperties = { margin: 0, fontSize: 13, color: "var(--pa-ink-dim)" };
-const button: React.CSSProperties = {
-  display: "block",
-  padding: "12px 16px",
-  borderRadius: 8,
-  fontFamily: "var(--pa-font-display), system-ui, sans-serif",
-  fontStyle: "italic",
-  fontWeight: 800,
-  fontSize: 18,
-  letterSpacing: 1,
-  textTransform: "uppercase",
-  textDecoration: "none",
-  cursor: "pointer",
-};
-const primary: React.CSSProperties = { ...button, border: 0, background: "var(--pa-cyan)", color: "#000" };
-const secondary: React.CSSProperties = { ...button, border: "1px solid rgba(242,242,245,0.35)", background: "transparent", color: "var(--pa-ink)" };
-const link: React.CSSProperties = { border: 0, background: "transparent", color: "var(--pa-ink-dim)", textDecoration: "underline", cursor: "pointer", fontSize: 13 };
+function SignedIn({ session, next, onSignOut }: { session: Session; next: string; onSignOut: () => void }) {
+  const [details, setDetails] = useState<UserDetails | null | undefined>(undefined); // undefined = loading
+  useEffect(() => {
+    void fetchUserDetails(session).then(setDetails);
+  }, [session]);
+
+  return (
+    <>
+      <div className={styles.profile} data-testid="login-signed-in">
+        {details?.avatarUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- Google's avatar host, sized here; no image pipeline
+          <img className={styles.avatar} src={details.avatarUrl} alt="" referrerPolicy="no-referrer" width={72} height={72} />
+        ) : (
+          <span className={styles.avatar} aria-hidden="true" />
+        )}
+        <div className={styles.who}>
+          <span className={styles.label}>Signed in with Google</span>
+          <strong className={styles.name} data-testid="login-name">
+            {details === undefined ? "…" : (details?.name ?? <span className={styles.empty}>No name from Google</span>)}
+          </strong>
+          <span className={styles.email} data-testid="login-email">
+            {details === undefined ? "" : (details?.email ?? session.email ?? <span className={styles.empty}>No email from Google</span>)}
+          </span>
+        </div>
+      </div>
+      {details === null && <p className={styles.note}>Couldn&apos;t read your Google details right now.</p>}
+
+      <HandleEntry session={session} />
+
+      <Link className={styles.play} href={next} data-testid="login-continue">
+        Continue
+      </Link>
+      <div className={styles.links}>
+        <Link href="/progress">My progress</Link>
+        <button type="button" className={styles.textButton} onClick={() => void signOut().then(onSignOut)} data-testid="login-signout">
+          Sign out
+        </button>
+      </div>
+    </>
+  );
+}
+
+type Status = { kind: "idle" | "saving" | "saved" } | { kind: "refused"; reason: string };
+
+function HandleEntry({ session }: { session: Session }) {
+  const [stored, setStored] = useState<string | null | undefined>(undefined); // undefined = loading or unreadable
+  const [value, setValue] = useState("");
+  const [status, setStatus] = useState<Status>({ kind: "idle" });
+
+  useEffect(() => {
+    void fetchHandle(session).then((h) => {
+      setStored(h);
+      if (h) setValue(h);
+    });
+  }, [session]);
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus({ kind: "saving" });
+    void saveHandle(value).then((r) => {
+      if (r.ok) {
+        setStored(r.handle);
+        setValue(r.handle);
+        setStatus({ kind: "saved" });
+      } else setStatus({ kind: "refused", reason: r.reason });
+    });
+  };
+
+  return (
+    <form className={styles.handle} onSubmit={submit}>
+      <label className={styles.label} htmlFor="handle">
+        Your handle
+      </label>
+      <div className={styles.handleRow}>
+        <input
+          id="handle"
+          className={styles.handleInput}
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value);
+            setStatus({ kind: "idle" });
+          }}
+          maxLength={HANDLE_MAX + 8 /* room to type past the limit and be told why */}
+          autoComplete="nickname"
+          spellCheck={false}
+          data-testid="handle-input"
+        />
+        <button type="submit" className={styles.save} disabled={status.kind === "saving" || value.trim() === (stored ?? "")} data-testid="handle-save">
+          {status.kind === "saving" ? "…" : "Save"}
+        </button>
+      </div>
+      <p className={status.kind === "refused" ? styles.refused : styles.status} role="status" data-testid="handle-status">
+        {status.kind === "refused"
+          ? status.reason
+          : status.kind === "saved"
+            ? "Saved"
+            : stored
+              ? "Shown on your account instead of your name"
+              : `Up to ${HANDLE_MAX} letters, numbers, spaces or _`}
+      </p>
+    </form>
+  );
+}
+
+function GoogleMark() {
+  return (
+    <svg viewBox="0 0 48 48" aria-hidden="true">
+      <path fill="#ffc107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.3-.4-3.5z" />
+      <path fill="#ff3d00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
+      <path fill="#4caf50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z" />
+      <path fill="#1976d2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.2-.1-2.3-.4-3.5z" />
+    </svg>
+  );
+}

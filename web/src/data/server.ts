@@ -54,6 +54,25 @@ export async function ensurePlayer(id: string): Promise<void> {
   });
 }
 
+/** A player's handle, or null when unset or when they have no row yet. */
+export async function readHandle(id: string): Promise<string | null> {
+  const rows = (await (await rest(`/rest/v1/players?id=eq.${encodeURIComponent(id)}&select=handle`)).json()) as { handle: string | null }[];
+  return rows[0]?.handle ?? null;
+}
+
+/** Sets this one player's handle (creating their row first). The table's CHECK has the last word. */
+export async function writeHandle(id: string, handle: string): Promise<string> {
+  await ensurePlayer(id);
+  const res = await rest(`/rest/v1/players?id=eq.${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({ handle }),
+  });
+  const rows = (await res.json()) as { handle: string }[];
+  if (rows.length !== 1) throw new SupabaseError(500, `players: expected 1 row, updated ${rows.length}`);
+  return rows[0].handle;
+}
+
 /** One transaction. A retry of the same take id changes nothing; an id owned by another player is refused. */
 export async function saveTake(take: TakeRow, notes: NoteRow[]): Promise<"saved" | "duplicate" | "conflict"> {
   const res = await rest("/rest/v1/rpc/save_take", { method: "POST", body: JSON.stringify({ p_take: take, p_notes: notes }) });

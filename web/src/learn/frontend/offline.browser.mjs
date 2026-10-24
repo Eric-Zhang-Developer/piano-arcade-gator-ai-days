@@ -1,6 +1,25 @@
 const { page } = globalThis;
 const origin = await page.eval(() => location.origin);
 
+// An offline interruption must cancel prepared-entry navigation and restore its action.
+await page.open(`${origin}/learn`);
+await page.wait('aside[aria-label="Your next activity"] button');
+await page.eval(async () => {
+  const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+  document.querySelector('aside[aria-label="Your next activity"] button').click();
+  await delay(100);
+  Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => false });
+  window.dispatchEvent(new Event('offline'));
+  await delay(100);
+  delete navigator.onLine;
+  window.dispatchEvent(new Event('online'));
+  await delay(1000);
+  const guide = document.querySelector('aside[aria-label="Your next activity"]');
+  if (location.pathname !== '/learn' || document.querySelector('[data-entering]')?.dataset.entering !== 'false' || !guide || guide.querySelector('button').disabled || getComputedStyle(guide).opacity !== '1') {
+    throw new Error('Interrupted entry navigated late or failed to restore the prepared action');
+  }
+});
+
 async function open(path) {
   await page.open(`${origin}/learn/${path}`);
   await page.wait('main h2');

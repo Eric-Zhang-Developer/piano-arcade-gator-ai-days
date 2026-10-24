@@ -3,7 +3,25 @@ export type Domain = 'theory' | 'procedure';
 export type Mastery = 'mastered' | 'developing' | 'unknown';
 export type GraphAction = { domain: Domain; skillId: string; intent: 'learn' | 'review' };
 export type Skill = { id: string; domain: Domain; title: string; short: string; description: string; parentId?: string; prerequisites: readonly string[]; activity?: string };
-export type LearnerState = { mastery: Mastery; due?: boolean };
+// A coarse distribution over mastery level, not a distribution over confidence.
+export type MasteryDistribution = Readonly<{ low: number; partial: number; secure: number }>;
+export type DistributionSource = 'fictional' | 'prior';
+// Optional distribution inputs keep existing eligibility fixtures compatible.
+export type LearnerState = { mastery: Mastery; due?: boolean; distribution?: MasteryDistribution; distributionSource?: DistributionSource };
+export type PresentedLearnerState = LearnerState & { distribution: MasteryDistribution; distributionSource: DistributionSource; displayMastery: Mastery };
+// An illustrative uninformative prior, not an estimated failure or fitted model.
+export const demoPrior: MasteryDistribution = Object.freeze({ low: 1 / 3, partial: 1 / 3, secure: 1 / 3 });
+// Demo presentation ONLY: project expected level on support [0, .5, 1].
+// These cutoffs are not validated mastery/eligibility thresholds. Equal means
+// can have different uncertainty; retain the full distribution and its source.
+export function displayMastery(distribution: MasteryDistribution): Mastery {
+  const expected = distribution.partial * .5 + distribution.secure;
+  return expected >= .7 ? 'mastered' : expected >= .3 ? 'developing' : 'unknown';
+}
+function fixture(mastery: Mastery, low: number, partial: number, secure: number, distributionSource: DistributionSource = 'fictional', due = false): PresentedLearnerState {
+  const distribution = { low, partial, secure };
+  return { mastery, distribution, distributionSource, displayMastery: displayMastery(distribution), ...(due ? { due: true } : {}) };
+}
 const skill = (domain: Domain, id: string, title: string, short: string, description: string, parentId?: string, prerequisites: readonly string[] = [], activity?: string): Skill => ({ id: `${domain}.${id}`, domain, title, short, description, parentId: parentId ? `${domain}.${parentId}` : undefined, prerequisites: prerequisites.map((p) => p.includes('.') ? p : `${domain}.${p}`), activity });
 
 // Subject definitions contain no learner estimates, recommendations or coordinates.
@@ -165,37 +183,156 @@ export const rootRelationships: readonly { from: string; to: string; kind: 'supp
   { from: 'procedure.practice', to: 'procedure.expression', kind: 'supports', label: 'Listen and refine' },
 ];
 
-// Entirely fictional state. Changing this overlay never changes the subject geography.
-export const demoLearner: Readonly<Record<string, LearnerState>> = {
-  'theory.staff-notes': { mastery: 'mastered' }, 'theory.note-values': { mastery: 'mastered' },
-  'theory.pitch-match': { mastery: 'mastered' }, 'theory.contour': { mastery: 'developing' },
-  'theory.repetition': { mastery: 'mastered' }, 'theory.tonal-center': { mastery: 'mastered', due: true },
-  'theory.phrase-endings': { mastery: 'developing' }, 'theory.phrase-length': { mastery: 'developing' },
-  'procedure.steady-pulse': { mastery: 'mastered', due: true }, 'procedure.key-targeting': { mastery: 'mastered' },
-  'procedure.short-phrase-coordination': { mastery: 'developing' }, 'procedure.held-endings': { mastery: 'developing' },
-  'procedure.score-to-keys': { mastery: 'developing' }, 'procedure.dynamics': { mastery: 'mastered' },
-  'theory.lines-spaces': { mastery: 'mastered' }, 'theory.treble-clef': { mastery: 'mastered' },
-  'theory.accidentals': { mastery: 'developing' }, 'theory.higher-lower': { mastery: 'mastered' },
-  'theory.same-different': { mastery: 'mastered' }, 'theory.steps-leaps': { mastery: 'developing' },
-  'theory.motif-return': { mastery: 'developing' }, 'theory.home-away': { mastery: 'mastered' },
-  'theory.final-note': { mastery: 'developing' }, 'theory.open-ending': { mastery: 'developing' },
-  'theory.pulse-notion': { mastery: 'mastered' }, 'theory.beat-groups': { mastery: 'mastered' },
-  'theory.duple': { mastery: 'mastered' }, 'theory.subdivision': { mastery: 'developing' },
-  'theory.intervals': { mastery: 'developing' }, 'theory.thirds': { mastery: 'developing' },
-  'procedure.start-with-click': { mastery: 'mastered' }, 'procedure.beat-continuation': { mastery: 'developing' },
-  'procedure.release-in-time': { mastery: 'developing' }, 'procedure.stepwise-motion': { mastery: 'mastered' },
-  'procedure.prepare-next': { mastery: 'developing' }, 'procedure.range-anchor': { mastery: 'mastered' },
-  'procedure.legato': { mastery: 'developing' }, 'procedure.controlled-attack': { mastery: 'mastered' },
-  'procedure.registers': { mastery: 'mastered' }, 'procedure.black-key-groups': { mastery: 'mastered' },
-  'procedure.finger-numbers': { mastery: 'mastered' }, 'procedure.hand-position': { mastery: 'developing' },
-  'procedure.self-listening': { mastery: 'developing' }, 'procedure.hear-stops': { mastery: 'mastered' },
-  'procedure.choose-unit': { mastery: 'developing' }, 'procedure.reconnect': { mastery: 'developing' },
+// Explicit demo overlay for every authored node, including independent parent states.
+// These are fictional examples or disclosed priors, never observed learner evidence.
+// Parent distributions are authored independently, never inferred by averaging children.
+// `mastery` retains existing demo action eligibility; displayMastery is presentation only.
+// The legacy display token 'unknown' means the low projected bucket, not proved failure.
+export const demoLearner: Readonly<Record<string, PresentedLearnerState>> = {
+  'theory.notation': fixture('unknown', 0.05, 0.1, 0.85),
+  'theory.staff-notes': fixture('mastered', 0.05, 0.1, 0.85),
+  'theory.note-values': fixture('mastered', 0.05, 0.1, 0.85),
+  'theory.rests': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.hearing': fixture('unknown', 0.15, 0.65, 0.2),
+  'theory.pitch-match': fixture('mastered', 0.05, 0.1, 0.85),
+  'theory.contour': fixture('developing', 0.15, 0.65, 0.2),
+  'theory.repetition': fixture('mastered', 0.05, 0.1, 0.85),
+  'theory.tonality': fixture('unknown', 0.1, 0.15, 0.75),
+  'theory.tonal-center': fixture('mastered', 0.05, 0.1, 0.85, 'fictional', true),
+  'theory.scale-steps': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.key-signatures': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.phrasing': fixture('unknown', 0.2, 0.6, 0.2),
+  'theory.phrase-endings': fixture('developing', 0.15, 0.65, 0.2),
+  'theory.phrase-length': fixture('developing', 0.15, 0.65, 0.2),
+  'theory.question-answer': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.pulse': fixture('unknown', 0.05, 0.1, 0.85),
+  'procedure.steady-pulse': fixture('mastered', 0.05, 0.1, 0.85, 'fictional', true),
+  'procedure.held-endings': fixture('developing', 0.15, 0.65, 0.2),
+  'procedure.rests-in-time': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.coordination': fixture('unknown', 0.15, 0.65, 0.2),
+  'procedure.key-targeting': fixture('mastered', 0.05, 0.1, 0.85),
+  'procedure.short-phrase-coordination': fixture('developing', 0.15, 0.65, 0.2),
+  'procedure.hands-together': fixture('unknown', 0.8, 0.15, 0.05),
+  'procedure.reading': fixture('unknown', 0.75, 0.2, 0.05),
+  'procedure.score-to-keys': fixture('developing', 0.15, 0.65, 0.2),
+  'procedure.reading-ahead': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.new-phrase': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.expression': fixture('unknown', 0.2, 0.6, 0.2),
+  'procedure.articulation': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.dynamics': fixture('mastered', 0.05, 0.1, 0.85),
+  'procedure.phrase-shape': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.lines-spaces': fixture('mastered', 0.05, 0.1, 0.85),
+  'theory.ledger-lines': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.treble-clef': fixture('mastered', 0.05, 0.1, 0.85),
+  'theory.bass-clef': fixture('unknown', 0.8, 0.15, 0.05),
+  'theory.ties': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.dots': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.accidentals': fixture('developing', 0.15, 0.65, 0.2),
+  'theory.higher-lower': fixture('mastered', 0.05, 0.1, 0.85),
+  'theory.same-different': fixture('mastered', 0.05, 0.1, 0.85),
+  'theory.steps-leaps': fixture('developing', 0.15, 0.65, 0.2),
+  'theory.repeated-note': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.motif-return': fixture('developing', 0.15, 0.65, 0.2),
+  'theory.rhythm-match': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.internal-hearing': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.home-away': fixture('mastered', 0.05, 0.1, 0.85),
+  'theory.final-note': fixture('developing', 0.15, 0.65, 0.2),
+  'theory.half-whole': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.scale-degree': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.major-scale': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.minor-color': fixture('unknown', 0.8, 0.15, 0.05),
+  'theory.key-change': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.open-ending': fixture('developing', 0.15, 0.65, 0.2),
+  'theory.settled-ending': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.phrase-boundaries': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.breathing-points': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.continuation': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.repeated-ending': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.phrase-balance': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.rhythm': fixture('unknown', 0.75, 0.2, 0.05),
+  'theory.pulse-notion': fixture('mastered', 0.05, 0.1, 0.85),
+  'theory.beat-groups': fixture('mastered', 0.05, 0.1, 0.85),
+  'theory.subdivision': fixture('developing', 0.15, 0.65, 0.2),
+  'theory.duration-ratios': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.downbeat': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.duple': fixture('mastered', 0.05, 0.1, 0.85),
+  'theory.triple': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.binary-division': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.sustained-time': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.syncopation': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.harmony': fixture('unknown', 0.8, 0.15, 0.05),
+  'theory.intervals': fixture('developing', 0.15, 0.65, 0.2),
+  'theory.triads': fixture('unknown', 0.8, 0.15, 0.05),
+  'theory.chord-functions': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.consonance': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.thirds': fixture('developing', 0.15, 0.65, 0.2),
+  'theory.fifths': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.major-triad': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.minor-triad': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.tonic-chord': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'theory.dominant-chord': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.beat-continuation': fixture('developing', 0.15, 0.65, 0.2),
+  'procedure.start-with-click': fixture('mastered', 0.05, 0.1, 0.85),
+  'procedure.release-in-time': fixture('developing', 0.15, 0.65, 0.2),
+  'procedure.silent-count': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.subdivision-motion': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.downbeat-accent': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.tempo-change': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.stepwise-motion': fixture('mastered', 0.05, 0.1, 0.85),
+  'procedure.leaping': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.prepare-next': fixture('developing', 0.15, 0.65, 0.2),
+  'procedure.joining-bars': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.alternating-hands': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.simultaneous-hands': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.independent-hands': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.range-anchor': fixture('mastered', 0.05, 0.1, 0.85),
+  'procedure.interval-reading': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.rhythm-reading': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.lookahead-group': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.fingering-plan': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.restart-points': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.unfamiliar-reading': fixture('unknown', 0.8, 0.15, 0.05),
+  'procedure.legato': fixture('developing', 0.15, 0.65, 0.2),
+  'procedure.staccato': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.controlled-attack': fixture('mastered', 0.05, 0.1, 0.85),
+  'procedure.gradual-change': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.melody-direction': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.voice-balance': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.pedal-release': fixture('unknown', 0.8, 0.15, 0.05),
+  'procedure.orientation': fixture('unknown', 0.1, 0.15, 0.75),
+  'procedure.registers': fixture('mastered', 0.05, 0.1, 0.85),
+  'procedure.finger-numbers': fixture('mastered', 0.05, 0.1, 0.85),
+  'procedure.hand-position': fixture('developing', 0.15, 0.65, 0.2),
+  'procedure.black-key-groups': fixture('mastered', 0.05, 0.1, 0.85),
+  'procedure.octave-starts': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.thumb-crossing': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.wrist-freedom': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.relaxed-release': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.finger-replacement': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.keyboard-distance': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.practice': fixture('unknown', 0.8, 0.15, 0.05),
+  'procedure.self-listening': fixture('developing', 0.15, 0.65, 0.2),
+  'procedure.isolate': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.reconnect': fixture('developing', 0.15, 0.65, 0.2),
+  'procedure.compare-takes': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.hear-durations': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.hear-stops': fixture('mastered', 0.05, 0.1, 0.85),
+  'procedure.choose-unit': fixture('developing', 0.15, 0.65, 0.2),
+  'procedure.slow-intentionally': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.into-out-of': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.vary-start': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.later-check': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
+  'procedure.changed-context': fixture('unknown', 1 / 3, 1 / 3, 1 / 3, 'prior'),
 };
 export const demoGoal = { title: 'Play short melodies with clear, steady endings', targets: ['theory.phrase-endings', 'procedure.short-phrase-coordination', 'theory.tonal-center', 'procedure.steady-pulse'] } as const;
 export const byId = new Map(skills.map((node) => [node.id, node]));
-export const stateOf = (id: string, learner = demoLearner): LearnerState => learner[id] ?? { mastery: 'unknown' };
+export function stateOf(id: string, learner: Readonly<Record<string, LearnerState>> = demoLearner): PresentedLearnerState {
+  const state = learner[id];
+  const distribution = state?.distribution ?? demoPrior;
+  return { ...state, mastery: state?.mastery ?? 'unknown', distribution, distributionSource: state?.distributionSource ?? 'prior', displayMastery: displayMastery(distribution) };
+}
 
-export function actionFor(node: Skill, learner = demoLearner): { action?: GraphAction; reason: string; missing: Skill[] } {
+export function actionFor(node: Skill, learner: Readonly<Record<string, LearnerState>> = demoLearner): { action?: GraphAction; reason: string; missing: Skill[] } {
   const children = skills.some((s) => s.parentId === node.id);
   const missing = node.prerequisites.filter((id) => stateOf(id, learner).mastery !== 'mastered').map((id) => byId.get(id)!).filter(Boolean);
   if (!node.parentId) return { reason: 'An organizing group. Select a smaller skill to inspect its state.', missing: [] };
@@ -203,10 +340,10 @@ export function actionFor(node: Skill, learner = demoLearner): { action?: GraphA
   if (missing.length) return { reason: 'In this sample, begin with the foundations below before this activity.', missing };
   const state = stateOf(node.id, learner);
   if (state.mastery === 'mastered') return state.due
-    ? { action: { domain: node.domain, skillId: node.id, intent: 'review' }, reason: 'Established in the sample; a fresh check is due. Due does not mean low mastery.', missing }
-    : { reason: 'Established in the sample. No review is due right now.', missing };
+    ? { action: { domain: node.domain, skillId: node.id, intent: 'review' }, reason: 'A recall activity is available for this sample skill.', missing }
+    : { reason: 'No activity is prepared for this sample skill.', missing };
   return { action: { domain: node.domain, skillId: node.id, intent: 'learn' }, reason: children ? 'Build this relationship before exploring its finer details.' : 'This supports the goal, and its sample foundations are in place.', missing };
 }
-export function recommendation(domain: Domain, learner = demoLearner): Skill | undefined {
+export function recommendation(domain: Domain, learner: Readonly<Record<string, LearnerState>> = demoLearner): Skill | undefined {
   return demoGoal.targets.map((id) => byId.get(id)!).find((node) => node.domain === domain && actionFor(node, learner).action);
 }

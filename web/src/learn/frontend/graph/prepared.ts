@@ -22,5 +22,5 @@ export const preparedActivity = {
   action: actionFor(candidate).action!,
   activityId: 'learn-theory' as ActivityId,
   title: 'Hearing a phrase come home',
-  reason: 'Compare two phrase endings to hear what makes a melody feel settled.',
+  reason: 'Hear how phrase endings help a melody feel settled.',
 } as const;

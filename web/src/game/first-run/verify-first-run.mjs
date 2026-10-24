@@ -113,19 +113,33 @@ for (const [w, h] of [
   await page.waitForFunction(() => window.__pianoArcade?.ready === true, null, { timeout: 60_000 });
   const chart = await page.evaluate(() => window.__pianoArcade.chart);
   await page.evaluate(([notes, mpb]) => notes.forEach((n) => window.__pianoArcade.press(n.pitch, n.beat * mpb + 5)), [chart.notes, 60000 / chart.bpm]);
-  // Early in each cue's window (fall from -4800, press from -1500, perfect from the first hit at +5), since a 1080p
-  // screenshot can take a second under load. The cue is read before and after, so a late screenshot still fails.
-  const cueNow = () => page.evaluate(() => window.__pianoArcadeFirstRun?.cue);
+  // Early in each cue's window (fall from -4800, press from -1500, perfect from the first hit at +5). The cue and its
+  // picture come from one evaluate: the hook is set in the draw that paints the cue, and no frame can draw while the
+  // script runs, so the playfield's canvases composited there are that frame. A page screenshot can take longer than a
+  // cue shows at 1080p under load (fall, then null: #566), so it can't prove the picture has the cue.
+  const cueShot = async (path) => {
+    const { cue, png } = await page.evaluate(() => {
+      const cs = [...document.querySelectorAll("canvas")];
+      const w = Math.max(...cs.map((c) => c.width));
+      const h = Math.max(...cs.map((c) => c.height));
+      const frame = Object.assign(document.createElement("canvas"), { width: w, height: h });
+      const g = frame.getContext("2d");
+      g.fillStyle = "#000";
+      g.fillRect(0, 0, w, h);
+      for (const c of cs) g.drawImage(c, 0, 0, w, h); // page order: the layers stack as on screen
+      return { cue: window.__pianoArcadeFirstRun?.cue ?? null, png: frame.toDataURL("image/png") };
+    });
+    writeFileSync(path, Buffer.from(png.slice(png.indexOf(",") + 1), "base64"));
+    return cue;
+  };
   for (const [n, ms, id] of [
     [1, -4600, "fall"],
     [2, -1400, "press"],
     [3, 100, "perfect"],
   ]) {
     await chartAt(page, ms);
-    const before = await cueNow();
-    await page.screenshot({ path: join(out, `${size}-cue${n}.png`) });
-    const after = await cueNow();
-    check(before === id && after === id, `${size} 2: cue ${n} at ${ms} ms is ${id}, in the screenshot too (${before}, then ${after})`);
+    const cue = await cueShot(join(out, `${size}-cue${n}.png`));
+    check(cue === id, `${size} 2: cue ${n} at ${ms} ms is ${id}, in the frame ${size}-cue${n}.png holds (${cue})`);
   }
   await page.getByTestId("results").waitFor({ timeout: 120_000 });
   const seen = await page.evaluate(() => window.__pianoArcadeFirstRun?.seen.join(","));

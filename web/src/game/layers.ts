@@ -34,6 +34,7 @@ import { feverStage } from "./stage";
 import { takeGraph } from "./take-graph";
 import { cabinet } from "./cabinet/plugin";
 import { demoReset } from "./demo-reset";
+import { helpOverlay } from "./help-overlay";
 import { versus } from "./versus";
 import { takeMidi } from "./take-midi";
 import { waitMode } from "./wait-mode/plugin";
@@ -84,6 +85,7 @@ export const plugins: GamePlugin[] = [
   stageCard(), // start panel: ARE YOU READY, the jacket, title and level, above Start
   cabinet(), // ?cabinet=1 returns a finished game to /cabinet; ?cabinet=demo starts the demo and reports it
   demoReset(), // 60 s with no input on a plain take's results (not ?cabinet) loads / clean
+  helpOverlay(), // ? card: knows when a take runs, so ? opens on the start screen and results only
   createSavePlugin(queueAndSend), // take-store: saves finished takes after the results screen
   sheetView(), // last: posts the chart as played (after every transformChart) to /sheet; "Sheet music ↗" on the start screen
   crashGuard(), // ?crash=draw|event: a plugin that throws on purpose, for crash-guard's check; inert without ?crash

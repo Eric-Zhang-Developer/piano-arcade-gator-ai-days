@@ -442,7 +442,8 @@ export default function Play() {
               settings={controls}
             />
           )}
-          {phase !== "results" && controls}
+          {/* not while loading: the slider would show useState's 0 before the stored offset is read (#447, #478) */}
+          {phase !== "results" && phase !== "loading" && controls}
         </div>
       )}
     </main>

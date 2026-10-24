@@ -14,7 +14,8 @@ highway, never in the lanes (`specs/context/references/*/README.md`). Register a
 ## Plan
 1. A top panel: the song card (title, composer, catalog) on the left, live judgment counters in the middle, and the
    score on the right (Chunithm chart study).
-2. A giant translucent combo number, top center, drawn behind the notes (Nostalgia, Chunithm).
+2. A giant translucent combo number, top center (Nostalgia, Chunithm). Plugin layers draw above the highway, so
+   it's drawn over the notes, faint enough that they read through (decision `hud-look.md`).
 3. A multiplier that changes color by tier, with pips filling toward the next tier (Guitar Hero 3).
 
 ## Requirements
@@ -30,7 +31,9 @@ highway, never in the lanes (`specs/context/references/*/README.md`). Register a
 ## Validation
 - Vitest: feed a scripted `GameEvent` list (10 PERFECT, 1 MISS, 25 GREAT) to the HUD's state reducer; the counters,
   combo, multiplier and score come out exact.
-- `verify.py`: the verify run's results screenshot, plus a mid-song screenshot showing the HUD.
+- `verify.py`: the verify run's results screenshot. The mid-song screenshot showing the HUD comes from
+  `web/src/game/hud/verify-hud.mjs` (`web/e2e/` is core-loop's), which also fails unless the HUD's numbers match
+  the results screen.
 - Eric checks readability on the piano: is the combo readable without looking away from the notes?
 
 ## Defaults

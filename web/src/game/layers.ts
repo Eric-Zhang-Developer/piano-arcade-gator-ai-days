@@ -7,6 +7,7 @@ import { warningCard } from "./difficulty";
 import { feverGauge } from "./fever-gauge";
 import { juiceVisual } from "./juice";
 import { midiWatchdog } from "./midi-watchdog";
+import { noteLabels } from "./note-labels";
 import { pianoOut } from "./piano-out";
 import { scenes } from "./scenes";
 import { evenness } from "./evenness";
@@ -24,6 +25,7 @@ export const plugins: GamePlugin[] = [
   barLoop(), // first: every later plugin (the sim's bot included) sees the looped chart
   scenes(), // ?bot=<name>: after bar-loop, so the bot plays the looped chart
   simPlugin, // piano-sim: /play?midi=sim only. First, so later plugins asking for MIDI get the fake piano.
+  noteLabels(), // after bar-loop, scenes and the sim: it labels the final chart and sees which device really played
   juiceVisual(), // under the HUD: wisps and flares never cover the score
   handColors(), // the L/R legend during the count-in, two-hand charts only
   hud(), // before beat-track, so beat-track's status line draws over the HUD's top panel

@@ -1,3 +1,29 @@
+/* Piano Arcade's tokens (specs/context/visual-direction.md); web/src/game/ui-tokens has the same values for canvas
+   code. Declared only: nothing uses them yet, so no screen changes. */
+:root {
+  --pa-bg: #000000;
+  --pa-hand-r: #5ef2c4;
+  --pa-hand-l: #6aa8ff;
+  --pa-flare: #ffffff;
+  --pa-miss: #c98a9a;
+  --pa-wrong: #ff4d5e;
+  --pa-gold: #ffe27a;
+  --pa-good: #7cb7ff;
+  --pa-panel: rgba(12, 12, 16, 0.72);
+  --pa-ink: #f2f2f5;
+  --pa-ink-dim: rgba(242, 242, 245, 0.6);
+  --pa-magenta: #ff2fd0;
+  --pa-cyan: #27e1ff;
+  --pa-sun: #ffb02e;
+  --pa-sun-from: #ffe66b;
+  --pa-sun-to: #ff3fa4;
+  --pa-sky: #0b0220;
+  --pa-tier-x1: #e8e8ec;
+  --pa-tier-x2: #ff9f43;
+  --pa-tier-x3: #8ee05e;
+  --pa-tier-x4: #c47cff;
+}
+
 html,
 body {
   margin: 0;

@@ -3,7 +3,7 @@
 ## Where it lives
 `web/src/operator/` (`board.ts` model and readers, `collect.ts` collector and cache, tests, `verify-operator.mjs`), `web/src/app/operator/` (page, layout, error boundary, CSS), `web/src/app/api/operator/` (live and snapshot routes, 404 in production).
 ## How to check it
-verify: `pnpm -C web verify` (Twinkle + sim) pass at 7eb6817 (evidence: `.git/agent-evidence/operator-board/20261024T071639Z`)
+verify: `pnpm -C web verify` pass at 7eb6817 (evidence: `.git/agent-evidence/operator-board/20261024T071639Z`)
 `node web/src/operator/verify-operator.mjs --out <dir>` passed 15/15 at 7eb6817: the spec's four Chrome steps, headless against live GitHub, plus a bad snapshot showing a banner. Screenshots `operator-live.png` and `operator-snapshot.png` are in that evidence folder's `operator/`. A production build was checked by hand: both routes 404 and the page falls back to SNAPSHOT.
 ## Gaps
 No snapshot is committed (per spec): Eric freezes one from main before judging. Repo files come from the checkout the dev server runs in, so run it from an up-to-date main (a banner says when HEAD isn't origin/main). Features in a milestone whose ship time has passed aren't treated as missed the way `status.py` does: no milestone has a ship time (decision 001). The one-collection-per-60 s check watched 17 s of polling, not a full minute. Seen in headless Chromium only, not in Eric's Chrome; mobile is out of scope.

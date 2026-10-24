@@ -156,3 +156,12 @@ it("output messages are recorded and never appear on the input", async () => {
   expect(events).toEqual([]);
   expect(raw).toEqual([]);
 });
+
+it("a live send during a scheduled replay arrives now, not after the replay", async () => {
+  const { sim, events } = await connect();
+  const t0 = performance.now();
+  sim.play([{ timeMs: 60_000, bytes: keyOn(72, 64) }], t0); // a replay with a message a minute away
+  sim.send(keyOn(60, 64)); // a virtual-keyboard press right now
+  await vi.advanceTimersByTimeAsync(10);
+  expect(events.map((e) => [e.pitch, e.timeMs - t0])).toEqual([[60, 0]]);
+});

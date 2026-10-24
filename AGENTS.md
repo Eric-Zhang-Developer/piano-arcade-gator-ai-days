@@ -60,8 +60,17 @@ Supabase Postgres, in `sharan`'s lane. `supabase/README.md` lists what's in it a
   every migration to an in-memory Postgres and fails on a table without RLS, a browser write grant, an unsafe view or
   an open function.
 - The browser never writes: only Next.js server routes, with `SUPABASE_SECRET_KEY`. CHECKs guard shape, not game rules.
-- Applying to the live project is a one-way door: after merge, a person runs `supabase/push.sh` (tests, dry run, asks,
-  applies, then `supabase/tests/live-smoke.mjs`). Agents don't apply migrations.
+- Applying to the live project is a one-way door, done only with `supabase/push.sh` (tests, dry run, asks, applies,
+  then `supabase/tests/live-smoke.mjs`), only after the migration's PR is merged, from a clean checkout of
+  `origin/main`. A `sharan` worker may run it, when `sharan` asks for it in chat:
+  1. Run the tests and the dry run (`supabase/push.sh` up to its question), and show `sharan` the dry run's list of
+     migrations. Answer the question `y` only after `sharan` approves that exact list in chat; anything else is `N`.
+     An approval covers that one run.
+  2. Never touch the live database another way: no `db reset`, `migration repair`, raw SQL, or dashboard SQL Editor.
+  3. Smoke check fails, or anything looks wrong? Stop. Don't fix it forward: file a `blocked` + `one-way-door` issue
+     with the output, and wait for `sharan`.
+  4. Comment on the migration's PR: the migrations applied and the smoke result. Never print `SUPABASE_DB_URL`.
+  Other people's workers don't apply migrations.
 - Another lane needs data stored or read (the coach, say)? File a `needs-human` issue for `sharan`, as for any folder.
 - `SUPABASE_SECRET_KEY` and `SUPABASE_DB_URL` stay in `web/.env.local`: never committed, never in a `NEXT_PUBLIC_` name.
 

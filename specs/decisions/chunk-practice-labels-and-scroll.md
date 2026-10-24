@@ -9,5 +9,7 @@ centre the panel.
 
 **Choice.** "bar 45" for a one-bar chunk (`barsLabel` in `chunks.ts`); every other chunk reads as the spec says.
 Focus without scrolling, then centre the panel, so the verdict and the link are both in view.
+**Superseded for focus** once #294 featured the panel in the first view: plain `focus()` scrolls nothing there, and
+centring had pushed the song title under the HUD.
 
 **How to undo.** `barsLabel` returns `bars ${from}–${to}` always; the effect in `index.tsx` calls `focus()` alone.

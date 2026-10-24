@@ -77,7 +77,7 @@ describe("when it's on", () => {
     expect(zoomOn(song("twinkle"), new URLSearchParams("zoom=on"))).toBe(true);
   });
 
-  it("matches makeLayout's padding for charts that start or end on a black key", () => {
+  it("matches makeLayout's static range for charts that start or end on a black key", () => {
     for (const pitches of [[61, 70], [60, 72], [59, 66]]) {
       const c: Chart = { ...jump, notes: pitches.map((pitch, i) => ({ ...jump.notes[0], id: `p${i}`, pitch })) };
       const L = makeLayout(c, 1280, 720, 0);

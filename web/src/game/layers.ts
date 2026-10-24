@@ -2,6 +2,7 @@ import type { GamePlugin } from "../contracts";
 import { barLoop } from "./bar-loop";
 import { beatTrack } from "./beat";
 import { handColors } from "./hand-colors";
+import { handMode } from "./hand-mode";
 import { hud } from "./hud";
 import { warningCard } from "./difficulty";
 import { feverGauge } from "./fever-gauge";
@@ -24,6 +25,7 @@ import { takeGraph } from "./take-graph";
 // own canvas above the highway, forwards every GameEvent, and applies transformChart and wrapInput in this order.
 export const plugins: GamePlugin[] = [
   barLoop(), // first: every later plugin (the sim's bot included) sees the looped chart
+  handMode(), // ?hands=R|L: before scenes and the sim, so their bots and the judge get only the played hand
   scenes(), // ?bot=<name>: after bar-loop, so the bot plays the looped chart
   simPlugin, // piano-sim: /play?midi=sim only. First, so later plugins asking for MIDI get the fake piano.
   noteLabels(), // after bar-loop, scenes and the sim: it labels the final chart and sees which device really played

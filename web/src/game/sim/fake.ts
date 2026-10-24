@@ -115,6 +115,7 @@ export function createSimMidiAccess(overrides: Partial<SimProfile> = {}) {
 
   const timers = new Set<ReturnType<typeof setTimeout>>();
   let stalledUntil = -Infinity;
+  let lastBase = -Infinity; // the latest scheduled time so far, before jitter
   let lastStamp = -Infinity;
   const dropReleases = new Set<number>();
   const listeners = new Set<(l: SimLog) => void>();
@@ -136,12 +137,16 @@ export function createSimMidiAccess(overrides: Partial<SimProfile> = {}) {
     log({ kind: "message", timeStamp: stamp, bytes, note });
   }
 
-  // Deliver bytes at a performance.now() time, with jitter, never reordered, floored to the timestamp resolution.
+  // Deliver bytes at a performance.now() time, with jitter, floored to the timestamp resolution. Jitter never
+  // reorders a message behind one scheduled before it; a message due earlier than what's queued (a key pressed
+  // during a replay) isn't held back behind the queue.
   function deliver(bytes: number[], atPerfMs: number, note?: string) {
     const j = profile.jitterMs ? (random() * 2 - 1) * profile.jitterMs : 0;
     const res = profile.timestampResolutionMs;
-    const stamp = Math.max(lastStamp, Math.floor((atPerfMs + j) / res) * res);
-    lastStamp = stamp;
+    const floored = Math.floor((atPerfMs + j) / res) * res;
+    const inOrder = atPerfMs >= lastBase;
+    const stamp = inOrder ? Math.max(lastStamp, floored) : floored;
+    if (inOrder) [lastBase, lastStamp] = [atPerfMs, stamp];
     const t = setTimeout(() => {
       timers.delete(t);
       arrive(bytes, stamp, note);

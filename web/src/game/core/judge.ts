@@ -77,6 +77,18 @@ export class Judge {
     }
   }
 
+  // rewind (wait mode's ←): every note at or after fromMs is unjudged again and pressable, and the combo starts over.
+  rewind(fromMs: number): void {
+    if (this.results) return;
+    for (const [i, t] of this.times.entries()) {
+      if (t < fromMs - 1e-6 || !this.judgments[i]) continue;
+      this.judgments[i] = null;
+      this.noteState.delete(this.chart.notes[i].id);
+    }
+    this.combo = 0;
+    this.onEvent({ type: "combo", count: 0, atMs: fromMs });
+  }
+
   finish(atMs: number): Results {
     if (this.results) return this.results;
     for (const i of this.byTime) if (!this.judgments[i]) this.miss(i);

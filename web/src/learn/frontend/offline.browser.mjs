@@ -95,7 +95,7 @@ await page.eval(async () => {
   await click('Check answer');
   await click('Reference');
   await recover();
-  assert(text().includes('Correct.') && document.querySelector('article h2')?.textContent === 'A sense of home', 'Review feedback or reference state reset');
+  assert(text().includes('Correct.') && document.querySelector('section[aria-label="Music and reference workspace"] article h2')?.textContent === 'A sense of home', 'Review feedback or reference state reset');
   await click('Continue');
   assert(reference().disabled && text().includes('Previous answers (1)'), 'Review did not advance with a fresh reference gate');
   await choose('Phrase 2');

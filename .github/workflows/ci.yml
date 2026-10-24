@@ -9,7 +9,9 @@ on:
 
 concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  # A PR cancels its superseded run. Main doesn't: a steady stream of merges cancelled every main run (none finished
+  # in ~15 merges after c2bb006). The running one finishes, and GitHub keeps only the newest pending one.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   ci:

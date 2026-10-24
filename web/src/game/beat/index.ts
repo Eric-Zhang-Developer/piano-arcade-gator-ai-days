@@ -74,8 +74,10 @@ export function beatTrack(): GamePlugin {
     // doesn't shift the clicks; until the context runs, fall back to "now".
     const stamp = audio.getOutputTimestamp?.();
     const [ctxT, perfT] = stamp?.performanceTime ? [stamp.contextTime ?? 0, stamp.performanceTime] : [audio.currentTime, performance.now()];
-    const t = ctxT + (perf - perfT) / 1000;
-    if (t < audio.currentTime - beatSettings.lateClickS) return; // a late click breaks the pulse; skip it
+    const due = ctxT + (perf - perfT) / 1000;
+    if (due < audio.currentTime - beatSettings.lateClickS) return; // a late click breaks the pulse; skip it
+    // A click due a few ms ago plays now: Web Audio throws on a past time, and before the context runs "now" is 0.
+    const t = Math.max(due, audio.currentTime);
     const osc = audio.createOscillator();
     const gain = audio.createGain();
     osc.frequency.value = h.accent ? beatSettings.clickAccentHz : beatSettings.clickHz;

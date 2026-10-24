@@ -25,6 +25,8 @@ export function midiWatchdog(): GamePlugin & { log: WatchdogEntry[] } {
   let chart: Chart | null = null;
   let zeroPerf: number | null = null; // chart clock 0 in performance.now() time, while a song plays
   let notice = "";
+  let paused = false; // play-slots' pause: silence is the player waiting, not a stall
+  let resumedAt = -Infinity; // performance.now() of the last resume; silence before it doesn't count
 
   const record = (kind: WatchdogEntry["kind"], detail: string) => {
     const e = { kind, atPerfMs: performance.now(), detail };
@@ -47,8 +49,11 @@ export function midiWatchdog(): GamePlugin & { log: WatchdogEntry[] } {
       return c;
     },
     onEvent(e) {
-      if (e.type === "songStart") zeroPerf = performance.now() - e.atMs;
-      if (e.type === "songEnd") zeroPerf = null;
+      if (e.type === "songStart" || e.type === "resume") zeroPerf = performance.now() - e.atMs; // the clock stood still
+      if (e.type === "songEnd" || e.type === "quit") zeroPerf = null;
+      if (e.type === "pause") paused = true;
+      if (e.type === "resume") resumedAt = performance.now();
+      if (e.type === "songStart" || e.type === "resume" || e.type === "quit") paused = false;
     },
     draw(ctx, frame) {
       if (!notice) return;
@@ -111,9 +116,9 @@ export function midiWatchdog(): GamePlugin & { log: WatchdogEntry[] } {
         await attach();
       }
       function check() {
-        if (!port || port.state !== "connected") return;
+        if (!port || port.state !== "connected" || paused) return;
         const now = performance.now();
-        const silent = now - last;
+        const silent = now - Math.max(last, resumedAt);
         const stalled = sensing ? silent >= watchdogSettings.stallMs : silent >= watchdogSettings.fallbackMs && notesDue(last, now);
         if (!stalled) return;
         record("stall", `no MIDI for ${Math.round(silent)} ms${sensing ? "" : " while notes were due"}; reconnecting`);

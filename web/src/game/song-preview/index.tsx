@@ -109,7 +109,7 @@ export function SongPreview({ id, best }: { id: string; best?: { rank: Rank; acc
           )}
         </span>
       </div>
-      <p data-testid="preview-status" style={status}>
+      <p data-testid="preview-status" data-capture-hide style={status}>
         {!isArmed ? "Press any key for previews" : voice === "piano" ? "Preview: on the piano" : voice === "tones" ? "Preview: laptop tones" : "\u00a0"}
       </p>
     </div>
@@ -133,4 +133,5 @@ const action: CSSProperties = {
   letterSpacing: "0.08em",
   textDecoration: "none",
 };
+// Device status, like beat-track's corner text: ?capture=1 hides it (capture-mode).
 const status: CSSProperties = { margin: "0.3em 0 0", fontSize: "clamp(13px, 0.85vw, 17px)", color: "var(--pa-ink-dim)" };

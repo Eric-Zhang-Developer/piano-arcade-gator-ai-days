@@ -79,9 +79,13 @@ Issue: #407
     | `:76` no page error or console.error | missing: its error check (`:118`) runs before /sim and counts only `pageerror` and `play-slots:` lines. Step 3 adds it. |
 
     `verify.mjs` also checks the /sim mean offset within ±4 ms (`:145`) and "Replay on piano" (`:147`); both stay.
-  - `verify.py` takes a machine-wide lock before it runs anything: `fcntl.flock` on
-    `<git common dir>/agent-verify.lock`, so one local headless check runs at a time across all worktrees. While it
-    waits it prints `verify: waiting for another check`. The wait doesn't count toward `[verify].timeout`.
+  - `verify.py` takes a machine-wide lock before it runs anything: it `mkdir`s `<git common dir>/verify.lock` (the
+    directory is the lock) and `rmdir`s it when the command ends, times out or is interrupted, so one local headless
+    check runs at a time across all worktrees. It's the same lock as the interim shell loop every worker uses until
+    this lands (`until mkdir "$L"; do ...; done; <check>; rmdir "$L"`), so the two never race; `fcntl.flock` on a
+    file wouldn't see that loop. A lock whose mtime is over 600 s old is taken over as stale, which assumes no check
+    holds it longer: `[verify].timeout` is 300 s. While it waits it prints `verify: waiting for another check`. The
+    wait doesn't count toward `[verify].timeout`.
   - `verify.py --slug <x> --cmd "<command>"` runs a feature check through the same lock, timeout, process-group
     cleanup and evidence folder, with the same `{slug}`, `{worktree}` and `{out}` placeholders (chosen over a
     separate `one_at_a_time.py`: one flag on the script that already does all of that).

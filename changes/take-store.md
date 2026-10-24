@@ -16,6 +16,6 @@ Live project: `node supabase/tests/live-smoke.mjs` pass, 8/8 (anonymous sign-in,
 CAPTCHA on anonymous sign-ins not set up. (Migrations 0001–0003 ran by hand and are recorded in the CLI's history;
 `supabase/push.sh --status` matches and a dry run says the live database is up to date.)
 Google sign-in (link, sign in on another device, merge that device's takes, sign out) is built and unit-tested
-(`merge.test.ts`, 5/5) and `merge_player` is live (checked with two throwaway players), but the Google click-through itself hasn't been
-tried by a person yet. Drills aren't saved. Charts must live at `public/songs/<id>/chart.json`, read from disk: on Vercel that needs file tracing for
+(`merge.test.ts`, 5/5) and `merge_player` is live (checked with two throwaway players), and Sharan signed in with Google on `/progress`
+(Oct 24 2026: one Google user in Auth). Linking an anonymous player and the second-device merge not yet tried by a person. Drills aren't saved. Charts must live at `public/songs/<id>/chart.json`, read from disk: on Vercel that needs file tracing for
 `public/songs` (local demo is fine). No per-player rate limit on saves.

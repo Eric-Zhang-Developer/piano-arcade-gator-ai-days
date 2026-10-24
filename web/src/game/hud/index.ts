@@ -21,6 +21,9 @@ export const hudSettings = {
   safeFraction: 0.6, // nothing below this fraction of the judgment line: the lowest 40% is where notes land
   panelBg: panel,
   swellFrom: 50, // milestones from this count swell the combo (25 only gets juice-sound's stinger)
+  rollMs: 200, // the score rolls to each new value (spec: score-rollup)
+  flashMs: 250, // the multiplier badge flashes on a tier-up
+  flashScale: 1.15,
   swellMs: 250,
   swellScale: 1.25,
   ghostMs: 1000,
@@ -79,6 +82,24 @@ export function reduceHud(s: HudState, e: GameEvent): HudState {
   }
 }
 
+// ---------- score roll-up and tier flash (spec: score-rollup) ----------
+
+const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
+
+// The score shown elapsedMs into a roll from `from` to `to`: whole, from `from` at 0 to exactly `to` at rollMs,
+// never past it. A roll down (a new take) jumps.
+export function rollup(from: number, to: number, elapsedMs: number): number {
+  if (to <= from) return to;
+  const t = Math.min(1, Math.max(0, elapsedMs / hudSettings.rollMs));
+  return from + Math.floor((to - from) * easeOutCubic(t));
+}
+
+// The badge's flash, 1 at a tier-up fading to 0 at flashMs (0 before it, too).
+export function tierFlash(elapsedMs: number): number {
+  if (elapsedMs < 0 || elapsedMs >= hudSettings.flashMs) return 0;
+  return (1 - elapsedMs / hudSettings.flashMs) ** 2;
+}
+
 // ---------- layout (CSS px) ----------
 
 export interface HudSlot {
@@ -133,7 +154,8 @@ function fitText(ctx: CanvasRenderingContext2D, text: string, maxW: number, px: 
 const reducedMotion = () => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // wait: a wait-mode take isn't scored, so the band holds the song card only (wait-hud draws its own count into it).
-function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Card | null, display: string, wait = false): void {
+// shown: the score on screen (mid-roll); flash: the badge's tier-up flash, 0–1.
+function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Card | null, display: string, wait = false, shown = s.score, flash = 0): void {
   const l = hudLayout(f.width, f.judgmentLineY);
   const { h } = l.panel;
   const { slots } = l;
@@ -218,8 +240,22 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Car
   ctx.textAlign = "right";
   ctx.fillStyle = tier.color;
   ctx.font = `italic 900 ${badge}px ${display}`;
-  ctx.fillText(`x${tier.mult}`, right, h * 0.4);
   const badgeW = ctx.measureText(`x${tier.mult}`).width;
+  ctx.save();
+  if (flash > 0) {
+    // A tier-up: the badge glows in its new color and settles from a little larger, inside the band.
+    ctx.beginPath();
+    ctx.rect(0, 0, f.width, h);
+    ctx.clip();
+    ctx.shadowColor = tier.color;
+    ctx.shadowBlur = h * 0.5 * flash;
+    const k = 1 + (hudSettings.flashScale - 1) * flash;
+    ctx.translate(right - badgeW / 2, h * 0.4);
+    ctx.scale(k, k);
+    ctx.translate(-(right - badgeW / 2), -h * 0.4);
+  }
+  ctx.fillText(`x${tier.mult}`, right, h * 0.4);
+  ctx.restore();
   const { filled, of } = tierProgress(s.combo);
   const pip = Math.max(2, h * 0.045);
   for (let i = 0; i < of; i++) {
@@ -231,7 +267,7 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, card: Car
   ctx.globalAlpha = 1;
   const scoreRight = right - badgeW - pad;
   ctx.fillStyle = "#ffffff";
-  const score = s.score.toLocaleString("en-US");
+  const score = shown.toLocaleString("en-US");
   let px = h * 0.42;
   ctx.font = `italic 800 ${Math.round(px)}px ${display}`;
   const room = scoreRight - slots.score.x0 - pad;
@@ -269,6 +305,9 @@ declare global {
 
 export function hud(): GamePlugin {
   let state = emptyHud();
+  // The roll and the flash live here, not in HudState, so the score there stays exact at every event.
+  let roll = { from: 0, to: 0, atMs: 0 };
+  let tierUpAt: number | null = null;
   let card: Card | null = null;
   let wait = false;
   // Body face until the display face has loaded (or 1 s has passed), so the HUD never draws a half-loaded font.
@@ -286,11 +325,22 @@ export function hud(): GamePlugin {
       return chart;
     },
     onEvent(e) {
+      const before = state;
       state = reduceHud(state, e);
+      if (e.type === "songStart") {
+        roll = { from: 0, to: 0, atMs: e.atMs };
+        tierUpAt = null;
+      } else if (state.score !== roll.to) {
+        roll = { from: rollup(roll.from, roll.to, e.atMs - roll.atMs), to: state.score, atMs: e.atMs }; // from what's shown
+      }
+      if (tierFor(state.combo).mult > tierFor(before.combo).mult) tierUpAt = e.atMs;
       if (typeof window !== "undefined") window.__pianoArcadeHud = state;
     },
     draw(ctx, frame) {
-      drawHud(ctx, frame, state, card, display, wait);
+      const still = reducedMotion();
+      const shown = still ? state.score : rollup(roll.from, roll.to, frame.nowMs - roll.atMs);
+      const flash = still || tierUpAt === null ? 0 : tierFlash(frame.nowMs - tierUpAt);
+      drawHud(ctx, frame, state, card, display, wait, shown, flash);
     },
   };
 }

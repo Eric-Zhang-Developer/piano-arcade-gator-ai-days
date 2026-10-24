@@ -21,9 +21,10 @@ transition's `ready`, `updateTiming` each `document.getAnimations()` entry whose
 transition's. No CSS, and no stylesheet from `/` that must outlive the navigation.
 
 ## Plan
-1. **A `fix(stage-card)` PR:** `.jacket` in `stage-card.module.css` gets `view-transition-name: stage-jacket`. One line.
+1. **A `fix(stage-card)` PR:** the stage card's `.jacket` gets `view-transition-name: stage-jacket` as an inline style.
+   Not in `stage-card.module.css`: CSS modules hash the name's value too (`dCe1hq_stage-jacket`), so it never pairs.
 2. **A `fix(select-layout)` PR:** `goToStage(href, router)` in `web/src/game/select-layout/`, with its test.
-   The focus panel's `.jacket` is named `stage-jacket` (it's the only one on `/`). A plain click or Enter on a card's
+   The focus panel's `.jacket` is named `stage-jacket` inline, for the same reason (it's the only one on `/`). A plain click or Enter on a card's
    link calls `goToStage`; modifier and middle clicks stay native links. Under reduced motion, or without
    `document.startViewTransition`, it just pushes. Otherwise it starts one view transition whose update pushes the
    route and resolves once `section[aria-label="Stage"]` (stage-card's) is in the DOM, capped at 1 s. The jacket's

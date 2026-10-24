@@ -112,6 +112,9 @@ try {
     await page.screenshot({ path: join(out, `toggle-easy-${w}.png`) });
     await page.reload();
     await toggle.waitFor({ timeout: 60_000 });
+    // The server renders Normal; the stored level arrives at hydration. The Easy level is filled in by a client fetch
+    // after hydration, so once it shows, the toggle reads the stored level (reading at once raced it: #532).
+    await page.getByText(/EASY Lv \d/).waitFor({ timeout: 10_000 });
     check((await toggle.getAttribute("aria-pressed")) === "true", `${w}×${h}: still Easy after a reload`);
     await page.keyboard.press("e");
     check((await toggle.getAttribute("aria-pressed")) === "false" && !(await href()).includes("level="), `${w}×${h}: E again goes back to Normal (${await href()})`);

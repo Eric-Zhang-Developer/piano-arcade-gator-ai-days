@@ -38,7 +38,7 @@ export interface TakeEvent {
 export interface Take {
   // Missing/1 is the original onset-only policy. Only explicit 2 earns sustain
   // credit; old files/outbox entries must never be silently reinterpreted.
-  scoringVersion?: 1 | 2;
+  scoringVersion?: 1 | 2 | 3;
   chartId: string;
   startedAt: string; // ISO
   latencyOffsetMs: number;
@@ -201,7 +201,7 @@ export function validateTake(t: unknown): string[] {
   if (!isStr(o.chartId)) p.push("chartId missing");
   if (!isStr(o.startedAt) || Number.isNaN(Date.parse(o.startedAt))) p.push("startedAt must be ISO");
   if (!isNum(o.latencyOffsetMs)) p.push("latencyOffsetMs missing");
-  if (o.scoringVersion !== undefined && o.scoringVersion !== 1 && o.scoringVersion !== 2) p.push("scoringVersion must be 1 or 2");
+  if (o.scoringVersion !== undefined && o.scoringVersion !== 1 && o.scoringVersion !== 2 && o.scoringVersion !== 3) p.push("scoringVersion must be 1, 2 or 3");
   if (!["midi", "keys", "test"].includes(o.inputDevice as string)) p.push("inputDevice invalid");
   if (!Array.isArray(o.events)) return [...p, "events missing"];
   o.events.forEach((e, i) => {
@@ -209,7 +209,7 @@ export function validateTake(t: unknown): string[] {
     if (!Number.isInteger(e.velocity) || e.velocity < 1 || e.velocity > 127) p.push(`event ${i}: velocity invalid`);
     if (!isNum(e.timeMs)) p.push(`event ${i}: timeMs missing`);
     if (e.offTimeMs !== null && !isNum(e.offTimeMs)) p.push(`event ${i}: offTimeMs must be a number or null`);
-    if (o.scoringVersion === 2 && e.offTimeMs !== null && e.offTimeMs < e.timeMs) p.push(`event ${i}: release precedes press`);
+    if ((o.scoringVersion === 2 || o.scoringVersion === 3) && e.offTimeMs !== null && e.offTimeMs < e.timeMs) p.push(`event ${i}: release precedes press`);
   });
   return p;
 }

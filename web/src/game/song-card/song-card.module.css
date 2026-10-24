@@ -70,6 +70,7 @@
   text-overflow: ellipsis;
 }
 
+.best,
 .count,
 .level {
   flex: none;
@@ -81,6 +82,14 @@
 
 .count {
   padding: 5px 0 3px;
+}
+
+.best {
+  padding: 5px 0 3px;
+}
+
+.best .number {
+  color: var(--pa-gold);
 }
 
 .level {

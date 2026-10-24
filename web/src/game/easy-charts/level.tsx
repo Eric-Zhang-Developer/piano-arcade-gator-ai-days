@@ -52,19 +52,26 @@ export function withLevel(href: string, l: Level): string {
   return q ? `${path}?${q}` : path;
 }
 
+// Two halves in song-preview's LEARN / PRACTICE outline and type; the level in force is lit in cyan (cabinet chrome:
+// selection), the other dimmed. Sized to its text, not stretched across the panel.
 const box: CSSProperties = {
+  alignSelf: "flex-start",
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "0.4em",
+  marginTop: "1.2vh",
+  padding: 0,
   font: "inherit",
-  fontSize: "0.85em",
+  fontSize: "clamp(14px, 1.25vw, 24px)",
+  fontWeight: 700,
   letterSpacing: "0.08em",
-  color: "var(--pa-ink)",
-  background: "var(--pa-panel)",
-  border: "1px solid rgba(242, 242, 245, 0.25)",
-  borderRadius: 6,
-  padding: "0.35em 0.7em",
+  color: "var(--pa-ink-dim)",
+  background: "none",
+  border: "none",
   cursor: "pointer",
 };
-const on: CSSProperties = { color: "var(--pa-cyan)", fontWeight: 700 };
-const off: CSSProperties = { color: "var(--pa-ink)", opacity: 0.55 };
+const half: CSSProperties = { padding: "0.25em 0.75em", borderRadius: 4, border: "1px solid rgba(242, 242, 245, 0.2)", color: "var(--pa-ink-dim)" };
+const lit: CSSProperties = { ...half, border: "1px solid var(--pa-cyan)", background: "rgba(39, 225, 255, 0.14)", color: "var(--pa-cyan)" };
 
 // NORMAL Lv n · EASY Lv m; the lit half is the level in force. m waits for the focused chart.
 export function LevelToggle({ normal, chart }: { normal: number; chart: Chart | null }) {
@@ -72,9 +79,9 @@ export function LevelToggle({ normal, chart }: { normal: number; chart: Chart | 
   const easy = useMemo(() => (chart ? difficulty(easyChart(chart)).level : null), [chart]);
   return (
     <button type="button" data-testid="level-toggle" aria-pressed={l === "easy"} style={box} onClick={() => set(l === "easy" ? "normal" : "easy")}>
-      <span style={l === "normal" ? on : off}>NORMAL Lv {normal}</span>
+      <span style={l === "normal" ? lit : half}>NORMAL Lv {normal}</span>
       {" · "}
-      <span style={l === "easy" ? on : off}>EASY Lv {easy ?? "…"}</span>
+      <span style={l === "easy" ? lit : half}>EASY Lv {easy ?? "…"}</span>
     </button>
   );
 }

@@ -157,6 +157,25 @@ features = [
 ]
 cut = []
 
+# extras: ten backlog specs promoted while Eric was away (2026-10-24, about 13:15 ET), in his order, after judging and
+# ahead of song-pack-3/4. Skipped for now on his word: versus-scores, attract-scores, song-palettes, pedal-lamp.
+[[milestone]]
+name = "extras"
+ship = ""
+features = [
+  "help-overlay",
+  "watch-demo",
+  "phone-guard",
+  "sheet-beams",
+  "sheet-pickups",
+  "key-preview",
+  "song-options",
+  "sheet-review",
+  "rewind",
+  "score-card",
+]
+cut = []
+
 [[milestone]]
 name = "submission"
 ship = ""

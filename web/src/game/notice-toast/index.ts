@@ -12,13 +12,17 @@ export interface Toast {
   leaving: boolean;
 }
 
-// The queue, pure apart from setTimeout, so it tests with fake timers and no DOM. `render` gets the toasts newest
-// first, leaving ones included until they're gone.
+// The queue, pure apart from setTimeout and Date.now, so it tests with fake timers and no DOM. `render` gets the toasts
+// newest first, leaving ones included until they're gone. Each toast's removal is timed from its own deadline, not
+// chained after the fade's timer: on a busy machine each timer fires late, and two late timers in a row kept a toast
+// 4106–4139 ms on CI (#432).
 export function toastStack(render: (toasts: readonly Toast[]) => void, reduced: () => boolean) {
   let toasts: Toast[] = [];
   let next = 0;
+  const deadline = new Map<number, number>(); // id -> Date.now() it must be gone by
   const remove = (id: number) => {
     toasts = toasts.filter((t) => t.id !== id);
+    deadline.delete(id);
     render(toasts);
   };
   const leave = (id: number) => {
@@ -27,10 +31,12 @@ export function toastStack(render: (toasts: readonly Toast[]) => void, reduced: 
     if (reduced()) return remove(id); // no fade: it goes at once
     t.leaving = true;
     render(toasts);
-    setTimeout(() => remove(id), toastSettings.leaveMs);
+    // The fade, cut short if the leave itself fired late: never past the deadline.
+    setTimeout(() => remove(id), Math.max(0, Math.min(toastSettings.leaveMs, (deadline.get(id) ?? 0) - Date.now())));
   };
   return (text: string) => {
     const t: Toast = { id: next++, text, leaving: false };
+    deadline.set(t.id, Date.now() + toastSettings.ms);
     toasts = [t, ...toasts];
     for (const old of toasts.filter((x) => !x.leaving).slice(toastSettings.max)) leave(old.id);
     render(toasts);

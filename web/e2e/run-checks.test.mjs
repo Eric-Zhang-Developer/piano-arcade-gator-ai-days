@@ -1,3 +1,4 @@
+import { spawn } from "node:child_process";
 import { existsSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -90,6 +91,25 @@ describe("runChecks", () => {
     ]);
     expect(exitCode(rows)).toBe(0);
   });
+
+  it("ends its output when the checks end, even if one leaves a server holding stderr", async () => {
+    // The checks start `next dev` detached with stderr inherited. One that outlives its check kept the CI step's pipe
+    // open, so the step hung until the job's timeout (#415, run 6). Run the runner the way the CI runner does: in a
+    // child whose output is a pipe, and wait for that pipe to close.
+    writeFileSync(
+      join(dir, "orphan.mjs"),
+      `import { spawn } from "node:child_process";\n` +
+        `spawn("sleep", ["20"], { detached: true, stdio: ["ignore", "ignore", "inherit"] }).unref();\nprocess.exit(0);\n`,
+    );
+    const runner = new URL("./run-checks.mjs", import.meta.url).href;
+    const script = `import(${JSON.stringify(runner)}).then((m) => m.runChecks(${JSON.stringify(dir)}, ["orphan.mjs"], ${JSON.stringify(join(dir, "out"))})).then(() => process.exit(0));`;
+    const start = Date.now();
+    const child = spawn(process.execPath, ["--input-type=module", "-e", script], { stdio: ["ignore", "pipe", "pipe"] });
+    child.stdout.resume();
+    child.stderr.resume();
+    await new Promise((done) => child.on("close", done));
+    expect(Date.now() - start).toBeLessThan(10_000);
+  }, 30_000);
 
   it("reports two failures as FAIL, and the shard exits 1", async () => {
     const rows = await run(["pass.mjs", "fail.mjs"]);

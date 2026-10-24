@@ -36,7 +36,6 @@ const CHECK_TIMEOUT_MS = 8 * 60_000;
 // Decision ci-browser-known-red.md.
 export const KNOWN_RED = {
   "web/src/game/notice-toast/verify-toast.mjs": 584,
-  "web/src/replay/verify-replay.mjs": 552,
 };
 
 /** Every check: verify.mjs first, then each verify*.mjs under web/src/, sorted. `files` are repo-relative paths. */

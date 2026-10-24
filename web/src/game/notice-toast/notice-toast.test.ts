@@ -72,6 +72,29 @@ describe("notice-toast", () => {
     expect(goneAt! - start).toBeLessThanOrEqual(toastSettings.ms);
   });
 
+  it("leaves in the first frame past its time when every timer is starved behind frames (#584)", () => {
+    for (const reduced of [false, true]) {
+      const start = Date.now();
+      let shown: readonly Toast[] = [];
+      let frames: (() => void)[] = [];
+      const push = toastStack((t) => (shown = t.map((x) => ({ ...x }))), () => reduced, (cb) => frames.push(cb));
+      const frameAt = (ms: number) => {
+        vi.setSystemTime(start + ms); // the clock moves, no timer fires
+        const due = frames;
+        frames = [];
+        due.forEach((cb) => cb());
+      };
+      push("a");
+      frameAt(toastSettings.ms - toastSettings.leaveMs - 1);
+      expect(shown.map((t) => t.leaving)).toEqual([false]);
+      frameAt(toastSettings.ms - toastSettings.leaveMs);
+      expect(shown.map((t) => t.leaving)).toEqual(reduced ? [] : [true]);
+      frameAt(toastSettings.ms);
+      expect(shown).toEqual([]);
+      expect(frames).toEqual([]); // nothing showing: no frame asked for
+    }
+  });
+
   it("does nothing on the server", () => {
     expect(typeof document).toBe("undefined");
     expect(() => toast("x")).not.toThrow();

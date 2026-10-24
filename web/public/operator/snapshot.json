@@ -1,0 +1,4734 @@
+{
+  "at": "2026-10-24T16:26:51.862Z",
+  "sha": "2008f7c",
+  "mainSha": "2008f7c",
+  "gh": {
+    "status": "ok",
+    "calls": 5
+  },
+  "banner": [],
+  "features": [
+    {
+      "slug": "attract-scores",
+      "name": "Attract scores: one timed HIGH SCORES screen of records' top entries between cabinet demos",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "cabinet",
+        "records"
+      ]
+    },
+    {
+      "slug": "bar-lines",
+      "name": "Bar lines: a faint line and the bar number at each bar start, like Synthesia",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop",
+        "bar-loop"
+      ]
+    },
+    {
+      "slug": "bar-loop",
+      "name": "Bar loop: practice bars X to Y at a slower tempo",
+      "state": "done",
+      "milestone": "submission",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "beat-track",
+      "name": "Beat track: a drum beat on the piano under every song, so players can hear the time",
+      "state": "done",
+      "milestone": "audible",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "black-key-lanes",
+      "name": "Black-key lanes: the lanes under black keys shaded a little lighter, like Synthesia",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop",
+        "fever-stage"
+      ]
+    },
+    {
+      "slug": "build-stamp",
+      "name": "Build stamp: the short commit and its age in a corner of /, so a stale build is obvious",
+      "state": "in flight",
+      "milestone": "judging",
+      "assignee": "eric",
+      "pr": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/434",
+      "dependsOn": [
+        "song-select",
+        "capture-mode",
+        "ui-tokens"
+      ]
+    },
+    {
+      "slug": "cabinet",
+      "name": "Cabinet: a kiosk loop with a title screen, attract mode and a demo game",
+      "state": "done",
+      "milestone": "encore",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "operator-replay",
+        "scenes"
+      ]
+    },
+    {
+      "slug": "calibration",
+      "name": "Calibration: tap along to clicks to set the latency offset",
+      "state": "done",
+      "milestone": "showcase",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "capture-mode",
+      "name": "Capture mode: ?capture=1 hides the cursor, debug text and setup controls while the video is recorded",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop",
+        "beat-track",
+        "song-select"
+      ]
+    },
+    {
+      "slug": "chart-compiler",
+      "name": "PROVISIONAL (learning lane): chart compiler from public-domain scores",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "chart-lint",
+      "name": "Chart lint: a hand-span rule in the library test, every rule pinned by a synthetic chart, and a library table",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "song-pack-1",
+        "song-pack-2"
+      ]
+    },
+    {
+      "slug": "chord-sync",
+      "name": "Chord sync: flag chords rolled by more than 30 ms",
+      "state": "done",
+      "milestone": "encore",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "play-slots"
+      ]
+    },
+    {
+      "slug": "chunk-practice",
+      "name": "Chunk practice: learn a song 4 bars at a time, then play each chunk judged at 70%",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "wait-mode",
+        "bar-loop",
+        "hand-mode"
+      ]
+    },
+    {
+      "slug": "ci-browser",
+      "name": "CI browser checks: the headless checks run on GitHub's machines, not Eric's Mac",
+      "state": "in flight",
+      "milestone": "judging",
+      "assignee": "eric",
+      "pr": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/427",
+      "dependsOn": [
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "clear-card",
+      "name": "Clear card: ALL PERFECT, FULL COMBO or CLEAR before the results",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "juice-visual",
+        "ui-tokens",
+        "scenes"
+      ]
+    },
+    {
+      "slug": "coach",
+      "name": "PROVISIONAL (learning lane): AI coach reads your takes and gives one drill",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "",
+      "pr": null,
+      "dependsOn": [
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "combo-hud",
+      "name": "Combo in the HUD: the combo moves off the lanes into the panel's center",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "hud",
+        "hud-skin"
+      ]
+    },
+    {
+      "slug": "core-loop",
+      "name": "Play Twinkle on the real piano, judged, with a results screen",
+      "state": "done",
+      "milestone": "playable",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "crash-guard",
+      "name": "Crash guard: one plugin's error never freezes the game; a render error shows a card with a way back",
+      "state": "done",
+      "milestone": "judging",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop",
+        "play-slots",
+        "ui-tokens",
+        "notice-toast"
+      ]
+    },
+    {
+      "slug": "demo-reset",
+      "name": "Demo reset: Shift+Esc, or 60 s idle on a plain take's results, returns to / clean between judges",
+      "state": "in flight",
+      "milestone": "judging",
+      "assignee": "eric",
+      "pr": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/418",
+      "dependsOn": [
+        "core-loop",
+        "cabinet",
+        "piano-out",
+        "replay-view"
+      ]
+    },
+    {
+      "slug": "difficulty",
+      "name": "Difficulty: a level from 1 to 15 computed from each chart, shown and sorted in song select",
+      "state": "done",
+      "milestone": "showcase",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "dynamics",
+      "name": "Dynamics: grade how loud you played against the score",
+      "state": "done",
+      "milestone": "showcase",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "song-pack-1",
+        "play-slots"
+      ]
+    },
+    {
+      "slug": "easy-charts",
+      "name": "Easy charts: every song gets an Easy level derived from its chart, picked with E on the select",
+      "state": "in flight",
+      "milestone": "judging",
+      "assignee": "eric",
+      "pr": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/468",
+      "dependsOn": [
+        "difficulty",
+        "select-layout",
+        "records",
+        "ghost",
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "evenness",
+      "name": "Evenness: score how even your runs are, per hand",
+      "state": "done",
+      "milestone": "showcase",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "play-slots"
+      ]
+    },
+    {
+      "slug": "fever-gauge",
+      "name": "Fever gauge: fever reachable on every song, scaled to its length",
+      "state": "done",
+      "milestone": "showcase",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "fever-moment",
+      "name": "Fever moment: fever's start, loud at the edges for at most 2 s",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "fever-gauge",
+        "fever-stage",
+        "juice-visual",
+        "scenes"
+      ]
+    },
+    {
+      "slug": "fever-stage",
+      "name": "Fever stage: a three.js synthwave stage behind the highway that reacts to your play",
+      "state": "done",
+      "milestone": "arcade",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop",
+        "hud"
+      ]
+    },
+    {
+      "slug": "finger-cam-spike",
+      "name": "Spike: can webcam hand tracking tell which finger pressed a key?",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "piano-midi-spike"
+      ]
+    },
+    {
+      "slug": "first-run",
+      "name": "First run: a 30-second guided Twinkle with laptop letters and text cues, one link and F away on /",
+      "state": "ready",
+      "milestone": "judging",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "song-select",
+        "note-labels",
+        "records",
+        "hud",
+        "stage-card"
+      ]
+    },
+    {
+      "slug": "ghost",
+      "name": "Ghost: your last take drawn on the highway when you retry",
+      "state": "done",
+      "milestone": "encore",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "hand-colors",
+      "name": "Hand colors: left and right hands in two colors",
+      "state": "done",
+      "milestone": "showcase",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "hand-mode",
+      "name": "Hand mode: play one hand while the DGX plays the other",
+      "state": "done",
+      "milestone": "showcase",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "help-overlay",
+      "name": "Help overlay: ? shows every control on one card, and a test fails when a key handler has no help line",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "select-layout",
+        "learn-from-select",
+        "laptop-octaves",
+        "play-slots",
+        "sheet-view",
+        "records",
+        "replay-view"
+      ]
+    },
+    {
+      "slug": "hero-replay",
+      "name": "Hero replay: a downloaded take file drives /play, judged and sounding, the same every run",
+      "state": "in flight",
+      "milestone": "judging",
+      "assignee": "eric",
+      "pr": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/420",
+      "dependsOn": [
+        "take-midi",
+        "scenes",
+        "piano-out",
+        "notice-toast"
+      ]
+    },
+    {
+      "slug": "highway-zoom",
+      "name": "Highway zoom: the visible key range follows the music",
+      "state": "done",
+      "milestone": "encore",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "hit-line",
+      "name": "Hit line: the animated electric judgment line",
+      "state": "done",
+      "milestone": "frontend",
+      "assignee": "eric-agent-1",
+      "pr": null,
+      "dependsOn": [
+        "note-pills"
+      ]
+    },
+    {
+      "slug": "how-it-works",
+      "name": "How it works: a /how page explaining how the agents built Piano Arcade, from real data",
+      "state": "in flight",
+      "milestone": "judging",
+      "assignee": "eric-foreman-agent",
+      "pr": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/443",
+      "dependsOn": [
+        "operator-board",
+        "operator-replay",
+        "ui-tokens"
+      ]
+    },
+    {
+      "slug": "hud",
+      "name": "Arcade HUD with a giant combo, counters, score and multiplier",
+      "state": "done",
+      "milestone": "arcade",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "hud-skin",
+      "name": "HUD skin: the HUD restyled to the tokens",
+      "state": "done",
+      "milestone": "frontend",
+      "assignee": "eric-agent-1",
+      "pr": null,
+      "dependsOn": [
+        "ui-tokens"
+      ]
+    },
+    {
+      "slug": "ipad-relay-spike",
+      "name": "Spike: can an iPad on the same wifi follow the sheet window?",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "sheet-view"
+      ]
+    },
+    {
+      "slug": "judging-tiers",
+      "name": "Judging tiers: a GOOD tier that keeps the combo, early/late labels, and wrong notes that break it",
+      "state": "done",
+      "milestone": "audible",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop",
+        "timing-feedback"
+      ]
+    },
+    {
+      "slug": "juice-sound",
+      "name": "Event sounds: count-in, combo stingers, fever, full combo, rank",
+      "state": "done",
+      "milestone": "arcade",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "juice-visual",
+      "name": "Visual juice: wisps, bursts, lane light, fever, full combo and rank reveal",
+      "state": "done",
+      "milestone": "arcade",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "key-preview",
+      "name": "Key preview: a key glows faintly in its hand color for 500 ms before its note reaches the line",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "key-skin",
+        "hand-colors",
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "key-skin",
+      "name": "Key skin: the drawn keyboard with sheen and a pressed glow",
+      "state": "done",
+      "milestone": "frontend",
+      "assignee": "eric-agent-1",
+      "pr": null,
+      "dependsOn": [
+        "hit-line"
+      ]
+    },
+    {
+      "slug": "laptop-octaves",
+      "name": "Laptop octaves: Z and X shift the laptop keys an octave, and the keyboard shows the keys they play",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "highway-zoom",
+        "note-labels"
+      ]
+    },
+    {
+      "slug": "learn-from-select",
+      "name": "Learn from the music select: L opens the focused song in wait mode",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "wait-mode",
+        "select-layout",
+        "song-preview"
+      ]
+    },
+    {
+      "slug": "learn-progress",
+      "name": "Learn progress: chunks cleared of total and the last practice date on the music select",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "chunk-practice",
+        "song-preview"
+      ]
+    },
+    {
+      "slug": "learning-ui",
+      "name": "Desktop learning frontend with four focused activities",
+      "state": "done",
+      "milestone": null,
+      "assignee": "",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "led-game",
+      "name": "LED game link: the game lights the next key and every hit on the strip",
+      "state": "blocked",
+      "milestone": "lights",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop",
+        "led-strip"
+      ]
+    },
+    {
+      "slug": "led-strip",
+      "name": "LED strip: the keys light up from the board, with a standalone tester",
+      "state": "in flight",
+      "milestone": "lights",
+      "assignee": "sharan",
+      "pr": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/340",
+      "dependsOn": []
+    },
+    {
+      "slug": "left-hands",
+      "name": "Left hands: the Minuet in G gets its left hand from its cited source; Twinkle's sources have none",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "minuet-g",
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "mic-pitch-spike",
+      "name": "Spike: can an acoustic piano play the game through the laptop microphone?",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "piano-midi-spike"
+      ]
+    },
+    {
+      "slug": "midi-watchdog",
+      "name": "MIDI watchdog: reconnect when Chrome's input goes silent",
+      "state": "done",
+      "milestone": "arcade",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop",
+        "piano-sim"
+      ]
+    },
+    {
+      "slug": "minuet-g",
+      "name": "Minuet in G: a second song, right hand, charted from a cited score",
+      "state": "done",
+      "milestone": "arcade",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "note-labels",
+      "name": "Note labels: letter names on notes and keys, laptop letters in laptop mode",
+      "state": "done",
+      "milestone": "showcase",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "note-pills",
+      "name": "Note pills: Synthesia-style notes, bright as they near the line",
+      "state": "done",
+      "milestone": "frontend",
+      "assignee": "eric-agent-1",
+      "pr": null,
+      "dependsOn": [
+        "ui-tokens",
+        "hand-colors"
+      ]
+    },
+    {
+      "slug": "notice-toast",
+      "name": "Notice toast: one styled stack for the game's notices",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "ui-tokens",
+        "midi-watchdog",
+        "scenes"
+      ]
+    },
+    {
+      "slug": "offline-ready",
+      "name": "Offline ready: a script proves the game runs from the laptop with the venue's wifi off",
+      "state": "done",
+      "milestone": "judging",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop",
+        "song-select",
+        "ui-tokens",
+        "sheet-view"
+      ]
+    },
+    {
+      "slug": "operator-board",
+      "name": "Operator board: the arcade's back office, live, showing how agents build Piano Arcade",
+      "state": "done",
+      "milestone": "arcade",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "operator-replay",
+      "name": "Operator replay: watch the build in 3D, one merge per note of Twinkle, on the piano",
+      "state": "done",
+      "milestone": "submission",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "operator-board"
+      ]
+    },
+    {
+      "slug": "options-panel",
+      "name": "Options panel: one styled drawer for latency, effects and labels",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "juice-sound",
+        "calibration",
+        "note-labels"
+      ]
+    },
+    {
+      "slug": "pause-skin",
+      "name": "Pause skin: a PAUSED menu, keyboard first, with a countdown that clicks",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "play-slots",
+        "ui-sounds"
+      ]
+    },
+    {
+      "slug": "pedal-lamp",
+      "name": "Pedal lamp: a sustain lamp in the HUD band, and Ped. marks under the bass staff on the sheet",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "hud",
+        "sheet-view",
+        "sheet-xml",
+        "piano-sim"
+      ]
+    },
+    {
+      "slug": "perf-budget",
+      "name": "Perf budget: frame time on the densest chart at 1920×1080, with fever and the stage on",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "fever-stage",
+        "scenes",
+        "fever-gauge"
+      ]
+    },
+    {
+      "slug": "phone-guard",
+      "name": "Phone guard: a phone or tablet gets a 'made for a laptop or a piano' card instead of a broken highway",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop",
+        "song-select",
+        "ui-tokens"
+      ]
+    },
+    {
+      "slug": "piano-midi-spike",
+      "name": "Prove a laptop can play to and read from the DGX-660",
+      "state": "done",
+      "milestone": null,
+      "assignee": "",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "piano-out",
+      "name": "Piano out: replay your take on the piano, and a piano count-in",
+      "state": "done",
+      "milestone": "submission",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "piano-sim",
+      "name": "Piano sim: a virtual DGX-660 for testing the real MIDI path, and a /sim page",
+      "state": "done",
+      "milestone": "arcade",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "piano-voice",
+      "name": "Piano voice: a chart names its GM voice and the DGX switches to it",
+      "state": "done",
+      "milestone": "encore",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "pill-match",
+      "name": "Pill match: ghost outlines and note labels take their size from the note pills",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "ghost",
+        "note-labels",
+        "note-pills"
+      ]
+    },
+    {
+      "slug": "play-slots",
+      "name": "Play slots: plugins add panels to the start and results screens, plus Pause and Quit",
+      "state": "done",
+      "milestone": "showcase",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "practice-mode",
+      "name": "PROVISIONAL (learning lane): practice mode",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "",
+      "pr": null,
+      "dependsOn": [
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "practice-report",
+      "name": "Practice report: after the last chunk, the run's chunks, tries, hardest bars and time",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "chunk-practice",
+        "bar-loop",
+        "results-layout"
+      ]
+    },
+    {
+      "slug": "rank-stamp",
+      "name": "Rank stamp: the rank letter stamps down",
+      "state": "done",
+      "milestone": "frontend",
+      "assignee": "eric-agent-1",
+      "pr": null,
+      "dependsOn": [
+        "results-layout"
+      ]
+    },
+    {
+      "slug": "record-moment",
+      "name": "Record moment: NEW RECORD stamps in gold after the rank, with an arcade high-score entry",
+      "state": "ready",
+      "milestone": "judging",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "records",
+        "rank-stamp",
+        "results-layout"
+      ]
+    },
+    {
+      "slug": "records",
+      "name": "Records: best grades and a local top 5 with arcade initials",
+      "state": "done",
+      "milestone": "showcase",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "play-slots"
+      ]
+    },
+    {
+      "slug": "replay-view",
+      "name": "Replay view: watch your take on the highway while the piano plays it",
+      "state": "done",
+      "milestone": "encore",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "play-slots"
+      ]
+    },
+    {
+      "slug": "results-layout",
+      "name": "Results layout: rank, tallies and a panel slot",
+      "state": "done",
+      "milestone": "frontend",
+      "assignee": "eric-agent-1",
+      "pr": null,
+      "dependsOn": [
+        "ui-tokens",
+        "play-slots"
+      ]
+    },
+    {
+      "slug": "results-tally",
+      "name": "Results tally: the counts tally up one by one",
+      "state": "done",
+      "milestone": "frontend",
+      "assignee": "eric-agent-1",
+      "pr": null,
+      "dependsOn": [
+        "results-layout"
+      ]
+    },
+    {
+      "slug": "rewind",
+      "name": "Rewind: in wait mode, ← moves back one bar and → skips ahead one, with the clock and holds set right",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "wait-mode",
+        "wait-hud",
+        "bar-lines",
+        "play-slots"
+      ]
+    },
+    {
+      "slug": "scenes",
+      "name": "Scenes: scripted takes so every state can be seen, tested and filmed",
+      "state": "done",
+      "milestone": "showcase",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "score-card",
+      "name": "Score card: Save card on the results downloads a PNG of the take",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "results-layout",
+        "song-jacket",
+        "records"
+      ]
+    },
+    {
+      "slug": "score-rollup",
+      "name": "Score roll-up: the HUD score rolls to each new value, the multiplier flashes on tier-up",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "combo-hud"
+      ]
+    },
+    {
+      "slug": "select-layout",
+      "name": "Music select layout: the song cards as an arcade music select",
+      "state": "done",
+      "milestone": "frontend",
+      "assignee": "eric-agent-1",
+      "pr": null,
+      "dependsOn": [
+        "song-card",
+        "song-jacket"
+      ]
+    },
+    {
+      "slug": "select-stage",
+      "name": "Select stage: the synthwave stage behind the music select",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "fever-stage",
+        "select-layout"
+      ]
+    },
+    {
+      "slug": "select-to-stage",
+      "name": "Select to stage: the focused jacket scales into the stage card",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "stage-card",
+        "select-layout"
+      ]
+    },
+    {
+      "slug": "sheet-beams",
+      "name": "Sheet beams: beamed eighths and sixteenths, and beams and stems in their notes' judgment color",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "sheet-xml",
+        "sheet-view"
+      ]
+    },
+    {
+      "slug": "sheet-pickups",
+      "name": "Sheet pickups: a pickup prints as a short bar 0, so the sheet's bar numbers match the printed score",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "sheet-xml",
+        "sheet-view"
+      ]
+    },
+    {
+      "slug": "sheet-review",
+      "name": "Sheet review: from the results, open the score with this take's judgments already colored",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "sheet-view",
+        "results-layout"
+      ]
+    },
+    {
+      "slug": "sheet-view",
+      "name": "Sheet view: the score in its own window, following a live take with judged noteheads",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "sheet-xml",
+        "play-slots"
+      ]
+    },
+    {
+      "slug": "sheet-xml",
+      "name": "Sheet XML: a chart as MusicXML on a grand staff, for the sheet music window",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "song-card",
+      "name": "Song card: one card per song for the music select",
+      "state": "done",
+      "milestone": "frontend",
+      "assignee": "eric-agent-1",
+      "pr": null,
+      "dependsOn": [
+        "ui-tokens"
+      ]
+    },
+    {
+      "slug": "song-jacket",
+      "name": "Song jacket: generated cover art for each song",
+      "state": "done",
+      "milestone": "frontend",
+      "assignee": "eric-agent-1",
+      "pr": null,
+      "dependsOn": [
+        "ui-tokens"
+      ]
+    },
+    {
+      "slug": "song-options",
+      "name": "Song options: Hands and Speed on the select's preview, remembered per song, passed to play and learn",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "song-preview",
+        "hand-mode",
+        "bar-loop",
+        "learn-from-select",
+        "easy-charts"
+      ]
+    },
+    {
+      "slug": "song-pack-1",
+      "name": "Song pack 1: Ode to Joy, Chopin's Prelude Op. 28 No. 4 and Für Elise, with a MIDI-to-chart converter",
+      "state": "done",
+      "milestone": "library",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "song-pack-2",
+      "name": "Song pack 2: Gymnopédie, Clair de lune, Nocturne Op. 9 No. 2, Maple Leaf Rag and Moonlight's 3rd movement",
+      "state": "done",
+      "milestone": "library",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "song-pack-1"
+      ]
+    },
+    {
+      "slug": "song-palettes",
+      "name": "Song palettes: each song's jacket palette tints the stage's sun and grid",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "fever-stage",
+        "song-jacket"
+      ]
+    },
+    {
+      "slug": "song-preview",
+      "name": "Song preview: the highlighted song plays its opening in song select",
+      "state": "done",
+      "milestone": "encore",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "difficulty",
+        "records"
+      ]
+    },
+    {
+      "slug": "song-requests",
+      "name": "Song requests: an agent turns a requested piece into a playable song",
+      "state": "ready",
+      "milestone": "encore",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "song-pack-1"
+      ]
+    },
+    {
+      "slug": "song-rip-spike",
+      "name": "PROVISIONAL (learning lane): spike: turn a recording into a playable level",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "song-select",
+      "name": "Song select: pick a piece from the library",
+      "state": "done",
+      "milestone": "arcade",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "song-sources",
+      "name": "Song sources: the song preview links each chart's public-domain score, the proof click",
+      "state": "in flight",
+      "milestone": "judging",
+      "assignee": "eric",
+      "pr": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/451",
+      "dependsOn": [
+        "song-preview"
+      ]
+    },
+    {
+      "slug": "song-sweep",
+      "name": "Song sweep: a bot plays every song and leaves a contact sheet of screenshots",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "scenes",
+        "hud",
+        "fever-gauge"
+      ]
+    },
+    {
+      "slug": "stage-card",
+      "name": "Stage card: ARE YOU READY before the song",
+      "state": "done",
+      "milestone": "frontend",
+      "assignee": "eric-agent-1",
+      "pr": null,
+      "dependsOn": [
+        "ui-tokens",
+        "play-slots",
+        "song-jacket"
+      ]
+    },
+    {
+      "slug": "static-keyboard",
+      "name": "Static keyboard: one fixed C-to-C range per song, zoom off by default",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop",
+        "highway-zoom",
+        "laptop-octaves"
+      ]
+    },
+    {
+      "slug": "take-graph",
+      "name": "Take graph: every note's timing over the song on the results screen",
+      "state": "done",
+      "milestone": "showcase",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "play-slots"
+      ]
+    },
+    {
+      "slug": "take-midi",
+      "name": "Take MIDI: download your take as a .mid file",
+      "state": "done",
+      "milestone": "encore",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "play-slots"
+      ]
+    },
+    {
+      "slug": "take-store",
+      "name": "Take store: every take saved to Supabase, with per-bar progress for the coach",
+      "state": "done",
+      "milestone": "submission",
+      "assignee": "sharan",
+      "pr": null,
+      "dependsOn": [
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "tempo-curve",
+      "name": "Tempo curve: a rubato score beside the strict one",
+      "state": "done",
+      "milestone": "encore",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "play-slots"
+      ]
+    },
+    {
+      "slug": "timing-feedback",
+      "name": "Timing feedback: how early or late you played, on the results screen",
+      "state": "done",
+      "milestone": "audible",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "core-loop"
+      ]
+    },
+    {
+      "slug": "twinkle-13",
+      "name": "Twinkle 13: an agent writes Mozart's 13th variation, played on the DGX",
+      "state": "done",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "ui-sounds",
+      "name": "UI sounds: cursor, confirm, back and a stage-card sting",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "juice-sound",
+        "select-layout",
+        "stage-card"
+      ]
+    },
+    {
+      "slug": "ui-tokens",
+      "name": "UI tokens: the color and type tokens and the display font",
+      "state": "done",
+      "milestone": "frontend",
+      "assignee": "eric-agent-1",
+      "pr": null,
+      "dependsOn": []
+    },
+    {
+      "slug": "versus",
+      "name": "Versus: two players on one piano",
+      "state": "done",
+      "milestone": "encore",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "play-slots"
+      ]
+    },
+    {
+      "slug": "versus-scores",
+      "name": "Versus scores: each half gets its own combo, score and multiplier in the HUD, and the higher score wins",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "versus",
+        "hud",
+        "combo-hud"
+      ]
+    },
+    {
+      "slug": "wait-hands",
+      "name": "Wait hands: learn one hand in wait mode while the other plays itself",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "wait-mode",
+        "hand-mode"
+      ]
+    },
+    {
+      "slug": "wait-hint",
+      "name": "Wait hint: after 3 s on a note, its key pulses, it sounds once and its name shows",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "wait-mode",
+        "note-labels",
+        "hand-colors",
+        "operator-replay"
+      ]
+    },
+    {
+      "slug": "wait-hud",
+      "name": "Wait HUD: LEARN and note n / N instead of the score in wait mode",
+      "state": "done",
+      "milestone": "polish",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "wait-mode",
+        "hud",
+        "fever-gauge"
+      ]
+    },
+    {
+      "slug": "wait-mode",
+      "name": "Wait mode: the highway waits for each note while you learn a song",
+      "state": "done",
+      "milestone": "encore",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "play-slots"
+      ]
+    },
+    {
+      "slug": "watch-demo",
+      "name": "Watch demo: W on the select plays the focused song with the perfect bot, labeled DEMO, then returns",
+      "state": "backlog",
+      "milestone": null,
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "scenes",
+        "select-layout",
+        "song-preview",
+        "records",
+        "hud"
+      ]
+    },
+    {
+      "slug": "weak-bars",
+      "name": "Weak bars: accuracy per phrase, one click to practice the worst one",
+      "state": "done",
+      "milestone": "showcase",
+      "assignee": "eric",
+      "pr": null,
+      "dependsOn": [
+        "play-slots"
+      ]
+    }
+  ],
+  "needs": [
+    {
+      "kind": "contract PR",
+      "text": "#415 contract: the browser CI job runs the headless checks on GitHub",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/415"
+    },
+    {
+      "kind": "plan PR",
+      "text": "#92 plan: UI foundation spec for play states and a responsive shell",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/92"
+    },
+    {
+      "kind": "contract PR",
+      "text": "#46 contract: event rules, judging and prizes",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/46"
+    },
+    {
+      "kind": "stale draft",
+      "text": "#82 feat(landing): Landing page at /about · no push for 583 min",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/82"
+    },
+    {
+      "kind": "needs-human",
+      "text": "#444 how-it-works: should /how and /about (#82) link to each other, or merge later?",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/444"
+    },
+    {
+      "kind": "needs-human",
+      "text": "#227 song-requests: open the first song-request issue (one public-domain piece) so the feature can run end to end",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/227"
+    },
+    {
+      "kind": "needs-human",
+      "text": "#45 Who judges round 1: UF grad students or other assigned judges?",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/45"
+    },
+    {
+      "kind": "needs-human",
+      "text": "#44 What is the exact text of the challenge statement?",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/44"
+    },
+    {
+      "kind": "needs-human",
+      "text": "#43 Is novelty a judging criterion?",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/43"
+    },
+    {
+      "kind": "needs-human",
+      "text": "#41 Which prize list is real: the site's or Devpost's?",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/41"
+    },
+    {
+      "kind": "needs-human",
+      "text": "#39 core-loop: play Twinkle on the DGX-660 and on laptop keys",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/39"
+    },
+    {
+      "kind": "needs-human",
+      "text": "#10 Which technology from the past 12 months is central to Piano Arcade?",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/10"
+    }
+  ],
+  "needsUnknown": [],
+  "crew": [
+    {
+      "worker": "eric-agent-1",
+      "prs": [
+        {
+          "number": 434,
+          "title": "feat(build-stamp): the short commit and its age in a corner of /",
+          "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/434",
+          "ci": "pending",
+          "isDraft": true
+        }
+      ]
+    },
+    {
+      "worker": "eric-agent-2",
+      "prs": [
+        {
+          "number": 420,
+          "title": "feat(hero-replay): a downloaded take file drives /play, judged and sounding, the same every run",
+          "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/420",
+          "ci": "pass",
+          "isDraft": true
+        }
+      ]
+    },
+    {
+      "worker": "eric-agent-5",
+      "prs": [
+        {
+          "number": 418,
+          "title": "feat(demo-reset): Shift+Esc, or 60 s idle on results, returns to / clean",
+          "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/418",
+          "ci": "fail",
+          "isDraft": true
+        }
+      ]
+    },
+    {
+      "worker": "eric-agent-6",
+      "prs": [
+        {
+          "number": 427,
+          "title": "feat(ci-browser): done note",
+          "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/427",
+          "ci": "pending",
+          "isDraft": true
+        }
+      ]
+    },
+    {
+      "worker": "eric-foreman-agent",
+      "prs": [
+        {
+          "number": 443,
+          "title": "feat(how-it-works): the data behind /how, with tests (part 1 of 2)",
+          "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/443",
+          "ci": "fail",
+          "isDraft": false
+        },
+        {
+          "number": 460,
+          "title": "feat(how-it-works): the /how page, four diagrams and verify-how.mjs",
+          "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/460",
+          "ci": "pass",
+          "isDraft": true
+        }
+      ]
+    },
+    {
+      "worker": "planner",
+      "prs": [
+        {
+          "number": 46,
+          "title": "contract: event rules, judging and prizes",
+          "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/46",
+          "ci": "pass",
+          "isDraft": false
+        },
+        {
+          "number": 92,
+          "title": "plan: UI foundation spec for play states and a responsive shell",
+          "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/92",
+          "ci": "fail",
+          "isDraft": false
+        },
+        {
+          "number": 415,
+          "title": "contract: the browser CI job runs the headless checks on GitHub",
+          "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/415",
+          "ci": "pending",
+          "isDraft": false
+        }
+      ]
+    },
+    {
+      "worker": "sharan",
+      "prs": [
+        {
+          "number": 340,
+          "title": "feat(led-strip): LED strip firmware and standalone tester",
+          "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/340",
+          "ci": "pass",
+          "isDraft": false
+        },
+        {
+          "number": 467,
+          "title": "fix(take-store): a sign-in screen that leads to the menu, and an account chip for it",
+          "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/467",
+          "ci": "fail",
+          "isDraft": false
+        }
+      ]
+    },
+    {
+      "worker": "sharan-1",
+      "prs": [
+        {
+          "number": 82,
+          "title": "feat(landing): Landing page at /about",
+          "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/82",
+          "ci": "pass",
+          "isDraft": true
+        }
+      ]
+    },
+    {
+      "worker": "unnamed",
+      "prs": [
+        {
+          "number": 342,
+          "title": "docs: judging playbook, each criterion against our features",
+          "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/342",
+          "ci": "pass",
+          "isDraft": false
+        },
+        {
+          "number": 451,
+          "title": "feat(song-sources): the song preview links each chart's public-domain score",
+          "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/451",
+          "ci": "pass",
+          "isDraft": true
+        },
+        {
+          "number": 468,
+          "title": "feat(easy-charts): verify-easy, the toggle's look and the done note",
+          "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/468",
+          "ci": "pending",
+          "isDraft": true
+        }
+      ]
+    }
+  ],
+  "prs": [
+    {
+      "closedAt": "2026-10-24T01:11:15Z",
+      "createdAt": "2026-10-24T01:09:41Z",
+      "mergedAt": "2026-10-24T01:11:15Z",
+      "number": 1,
+      "state": "MERGED",
+      "title": "contract: install agent-brigade and add raw planning context",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/1",
+      "worker": "planner"
+    },
+    {
+      "closedAt": "2026-10-24T01:22:00Z",
+      "createdAt": "2026-10-24T01:20:22Z",
+      "mergedAt": "2026-10-24T01:22:00Z",
+      "number": 4,
+      "state": "MERGED",
+      "title": "plan: spec the piano MIDI feasibility spike",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/4",
+      "worker": "planner"
+    },
+    {
+      "closedAt": "2026-10-24T01:22:02Z",
+      "createdAt": "2026-10-24T01:21:20Z",
+      "mergedAt": "2026-10-24T01:22:02Z",
+      "number": 5,
+      "state": "MERGED",
+      "title": "feat(piano-midi-spike): DGX-660 MIDI feasibility spike",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/5",
+      "worker": "piano-midi-spike"
+    },
+    {
+      "closedAt": "2026-10-24T02:38:13Z",
+      "createdAt": "2026-10-24T01:25:07Z",
+      "mergedAt": "2026-10-24T02:38:13Z",
+      "number": 6,
+      "state": "MERGED",
+      "title": "feat(piano-midi-spike): DGX-660 MIDI feasibility spike",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/6",
+      "worker": "piano-midi-spike"
+    },
+    {
+      "closedAt": "2026-10-24T02:39:55Z",
+      "createdAt": "2026-10-24T02:34:34Z",
+      "mergedAt": "2026-10-24T02:39:55Z",
+      "number": 7,
+      "state": "MERGED",
+      "title": "docs: start the project story with the piano feasibility spike",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/7",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T04:11:02Z",
+      "createdAt": "2026-10-24T04:06:33Z",
+      "mergedAt": "2026-10-24T04:11:02Z",
+      "number": 8,
+      "state": "MERGED",
+      "title": "contract: mission, tech stack and per-person lanes",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/8",
+      "worker": "planner"
+    },
+    {
+      "closedAt": "2026-10-24T04:10:49Z",
+      "createdAt": "2026-10-24T04:06:35Z",
+      "mergedAt": "2026-10-24T04:10:49Z",
+      "number": 9,
+      "state": "MERGED",
+      "title": "plan: game-lane features, provisional learning stubs, milestones",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/9",
+      "worker": "planner"
+    },
+    {
+      "closedAt": "2026-10-24T06:28:53Z",
+      "createdAt": "2026-10-24T04:21:51Z",
+      "mergedAt": "2026-10-24T06:28:53Z",
+      "number": 34,
+      "state": "MERGED",
+      "title": "contract: overnight planner, idea catalog and issue-first promotions",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/34",
+      "worker": "planner"
+    },
+    {
+      "closedAt": "2026-10-24T05:28:19Z",
+      "createdAt": "2026-10-24T04:45:35Z",
+      "mergedAt": "2026-10-24T05:28:19Z",
+      "number": 36,
+      "state": "MERGED",
+      "title": "feat(core-loop): Play Twinkle on the real piano, judged, with a results screen",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/36",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T05:45:41Z",
+      "createdAt": "2026-10-24T04:50:09Z",
+      "mergedAt": "2026-10-24T05:45:41Z",
+      "number": 38,
+      "state": "MERGED",
+      "title": "plan: piano-sim, a virtual DGX-660 for testing MIDI",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/38",
+      "worker": "planner"
+    },
+    {
+      "closedAt": "2026-10-24T06:33:56Z",
+      "createdAt": "2026-10-24T05:15:43Z",
+      "mergedAt": "2026-10-24T06:33:56Z",
+      "number": 40,
+      "state": "MERGED",
+      "title": "plan: add the LED strip back (led-strip, led-game)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/40",
+      "worker": "planner"
+    },
+    {
+      "closedAt": null,
+      "createdAt": "2026-10-24T05:26:48Z",
+      "mergedAt": null,
+      "number": 46,
+      "state": "OPEN",
+      "title": "contract: event rules, judging and prizes",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/46",
+      "worker": "planner"
+    },
+    {
+      "closedAt": "2026-10-24T05:40:30Z",
+      "createdAt": "2026-10-24T05:39:45Z",
+      "mergedAt": "2026-10-24T05:40:30Z",
+      "number": 48,
+      "state": "MERGED",
+      "title": "contract: playtest findings, an accompaniment track, and the beat-track spec",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/48",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T05:54:33Z",
+      "createdAt": "2026-10-24T05:41:07Z",
+      "mergedAt": "2026-10-24T05:54:33Z",
+      "number": 50,
+      "state": "MERGED",
+      "title": "feat(beat-track): a drum beat on the piano under every song",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/50",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T05:44:03Z",
+      "createdAt": "2026-10-24T05:41:10Z",
+      "mergedAt": "2026-10-24T05:44:03Z",
+      "number": 51,
+      "state": "MERGED",
+      "title": "plan: twinkle-13, an agent writes Mozart's 13th variation",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/51",
+      "worker": "planner"
+    },
+    {
+      "closedAt": "2026-10-24T06:14:35Z",
+      "createdAt": "2026-10-24T05:45:34Z",
+      "mergedAt": "2026-10-24T06:14:35Z",
+      "number": 52,
+      "state": "MERGED",
+      "title": "feat(twinkle-13): an agent writes Mozart's 13th variation",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/52",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T06:00:08Z",
+      "createdAt": "2026-10-24T05:47:33Z",
+      "mergedAt": "2026-10-24T06:00:08Z",
+      "number": 53,
+      "state": "MERGED",
+      "title": "fix(core-loop): two-bar count-in and separated repeated notes",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/53",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T06:01:50Z",
+      "createdAt": "2026-10-24T05:48:53Z",
+      "mergedAt": "2026-10-24T06:01:50Z",
+      "number": 54,
+      "state": "MERGED",
+      "title": "feat(piano-sim): fake Web MIDI piano, tests through core's MIDI input, and the /play hook",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/54",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T06:16:56Z",
+      "createdAt": "2026-10-24T06:02:03Z",
+      "mergedAt": "2026-10-24T06:16:55Z",
+      "number": 55,
+      "state": "MERGED",
+      "title": "feat(piano-sim): the /sim page, record mode and done note",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/55",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T06:03:35Z",
+      "createdAt": "2026-10-24T06:02:57Z",
+      "mergedAt": "2026-10-24T06:03:35Z",
+      "number": 57,
+      "state": "MERGED",
+      "title": "plan: timing-feedback spec, and the beat playtest in findings",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/57",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T06:14:48Z",
+      "createdAt": "2026-10-24T06:03:40Z",
+      "mergedAt": "2026-10-24T06:14:48Z",
+      "number": 58,
+      "state": "MERGED",
+      "title": "feat(timing-feedback): how early or late you played, on the results screen",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/58",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T07:03:47Z",
+      "createdAt": "2026-10-24T06:14:08Z",
+      "mergedAt": "2026-10-24T07:03:47Z",
+      "number": 59,
+      "state": "MERGED",
+      "title": "contract: Supabase for take history, anonymous accounts, Sharan's lane",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/59",
+      "worker": "planner"
+    },
+    {
+      "closedAt": "2026-10-24T15:15:25Z",
+      "createdAt": "2026-10-24T06:14:11Z",
+      "mergedAt": "2026-10-24T15:15:25Z",
+      "number": 60,
+      "state": "MERGED",
+      "title": "plan: spec the take store (Supabase take history for the coach)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/60",
+      "worker": "sharan"
+    },
+    {
+      "closedAt": "2026-10-24T15:29:51Z",
+      "createdAt": "2026-10-24T06:14:14Z",
+      "mergedAt": "2026-10-24T15:29:51Z",
+      "number": 61,
+      "state": "MERGED",
+      "title": "feat(take-store): save every take to Supabase and show progress",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/61",
+      "worker": "sharan"
+    },
+    {
+      "closedAt": "2026-10-24T06:14:55Z",
+      "createdAt": "2026-10-24T06:14:21Z",
+      "mergedAt": null,
+      "number": 62,
+      "state": "CLOSED",
+      "title": "contract: Supabase for take history, anonymous accounts, Sharan's lane",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/62",
+      "worker": "planner"
+    },
+    {
+      "closedAt": "2026-10-24T06:21:23Z",
+      "createdAt": "2026-10-24T06:18:42Z",
+      "mergedAt": "2026-10-24T06:21:22Z",
+      "number": 63,
+      "state": "MERGED",
+      "title": "contract: loose sources and licenses (decision 003)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/63",
+      "worker": "planner"
+    },
+    {
+      "closedAt": "2026-10-24T06:22:00Z",
+      "createdAt": "2026-10-24T06:20:51Z",
+      "mergedAt": "2026-10-24T06:22:00Z",
+      "number": 64,
+      "state": "MERGED",
+      "title": "refactor(core-loop): let the judge and highway tolerate judgments added to the contract",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/64",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T06:42:30Z",
+      "createdAt": "2026-10-24T06:22:32Z",
+      "mergedAt": "2026-10-24T06:42:30Z",
+      "number": 65,
+      "state": "MERGED",
+      "title": "feat(hud): Arcade HUD with a giant combo, counters, score and multiplier",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/65",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T06:24:37Z",
+      "createdAt": "2026-10-24T06:23:57Z",
+      "mergedAt": "2026-10-24T06:24:37Z",
+      "number": 67,
+      "state": "MERGED",
+      "title": "contract: GOOD and WRONG judgments, the judging rule, and the judging-tiers spec",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/67",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T06:25:42Z",
+      "createdAt": "2026-10-24T06:24:52Z",
+      "mergedAt": "2026-10-24T06:25:42Z",
+      "number": 68,
+      "state": "MERGED",
+      "title": "test(core-loop): verify also plays Twinkle through the MIDI path on /sim",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/68",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T06:45:54Z",
+      "createdAt": "2026-10-24T06:25:07Z",
+      "mergedAt": "2026-10-24T06:45:54Z",
+      "number": 69,
+      "state": "MERGED",
+      "title": "feat(judging-tiers): GOOD keeps the combo, early/late labels, wrong notes break it",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/69",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T06:28:24Z",
+      "createdAt": "2026-10-24T06:27:43Z",
+      "mergedAt": "2026-10-24T06:28:24Z",
+      "number": 70,
+      "state": "MERGED",
+      "title": "fix(piano-sim): check the four counts it cares about, not the exact counts object",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/70",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T06:32:27Z",
+      "createdAt": "2026-10-24T06:30:46Z",
+      "mergedAt": "2026-10-24T06:32:27Z",
+      "number": 73,
+      "state": "MERGED",
+      "title": "plan: operator board and attract-mode replay",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/73",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T06:36:42Z",
+      "createdAt": "2026-10-24T06:35:24Z",
+      "mergedAt": "2026-10-24T06:36:42Z",
+      "number": 78,
+      "state": "MERGED",
+      "title": "plan: song select earlier, /play?song, and a Minuet in G chart",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/78",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T06:41:00Z",
+      "createdAt": "2026-10-24T06:40:08Z",
+      "mergedAt": "2026-10-24T06:41:00Z",
+      "number": 79,
+      "state": "MERGED",
+      "title": "docs: README with what it is, how to run it, and where things live",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/79",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T06:41:54Z",
+      "createdAt": "2026-10-24T06:40:51Z",
+      "mergedAt": "2026-10-24T06:41:54Z",
+      "number": 80,
+      "state": "MERGED",
+      "title": "contract: verify also runs piano-sim's MIDI-path check",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/80",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T06:59:13Z",
+      "createdAt": "2026-10-24T06:42:43Z",
+      "mergedAt": "2026-10-24T06:59:13Z",
+      "number": 81,
+      "state": "MERGED",
+      "title": "feat(song-select): pick a piece from the library",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/81",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": null,
+      "createdAt": "2026-10-24T06:43:34Z",
+      "mergedAt": null,
+      "number": 82,
+      "state": "OPEN",
+      "title": "feat(landing): Landing page at /about",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/82",
+      "worker": "sharan-1"
+    },
+    {
+      "closedAt": "2026-10-24T06:57:35Z",
+      "createdAt": "2026-10-24T06:43:56Z",
+      "mergedAt": "2026-10-24T06:57:35Z",
+      "number": 83,
+      "state": "MERGED",
+      "title": "feat(midi-watchdog): reconnect when Chrome's MIDI input goes silent",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/83",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T06:46:23Z",
+      "createdAt": "2026-10-24T06:45:43Z",
+      "mergedAt": "2026-10-24T06:46:23Z",
+      "number": 85,
+      "state": "MERGED",
+      "title": "fix(core-loop): /play?song=<id> loads that song's chart",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/85",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T06:53:12Z",
+      "createdAt": "2026-10-24T06:47:42Z",
+      "mergedAt": "2026-10-24T06:53:12Z",
+      "number": 86,
+      "state": "MERGED",
+      "title": "fix(piano-sim): a live send during a scheduled replay arrives now",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/86",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T06:48:38Z",
+      "createdAt": "2026-10-24T06:48:01Z",
+      "mergedAt": "2026-10-24T06:48:38Z",
+      "number": 87,
+      "state": "MERGED",
+      "title": "fix(hud): advance the judge past its GOOD window in the real-judge test",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/87",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T06:51:33Z",
+      "createdAt": "2026-10-24T06:50:39Z",
+      "mergedAt": "2026-10-24T06:51:33Z",
+      "number": 89,
+      "state": "MERGED",
+      "title": "fix(beat-track): Start crashed the game without a piano (negative Web Audio time)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/89",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T07:21:45Z",
+      "createdAt": "2026-10-24T06:51:20Z",
+      "mergedAt": "2026-10-24T07:21:45Z",
+      "number": 90,
+      "state": "MERGED",
+      "title": "feat(operator-board): the arcade's operator menu at /operator",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/90",
+      "worker": "eric-foreman-agent"
+    },
+    {
+      "closedAt": null,
+      "createdAt": "2026-10-24T06:57:11Z",
+      "mergedAt": null,
+      "number": 92,
+      "state": "OPEN",
+      "title": "plan: UI foundation spec for play states and a responsive shell",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/92",
+      "worker": "planner"
+    },
+    {
+      "closedAt": "2026-10-24T07:07:08Z",
+      "createdAt": "2026-10-24T06:57:57Z",
+      "mergedAt": "2026-10-24T07:07:08Z",
+      "number": 93,
+      "state": "MERGED",
+      "title": "contract: three.js, a background layer hook, the fever stage and a 3D attract mode",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/93",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T07:10:40Z",
+      "createdAt": "2026-10-24T07:02:19Z",
+      "mergedAt": "2026-10-24T07:10:40Z",
+      "number": 96,
+      "state": "MERGED",
+      "title": "feat(minuet-g): Minuet in G, a second song charted from a cited score",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/96",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T07:08:14Z",
+      "createdAt": "2026-10-24T07:03:11Z",
+      "mergedAt": "2026-10-24T07:08:14Z",
+      "number": 97,
+      "state": "MERGED",
+      "title": "plan: two song packs bring the library to ten, easy to expert",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/97",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T07:06:22Z",
+      "createdAt": "2026-10-24T07:05:15Z",
+      "mergedAt": "2026-10-24T07:06:22Z",
+      "number": 98,
+      "state": "MERGED",
+      "title": "test(core-loop): verify opens / and picks Twinkle before playing it",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/98",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T07:16:08Z",
+      "createdAt": "2026-10-24T07:06:20Z",
+      "mergedAt": "2026-10-24T07:16:08Z",
+      "number": 99,
+      "state": "MERGED",
+      "title": "feat(juice-visual): wisps, bursts, lane light, fever, full combo and rank reveal",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/99",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T07:14:52Z",
+      "createdAt": "2026-10-24T07:07:55Z",
+      "mergedAt": "2026-10-24T07:14:52Z",
+      "number": 100,
+      "state": "MERGED",
+      "title": "feat(juice-sound): event sounds for combo, fever, full combo and rank",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/100",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T07:20:17Z",
+      "createdAt": "2026-10-24T07:17:30Z",
+      "mergedAt": "2026-10-24T07:20:17Z",
+      "number": 101,
+      "state": "MERGED",
+      "title": "chore: a gitignored songs/local/ folder for songs that stay on Eric's machine",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/101",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T07:41:04Z",
+      "createdAt": "2026-10-24T07:17:34Z",
+      "mergedAt": "2026-10-24T07:41:04Z",
+      "number": 102,
+      "state": "MERGED",
+      "title": "feat(fever-stage): a three.js synthwave stage behind the highway",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/102",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T07:20:55Z",
+      "createdAt": "2026-10-24T07:18:36Z",
+      "mergedAt": "2026-10-24T07:20:55Z",
+      "number": 103,
+      "state": "MERGED",
+      "title": "fix: effects volume, mute and miss cue on /play's start screen",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/103",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T07:27:45Z",
+      "createdAt": "2026-10-24T07:21:28Z",
+      "mergedAt": "2026-10-24T07:27:45Z",
+      "number": 104,
+      "state": "MERGED",
+      "title": "feat(bar-loop): practice bars X to Y at a slower tempo",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/104",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T07:23:17Z",
+      "createdAt": "2026-10-24T07:22:27Z",
+      "mergedAt": "2026-10-24T07:23:17Z",
+      "number": 105,
+      "state": "MERGED",
+      "title": "fix(juice-sound): done note: the effects controls are on /play now",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/105",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T07:24:02Z",
+      "createdAt": "2026-10-24T07:22:39Z",
+      "mergedAt": "2026-10-24T07:24:02Z",
+      "number": 106,
+      "state": "MERGED",
+      "title": "fix(core-loop): mount the background layer hook behind the highway",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/106",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T08:09:47Z",
+      "createdAt": "2026-10-24T07:23:24Z",
+      "mergedAt": "2026-10-24T08:09:47Z",
+      "number": 107,
+      "state": "MERGED",
+      "title": "feat(operator-replay): attract mode, the build replayed one merge per note of Twinkle",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/107",
+      "worker": "eric-foreman-agent"
+    },
+    {
+      "closedAt": "2026-10-24T08:08:41Z",
+      "createdAt": "2026-10-24T07:23:57Z",
+      "mergedAt": "2026-10-24T08:08:41Z",
+      "number": 108,
+      "state": "MERGED",
+      "title": "feat(song-pack-1): Ode to Joy, Chopin Prelude 4 and Für Elise, with a MIDI-to-chart converter",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/108",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T07:32:36Z",
+      "createdAt": "2026-10-24T07:26:38Z",
+      "mergedAt": "2026-10-24T07:32:35Z",
+      "number": 109,
+      "state": "MERGED",
+      "title": "fix(operator-board): the board lists every PR and each feature's depends_on, for the replay",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/109",
+      "worker": "eric-foreman-agent"
+    },
+    {
+      "closedAt": "2026-10-24T07:34:01Z",
+      "createdAt": "2026-10-24T07:28:43Z",
+      "mergedAt": "2026-10-24T07:34:01Z",
+      "number": 111,
+      "state": "MERGED",
+      "title": "feat(piano-out): replay your take on the piano",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/111",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T07:39:09Z",
+      "createdAt": "2026-10-24T07:38:14Z",
+      "mergedAt": "2026-10-24T07:39:09Z",
+      "number": 113,
+      "state": "MERGED",
+      "title": "fix(core-loop): Replay on piano beside Retry on the results screen",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/113",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T07:40:13Z",
+      "createdAt": "2026-10-24T07:39:18Z",
+      "mergedAt": "2026-10-24T07:40:13Z",
+      "number": 114,
+      "state": "MERGED",
+      "title": "fix(piano-out): done note: the replay button is on the results screen",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/114",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T07:48:22Z",
+      "createdAt": "2026-10-24T07:47:21Z",
+      "mergedAt": "2026-10-24T07:48:22Z",
+      "number": 115,
+      "state": "MERGED",
+      "title": "fix(timing-feedback): count early and late at whole-ms precision, like the mean",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/115",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T08:05:55Z",
+      "createdAt": "2026-10-24T08:04:58Z",
+      "mergedAt": "2026-10-24T08:05:55Z",
+      "number": 116,
+      "state": "MERGED",
+      "title": "contract: add the reference frames the game specs already cite",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/116",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T08:36:41Z",
+      "createdAt": "2026-10-24T08:10:25Z",
+      "mergedAt": "2026-10-24T08:36:41Z",
+      "number": 142,
+      "state": "MERGED",
+      "title": "feat(song-pack-2): Gymnopédie, Clair de lune, Nocturne Op. 9 No. 2, Maple Leaf Rag and Moonlight's 3rd movement",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/142",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T08:29:11Z",
+      "createdAt": "2026-10-24T08:19:06Z",
+      "mergedAt": "2026-10-24T08:29:11Z",
+      "number": 143,
+      "state": "MERGED",
+      "title": "contract: panels and pause for plugins, chart voice and velocity, song requests, 4 workers",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/143",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T08:30:07Z",
+      "createdAt": "2026-10-24T08:24:43Z",
+      "mergedAt": "2026-10-24T08:30:07Z",
+      "number": 144,
+      "state": "MERGED",
+      "title": "plan: overnight batch A, foundation and playing (13 game features)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/144",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T08:38:11Z",
+      "createdAt": "2026-10-24T08:28:30Z",
+      "mergedAt": "2026-10-24T08:38:11Z",
+      "number": 158,
+      "state": "MERGED",
+      "title": "plan: overnight batch B, how you played (8 game features)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/158",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T08:36:37Z",
+      "createdAt": "2026-10-24T08:30:57Z",
+      "mergedAt": "2026-10-24T08:36:37Z",
+      "number": 159,
+      "state": "MERGED",
+      "title": "plan: overnight batch C, arcade shell (4 game features)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/159",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T08:59:26Z",
+      "createdAt": "2026-10-24T08:32:14Z",
+      "mergedAt": "2026-10-24T08:59:26Z",
+      "number": 160,
+      "state": "MERGED",
+      "title": "feat(play-slots): plugin panels on the start and results screens, plus Pause and Quit",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/160",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T08:34:57Z",
+      "createdAt": "2026-10-24T08:33:59Z",
+      "mergedAt": "2026-10-24T08:34:57Z",
+      "number": 161,
+      "state": "MERGED",
+      "title": "contract: visual direction, reference notes and 12 frontend specs for eric-agent-1",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/161",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T08:55:12Z",
+      "createdAt": "2026-10-24T08:36:16Z",
+      "mergedAt": "2026-10-24T08:55:12Z",
+      "number": 162,
+      "state": "MERGED",
+      "title": "feat(scenes): scripted bot players for every scene",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/162",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T08:57:37Z",
+      "createdAt": "2026-10-24T08:37:25Z",
+      "mergedAt": "2026-10-24T08:57:37Z",
+      "number": 163,
+      "state": "MERGED",
+      "title": "feat(fever-gauge): Fever gauge: fever reachable on every song, scaled to its length",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/163",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T08:39:35Z",
+      "createdAt": "2026-10-24T08:38:05Z",
+      "mergedAt": "2026-10-24T08:39:35Z",
+      "number": 164,
+      "state": "MERGED",
+      "title": "docs: credit the two CC BY-SA song sources",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/164",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T08:44:30Z",
+      "createdAt": "2026-10-24T08:38:54Z",
+      "mergedAt": "2026-10-24T08:44:30Z",
+      "number": 165,
+      "state": "MERGED",
+      "title": "fix(core-loop): plugin panels on the start and results screens, and Esc pauses",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/165",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T08:40:30Z",
+      "createdAt": "2026-10-24T08:39:40Z",
+      "mergedAt": "2026-10-24T08:40:30Z",
+      "number": 166,
+      "state": "MERGED",
+      "title": "chore(fever-gauge): the pure gauge the judge and meter will share",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/166",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T09:00:48Z",
+      "createdAt": "2026-10-24T08:40:14Z",
+      "mergedAt": "2026-10-24T09:00:48Z",
+      "number": 167,
+      "state": "MERGED",
+      "title": "feat(ui-tokens): color and type tokens and the display font",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/167",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T08:53:13Z",
+      "createdAt": "2026-10-24T08:44:14Z",
+      "mergedAt": "2026-10-24T08:53:13Z",
+      "number": 168,
+      "state": "MERGED",
+      "title": "fix(core-loop): declare the color tokens and load Saira as a CSS variable",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/168",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T08:48:56Z",
+      "createdAt": "2026-10-24T08:45:00Z",
+      "mergedAt": "2026-10-24T08:48:55Z",
+      "number": 170,
+      "state": "MERGED",
+      "title": "fix(beat-track): go silent on pause and quit, come back on the beat after resume",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/170",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T08:47:21Z",
+      "createdAt": "2026-10-24T08:45:05Z",
+      "mergedAt": "2026-10-24T08:47:21Z",
+      "number": 171,
+      "state": "MERGED",
+      "title": "fix(core-loop): fever starts when the fever gauge fills, not at a combo of 50",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/171",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T08:50:06Z",
+      "createdAt": "2026-10-24T08:47:41Z",
+      "mergedAt": "2026-10-24T08:50:06Z",
+      "number": 172,
+      "state": "MERGED",
+      "title": "fix(midi-watchdog): count no stall while the game is paused",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/172",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T08:54:49Z",
+      "createdAt": "2026-10-24T08:54:04Z",
+      "mergedAt": "2026-10-24T08:54:49Z",
+      "number": 174,
+      "state": "MERGED",
+      "title": "fix(core-loop): Replay on piano moves into piano-out's results panel",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/174",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T09:18:40Z",
+      "createdAt": "2026-10-24T08:59:48Z",
+      "mergedAt": "2026-10-24T09:18:40Z",
+      "number": 175,
+      "state": "MERGED",
+      "title": "feat(difficulty): Difficulty: a level from 1 to 15 computed from each chart, shown and sorted in song select",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/175",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T09:33:43Z",
+      "createdAt": "2026-10-24T09:00:31Z",
+      "mergedAt": "2026-10-24T09:33:43Z",
+      "number": 176,
+      "state": "MERGED",
+      "title": "feat(dynamics): grade how loud you played against the score",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/176",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T09:05:34Z",
+      "createdAt": "2026-10-24T09:00:59Z",
+      "mergedAt": "2026-10-24T09:05:34Z",
+      "number": 177,
+      "state": "MERGED",
+      "title": "fix(core-loop): fix /play's zero after the stage is built, so songStart's clock is the judge's",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/177",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T09:04:06Z",
+      "createdAt": "2026-10-24T09:03:07Z",
+      "mergedAt": "2026-10-24T09:04:06Z",
+      "number": 178,
+      "state": "MERGED",
+      "title": "chore(difficulty): compute a chart's level from the chart itself",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/178",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T09:12:12Z",
+      "createdAt": "2026-10-24T09:03:07Z",
+      "mergedAt": "2026-10-24T09:12:12Z",
+      "number": 179,
+      "state": "MERGED",
+      "title": "feat(song-card): one card per song for the music select",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/179",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T09:07:26Z",
+      "createdAt": "2026-10-24T09:04:22Z",
+      "mergedAt": "2026-10-24T09:07:26Z",
+      "number": 180,
+      "state": "MERGED",
+      "title": "fix(song-pack-1): the converter writes note velocities, and the three charts carry them",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/180",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T09:09:49Z",
+      "createdAt": "2026-10-24T09:07:26Z",
+      "mergedAt": "2026-10-24T09:09:49Z",
+      "number": 182,
+      "state": "MERGED",
+      "title": "fix(song-select): show each song's level and list the easiest first",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/182",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T09:18:57Z",
+      "createdAt": "2026-10-24T09:07:45Z",
+      "mergedAt": "2026-10-24T09:18:57Z",
+      "number": 183,
+      "state": "MERGED",
+      "title": "feat(evenness): score how even your runs are, per hand",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/183",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T09:12:09Z",
+      "createdAt": "2026-10-24T09:10:02Z",
+      "mergedAt": "2026-10-24T09:12:09Z",
+      "number": 184,
+      "state": "MERGED",
+      "title": "test(operator-replay): the piano-voice test no longer flakes on the clock's float value",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/184",
+      "worker": "eric-foreman-agent"
+    },
+    {
+      "closedAt": "2026-10-24T09:13:08Z",
+      "createdAt": "2026-10-24T09:11:07Z",
+      "mergedAt": null,
+      "number": 185,
+      "state": "CLOSED",
+      "title": "fix(song-pack-1): take chart velocities from CC7 volume when note-ons are flat",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/185",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T09:16:06Z",
+      "createdAt": "2026-10-24T09:15:03Z",
+      "mergedAt": "2026-10-24T09:16:06Z",
+      "number": 186,
+      "state": "MERGED",
+      "title": "fix(song-pack-1): take chart velocities from CC7 volume when note-ons are flat",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/186",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T09:23:56Z",
+      "createdAt": "2026-10-24T09:15:25Z",
+      "mergedAt": "2026-10-24T09:23:56Z",
+      "number": 187,
+      "state": "MERGED",
+      "title": "feat(song-jacket): generated cover art for each song",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/187",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T09:52:11Z",
+      "createdAt": "2026-10-24T09:20:42Z",
+      "mergedAt": "2026-10-24T09:52:11Z",
+      "number": 188,
+      "state": "MERGED",
+      "title": "feat(take-graph): Take graph: every note's timing over the song on the results screen",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/188",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T09:30:29Z",
+      "createdAt": "2026-10-24T09:21:44Z",
+      "mergedAt": "2026-10-24T09:30:29Z",
+      "number": 189,
+      "state": "MERGED",
+      "title": "feat(weak-bars): accuracy per phrase, one click to practice the worst one",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/189",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T09:39:32Z",
+      "createdAt": "2026-10-24T09:30:30Z",
+      "mergedAt": "2026-10-24T09:39:32Z",
+      "number": 190,
+      "state": "MERGED",
+      "title": "feat(select-layout): the song cards as an arcade music select",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/190",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T09:34:39Z",
+      "createdAt": "2026-10-24T09:32:25Z",
+      "mergedAt": "2026-10-24T09:34:39Z",
+      "number": 191,
+      "state": "MERGED",
+      "title": "fix(core-loop): the results screen scrolls instead of cutting off its top",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/191",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T10:06:54Z",
+      "createdAt": "2026-10-24T09:35:08Z",
+      "mergedAt": "2026-10-24T10:06:54Z",
+      "number": 192,
+      "state": "MERGED",
+      "title": "feat(records): best grades and a local top 5 with arcade initials",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/192",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T10:01:18Z",
+      "createdAt": "2026-10-24T09:36:10Z",
+      "mergedAt": "2026-10-24T10:01:18Z",
+      "number": 193,
+      "state": "MERGED",
+      "title": "feat(hand-colors): left and right hands in two colors",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/193",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T09:38:14Z",
+      "createdAt": "2026-10-24T09:37:13Z",
+      "mergedAt": "2026-10-24T09:38:14Z",
+      "number": 194,
+      "state": "MERGED",
+      "title": "plan: results-layout keeps the ceremony on one screen and moves other panels below",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/194",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T09:44:16Z",
+      "createdAt": "2026-10-24T09:43:21Z",
+      "mergedAt": "2026-10-24T09:44:16Z",
+      "number": 195,
+      "state": "MERGED",
+      "title": "feat(hand-colors): handColor and the L/R legend during the count-in",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/195",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T09:44:56Z",
+      "createdAt": "2026-10-24T09:43:36Z",
+      "mergedAt": "2026-10-24T09:44:56Z",
+      "number": 196,
+      "state": "MERGED",
+      "title": "fix(evenness): correct the done note's two-hand claim",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/196",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T09:46:13Z",
+      "createdAt": "2026-10-24T09:43:57Z",
+      "mergedAt": "2026-10-24T09:46:13Z",
+      "number": 197,
+      "state": "MERGED",
+      "title": "fix(records): the local records store, and its results panel with arcade initials",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/197",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T09:48:16Z",
+      "createdAt": "2026-10-24T09:44:07Z",
+      "mergedAt": "2026-10-24T09:48:16Z",
+      "number": 198,
+      "state": "MERGED",
+      "title": "fix(song-select): / renders the arcade music select",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/198",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T09:50:18Z",
+      "createdAt": "2026-10-24T09:49:29Z",
+      "mergedAt": null,
+      "number": 199,
+      "state": "CLOSED",
+      "title": "fix(song-select): each song shows its best grade from records",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/199",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T10:05:26Z",
+      "createdAt": "2026-10-24T09:49:45Z",
+      "mergedAt": "2026-10-24T10:05:25Z",
+      "number": 200,
+      "state": "MERGED",
+      "title": "feat(hud-skin): the HUD restyled to the tokens",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/200",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T09:51:36Z",
+      "createdAt": "2026-10-24T09:50:33Z",
+      "mergedAt": "2026-10-24T09:51:36Z",
+      "number": 201,
+      "state": "MERGED",
+      "title": "fix(core-loop): notes and lit keys take their hand's color",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/201",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T09:53:39Z",
+      "createdAt": "2026-10-24T09:50:46Z",
+      "mergedAt": "2026-10-24T09:53:39Z",
+      "number": 202,
+      "state": "MERGED",
+      "title": "fix(records): a useBestGrades hook for the music select",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/202",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T10:04:11Z",
+      "createdAt": "2026-10-24T09:54:27Z",
+      "mergedAt": "2026-10-24T10:04:11Z",
+      "number": 203,
+      "state": "MERGED",
+      "title": "feat(note-labels): Note labels: letter names on notes and keys, laptop letters in laptop mode",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/203",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T09:56:52Z",
+      "createdAt": "2026-10-24T09:55:49Z",
+      "mergedAt": "2026-10-24T09:56:52Z",
+      "number": 204,
+      "state": "MERGED",
+      "title": "fix(juice-visual): hit bursts take the hit note's hand color",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/204",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T09:58:51Z",
+      "createdAt": "2026-10-24T09:56:10Z",
+      "mergedAt": "2026-10-24T09:58:51Z",
+      "number": 205,
+      "state": "MERGED",
+      "title": "fix: the music select shows each song's best grade",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/205",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T10:00:38Z",
+      "createdAt": "2026-10-24T09:58:41Z",
+      "mergedAt": "2026-10-24T10:00:37Z",
+      "number": 206,
+      "state": "MERGED",
+      "title": "fix(hud): numbers in the display face and colors from the tokens",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/206",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T10:12:01Z",
+      "createdAt": "2026-10-24T10:03:17Z",
+      "mergedAt": "2026-10-24T10:12:01Z",
+      "number": 207,
+      "state": "MERGED",
+      "title": "feat(calibration): tap along to clicks to set the latency offset",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/207",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T10:19:29Z",
+      "createdAt": "2026-10-24T10:07:18Z",
+      "mergedAt": "2026-10-24T10:19:29Z",
+      "number": 208,
+      "state": "MERGED",
+      "title": "feat(hand-mode): Hand mode: play one hand while the DGX plays the other",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/208",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T10:15:36Z",
+      "createdAt": "2026-10-24T10:07:18Z",
+      "mergedAt": "2026-10-24T10:15:36Z",
+      "number": 209,
+      "state": "MERGED",
+      "title": "feat(note-pills): pill geometry and the brightness curve",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/209",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T10:16:51Z",
+      "createdAt": "2026-10-24T10:08:31Z",
+      "mergedAt": "2026-10-24T10:16:51Z",
+      "number": 210,
+      "state": "MERGED",
+      "title": "feat(replay-view): watch your take on the highway while the piano plays it",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/210",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T10:12:41Z",
+      "createdAt": "2026-10-24T10:09:45Z",
+      "mergedAt": "2026-10-24T10:12:41Z",
+      "number": 211,
+      "state": "MERGED",
+      "title": "fix(song-select): a Calibrate latency link on the music select",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/211",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T10:40:37Z",
+      "createdAt": "2026-10-24T10:18:20Z",
+      "mergedAt": "2026-10-24T10:40:37Z",
+      "number": 212,
+      "state": "MERGED",
+      "title": "feat(wait-mode): the highway waits for each note while you learn a song",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/212",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T10:21:14Z",
+      "createdAt": "2026-10-24T10:19:23Z",
+      "mergedAt": "2026-10-24T10:21:14Z",
+      "number": 213,
+      "state": "MERGED",
+      "title": "fix(core-loop): notes as pills sized to their key, dim far from the line",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/213",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T10:36:57Z",
+      "createdAt": "2026-10-24T10:20:46Z",
+      "mergedAt": "2026-10-24T10:36:57Z",
+      "number": 214,
+      "state": "MERGED",
+      "title": "feat(highway-zoom): the visible key range follows the music",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/214",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T10:23:03Z",
+      "createdAt": "2026-10-24T10:22:15Z",
+      "mergedAt": "2026-10-24T10:23:03Z",
+      "number": 215,
+      "state": "MERGED",
+      "title": "feat(note-pills): done note",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/215",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T10:36:11Z",
+      "createdAt": "2026-10-24T10:22:33Z",
+      "mergedAt": "2026-10-24T10:36:11Z",
+      "number": 216,
+      "state": "MERGED",
+      "title": "feat(ghost): Ghost: your last take drawn on the highway when you retry",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/216",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T10:25:30Z",
+      "createdAt": "2026-10-24T10:24:26Z",
+      "mergedAt": "2026-10-24T10:25:30Z",
+      "number": 217,
+      "state": "MERGED",
+      "title": "feat(highway-zoom): the per-frame key range, eased, never cutting off a note",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/217",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T10:39:10Z",
+      "createdAt": "2026-10-24T10:24:58Z",
+      "mergedAt": "2026-10-24T10:39:10Z",
+      "number": 218,
+      "state": "MERGED",
+      "title": "feat(hit-line): the stroke's path as a pure function of time",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/218",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T10:33:20Z",
+      "createdAt": "2026-10-24T10:29:13Z",
+      "mergedAt": "2026-10-24T10:33:20Z",
+      "number": 219,
+      "state": "MERGED",
+      "title": "fix(core-loop): ?mode=wait holds the chart clock at each note until it's pressed (wait-mode)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/219",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T10:34:38Z",
+      "createdAt": "2026-10-24T10:30:19Z",
+      "mergedAt": "2026-10-24T10:34:38Z",
+      "number": 220,
+      "state": "MERGED",
+      "title": "fix(beat-track): no beat while ?mode=wait",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/220",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T10:32:14Z",
+      "createdAt": "2026-10-24T10:31:08Z",
+      "mergedAt": "2026-10-24T10:32:14Z",
+      "number": 221,
+      "state": "MERGED",
+      "title": "fix(core-loop): the highway follows highway-zoom's range on wide charts",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/221",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T10:48:16Z",
+      "createdAt": "2026-10-24T10:38:32Z",
+      "mergedAt": "2026-10-24T10:48:16Z",
+      "number": 222,
+      "state": "MERGED",
+      "title": "feat(chord-sync): Chord sync: flag chords rolled by more than 30 ms",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/222",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T10:50:18Z",
+      "createdAt": "2026-10-24T10:39:13Z",
+      "mergedAt": "2026-10-24T10:50:17Z",
+      "number": 223,
+      "state": "MERGED",
+      "title": "feat(tempo-curve): a rubato score beside the strict one",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/223",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T10:48:41Z",
+      "createdAt": "2026-10-24T10:42:02Z",
+      "mergedAt": "2026-10-24T10:48:41Z",
+      "number": 224,
+      "state": "MERGED",
+      "title": "feat(song-preview): the highlighted song plays its opening in song select",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/224",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T10:47:12Z",
+      "createdAt": "2026-10-24T10:44:54Z",
+      "mergedAt": "2026-10-24T10:47:12Z",
+      "number": 225,
+      "state": "MERGED",
+      "title": "fix(core-loop): the hit line as a moving white stroke that lights at each pressed key",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/225",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T10:52:08Z",
+      "createdAt": "2026-10-24T10:48:28Z",
+      "mergedAt": "2026-10-24T10:52:08Z",
+      "number": 226,
+      "state": "MERGED",
+      "title": "feat(hit-line): done note",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/226",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T10:57:59Z",
+      "createdAt": "2026-10-24T10:52:38Z",
+      "mergedAt": null,
+      "number": 228,
+      "state": "CLOSED",
+      "title": "feat(song-requests): an agent turns a requested piece into a playable song",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/228",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T11:02:12Z",
+      "createdAt": "2026-10-24T10:52:59Z",
+      "mergedAt": "2026-10-24T11:02:12Z",
+      "number": 229,
+      "state": "MERGED",
+      "title": "feat(piano-voice): Piano voice: a chart names its GM voice and the DGX switches to it",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/229",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T10:57:02Z",
+      "createdAt": "2026-10-24T10:53:20Z",
+      "mergedAt": "2026-10-24T10:57:02Z",
+      "number": 230,
+      "state": "MERGED",
+      "title": "feat(song-preview): the highlighted song plays its opening in song select",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/230",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T10:54:01Z",
+      "createdAt": "2026-10-24T10:53:30Z",
+      "mergedAt": "2026-10-24T10:54:01Z",
+      "number": 231,
+      "state": "MERGED",
+      "title": "fix(select-layout): the focused song shows its preview, and hover focuses a card",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/231",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T11:00:47Z",
+      "createdAt": "2026-10-24T10:53:51Z",
+      "mergedAt": "2026-10-24T11:00:47Z",
+      "number": 232,
+      "state": "MERGED",
+      "title": "feat(key-skin): drawing helpers for the keyboard",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/232",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T10:57:41Z",
+      "createdAt": "2026-10-24T10:56:23Z",
+      "mergedAt": "2026-10-24T10:57:41Z",
+      "number": 233,
+      "state": "MERGED",
+      "title": "fix(operator-board): time each song request from issue to merge",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/233",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T11:14:00Z",
+      "createdAt": "2026-10-24T10:57:40Z",
+      "mergedAt": "2026-10-24T11:14:00Z",
+      "number": 235,
+      "state": "MERGED",
+      "title": "feat(take-midi): download your take as a .mid file",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/235",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T11:08:26Z",
+      "createdAt": "2026-10-24T10:58:23Z",
+      "mergedAt": "2026-10-24T11:08:26Z",
+      "number": 236,
+      "state": "MERGED",
+      "title": "feat(versus): two players on one piano",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/236",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T11:06:57Z",
+      "createdAt": "2026-10-24T11:04:40Z",
+      "mergedAt": "2026-10-24T11:06:57Z",
+      "number": 237,
+      "state": "MERGED",
+      "title": "fix(core-loop): the keyboard painted by key-skin, and a no-note press lights white",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/237",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T11:17:33Z",
+      "createdAt": "2026-10-24T11:07:53Z",
+      "mergedAt": "2026-10-24T11:17:33Z",
+      "number": 238,
+      "state": "MERGED",
+      "title": "fix(song-pack-2): Maple Leaf Rag plays on honky-tonk piano",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/238",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T11:10:24Z",
+      "createdAt": "2026-10-24T11:09:27Z",
+      "mergedAt": "2026-10-24T11:10:23Z",
+      "number": 239,
+      "state": "MERGED",
+      "title": "test(hit-line): one assertion on the worst offset, so the bound test can't time out",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/239",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T11:32:13Z",
+      "createdAt": "2026-10-24T11:09:47Z",
+      "mergedAt": "2026-10-24T11:32:13Z",
+      "number": 240,
+      "state": "MERGED",
+      "title": "feat(cabinet): a kiosk loop with a title screen, attract mode and a demo game",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/240",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T11:12:58Z",
+      "createdAt": "2026-10-24T11:11:59Z",
+      "mergedAt": "2026-10-24T11:12:58Z",
+      "number": 241,
+      "state": "MERGED",
+      "title": "feat(key-skin): done note",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/241",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T11:34:17Z",
+      "createdAt": "2026-10-24T11:14:47Z",
+      "mergedAt": "2026-10-24T11:34:16Z",
+      "number": 242,
+      "state": "MERGED",
+      "title": "feat(stage-card): ARE YOU READY before the song",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/242",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T11:37:38Z",
+      "createdAt": "2026-10-24T11:23:04Z",
+      "mergedAt": "2026-10-24T11:37:38Z",
+      "number": 245,
+      "state": "MERGED",
+      "title": "fix(core-loop): the judgment word moves off the notes",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/245",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T11:26:37Z",
+      "createdAt": "2026-10-24T11:25:33Z",
+      "mergedAt": "2026-10-24T11:26:37Z",
+      "number": 246,
+      "state": "MERGED",
+      "title": "fix(hud): an opaque band under the HUD panel, so no note shows through the counts",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/246",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T11:41:35Z",
+      "createdAt": "2026-10-24T11:38:48Z",
+      "mergedAt": "2026-10-24T11:41:35Z",
+      "number": 247,
+      "state": "MERGED",
+      "title": "contract: add OpenSheetMusicDisplay for the sheet music window",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/247",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T11:41:25Z",
+      "createdAt": "2026-10-24T11:39:02Z",
+      "mergedAt": "2026-10-24T11:41:25Z",
+      "number": 248,
+      "state": "MERGED",
+      "title": "fix(core-loop): the stage card's title is the start screen's one heading",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/248",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T12:00:13Z",
+      "createdAt": "2026-10-24T11:43:44Z",
+      "mergedAt": "2026-10-24T12:00:13Z",
+      "number": 249,
+      "state": "MERGED",
+      "title": "feat(results-layout): results layout with rank, tallies and a panel slot",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/249",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T12:12:25Z",
+      "createdAt": "2026-10-24T12:11:27Z",
+      "mergedAt": "2026-10-24T12:12:25Z",
+      "number": 275,
+      "state": "MERGED",
+      "title": "plan: quick practice mode, the first 5 of Eric's 25 polish features",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/275",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T12:14:38Z",
+      "createdAt": "2026-10-24T12:12:27Z",
+      "mergedAt": "2026-10-24T12:14:38Z",
+      "number": 276,
+      "state": "MERGED",
+      "title": "fix(core-loop): /play's results screen is the results layout",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/276",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T12:29:08Z",
+      "createdAt": "2026-10-24T12:13:08Z",
+      "mergedAt": "2026-10-24T12:29:08Z",
+      "number": 277,
+      "state": "MERGED",
+      "title": "feat(learn-from-select): L on the music select opens the focused song in wait mode",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/277",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T12:49:24Z",
+      "createdAt": "2026-10-24T12:13:10Z",
+      "mergedAt": "2026-10-24T12:49:24Z",
+      "number": 278,
+      "state": "MERGED",
+      "title": "feat(wait-hud): LEARN and note n / N instead of the score in wait mode",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/278",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T12:47:53Z",
+      "createdAt": "2026-10-24T12:13:15Z",
+      "mergedAt": "2026-10-24T12:47:53Z",
+      "number": 279,
+      "state": "MERGED",
+      "title": "feat(chunk-practice): learn a song 4 bars at a time, then play each chunk judged at 70%",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/279",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T12:31:29Z",
+      "createdAt": "2026-10-24T12:16:53Z",
+      "mergedAt": "2026-10-24T12:31:29Z",
+      "number": 281,
+      "state": "MERGED",
+      "title": "feat(results-tally): the counts tally up one by one",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/281",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T12:21:41Z",
+      "createdAt": "2026-10-24T12:20:23Z",
+      "mergedAt": "2026-10-24T12:21:41Z",
+      "number": 282,
+      "state": "MERGED",
+      "title": "plan: the other 20 polish features (sheet music, video moments, chrome, checks), 12 more scheduled",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/282",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T12:22:23Z",
+      "createdAt": "2026-10-24T12:21:34Z",
+      "mergedAt": "2026-10-24T12:22:22Z",
+      "number": 283,
+      "state": "MERGED",
+      "title": "fix: L on the music select opens the focused song in wait mode (learn-from-select)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/283",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T12:58:32Z",
+      "createdAt": "2026-10-24T12:30:02Z",
+      "mergedAt": "2026-10-24T12:58:32Z",
+      "number": 284,
+      "state": "MERGED",
+      "title": "feat(capture-mode): the recording guide and done note",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/284",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T12:33:52Z",
+      "createdAt": "2026-10-24T12:33:04Z",
+      "mergedAt": "2026-10-24T12:33:52Z",
+      "number": 285,
+      "state": "MERGED",
+      "title": "feat(capture-mode): the capture flag, its stored value and the hide rules",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/285",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T12:35:54Z",
+      "createdAt": "2026-10-24T12:34:49Z",
+      "mergedAt": "2026-10-24T12:35:54Z",
+      "number": 286,
+      "state": "MERGED",
+      "title": "fix(core-loop): a key pressed outside the chart's range no longer stops the game",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/286",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T12:38:23Z",
+      "createdAt": "2026-10-24T12:35:17Z",
+      "mergedAt": "2026-10-24T12:38:23Z",
+      "number": 287,
+      "state": "MERGED",
+      "title": "fix(results-layout): the counts tally up with results-tally's Tally",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/287",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T12:36:37Z",
+      "createdAt": "2026-10-24T12:35:20Z",
+      "mergedAt": "2026-10-24T12:36:37Z",
+      "number": 288,
+      "state": "MERGED",
+      "title": "fix: wait mode shows no score moments",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/288",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T12:39:52Z",
+      "createdAt": "2026-10-24T12:38:41Z",
+      "mergedAt": "2026-10-24T12:39:52Z",
+      "number": 289,
+      "state": "MERGED",
+      "title": "feat(results-tally): done note",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/289",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T12:42:31Z",
+      "createdAt": "2026-10-24T12:39:52Z",
+      "mergedAt": "2026-10-24T12:42:31Z",
+      "number": 290,
+      "state": "MERGED",
+      "title": "fix(core-loop): ?capture=1 hides /play's setup text and controls (capture-mode)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/290",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T12:53:21Z",
+      "createdAt": "2026-10-24T12:42:01Z",
+      "mergedAt": "2026-10-24T12:53:21Z",
+      "number": 291,
+      "state": "MERGED",
+      "title": "feat(rank-stamp): the rank letter stamps down",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/291",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T12:43:16Z",
+      "createdAt": "2026-10-24T12:42:37Z",
+      "mergedAt": "2026-10-24T12:43:16Z",
+      "number": 292,
+      "state": "MERGED",
+      "title": "fix(song-select): ?capture=1 hides the Calibrate latency link (capture-mode)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/292",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T12:44:38Z",
+      "createdAt": "2026-10-24T12:42:46Z",
+      "mergedAt": "2026-10-24T12:44:38Z",
+      "number": 293,
+      "state": "MERGED",
+      "title": "fix(beat-track): ?capture=1 leaves out the Beat: status text (capture-mode)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/293",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T12:50:56Z",
+      "createdAt": "2026-10-24T12:48:39Z",
+      "mergedAt": "2026-10-24T12:50:56Z",
+      "number": 295,
+      "state": "MERGED",
+      "title": "fix(song-preview): ?capture=1 hides the preview's status line (capture-mode)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/295",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T13:08:53Z",
+      "createdAt": "2026-10-24T12:50:10Z",
+      "mergedAt": "2026-10-24T13:08:53Z",
+      "number": 296,
+      "state": "MERGED",
+      "title": "feat(fever-moment): fever's start, loud at the edges for at most 2 s",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/296",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T12:56:19Z",
+      "createdAt": "2026-10-24T12:55:06Z",
+      "mergedAt": "2026-10-24T12:56:19Z",
+      "number": 297,
+      "state": "MERGED",
+      "title": "fix(juice-visual): fever's edge glow stops above the 500 ms mark",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/297",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T13:02:53Z",
+      "createdAt": "2026-10-24T12:57:00Z",
+      "mergedAt": "2026-10-24T13:02:53Z",
+      "number": 298,
+      "state": "MERGED",
+      "title": "fix(results-layout): a chunk-practice step features its way on in place of the take graph",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/298",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T13:02:03Z",
+      "createdAt": "2026-10-24T12:57:34Z",
+      "mergedAt": "2026-10-24T13:02:03Z",
+      "number": 299,
+      "state": "MERGED",
+      "title": "fix(juice-visual): the rank reveal is rank-stamp's stamp",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/299",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T12:59:28Z",
+      "createdAt": "2026-10-24T12:58:22Z",
+      "mergedAt": "2026-10-24T12:59:28Z",
+      "number": 300,
+      "state": "MERGED",
+      "title": "fix(fever-stage): fever's start flashes the grid, as a count-in beat does",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/300",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T13:23:49Z",
+      "createdAt": "2026-10-24T12:59:26Z",
+      "mergedAt": "2026-10-24T13:23:49Z",
+      "number": 301,
+      "state": "MERGED",
+      "title": "feat(laptop-octaves): Z and X shift the laptop keys an octave, and the keyboard shows the keys they play",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/301",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T13:07:11Z",
+      "createdAt": "2026-10-24T13:00:21Z",
+      "mergedAt": "2026-10-24T13:07:11Z",
+      "number": 302,
+      "state": "MERGED",
+      "title": "fix(juice-sound): the rank hit lands on the stamp's impact",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/302",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T13:04:38Z",
+      "createdAt": "2026-10-24T13:03:49Z",
+      "mergedAt": "2026-10-24T13:04:38Z",
+      "number": 303,
+      "state": "MERGED",
+      "title": "fix(note-labels): setLaptopShift moves the laptop letters, for laptop-octaves",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/303",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T13:08:22Z",
+      "createdAt": "2026-10-24T13:06:34Z",
+      "mergedAt": "2026-10-24T13:08:22Z",
+      "number": 304,
+      "state": "MERGED",
+      "title": "fix(chunk-practice): Next takes focus without scrolling, now that it's in the first view",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/304",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T13:33:42Z",
+      "createdAt": "2026-10-24T13:08:47Z",
+      "mergedAt": "2026-10-24T13:33:42Z",
+      "number": 305,
+      "state": "MERGED",
+      "title": "feat(song-sweep): a bot plays every song and leaves a contact sheet of screenshots",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/305",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T13:10:57Z",
+      "createdAt": "2026-10-24T13:09:29Z",
+      "mergedAt": "2026-10-24T13:10:57Z",
+      "number": 306,
+      "state": "MERGED",
+      "title": "feat(rank-stamp): done note",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/306",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T13:20:58Z",
+      "createdAt": "2026-10-24T13:09:56Z",
+      "mergedAt": "2026-10-24T13:20:58Z",
+      "number": 307,
+      "state": "MERGED",
+      "title": "feat(sheet-xml): a chart as MusicXML on a grand staff",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/307",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T13:36:25Z",
+      "createdAt": "2026-10-24T13:13:43Z",
+      "mergedAt": "2026-10-24T13:36:25Z",
+      "number": 308,
+      "state": "MERGED",
+      "title": "feat(clear-card): ALL PERFECT, FULL COMBO or CLEAR before the results",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/308",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T13:18:11Z",
+      "createdAt": "2026-10-24T13:17:20Z",
+      "mergedAt": "2026-10-24T13:18:11Z",
+      "number": 309,
+      "state": "MERGED",
+      "title": "fix: no FULL COMBO banner over the results; the rank stamp never waits for one",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/309",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T13:32:55Z",
+      "createdAt": "2026-10-24T13:21:37Z",
+      "mergedAt": "2026-10-24T13:32:55Z",
+      "number": 310,
+      "state": "MERGED",
+      "title": "feat(sheet-view): the score in its own window (1/2: the page)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/310",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T13:46:35Z",
+      "createdAt": "2026-10-24T13:24:52Z",
+      "mergedAt": "2026-10-24T13:46:35Z",
+      "number": 312,
+      "state": "MERGED",
+      "title": "feat(perf-budget): frame time on the densest chart at 1920×1080, with fever and the stage on",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/312",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T13:28:36Z",
+      "createdAt": "2026-10-24T13:27:21Z",
+      "mergedAt": "2026-10-24T13:28:36Z",
+      "number": 313,
+      "state": "MERGED",
+      "title": "plan: promote six polish backlog features as the ready queue runs low",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/313",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T13:53:36Z",
+      "createdAt": "2026-10-24T13:33:10Z",
+      "mergedAt": "2026-10-24T13:53:36Z",
+      "number": 315,
+      "state": "MERGED",
+      "title": "feat(sheet-view): the sheet follows a live take (2/2)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/315",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T13:37:51Z",
+      "createdAt": "2026-10-24T13:36:21Z",
+      "mergedAt": "2026-10-24T13:37:51Z",
+      "number": 316,
+      "state": "MERGED",
+      "title": "test(midi-watchdog): the pause test ticks through the pause synchronously, so load can't time it out",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/316",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T13:45:18Z",
+      "createdAt": "2026-10-24T13:38:22Z",
+      "mergedAt": "2026-10-24T13:45:18Z",
+      "number": 317,
+      "state": "MERGED",
+      "title": "feat(chart-lint): a hand-span rule in the library test, every rule pinned by a synthetic chart, and a library table",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/317",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T14:03:06Z",
+      "createdAt": "2026-10-24T13:38:32Z",
+      "mergedAt": "2026-10-24T14:03:06Z",
+      "number": 318,
+      "state": "MERGED",
+      "title": "feat(combo-hud): the combo moves off the lanes into the HUD panel's center",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/318",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T14:05:19Z",
+      "createdAt": "2026-10-24T13:46:11Z",
+      "mergedAt": "2026-10-24T14:05:19Z",
+      "number": 319,
+      "state": "MERGED",
+      "title": "feat(bar-lines): a faint line and the bar number at each bar start",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/319",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T14:04:31Z",
+      "createdAt": "2026-10-24T13:47:21Z",
+      "mergedAt": "2026-10-24T14:04:31Z",
+      "number": 320,
+      "state": "MERGED",
+      "title": "feat(select-stage): the synthwave stage behind the music select",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/320",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T13:49:16Z",
+      "createdAt": "2026-10-24T13:48:04Z",
+      "mergedAt": "2026-10-24T13:49:16Z",
+      "number": 321,
+      "state": "MERGED",
+      "title": "chore(bar-lines): barLines and drawBarLines, with the calm rule pinned",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/321",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T13:52:59Z",
+      "createdAt": "2026-10-24T13:50:55Z",
+      "mergedAt": "2026-10-24T13:52:59Z",
+      "number": 322,
+      "state": "MERGED",
+      "title": "fix(hud): the combo draws in the band's center slot, at full strength",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/322",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T13:56:28Z",
+      "createdAt": "2026-10-24T13:55:25Z",
+      "mergedAt": "2026-10-24T13:56:28Z",
+      "number": 323,
+      "state": "MERGED",
+      "title": "feat(select-stage): the stage driver, <SelectStage /> and its browser check (1/2)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/323",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T13:57:34Z",
+      "createdAt": "2026-10-24T13:56:27Z",
+      "mergedAt": "2026-10-24T13:57:34Z",
+      "number": 324,
+      "state": "MERGED",
+      "title": "fix: the score keeps the whole song's key under ?hands= and loops",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/324",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T14:00:23Z",
+      "createdAt": "2026-10-24T13:56:58Z",
+      "mergedAt": "2026-10-24T14:00:22Z",
+      "number": 325,
+      "state": "MERGED",
+      "title": "fix(select-layout): the select-stage scene behind the music select",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/325",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T13:58:48Z",
+      "createdAt": "2026-10-24T13:57:40Z",
+      "mergedAt": "2026-10-24T13:58:48Z",
+      "number": 326,
+      "state": "MERGED",
+      "title": "fix(core-loop): the highway draws bar-lines' bar starts under the notes",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/326",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T14:17:44Z",
+      "createdAt": "2026-10-24T13:58:00Z",
+      "mergedAt": "2026-10-24T14:17:44Z",
+      "number": 327,
+      "state": "MERGED",
+      "title": "feat(wait-hands): learn one hand in wait mode while the other plays itself",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/327",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T14:27:29Z",
+      "createdAt": "2026-10-24T14:05:29Z",
+      "mergedAt": "2026-10-24T14:27:29Z",
+      "number": 328,
+      "state": "MERGED",
+      "title": "feat(score-rollup): the HUD score rolls to each new value, the multiplier flashes on tier-up",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/328",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T14:05:53Z",
+      "createdAt": "2026-10-24T14:05:41Z",
+      "mergedAt": null,
+      "number": 329,
+      "state": "CLOSED",
+      "title": "feat(select-to-stage): the focused jacket scales into the stage card",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/329",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T14:06:44Z",
+      "createdAt": "2026-10-24T14:05:52Z",
+      "mergedAt": "2026-10-24T14:06:44Z",
+      "number": 330,
+      "state": "MERGED",
+      "title": "plan: promote the last four polish backlog features",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/330",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T14:17:06Z",
+      "createdAt": "2026-10-24T14:06:04Z",
+      "mergedAt": "2026-10-24T14:17:06Z",
+      "number": 331,
+      "state": "MERGED",
+      "title": "feat(wait-hint): after 3 s on a note, its key pulses, it sounds once and its name shows",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/331",
+      "worker": "eric-agent-4"
+    },
+    {
+      "closedAt": "2026-10-24T14:06:27Z",
+      "createdAt": "2026-10-24T14:06:15Z",
+      "mergedAt": null,
+      "number": 332,
+      "state": "CLOSED",
+      "title": "feat(ui-sounds): cursor, confirm, back and a stage-card sting",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/332",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T14:06:49Z",
+      "createdAt": "2026-10-24T14:06:37Z",
+      "mergedAt": null,
+      "number": 333,
+      "state": "CLOSED",
+      "title": "feat(select-to-stage): the focused jacket scales into the stage card",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/333",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T14:44:26Z",
+      "createdAt": "2026-10-24T14:06:56Z",
+      "mergedAt": "2026-10-24T14:44:26Z",
+      "number": 334,
+      "state": "MERGED",
+      "title": "feat(ui-sounds): cursor, confirm, back and a stage-card sting",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/334",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T14:08:53Z",
+      "createdAt": "2026-10-24T14:07:36Z",
+      "mergedAt": "2026-10-24T14:08:53Z",
+      "number": 335,
+      "state": "MERGED",
+      "title": "fix(juice-sound): export tone and noise for ui-sounds",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/335",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T14:09:18Z",
+      "createdAt": "2026-10-24T14:07:39Z",
+      "mergedAt": "2026-10-24T14:09:18Z",
+      "number": 336,
+      "state": "MERGED",
+      "title": "fix(hand-mode): in wait mode, play the other hand on the held clock",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/336",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": null,
+      "createdAt": "2026-10-24T14:11:57Z",
+      "mergedAt": null,
+      "number": 340,
+      "state": "OPEN",
+      "title": "feat(led-strip): LED strip firmware and standalone tester",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/340",
+      "worker": "sharan"
+    },
+    {
+      "closedAt": "2026-10-24T14:15:22Z",
+      "createdAt": "2026-10-24T14:13:23Z",
+      "mergedAt": "2026-10-24T14:15:22Z",
+      "number": 341,
+      "state": "MERGED",
+      "title": "fix(hud): the score rolls to each new value; the multiplier flashes on a tier-up",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/341",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": null,
+      "createdAt": "2026-10-24T14:14:16Z",
+      "mergedAt": null,
+      "number": 342,
+      "state": "OPEN",
+      "title": "docs: judging playbook, each criterion against our features",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/342",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T14:51:14Z",
+      "createdAt": "2026-10-24T14:17:03Z",
+      "mergedAt": "2026-10-24T14:51:14Z",
+      "number": 343,
+      "state": "MERGED",
+      "title": "feat(learning-ui): add interactive piano learning preview",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/343",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T14:38:03Z",
+      "createdAt": "2026-10-24T14:25:47Z",
+      "mergedAt": "2026-10-24T14:38:03Z",
+      "number": 344,
+      "state": "MERGED",
+      "title": "feat(notice-toast): toast(text), one styled stack for the game's notices (1/2)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/344",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T15:06:06Z",
+      "createdAt": "2026-10-24T14:25:55Z",
+      "mergedAt": "2026-10-24T15:06:06Z",
+      "number": 345,
+      "state": "MERGED",
+      "title": "feat(options-panel): one styled drawer for latency, effects and labels",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/345",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T14:50:09Z",
+      "createdAt": "2026-10-24T14:27:21Z",
+      "mergedAt": null,
+      "number": 346,
+      "state": "CLOSED",
+      "title": "contract: let sharan's workers apply Supabase migrations, with sharan's approval",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/346",
+      "worker": "sharan-1"
+    },
+    {
+      "closedAt": "2026-10-24T15:32:51Z",
+      "createdAt": "2026-10-24T14:29:27Z",
+      "mergedAt": "2026-10-24T15:32:51Z",
+      "number": 347,
+      "state": "MERGED",
+      "title": "feat(select-to-stage): the focused jacket scales into the stage card",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/347",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T14:31:22Z",
+      "createdAt": "2026-10-24T14:30:04Z",
+      "mergedAt": "2026-10-24T14:31:22Z",
+      "number": 348,
+      "state": "MERGED",
+      "title": "fix(stage-card): the jacket is the stage-jacket view-transition target",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/348",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T14:33:14Z",
+      "createdAt": "2026-10-24T14:30:43Z",
+      "mergedAt": "2026-10-24T14:33:14Z",
+      "number": 349,
+      "state": "MERGED",
+      "title": "feat(ui-sounds): the uiSound module, its tests and browser check (1/2)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/349",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T14:42:36Z",
+      "createdAt": "2026-10-24T14:33:09Z",
+      "mergedAt": "2026-10-24T14:42:36Z",
+      "number": 350,
+      "state": "MERGED",
+      "title": "chore(options-panel): the Options drawer as a module, not yet rendered",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/350",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T14:34:49Z",
+      "createdAt": "2026-10-24T14:33:36Z",
+      "mergedAt": "2026-10-24T14:34:48Z",
+      "number": 351,
+      "state": "MERGED",
+      "title": "fix(select-layout): a move sound on ↑/↓ and a confirm when a song is chosen",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/351",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T14:36:14Z",
+      "createdAt": "2026-10-24T14:33:42Z",
+      "mergedAt": "2026-10-24T14:36:14Z",
+      "number": 352,
+      "state": "MERGED",
+      "title": "fix(stage-card): a sting when the stage card shows",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/352",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T14:48:17Z",
+      "createdAt": "2026-10-24T14:36:43Z",
+      "mergedAt": "2026-10-24T14:48:17Z",
+      "number": 353,
+      "state": "MERGED",
+      "title": "fix(stage-card): set the jacket's view-transition-name inline",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/353",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T14:56:52Z",
+      "createdAt": "2026-10-24T14:36:58Z",
+      "mergedAt": "2026-10-24T14:56:52Z",
+      "number": 354,
+      "state": "MERGED",
+      "title": "fix(select-layout): Enter or a click on a song moves its jacket to the stage",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/354",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T14:39:30Z",
+      "createdAt": "2026-10-24T14:38:28Z",
+      "mergedAt": "2026-10-24T14:39:29Z",
+      "number": 355,
+      "state": "MERGED",
+      "title": "fix(midi-watchdog): notices go to the toast stack, not the canvas",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/355",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T14:41:17Z",
+      "createdAt": "2026-10-24T14:40:00Z",
+      "mergedAt": "2026-10-24T14:41:17Z",
+      "number": 356,
+      "state": "MERGED",
+      "title": "fix(scenes): the unknown-bot notice is a toast",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/356",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:25:38Z",
+      "createdAt": "2026-10-24T14:45:03Z",
+      "mergedAt": "2026-10-24T15:25:38Z",
+      "number": 382,
+      "state": "MERGED",
+      "title": "feat(pause-skin): a PAUSED menu, keyboard first, with a countdown that clicks",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/382",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T14:46:36Z",
+      "createdAt": "2026-10-24T14:45:17Z",
+      "mergedAt": "2026-10-24T14:46:36Z",
+      "number": 383,
+      "state": "MERGED",
+      "title": "feat(notice-toast): the headless check and done note (2/2)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/383",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": "2026-10-24T14:49:59Z",
+      "createdAt": "2026-10-24T14:46:47Z",
+      "mergedAt": "2026-10-24T14:49:59Z",
+      "number": 385,
+      "state": "MERGED",
+      "title": "fix(song-select): the Options drawer takes the Calibrate link's place on /",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/385",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:29:50Z",
+      "createdAt": "2026-10-24T14:53:21Z",
+      "mergedAt": "2026-10-24T15:29:50Z",
+      "number": 386,
+      "state": "MERGED",
+      "title": "feat(black-key-lanes): shade the lanes under black keys",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/386",
+      "worker": "eric-agent-5"
+    },
+    {
+      "closedAt": "2026-10-24T14:59:07Z",
+      "createdAt": "2026-10-24T14:53:42Z",
+      "mergedAt": "2026-10-24T14:59:07Z",
+      "number": 387,
+      "state": "MERGED",
+      "title": "chore(black-key-lanes): the tint and the lane fill, not yet drawn anywhere",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/387",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T14:57:53Z",
+      "createdAt": "2026-10-24T14:53:42Z",
+      "mergedAt": "2026-10-24T14:57:53Z",
+      "number": 388,
+      "state": "MERGED",
+      "title": "plan: static keyboard, one fixed C-to-C range per song",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/388",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T15:07:21Z",
+      "createdAt": "2026-10-24T14:56:02Z",
+      "mergedAt": "2026-10-24T15:07:21Z",
+      "number": 389,
+      "state": "MERGED",
+      "title": "feat(pause-skin): PauseMenu, the tick schedule and the browser check (1/2)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/389",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:29:12Z",
+      "createdAt": "2026-10-24T14:57:04Z",
+      "mergedAt": "2026-10-24T15:29:12Z",
+      "number": 390,
+      "state": "MERGED",
+      "title": "fix(learning-ui): clarify learning and review workspaces",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/390",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T14:59:31Z",
+      "createdAt": "2026-10-24T14:57:51Z",
+      "mergedAt": "2026-10-24T14:59:31Z",
+      "number": 391,
+      "state": "MERGED",
+      "title": "fix(core-loop): one static keyboard per song, from C to C",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/391",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:08:25Z",
+      "createdAt": "2026-10-24T14:59:54Z",
+      "mergedAt": "2026-10-24T15:08:25Z",
+      "number": 393,
+      "state": "MERGED",
+      "title": "fix(fever-stage): cap the stage canvas so a black key's lane stays under maxLaneLuma",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/393",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T16:08:10Z",
+      "createdAt": "2026-10-24T15:01:19Z",
+      "mergedAt": "2026-10-24T16:08:10Z",
+      "number": 394,
+      "state": "MERGED",
+      "title": "feat(pill-match): ghost outlines and note labels take their size from the note pills",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/394",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T15:10:28Z",
+      "createdAt": "2026-10-24T15:02:46Z",
+      "mergedAt": "2026-10-24T15:10:28Z",
+      "number": 395,
+      "state": "MERGED",
+      "title": "fix(highway-zoom): off by default; only ?zoom=on pans",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/395",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:04:31Z",
+      "createdAt": "2026-10-24T15:03:21Z",
+      "mergedAt": "2026-10-24T15:04:31Z",
+      "number": 397,
+      "state": "MERGED",
+      "title": "fix(black-key-lanes): the lane test expects core's static C-to-C range",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/397",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:04:57Z",
+      "createdAt": "2026-10-24T15:03:38Z",
+      "mergedAt": null,
+      "number": 398,
+      "state": "CLOSED",
+      "title": "fix(black-key-lanes): the lane test reads the black keys from the layout",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/398",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:37:55Z",
+      "createdAt": "2026-10-24T15:03:59Z",
+      "mergedAt": "2026-10-24T15:37:55Z",
+      "number": 399,
+      "state": "MERGED",
+      "title": "fix(ghost): outline each hit on its note pill, rounded like the highway's",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/399",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:07:17Z",
+      "createdAt": "2026-10-24T15:04:56Z",
+      "mergedAt": "2026-10-24T15:07:17Z",
+      "number": 400,
+      "state": "MERGED",
+      "title": "plan: second batch, 25 specs and 3 spikes; 8 scheduled for judging",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/400",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T15:41:19Z",
+      "createdAt": "2026-10-24T15:05:22Z",
+      "mergedAt": "2026-10-24T15:41:19Z",
+      "number": 401,
+      "state": "MERGED",
+      "title": "fix(note-labels): fit falling-note labels to the note pill, not 84% of the key",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/401",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:52:58Z",
+      "createdAt": "2026-10-24T15:08:03Z",
+      "mergedAt": "2026-10-24T15:52:58Z",
+      "number": 402,
+      "state": "MERGED",
+      "title": "feat(crash-guard): one plugin's error never freezes the game",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/402",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:22:54Z",
+      "createdAt": "2026-10-24T15:09:32Z",
+      "mergedAt": "2026-10-24T15:22:54Z",
+      "number": 403,
+      "state": "MERGED",
+      "title": "fix(core-loop): drawHighway shades the lanes under black keys",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/403",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:16:34Z",
+      "createdAt": "2026-10-24T15:11:45Z",
+      "mergedAt": "2026-10-24T15:16:34Z",
+      "number": 404,
+      "state": "MERGED",
+      "title": "fix(core-loop): /play renders pause-skin's PauseMenu, and Quit opens the music select",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/404",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:28:41Z",
+      "createdAt": "2026-10-24T15:15:32Z",
+      "mergedAt": "2026-10-24T15:28:41Z",
+      "number": 405,
+      "state": "MERGED",
+      "title": "chore: get the app ready for Vercel (health route, charts shipped with the save route)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/405",
+      "worker": "sharan"
+    },
+    {
+      "closedAt": "2026-10-24T15:19:12Z",
+      "createdAt": "2026-10-24T15:18:02Z",
+      "mergedAt": "2026-10-24T15:19:12Z",
+      "number": 408,
+      "state": "MERGED",
+      "title": "fix(core-loop): the static range follows the spec, from the chart as loaded",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/408",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:21:42Z",
+      "createdAt": "2026-10-24T15:19:48Z",
+      "mergedAt": "2026-10-24T15:21:42Z",
+      "number": 409,
+      "state": "MERGED",
+      "title": "fix(play-slots): remove the unused PauseOverlay; Quit opens /",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/409",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:22:04Z",
+      "createdAt": "2026-10-24T15:20:35Z",
+      "mergedAt": "2026-10-24T15:22:04Z",
+      "number": 410,
+      "state": "MERGED",
+      "title": "plan: ci-browser, the headless checks move to GitHub's machines",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/410",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T15:26:13Z",
+      "createdAt": "2026-10-24T15:24:54Z",
+      "mergedAt": "2026-10-24T15:26:13Z",
+      "number": 411,
+      "state": "MERGED",
+      "title": "fix(laptop-octaves): the laptop map holds still like the keyboard does",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/411",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:54:48Z",
+      "createdAt": "2026-10-24T15:25:37Z",
+      "mergedAt": "2026-10-24T15:54:48Z",
+      "number": 412,
+      "state": "MERGED",
+      "title": "feat(static-keyboard): one fixed C-to-C keyboard per song",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/412",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:27:29Z",
+      "createdAt": "2026-10-24T15:25:41Z",
+      "mergedAt": "2026-10-24T15:27:29Z",
+      "number": 413,
+      "state": "MERGED",
+      "title": "feat(ci-browser): run the headless checks on GitHub's machines",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/413",
+      "worker": "eric-agent-6"
+    },
+    {
+      "closedAt": "2026-10-24T15:35:48Z",
+      "createdAt": "2026-10-24T15:27:14Z",
+      "mergedAt": "2026-10-24T15:35:48Z",
+      "number": 414,
+      "state": "MERGED",
+      "title": "feat(offline-ready): a script proves the game runs from the laptop with the venue's wifi off",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/414",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": null,
+      "createdAt": "2026-10-24T15:27:57Z",
+      "mergedAt": null,
+      "number": 415,
+      "state": "OPEN",
+      "title": "contract: the browser CI job runs the headless checks on GitHub",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/415",
+      "worker": "planner"
+    },
+    {
+      "closedAt": "2026-10-24T15:34:30Z",
+      "createdAt": "2026-10-24T15:28:21Z",
+      "mergedAt": "2026-10-24T15:34:29Z",
+      "number": 416,
+      "state": "MERGED",
+      "title": "chore(crash-guard): the take's guard, GameBoundary and the ?crash test plugin",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/416",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:50:53Z",
+      "createdAt": "2026-10-24T15:28:36Z",
+      "mergedAt": "2026-10-24T15:50:53Z",
+      "number": 417,
+      "state": "MERGED",
+      "title": "fix(ci-browser): the verify lock is the interim mkdir lock, not flock",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/417",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": null,
+      "createdAt": "2026-10-24T15:31:19Z",
+      "mergedAt": null,
+      "number": 418,
+      "state": "OPEN",
+      "title": "feat(demo-reset): Shift+Esc, or 60 s idle on results, returns to / clean",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/418",
+      "worker": "eric-agent-5"
+    },
+    {
+      "closedAt": null,
+      "createdAt": "2026-10-24T15:36:42Z",
+      "mergedAt": null,
+      "number": 420,
+      "state": "OPEN",
+      "title": "feat(hero-replay): a downloaded take file drives /play, judged and sounding, the same every run",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/420",
+      "worker": "eric-agent-2"
+    },
+    {
+      "closedAt": "2026-10-24T15:38:49Z",
+      "createdAt": "2026-10-24T15:38:21Z",
+      "mergedAt": "2026-10-24T15:38:49Z",
+      "number": 421,
+      "state": "MERGED",
+      "title": "fix(take-midi): a bar-1 marker in the file, and readTakeMidi to read a take back",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/421",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:46:50Z",
+      "createdAt": "2026-10-24T15:39:34Z",
+      "mergedAt": "2026-10-24T15:46:50Z",
+      "number": 423,
+      "state": "MERGED",
+      "title": "fix(core-loop): plugin hooks run through crash-guard; the frame loop always asks for the next frame",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/423",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:41:57Z",
+      "createdAt": "2026-10-24T15:40:05Z",
+      "mergedAt": "2026-10-24T15:41:57Z",
+      "number": 424,
+      "state": "MERGED",
+      "title": "plan: build-stamp, the commit and its age on /",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/424",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T15:56:54Z",
+      "createdAt": "2026-10-24T15:40:46Z",
+      "mergedAt": "2026-10-24T15:56:54Z",
+      "number": 425,
+      "state": "MERGED",
+      "title": "contract: agents read state from a fresh origin/main, never the main checkout",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/425",
+      "worker": "eric-planning-agent"
+    },
+    {
+      "closedAt": "2026-10-24T15:41:15Z",
+      "createdAt": "2026-10-24T15:41:09Z",
+      "mergedAt": "2026-10-24T15:41:15Z",
+      "number": 426,
+      "state": "MERGED",
+      "title": "fix(scenes): bot=take replays a take file from /takes/, with its own velocities and holds",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/426",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": null,
+      "createdAt": "2026-10-24T15:42:32Z",
+      "mergedAt": null,
+      "number": 427,
+      "state": "OPEN",
+      "title": "feat(ci-browser): done note",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/427",
+      "worker": "eric-agent-6"
+    },
+    {
+      "closedAt": "2026-10-24T15:54:19Z",
+      "createdAt": "2026-10-24T15:50:20Z",
+      "mergedAt": "2026-10-24T15:54:19Z",
+      "number": 433,
+      "state": "MERGED",
+      "title": "fix(ci-browser): checks already red on main run but don't gate, each with its issue",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/433",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": null,
+      "createdAt": "2026-10-24T15:51:08Z",
+      "mergedAt": null,
+      "number": 434,
+      "state": "OPEN",
+      "title": "feat(build-stamp): the short commit and its age in a corner of /",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/434",
+      "worker": "eric-agent-1"
+    },
+    {
+      "closedAt": "2026-10-24T15:56:14Z",
+      "createdAt": "2026-10-24T15:54:47Z",
+      "mergedAt": "2026-10-24T15:56:14Z",
+      "number": 435,
+      "state": "MERGED",
+      "title": "refactor(cabinet): the idle watch is whenIdle in idle.ts",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/435",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T15:56:40Z",
+      "createdAt": "2026-10-24T15:55:08Z",
+      "mergedAt": "2026-10-24T15:56:40Z",
+      "number": 436,
+      "state": "MERGED",
+      "title": "docs: incident log, a 9-hour-old playtest build",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/436",
+      "worker": "eric-agent-6"
+    },
+    {
+      "closedAt": "2026-10-24T16:06:34Z",
+      "createdAt": "2026-10-24T16:00:10Z",
+      "mergedAt": "2026-10-24T16:06:34Z",
+      "number": 438,
+      "state": "MERGED",
+      "title": "fix(static-keyboard): the spec's minimum is four octaves, C2–C6 for songs that fit",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/438",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T16:02:43Z",
+      "createdAt": "2026-10-24T16:01:16Z",
+      "mergedAt": "2026-10-24T16:02:43Z",
+      "number": 439,
+      "state": "MERGED",
+      "title": "fix(take-store): save only takes the server can re-judge, store GOOD/WRONG and compound meters",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/439",
+      "worker": "sharan"
+    },
+    {
+      "closedAt": "2026-10-24T16:09:42Z",
+      "createdAt": "2026-10-24T16:01:39Z",
+      "mergedAt": "2026-10-24T16:09:42Z",
+      "number": 440,
+      "state": "MERGED",
+      "title": "fix(capture-mode): the check looks for the Options button, not the Calibrate link it replaced",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/440",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T16:04:13Z",
+      "createdAt": "2026-10-24T16:02:44Z",
+      "mergedAt": "2026-10-24T16:04:13Z",
+      "number": 441,
+      "state": "MERGED",
+      "title": "plan: how-it-works, a /how page on how the agents built it",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/441",
+      "worker": "planner"
+    },
+    {
+      "closedAt": "2026-10-24T16:05:04Z",
+      "createdAt": "2026-10-24T16:03:48Z",
+      "mergedAt": "2026-10-24T16:05:04Z",
+      "number": 442,
+      "state": "MERGED",
+      "title": "fix(core-loop): every keyboard is at least four octaves, C2–C6 for songs that fit",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/442",
+      "worker": "eric-agent-3"
+    },
+    {
+      "closedAt": null,
+      "createdAt": "2026-10-24T16:05:30Z",
+      "mergedAt": null,
+      "number": 443,
+      "state": "OPEN",
+      "title": "feat(how-it-works): the data behind /how, with tests (part 1 of 2)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/443",
+      "worker": "eric-foreman-agent"
+    },
+    {
+      "closedAt": "2026-10-24T16:12:49Z",
+      "createdAt": "2026-10-24T16:07:14Z",
+      "mergedAt": "2026-10-24T16:12:49Z",
+      "number": 445,
+      "state": "MERGED",
+      "title": "feat(build-stamp): the commit and its age as a server component, not yet mounted",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/445",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T16:10:17Z",
+      "createdAt": "2026-10-24T16:07:54Z",
+      "mergedAt": "2026-10-24T16:10:17Z",
+      "number": 446,
+      "state": "MERGED",
+      "title": "fix(take-store): every-song uses one test player per run",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/446",
+      "worker": "sharan"
+    },
+    {
+      "closedAt": "2026-10-24T16:11:14Z",
+      "createdAt": "2026-10-24T16:09:19Z",
+      "mergedAt": "2026-10-24T16:11:14Z",
+      "number": 448,
+      "state": "MERGED",
+      "title": "fix(wait-hands): hold the 9th note past wait-hint's 3 s and pin its one A4",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/448",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T16:10:45Z",
+      "createdAt": "2026-10-24T16:09:22Z",
+      "mergedAt": "2026-10-24T16:10:45Z",
+      "number": 449,
+      "state": "MERGED",
+      "title": "fix(ci-browser): options-panel's check is known red (#447)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/449",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T16:17:50Z",
+      "createdAt": "2026-10-24T16:09:40Z",
+      "mergedAt": "2026-10-24T16:17:50Z",
+      "number": 450,
+      "state": "MERGED",
+      "title": "fix(song-preview): count ui-sounds' ↓ blip apart from the preview's tones",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/450",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": null,
+      "createdAt": "2026-10-24T16:10:54Z",
+      "mergedAt": null,
+      "number": 451,
+      "state": "OPEN",
+      "title": "feat(song-sources): the song preview links each chart's public-domain score",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/451",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T16:12:52Z",
+      "createdAt": "2026-10-24T16:11:39Z",
+      "mergedAt": "2026-10-24T16:12:52Z",
+      "number": 452,
+      "state": "MERGED",
+      "title": "fix(ci-browser): a known-red entry leaves only after 2 green runs with the fix",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/452",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T16:14:44Z",
+      "createdAt": "2026-10-24T16:13:30Z",
+      "mergedAt": "2026-10-24T16:14:44Z",
+      "number": 453,
+      "state": "MERGED",
+      "title": "fix(song-select): mount the build stamp on /",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/453",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T16:15:44Z",
+      "createdAt": "2026-10-24T16:13:50Z",
+      "mergedAt": "2026-10-24T16:15:44Z",
+      "number": 454,
+      "state": "MERGED",
+      "title": "feat(demo-reset): reset(), the Shift+Esc key, the idle plugin and verify-reset",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/454",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T16:19:40Z",
+      "createdAt": "2026-10-24T16:15:23Z",
+      "mergedAt": "2026-10-24T16:19:40Z",
+      "number": 455,
+      "state": "MERGED",
+      "title": "fix(take-store): record that every song saves and reads back live",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/455",
+      "worker": "sharan"
+    },
+    {
+      "closedAt": "2026-10-24T16:17:16Z",
+      "createdAt": "2026-10-24T16:15:58Z",
+      "mergedAt": "2026-10-24T16:17:16Z",
+      "number": 456,
+      "state": "MERGED",
+      "title": "fix(core-loop): the layout mounts DemoReset beside CaptureMode",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/456",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T16:17:49Z",
+      "createdAt": "2026-10-24T16:16:38Z",
+      "mergedAt": "2026-10-24T16:17:49Z",
+      "number": 457,
+      "state": "MERGED",
+      "title": "feat(easy-charts): easyChart, the level=easy plugin and the level helpers",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/457",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T16:18:35Z",
+      "createdAt": "2026-10-24T16:17:25Z",
+      "mergedAt": "2026-10-24T16:18:35Z",
+      "number": 458,
+      "state": "MERGED",
+      "title": "fix(ghost): level joins the params that change the chart",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/458",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T16:22:39Z",
+      "createdAt": "2026-10-24T16:17:56Z",
+      "mergedAt": "2026-10-24T16:22:39Z",
+      "number": 459,
+      "state": "MERGED",
+      "title": "fix(records): an Easy take keeps its own best and top 5, under <id>@easy",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/459",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": null,
+      "createdAt": "2026-10-24T16:22:13Z",
+      "mergedAt": null,
+      "number": 460,
+      "state": "OPEN",
+      "title": "feat(how-it-works): the /how page, four diagrams and verify-how.mjs",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/460",
+      "worker": "eric-foreman-agent"
+    },
+    {
+      "closedAt": "2026-10-24T16:25:41Z",
+      "createdAt": "2026-10-24T16:24:21Z",
+      "mergedAt": "2026-10-24T16:25:40Z",
+      "number": 464,
+      "state": "MERGED",
+      "title": "fix(select-layout): E switches Easy, and the cards, L and best grades follow the level",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/464",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": "2026-10-24T16:25:02Z",
+      "createdAt": "2026-10-24T16:24:57Z",
+      "mergedAt": "2026-10-24T16:25:02Z",
+      "number": 466,
+      "state": "MERGED",
+      "title": "fix(ci-browser): ui-sounds' check is known red (#465)",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/466",
+      "worker": "unnamed"
+    },
+    {
+      "closedAt": null,
+      "createdAt": "2026-10-24T16:25:41Z",
+      "mergedAt": null,
+      "number": 467,
+      "state": "OPEN",
+      "title": "fix(take-store): a sign-in screen that leads to the menu, and an account chip for it",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/467",
+      "worker": "sharan"
+    },
+    {
+      "closedAt": null,
+      "createdAt": "2026-10-24T16:26:18Z",
+      "mergedAt": null,
+      "number": 468,
+      "state": "OPEN",
+      "title": "feat(easy-charts): verify-easy, the toggle's look and the done note",
+      "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/468",
+      "worker": "unnamed"
+    }
+  ],
+  "heartbeats": null,
+  "books": {
+    "milestones": [
+      {
+        "name": "playable",
+        "done": 1,
+        "planned": 1,
+        "cut": 0
+      },
+      {
+        "name": "audible",
+        "done": 3,
+        "planned": 3,
+        "cut": 0
+      },
+      {
+        "name": "arcade",
+        "done": 9,
+        "planned": 9,
+        "cut": 0
+      },
+      {
+        "name": "frontend",
+        "done": 12,
+        "planned": 12,
+        "cut": 0
+      },
+      {
+        "name": "library",
+        "done": 2,
+        "planned": 2,
+        "cut": 0
+      },
+      {
+        "name": "lights",
+        "done": 0,
+        "planned": 2,
+        "cut": 0
+      },
+      {
+        "name": "showcase",
+        "done": 13,
+        "planned": 13,
+        "cut": 0
+      },
+      {
+        "name": "encore",
+        "done": 11,
+        "planned": 12,
+        "cut": 0
+      },
+      {
+        "name": "polish",
+        "done": 26,
+        "planned": 26,
+        "cut": 0
+      },
+      {
+        "name": "judging",
+        "done": 2,
+        "planned": 11,
+        "cut": 0
+      },
+      {
+        "name": "submission",
+        "done": 4,
+        "planned": 4,
+        "cut": 0
+      }
+    ],
+    "mergedByType": [
+      [
+        "fix",
+        110
+      ],
+      [
+        "feat",
+        106
+      ],
+      [
+        "plan",
+        23
+      ],
+      [
+        "contract",
+        14
+      ],
+      [
+        "chore",
+        8
+      ],
+      [
+        "test",
+        5
+      ],
+      [
+        "docs",
+        4
+      ],
+      [
+        "refactor",
+        2
+      ]
+    ],
+    "medianMergeMin": 4,
+    "longest": [
+      {
+        "number": 61,
+        "title": "feat(take-store): save every take to Supabase and show progress",
+        "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/61",
+        "minutes": 556
+      },
+      {
+        "number": 6,
+        "title": "feat(piano-midi-spike): DGX-660 MIDI feasibility spike",
+        "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/6",
+        "minutes": 73
+      },
+      {
+        "number": 394,
+        "title": "feat(pill-match): ghost outlines and note labels take their size from the note pills",
+        "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/394",
+        "minutes": 67
+      }
+    ],
+    "firstPrAt": "2026-10-24T01:09:41Z",
+    "songRequests": []
+  }
+}

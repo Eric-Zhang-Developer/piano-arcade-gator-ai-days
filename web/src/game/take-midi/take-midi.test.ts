@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import type { Chart, Take, TakeEvent } from "../../contracts";
 import { pianoOutSettings } from "../piano-out";
-import { midiFileName, takeToMidi, timeSignature, vlq } from ".";
+import { MARKER, midiFileName, PPQ, readTakeMidi, takeToMidi, timeSignature, vlq } from ".";
 
 const chart = (beatsPerBar = 4): Chart =>
   ({ id: "twinkle", title: "Twinkle", composer: "trad", source: "x", bpm: 100, beatsPerBar, notes: [] }) as unknown as Chart;
@@ -109,4 +109,58 @@ test("a press and release on one tick: the release still comes after its press",
 
 test("the file name is the chart id with '/' as '-', and startedAt as YYYYMMDD-HHmm", () => {
   expect(midiFileName(take([]))).toBe("classics-twinkle-20261024-0905.mid");
+});
+
+// readTakeMidi (hero-replay): the inverse of takeToMidi.
+const halfTickMs = 600 / PPQ / 2; // at 100 BPM
+const back = (bytes: Uint8Array, c = chart()) => {
+  const r = readTakeMidi(bytes, c);
+  if ("error" in r) throw new Error(r.error);
+  return r;
+};
+
+test("reads every press's pitch and velocity exactly, and its times within half a tick", () => {
+  const events = [
+    { pitch: 60, velocity: 40, timeMs: 0, offTimeMs: 300.4 },
+    { pitch: 64, velocity: 100, timeMs: 301.2, offTimeMs: 600 },
+    { pitch: 60, velocity: 70, timeMs: 300.6, offTimeMs: 301 },
+    { pitch: 72, velocity: 127, timeMs: 1234.5, offTimeMs: 1999.9 },
+  ];
+  const r = back(takeToMidi(chart(), take(events)));
+  expect(r.marker).toBe(true);
+  const byOn = [...r.events].sort((a, b) => a.timeMs - b.timeMs || a.pitch - b.pitch);
+  const want = [...events].sort((a, b) => a.timeMs - b.timeMs || a.pitch - b.pitch);
+  expect(byOn.map((e) => [e.pitch, e.velocity])).toEqual(want.map((e) => [e.pitch, e.velocity]));
+  byOn.forEach((e, i) => {
+    expect(Math.abs(e.timeMs - want[i].timeMs)).toBeLessThanOrEqual(halfTickMs);
+    expect(Math.abs(e.offTimeMs! - want[i].offTimeMs)).toBeLessThanOrEqual(halfTickMs);
+  });
+});
+
+test("a press at -300 ms comes back at -300 ms: the marker sits at bar 2", () => {
+  const bytes = takeToMidi(chart(), take([{ timeMs: -300, offTimeMs: 0 }, { timeMs: 600, offTimeMs: 900 }]));
+  const { meta, notes } = read(bytes);
+  expect(String.fromCharCode(...meta[0x06])).toBe(MARKER);
+  expect(notes[0].tick).toBe(4 * 480 - 240); // shifted a bar
+  expect(back(bytes).events.map((e) => e.timeMs)).toEqual([-300, 600]);
+});
+
+test("a file without a marker reads tick 0 as chart time 0", () => {
+  const bytes = takeToMidi(chart(), take([{ timeMs: 600, offTimeMs: 900 }]));
+  // Drop the marker (delta 0, FF 06 05 "bar 1" at tick 0) and fix the track length.
+  const at = [...bytes].findIndex((v, i) => v === 0xff && bytes[i + 1] === 0x06);
+  const cut = Uint8Array.from([...bytes.subarray(0, at - 1), ...bytes.subarray(at + 3 + MARKER.length)]);
+  const len = cut.length - 22;
+  cut.set([(len >>> 24) & 0xff, (len >>> 16) & 0xff, (len >>> 8) & 0xff, len & 0xff], 18);
+  const r = back(cut);
+  expect(r.marker).toBe(false);
+  expect(r.events.map((e) => e.timeMs)).toEqual([600]);
+});
+
+test("refuses a wrong title, a wrong tempo and truncated bytes, each with a reason", () => {
+  const bytes = takeToMidi(chart(), take([{ timeMs: 600, offTimeMs: 900 }]));
+  expect(readTakeMidi(bytes, { ...chart(), title: "Für Elise" })).toEqual({ error: expect.stringContaining("not \"Für Elise\"") });
+  expect(readTakeMidi(bytes, { ...chart(), bpm: 70 })).toEqual({ error: expect.stringContaining("70 BPM") });
+  expect(readTakeMidi(bytes.subarray(0, bytes.length - 6), chart())).toEqual({ error: expect.stringContaining("cut short") });
+  expect(readTakeMidi(new Uint8Array([1, 2, 3]), chart())).toEqual({ error: expect.stringContaining("not a take file") });
 });

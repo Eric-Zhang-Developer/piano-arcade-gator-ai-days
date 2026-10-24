@@ -38,7 +38,7 @@ describe("the game's MIDI input through the fake piano", () => {
     const judge = new Judge(chart);
     events.filter((e) => e.type === "on").forEach((e, i) => judge.press(e.pitch, e.timeMs - zeroPerf, i));
     const r = judge.finish(1e9);
-    expect(r.counts).toEqual({ PERFECT: chart.notes.length, GREAT: 0, MISS: 0, extra: 0 });
+    expect(r.counts).toMatchObject({ PERFECT: chart.notes.length, GREAT: 0, MISS: 0, extra: 0 }); // later fields (GOOD, wrong) may be added
     expect(events.filter((e) => e.type === "off")).toHaveLength(chart.notes.length);
   });
 

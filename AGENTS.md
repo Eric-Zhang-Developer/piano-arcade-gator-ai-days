@@ -33,11 +33,25 @@ Each person owns a lane: their features, their folder, and the final say over bo
 |---|---|---|---|
 | `eric` | `@Eric-Zhang-Developer` | game: playing, highway, judging, HUD, juice, MIDI in and out | `web/src/game/` |
 | not set yet | not set yet | learning: coach, practice mode, chart compiler, song ripping | `web/src/learn/`, `tools/` |
+| `sharan` | `@iKnow24` | backend: take store, Supabase, accounts, progress page; LED strip firmware | `supabase/`, `web/src/data/`, `web/src/app/api/takes/`, `web/src/app/api/progress/`, `web/src/app/progress/`, `web/src/app/auth/`, `firmware/` |
 
 - The shared formats in `web/src/contracts/` are frozen: change them only through a `contract:` PR, which both people see.
 - Never change another lane's folder. If you need something from it, file a `needs-human` issue for its person.
 - **Blocked?** Don't wait. File a `needs-human` issue (below), note it on your PR, and take the next ready feature.
 - **Nothing ready?** Say so in your PR or in an issue and stop. Never invent scope.
+
+## The database
+Supabase Postgres, in `sharan`'s lane. `supabase/README.md` lists what's in it and is the recipe for adding anything.
+- Every change is a new file in `supabase/migrations/` (`npx -y supabase@2.122.0 migration new <name>`). Never edit one
+  that's already live; add another.
+- `npm --prefix supabase/tests ci && node supabase/tests/migrations.mjs` must pass before the PR is ready. It applies
+  every migration to an in-memory Postgres and fails on a table without RLS, a browser write grant, an unsafe view or
+  an open function.
+- The browser never writes: only Next.js server routes, with `SUPABASE_SECRET_KEY`. CHECKs guard shape, not game rules.
+- Applying to the live project is a one-way door: after merge, a person runs `supabase/push.sh` (tests, dry run, asks,
+  applies, then `supabase/tests/live-smoke.mjs`). Agents don't apply migrations.
+- Another lane needs data stored or read (the coach, say)? File a `needs-human` issue for `sharan`, as for any folder.
+- `SUPABASE_SECRET_KEY` and `SUPABASE_DB_URL` stay in `web/.env.local`: never committed, never in a `NEXT_PUBLIC_` name.
 
 ## The loop
 1. Work in a worktree outside the project folder:

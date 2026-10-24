@@ -2,7 +2,10 @@
 // its notes' judgment color. Pure: sheet-view measures OSMD's beaming against shouldBeam and paints beams by
 // beamJudgment.
 import type { Judgment } from "../../contracts";
-import { DIVISIONS, type Meter, type Placed } from "../sheet-xml";
+import type { Meter, Placed } from "../sheet-xml";
+
+// sheet-xml's divisions per quarter note (a 16th is 1). Not imported: sheet-xml imports shouldBeam to write <beam>.
+const DIVISIONS = 4;
 
 // The longest chord that prints as one value of an eighth or shorter: a dotted eighth.
 const BEAMABLE = 3;

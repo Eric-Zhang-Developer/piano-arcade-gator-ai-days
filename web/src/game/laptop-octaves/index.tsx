@@ -1,5 +1,6 @@
-// Laptop octaves (spec: laptop-octaves): Z and X move the laptop keys an octave, and the map follows the zoomed view
-// by itself when the view leaves it behind. A cyan bar along the bottom of the drawn keyboard marks the keys the
+// Laptop octaves (spec: laptop-octaves): Z and X move the laptop keys an octave. The map never moves by itself: the
+// keyboard is static for the whole take (spec: static-keyboard), so a map that wandered would move under the
+// player's fingers just as a moving keyboard moved under their eyes. A cyan bar along the bottom of the drawn keyboard marks the keys the
 // laptop plays. Core's key map doesn't change: laptop-key events are shifted on their way in.
 import type { Frame, GamePlugin, InputDevice } from "../../contracts";
 import { makeLayout } from "../core/highway";
@@ -40,19 +41,6 @@ export const onPiano = (m: LaptopMap, k: number): boolean => m.keys.every((p) =>
 // Z (d = -1) and X (d = +1): only to a position on the piano with enough keys on screen.
 export const canMove = (m: LaptopMap, k: number, d: number, v: View): boolean =>
   onPiano(m, k + d) && onScreen(m, k + d, v) >= octaveSettings.minKeys;
-
-// Stays while enough keys are on screen; otherwise the position with the most (ties: nearest to k, then the lower).
-export function follow(m: LaptopMap, k: number, v: View): number {
-  if (onScreen(m, k, v) >= octaveSettings.minKeys) return k;
-  let best = k;
-  for (let j = -8; j <= 8; j++) {
-    if (!onPiano(m, j)) continue;
-    const n = onScreen(m, j, v);
-    const nb = onScreen(m, best, v);
-    if (n > nb || (n === nb && Math.abs(j - k) < Math.abs(best - k))) best = j;
-  }
-  return best;
-}
 
 // The chart's whole padded range, as /play lays it out before zoom (if any) takes over.
 const wholeRange = (chart: Parameters<typeof makeLayout>[0]): View => {
@@ -183,14 +171,13 @@ export function laptopOctaves(): GamePlugin {
       if (e.type === "resume" || e.type === "songStart") paused = false;
     },
     draw(ctx, frame) {
-      view = { lo: frame.lowPitch, hi: frame.highPitch };
-      moveTo(follow(map, k, view));
+      view = { lo: frame.lowPitch, hi: frame.highPitch }; // for Z and X's rule; k itself stays where the player put it
       if (!midiPlayed) drawBar(ctx, frame);
     },
+    // The hint only when the laptop can't play the whole chart from where it starts (k = 0).
     startPanel: ({ chart }) => {
       const m = laptopMap(Math.min(...chart.notes.map((n) => n.pitch)));
-      const v = wholeRange(chart);
-      if (!canMove(m, 0, -1, v) && !canMove(m, 0, 1, v)) return null;
+      if (chart.notes.every((n) => m.keys.includes(n.pitch))) return null;
       return (
         <p data-capture-hide style={{ opacity: 0.7, margin: 0 }}>
           <b style={{ color: "var(--pa-cyan)" }}>Z</b> / <b style={{ color: "var(--pa-cyan)" }}>X</b>: octave down / up

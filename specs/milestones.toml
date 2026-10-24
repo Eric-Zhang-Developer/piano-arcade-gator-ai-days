@@ -143,6 +143,7 @@ cut = []
 name = "judging"
 ship = ""
 features = [
+  "ci-browser",
   "crash-guard",
   "offline-ready",
   "demo-reset",

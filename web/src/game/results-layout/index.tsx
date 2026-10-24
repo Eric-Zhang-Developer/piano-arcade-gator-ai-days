@@ -10,7 +10,7 @@ import styles from "./results-layout.module.css";
 export const resultsLayoutSettings = {
   featured: ["take-graph"], // panels in the first view, under the counts
   practiceFeatured: ["chunk-practice"], // a practice=1 take: chunk practice's way on in place of the graph (#294)
-  actions: ["piano-out", "wait-mode"], // panels that are buttons: they join Retry and Songs
+  actions: ["piano-out", "wait-mode", "score-card"], // panels that are buttons: they join Retry and Songs
   names: { "take-midi": "MIDI", "replay-view": "Replay", "weak-bars": "Phrases", "tempo-curve": "Tempo" } as Record<string, string>,
 };
 

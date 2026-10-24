@@ -44,14 +44,14 @@ their own folders.
 
 ## Validation
 - `pnpm -C web test`: the pause clock. Pause at t, wait 5 s of wall time, resume -> the chart time is still t, and a
-  note due during the pause isn't missed. The menu's state machine: Esc then Esc resumes; Quit returns to the
-  start screen.
+  note due during the pause isn't missed. The menu's state machine: Esc then Esc resumes; Quit opens `/` (the
+  music select; issue #267, pause-skin).
 - `verify.py --slug play-slots` passes. After the `fix(core-loop)` PR, `web/e2e/verify.mjs` also checks that the
   results screen renders without errors when no plugin has a panel.
 - In Chrome:
   1. Press Esc mid-song -> notes freeze and the menu shows. Wait 5 s, then Resume -> a countdown, then play goes
      on with no MISS for the wait.
-  2. Press Esc, then Quit -> the start screen. Press Esc, then Retry -> a new count-in.
+  2. Press Esc, then Quit -> `/`. Press Esc, then Retry -> a new count-in.
   3. Open `/sim`, watch the bot, and reach the results -> "Replay on piano" shows inside `slot-piano-out`.
 - On the piano (Eric; mark it in the done note): pause mid-song while the beat plays. The beat stops, no note
   hangs, and the beat comes back on the beat after Resume.

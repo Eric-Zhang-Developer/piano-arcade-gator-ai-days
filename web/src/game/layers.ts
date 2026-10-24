@@ -7,6 +7,7 @@ import { handColors } from "./hand-colors";
 import { ghost } from "./ghost";
 import { handMode } from "./hand-mode";
 import { hud } from "./hud";
+import { waitHud } from "./wait-hud";
 import { warningCard } from "./difficulty";
 import { stageCard } from "./stage-card";
 import { feverGauge } from "./fever-gauge";
@@ -45,6 +46,7 @@ export const plugins: GamePlugin[] = [
   juiceVisual(), // under the HUD: wisps and flares never cover the score
   handColors(), // the L/R legend during the count-in, two-hand charts only
   hud(), // before beat-track, so beat-track's status line draws over the HUD's top panel
+  waitHud(), // wait mode: LEARN and note n / N in the HUD's band, where the counters and score were
   beatTrack(),
   midiWatchdog(), // reconnects a piano that goes silent mid-song
   waitMode(), // start panel: Learn it first; results panel after a wait-mode take: Play it judged, on top

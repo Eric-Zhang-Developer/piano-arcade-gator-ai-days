@@ -101,6 +101,15 @@ features = [
 ]
 cut = []
 
+# polish: Eric's 25 polish features (2026-10-24), ranked by a hackathon-coach pass for the 90-second video and the
+# judges' hands-on demo. Quick practice mode first; the rest arrive in the next plan PR. wait-hands and wait-hint are
+# specced in backlog; the planner promotes them when this queue runs low.
+[[milestone]]
+name = "polish"
+ship = ""
+features = ["learn-from-select", "wait-hud", "chunk-practice"]
+cut = []
+
 [[milestone]]
 name = "submission"
 ship = ""

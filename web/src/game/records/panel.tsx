@@ -1,5 +1,5 @@
 "use client";
-// The records results panel: NEW RECORD, the initials entry and the top 5 (spec: records).
+// The records results panel: the initials entry and the top 5 (spec: records). NEW RECORD is record-moment's.
 import { useInitials } from "./initials";
 import { NO_INITIALS, type Entry } from "./store";
 
@@ -15,18 +15,15 @@ export function RecordsPanel({ outcome }: { outcome: Outcome }) {
 }
 
 function Recorded({ chartId, date, newRecord, inTop, top }: Extract<Outcome, { kind: "recorded" }>) {
-  const { letters, done, saved } = useInitials(chartId, date, inTop);
+  // A NEW RECORD take's entry is record-moment's: the card then shows only the top 5, with the letters as they're
+  // typed there. Any other top-5 take keeps its entry here.
+  const { letters, done, saved } = useInitials(chartId, date, inTop && !newRecord);
   const entering = inTop && !done;
   const initials = (t: Entry) => (t.date !== date ? t.initials : entering ? letters.join("").padEnd(3, "_") : saved ? letters.join("") : t.initials);
 
   return (
     <div data-testid="records" style={{ fontSize: 16, lineHeight: 1.6 }}>
-      {newRecord && (
-        <div data-testid="new-record" style={{ fontSize: 28, fontWeight: 800, color: "#ffd84a", animation: "records-flash 0.5s steps(2) infinite" }}>
-          NEW RECORD
-        </div>
-      )}
-      {entering && (
+      {entering && !newRecord && (
         <div data-testid="initials-entry">
           Your initials:{" "}
           <span style={{ fontFamily: "monospace", fontSize: 24, letterSpacing: 6 }}>
@@ -53,7 +50,6 @@ function Recorded({ chartId, date, newRecord, inTop, top }: Extract<Outcome, { k
           ))}
         </tbody>
       </table>
-      <style>{"@keyframes records-flash { 50% { opacity: 0.3 } }"}</style>
     </div>
   );
 }

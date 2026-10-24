@@ -38,7 +38,19 @@ Each person owns a lane: their features, their folder, and the final say over bo
 - The shared formats in `web/src/contracts/` are frozen: change them only through a `contract:` PR, which both people see.
 - Never change another lane's folder. If you need something from it, file a `needs-human` issue for its person.
 - **Blocked?** Don't wait. File a `needs-human` issue (below), note it on your PR, and take the next ready feature.
-- **Nothing ready?** Say so in your PR or in an issue and stop. Never invent scope.
+- **Nothing ready?** Take a song request if one is open (below). Otherwise say so in your PR or in an issue and
+  stop. Never invent scope.
+
+## Song requests
+An open issue labeled `song-request` asks for one piece to play. The label is the approval: only people with write
+access can set it, so an unlabeled request is only an idea.
+- It's work for `eric`'s workers once `changes/song-requests.md` is on `main`, and only when no milestone feature is
+  ready for you. Oldest request first. It needs no spec and no plan PR.
+- Claim it with a draft PR titled `chore(song-requests): chart <piece>` with `Closes #<n>`, then follow
+  `specs/features/song-requests/spec.md`: a source decision 003 lets you commit, the converter, the library test.
+- A request adds one chart, nothing else: no game code, no new scope, no notes from memory. A credit the source asks
+  for goes in `CREDITS.md` through a `docs:` PR.
+- No allowed source, or the piece is unclear? Comment what you searched, label it `needs-info`, and switch.
 
 ## The database
 Supabase Postgres, in `sharan`'s lane. `supabase/README.md` lists what's in it and is the recipe for adding anything.

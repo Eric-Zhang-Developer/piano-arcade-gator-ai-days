@@ -15,7 +15,7 @@ frozen = ["AGENTS.md", "CLAUDE.md", ".agents/", ".github/", "web/src/contracts/"
 open = ["web/src/game/layers.ts"]   # one line per game feature that plugs a layer into the play screen
 
 [agents]
-max_parallel = 3      # agents running at once on one machine
+max_parallel = 4      # agents running at once on one machine
 reporter = ""                    # worker that refreshes the Status issue (full size)
 
 [pr]

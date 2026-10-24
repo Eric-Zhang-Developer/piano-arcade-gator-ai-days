@@ -1,6 +1,7 @@
 // Judging, exactly mission.md's rule. Pure: no React, no clock. Live play and judgeTake share this one class.
 import type { Chart, ChartNote, GameEvent, Judgment, NoteJudgment, Rank, Results, Take } from "../../contracts";
-import { FEVER_COMBO, GOOD_MS, GOOD_WEIGHT, GREAT_MS, NEAR_MISS_MS, PERFECT_MS, msPerBeat } from "./settings";
+import { type Gauge, emptyGauge, reduceGauge } from "../fever-gauge/gauge";
+import { GOOD_MS, GOOD_WEIGHT, GREAT_MS, NEAR_MISS_MS, PERFECT_MS, msPerBeat } from "./settings";
 
 export function noteTimeMs(chart: Chart, note: ChartNote): number {
   return note.beat * msPerBeat(chart.bpm);
@@ -25,7 +26,7 @@ export class Judge {
   private readonly wrong: { eventIndex: number }[] = [];
   private combo = 0;
   private maxCombo = 0;
-  private fever = false;
+  private gauge: Gauge;
   private results: Results | null = null;
 
   constructor(
@@ -35,6 +36,7 @@ export class Judge {
     this.times = chart.notes.map((n) => noteTimeMs(chart, n));
     this.byTime = chart.notes.map((_, i) => i).sort((a, b) => this.times[a] - this.times[b]);
     this.judgments = chart.notes.map(() => null);
+    this.gauge = emptyGauge(chart.notes.length);
   }
 
   press(pitch: number, timeMs: number, eventIndex: number): void {
@@ -54,13 +56,13 @@ export class Judge {
     this.noteState.set(note.id, judgment);
     this.combo++;
     this.maxCombo = Math.max(this.maxCombo, this.combo);
-    this.onEvent({ type: "noteHit", noteId: note.id, pitch, judgment, offsetMs, atMs: timeMs });
+    const hit: GameEvent = { type: "noteHit", noteId: note.id, pitch, judgment, offsetMs, atMs: timeMs };
+    const wasFever = this.gauge.fever;
+    this.gauge = reduceGauge(this.gauge, hit);
+    this.onEvent(hit);
     this.onEvent({ type: "combo", count: this.combo, atMs: timeMs });
     if (isMilestone(this.combo)) this.onEvent({ type: "comboMilestone", count: this.combo, atMs: timeMs });
-    if (this.combo === FEVER_COMBO && !this.fever) {
-      this.fever = true;
-      this.onEvent({ type: "feverStart", atMs: timeMs });
-    }
+    if (this.gauge.fever && !wasFever) this.onEvent({ type: "feverStart", atMs: timeMs });
   }
 
   advance(nowMs: number): void {
@@ -104,8 +106,7 @@ export class Judge {
     if (timeMs < first - GOOD_MS || timeMs > last + GOOD_MS) return;
     if (this.chart.notes.some((n, i) => n.pitch === pitch && Math.abs(timeMs - this.times[i]) <= NEAR_MISS_MS)) return;
     this.wrong.push({ eventIndex });
-    this.onEvent({ type: "wrongNote", pitch, atMs: timeMs });
-    this.breakCombo(timeMs);
+    this.breakCombo({ type: "wrongNote", pitch, atMs: timeMs });
   }
 
   private miss(i: number): void {
@@ -113,16 +114,16 @@ export class Judge {
     const atMs = this.times[i] + GOOD_MS;
     this.judgments[i] = { noteId: note.id, judgment: "MISS", offsetMs: null, eventIndex: null };
     this.noteState.set(note.id, "MISS");
-    this.onEvent({ type: "noteMiss", noteId: note.id, pitch: note.pitch, atMs });
-    this.breakCombo(atMs);
+    this.breakCombo({ type: "noteMiss", noteId: note.id, pitch: note.pitch, atMs });
   }
 
-  private breakCombo(atMs: number): void {
+  // A MISS or WRONG: sends it, resets the combo and steps the fever gauge, which ends fever if it was on.
+  private breakCombo(e: GameEvent & { type: "noteMiss" | "wrongNote" }): void {
+    this.onEvent(e);
     this.combo = 0;
-    if (this.fever) {
-      this.fever = false;
-      this.onEvent({ type: "feverEnd", atMs });
-    }
+    const wasFever = this.gauge.fever;
+    this.gauge = reduceGauge(this.gauge, e);
+    if (wasFever) this.onEvent({ type: "feverEnd", atMs: e.atMs });
   }
 }
 

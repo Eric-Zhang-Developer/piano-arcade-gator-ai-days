@@ -57,6 +57,7 @@ export function beatTrack(): GamePlugin {
   let off = false;
   let output: MIDIOutput | null = null;
   let audio: AudioContext | null = null;
+  let bus: GainNode | null = null; // this run's clicks; disconnecting it silences clicks already queued
   let zero = 0; // performance.now() at chart time 0
   let scheduledUntil = 0;
   let active = false;
@@ -83,7 +84,7 @@ export function beatTrack(): GamePlugin {
     osc.frequency.value = h.accent ? beatSettings.clickAccentHz : beatSettings.clickHz;
     gain.gain.setValueAtTime(beatSettings.clickVolume, t);
     gain.gain.exponentialRampToValueAtTime(0.001, t + beatSettings.clickLengthS);
-    osc.connect(gain).connect(audio.destination);
+    osc.connect(gain).connect(bus ?? audio.destination);
     osc.start(t);
     osc.stop(t + beatSettings.clickLengthS);
   };
@@ -102,6 +103,27 @@ export function beatTrack(): GamePlugin {
     // All Notes Off on channel 10, again once anything already queued has gone out.
     output?.send([0xb9, 123, 0]);
     output?.send([0xb9, 123, 0], performance.now() + beatSettings.lookaheadMs + beatSettings.noteLengthMs);
+  };
+
+  // Pause and quit (play-slots): silent now, including what's already queued.
+  const silence = () => {
+    stop();
+    bus?.disconnect();
+    bus = null;
+    // Web MIDI's clear() drops queued sends. Not every browser has it, and TypeScript's types leave it out.
+    (output as (MIDIOutput & { clear?(): void }) | null)?.clear?.();
+  };
+
+  // From chart time atMs on: songStart, or resume after a pause (the clock stood still, so atMs maps to now).
+  const begin = (atMs: number) => {
+    zero = performance.now() - atMs;
+    if (audio) {
+      bus = audio.createGain();
+      bus.connect(audio.destination);
+    }
+    scheduledUntil = atMs;
+    active = true;
+    schedule(atMs);
   };
 
   return {
@@ -123,9 +145,11 @@ export function beatTrack(): GamePlugin {
     },
     onEvent(e: GameEvent) {
       if (e.type === "songEnd") return stop();
-      if (e.type !== "songStart" || off || !chart) return;
-      stop();
-      zero = performance.now() - e.atMs;
+      if (e.type === "pause" || e.type === "quit") return silence();
+      if (off || !chart) return;
+      if (e.type === "resume") return begin(e.atMs);
+      if (e.type !== "songStart") return;
+      silence();
       if (!output) {
         try {
           audio ??= new AudioContext();
@@ -135,9 +159,7 @@ export function beatTrack(): GamePlugin {
         }
       }
       where = output ? "Beat: piano" : audio ? "Beat: laptop" : "Beat: unavailable";
-      scheduledUntil = e.atMs;
-      active = true;
-      schedule(e.atMs);
+      begin(e.atMs);
     },
     draw(ctx, frame) {
       schedule(frame.nowMs);

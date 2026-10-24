@@ -1,8 +1,8 @@
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { MAIN_CHECK, allChecks, exitCode, runChecks, selectChecks, shard } from "./run-checks.mjs";
+import { KNOWN_RED, MAIN_CHECK, allChecks, exitCode, runChecks, selectChecks, shard } from "./run-checks.mjs";
 
 const TOAST = "web/src/game/notice-toast/verify-toast.mjs";
 const SIM = "web/src/game/sim/verify-sim.mjs";
@@ -95,5 +95,18 @@ describe("runChecks", () => {
     const rows = await run(["pass.mjs", "fail.mjs"]);
     expect(rows.map((r) => r.result)).toEqual(["pass", "FAIL"]);
     expect(exitCode(rows)).toBe(1);
+  });
+});
+
+describe("KNOWN_RED", () => {
+  const repo = resolve(import.meta.dirname, "../..");
+  it.each(Object.entries(KNOWN_RED))("%s names its issue and is a real check", (check, issue) => {
+    expect(Number.isInteger(issue) && issue > 0).toBe(true);
+    expect(existsSync(join(repo, check))).toBe(true);
+  });
+
+  it("doesn't fail the shard for a known-red check, but does for any other", () => {
+    expect(exitCode([{ check: "a", result: "FAIL", knownRed: 1 }, { check: "b", result: "pass" }])).toBe(0);
+    expect(exitCode([{ check: "a", result: "FAIL", knownRed: 1 }, { check: "b", result: "FAIL" }])).toBe(1);
   });
 });

@@ -39,7 +39,7 @@ export function takeToMidi(chart: Chart, take: Take): Uint8Array {
   // after its press, even when they round to the same tick.
   const notes = presses.flatMap((e) => {
     const on = tick(e.timeMs);
-    const off = Math.max(on, tick(e.offTimeMs ?? e.timeMs + pianoOutSettings.heldMs));
+    const off = Math.max(on, tick(e.offTimeMs ?? e.timeMs + (take.scoringVersion === 2 ? 0 : pianoOutSettings.heldMs)));
     return [
       { at: on, rank: 1, bytes: [0x90, e.pitch, e.velocity] },
       { at: off, rank: off === on ? 2 : 0, bytes: [0x80, e.pitch, 0] },
@@ -48,6 +48,10 @@ export function takeToMidi(chart: Chart, take: Take): Uint8Array {
   // A Marker at chart time 0's tick ("bar 1"), so a reader can undo the whole-bar shift (hero-replay).
   const marker = [...new TextEncoder().encode(MARKER)];
   notes.push({ at: tick(0), rank: -1, bytes: [0xff, 0x06, ...vlq(marker.length), ...marker] });
+  if (take.scoringVersion === 2) {
+    const policy = [...new TextEncoder().encode("pianoArcade scoring 2")];
+    notes.push({ at: tick(0), rank: -1, bytes: [0xff, 0x06, ...vlq(policy.length), ...policy] });
+  }
   notes.sort((a, b) => a.at - b.at || a.rank - b.rank);
 
   const name = [...new TextEncoder().encode(chart.title)];
@@ -76,7 +80,7 @@ export function takeToMidi(chart: Chart, take: Take): Uint8Array {
 export function readTakeMidi(
   bytes: Uint8Array,
   chart: Chart,
-): { events: TakeEvent[]; marker: boolean } | { error: string } {
+): { events: TakeEvent[]; marker: boolean; scoringVersion: 1 | 2 } | { error: string } {
   const b = bytes;
   const str = (i: number) => String.fromCharCode(...b.subarray(i, i + 4));
   const u32 = (i: number) => ((b[i] << 24) | (b[i + 1] << 16) | (b[i + 2] << 8) | b[i + 3]) >>> 0;
@@ -91,6 +95,7 @@ export function readTakeMidi(
   let name: string | null = null;
   let usPerQuarter: number | null = null;
   let markerTick: number | null = null;
+  let scoringVersion: 1 | 2 = 1;
   const ons: { pitch: number; velocity: number; tick: number; off: number | null }[] = [];
   const held = new Map<number, number[]>(); // pitch -> indexes of presses not yet released, oldest first
   const num = () => {
@@ -115,6 +120,11 @@ export function readTakeMidi(
         if (type === 0x03) name = new TextDecoder().decode(data);
         if (type === 0x51 && len === 3) usPerQuarter = (data[0] << 16) | (data[1] << 8) | data[2];
         if (type === 0x06 && new TextDecoder().decode(data) === MARKER) markerTick ??= tick;
+        if (type === 0x06 && new TextDecoder().decode(data).startsWith("pianoArcade scoring ")) {
+          const policy = new TextDecoder().decode(data);
+          if (policy !== "pianoArcade scoring 1" && policy !== "pianoArcade scoring 2") return { error: "unsupported take scoring policy" };
+          scoringVersion = policy.endsWith("2") ? 2 : 1;
+        }
         if (type === 0x2f) break;
         continue;
       }
@@ -148,6 +158,7 @@ export function readTakeMidi(
   return {
     events: ons.map((n) => ({ pitch: n.pitch, velocity: n.velocity, timeMs: ms(n.tick), offTimeMs: n.off === null ? null : ms(n.off) })),
     marker: markerTick !== null,
+    scoringVersion,
   };
 }
 

@@ -150,3 +150,13 @@ describe("one take's entry, shared", () => {
     expect(pressKey("twinkle", date, "x")).toBe(false); // closed: keys go back to the page
   });
 });
+
+it("version2 credits cannot overwrite or compare with legacy records", () => {
+  const params = new URLSearchParams();
+  expect(recordKey("twinkle", params)).toBe("twinkle");
+  expect(recordKey("twinkle", params, 2)).toBe("twinkle@scoring-v2");
+  const old = addTake({}, "twinkle", take(900)).records;
+  const combined = addTake(old, recordKey("twinkle", params, 2), take(1000)).records;
+  expect(combined.twinkle).toEqual(old.twinkle);
+  expect(combined["twinkle@scoring-v2"].top[0].score).toBe(1000);
+});

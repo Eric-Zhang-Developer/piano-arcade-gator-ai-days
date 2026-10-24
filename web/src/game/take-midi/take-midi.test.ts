@@ -164,3 +164,11 @@ test("refuses a wrong title, a wrong tempo and truncated bytes, each with a reas
   expect(readTakeMidi(bytes.subarray(0, bytes.length - 6), chart())).toEqual({ error: expect.stringContaining("cut short") });
   expect(readTakeMidi(new Uint8Array([1, 2, 3]), chart())).toEqual({ error: expect.stringContaining("not a take file") });
 });
+
+test("scoring policy survives v2 MIDI round-trip; unmarked old files remain legacy", () => {
+  const old = take([{ timeMs: 0, offTimeMs: 1200 }]);
+  const legacy = readTakeMidi(takeToMidi(chart(), old), chart());
+  const modern = readTakeMidi(takeToMidi(chart(), { ...old, scoringVersion: 2 }), chart());
+  expect("error" in legacy ? legacy : legacy.scoringVersion).toBe(1);
+  expect("error" in modern ? modern : modern.scoringVersion).toBe(2);
+});

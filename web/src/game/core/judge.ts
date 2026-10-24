@@ -1,5 +1,6 @@
 // Judging, exactly mission.md's rule. Pure: no React, no clock. Live play and judgeTake share this one class.
-import type { Chart, ChartNote, GameEvent, Judgment, NoteJudgment, Rank, Results, Take } from "../../contracts";
+import type { Chart, ChartNote, GameEvent, Judgment, NoteJudgment, Rank, Results, Take, TakeEvent } from "../../contracts";
+import { evaluateSustain } from "./sustain";
 import { type Gauge, emptyGauge, reduceGauge } from "../fever-gauge/gauge";
 import { GOOD_MS, GOOD_WEIGHT, GREAT_MS, NEAR_MISS_MS, PERFECT_MS, msPerBeat } from "./settings";
 
@@ -28,13 +29,15 @@ export class Judge {
   private maxCombo = 0;
   private gauge: Gauge;
   private results: Results | null = null;
+  private presses = new Map<number, TakeEvent>();
+  private held = new Map<number, number>();
 
   // scored: false (wait mode) judges as usual but sends none of the score's moments: no combo milestones, no fever
   // and no full combo. songEnd still goes out, since records, piano-out and the rest need it.
   constructor(
     private readonly chart: Chart,
     private readonly onEvent: (e: GameEvent) => void = () => {},
-    private readonly opts: { scored?: boolean } = {},
+    private readonly opts: { scored?: boolean; scoringVersion?: 1 | 2 } = {},
   ) {
     this.times = chart.notes.map((n) => noteTimeMs(chart, n));
     this.byTime = chart.notes.map((_, i) => i).sort((a, b) => this.times[a] - this.times[b]);
@@ -44,6 +47,9 @@ export class Judge {
 
   press(pitch: number, timeMs: number, eventIndex: number): void {
     if (this.results) return;
+    this.release(pitch, timeMs); // retrigger closes the preceding hold
+    this.presses.set(eventIndex, { pitch, velocity: 80, timeMs, offTimeMs: null });
+    this.held.set(pitch, eventIndex);
     let best = -1;
     for (const i of this.byTime) {
       if (this.judgments[i] || this.chart.notes[i].pitch !== pitch) continue;
@@ -67,6 +73,23 @@ export class Judge {
     if (!this.scored) return;
     if (isMilestone(this.combo)) this.onEvent({ type: "comboMilestone", count: this.combo, atMs: timeMs });
     if (this.gauge.fever && !wasFever) this.onEvent({ type: "feverStart", atMs: timeMs });
+  }
+
+  release(pitch: number, timeMs: number, eventIndex?: number): void {
+    if (this.results) return;
+    const index = this.held.get(pitch);
+    if (eventIndex !== undefined && index !== eventIndex) return;
+    const press = index === undefined ? undefined : this.presses.get(index);
+    if (press) press.offTimeMs = Math.max(press.timeMs, timeMs);
+    this.held.delete(pitch);
+  }
+
+  cancel(pitch: number): void { this.held.delete(pitch); }
+
+  sustainAt(nowMs: number, final = false) {
+    const active = new Set(this.held.values());
+    const evidence = new Map([...this.presses].filter(([i, e]) => e.offTimeMs !== null || active.has(i)));
+    return this.opts.scoringVersion === 2 ? evaluateSustain(this.chart, this.judgments.filter((j): j is NoteJudgment => j !== null), evidence, nowMs, final) : undefined;
   }
 
   advance(nowMs: number): void {
@@ -106,6 +129,7 @@ export class Judge {
       accuracy,
       maxCombo: this.maxCombo,
       rank: rankFor(accuracy),
+      ...(this.opts.scoringVersion === 2 ? { sustain: this.sustainAt(atMs, true) } : {}),
     };
     if (this.scored && counts.MISS === 0 && this.wrong.length === 0) this.onEvent({ type: "fullCombo", atMs });
     this.onEvent({ type: "songEnd", results: this.results, atMs });
@@ -148,13 +172,28 @@ export class Judge {
 }
 
 export function judgeTake(chart: Chart, take: Take): Results {
-  const judge = new Judge(chart);
-  const order = take.events.map((_, i) => i).sort((a, b) => take.events[a].timeMs - take.events[b].timeMs);
-  for (const i of order) {
-    judge.advance(take.events[i].timeMs);
-    judge.press(take.events[i].pitch, take.events[i].timeMs, i);
+  const judge = new Judge(chart, undefined, { scoringVersion: take.scoringVersion ?? 1 });
+  const timeline = take.events.flatMap((e, i) => [
+    { time: e.timeMs, i, off: false },
+    ...(take.scoringVersion === 2 && e.offTimeMs !== null ? [{ time: e.offTimeMs, i, off: true }] : []),
+  ]).sort((a, b) => a.time - b.time || a.i - b.i || Number(a.off) - Number(b.off));
+  const active = new Map<number, number>();
+  for (const e of timeline) {
+    judge.advance(e.time);
+    const pitch = take.events[e.i].pitch;
+    if (e.off) {
+      judge.release(pitch, e.time, e.i);
+      if (active.get(pitch) === e.i) active.delete(pitch);
+    } else {
+      const previous = active.get(pitch);
+      // Canonical live retriggers already have an offTime. A still-null
+      // predecessor may be an unplugged/unconfirmed key; never fill its gap.
+      if (take.scoringVersion === 2 && previous !== undefined && take.events[previous].offTimeMs === null) judge.cancel(pitch);
+      judge.press(pitch, e.time, e.i);
+      active.set(pitch, e.i);
+    }
   }
   const lastNote = Math.max(0, ...chart.notes.map((n) => noteTimeMs(chart, n)));
-  const lastEvent = order.length ? take.events[order[order.length - 1]].timeMs : 0;
+  const lastEvent = timeline.at(-1)?.time ?? 0;
   return judge.finish(Math.max(lastNote + GOOD_MS, lastEvent));
 }

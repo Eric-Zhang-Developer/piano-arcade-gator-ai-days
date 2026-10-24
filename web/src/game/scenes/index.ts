@@ -135,6 +135,7 @@ export function scenes(): GamePlugin {
     }
   };
 
+  let takeParams: URLSearchParams | null = null;
   // bot=take: read the file once, for both devices. Refused -> a toast, and the take plays normally.
   const loadTake = () =>
     (loading ??= (async () => {
@@ -143,6 +144,7 @@ export function scenes(): GamePlugin {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const r = readTakeMidi(new Uint8Array(await res.arrayBuffer()), chart!);
         if ("error" in r) throw new Error(r.error);
+        takeParams?.set("scoring", String(r.scoringVersion));
         if (!r.marker) toast(`Take ${takeFile} has no bar-1 marker (saved before hero-replay): its tick 0 is read as beat 0.`);
         return (take = takePresses(r.events));
       } catch (e) {
@@ -155,6 +157,7 @@ export function scenes(): GamePlugin {
   return {
     id: "scenes",
     transformChart(c, params) {
+      takeParams = params;
       const name = params.get("bot");
       bot = isBot(name) ? name : null;
       audible = params.get("audible") === "1";

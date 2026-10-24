@@ -33,3 +33,18 @@ test("laptop keys from C4: whites on A–;, blacks on W E T Y U O P", () => {
 test("a black lowest note starts at the white key below it", () => {
   expect(keyMap(61).get("KeyA")).toBe(60);
 });
+
+test("velocity-zero is a release; unplug cancels without inventing physical release evidence", async () => {
+  let state: () => void = () => {};
+  const input = { name: "Portable Grand", state: "connected", onmidimessage: null as null | ((e: { data: Uint8Array; timeStamp: number }) => void) };
+  vi.stubGlobal("navigator", { requestMIDIAccess: async () => ({ inputs: new Map([["piano", input]]), addEventListener: (_: string, cb: () => void) => { state = cb; }, removeEventListener() {} }) });
+  const events: { type: string; cancelled?: true }[] = [];
+  const device = midiDevice(() => {});
+  await device.start(e => events.push(e));
+  input.onmidimessage!({ data: new Uint8Array([0x90, 60, 80]), timeStamp: 0 });
+  input.onmidimessage!({ data: new Uint8Array([0x90, 60, 0]), timeStamp: 50 });
+  input.onmidimessage!({ data: new Uint8Array([0x90, 64, 80]), timeStamp: 100 });
+  input.state = "disconnected"; state(); state();
+  expect(events.map(e => [e.type, !!e.cancelled])).toEqual([["on", false], ["off", false], ["on", false], ["off", true]]);
+  device.stop();
+});

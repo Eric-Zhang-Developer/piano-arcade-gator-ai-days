@@ -205,7 +205,7 @@ export function beatTrack(): GamePlugin {
     onEvent(e: GameEvent) {
       // Initialization can take time. Keep the event's mapping instead of
       // moving the song's entire pulse to the end of AudioContext startup.
-      const eventPerf = performance.now();
+      const eventPerf = e.performanceMs ?? performance.now();
       if (e.type === "songEnd") return stop();
       if (e.type === "pause" || e.type === "quit") return silence();
       if (off || !chart) return;

@@ -63,6 +63,8 @@ export function tierProgress(combo: number): { filled: number; of: number } {
 // noteHit before the combo event that counts it, so state.combo here is the combo before this hit.
 export function reduceHud(s: HudState, e: GameEvent): HudState {
   switch (e.type) {
+    case "songEnd":
+      return { ...s, score: s.score + (e.results.sustain?.earnedPoints ?? 0) };
     case "songStart":
       return emptyHud();
     case "noteHit":

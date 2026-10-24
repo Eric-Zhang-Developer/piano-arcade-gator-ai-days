@@ -112,7 +112,7 @@ export function ResultsLayout({
                   <dd data-testid="score">{score === undefined ? "—" : score.toLocaleString("en-US")}</dd>
                 </div>
                 <div>
-                  <dt>Accuracy</dt>
+                  <dt>{results.sustain ? "Timing accuracy" : "Accuracy"}</dt>
                   <dd data-testid="accuracy">{(results.accuracy * 100).toFixed(1)}%</dd>
                 </div>
                 <div>
@@ -128,6 +128,11 @@ export function ResultsLayout({
           </h2>
         )}
         {scored && timing && <div className={styles.timing}>{timing}</div>}
+        {scored && results.sustain && <section data-testid="sustain-results" aria-label="Hold completion" style={{ textAlign: "center", padding: 12 }}>
+          <strong>Long-note hold bonus: {results.sustain.earnedPoints} / {results.sustain.possiblePoints} points</strong>
+          <p>Timing grade stays separate. Hold marked notes through their tails, then release. Early releases earn partial credit; unconfirmed releases earn none. Extra time earns no extra points.</p>
+          <small>Scoring v2 · timing points + confirmed hold bonus · separate v2 records</small>
+        </section>}
         <div className={styles.featured}>
           <Slots plugins={only(featured)} panel={panel} />
         </div>

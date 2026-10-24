@@ -32,7 +32,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
   const song = songs[focused];
   const [level, setLevel] = useLevel();
   const levelParams = new URLSearchParams(level === "easy" ? "level=easy" : "");
-  const bestOf = (id: string) => best[recordKey(id, levelParams)];
+  const bestOf = (id: string) => best[recordKey(id, levelParams, 2)];
   const [chart, setChart] = useState<{ id: string; chart: Chart } | null>(null); // the focused song's, for its Easy level
 
   useEffect(() => {

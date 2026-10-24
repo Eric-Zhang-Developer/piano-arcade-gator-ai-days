@@ -3,6 +3,7 @@
 import { createElement, type CSSProperties } from "react";
 import type { GamePlugin, InputDevice, Take, TakeEvent } from "../../contracts";
 import { ReplayOnPiano } from "./ReplayOnPiano";
+import { scoringVersion } from "../core/sustain";
 
 export const pianoOutSettings = {
   leadMs: 200, // from pressing Replay to the first note
@@ -23,7 +24,7 @@ export const allNotesOff = (atMs: number): Message[] => [...Array(16).keys()].ma
 // from startMs + leadMs, then All Notes Off and Local Control back on once the last note ends.
 export function replayMessages(take: Take, startMs: number): Message[] {
   const { leadMs, heldMs } = pianoOutSettings;
-  const events = take.events.filter((e) => e.velocity > 0);
+  const events = take.events.filter((e) => e.velocity > 0 && (take.scoringVersion !== 2 || e.offTimeMs !== null && e.offTimeMs > e.timeMs));
   const out: Message[] = [{ bytes: LOCAL(false), atMs: startMs }];
   if (!events.length) return [...out, ...allNotesOff(startMs), { bytes: LOCAL(true), atMs: startMs }];
   const t0 = Math.min(...events.map((e) => e.timeMs));
@@ -113,16 +114,29 @@ export function pianoOut(): GamePlugin {
   let recording = false;
   let chartId = "";
   let inputKind: Take["inputDevice"] = "keys";
+  let params = new URLSearchParams();
+  let pausedChart: number | null = null;
+  const active = new Map<number, number>();
 
   const record = (input: InputDevice): InputDevice => ({
     kind: input.kind,
     start: (onEvent) =>
       input.start((e) => {
         if (recording) {
-          if (e.type === "on") events.push({ pitch: e.pitch, velocity: e.velocity, timeMs: e.timeMs - zero, offTimeMs: null });
+          const timeMs = pausedChart ?? e.timeMs - zero;
+          if (e.type === "on" && pausedChart === null) {
+            if (!events.length) inputKind = input.kind;
+            const previous = active.get(e.pitch);
+            if (scoringVersion(params) === 2 && previous !== undefined) events[previous].offTimeMs = Math.max(events[previous].timeMs, timeMs);
+            events.push({ pitch: e.pitch, velocity: e.velocity, timeMs, offTimeMs: null });
+            active.set(e.pitch, events.length - 1);
+          }
           else {
-            const held = events.findLast((x) => x.pitch === e.pitch && x.offTimeMs === null);
-            if (held) held.offTimeMs = e.timeMs - zero;
+            if (e.type === "on") return onEvent(e);
+            const index = active.get(e.pitch);
+            const held = scoringVersion(params) === 2 ? index === undefined ? undefined : events[index] : events.findLast((x) => x.pitch === e.pitch && x.offTimeMs === null);
+            active.delete(e.pitch);
+            if (held && !(scoringVersion(params) === 2 && e.cancelled)) held.offTimeMs = Math.max(held.timeMs, timeMs);
           }
         }
         onEvent(e);
@@ -132,7 +146,8 @@ export function pianoOut(): GamePlugin {
 
   return {
     id: "piano-out",
-    transformChart(chart) {
+    transformChart(chart, p) {
+      params = p;
       chartId = chart.id;
       if (typeof window !== "undefined") {
         window.addEventListener("pagehide", stopReplay); // never leave the piano's keys silent
@@ -154,23 +169,27 @@ export function pianoOut(): GamePlugin {
       if (e.type === "songStart") {
         if (state.playing) stopReplay();
         events = [];
-        zero = performance.now() - e.atMs;
+        active.clear();
+        pausedChart = null;
+        zero = (scoringVersion(params) === 2 ? e.performanceMs ?? performance.now() : performance.now()) - e.atMs;
         recording = true;
         set({ take: null, canReplay: false });
       }
       // play-slots: keys while paused aren't part of the take, and the pause isn't replayed as silence.
       if (e.type === "pause" || e.type === "quit") {
         if (state.playing) stopReplay();
-        recording = false;
+        if (e.type === "quit" || scoringVersion(params) !== 2) recording = false;
+        else pausedChart = e.atMs;
         pausedAt = performance.now();
       }
       if (e.type === "resume") {
-        zero += performance.now() - pausedAt;
+        zero = scoringVersion(params) === 2 ? (e.performanceMs ?? performance.now()) - e.atMs : zero + performance.now() - pausedAt;
+        pausedChart = null;
         recording = true;
       }
       if (e.type === "songEnd") {
         recording = false;
-        const take: Take = { chartId, startedAt: new Date().toISOString(), latencyOffsetMs: 0, inputDevice: inputKind, events };
+        const take: Take = { ...(scoringVersion(params) === 2 ? { scoringVersion: 2 as const } : {}), chartId, startedAt: new Date().toISOString(), latencyOffsetMs: 0, inputDevice: inputKind, events };
         set({ take, canReplay: !!output && events.length > 0 });
       }
     },

@@ -19,6 +19,7 @@ import { nextPause, pauseClock, type PauseAction, type PauseMode } from "../../g
 import { Slots } from "../../game/play-slots/ui";
 import { PauseMenu } from "../../game/pause-skin";
 import { beatTiming, countdownSettings } from "../../game/beat/timing";
+import { scoringVersion } from "../../game/core/sustain";
 import { ResultsLayout } from "../../game/results-layout";
 import { emptyHud, reduceHud } from "../../game/hud";
 import { barStep, holdClock, isWaitMode } from "../../game/wait-mode";
@@ -132,8 +133,10 @@ export default function Play() {
     const pulse = beatTiming(chart);
     const leadBeats = skipCountdown ? 0 : pulse.countInBeats;
     const lastNoteMs = Math.max(...chart.notes.map((n) => noteTimeMs(chart, n)));
+    const lastEndMs = Math.max(...chart.notes.map((n) => noteTimeMs(chart, n) + n.duration * mpb));
 
     const take: Take = {
+      scoringVersion: scoringVersion(params),
       chartId: chart.id,
       startedAt: new Date().toISOString(),
       latencyOffsetMs: latencyRef.current,
@@ -172,7 +175,7 @@ export default function Play() {
       if (e.type === "wrongNote") hw.latest = { judgment: "WRONG", offsetMs: null, atMs: e.atMs };
       for (const p of plugins) if (p.onEvent) guard.run(p.id, "onEvent", () => p.onEvent!(e));
     };
-    const judge = new Judge(chart, emit, { scored: !isWaitMode(params) }); // wait mode: no score moments
+    const judge = new Judge(chart, emit, { scored: !isWaitMode(params), get scoringVersion() { return scoringVersion(params); } });
     hw.noteState = judge.noteState;
     // Zero is fixed here, after the stage and judge are built, so songStart's atMs is the chart time now and a plugin's
     // performance.now() - atMs is the same zero the judge uses. Fixed before the build, it trailed by the build (#173).
@@ -184,25 +187,39 @@ export default function Play() {
       now: (perf: number) => (wait ? wait.now(pauses.now(perf)) : pauses.now(perf)),
       toPerf: (chartMs: number) => pauses.toPerf(wait ? wait.toOuter(chartMs) : chartMs),
     };
-    emit({ type: "songStart", atMs: clock.now(performance.now()) });
+    const startedPerf = performance.now();
+    emit({ type: "songStart", atMs: clock.now(startedPerf), performanceMs: startedPerf });
 
     // Input: every device feeds one handler; a key's judged time is its arrival minus the latency offset.
     let firstKind = true;
+    const activeEvents = new Map<number, number>();
     const onInput = (kind: Take["inputDevice"]) => (e: InputEvent) => {
-      if (pauses.paused) return; // keys while paused are neither judged nor recorded
+      if (pauses.paused && (scoringVersion(params) !== 2 || e.type === "on")) return;
       // A press during a hold lands on the held note's time; taking off the latency could put it outside GOOD.
       const t = wait?.holding ? clock.now(e.timeMs) : clock.now(e.timeMs) - latencyRef.current;
       if (e.type === "on") {
+        if (firstKind) take.scoringVersion = scoringVersion(params);
         if (firstKind && !test) take.inputDevice = kind;
         firstKind = false;
+        if (take.scoringVersion === 2 && hw.pressed.has(e.pitch)) {
+          const previous = take.events.findLast(x => x.pitch === e.pitch && x.offTimeMs === null);
+          if (previous) previous.offTimeMs = Math.max(previous.timeMs, t);
+        }
         hw.pressed.add(e.pitch);
         take.events.push({ pitch: e.pitch, velocity: e.velocity, timeMs: t, offTimeMs: null });
+        activeEvents.set(e.pitch, take.events.length - 1);
         judge.press(e.pitch, t, take.events.length - 1);
       } else {
         hw.pressed.delete(e.pitch);
         hw.pressedHand!.delete(e.pitch);
-        const ev = take.events.findLast((x) => x.pitch === e.pitch && x.offTimeMs === null);
-        if (ev) ev.offTimeMs = t;
+        const index = activeEvents.get(e.pitch);
+        const ev = take.scoringVersion === 2 ? index === undefined ? undefined : take.events[index] : take.events.findLast((x) => x.pitch === e.pitch && x.offTimeMs === null);
+        activeEvents.delete(e.pitch);
+        if (e.cancelled && take.scoringVersion === 2) judge.cancel(e.pitch);
+        else {
+          if (ev) ev.offTimeMs = Math.max(ev.timeMs, t);
+          judge.release(e.pitch, t);
+        }
       }
     };
     const wrap = (d: InputDevice) => plugins.reduce((dev, p) => p.wrapInput?.(dev) ?? dev, d);
@@ -259,8 +276,9 @@ export default function Play() {
       if (next === "menu") {
         pauses.pause(perf);
         const at = clock.now(perf);
-        emit({ type: "pause", atMs: at });
-        endHeld(at);
+        emit({ type: "pause", atMs: at, performanceMs: perf });
+        // Policy v2 keeps confirmed holds through the pause; older takes end held keys here.
+        if (take.scoringVersion !== 2) endHeld(at);
       }
       if (next === "countdown") {
         countdownUntil = perf + countdownSettings.resumePulses * pulse.pulseMs;
@@ -268,12 +286,12 @@ export default function Play() {
       }
       if (next === "playing") {
         pauses.resume(perf);
-        emit({ type: "resume", atMs: clock.now(perf) });
+        emit({ type: "resume", atMs: clock.now(perf), performanceMs: perf });
       }
       mode = next;
       setPauseMode(next);
       if (next !== "quit") return;
-      emit({ type: "quit", atMs: clock.now(perf) });
+      emit({ type: "quit", atMs: clock.now(perf), performanceMs: perf });
       if (a === "retry") return startRef.current();
       stopRef.current();
       router.push("/"); // Quit opens the music select (pause-skin)
@@ -345,6 +363,7 @@ export default function Play() {
       wait?.update(pauses.now(perf));
       const now = clock.now(perf);
       hw.nowMs = now;
+      hw.sustain = judge.sustainAt(now);
       if (skipVisible && now >= -GOOD_MS) { skipVisible = false; setCanSkip(false); }
       const beat = now < 0 ? Math.floor(now / pulse.pulseMs) + pulse.countInPulses + 1 : 0;
       hw.countInBeat = beat > 0 ? beat : null;
@@ -363,7 +382,7 @@ export default function Play() {
       });
       if (background) guard.run(bgId, "background", () => background.frame(f));
 
-      if (now > lastNoteMs + GOOD_MS + Math.max(0, latencyRef.current) + INPUT_GRACE_MS + END_TAIL_MS) finish(now);
+      if (now > (scoringVersion(params) === 2 ? lastEndMs : lastNoteMs) + GOOD_MS + Math.max(0, latencyRef.current) + INPUT_GRACE_MS + END_TAIL_MS) finish(now);
     };
     raf = requestAnimationFrame(frame);
 
@@ -376,7 +395,8 @@ export default function Play() {
     }
     stopRef.current = () => {
       done = true;
-      emit({ type: "quit", atMs: clock.now(performance.now()) });
+      const stoppedPerf = performance.now();
+      emit({ type: "quit", atMs: clock.now(stoppedPerf), performanceMs: stoppedPerf });
       stop();
       cancelAnimationFrame(idleRaf);
       background?.dispose();

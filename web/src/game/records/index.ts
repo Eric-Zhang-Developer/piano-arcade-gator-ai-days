@@ -16,6 +16,7 @@ export const takeOutcome = (): Outcome | null => current;
 
 export function records(): GamePlugin {
   let chartId = "";
+  let songId = "";
   let params = new URLSearchParams();
   let hud = emptyHud(); // the score the player saw, rebuilt with the HUD's own reducer
   let outcome: Outcome | null = null;
@@ -23,6 +24,7 @@ export function records(): GamePlugin {
     id: "records",
     transformChart(chart, p) {
       chartId = recordKey(chart.id, p);
+      songId = chart.id;
       params = p;
       return chart;
     },
@@ -30,6 +32,7 @@ export function records(): GamePlugin {
       hud = reduceHud(hud, e);
       if (e.type === "songStart") outcome = current = null;
       if (e.type !== "songEnd") return;
+      chartId = recordKey(songId, params, e.results.sustain ? 2 : 1);
       if (practiceReason(params)) {
         outcome = current = { kind: "practice" };
         return;

@@ -1,5 +1,6 @@
 // The highway: a flat-or-mildly-tilted lane per key, notes falling to the keyboard. Canvas 2D, no React.
-import type { Chart, Frame, Hand, Judgment } from "../../contracts";
+import type { Chart, Frame, Hand, Judgment, SustainSummary } from "../../contracts";
+import { onsetLabel, sustainSettings } from "./sustain";
 import { drawBarLines, type BarLine } from "../bar-lines";
 import { drawBlackKeyLanes } from "../black-key-lanes";
 import { noteColorFor } from "../hand-colors";
@@ -54,6 +55,7 @@ export interface Layout extends Omit<Frame, "nowMs"> {
 }
 
 export interface HighwayState {
+  sustain?: SustainSummary;
   nowMs: number; // chart clock
   noteState: Map<string, Judgment>; // judged notes
   pressed: Set<number>; // pitches held right now
@@ -188,9 +190,12 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
   ctx.rect(0, 0, L.width, line);
   ctx.clip();
   const color = noteColorFor(chart);
+  const holds = new Map(s.sustain?.notes.map(n => [n.noteId, n]) ?? []);
   for (const n of chart.notes) {
     const state = s.noteState.get(n.id);
-    if (state && state !== "MISS") continue; // consumed on hit
+    const hold = holds.get(n.id);
+    const holdingTarget = hold && state && state !== "MISS" && s.nowMs < (n.beat + n.duration) * beatMs;
+    if (state && state !== "MISS" && !holdingTarget) continue;
     const startMs = n.beat * beatMs;
     const yBottom = line - (startMs - s.nowMs) * pxPerMs;
     const yTop = line - (startMs + n.duration * beatMs - s.nowMs) * pxPerMs;
@@ -207,7 +212,7 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
       bar(ctx, L, x1, x2, top, yBottom - 1, pill.radius);
       ctx.globalAlpha = b;
     }
-    ctx.fillStyle = state === "MISS" ? settings.missColor : color(n.hand);
+    ctx.fillStyle = state === "MISS" || hold?.releasedEarly ? settings.missColor : color(n.hand);
     bar(ctx, L, x1, x2, top, yBottom - 1, pill.radius);
     if (state !== "MISS") {
       // The head is the pill's leading edge, clipped to its rounded end.
@@ -218,6 +223,12 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
       ctx.restore();
     }
     ctx.globalAlpha = 1;
+    if (s.sustain && n.duration >= sustainSettings.minDurationBeats) {
+      ctx.fillStyle = "#151020";
+      ctx.font = "bold 12px system-ui";
+      ctx.textAlign = "center";
+      ctx.fillText("HOLD", pill.x + pill.width / 2, Math.max(14, Math.min(line - 16, yBottom - 12)));
+    }
   }
   ctx.restore();
 
@@ -305,7 +316,7 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
     ctx.shadowBlur = size * 0.35;
     ctx.fillStyle = JUDGMENT_COLORS[judgment];
     ctx.font = `italic 800 ${Math.round(size * pop)}px ${font}`;
-    ctx.fillText(judgment, cx, cy);
+    ctx.fillText(onsetLabel(judgment, offsetMs), cx, cy);
     if (offsetMs !== null) {
       const ms = Math.round(offsetMs);
       ctx.font = `italic 600 ${Math.round(size * 0.5)}px ${font}`;
@@ -314,6 +325,24 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
       const label = judgment === "PERFECT" ? signed : `${offsetMs < 0 ? "EARLY" : "LATE"} ${signed}`;
       ctx.fillText(label, cx, readoutY);
     }
+    ctx.restore();
+  }
+  if (s.sustain) {
+    const current = chart.notes.flatMap(n => {
+      const h = holds.get(n.id);
+      const state = s.noteState.get(n.id);
+      return h && state && state !== "MISS" && s.nowMs >= n.beat * beatMs - 100 && s.nowMs <= (n.beat + n.duration) * beatMs + 700 ? [{ n, h }] : [];
+    }).slice(-4);
+    ctx.save();
+    ctx.textAlign = "left";
+    ctx.font = "bold 15px system-ui";
+    current.forEach(({ n, h }, i) => {
+      const pct = Math.floor(100 * h.earnedPoints / h.possiblePoints);
+      const down = s.pressed.has(n.pitch);
+      const label = h.releasedEarly ? "RELEASED EARLY" : pct === 100 ? down ? "HOLD TARGET MET · RELEASE" : "HOLD COMPLETE" : down ? "HOLD" : pct > 0 ? "HOLD CREDIT" : "HOLD UNCONFIRMED";
+      ctx.fillStyle = h.releasedEarly ? miss : "#5ef2c4";
+      ctx.fillText(`${label} · ${pct}%`, 16, line - 30 - i * 22);
+    });
     ctx.restore();
   }
 }

@@ -7,6 +7,7 @@ import { noteTimeMs } from "../core/judge";
 import { GOOD_MS, msPerBeat } from "../core/settings";
 import { pianoOutSettings } from "../piano-out";
 import { ReplayButton } from "./overlay";
+import { evaluateSustain } from "../core/sustain";
 
 // The replay's span on the chart clock: one bar before the first press to one bar after the last release.
 export function replaySpan(chart: Chart, take: Take) {
@@ -22,7 +23,7 @@ export function replaySpan(chart: Chart, take: Take) {
 export const replayChartTime = (perf: number, startPerf: number, firstPressMs: number, leadMs = pianoOutSettings.leadMs) =>
   firstPressMs + (perf - startPerf - leadMs);
 
-const heldUntil = (e: Take["events"][number]) => e.offTimeMs ?? e.timeMs + pianoOutSettings.heldMs;
+const heldUntil = (e: Take["events"][number], version = 1) => e.offTimeMs ?? e.timeMs + (version === 2 ? 0 : pianoOutSettings.heldMs);
 
 // What the highway shows at chart time t: each note in its judged state once it was judged (a hit at its press, a
 // miss once its window closed), the keys held by presses at t, and the latest judgment text.
@@ -38,8 +39,10 @@ export function highwayAt(chart: Chart, take: Take, results: Results, t: number)
     noteState.set(j.noteId, j.judgment);
     if (!latest || at >= latest.atMs) latest = { judgment: j.judgment, offsetMs: j.offsetMs, atMs: at };
   }
-  const pressed = new Set(take.events.filter((e) => e.velocity > 0 && e.timeMs <= t && t < heldUntil(e)).map((e) => e.pitch));
-  return { nowMs: t, noteState, pressed, latest, countInBeat: null };
+  const pressed = new Set(take.events.filter((e) => e.velocity > 0 && e.timeMs <= t && t < heldUntil(e, take.scoringVersion)).map((e) => e.pitch));
+  return { nowMs: t, noteState, pressed, latest, countInBeat: null,
+    ...(take.scoringVersion === 2 ? { sustain: evaluateSustain(chart, results.judgments.filter(j => j.eventIndex !== null && take.events[j.eventIndex].timeMs <= t), new Map(take.events.map((e, i) => [i, e])), t, true) } : {}),
+  };
 }
 
 export function replayView(): GamePlugin {

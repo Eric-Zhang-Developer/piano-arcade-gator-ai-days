@@ -6,12 +6,15 @@ const isBlack = (pitch: number) => [1, 3, 6, 8, 10].includes(pitch % 12);
 // Chrome Web MIDI. Prefers the DGX-660 ("Portable Grand"), else the first input.
 export function midiDevice(onStatus: (status: string) => void): InputDevice {
   let input: MIDIInput | null = null;
+  let generation = 0;
   return {
     kind: "midi",
     async start(onEvent) {
+      const run = ++generation;
       if (!navigator.requestMIDIAccess) return onStatus("MIDI: not supported (use Chrome)");
       try {
         const access = await navigator.requestMIDIAccess();
+        if (run !== generation) return;
         const inputs = [...access.inputs.values()];
         input = inputs.find((i) => i.name?.includes("Portable Grand")) ?? inputs[0] ?? null;
         if (!input) return onStatus("MIDI: no device, laptop keys only");
@@ -25,11 +28,14 @@ export function midiDevice(onStatus: (status: string) => void): InputDevice {
           onEvent({ type: on ? "on" : "off", pitch: d[1], velocity: on ? d[2] : 0, timeMs: m.timeStamp });
         };
       } catch (e) {
+        if (run !== generation) return;
         onStatus(`MIDI: ${(e as Error).name}, laptop keys only`);
       }
     },
     stop() {
+      generation++;
       if (input) input.onmidimessage = null;
+      input = null;
     },
   };
 }

@@ -1,12 +1,12 @@
 import { readFileSync } from "node:fs";
 import { afterEach, expect, test, vi } from "vitest";
 import type { Chart, Frame } from "../../contracts";
-import { settings } from "../core/settings";
+import { beatTiming } from "./timing";
 import { beatHits, beatTrack, endBeat } from "./index";
 
 const chart: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
 const mpb = 60000 / chart.bpm;
-const count = settings.countInBeats;
+const count = beatTiming(chart).countInPulses;
 const all = beatHits(chart, -Infinity, Infinity);
 const at = (note: number) => all.filter((h) => h.note === note).map((h) => h.atMs / mpb);
 const range = (from: number, to: number) => Array.from({ length: to - from }, (_, i) => from + i);
@@ -20,7 +20,7 @@ test("Twinkle: side stick on each count-in beat, hi-hat on beats 0–51, kick on
 });
 
 test("accent falls on beat 1 of each bar, count-in included", () => {
-  expect(all.filter((h) => h.note === 37 && h.accent).map((h) => h.atMs / mpb)).toEqual(range(-count, 0).filter((b) => (b + count) % 4 === 0));
+  expect(all.filter((h) => h.note === 37 && h.accent).map((h) => h.atMs / mpb)).toEqual(range(-count, 0).filter((b) => b % 4 === 0));
   expect(all.filter((h) => h.note === 42 && h.accent).map((h) => h.atMs / mpb)).toEqual([0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48]);
 });
 

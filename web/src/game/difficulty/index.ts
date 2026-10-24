@@ -10,10 +10,10 @@ import { difficulty, difficultySettings } from "./difficulty";
 export { difficulty, difficultyInputs, difficultySettings } from "./difficulty";
 
 // Chart time of the count-in's first bar: from the first count-in beat to the start of the second bar.
-export function firstCountInBar(chart: Pick<Chart, "bpm" | "beatsPerBar">): { fromMs: number; toMs: number } {
+export function firstCountInBar(chart: Pick<Chart, "id" | "bpm" | "beatsPerBar">): { fromMs: number; toMs: number } {
   const mpb = msPerBeat(chart.bpm);
   const fromMs = -countInBeats(chart) * mpb;
-  return { fromMs, toMs: fromMs + chart.beatsPerBar * mpb };
+  return { fromMs, toMs: fromMs + Math.min(chart.beatsPerBar, countInBeats(chart)) * mpb };
 }
 
 // A band across the playfield, between the fever meter's label and the count-in digit, which core draws at 0.45 of

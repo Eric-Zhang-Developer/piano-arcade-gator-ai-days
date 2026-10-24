@@ -179,3 +179,18 @@ describe("pause (play-slots)", () => {
     expect(stalls()).toBe(0);
   });
 });
+
+it("Home during pending access leaves no watchdog listeners or timer", async () => {
+  let allow!: (access: unknown) => void;
+  const request = new Promise(resolve => { allow = resolve; });
+  vi.stubGlobal("navigator", { requestMIDIAccess: () => request });
+  const add = vi.fn();
+  const device = midiWatchdog().wrapInput!({ kind: "midi", start: async () => {}, stop: vi.fn() });
+  const pending = device.start(vi.fn());
+  await Promise.resolve();
+  device.stop();
+  allow({ inputs: new Map(), addEventListener: add });
+  await pending;
+  expect(add).not.toHaveBeenCalled();
+  expect(vi.getTimerCount()).toBe(0);
+});

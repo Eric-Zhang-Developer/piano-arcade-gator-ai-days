@@ -16,6 +16,7 @@ export function PauseMenu({
   onResume,
   onRetry,
   onQuit,
+  onSkip,
 }: {
   mode: PauseMode;
   count: number; // countdown beats left; the bar's beats when the countdown starts
@@ -23,6 +24,7 @@ export function PauseMenu({
   onResume(): void;
   onRetry(): void;
   onQuit(): void;
+  onSkip?(): void;
 }) {
   // Every click of the countdown at once, when it shows: beatMs apart on the audio clock, not frame by frame. /play
   // sets count to the bar's beats as the countdown starts, so the first render of it has the right number.
@@ -43,6 +45,7 @@ export function PauseMenu({
         <div data-testid="pause-countdown" key={count} className={styles.count}>
           {count}
         </div>
+        {onSkip && <button onClick={onSkip}>Skip countdown</button>}
       </div>
     );
   if (mode !== "menu") return null;

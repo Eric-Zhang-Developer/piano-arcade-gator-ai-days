@@ -18,7 +18,7 @@ import { SfxControls } from "../../game/sound/SfxControls";
 import { nextPause, pauseClock, type PauseAction, type PauseMode } from "../../game/play-slots";
 import { Slots } from "../../game/play-slots/ui";
 import { PauseMenu } from "../../game/pause-skin";
-import { beatTiming } from "../../game/beat/timing";
+import { beatTiming, countdownSettings } from "../../game/beat/timing";
 import { ResultsLayout } from "../../game/results-layout";
 import { emptyHud, reduceHud } from "../../game/hud";
 import { barStep, holdClock, isWaitMode } from "../../game/wait-mode";
@@ -67,6 +67,7 @@ export default function Play() {
   const [loaded, setLoaded] = useState<{ chart: Chart; params: URLSearchParams } | null>(null); // for the panels
   const [pauseMode, setPauseMode] = useState<PauseMode>("playing");
   const [countdown, setCountdown] = useState(0);
+  const [canSkip, setCanSkip] = useState(false);
 
   const chartRef = useRef<Chart | null>(null);
   const keysRef = useRef<KeyRange | null>(null); // the keyboard for every take: the chart as loaded, before transforms
@@ -77,7 +78,8 @@ export default function Play() {
   const layerRefs = useRef<(HTMLCanvasElement | null)[]>([]);
   const stopRef = useRef<() => void>(() => {});
   const pauseRef = useRef<(a: PauseAction) => void>(() => {});
-  const startRef = useRef<() => void>(() => {}); // Retry from the pause menu, inside start itself
+  const startRef = useRef<(skipCountdown?: boolean) => void>(() => {});
+  const skipRef = useRef<() => void>(() => {});
 
   // Load settings and the chart once.
   useEffect(() => {
@@ -113,7 +115,7 @@ export default function Play() {
     };
   }, []);
 
-  const start = useCallback(() => {
+  const start = useCallback((skipCountdown = false) => {
     const chart = chartRef.current;
     const canvas = highwayRef.current;
     if (!chart || !canvas) return;
@@ -121,12 +123,14 @@ export default function Play() {
     setResults(null);
     setPhase("playing");
     setPauseMode("playing");
+    setCanSkip(!skipCountdown);
 
     const params = paramsRef.current ?? new URLSearchParams();
     const test = params.get("input") === "test";
     const perspective = Math.min(0.3, Math.max(0, Number(params.get("perspective")) || settings.perspective));
     const mpb = msPerBeat(chart.bpm);
     const pulse = beatTiming(chart);
+    const leadBeats = skipCountdown ? 0 : pulse.countInBeats;
     const lastNoteMs = Math.max(...chart.notes.map((n) => noteTimeMs(chart, n)));
 
     const take: Take = {
@@ -140,7 +144,7 @@ export default function Play() {
     const bgEl = backgroundRef.current;
     const background = bgEl ? (plugins.find((p) => p.background)?.background?.(bgEl) ?? null) : null;
     const hw: HighwayState = {
-      nowMs: -pulse.countInBeats * mpb,
+      nowMs: -leadBeats * mpb,
       noteState: new Map(),
       pressed: new Set(),
       pressedHand: new Map(),
@@ -172,7 +176,7 @@ export default function Play() {
     hw.noteState = judge.noteState;
     // Zero is fixed here, after the stage and judge are built, so songStart's atMs is the chart time now and a plugin's
     // performance.now() - atMs is the same zero the judge uses. Fixed before the build, it trailed by the build (#173).
-    const zeroPerf = performance.now() + pulse.countInBeats * mpb; // chart clock 0 = beat 0 of bar 1
+    const zeroPerf = performance.now() + leadBeats * mpb; // chart clock 0 = beat 0 of bar 1
     const pauses = pauseClock(zeroPerf); // stands still while paused (play-slots)
     // ?mode=wait: the chart clock also holds at each note until it's pressed, and nothing is a MISS (wait-mode).
     const wait = isWaitMode(params) ? holdClock(chart, judge.noteState) : null;
@@ -246,6 +250,7 @@ export default function Play() {
       hw.pressed.clear();
       hw.pressedHand!.clear();
     };
+    let skipVisible = !skipCountdown;
     // Pause, Resume, Retry and Quit (play-slots). Esc and the menu's buttons both come here.
     const act = (a: PauseAction) => {
       const next = nextPause(mode, a);
@@ -258,8 +263,8 @@ export default function Play() {
         endHeld(at);
       }
       if (next === "countdown") {
-        countdownUntil = perf + chart.beatsPerBar * mpb;
-        setCountdown((shownCount = pulse.pulsesPerBar));
+        countdownUntil = perf + countdownSettings.resumePulses * pulse.pulseMs;
+        setCountdown((shownCount = countdownSettings.resumePulses));
       }
       if (next === "playing") {
         pauses.resume(perf);
@@ -274,6 +279,12 @@ export default function Play() {
       router.push("/"); // Quit opens the music select (pause-skin)
     };
     pauseRef.current = act;
+    skipRef.current = () => {
+      if (mode !== "playing" || clock.now(performance.now()) >= -GOOD_MS) return;
+      // A fresh songStart keeps all recording plugins on the same epoch.
+      // The old transport is cancelled, never finished or saved.
+      startRef.current(true);
+    };
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape" || e.repeat) return;
       e.preventDefault();
@@ -334,6 +345,7 @@ export default function Play() {
       wait?.update(pauses.now(perf));
       const now = clock.now(perf);
       hw.nowMs = now;
+      if (skipVisible && now >= -GOOD_MS) { skipVisible = false; setCanSkip(false); }
       const beat = now < 0 ? Math.floor(now / pulse.pulseMs) + pulse.countInPulses + 1 : 0;
       hw.countInBeat = beat > 0 ? beat : null;
       if (beat > lastBeat) emit({ type: "countInBeat", beat, atMs: (beat - 1 - pulse.countInPulses) * pulse.pulseMs });
@@ -363,6 +375,8 @@ export default function Play() {
       for (const d of devices) d.stop();
     }
     stopRef.current = () => {
+      done = true;
+      emit({ type: "quit", atMs: clock.now(performance.now()) });
       stop();
       cancelAnimationFrame(idleRaf);
       background?.dispose();
@@ -431,8 +445,10 @@ export default function Play() {
           onResume={() => pauseRef.current("resume")}
           onRetry={() => pauseRef.current("retry")}
           onQuit={() => pauseRef.current("quit")}
+          onSkip={() => pauseRef.current("countdownDone")}
         />
       )}
+      {phase === "playing" && canSkip && pauseMode === "playing" && <button data-testid="skip-countdown" onClick={() => skipRef.current()} style={{ position: "fixed", top: 12, right: 12, zIndex: 100, padding: "10px 16px" }}>Skip countdown</button>}
       {phase !== "playing" && (
         <div style={overlay}>
           {phase === "loading" && <p>Loading chart…</p>}
@@ -449,7 +465,7 @@ export default function Play() {
               <p data-capture-hide style={{ opacity: 0.7 }}>
                 Laptop keys: A S D F G H J K L ; (white) · W E T Y U O P (black)
               </p>
-              <button style={button} onClick={start} autoFocus>
+              <button style={button} onClick={() => start()} autoFocus>
                 Start
               </button>
               {loaded && <Slots plugins={plugins} panel={(p) => p.startPanel?.(loaded)} />}
@@ -463,8 +479,8 @@ export default function Play() {
               score={score}
               timing={timing && <TimingPanel timing={timing} latency={latency} onLatency={onLatency} />}
               plugins={take && loaded ? plugins : []}
-              panel={(p) => take && loaded && p.resultsPanel?.({ ...loaded, take, results, retry: start })}
-              onRetry={start}
+              panel={(p) => take && loaded && p.resultsPanel?.({ ...loaded, take, results, retry: () => start() })}
+              onRetry={() => start()}
               settings={controls}
             />
           )}

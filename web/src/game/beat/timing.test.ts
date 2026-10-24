@@ -11,20 +11,20 @@ afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 
 // Chart BPM and positions are quarter notes. The sourced Nocturne meter is 12/8:
 // four dotted-quarter pulses per six-quarter bar, not six quarter-note clicks.
-test.each([100, 70])("Nocturne at %s percent has four equally spaced pulses per bar and a two-bar count-in", (percent) => {
+test.each([100, 70])("Nocturne at %s percent has four equally spaced pulses per bar and a three-pulse count-in", (percent) => {
   const chart = load("nocturne-op9-2");
   chart.bpm *= percent / 100;
   const quarterMs = 60000 / chart.bpm;
   const hits = beatHits(chart, -Infinity, 6 * quarterMs);
-  expect(hits.filter(h => h.note === 37).map(h => h.atMs / quarterMs)).toEqual([-12, -10.5, -9, -7.5, -6, -4.5, -3, -1.5]);
+  expect(hits.filter(h => h.note === 37).map(h => h.atMs / quarterMs)).toEqual([-4.5, -3, -1.5]);
   expect(hits.filter(h => h.note === 42).map(h => h.atMs / quarterMs)).toEqual([0, 1.5, 3, 4.5]);
-  expect(hits.filter(h => h.accent && h.note !== 36).map(h => h.atMs / quarterMs)).toEqual([-12, -6, 0]);
+  expect(hits.filter(h => h.accent && h.note !== 36).map(h => h.atMs / quarterMs)).toEqual([0]);
 });
 
-test("Twinkle keeps its existing quarter-note pulse and eight-beat count-in", () => {
+test("Twinkle keeps its existing quarter-note pulse and a shorter count-in", () => {
   const chart = load("twinkle");
   const hits = beatHits(chart, -Infinity, 2400);
-  expect(hits.filter(h => h.note === 37).map(h => h.atMs)).toEqual([-4800, -4200, -3600, -3000, -2400, -1800, -1200, -600]);
+  expect(hits.filter(h => h.note === 37).map(h => h.atMs)).toEqual([-1800, -1200, -600]);
   expect(hits.filter(h => h.note === 42).map(h => h.atMs)).toEqual([0, 600, 1200, 1800]);
 });
 
@@ -109,12 +109,12 @@ test.each(["twinkle", "nocturne-op9-2"].flatMap(song => [100, 70].map(percent =>
 
 
 test.each([
-  ["twinkle", 1, 4, 8],
-  ["minuet-g", 1, 3, 6],
-  ["nocturne-op9-2", 1.5, 4, 8],
-  ["fur-elise", 0.5, 3, 6],
-  ["chopin-prelude-4", 2, 2, 4],
-] as const)("%s uses its sourced pulse, complete bars and gap-free scheduling windows", (id, pulseBeats, pulsesPerBar, countInPulses) => {
+  ["twinkle", 1, 4, 3],
+  ["minuet-g", 1, 3, 3],
+  ["nocturne-op9-2", 1.5, 4, 3],
+  ["fur-elise", 0.5, 3, 3],
+  ["chopin-prelude-4", 2, 2, 3],
+] as const)("%s uses its sourced pulse, short count-in and gap-free scheduling windows", (id, pulseBeats, pulsesPerBar, countInPulses) => {
   const chart = load(id);
   chart.bpm *= .7;
   expect(beatTiming(chart)).toMatchObject({ pulseBeats, pulsesPerBar, countInPulses });

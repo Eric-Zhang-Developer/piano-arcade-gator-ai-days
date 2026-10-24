@@ -157,6 +157,13 @@ export function eventSounds(): GamePlugin {
       return chart;
     },
     onEvent(e) {
+      if (e.type === "quit") {
+        master?.disconnect();
+        master = null;
+        void audio?.close().catch(() => {});
+        audio = null;
+        return;
+      }
       if (wait && e.type === "songEnd") return;
       if (e.type === "songStart") {
         zeroPerf = performance.now() - e.atMs;

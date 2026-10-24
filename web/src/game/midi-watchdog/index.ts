@@ -67,6 +67,8 @@ export function midiWatchdog(): GamePlugin & { log: WatchdogEntry[] } {
       let last = 0; // performance.now() of the last message of any kind
       let sensing = false; // a 0xFE has arrived on this port
       let deliver: (e: InputEvent) => void = () => {};
+      let active = false;
+      let generation = 0;
 
       const onRaw = (m: Event) => {
         last = performance.now();
@@ -92,10 +94,11 @@ export function midiWatchdog(): GamePlugin & { log: WatchdogEntry[] } {
         }
       };
       // Same port pick as core: the DGX-660, else the first input. Watches raw messages, which core filters.
-      async function attach() {
+      async function attach(run = generation) {
         if (!navigator.requestMIDIAccess) return;
         try {
           const a = await navigator.requestMIDIAccess();
+          if (!active || run !== generation) return;
           const inputs = [...a.inputs.values()];
           const p = inputs.find((i) => i.name?.includes("Portable Grand")) ?? inputs[0] ?? null;
           port?.removeEventListener("midimessage", onRaw);
@@ -112,8 +115,11 @@ export function midiWatchdog(): GamePlugin & { log: WatchdogEntry[] } {
       // Core's start re-requests access and swaps its handler onto the port in one assignment: no gap. If Chrome
       // hands back a new port object, the old one's handler can still fire, so deliver() drops exact repeats.
       async function reconnect() {
+        const run = generation;
+        if (!active) return;
         await device.start(deliver);
-        await attach();
+        if (!active || run !== generation) return;
+        await attach(run);
       }
       function check() {
         if (!port || port.state !== "connected" || paused) return;
@@ -131,6 +137,8 @@ export function midiWatchdog(): GamePlugin & { log: WatchdogEntry[] } {
       return {
         kind: device.kind,
         async start(onEvent) {
+          active = true;
+          const run = ++generation;
           const seen = new Map<string, number>();
           deliver = (e) => {
             const key = `${e.type}:${e.pitch}:${e.timeMs}`;
@@ -140,11 +148,15 @@ export function midiWatchdog(): GamePlugin & { log: WatchdogEntry[] } {
             onEvent(e);
           };
           await device.start(deliver);
-          await attach();
+          if (!active || run !== generation) return;
+          await attach(run);
+          if (!active || run !== generation) return;
           last = performance.now();
           timer = setInterval(check, watchdogSettings.checkMs);
         },
         stop() {
+          active = false;
+          generation++;
           clearInterval(timer);
           port?.removeEventListener("midimessage", onRaw);
           access?.removeEventListener("statechange", onState);

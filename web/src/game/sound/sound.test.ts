@@ -66,3 +66,15 @@ test("wait mode: songEnd schedules no drumroll or rank hit", () => {
   expect(ending("mode=wait")).toBe(0);
   vi.unstubAllGlobals();
 });
+
+test("quit closes the take's audio context, including queued effect nodes", () => {
+  const close = vi.fn(async () => {});
+  vi.stubGlobal("AudioContext", function () {
+    return { resume: async () => {}, close, createGain: () => ({ gain: { value: 0 }, connect() {}, disconnect() {} }), destination: {} };
+  });
+  const plugin = eventSounds();
+  plugin.onEvent!({ type: "songStart", atMs: 0 });
+  plugin.onEvent!({ type: "quit", atMs: 10 });
+  expect(close).toHaveBeenCalledTimes(1);
+  vi.unstubAllGlobals();
+});

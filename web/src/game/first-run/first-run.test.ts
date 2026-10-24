@@ -1,13 +1,14 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { Chart, GameEvent } from "../../contracts";
-import { msPerBeat, settings } from "../core/settings";
+import { msPerBeat } from "../core/settings";
 import { cueAlpha, cueAt, cueBand, cuesFor, firstNote, firstRunSettings } from "./cues";
 import { firstRun } from ".";
+import { beatTiming } from "../beat/timing";
 
 const twinkle: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
 const mpb = msPerBeat(twinkle.bpm);
-const songStart: GameEvent = { type: "songStart", atMs: -settings.countInBeats * mpb };
+const songStart: GameEvent = { type: "songStart", atMs: -beatTiming(twinkle).countInBeats * mpb };
 
 // Twinkle's first n notes, each hit on time: noteHit, then combo, as the judge sends them.
 const onTime = (n: number): GameEvent[] =>

@@ -160,6 +160,7 @@ export function pianoOut(): GamePlugin {
       }
       // play-slots: keys while paused aren't part of the take, and the pause isn't replayed as silence.
       if (e.type === "pause" || e.type === "quit") {
+        if (state.playing) stopReplay();
         recording = false;
         pausedAt = performance.now();
       }

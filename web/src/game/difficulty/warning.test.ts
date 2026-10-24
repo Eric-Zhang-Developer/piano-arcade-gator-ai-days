@@ -27,8 +27,8 @@ function textsAt(chart: Chart, query: string, nowMs: number): string[] {
 }
 
 describe("WARNING card", () => {
-  it("covers the count-in's first bar: Twinkle at 100 BPM, 4/4, an 8-beat count-in", () => {
-    expect(firstCountInBar(load("twinkle"))).toEqual({ fromMs: -4800, toMs: -2400 });
+  it("covers the count-in's first bar: Twinkle at100BPM, clipped to its three-pulse countdown", () => {
+    expect(firstCountInBar(load("twinkle"))).toEqual({ fromMs: -1800, toMs: 0 });
   });
 
   it("shows on a level 13+ chart during the first bar only, with its level", () => {
@@ -41,8 +41,8 @@ describe("WARNING card", () => {
 
   it("stays off below 13, unless ?warn=1", () => {
     const twinkle = load("twinkle");
-    expect(textsAt(twinkle, "", -4000)).toEqual([]);
-    expect(textsAt(twinkle, "warn=1", -4000)).toEqual(["WARNING", "Lv 1"]);
+    expect(textsAt(twinkle, "", -1000)).toEqual([]);
+    expect(textsAt(twinkle, "warn=1", -1000)).toEqual(["WARNING", "Lv 1"]);
   });
 
   it("sits under the HUD panel and the fever meter, above the count-in digit", () => {
@@ -57,6 +57,6 @@ describe("WARNING card", () => {
 });
 
 
-test("Nocturne warning follows the first bar of its two-bar 12/8 count-in", () => {
-  expect(firstCountInBar(load("nocturne-op9-2"))).toEqual({ fromMs: -12000, toMs: -6000 });
+test("Nocturne warning follows the three-pulse12/8 countdown", () => {
+  expect(firstCountInBar(load("nocturne-op9-2"))).toEqual({ fromMs: -4500, toMs: 0 });
 });

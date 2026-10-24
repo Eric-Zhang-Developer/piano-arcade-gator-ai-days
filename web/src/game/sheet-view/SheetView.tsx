@@ -253,6 +253,7 @@ export function SheetView() {
   return (
     <main className={styles.sheet} data-sheet={rendered ? "ready" : "loading"}>
       <header className={styles.head} ref={headRef}>
+        <Link href="/" aria-label="Home — song selection">Home</Link>
         <div>
           <h1 className={styles.title}>{chart?.title ?? "Loading the score…"}</h1>
           {chart?.composer && <p className={styles.composer}>{chart.composer}</p>}

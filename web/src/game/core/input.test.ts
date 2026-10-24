@@ -1,5 +1,24 @@
-import { expect, test } from "vitest";
-import { keyMap } from "./input";
+import { afterEach, expect, test, vi } from "vitest";
+import { keyMap, midiDevice } from "./input";
+
+afterEach(() => vi.unstubAllGlobals());
+
+test("leaving while MIDI permission is pending cannot attach an old input handler", async () => {
+  let allow!: (access: { inputs: Map<string, object> }) => void;
+  const permission = new Promise<{ inputs: Map<string, object> }>(resolve => { allow = resolve; });
+  const input = { name: "Portable Grand", onmidimessage: null };
+  vi.stubGlobal("navigator", { requestMIDIAccess: () => permission });
+  const status = vi.fn();
+  const event = vi.fn();
+  const device = midiDevice(status);
+  const pending = device.start(event);
+  device.stop();
+  allow({ inputs: new Map([["piano", input]]) });
+  await pending;
+  expect(input.onmidimessage).toBeNull();
+  expect(status).not.toHaveBeenCalled();
+  expect(event).not.toHaveBeenCalled();
+});
 
 test("laptop keys from C4: whites on A–;, blacks on W E T Y U O P", () => {
   const m = keyMap(60);

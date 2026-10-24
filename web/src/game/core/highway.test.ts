@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import type { Chart } from "../../contracts";
 import { handColor } from "../hand-colors";
 import { fullRange, whiteIndex } from "../highway-zoom";
-import { drawHighway, isBlack, makeLayout, type HighwayState } from "./highway";
+import { meterLayout } from "../fever-gauge";
+import { drawHighway, isBlack, judgmentPlace, makeLayout, type HighwayState } from "./highway";
 import { settings } from "./settings";
 
 const chart = (pitches: number[]): Chart => ({
@@ -135,5 +136,22 @@ describe("makeLayout with a view (highway-zoom)", () => {
     expect(zoomed.keyX(60).width).toBeGreaterThan(plain.keyX(60).width);
     expect(zoomed.judgmentLineY).toBe(plain.judgmentLineY);
     expect([zoomed.lowPitch, zoomed.highPitch]).toEqual([60, 84]);
+  });
+});
+
+describe("the judgment word (#244)", () => {
+  // The issue's bar: where notes are dim and seconds away, so well past juice-visual's 500 ms. A note at height y is
+  // due in (line - y) / line × lookahead.
+  it.each([
+    [1280, 720],
+    [1920, 1080],
+    [1024, 768],
+  ])("at %i×%i it sits under the HUD's band and ends more than 1 s above the line", (w, h) => {
+    const L = makeLayout(chart([60, 69]), w, h, settings.perspective);
+    const line = L.judgmentLineY;
+    const p = judgmentPlace(w, line);
+    const meter = meterLayout(w, line).bar;
+    expect(p.cy - p.size / 2).toBeGreaterThanOrEqual(meter.y + meter.h);
+    expect(((line - p.bottom) / line) * settings.lookaheadMs).toBeGreaterThan(1000);
   });
 });

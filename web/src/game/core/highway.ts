@@ -2,20 +2,42 @@
 import type { Chart, Frame, Hand, Judgment } from "../../contracts";
 import { noteColorFor } from "../hand-colors";
 import { hitLinePath } from "../hit-line";
+import { meterLayout } from "../fever-gauge";
 import { whiteIndex as whiteIndexOf, type Range } from "../highway-zoom";
 import { drawBlackKey, drawWhiteKey } from "../key-skin";
 import { brightness, pillRect } from "../note-pills";
+import { gold, good, handR, miss, whenDisplayFontReady, wrong } from "../ui-tokens";
 import { msPerBeat, settings } from "./settings";
 
 const JUDGMENT_SHOW_MS = 600;
 // Keyed by name, not Record<Judgment>, so a judgment added to the contract doesn't break the build first.
-const JUDGMENT_COLORS: Record<string, string> = {
-  PERFECT: "#ffe27a",
-  GREAT: "#5ef2c4",
-  GOOD: "#7ab8ff",
-  MISS: "#c98a9a",
-  WRONG: "#ff3b4e",
-};
+// The HUD's counter colors (ui-tokens); GREAT has no token of its own and shares the right hand's mint.
+const JUDGMENT_COLORS: Record<string, string> = { PERFECT: gold, GREAT: handR, GOOD: good, MISS: miss, WRONG: wrong };
+const JUDGMENT_POP_MS = 120; // the word lands slightly large and settles; none under reduced motion
+
+// Where the judgment word goes: top center, just under the HUD's band (its panel and the fever strip), where notes are
+// dim and over a second from the line. It lies over the giant combo, which the HUD keeps faint (20%) so things read
+// through it; under the combo instead, it covered bright notes under a second away (the #244 complaint). The readout
+// under the word is its lowest line; bottom is where that ends.
+export function judgmentPlace(width: number, judgmentLineY: number) {
+  const size = Math.max(18, Math.round(judgmentLineY * 0.07));
+  const meter = meterLayout(width, judgmentLineY).bar;
+  const cy = meter.y + meter.h + size * 0.8;
+  return { cx: width / 2, cy, size, readoutY: cy + size * 0.85, bottom: cy + size * 1.1 };
+}
+// Body face until the display face has loaded, as the HUD does, so the word never draws in a half-loaded font.
+const BODY_FONT = "system-ui, sans-serif";
+let displayFont: string | null = null;
+function judgmentFont(): string {
+  if (displayFont === null && typeof document !== "undefined") {
+    displayFont = BODY_FONT;
+    whenDisplayFontReady().then(() => {
+      const family = getComputedStyle(document.documentElement).getPropertyValue("--pa-font-display").trim();
+      if (family) displayFont = `${family}, ${BODY_FONT}`;
+    });
+  }
+  return displayFont ?? BODY_FONT;
+}
 const BLACK_KEY_WIDTH = 0.6; // × white key width
 const MAX_PERSPECTIVE = 0.3;
 
@@ -254,19 +276,30 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
     ctx.fillText(String(s.countInBeat), L.width / 2, line * 0.45);
   }
 
-  if (s.latest && s.nowMs - s.latest.atMs < JUDGMENT_SHOW_MS) {
+  // The judgment word under the HUD's band (judgmentPlace): off the notes' path near the line. The flare at the key
+  // stays the feedback at the line.
+  const t = s.latest ? s.nowMs - s.latest.atMs : Infinity;
+  if (s.latest && t >= 0 && t < JUDGMENT_SHOW_MS) {
     const { judgment, offsetMs } = s.latest;
-    const size = Math.max(18, Math.round(line * 0.07));
+    const { cx, cy, size, readoutY } = judgmentPlace(L.width, line);
+    const pop = reducedMotion() || t >= JUDGMENT_POP_MS ? 1 : 1.15 - 0.15 * (t / JUDGMENT_POP_MS);
+    const fade = Math.min(1, (JUDGMENT_SHOW_MS - t) / 150);
+    const font = judgmentFont();
+    ctx.save();
+    ctx.globalAlpha = fade;
+    ctx.shadowColor = "rgba(0,0,0,0.85)";
+    ctx.shadowBlur = size * 0.35;
     ctx.fillStyle = JUDGMENT_COLORS[judgment];
-    ctx.font = `bold ${size}px system-ui, sans-serif`;
-    ctx.fillText(judgment, L.width / 2, line - size * 2);
+    ctx.font = `italic 800 ${Math.round(size * pop)}px ${font}`;
+    ctx.fillText(judgment, cx, cy);
     if (offsetMs !== null) {
       const ms = Math.round(offsetMs);
-      ctx.font = `${Math.round(size * 0.55)}px system-ui, sans-serif`;
+      ctx.font = `italic 600 ${Math.round(size * 0.5)}px ${font}`;
       const signed = `${ms > 0 ? "+" : ""}${ms} ms`;
       // GREAT and GOOD say which way you were off; PERFECT just shows the ms.
       const label = judgment === "PERFECT" ? signed : `${offsetMs < 0 ? "EARLY" : "LATE"} ${signed}`;
-      ctx.fillText(label, L.width / 2, line - size * 0.9);
+      ctx.fillText(label, cx, readoutY);
     }
+    ctx.restore();
   }
 }

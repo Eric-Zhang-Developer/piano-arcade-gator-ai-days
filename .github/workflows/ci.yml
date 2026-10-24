@@ -53,6 +53,71 @@ jobs:
       - name: Project checks
         run: pnpm -C web lint && pnpm -C web typecheck && pnpm -C web test && pnpm -C web build
 
+  browser:
+    # The headless game checks on GitHub's CPU (specs/features/ci-browser/spec.md): verify.mjs plus the checks a PR's
+    # changes need, every check on main, over 8 shards. Each check still starts its own server (phase 1).
+    name: browser (${{ matrix.shard }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:  # read-only: the operator board and replay read PRs, issues and runs through gh
+      contents: read
+      pull-requests: read
+      issues: read
+      actions: read
+      checks: read
+      statuses: read
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]  # 4 left one all-checks shard at 18.75 of 20 min (#415's first run)
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: web/package.json
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - name: Select
+        id: select
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.event.pull_request.base.ref) || '' }}
+          SHARD: ${{ matrix.shard }}/8
+        run: |
+          if [ -n "$BASE" ]; then args="--base $BASE --shard $SHARD"; else args="--all --shard $SHARD"; fi
+          list="$(node web/e2e/run-checks.mjs --list $args)"
+          echo "${list:-no checks in this shard}"
+          echo "args=$args" >> "$GITHUB_OUTPUT"
+          if [ -n "$list" ]; then echo "any=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Install
+        if: steps.select.outputs.any == 'true'
+        run: |
+          pnpm -C web install --frozen-lockfile
+          echo "PLAYWRIGHT_VERSION=$(node -p "require('./web/node_modules/playwright/package.json').version")" >> "$GITHUB_ENV"
+      - uses: actions/cache@v4
+        if: steps.select.outputs.any == 'true'
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ env.PLAYWRIGHT_VERSION }}
+      - name: Chromium
+        if: steps.select.outputs.any == 'true'
+        run: pnpm -C web exec playwright install --with-deps chromium
+      - name: Checks
+        if: steps.select.outputs.any == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node web/e2e/run-checks.mjs ${{ steps.select.outputs.args }} --out "$RUNNER_TEMP/evidence"
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-evidence-${{ matrix.shard }}
+          path: ${{ runner.temp }}/evidence
+          if-no-files-found: ignore
+
   issues:
     # After a merge: one issue per feature spec (closed when done), one GitHub milestone per milestone, and a
     # fresh pinned Status issue.

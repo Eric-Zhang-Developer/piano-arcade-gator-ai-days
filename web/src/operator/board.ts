@@ -47,7 +47,15 @@ export type Inputs = {
 };
 
 export type State = "done" | "in flight" | "ready" | "blocked" | "backlog" | "cut" | "unknown";
-export type Feature = { slug: string; name: string; state: State; milestone: string | null; assignee: string; pr: string | null };
+export type Feature = {
+  slug: string;
+  name: string;
+  state: State;
+  milestone: string | null;
+  assignee: string;
+  pr: string | null; // its open feat PR
+  dependsOn: string[];
+};
 export type NeedItem = { kind: string; text: string; url: string | null };
 export type CrewPr = { number: number; title: string; url: string; ci: Ci; isDraft: boolean };
 export type BoardPr = Omit<AnyPr, "body"> & { worker: string };
@@ -163,6 +171,7 @@ export function buildBoard(i: Inputs): Board {
     milestone: milestoneOf(s.slug),
     assignee: s.assignee,
     pr: prOf.get(s.slug) ?? null,
+    dependsOn: s.dependsOn,
   }));
 
   let crew: Board["crew"] = null;

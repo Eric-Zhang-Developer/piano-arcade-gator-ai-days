@@ -42,6 +42,7 @@ test("in flight comes from open feat(<slug>) PR titles only", () => {
   }));
   expect(b.features.map((f) => f.state)).toEqual(["in flight", "ready"]);
   expect(b.features.map((f) => f.pr)).toEqual(["https://github.com/o/r/pull/1", null]);
+  expect(buildBoard(inputs({ specs: [spec("b", ["a"])] })).features[0].dependsOn).toEqual(["a"]);
 });
 
 test("milestones reader on the real milestones.toml; one spec per feature folder", () => {

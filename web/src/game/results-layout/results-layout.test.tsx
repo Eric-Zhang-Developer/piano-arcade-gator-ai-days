@@ -56,6 +56,18 @@ test("a featured plugin with no panel this time leaves nothing in the first view
   expect(html).not.toContain("slot-take-graph");
 });
 
+test("a chunk-practice step features chunk practice's panel, and the graph moves to the details (#294)", () => {
+  const all = [...plugins, plugin("chunk-practice", "NEXT")];
+  const html = render({ plugins: all, params: new URLSearchParams("song=twinkle&from=1&to=4&practice=1") });
+  const ceremony = between(html, 'data-testid="results"', 'id="results-details"');
+  const details = html.slice(html.indexOf('id="results-details"'));
+  expect(ceremony).toContain("NEXT");
+  expect(ceremony).not.toContain("GRAPH");
+  expect(details).toContain('aria-label="Take graph"');
+  const plain = render({ plugins: all, params: new URLSearchParams("song=twinkle") });
+  expect(between(plain, 'data-testid="results"', 'id="results-details"')).toContain("GRAPH");
+});
+
 test("wait mode shows no rank or counts", () => {
   const html = render({ scored: false });
   expect(html).toContain('data-testid="unscored"');

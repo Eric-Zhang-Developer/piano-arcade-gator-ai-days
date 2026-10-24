@@ -34,7 +34,8 @@ was never measured, `spikes/piano-midi/RESULTS.md`).
 
 ## Validation
 - `pnpm -C web test`: taps at a steady +30 ms give 30. Taps with the first 4 off by 200 ms still give 30. Five taps
-  save nothing. A spread of 60 ms saves nothing. +400 ms clamps to `LATENCY_MAX`.
+  save nothing. A spread of 60 ms saves nothing. +200 ms clamps to `LATENCY_MAX`. (+400 can't: at 100 BPM
+  the clicks are 600 ms apart, so +400 pairs with the next click as -200.)
 - `verify.py --slug calibration` passes.
 - In Chrome: open `/calibrate` and tap Space along to the clicks -> the page shows an offset and a spread. Open
   `/play` -> the slider shows the same offset. Tap randomly -> "too spread", and nothing changes.

@@ -29,6 +29,12 @@ features = ["song-select", "minuet-g", "operator-board", "piano-sim", "hud", "ju
 cut = []
 
 [[milestone]]
+name = "library"
+ship = ""
+features = ["song-pack-1", "song-pack-2"]
+cut = []
+
+[[milestone]]
 name = "lights"
 ship = ""
 features = ["led-strip", "led-game"]

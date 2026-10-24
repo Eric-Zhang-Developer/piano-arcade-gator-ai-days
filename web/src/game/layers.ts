@@ -37,6 +37,7 @@ import { waitMode } from "./wait-mode/plugin";
 import { waitHint } from "./wait-hint";
 import { sheetView } from "./sheet-view/plugin";
 import { createSavePlugin, queueAndSend } from "../data/save-plugin";
+import { crashGuard } from "./crash-guard";
 
 // Open file: each game feature registers its plugin here, one line each. /play draws every plugin's layer on its
 // own canvas above the highway, forwards every GameEvent, and applies transformChart and wrapInput in this order.
@@ -79,4 +80,5 @@ export const plugins: GamePlugin[] = [
   cabinet(), // ?cabinet=1 returns a finished game to /cabinet; ?cabinet=demo starts the demo and reports it
   createSavePlugin(queueAndSend), // take-store: saves finished takes after the results screen
   sheetView(), // last: posts the chart as played (after every transformChart) to /sheet; "Sheet music ↗" on the start screen
+  crashGuard(), // ?crash=draw|event: a plugin that throws on purpose, for crash-guard's check; inert without ?crash
 ];

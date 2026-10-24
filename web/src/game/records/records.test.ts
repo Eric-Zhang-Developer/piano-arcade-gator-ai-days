@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Chart, GameEvent, Results } from "../../contracts";
 import { records } from ".";
-import { addTake, betterGrade, loadRecords, NO_INITIALS, practiceReason, RECORDS_KEY, setInitials, type Records } from "./store";
+import { addTake, betterGrade, loadRecords, NO_INITIALS, practiceReason, recordKey, RECORDS_KEY, setInitials, type Records } from "./store";
 
 const take = (score: number, accuracy = 0.9, rank: "S" | "A" | "B" | "C" | "D" = "A", date = `2026-10-24T00:00:0${score % 10}Z`) => ({ score, accuracy, rank, maxCombo: 10, date });
 
@@ -92,6 +92,15 @@ describe("the plugin", () => {
     const saved = JSON.parse(store.get(RECORDS_KEY)!);
     expect(saved.twinkle.top).toHaveLength(1);
     expect(saved.twinkle.top[0]).toMatchObject({ score: 300, rank: "S", initials: NO_INITIALS }); // 3 PERFECT at x1
+  });
+
+  it("an Easy take saves under <id>@easy and leaves the Normal records alone (easy-charts)", () => {
+    const { store } = play("song=twinkle&level=easy");
+    const saved = JSON.parse(store.get(RECORDS_KEY)!);
+    expect(Object.keys(saved)).toEqual(["twinkle@easy"]);
+    expect(recordKey("fur-elise", new URLSearchParams("level=easy"))).toBe("fur-elise@easy");
+    expect(recordKey("fur-elise", new URLSearchParams("level=normal"))).toBe("fur-elise");
+    expect(recordKey("fur-elise", new URLSearchParams())).toBe("fur-elise");
   });
 
   it("records nothing for a practice take", () => {

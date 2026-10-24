@@ -4,7 +4,7 @@ import { createElement } from "react";
 import type { GamePlugin } from "../../contracts";
 import { emptyHud, reduceHud } from "../hud";
 import { RecordsPanel, type Outcome } from "./panel";
-import { addTake, browserStorage, loadRecords, practiceReason, saveRecords } from "./store";
+import { addTake, browserStorage, loadRecords, practiceReason, recordKey, saveRecords } from "./store";
 
 export function records(): GamePlugin {
   let chartId = "";
@@ -14,7 +14,7 @@ export function records(): GamePlugin {
   return {
     id: "records",
     transformChart(chart, p) {
-      chartId = chart.id;
+      chartId = recordKey(chart.id, p);
       params = p;
       return chart;
     },

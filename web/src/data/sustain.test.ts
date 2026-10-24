@@ -9,13 +9,13 @@ const chart: Chart = { id: "hold", title: "Hold", composer: "fixture", source: "
 const ids = { takeId: "00000000-0000-4000-8000-000000000001", playerId: "00000000-0000-4000-8000-000000000002", chartSha256: "f".repeat(64) };
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
-test.each([false, true])("save recording preserves frozen-clock release evidence; released in pause=%s", async releasedInPause => {
+test.each([[false, 2], [true, 2], [false, 3], [true, 3]] as const)("save recording preserves frozen-clock release evidence; released=%s policy=%s", async (releasedInPause, version) => {
   let now = 1000;
   vi.spyOn(performance, "now").mockImplementation(() => now);
   vi.stubGlobal("localStorage", { getItem: () => null });
   const saved: Take[] = [];
   const plugin = createSavePlugin((_id, take) => saved.push(take), async () => chart);
-  plugin.transformChart!(chart, new URLSearchParams());
+  plugin.transformChart!(chart, new URLSearchParams(`scoring=${version}`));
   let fire: (e: InputEvent) => void = () => {};
   plugin.wrapInput!({ kind: "midi", start(cb) { fire = cb; }, stop() {} }).start(() => {});
   plugin.onEvent!({ type: "songStart", atMs: 0 });
@@ -27,13 +27,13 @@ test.each([false, true])("save recording preserves frozen-clock release evidence
   if (!releasedInPause) fire({ type: "off", pitch: 60, velocity: 0, timeMs: 7000 });
   plugin.onEvent!({ type: "songEnd", atMs: 1200, results: {} as never });
   await vi.waitFor(() => expect(saved).toHaveLength(1));
-  expect(saved[0].scoringVersion).toBe(2);
+  expect(saved[0].scoringVersion).toBe(version);
   expect(saved[0].events).toEqual([{ pitch: 60, velocity: 80, timeMs: 0, offTimeMs: releasedInPause ? 400 : 1000 }]);
   const result = judgeTake(chart, saved[0]);
   expect(result.sustain!.earnedPoints).toBe(releasedInPause ? 40 : 100);
   const row = takeRows(ids, chart, saved[0], result).take;
-  expect([row.judge_version, row.contract_version]).toEqual([2, 2]);
-  expect(row.take.scoringVersion).toBe(2);
+  expect([row.judge_version, row.contract_version]).toEqual([version, version]);
+  expect(row.take.scoringVersion).toBe(version);
   expect(row.results.sustain).toEqual(result.sustain);
 });
 
@@ -54,7 +54,7 @@ test("matched phase timestamps survive delayed plugin dispatch without shifting 
   vi.stubGlobal("localStorage", { getItem: () => null });
   const saved: Take[] = [];
   const plugin = createSavePlugin((_id, take) => saved.push(take), async () => chart);
-  plugin.transformChart!(chart, new URLSearchParams());
+  plugin.transformChart!(chart, new URLSearchParams("scoring=2"));
   let fire: (e: InputEvent) => void = () => {};
   plugin.wrapInput!({ kind: "midi", start(cb) { fire = cb; }, stop() {} }).start(() => {});
   plugin.onEvent!({ type: "songStart", atMs: 0, performanceMs: 1000 });

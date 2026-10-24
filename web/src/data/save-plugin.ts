@@ -65,7 +65,7 @@ export function sameChart(a: Chart, b: Chart): boolean {
 }
 
 interface Recording {
-  scoringVersion: 1 | 2;
+  scoringVersion: 1 | 2 | 3;
   pausedChartMs: number | null;
   active: Map<number, number>;
   zeroPerf: number;
@@ -104,20 +104,20 @@ export function createSavePlugin(sink: TakeSink, loadChart: LoadChart = loadComm
 
   const record = (kind: InputKind, type: "on" | "off", pitch: number, velocity: number, perfMs: number, cancelled = false) => {
     if (!rec) return;
-    if (rec.scoringVersion === 2 && rec.pausedChartMs !== null && type === "on") return;
-    const t = rec.scoringVersion === 2 && rec.pausedChartMs !== null ? rec.pausedChartMs : perfMs - rec.zeroPerf - rec.latency;
+    if (rec.scoringVersion >= 2 && rec.pausedChartMs !== null && type === "on") return;
+    const t = rec.scoringVersion >= 2 && rec.pausedChartMs !== null ? rec.pausedChartMs : perfMs - rec.zeroPerf - rec.latency;
     if (type === "on") {
       if (!rec.events.length) rec.scoringVersion = scoringVersion(params);
       const previous = rec.active.get(pitch);
-      if (rec.scoringVersion === 2 && previous !== undefined) rec.events[previous].offTimeMs = Math.max(rec.events[previous].timeMs, t);
+      if (rec.scoringVersion >= 2 && previous !== undefined) rec.events[previous].offTimeMs = Math.max(rec.events[previous].timeMs, t);
       rec.kind ??= kind;
       rec.events.push({ pitch, velocity, timeMs: t, offTimeMs: null });
       rec.active.set(pitch, rec.events.length - 1);
     } else {
       const index = rec.active.get(pitch);
-      const ev = rec.scoringVersion === 2 ? index === undefined ? undefined : rec.events[index] : rec.events.findLast((x) => x.pitch === pitch && x.offTimeMs === null);
+      const ev = rec.scoringVersion >= 2 ? index === undefined ? undefined : rec.events[index] : rec.events.findLast((x) => x.pitch === pitch && x.offTimeMs === null);
       rec.active.delete(pitch);
-      if (ev && !(rec.scoringVersion === 2 && cancelled)) ev.offTimeMs = Math.max(ev.timeMs, t);
+      if (ev && !(rec.scoringVersion >= 2 && cancelled)) ev.offTimeMs = Math.max(ev.timeMs, t);
     }
   };
 
@@ -148,10 +148,10 @@ export function createSavePlugin(sink: TakeSink, loadChart: LoadChart = loadComm
       if (e.type === "songStart") {
         current = null;
         setStatus(null);
-        rec = { scoringVersion: scoringVersion(params), pausedChartMs: null, active: new Map(), zeroPerf: (scoringVersion(params) === 2 ? e.performanceMs ?? performance.now() : performance.now()) - e.atMs, latency: loadLatencyOffset(), startedAt: new Date().toISOString(), kind: null, events: [] };
-      } else if (e.type === "pause" && rec?.scoringVersion === 2) {
+        rec = { scoringVersion: scoringVersion(params), pausedChartMs: null, active: new Map(), zeroPerf: (scoringVersion(params) >= 2 ? e.performanceMs ?? performance.now() : performance.now()) - e.atMs, latency: loadLatencyOffset(), startedAt: new Date().toISOString(), kind: null, events: [] };
+      } else if (e.type === "pause" && rec && rec.scoringVersion >= 2) {
         rec.pausedChartMs = e.atMs - rec.latency;
-      } else if (e.type === "resume" && rec?.scoringVersion === 2) {
+      } else if (e.type === "resume" && rec && rec.scoringVersion >= 2) {
         rec.zeroPerf = (e.performanceMs ?? performance.now()) - e.atMs;
         rec.pausedChartMs = null;
       } else if (e.type === "quit") {
@@ -166,7 +166,7 @@ export function createSavePlugin(sink: TakeSink, loadChart: LoadChart = loadComm
         }
         setStatus({ state: "checking" });
         const take: Take = {
-          ...(r.scoringVersion === 2 ? { scoringVersion: 2 as const } : {}),
+          ...(r.scoringVersion >= 2 ? { scoringVersion: r.scoringVersion } : {}),
           chartId: played.id,
           startedAt: r.startedAt,
           latencyOffsetMs: r.latency,

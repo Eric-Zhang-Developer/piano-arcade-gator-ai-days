@@ -1,6 +1,6 @@
 // Take + Results -> database rows. Pure: the server route and the local fallback both use it.
 import type { Chart, Judgment, Results, Take } from "../contracts";
-import { CONTRACT_VERSION, JUDGE_VERSION, SUSTAIN_VERSION } from "./config";
+import { CONTRACT_VERSION, JUDGE_VERSION, SUSTAIN_VERSION, FORGIVING_VERSION } from "./config";
 
 export interface TakeRow {
   id: string;
@@ -73,7 +73,7 @@ export function takeRows(
   results: Results,
 ): { take: TakeRow; notes: NoteRow[] } {
   if (take.inputDevice === "test") throw new Error("test takes are never stored");
-  if ((take.scoringVersion === 2) !== (results.sustain?.version === 2)) throw new Error("take/results scoring policy mismatch");
+  if (((take.scoringVersion ?? 1) >= 2) !== (results.sustain?.version === 2)) throw new Error("take/results scoring policy mismatch");
   const byId = new Map(chart.notes.map((n) => [n.id, n]));
   const notes = results.judgments.map((j): NoteRow => {
     const n = byId.get(j.noteId);
@@ -97,8 +97,8 @@ export function takeRows(
       player_id: ids.playerId,
       song_id: chart.id,
       chart_sha256: ids.chartSha256,
-      judge_version: take.scoringVersion === 2 ? SUSTAIN_VERSION : JUDGE_VERSION,
-      contract_version: take.scoringVersion === 2 ? SUSTAIN_VERSION : CONTRACT_VERSION,
+      judge_version: (take.scoringVersion ?? 1) >= 2 ? take.scoringVersion === 3 ? FORGIVING_VERSION : SUSTAIN_VERSION : JUDGE_VERSION,
+      contract_version: (take.scoringVersion ?? 1) >= 2 ? take.scoringVersion === 3 ? FORGIVING_VERSION : SUSTAIN_VERSION : CONTRACT_VERSION,
       started_at: take.startedAt,
       input_device: take.inputDevice,
       latency_offset_ms: Math.round(take.latencyOffsetMs),

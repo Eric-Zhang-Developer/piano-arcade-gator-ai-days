@@ -7,9 +7,9 @@ anonymous Supabase users with an optional Google link, and `/progress` shows eac
 `web/src/app/api/progress/`, `web/src/app/progress/`, `web/src/app/auth/callback/`, one line in `web/src/game/layers.ts`.
 
 ## How to check it
-`verify: ... pass at 08b3ecb` (now with the piano-sim MIDI path) (42/42 PERFECT; test takes not sent). Local stack: Chrome laptop-keys take, rank S with 1 MISS, one
+`verify: ... pass at c16236f` (42/42 PERFECT, test input and the piano-sim MIDI path) (42/42 PERFECT; test takes not sent). Local stack: Chrome laptop-keys take, rank S with 1 MISS, one
 `takes` row and 42 `note_judgments`, missed bar first on `/progress`, no duplicate after reload. 14/14 abuse checks
-(`supabase/tests/local-stack/attacks.mjs`: forged tokens, lying scores, id hijack, cross-player reads). Vitest 49/49. `node supabase/tests/migrations.mjs`: pass, 3 migrations apply and keep the rules (18 checks).
+(`supabase/tests/local-stack/attacks.mjs`: forged tokens, lying scores, id hijack, cross-player reads). Vitest 588 passed, 1 skipped (whole app). `node supabase/tests/migrations.mjs`: pass, 3 migrations apply and keep the rules (18 checks).
 Live project: `node supabase/tests/live-smoke.mjs` pass, 8/8 (anonymous sign-in, save_take, a later GOOD, own-row reads, RLS).
 
 ## Gaps

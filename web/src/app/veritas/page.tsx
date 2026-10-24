@@ -1,6 +1,7 @@
 // /veritas: test players play real songs with planted mistakes, and the real judge has to find exactly those.
-// The hero runs in the browser (web/src/veritas/hero.tsx); the dashboard of the last CI run comes with freeze.mjs.
+// The hero runs in the browser (web/src/veritas/hero.tsx); the dashboard reads the last CI run frozen by freeze.mjs.
 import type { Metadata } from "next";
+import { Dashboard } from "../../veritas/dashboard";
 import { Hero } from "../../veritas/hero";
 import styles from "./veritas.module.css";
 
@@ -19,7 +20,7 @@ export default function VeritasPage() {
       <Hero />
       <section className={styles.dashboard} aria-label="The last CI run">
         <h2 className={styles.h2}>The last CI run</h2>
-        <p className={styles.dim}>No snapshot frozen yet: run node web/src/veritas/freeze.mjs</p>
+        <Dashboard />
       </section>
     </main>
   );

@@ -114,13 +114,13 @@ function RunView({ index, name, id, does, done }: { index: number; name: string;
           <i key={`p${n}`} className={styles.press} style={vars({ x: ms / span })} />
         ))}
         {marks.map((m, n) => (
-          <b key={m.k} className={`${styles.mark} ${styles[m.kind]}`} style={vars({ x: m.x, row: n % 3 })}>
+          <b key={m.k} className={`${styles.mark} ${styles[m.kind]}`} style={vars({ x: m.x, row: n % 3 })} data-mark={m.kind}>
             {m.label}
           </b>
         ))}
         <span className={styles.playhead} />
       </div>
-      <p className={styles.tally}>
+      <p className={styles.tally} data-tally="">
         <span className={styles.num}>{t.planted}</span> planted,{" "}
         {tempo ? (
           <span className={styles.dim}>no rushing flag yet (#{RUSHER_ISSUE})</span>

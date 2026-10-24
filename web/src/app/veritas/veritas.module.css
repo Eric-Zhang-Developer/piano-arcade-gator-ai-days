@@ -241,3 +241,74 @@
   padding-top: 24px;
   border-top: 1px solid rgba(255, 47, 208, 0.4);
 }
+
+.dash a {
+  color: var(--pa-cyan);
+  text-underline-offset: 3px;
+}
+
+.dash a:focus-visible {
+  outline: 3px solid var(--pa-magenta);
+  outline-offset: 3px;
+}
+
+.h3 {
+  margin: 24px 0 8px;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 800;
+}
+
+.jobs,
+.suites {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.suites {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+}
+
+/* Pass and fail say so in words; the color only repeats it. Red stays WRONG's alone (visual-direction.md). */
+.pass {
+  color: var(--pa-cyan);
+}
+
+.fail {
+  color: var(--pa-sun);
+  font-weight: 800;
+}
+
+.checks {
+  border-collapse: collapse;
+}
+
+.checks td {
+  padding: 2px 24px 2px 0;
+}
+
+.shots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.shots figure {
+  margin: 0;
+}
+
+.shots img {
+  display: block;
+  width: 100%;
+  border: 1px solid rgba(242, 242, 245, 0.2);
+}
+
+.shots figcaption {
+  color: var(--pa-ink-dim);
+  font-size: 0.8em;
+}

@@ -1,6 +1,7 @@
 // The highway: a flat-or-mildly-tilted lane per key, notes falling to the keyboard. Canvas 2D, no React.
 import type { Chart, Frame, Hand, Judgment } from "../../contracts";
 import { noteColorFor } from "../hand-colors";
+import { brightness, pillRect } from "../note-pills";
 import { msPerBeat, settings } from "./settings";
 
 const JUDGMENT_SHOW_MS = 600;
@@ -74,9 +75,10 @@ export function makeLayout(chart: Chart, width: number, height: number, perspect
   };
 }
 
-// A rounded quad from x-range [x0, x1] (at the line) between yTop and yBottom, through the perspective.
-function bar(ctx: CanvasRenderingContext2D, L: Layout, x0: number, x1: number, yTop: number, yBottom: number) {
-  const r = Math.min(6, (x1 - x0) / 3, (yBottom - yTop) / 2);
+// A rounded quad from x-range [x0, x1] (at the line) between yTop and yBottom, through the perspective. Fills it
+// unless fill is false (the path is left for a clip).
+function bar(ctx: CanvasRenderingContext2D, L: Layout, x0: number, x1: number, yTop: number, yBottom: number, radius = 6, fill = true) {
+  const r = Math.min(radius, (x1 - x0) / 3, (yBottom - yTop) / 2);
   const tl = L.project(x0, yTop), tr = L.project(x1, yTop);
   const bl = L.project(x0, yBottom), br = L.project(x1, yBottom);
   ctx.beginPath();
@@ -86,7 +88,7 @@ function bar(ctx: CanvasRenderingContext2D, L: Layout, x0: number, x1: number, y
   ctx.arcTo(bl, yBottom, tl, yTop, r);
   ctx.arcTo(tl, yTop, tr, yTop, r);
   ctx.closePath();
-  ctx.fill();
+  if (fill) ctx.fill();
 }
 
 export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Chart, s: HighwayState): void {
@@ -124,17 +126,29 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
     const yBottom = line - (startMs - s.nowMs) * pxPerMs;
     const yTop = line - (startMs + n.duration * beatMs - s.nowMs) * pxPerMs;
     if (yBottom < 0 || yTop > line) continue;
-    const k = L.keyX(n.pitch);
-    const inset = k.width * 0.08;
-    const x1 = k.x + inset;
-    const x2 = k.x + k.width - inset;
+    // A pill sized to its key (note-pills), dim far from the line and full brightness at it. Dimmed by alpha over a
+    // black underlay, so the hand's color stays exact and a background layer never shows through a far note.
+    const pill = pillRect(L.keyX(n.pitch), L.isBlack(n.pitch));
+    const x1 = pill.x;
+    const x2 = pill.x + pill.width;
     const top = Math.min(yTop + settings.noteGapPx, yBottom - settings.noteHeadPx * 2);
-    ctx.fillStyle = state === "MISS" ? settings.missColor : color(n.hand);
-    bar(ctx, L, x1, x2, top, yBottom - 1);
-    if (state !== "MISS") {
-      ctx.fillStyle = settings.noteHeadColor;
-      bar(ctx, L, x1, x2, yBottom - 1 - settings.noteHeadPx, yBottom - 1);
+    const b = state === "MISS" ? 1 : brightness(startMs - s.nowMs, settings.lookaheadMs);
+    if (b < 1) {
+      ctx.fillStyle = "#000";
+      bar(ctx, L, x1, x2, top, yBottom - 1, pill.radius);
+      ctx.globalAlpha = b;
     }
+    ctx.fillStyle = state === "MISS" ? settings.missColor : color(n.hand);
+    bar(ctx, L, x1, x2, top, yBottom - 1, pill.radius);
+    if (state !== "MISS") {
+      // The head is the pill's leading edge, clipped to its rounded end.
+      ctx.save();
+      ctx.clip();
+      ctx.fillStyle = settings.noteHeadColor;
+      ctx.fillRect(0, yBottom - 1 - settings.noteHeadPx, L.width, settings.noteHeadPx);
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
   }
   ctx.restore();
 

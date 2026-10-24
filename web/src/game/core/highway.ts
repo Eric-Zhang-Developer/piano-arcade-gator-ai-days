@@ -82,6 +82,7 @@ export function makeLayout(chart: Chart, width: number, height: number, perspect
   const whiteIndex = new Map<number, number>();
   for (let p = lowPitch; p <= highPitch; p++) if (!isBlack(p)) whiteIndex.set(p, whiteIndex.size);
   const whiteW = width / whiteIndex.size;
+  const w0 = whiteIndexOf(lowPitch); // the lowest key's white index: whiteIndex.get(p) is whiteIndexOf(p) - w0
   const blackW = whiteW * BLACK_KEY_WIDTH;
 
   const keyboardHeight = Math.min(height * 0.22, whiteW * 4.5);
@@ -119,9 +120,11 @@ export function makeLayout(chart: Chart, width: number, height: number, perspect
     keyboardHeight,
     perspective: p,
     isBlack,
+    // Any pitch, not just the chart's: a key pressed outside the range lies off-screen instead of at NaN, which threw
+    // in createRadialGradient and stopped the game (the hit-line glow, juice and ghost all ask for pressed keys).
     keyX(pitch) {
-      if (!isBlack(pitch)) return { x: whiteIndex.get(pitch)! * whiteW, width: whiteW };
-      return { x: (whiteIndex.get(pitch - 1)! + 1) * whiteW - blackW / 2, width: blackW };
+      if (!isBlack(pitch)) return { x: (whiteIndexOf(pitch) - w0) * whiteW, width: whiteW };
+      return { x: (whiteIndexOf(pitch - 1) - w0 + 1) * whiteW - blackW / 2, width: blackW };
     },
     project(x, y) {
       const t = Math.max(0, Math.min(1, y / judgmentLineY));

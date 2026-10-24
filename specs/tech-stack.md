@@ -8,6 +8,7 @@ New dependencies only through a `contract:` PR (`web/package.json` and `web/pnpm
 | Package manager | pnpm, pinned with the `packageManager` field; teammates run `corepack enable` once. |
 | Rendering | One 2D canvas per layer, driven by `requestAnimationFrame`. Game state per frame lives in refs, never React state; React renders menus and the results screen only. One exception: at most one WebGL background under the highway, through `GamePlugin.background` (`fever-stage`). |
 | 3D | three.js (`three`, pinned), for the fever stage and the attract mode. It never draws notes, keys or the judgment line, which stay 2D. |
+| Sheet music | OpenSheetMusicDisplay (`opensheetmusicdisplay`, pinned), only in the sheet-music window (`/sheet`); never on the arcade screen (decision 001, row 13). |
 | Input | Chrome Web MIDI (`navigator.requestMIDIAccess`) and laptop keys, behind one input interface. Client components only. |
 | Sound | Web Audio API, scheduled on the audio clock. No audio libraries unless a `contract:` PR adds one. |
 | Data / database | Supabase Postgres (free tier) for take history only (`take-store`). Written only by Next.js server routes with the secret key; migrations in `supabase/migrations/`. Charts stay JSON files in `web/public/songs/`; settings (latency offset) stay in `localStorage`. The game is fully playable with the database unreachable: nothing in the playing loop touches the network. |

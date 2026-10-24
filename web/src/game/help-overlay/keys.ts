@@ -94,4 +94,5 @@ export const helpGroups: HelpGroup[] = [
 export const unlisted: Record<string, string> = {
   "game/cabinet/idle.ts": "any key restarts the cabinet's idle timer: not a control",
   "game/song-preview/index.tsx": "Enter and L stop the preview as you leave the select: the select's lines cover them",
+  "game/ui-sounds/index.ts": "notes the page's first key or pointer press, after which UI sounds may play: not a control",
 };

@@ -31,8 +31,10 @@ export function scoreCard(): GamePlugin {
 
 function SaveCard({ model }: { model: CardModel }) {
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
   const save = async () => {
     setBusy(true);
+    setFailed(false);
     try {
       await whenDisplayFontReady();
       const family = getComputedStyle(document.documentElement).getPropertyValue("--pa-font-display").trim();
@@ -40,24 +42,33 @@ function SaveCard({ model }: { model: CardModel }) {
       canvas.width = CARD_W;
       canvas.height = CARD_H;
       const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+      if (!ctx) throw new Error("no 2D canvas");
       drawCard(ctx, model, family ? `${family}, system-ui, sans-serif` : undefined);
       const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
-      if (!blob) return;
+      if (!blob) throw new Error("no PNG");
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
       a.download = model.file;
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 10_000);
+    } catch {
+      setFailed(true); // no canvas, or the browser wouldn't encode it
     } finally {
       setBusy(false);
     }
   };
   return (
-    <button data-testid="save-card" className={styles.button} disabled={busy} onClick={save}>
-      Save card
-    </button>
+    <span className={styles.wrap}>
+      <button data-testid="save-card" className={styles.button} disabled={busy} onClick={save}>
+        Save card
+      </button>
+      {failed && (
+        <span role="status" className={styles.failed}>
+          Couldn&apos;t save the card in this browser
+        </span>
+      )}
+    </span>
   );
 }
 

@@ -14,7 +14,10 @@ export const hasBothHands = (chart: Chart): boolean =>
   chart.notes.some((n) => n.hand === "L") && chart.notes.some((n) => n.hand === "R");
 
 // The color for a note of this chart: by hand when it has both, today's single color when it has one.
-export const noteColorFor = (chart: Chart) => (hand: Hand) => (hasBothHands(chart) ? handColor(hand) : settings.noteColor);
+export function noteColorFor(chart: Chart): (hand: Hand) => string {
+  const both = hasBothHands(chart); // once per chart, not per note per frame
+  return (hand) => (both ? handColor(hand) : settings.noteColor);
+}
 
 // "L" and "R" swatches during the count-in, only for a two-hand chart.
 export function handColors(): GamePlugin {

@@ -25,7 +25,7 @@ describe("help overlay's drift test", () => {
   const handlers = files.filter((f) => HANDLES.test(readFileSync(f, "utf8"))).map((f) => relative(src, f));
 
   it("finds the key handlers on main", () => {
-    for (const f of ["game/records/panel.tsx", "game/sheet-view/SheetView.tsx", "game/core/input.ts", "game/laptop-octaves/index.tsx", "game/replay-view/overlay.tsx", "game/select-layout/index.tsx", "game/song-preview/index.tsx", "app/play/page.tsx"])
+    for (const f of ["game/records/initials.ts", "game/sheet-view/SheetView.tsx", "game/core/input.ts", "game/laptop-octaves/index.tsx", "game/replay-view/overlay.tsx", "game/select-layout/index.tsx", "game/song-preview/index.tsx", "app/play/page.tsx"])
       expect(handlers, f).toContain(f);
   });
 

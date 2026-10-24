@@ -34,7 +34,9 @@ const CHECK_TIMEOUT_MS = 8 * 60_000;
 // the shard. Check -> its issue. The list only shrinks: an entry leaves after its check passes 2 browser runs in a
 // row that include the fix (one green run can be luck).
 // Decision ci-browser-known-red.md.
-export const KNOWN_RED = {};
+export const KNOWN_RED = {
+  "web/src/replay/verify-replay.mjs": 552,
+};
 
 /** Every check: verify.mjs first, then each verify*.mjs under web/src/, sorted. `files` are repo-relative paths. */
 export function allChecks(files) {

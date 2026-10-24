@@ -6,7 +6,8 @@ New dependencies only through a `contract:` PR (`web/package.json` and `web/pnpm
 |---|---|
 | Language / framework | Next.js (App Router) with TypeScript, in `web/`. Pin the exact versions the bootstrap installs in `web/package.json`. |
 | Package manager | pnpm, pinned with the `packageManager` field; teammates run `corepack enable` once. |
-| Rendering | One 2D canvas per layer, driven by `requestAnimationFrame`. Game state per frame lives in refs, never React state; React renders menus and the results screen only. |
+| Rendering | One 2D canvas per layer, driven by `requestAnimationFrame`. Game state per frame lives in refs, never React state; React renders menus and the results screen only. One exception: at most one WebGL background under the highway, through `GamePlugin.background` (`fever-stage`). |
+| 3D | three.js (`three`, pinned), for the fever stage and the attract mode. It never draws notes, keys or the judgment line, which stay 2D. |
 | Input | Chrome Web MIDI (`navigator.requestMIDIAccess`) and laptop keys, behind one input interface. Client components only. |
 | Sound | Web Audio API, scheduled on the audio clock. No audio libraries unless a `contract:` PR adds one. |
 | Data / database | Supabase Postgres (free tier) for take history only (`take-store`). Written only by Next.js server routes with the secret key; migrations in `supabase/migrations/`. Charts stay JSON files in `web/public/songs/`; settings (latency offset) stay in `localStorage`. The game is fully playable with the database unreachable: nothing in the playing loop touches the network. |
@@ -33,7 +34,7 @@ web/
     game/                             game lane (eric)
       core/                           clock, input, judging, highway (core-loop)
       layers.ts                       open: each game feature registers its layer or hook here, one line
-      hud/  juice/  sound/  piano-out/  midi-watchdog/  bar-loop/
+      hud/  juice/  sound/  piano-out/  midi-watchdog/  bar-loop/  stage/
     learn/                            learning lane (provisional)
   public/songs/<id>/chart.json        one folder per piece
   e2e/                                Playwright verify script

@@ -100,8 +100,17 @@ export interface Frame {
   height: number;
 }
 
+// A layer under the highway that its plugin renders itself (WebGL, e.g. three.js). /play gives it an empty element
+// the size of the window, behind the highway canvas, calls frame() once per animation frame after the plugins' draw,
+// and dispose() when the take ends or the page unmounts. At most one plugin provides one.
+export interface BackgroundLayer {
+  frame(frame: Frame): void;
+  dispose(): void;
+}
+
 export interface GamePlugin {
   id: string;
+  background?(el: HTMLElement): BackgroundLayer | null; // null: no stage this time (no WebGL, switched off)
   draw?(ctx: CanvasRenderingContext2D, frame: Frame): void;
   onEvent?(event: GameEvent): void;
   transformChart?(chart: Chart, params: URLSearchParams): Chart;

@@ -53,6 +53,12 @@ for Eric. Eric checks it by playing.
 it loads Twinkle. An unknown id shows a clear message and a link to `/`, never a blank page. `?input=test` and the
 verify script keep working. This lands as a `fix(core-loop)` PR.
 
+**Background layer** (added after core-loop shipped, #91): `/play` mounts the first plugin's `background` hook
+(`GamePlugin.background` in `web/src/contracts/`) behind the highway canvas, calls its `frame` once per animation
+frame and its `dispose` when the take ends or the page unmounts. While one is mounted, the highway's full-screen
+backdrop is drawn at the stage's backdrop alpha instead of opaque. With none, nothing changes. This lands as a
+`fix(core-loop)` PR; `fever-stage`'s spec has the details.
+
 **Input:**
 - MIDI: Chrome Web MIDI. Pick the port whose name contains "Portable Grand", else the first input. Ignore `0xFE` and
   `0xF8`. A note-on with velocity 0 is a release. Use the message's `timeStamp` for time.

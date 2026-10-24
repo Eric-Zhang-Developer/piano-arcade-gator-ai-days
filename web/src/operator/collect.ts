@@ -117,6 +117,9 @@ export async function collect(opts: { root: string; gh?: GhRun; now?: Date }): P
   const issues = await ghJson<{ number: number; title: string; url: string; labels: { name: string }[] }[]>([
     "issue", "list", "--state", "open", "--limit", "300", "--json", "number,title,url,labels",
   ]);
+  const songRequests = await ghJson<{ number: number; createdAt: string }[]>([
+    "issue", "list", "--label", "song-request", "--state", "all", "--limit", "200", "--json", "number,createdAt",
+  ]);
   const runs = await ghJson<{ conclusion: string; url: string; updatedAt: string }[]>([
     "run", "list", "--branch", "main", "--status", "completed", "--limit", "1", "--json", "conclusion,url,updatedAt",
   ]);
@@ -141,6 +144,7 @@ export async function collect(opts: { root: string; gh?: GhRun; now?: Date }): P
     heartbeats: beats,
     gh: { status: failure ? failure.status : "ok", calls },
     banner,
+    songRequests,
   });
 }
 

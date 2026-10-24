@@ -64,8 +64,9 @@ The code lives in other features' folders, so it lands as fixes to them, each st
   tests unchanged); `?zoom=off` means static.
 - **Laptop keys:** the map never moves by itself. Z and X still shift it an octave under today's rule (`canMove`: on
   the piano, at least 5 of its white keys in range), and the cyan highlight shows the mapped keys. The start screen's
-  "Z / X: octave down / up" shows when the range is wider than the map's 10 white keys, which with the 15-key minimum
-  is every song.
+  "Z / X: octave down / up" shows only when the chart's own pitches don't all fit the laptop map at its starting
+  octave (k = 0, today's `keyMap(lowest)`). At 198c902 that leaves twinkle and minuet-g with no hint, as before, and
+  gives the other eight songs one.
 - **Unchanged:** sheet-view, bar-lines, practice (chunk-practice, wait-mode), `hands=` and their tests work with the static layout. Every visible
   key's lane lines up with its key (`keyX` serves both). `verify.py`'s Twinkle run stays 42/42 PERFECT.
 
@@ -74,7 +75,8 @@ The code lives in other features' folders, so it lands as fixes to them, each st
   from their real charts; a chart of only C4 gives C3–C5; a chart reaching 21 or 108 stays inside 21–108 and at
   least 24 semitones wide; Für Elise after hand-mode's `transformChart` with `hands=R` still lays out C2–C7. `zoomOn` is
   false with no `zoom` param on fur-elise and true with `?zoom=on`. On a laptop-octaves plugin fed frames whose
-  range jumps, k stays put; the hint shows on twinkle. Each of these fails on `origin/main` before its fix.
+  range jumps, k stays put; the hint shows on fur-elise and not on twinkle or minuet-g. Each fix PR's new test fails
+  on `origin/main` before its fix.
 - Headless 1920×1080, `/play?song=fur-elise&bot=perfect`: the keyboard shows 36 white keys, C2 to C7, in the
   count-in, at 25% and at 75% of the notes judged. Keep the three screenshots.
 - `/play?song=fur-elise&zoom=on`: the lanes still pan and zoom as in highway-zoom's done note. Keep a screenshot.

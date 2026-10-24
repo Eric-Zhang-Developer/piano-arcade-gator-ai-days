@@ -169,4 +169,3 @@ await page.eval(async () => {
   assert(text().includes('Start preview take'), 'Play again no longer resets completed result');
   delete navigator.onLine;
 });
-console.log('PASS: offline recovery preserves theory, practice and completed results; cancels audio, count-in and takes; allows fresh playback.');

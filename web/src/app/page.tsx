@@ -12,11 +12,18 @@ export default function Home() {
   if (!songs.length) return <main style={{ padding: 48 }}>No songs yet.</main>;
   return (
     <>
-      <MusicSelect songs={songs} />
-      {/* options-panel: latency (with Calibrate), effects and labels in one drawer; setup, so ?capture=1 hides its button */}
-      <OptionsDrawer />
-      {/* first-run: "First time?" above the Options button, and F, open the guided Twinkle */}
-      <FirstRunLink />
+      {/* The left column's footer, in flow under the focused song: options-panel's drawer (latency with Calibrate,
+          effects, labels; setup, so ?capture=1 hides its button), then first-run's "First time?" link, and F, which
+          open the guided Twinkle. */}
+      <MusicSelect
+        songs={songs}
+        footer={
+          <>
+            <OptionsDrawer />
+            <FirstRunLink />
+          </>
+        }
+      />
       {/* build-stamp: the commit this page was built from and its age, so a stale checkout shows */}
       <BuildStamp />
     </>

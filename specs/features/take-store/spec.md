@@ -20,7 +20,8 @@ The game never waits on any of this. Judging, rendering, sound and LEDs stay loc
    pure mapping from `Take` + `Results` to rows.
 3. `POST /api/takes`: re-judge, save. `GET /api/progress`: history and per-bar trends.
 4. Anonymous Supabase Auth on first save; "Keep my progress" links Google to the same user.
-5. `/progress`: accuracy and timing per take, and the weakest bars.
+5. `/progress`: the player's profile: every session across songs (when, how long, rank, accuracy, hits), totals, and
+   for one song the weakest bars. The account chip's name opens it.
 
 ## Requirements
 **Data** (`supabase/migrations/`, Postgres on the Supabase free tier):

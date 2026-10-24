@@ -114,7 +114,16 @@ assert.equal((await rows(`select count(*)::int as n from players where id = '${o
 assert.equal((await rows(`select merge_player('${player}', '${player}') as n`))[0].n, 0);
 say("ok  merge_player moves a device's takes to the signed-in player");
 
-const [trend] = await rows(`select notes, misses from bar_trends where player_id = '${player}'`);
+// session_history: one row per take with the song's title and how long it was played.
+const t6 = take({ song_id: "fur-elise", take: { events: [{ pitch: 60, velocity: 80, timeMs: 1000, offTimeMs: 1200 }, { pitch: 62, velocity: 80, timeMs: 61500, offTimeMs: null }] } });
+assert.equal(await save(t6, [note(t6, "PERFECT", 1)]), "saved");
+const [sess] = await rows(`select title, duration_ms, rank from session_history where take_id = '${t6.id}'`);
+assert.deepEqual([sess.title, sess.duration_ms, sess.rank], ["Fur Elise", 61500, "D"]);
+const [empty] = await rows(`select duration_ms from session_history where take_id = '${t1.id}'`);
+assert.equal(empty.duration_ms, 0);
+say("ok  session_history lists each take with its song title and how long it was played");
+
+const [trend] = await rows(`select notes, misses from bar_trends where player_id = '${player}' and song_id = 'twinkle'`);
 assert.deepEqual([Number(trend.notes), Number(trend.misses)], [6, 1]);
 say("ok  bar_trends counts the saved notes");
 say(`pass: ${files.length} migrations apply and keep the rules`);

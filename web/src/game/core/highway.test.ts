@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { Chart } from "../../contracts";
+import { blackKeyLaneSettings } from "../black-key-lanes";
 import { handColor } from "../hand-colors";
+import { splitHands } from "../hand-mode/hands";
 import { whiteIndex } from "../highway-zoom";
 import { meterLayout } from "../fever-gauge";
 import { readFileSync } from "node:fs";
@@ -27,15 +29,31 @@ describe("the static keyboard (#384): one range per song, C to C", () => {
     expect(staticRange(chart([61, 94]))).toEqual({ lowPitch: 60, highPitch: 96 }); // black ends snap to Cs too
   });
 
-  it("is at least two octaves: Twinkle and the Minuet get C4–C6", () => {
+  it("is at least two octaves, the missing ones split with the odd one above", () => {
     expect(staticRange(song("twinkle"))).toEqual({ lowPitch: 60, highPitch: 84 }); // C4–A4 -> C4–C5 -> C4–C6
     expect(staticRange(song("minuet-g"))).toEqual({ lowPitch: 60, highPitch: 84 }); // F#4–G5 -> C4–C6
-    expect(staticRange(chart([72]))).toEqual({ lowPitch: 72, highPitch: 96 }); // one C: two octaves up from it
+    expect(staticRange(chart([60]))).toEqual({ lowPitch: 48, highPitch: 72 }); // only C4: one octave each side
   });
 
-  it("keeps to the piano's 21–108", () => {
+  it("keeps to the piano's 21–108 and still two octaves wide", () => {
     expect(staticRange(chart([21, 108]))).toEqual({ lowPitch: 21, highPitch: 108 });
-    expect(staticRange(chart([100, 105]))).toEqual({ lowPitch: 84, highPitch: 108 }); // no room above: it grows down
+    expect(staticRange(chart([100, 105]))).toEqual({ lowPitch: 84, highPitch: 108 }); // no room above: it goes below
+    expect(staticRange(chart([108]))).toEqual({ lowPitch: 84, highPitch: 108 });
+    expect(staticRange(chart([21, 30]))).toEqual({ lowPitch: 21, highPitch: 48 }); // A0–C3 is 15: an octave above
+    for (const c of [chart([21]), chart([22, 23]), chart([107, 108])]) {
+      const r = staticRange(c);
+      expect(r.lowPitch).toBeGreaterThanOrEqual(21);
+      expect(r.highPitch).toBeLessThanOrEqual(108);
+      expect(r.highPitch - r.lowPitch).toBeGreaterThanOrEqual(24);
+    }
+  });
+
+  it("a hands=R take keeps the whole song's keyboard: Für Elise stays C2–C7", () => {
+    const full = song("fur-elise");
+    const right = splitHands(full, "R").judged;
+    expect(staticRange(right)).not.toEqual(staticRange(full)); // why /play keeps the loaded chart's range
+    const L = makeLayout(right, 1920, 1080, 0, undefined, staticRange(full));
+    expect([L.lowPitch, L.highPitch]).toEqual([36, 96]);
   });
 
   it("makeLayout lays exactly that range, white keys at both ends", () => {
@@ -99,6 +117,25 @@ describe("drawHighway backdrop", () => {
     const { ctx, calls } = recorder();
     drawHighway(ctx, makeLayout(c, 800, 600, 0), c, state(0.55));
     expect(calls.slice(0, 2)).toEqual(["clearRect", "fillRect rgba(0,0,0,0.55)"]);
+  });
+});
+
+describe("drawHighway black-key lanes (black-key-lanes)", () => {
+  it("fills a lane per black key in view at the tint, after the backdrop and before the first note", () => {
+    const fills: string[] = [];
+    const state: Record<string | symbol, unknown> = {};
+    const ctx = new Proxy(state, {
+      get: (t, k) => (k in t ? t[k] : k === "fill" || k === "fillRect" ? () => fills.push(String(t.fillStyle)) : () => ({ width: 0, addColorStop() {} })),
+      set: (t, k, v) => ((t[k] = v), true),
+    }) as unknown as CanvasRenderingContext2D;
+    const c = chart([60, 72]); // C4–C5
+    const L = makeLayout(c, 800, 600, 0.2);
+    drawHighway(ctx, L, c, { nowMs: 0, noteState: new Map(), pressed: new Set(), latest: null, countInBeat: null });
+    const n = Array.from({ length: L.highPitch - L.lowPitch + 1 }, (_, i) => L.lowPitch + i).filter(isBlack).length;
+    expect(n).toBeGreaterThanOrEqual(5); // C♯4 to A♯4 at least, whatever range core pads to
+    const tint = `rgba(255,255,255,${blackKeyLaneSettings.tint})`;
+    expect(fills.slice(0, n + 2)).toEqual(["#000", ...Array(n).fill(tint), settings.noteColor]);
+    expect(fills.filter((f) => f === tint)).toHaveLength(n);
   });
 });
 
@@ -235,7 +272,7 @@ describe("drawHighway bar lines (bar-lines)", () => {
     const calls = draw([{ atMs: 0, label: 1 }, { atMs: 600, label: 2 }]);
     const octave = calls.lastIndexOf("stroke rgba(255,255,255,0.08)");
     const bars = calls.flatMap((x, i) => (x === "stroke rgba(255,255,255,0.12)" ? [i] : []));
-    const note = calls.findIndex((x) => x.startsWith("fill"));
+    const note = calls.findIndex((x) => x.startsWith("fill") && x !== `fill rgba(255,255,255,${blackKeyLaneSettings.tint})`); // black-key lanes fill first
     expect(bars).toHaveLength(2);
     expect(octave).toBeLessThan(bars[0]);
     expect(bars[1]).toBeLessThan(note);

@@ -8,7 +8,6 @@ import { GOOD_MS, settings } from "../core/settings";
 
 export const zoomSettings = {
   easeMs: 400, // time constant of the pan and zoom
-  minWhiteKeys: 22, // charts wider than this (about three octaves) zoom by default
   minWidth: 15, // white keys: never narrower
   padKeys: 2, // white keys of room each side of the notes
   aheadMs: 1000, // look this far past the top of the highway, so the range moves before notes arrive
@@ -32,12 +31,9 @@ export function fullRange(chart: Chart): Range {
   return { lo: whiteIndex(lowPitch), hi: whiteIndex(highPitch) + 1 };
 }
 
-export const zoomOn = (chart: Chart, params: URLSearchParams): boolean => {
-  const z = params.get("zoom");
-  if (z === "on" || z === "off") return z === "on";
-  const r = fullRange(chart);
-  return r.hi - r.lo > zoomSettings.minWhiteKeys;
-};
+// Off unless asked for (#384): a keyboard that moves during a song is wrong for a pianist, who finds notes by where
+// the keys sit. ?zoom=on still pans; ?zoom=off, or nothing, is the static keyboard. The chart no longer decides.
+export const zoomOn = (_chart: Chart, params: URLSearchParams): boolean => params.get("zoom") === "on";
 
 // Each frame's range for one take. Notes are walked in time order with a cursor, so a frame costs the notes in its
 // window. Time going backwards (a new take) starts over.

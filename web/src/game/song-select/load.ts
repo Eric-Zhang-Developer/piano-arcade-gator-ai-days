@@ -2,6 +2,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join, sep } from "node:path";
 import { validateChart, type Chart } from "../../contracts";
+import { difficulty } from "../difficulty/difficulty";
 
 export interface Song {
   id: string; // the chart's folder under songs/, what /play?song= takes
@@ -9,6 +10,7 @@ export interface Song {
   composer: string;
   catalog?: string;
   noteCount: number;
+  level: number; // 1–15, computed from the chart (difficulty)
 }
 
 export function loadSongs(songsDir: string): { songs: Song[]; invalid: { path: string; problems: string[] }[] } {
@@ -29,8 +31,8 @@ export function loadSongs(songsDir: string): { songs: Song[]; invalid: { path: s
       continue;
     }
     const id = dirname(path).split(sep).join("/");
-    songs.push({ id, title: chart.title, composer: chart.composer, catalog: chart.catalog, noteCount: chart.notes.length });
+    songs.push({ id, title: chart.title, composer: chart.composer, catalog: chart.catalog, noteCount: chart.notes.length, level: difficulty(chart).level });
   }
-  songs.sort((a, b) => a.title.localeCompare(b.title));
+  songs.sort((a, b) => a.level - b.level || a.title.localeCompare(b.title)); // easiest first
   return { songs, invalid };
 }

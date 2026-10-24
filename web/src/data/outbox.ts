@@ -9,7 +9,9 @@ export interface OutboxItem {
   sent: boolean; // true once the server confirmed it (kept for the offline progress view)
 }
 
-export type SendResult = "ok" | "retry" | "drop";
+// "later": the take is fine but the database can't take it yet (its schema is behind the game's contracts).
+// Keep it unsent and move on to the next one, so one stuck take never blocks the rest.
+export type SendResult = "ok" | "retry" | "later" | "drop";
 type Storage = Pick<globalThis.Storage, "getItem" | "setItem">;
 
 export const OUTBOX_KEY = "pianoArcade.outbox";
@@ -49,6 +51,7 @@ export async function flush(storage: Storage, send: (item: OutboxItem) => Promis
       r = "retry";
     }
     if (r === "retry") break;
+    if (r === "later") continue;
     // "drop": the server rejected it for good (invalid take); keep it locally but stop resending
     write(storage, readOutbox(storage).map((i) => (i.id === item.id ? { ...i, sent: true } : i)));
     if (r === "ok") sent++;

@@ -9,6 +9,7 @@ create function auth.uid() returns uuid language sql stable as $$ select nullif(
 grant usage on schema auth to anon, authenticated, service_role;
 \i supabase/migrations/20261024000001_take_store.sql
 \i supabase/migrations/20261024000002_supabase_auth.sql
+\i supabase/migrations/20261024000003_contract_tolerant.sql
 insert into auth.users(id) values ('00000000-0000-0000-0000-000000000001'), ('00000000-0000-0000-0000-000000000002');
 grant usage on schema public to anon, authenticated, service_role;
 set role service_role;
@@ -21,6 +22,10 @@ select save_take(:'take', :'notes');
 select save_take(:'take', :'notes');
 -- the same id from another player: 'conflict', nothing changes
 select save_take(jsonb_set(:'take'::jsonb, '{player_id}', '"00000000-0000-0000-0000-000000000002"'), '[]');
+-- a judgment the contract adds later (GOOD at +70 ms) and a new rank save with no migration: 'saved'
+select save_take(jsonb_set(jsonb_set(:'take'::jsonb, '{id}', '"10000000-0000-0000-0000-000000000009"'), '{rank}', '"A+"'),
+  '[{"take_id":"10000000-0000-0000-0000-000000000009","note_id":"n1","pitch":60,"hand":"R","bar":1,"beat":0,"judgment":"GOOD","offset_ms":70,"velocity":80}]');
+delete from takes where id = '10000000-0000-0000-0000-000000000009';
 select 'takes', count(*) from takes union all select 'notes', count(*) from note_judgments;
 select bar, notes, misses, mean_offset_ms from bar_trends;
 select accuracy, mean_abs_offset_ms from take_history;

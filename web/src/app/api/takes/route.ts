@@ -71,9 +71,11 @@ export async function POST(request: Request) {
     await ensurePlayer(user.id);
     outcome = await saveTake(rows.take, rows.notes);
   } catch (e) {
-    const status = e instanceof SupabaseError && e.status < 500 ? 422 : 502;
     console.error("take-store save failed", e);
-    return fail(status, "save failed");
+    // The take passed validation and was judged here, so a 4xx from the database means its schema is behind
+    // the game's contracts (say, a new judgment). 424 tells the browser to keep the take and resend it later.
+    if (e instanceof SupabaseError && e.status < 500) return fail(424, "the database refused this take; kept for later");
+    return fail(502, "save failed");
   }
   if (outcome === "conflict") return fail(409, "that take id belongs to someone else");
   return Response.json(

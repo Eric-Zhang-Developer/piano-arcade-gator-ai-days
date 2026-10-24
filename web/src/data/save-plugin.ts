@@ -85,6 +85,7 @@ export async function sendTake(item: OutboxItem): Promise<SendResult> {
     body: JSON.stringify({ id: item.id, take: item.take }),
   });
   if (res.ok) return "ok";
+  if (res.status === 424) return "later"; // the database refused a take the game accepted: resend after a migration
   if ([400, 409, 413, 422].includes(res.status)) return "drop"; // the take itself is bad: resending won't help
   return "retry"; // offline, 401 (session expired), 5xx, or not configured on the server
 }

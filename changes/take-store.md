@@ -7,12 +7,14 @@ anonymous Supabase users with an optional Google link, and `/progress` shows eac
 `web/src/app/api/progress/`, `web/src/app/progress/`, `web/src/app/auth/callback/`, one line in `web/src/game/layers.ts`.
 
 ## How to check it
-`verify.py`: pass, 42/42 PERFECT (test takes not sent). Local stack: Chrome laptop-keys take, rank S with 1 MISS, one
+`verify: ... pass at 3df5031` (42/42 PERFECT; test takes not sent). Local stack: Chrome laptop-keys take, rank S with 1 MISS, one
 `takes` row and 42 `note_judgments`, missed bar first on `/progress`, no duplicate after reload. 14/14 abuse checks
-(`supabase/tests/local-stack/attacks.mjs`: forged tokens, lying scores, id hijack, cross-player reads). Vitest 47/47.
+(`supabase/tests/local-stack/attacks.mjs`: forged tokens, lying scores, id hijack, cross-player reads). Vitest 49/49; migrations 0001–0003 checked in PGlite (GOOD, A+ saved; MISS/pitch/latency guards kept).
 Live project: `node supabase/tests/live-smoke.mjs` pass, 7/7 (anonymous sign-in, save_take, own-row reads, RLS).
 
 ## Gaps
+Live project still needs `supabase/migrations/20261024000003_contract_tolerant.sql` run in the SQL Editor; until then a
+take with a judgment the contract adds later (GOOD) is kept in the outbox, not saved (live-smoke's GOOD check fails).
 Google linking untested (needs the
 Google provider set up). Drills aren't saved. Charts must live at `public/songs/<id>/chart.json`, read from disk: on Vercel that needs file tracing for
 `public/songs` (local demo is fine). No per-player rate limit on saves.

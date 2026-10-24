@@ -1,5 +1,5 @@
 // Take + Results -> database rows. Pure: the server route and the local fallback both use it.
-import type { Chart, Results, Take } from "../contracts";
+import type { Chart, Judgment, Results, Take } from "../contracts";
 import { CONTRACT_VERSION, JUDGE_VERSION } from "./config";
 
 export interface TakeRow {
@@ -34,7 +34,7 @@ export interface NoteRow {
   hand: "R" | "L";
   bar: number;
   beat: number;
-  judgment: "PERFECT" | "GREAT" | "MISS";
+  judgment: Judgment; // follows the contract: a judgment added there needs no change here
   offset_ms: number | null;
   velocity: number | null;
 }

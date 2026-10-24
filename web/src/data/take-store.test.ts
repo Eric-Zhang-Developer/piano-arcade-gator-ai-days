@@ -48,6 +48,14 @@ describe("mapping", () => {
     expect(notes[2]).toMatchObject({ judgment: "MISS", offset_ms: null, velocity: null });
   });
 
+  it("passes through a judgment the contract adds later (GOOD is next)", () => {
+    const take = play(() => 0);
+    const results = judgeTake(chart, take);
+    const widened = { ...results, judgments: results.judgments.map((j, i) => (i === 0 ? { ...j, judgment: "GOOD" as never, offsetMs: 70 } : j)) };
+    const { notes } = takeRows(ids(1), chart, take, widened);
+    expect(notes[0]).toMatchObject({ judgment: "GOOD", offset_ms: 70 });
+  });
+
   it("refuses test takes", () => {
     const take = { ...play(() => 0), inputDevice: "test" as const };
     expect(() => takeRows(ids(1), chart, take, judgeTake(chart, take))).toThrow();
@@ -100,6 +108,18 @@ describe("outbox", () => {
     expect(await flush(s, send)).toBe(0);
     expect(send).toHaveBeenCalledTimes(2);
     expect(readOutbox(s)).toHaveLength(1);
+  });
+
+  it("a take the database can't hold yet stays queued and doesn't block the next one", async () => {
+    const s = new MemStorage();
+    enqueue(s, "new-judgment", play(() => 0));
+    enqueue(s, "plain", play(() => 0));
+    const send = vi.fn(async (item: { id: string }) => (item.id === "new-judgment" ? "later" : "ok") as "later" | "ok");
+    expect(await flush(s, send)).toBe(1);
+    expect(readOutbox(s).map((i) => [i.id, i.sent])).toEqual([["new-judgment", false], ["plain", true]]);
+    send.mockResolvedValue("ok"); // after the migration
+    expect(await flush(s, send)).toBe(1);
+    expect(readOutbox(s).every((i) => i.sent)).toBe(true);
   });
 
   it("a thrown send (offline) counts as retry", async () => {

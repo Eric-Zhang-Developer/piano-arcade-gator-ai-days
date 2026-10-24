@@ -49,6 +49,12 @@ try {
     assert.equal(await save(), "saved");
     assert.equal(await save(), "duplicate");
   });
+  await check("a judgment the contract adds later (GOOD at +70 ms) saves with no migration", async () => {
+    const id = randomUUID();
+    const r = await rest("rpc/save_take", SECRET, null, { method: "POST", body: JSON.stringify({ p_take: { ...takeRow, id, rank: "A+" }, p_notes: [{ ...notes[0], take_id: id, judgment: "GOOD", offset_ms: 70 }] }) });
+    assert.ok(r.ok, `save_take with GOOD: ${r.status} ${await r.text()} (run 0003_contract_tolerant.sql)`);
+    await rest(`takes?id=eq.${id}`, SECRET, null, { method: "DELETE" });
+  });
   await check("the player reads their own take, notes and trends", async () => {
     assert.equal((await (await rest(`takes?id=eq.${takeId}&select=id`, PUB, a.access_token)).json()).length, 1);
     assert.equal((await (await rest(`note_judgments?take_id=eq.${takeId}&select=note_id`, PUB, a.access_token)).json()).length, 1);

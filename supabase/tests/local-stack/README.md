@@ -3,7 +3,7 @@
 No Docker needed. Proves the whole path: laptop keys in Chrome, the save plugin, `POST /api/takes` re-judging,
 `save_take`, RLS, and `/progress`, against a throwaway Postgres.
 
-1. Postgres 16 on port 5498 with its socket in `$PGHOST`; run `setup.sql`, then both files in `../../migrations/`.
+1. Postgres 16 on port 5498 with its socket in `$PGHOST`; run `setup.sql`, then every file in `../../migrations/`, in order.
 2. PostgREST 12 on :3001: `db-uri = "postgres://authenticator@localhost:5498/postgres"`, `db-anon-role = "anon"`,
    `jwt-secret = "test-secret-test-secret-test-secret-1234"`.
 3. `node gateway.mjs` (port 54321).

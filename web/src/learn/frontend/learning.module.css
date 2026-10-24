@@ -10,7 +10,9 @@
 .rail { width:200px; flex:none; padding:40px 20px 24px; border-right:1px solid var(--learn-border); display:flex; flex-direction:column; min-height:100dvh; }
 .brand { display:flex; gap:13px; align-items:center; font-size:19px; line-height:1.08; font-weight:600; letter-spacing:-.02em; margin:0 10px 58px; }
 .brand svg { width:28px; height:32px; fill:none; stroke:currentColor; stroke-width:1; color:var(--learn-accent); }
-.rail nav { display:grid; gap:6px; }
+.rail nav { display:grid; gap:24px; }
+.navGroup { display:grid; gap:6px; }
+.navGroup h2 { margin:0 14px 2px; font-size:12px; font-weight:500; color:var(--learn-muted); }
 .rail nav a { padding:12px 14px; border-radius:4px; }
 .rail nav a:hover { background:#2a322d; }
 .rail nav a[aria-current] { background:#30382f; color:var(--learn-accent); }

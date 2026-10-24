@@ -40,9 +40,18 @@ jobs:
         if: github.event_name == 'push'
         run: python3 .agents/scripts/check_markers.py --all
 
-      # Your project's own checks go here: tests, lint, build.
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: web/package.json
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - name: Install
+        run: pnpm -C web install --frozen-lockfile
       - name: Project checks
-        run: echo "Add your test command here (see specs/tech-stack.md, Checks)"
+        run: pnpm -C web lint && pnpm -C web typecheck && pnpm -C web test && pnpm -C web build
 
   issues:
     # After a merge: one issue per feature spec (closed when done), one GitHub milestone per milestone, and a

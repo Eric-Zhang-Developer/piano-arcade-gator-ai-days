@@ -86,7 +86,9 @@ export interface SustainSummary {
   notes: SustainNote[];
 }
 
-type At = { atMs: number };
+// Optional matched wall-clock reading for phase events. Receivers may run after
+// expensive audio initialization, so dispatch time is not the chart epoch.
+type At = { atMs: number; performanceMs?: number };
 export type GameEvent = At &
   (
     | { type: "songStart" }

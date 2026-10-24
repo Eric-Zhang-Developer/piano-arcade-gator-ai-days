@@ -21,8 +21,8 @@ export default function Home() {
 
 const calibrateLink: React.CSSProperties = {
   position: "fixed",
-  right: 16,
-  bottom: 16,
+  left: 52, // under the music select's left column, clear of the song list
+  bottom: 24,
   padding: "6px 12px",
   borderRadius: 6,
   background: "var(--pa-panel)",

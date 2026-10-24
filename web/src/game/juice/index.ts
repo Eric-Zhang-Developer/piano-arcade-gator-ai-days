@@ -17,7 +17,6 @@ export const juiceSettings = {
   laneLightAlpha: 0.13,
   laneLightHeight: 0.35, // of the line's height
   feverEdgePx: 90,
-  fullComboMs: 2000, // spec: about 2 s
   feverColor: "255, 140, 60",
   missColor: "150, 150, 160",
 };
@@ -41,7 +40,6 @@ export function juiceVisual(): GamePlugin {
   let color: (hand: Hand) => string = () => settings.noteColor; // hand-colors: by hand on two-hand charts
   const hitIds = new Set<string>(); // played notes no longer need to be read, so effects may cover them
   let fever = false;
-  let fullCombo = false;
   let sparkClock = 0;
   let lastCtx: CanvasRenderingContext2D | null = null; // /play stops drawing at the results: clear what's left
 
@@ -93,9 +91,9 @@ export function juiceVisual(): GamePlugin {
         flares.length = misses.length = 0;
         heldHits.clear();
         hitIds.clear();
-        fever = fullCombo = false;
+        fever = false;
         lastNow = null;
-        rankReveal(false);
+        rankReveal();
       }
       if (e.type === "noteHit") {
         hitIds.add(e.noteId);
@@ -107,12 +105,8 @@ export function juiceVisual(): GamePlugin {
       if (e.type === "noteMiss") misses.push({ pitch: e.pitch, atMs: e.atMs });
       if (e.type === "feverStart") fever = true;
       if (e.type === "feverEnd") fever = false;
-      if (e.type === "fullCombo") {
-        fullCombo = true;
-        showFullCombo();
-      }
       if (e.type === "songEnd") {
-        rankReveal(fullCombo);
+        rankReveal();
         lastCtx?.clearRect(0, 0, lastCtx.canvas.width, lastCtx.canvas.height);
       }
     },
@@ -236,38 +230,13 @@ function hexAlpha(hex: string, a: number) {
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${Math.max(0, Math.min(1, a))})`;
 }
 
-// Full combo: a large banner over a dimmed screen for about 2 s, before the results show through.
-function showFullCombo() {
-  if (typeof document === "undefined") return;
-  const el = document.createElement("div");
-  el.textContent = "FULL COMBO";
-  el.setAttribute("data-testid", "full-combo");
-  Object.assign(el.style, {
-    position: "fixed",
-    inset: "0",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    background: "rgba(0, 0, 0, 0.6)",
-    color: settings.noteColor,
-    font: "900 clamp(48px, 11vw, 160px) system-ui, sans-serif",
-    letterSpacing: "0.04em",
-    textShadow: `0 0 32px ${settings.noteColor}`,
-    zIndex: "1000",
-    pointerEvents: "none",
-    animation: `juice-banner ${juiceSettings.fullComboMs}ms ease-out both`,
-  });
-  ensureStyles();
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), juiceSettings.fullComboMs);
-}
-
-// Rank reveal: the results screen's rank letter stamps down (rank-stamp) once the tally ends, or after the full-combo
-// banner. The results screen is results-layout's, so this styles its rank element by test id instead of editing it.
-function rankReveal(fullCombo: boolean) {
+// Rank reveal: the results screen's rank letter stamps down (rank-stamp) once the tally ends. The results screen is
+// results-layout's, so this styles its rank element by test id instead of editing it. A full combo's moment is
+// clear-card's, before the results, so nothing here waits on it.
+function rankReveal() {
   if (typeof document === "undefined") return;
   ensureStyles();
-  document.documentElement.style.setProperty("--juice-rank-delay", `${stampStartMs(fullCombo)}ms`);
+  document.documentElement.style.setProperty("--juice-rank-delay", `${stampStartMs()}ms`);
 }
 
 function ensureStyles() {
@@ -275,13 +244,12 @@ function ensureStyles() {
   const css = document.createElement("style");
   css.id = "juice-visual-css";
   css.textContent = `
-@keyframes juice-banner { 0% { opacity: 0; transform: scale(1.15) } 12% { opacity: 1; transform: scale(1) } 80% { opacity: 1 } 100% { opacity: 0 } }
 ${stampKeyframes("juice-rank")}
 @keyframes juice-rank-ring { from { opacity: 0.95; transform: scale(0.55) } to { opacity: 0; transform: scale(1.9) } }
 [data-testid="rank"] { position: relative; animation: juice-rank ${stampSettings.durationMs}ms linear var(--juice-rank-delay, 0ms) both; }
 [data-testid="rank"]::after { content: ""; position: absolute; inset: 4% -8%; border-radius: 50%; pointer-events: none;
   border: 3px solid var(--pa-gold); box-shadow: 0 0 28px var(--pa-gold), inset 0 0 28px var(--pa-gold); opacity: 0;
   animation: juice-rank-ring ${stampSettings.flashMs}ms ease-out calc(var(--juice-rank-delay, 0ms) + ${Math.round(impactT * stampSettings.durationMs)}ms) forwards; }
-@media (prefers-reduced-motion: reduce) { [data-testid="rank"], [data-testid="rank"]::after, [data-testid="full-combo"] { animation: none; } }`;
+@media (prefers-reduced-motion: reduce) { [data-testid="rank"], [data-testid="rank"]::after { animation: none; } }`;
   document.head.appendChild(css);
 }

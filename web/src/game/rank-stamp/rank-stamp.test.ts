@@ -1,6 +1,5 @@
 import { expect, test } from "vitest";
 import { tallySettings } from "../results-tally";
-import { juiceSettings } from "../juice";
 import { impactT, stampImpactMs, stampKeyframes, stampScale, stampSettings, stampStartMs } from ".";
 
 test("the scale starts at 1.6, ends at exactly 1, and overshoots once", () => {
@@ -15,12 +14,10 @@ test("the scale starts at 1.6, ends at exactly 1, and overshoots once", () => {
   expect(stampScale(impactT)).toBeCloseTo(1, 10);
 });
 
-test("the stamp starts when the tally ends, or after the full-combo banner", () => {
+test("the stamp starts when the tally ends", () => {
   expect(stampSettings.afterTallyMs).toBe(tallySettings.totalMs);
-  expect(stampSettings.afterBannerMs).toBe(juiceSettings.fullComboMs);
-  expect(stampStartMs(false)).toBe(1200);
-  expect(stampStartMs(true)).toBe(2000);
-  expect(stampImpactMs(false)).toBe(1200 + Math.round(impactT * 300));
+  expect(stampStartMs()).toBe(1200);
+  expect(stampImpactMs()).toBe(1200 + Math.round(impactT * 300));
 });
 
 test("the keyframes are the curve, from 1.6 and transparent to 1 and solid", () => {

@@ -86,3 +86,9 @@ export async function readSessions(userToken: string, songId?: string) {
   const song = songId ? `&song_id=eq.${encodeURIComponent(songId)}` : "";
   return rest(`/rest/v1/session_history?select=*&order=created_at.desc&limit=500${song}`, { userToken }).then((r) => r.json());
 }
+
+/** The signed-in player's per-hand judgments and timing, per song (RLS: their rows only). */
+export async function readHandStats(userToken: string, songId?: string) {
+  const song = songId ? `&song_id=eq.${encodeURIComponent(songId)}` : "";
+  return rest(`/rest/v1/hand_stats?select=*${song}`, { userToken }).then((r) => r.json());
+}

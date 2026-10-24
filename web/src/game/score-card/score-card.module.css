@@ -1,0 +1,25 @@
+/* A secondary action beside Retry and Songs: results-layout's Songs look. */
+.button {
+  padding: 12px 36px;
+  border-radius: 6px;
+  border: 1px solid var(--pa-ink-dim);
+  background: transparent;
+  color: var(--pa-ink);
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--pa-magenta);
+  outline-offset: 3px;
+}

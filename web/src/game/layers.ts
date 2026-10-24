@@ -7,6 +7,7 @@ import { midiWatchdog } from "./midi-watchdog";
 import { pianoOut } from "./piano-out";
 import { eventSounds } from "./sound";
 import { simPlugin } from "./sim/plugin";
+import { feverStage } from "./stage";
 
 // Open file: each game feature registers its plugin here, one line each. /play draws every plugin's layer on its
 // own canvas above the highway, forwards every GameEvent, and applies transformChart and wrapInput in this order.
@@ -18,5 +19,6 @@ export const plugins: GamePlugin[] = [
   beatTrack(),
   midiWatchdog(), // reconnects a piano that goes silent mid-song
   pianoOut(), // records the take for "Replay on piano"
+  feverStage(), // three.js stage behind the highway (background hook only, no 2D layer)
   eventSounds(), // laptop sounds at combo milestones, fever, full combo, rank and (optionally) misses
 ];

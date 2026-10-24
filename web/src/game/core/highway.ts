@@ -27,6 +27,7 @@ export interface HighwayState {
   pressed: Set<number>; // pitches held right now
   latest: { judgment: Judgment | "WRONG"; offsetMs: number | null; atMs: number } | null;
   countInBeat: number | null; // 1..countInBeats while counting in, else null
+  backdropAlpha?: number; // below 1 while a background layer is mounted; default opaque
 }
 
 export const isBlack = (pitch: number) => [1, 3, 6, 8, 10].includes(((pitch % 12) + 12) % 12);
@@ -91,7 +92,9 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
   const beatMs = msPerBeat(chart.bpm);
   const pxPerMs = line / settings.lookaheadMs;
 
-  ctx.fillStyle = "#000";
+  const alpha = s.backdropAlpha ?? 1;
+  if (alpha < 1) ctx.clearRect(0, 0, L.width, L.height); // a translucent fill would smear last frame
+  ctx.fillStyle = alpha < 1 ? `rgba(0,0,0,${alpha})` : "#000";
   ctx.fillRect(0, 0, L.width, L.height);
 
   // Faint octave lines at each C, so the lanes read against the keys.

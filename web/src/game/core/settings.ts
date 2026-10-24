@@ -18,6 +18,7 @@ export const settings = {
   noteGapPx: 8, // space at the end of each note, so repeated notes read as separate
   missColor: "#6b5560",
   keyLitColor: "#5ef2c4",
+  stageBackdropAlpha: 0.55, // the highway's backdrop while a background layer (fever-stage) shows through
 };
 
 export const LATENCY_KEY = "pianoArcade.latencyOffsetMs";

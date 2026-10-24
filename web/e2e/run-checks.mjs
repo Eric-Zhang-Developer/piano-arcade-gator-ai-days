@@ -40,6 +40,7 @@ export const KNOWN_RED = {
   "web/src/game/notice-toast/verify-toast.mjs": 432,
   "web/src/game/options-panel/verify-options.mjs": 447,
   "web/src/game/song-preview/verify-preview.mjs": 428,
+  "web/src/game/ui-sounds/verify-ui-sounds.mjs": 465,
   "web/src/game/wait-hands/verify-wait-hands.mjs": 430,
 };
 

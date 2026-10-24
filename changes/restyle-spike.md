@@ -12,4 +12,7 @@ src/game/songs/library.test.ts`: 34 passed at 21:11 UTC, the four restyles inclu
 the synthetic cases only. `verify.py --slug restyle-spike`: pass at e68d179 (42/42 PERFECT with test input and on /sim).
 ## Gaps
 - **Eric hasn't listened yet (the spike's question):** FINDINGS.md says "listen pending".
+- The checks prove the melody, not the sound: three harmony mistakes (wrong key, ties to I, bass outweighed) passed
+  every test and showed only when the session printed the chords. The lullaby is the weakest restyle: only tempo,
+  dynamics and the left hand change.
 - Restyles are judged with `hands=R` only, until #506 is decided. Tokens per run weren't measured.

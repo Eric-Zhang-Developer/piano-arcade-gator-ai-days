@@ -1,4 +1,4 @@
-/* The card leads the start screen: its slot moves above the title and Start (the overlay is a flex column). */
+/* The card leads the start screen: its slot moves above the hint and Start (the overlay is a flex column). */
 :global([data-testid="slot-stage-card"]) {
   order: -1;
   width: 100%;

@@ -25,3 +25,9 @@ test("the plugin's start panel is the card, with the chart's computed level", ()
   expect(t).toContain("|Für Elise|");
   expect(t).toMatch(/\|\d+\|/);
 });
+
+test("the title is the start screen's one h1 (verify waits for a heading named after the song)", () => {
+  const html = renderToStaticMarkup(<StageCard {...song} />);
+  expect(html.match(/<h1[^>]*>Für Elise<\/h1>/)).not.toBeNull();
+  expect(html.match(/<h[1-6]/g)).toHaveLength(1);
+});

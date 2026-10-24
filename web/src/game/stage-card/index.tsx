@@ -9,14 +9,14 @@ export function StageCard({ id, title, composer, catalog, level }: Pick<Chart, "
   return (
     <section className={styles.card} aria-label="Stage">
       <div className={styles.band}>
-        <h2 className={styles.ready}>Are you ready?</h2>
+        <p className={styles.ready}>Are you ready?</p>
       </div>
       <div className={styles.track}>
         <div className={styles.jacket}>
           <SongJacket id={id} title={title} composer={composer} />
         </div>
         <div className={styles.text}>
-          <p className={styles.title}>{title}</p>
+          <h1 className={styles.title}>{title}</h1>
           <p className={styles.composer}>
             {composer}
             {catalog && ` · ${catalog}`}

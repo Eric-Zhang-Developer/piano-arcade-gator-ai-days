@@ -11,6 +11,7 @@ import { opening, openingMs, playAsTones, playOnPiano, practiceUrl, previewSetti
 import { SongSource } from "../song-sources";
 import { useLevel, withLevel } from "../easy-charts";
 import { SongOptions, useSongOptions, withOptions } from "../song-options";
+import { isWatchKey, watchUrl } from "../watch-demo/demo";
 
 // The music select's L (learn-from-select): plain l or L, no Ctrl, Meta or Alt (Cmd+L stays the browser's), no repeat.
 export const isLearnKey = (e: Pick<KeyboardEvent, "key" | "ctrlKey" | "metaKey" | "altKey" | "repeat">) =>
@@ -80,7 +81,7 @@ export function SongPreview({ id, best }: { id: string; best?: { rank: Rank; acc
       }
       setTimeout(() => live && end(), openingMs(notes) + 50); // the opening ended: All Notes Off
     }, previewSettings.delayMs);
-    const onEnter = (e: KeyboardEvent) => (e.key === "Enter" || isLearnKey(e)) && end(); // leaving: stop at once
+    const onEnter = (e: KeyboardEvent) => (e.key === "Enter" || isLearnKey(e) || isWatchKey(e)) && end(); // leaving: stop at once
     window.addEventListener("keydown", onEnter);
     window.addEventListener("pagehide", end);
     return () => {
@@ -107,6 +108,9 @@ export function SongPreview({ id, best }: { id: string; best?: { rank: Rank; acc
         <span style={actions}>
           <a data-testid="preview-learn" href={withOptions(withLevel(learnUrl(id), level), options)} style={action}>
             LEARN
+          </a>
+          <a data-testid="preview-watch" href={watchUrl(id)} style={action}>
+            WATCH
           </a>
           {/* PRACTICE keeps its own 70% whatever Speed says; it takes the song's level and hands */}
           {chart && (

@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Chart, Frame, InputDevice, InputEvent } from "../../contracts";
-import { canMove, follow, laptopMap, laptopOctaves, octaveSettings, onScreen, type View } from ".";
+import { canMove, laptopMap, laptopOctaves, onScreen, type View } from ".";
 
 const song = (id: string): Chart => JSON.parse(readFileSync(new URL(`../../../public/songs/${id}/chart.json`, import.meta.url), "utf8"));
 
@@ -62,23 +62,25 @@ describe("laptop octaves", () => {
     key("KeyX"); // C5–E6: C5..C6 on screen
     plugin.draw!(canvas().ctx, frame(v));
     expect(a("on")).toBe(lowest + 12);
-    expect(plugin.startPanel!({ chart: song("twinkle"), params: new URLSearchParams() })).not.toBeNull();
   });
 
-  it("follows a view that jumps from C2 to C6, ending every frame with enough keys on screen", () => {
-    const furElise = song("fur-elise");
-    const { plugin, a, lowest } = setup(furElise);
-    const map = laptopMap(lowest);
-    const views = [{ lo: 36, hi: 62 }, { lo: 84, hi: 108 }, { lo: 84, hi: 108 }, { lo: 36, hi: 62 }];
+  it("never moves by itself: on frames whose range jumps from C2 to C6, k stays put (static-keyboard)", () => {
+    const { plugin, a, lowest } = setup(song("fur-elise"));
     const ks: number[] = [];
-    for (const v of views) {
+    for (const v of [{ lo: 36, hi: 62 }, { lo: 84, hi: 108 }, { lo: 84, hi: 108 }, { lo: 36, hi: 62 }]) {
       plugin.draw!(canvas().ctx, frame(v));
-      const k = (a("on") - lowest) / 12;
+      ks.push((a("on") - lowest) / 12);
       a("off");
-      ks.push(k);
-      expect(onScreen(map, k, v)).toBeGreaterThanOrEqual(octaveSettings.minKeys);
     }
-    expect(ks).toEqual([0, 4, 4, 0]);
+    expect(ks).toEqual([0, 0, 0, 0]);
+  });
+
+  it("the hint shows only when the chart's notes don't all fit the map where it starts", () => {
+    const panel = (id: string) => setup(song(id)).plugin.startPanel!({ chart: song(id), params: new URLSearchParams() });
+    expect(panel("twinkle")).toBeNull();
+    expect(panel("minuet-g")).toBeNull();
+    for (const id of ["fur-elise", "ode-to-joy", "chopin-prelude-4", "clair-de-lune", "gymnopedie-1", "moonlight-3", "nocturne-op9-2", "maple-leaf-rag"])
+      expect(panel(id)).not.toBeNull();
   });
 
   it("Z and X move an octave only where enough keys stay on screen; not on repeat, with Ctrl, or while paused", () => {
@@ -98,13 +100,13 @@ describe("laptop octaves", () => {
     expect(a("on")).toBe(lowest);
   });
 
-  it("a release releases the pitch its press played, even after a follow", () => {
-    const { plugin, a, lowest } = setup(song("fur-elise"));
-    plugin.draw!(canvas().ctx, frame({ lo: 36, hi: 62 }));
+  it("a release releases the pitch its press played, even after an X", () => {
+    const { plugin, key, a, lowest } = setup(song("fur-elise"));
+    plugin.draw!(canvas().ctx, frame({ lo: 36, hi: 96 })); // Für Elise's static keyboard, C2–C7
     expect(a("on")).toBe(lowest);
-    plugin.draw!(canvas().ctx, frame({ lo: 84, hi: 108 })); // k moves while A is held
+    key("KeyX"); // k moves while A is held
     expect(a("off")).toBe(lowest);
-    expect(a("on")).toBe(lowest + 48);
+    expect(a("on")).toBe(lowest + 12);
   });
 
   it("passes MIDI through unchanged, and draws nothing after the first MIDI note-on", () => {
@@ -123,11 +125,9 @@ describe("laptop octaves", () => {
     expect(after.filled).toEqual([]);
   });
 
-  it("follow moves to the position with the most keys on screen, and stays when none reach the view", () => {
+  it("canMove needs enough of the map's keys on screen after the move", () => {
     const map = laptopMap(48); // C3..E4
-    expect(follow(map, 0, { lo: 48, hi: 64 })).toBe(0);
-    expect(follow(map, 0, { lo: 36, hi: 40 })).toBe(-1); // only an octave down reaches C2..E2
-    expect(follow(map, 0, { lo: 200, hi: 220 })).toBe(0); // all positions score 0: the nearest is k itself
+    expect(onScreen(map, 0, { lo: 48, hi: 64 })).toBe(10);
     expect(canMove(map, 0, -1, { lo: 36, hi: 64 })).toBe(true);
     expect(canMove(map, 0, 1, { lo: 36, hi: 64 })).toBe(false);
   });

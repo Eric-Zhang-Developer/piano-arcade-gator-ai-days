@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import Link from "next/link";
+import { OptionsDrawer } from "@/game/options-panel";
 import { MusicSelect } from "@/game/select-layout";
 import { loadSongs } from "@/game/song-select/load";
 
@@ -11,23 +11,9 @@ export default function Home() {
   return (
     <>
       <MusicSelect songs={songs} />
-      {/* calibration: tap along to clicks to set the latency offset before a first game; setup, so ?capture=1 hides it */}
-      <Link href="/calibrate" style={calibrateLink} data-capture-hide>
-        Calibrate latency
-      </Link>
+      {/* options-panel: latency (with Calibrate), effects and labels in one drawer; setup, so ?capture=1 hides its button */}
+      <OptionsDrawer />
     </>
   );
 }
 
-const calibrateLink: React.CSSProperties = {
-  position: "fixed",
-  left: 52, // under the music select's left column, clear of the song list
-  bottom: 24,
-  padding: "6px 12px",
-  borderRadius: 6,
-  background: "var(--pa-panel)",
-  color: "var(--pa-ink)",
-  fontSize: 14,
-  textDecoration: "none",
-  zIndex: 10,
-};

@@ -102,13 +102,13 @@ features = [
 cut = []
 
 # polish: Eric's 25 polish features (2026-10-24), ranked by a hackathon-coach pass for the 90-second video and the
-# judges' hands-on demo: quick practice mode first, then what protects and lights up the video. The last six were
-# promoted from backlog when the queue ran low (closest to the video and practice first). Still in backlog:
-# options-panel, notice-toast, black-key-lanes, pill-match.
+# judges' hands-on demo: quick practice mode first, then what protects and lights up the video. The last ten were
+# promoted from backlog, in two steps, as the queue ran low (closest to the video and practice first).
 [[milestone]]
 name = "polish"
 ship = ""
 features = [
+  "static-keyboard",
   "learn-from-select",
   "wait-hud",
   "chunk-practice",
@@ -130,6 +130,27 @@ features = [
   "wait-hint",
   "wait-hands",
   "pause-skin",
+  "options-panel",
+  "notice-toast",
+  "black-key-lanes",
+  "pill-match",
+]
+cut = []
+
+# judging: batch two (2026-10-24), ranked by a hackathon-coach pass: keep the live demo alive first, then what the
+# video and a judge's first two minutes show. The other 17 batch-two specs and the 3 spikes stay backlog.
+[[milestone]]
+name = "judging"
+ship = ""
+features = [
+  "crash-guard",
+  "offline-ready",
+  "demo-reset",
+  "hero-replay",
+  "record-moment",
+  "song-sources",
+  "easy-charts",
+  "first-run",
 ]
 cut = []
 
@@ -137,6 +158,6 @@ cut = []
 name = "submission"
 ship = ""
 final = true
-features = ["bar-loop", "piano-out", "operator-replay"]
+features = ["bar-loop", "piano-out", "operator-replay", "take-store"]
 cut = []
 allow = []

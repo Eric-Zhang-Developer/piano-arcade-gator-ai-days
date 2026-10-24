@@ -34,6 +34,8 @@ import { cabinet } from "./cabinet/plugin";
 import { versus } from "./versus";
 import { takeMidi } from "./take-midi";
 import { waitMode } from "./wait-mode/plugin";
+import { waitHint } from "./wait-hint";
+import { sheetView } from "./sheet-view/plugin";
 
 // Open file: each game feature registers its plugin here, one line each. /play draws every plugin's layer on its
 // own canvas above the highway, forwards every GameEvent, and applies transformChart and wrapInput in this order.
@@ -47,6 +49,7 @@ export const plugins: GamePlugin[] = [
   ghost(), // the last take, dashed: under every layer that draws, after every plugin that changes the chart
   laptopOctaves(), // Z and X: after scenes and the sim (their bots aren't laptop keys), before note-labels (shifted pitches)
   noteLabels(), // after bar-loop, scenes and the sim: it labels the final chart and sees which device really played
+  waitHint(), // ?mode=wait: after 3 s on a note, its key pulses, it sounds once and its name shows; after noteLabels, on the final chart
   juiceVisual(), // under the HUD: wisps and flares never cover the score
   handColors(), // the L/R legend during the count-in, two-hand charts only
   hud(), // before beat-track, so beat-track's status line draws over the HUD's top panel
@@ -73,4 +76,5 @@ export const plugins: GamePlugin[] = [
   warningCard(), // after every transformChart too: the level is the chart the player gets; WARNING at Lv 13+
   stageCard(), // start panel: ARE YOU READY, the jacket, title and level, above Start
   cabinet(), // ?cabinet=1 returns a finished game to /cabinet; ?cabinet=demo starts the demo and reports it
+  sheetView(), // last: posts the chart as played (after every transformChart) to /sheet; "Sheet music ↗" on the start screen
 ];

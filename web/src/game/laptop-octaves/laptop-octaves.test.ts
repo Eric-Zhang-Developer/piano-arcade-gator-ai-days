@@ -52,15 +52,17 @@ beforeEach(() => vi.stubGlobal("window", new EventTarget()));
 afterEach(() => vi.unstubAllGlobals());
 
 describe("laptop octaves", () => {
-  it("on Twinkle's range k stays 0, and Z and X are refused", () => {
+  it("on Twinkle's static keyboard (C4–C6), Z is refused and X reaches the top octave", () => {
     const { plugin, key, a, lowest } = setup(song("twinkle"));
-    const v = { lo: 59, hi: 71 }; // the padded range makeLayout gives Twinkle (60..69)
+    const v = { lo: 60, hi: 84 }; // makeLayout's static range for Twinkle (#384)
     plugin.draw!(canvas().ctx, frame(v));
-    key("KeyX");
-    key("KeyZ");
+    key("KeyZ"); // C3–E4: no key on screen
     plugin.draw!(canvas().ctx, frame(v));
     expect(a("on")).toBe(lowest);
-    expect(plugin.startPanel!({ chart: song("twinkle"), params: new URLSearchParams() })).toBeNull();
+    key("KeyX"); // C5–E6: C5..C6 on screen
+    plugin.draw!(canvas().ctx, frame(v));
+    expect(a("on")).toBe(lowest + 12);
+    expect(plugin.startPanel!({ chart: song("twinkle"), params: new URLSearchParams() })).not.toBeNull();
   });
 
   it("follows a view that jumps from C2 to C6, ending every frame with enough keys on screen", () => {

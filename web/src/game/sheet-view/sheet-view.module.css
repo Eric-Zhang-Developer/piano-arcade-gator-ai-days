@@ -104,3 +104,33 @@
     transition: none;
   }
 }
+
+/* Names the notehead colors, so color is never alone. */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  align-items: center;
+  min-height: 2.5rem; /* the zoom buttons' height: both sit on the header's bottom, so their centers line up */
+  margin: 0 0 0 auto;
+  padding: 0;
+  list-style: none;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.swatch {
+  width: 0.7rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  transform: rotate(-20deg); /* a notehead's tilt */
+}

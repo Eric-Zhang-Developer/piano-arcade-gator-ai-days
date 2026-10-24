@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Chart, GameEvent, InputDevice, InputEvent, Results, Take } from "../../contracts";
 import { validateChart } from "../../contracts";
 import { plugins } from "../../game/layers";
+import { barLines } from "../../game/bar-lines";
 import { drawHighway, makeLayout, type HighwayState, type Layout } from "../../game/core/highway";
 import { createZoom, zoomOn } from "../../game/highway-zoom";
 import { Judge, noteTimeMs } from "../../game/core/judge";
@@ -12,7 +14,8 @@ import { keysDevice, midiDevice, testDevice } from "../../game/core/input";
 import { describeTiming, timingSummary, type TimingSummary } from "../../game/timing";
 import { SfxControls } from "../../game/sound/SfxControls";
 import { nextPause, pauseClock, type PauseAction, type PauseMode } from "../../game/play-slots";
-import { PauseOverlay, Slots } from "../../game/play-slots/ui";
+import { Slots } from "../../game/play-slots/ui";
+import { PauseMenu } from "../../game/pause-skin";
 import { ResultsLayout } from "../../game/results-layout";
 import { emptyHud, reduceHud } from "../../game/hud";
 import { holdClock, isWaitMode } from "../../game/wait-mode";
@@ -48,6 +51,7 @@ declare global {
 }
 
 export default function Play() {
+  const router = useRouter();
   const [phase, setPhase] = useState<Phase>("loading");
   const [error, setError] = useState("");
   const [results, setResults] = useState<Results | null>(null);
@@ -137,6 +141,7 @@ export default function Play() {
       latest: null,
       countInBeat: null,
       backdropAlpha: background ? settings.stageBackdropAlpha : 1,
+      barLines: barLines(chart, params), // the chart /play plays: a loop's bars carry the song's numbers
     };
     const handOf = new Map(chart.notes.map((n) => [n.id, n.hand]));
     let hud = emptyHud(); // rebuilt with the HUD's own reducer, as records does
@@ -233,7 +238,10 @@ export default function Play() {
         hw.pressed.clear();
         hw.pressedHand!.clear();
       }
-      if (next === "countdown") countdownUntil = perf + chart.beatsPerBar * mpb;
+      if (next === "countdown") {
+        countdownUntil = perf + chart.beatsPerBar * mpb;
+        setCountdown((shownCount = chart.beatsPerBar)); // the countdown's first render has its full count (pause-skin)
+      }
       if (next === "playing") {
         pauses.resume(perf);
         emit({ type: "resume", atMs: clock.now(perf) });
@@ -244,7 +252,7 @@ export default function Play() {
       emit({ type: "quit", atMs: clock.now(perf) });
       if (a === "retry") return startRef.current();
       stopRef.current();
-      setPhase("ready");
+      router.push("/"); // Quit opens the music select (pause-skin)
     };
     pauseRef.current = act;
     const onKey = (e: KeyboardEvent) => {
@@ -322,7 +330,7 @@ export default function Play() {
         now: () => clock.now(performance.now()),
       });
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     startRef.current = start;
@@ -370,10 +378,10 @@ export default function Play() {
       ))}
 
       {phase === "playing" && (
-        <PauseOverlay
+        <PauseMenu
           mode={pauseMode}
           count={countdown}
-          button={button}
+          beatMs={loaded ? msPerBeat(loaded.chart.bpm) : 500}
           onResume={() => pauseRef.current("resume")}
           onRetry={() => pauseRef.current("retry")}
           onQuit={() => pauseRef.current("quit")}

@@ -3,11 +3,11 @@
 // eases, and a black key sits on the boundary between its two white neighbours.
 import type { Chart } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
+import { staticRange } from "../core/range";
 import { GOOD_MS, settings } from "../core/settings";
 
 export const zoomSettings = {
   easeMs: 400, // time constant of the pan and zoom
-  minWhiteKeys: 22, // charts wider than this (about three octaves) zoom by default
   minWidth: 15, // white keys: never narrower
   padKeys: 2, // white keys of room each side of the notes
   aheadMs: 1000, // look this far past the top of the highway, so the range moves before notes arrive
@@ -25,18 +25,15 @@ export const whiteIndex = (p: number) => Math.floor(p / 12) * 7 + WHITE_IN_OCTAV
 // The white-key span a pitch needs: its own key, or both neighbours for a black key (it straddles them).
 const span = (p: number): Range => (isBlack(p) ? { lo: whiteIndex(p), hi: whiteIndex(p) + 2 } : { lo: whiteIndex(p), hi: whiteIndex(p) + 1 });
 
-// Today's whole-chart range, as makeLayout pads it: one white key past each end.
+// The whole-chart range: the static keyboard's (core's staticRange, #384), in white-key units.
 export function fullRange(chart: Chart): Range {
-  const pitches = chart.notes.map((n) => n.pitch);
-  return { lo: span(Math.min(...pitches)).lo - 1, hi: span(Math.max(...pitches)).hi + 1 };
+  const { lowPitch, highPitch } = staticRange(chart);
+  return { lo: whiteIndex(lowPitch), hi: whiteIndex(highPitch) + 1 };
 }
 
-export const zoomOn = (chart: Chart, params: URLSearchParams): boolean => {
-  const z = params.get("zoom");
-  if (z === "on" || z === "off") return z === "on";
-  const r = fullRange(chart);
-  return r.hi - r.lo > zoomSettings.minWhiteKeys;
-};
+// Off unless asked for (#384): a keyboard that moves during a song is wrong for a pianist, who finds notes by where
+// the keys sit. ?zoom=on still pans; ?zoom=off, or nothing, is the static keyboard. The chart no longer decides.
+export const zoomOn = (_chart: Chart, params: URLSearchParams): boolean => params.get("zoom") === "on";
 
 // Each frame's range for one take. Notes are walked in time order with a cursor, so a frame costs the notes in its
 // window. Time going backwards (a new take) starts over.

@@ -11,3 +11,14 @@ Context: the taste step-8 Look, done at 1280×720, 1920×1080 and a 560-wide pop
   small popup. Undo: return `1` from `loadZoom`'s fallback.
 - **Color.** Music in `--pa-ink` on `--pa-bg`. Magenta appears only in the header's hairline and the focus ring:
   the score is for reading, not cabinet chrome.
+
+## PR 2: following
+
+- **PERFECT against ink.** Gold `#ffe27a` noteheads next to `--pa-ink` ones read apart in the Für Elise and Ode to
+  Joy shots at 1280. OSMD's `setColor` with `applyToNoteheads` also colors stems, flags and accidentals (its other
+  options default to on), which widens the colored mass. Beams stay ink. No `colorStemsLikeNoteheads` needed.
+  Undo: pass `applyToStem: false, applyToModifiers: false` in `follow.ts`.
+- **Cursor:** OSMD's standard cursor in `--pa-cyan` at alpha 0.35, cabinet chrome for "where you are". It isn't one
+  of the judgment colors.
+- **Legend:** the four judgment colors as tilted dots and their words, in the header between the title and the zoom.
+  Its box is the zoom buttons' height, so their centers line up (both 78 px at 1280×720).

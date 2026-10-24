@@ -1,0 +1,54 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { toast, toastSettings, toastStack, type Toast } from ".";
+
+describe("notice-toast", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  const setup = (reduced = false) => {
+    let shown: readonly Toast[] = [];
+    const push = toastStack((t) => (shown = t.map((x) => ({ ...x }))), () => reduced);
+    const visible = () => shown.filter((t) => !t.leaving).map((t) => t.text);
+    return { push, visible, all: () => shown.map((t) => t.text) };
+  };
+
+  it("shows the newest on top, and a fourth drops the oldest", () => {
+    const s = setup();
+    ["a", "b", "c"].forEach(s.push);
+    expect(s.visible()).toEqual(["c", "b", "a"]);
+    s.push("d");
+    expect(s.visible()).toEqual(["d", "c", "b"]); // "a" is fading out
+    vi.advanceTimersByTime(toastSettings.leaveMs);
+    expect(s.all()).toEqual(["d", "c", "b"]);
+  });
+
+  it("a toast is gone at 4 s: fading from 3.8 s", () => {
+    const s = setup();
+    s.push("a");
+    vi.advanceTimersByTime(toastSettings.ms - toastSettings.leaveMs - 1);
+    expect(s.visible()).toEqual(["a"]);
+    vi.advanceTimersByTime(1);
+    expect(s.visible()).toEqual([]);
+    expect(s.all()).toEqual(["a"]);
+    vi.advanceTimersByTime(toastSettings.leaveMs - 1);
+    expect(s.all()).toEqual(["a"]);
+    vi.advanceTimersByTime(1);
+    expect(s.all()).toEqual([]);
+  });
+
+  it("under reduced motion it stays the full 4 s and leaves at once, with no fade", () => {
+    const s = setup(true);
+    s.push("a");
+    vi.advanceTimersByTime(toastSettings.ms - 1);
+    expect(s.visible()).toEqual(["a"]);
+    vi.advanceTimersByTime(1);
+    expect(s.all()).toEqual([]);
+    ["b", "c", "d", "e"].forEach(s.push);
+    expect(s.all()).toEqual(["e", "d", "c"]); // the dropped one goes at once too
+  });
+
+  it("does nothing on the server", () => {
+    expect(typeof document).toBe("undefined");
+    expect(() => toast("x")).not.toThrow();
+  });
+});

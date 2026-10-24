@@ -133,8 +133,8 @@ describe.each(charts.map((c) => [c.id, c] as const))("%s", (_, chart) => {
 
 // ---------- fixed cases ----------
 
-const attrs = (c: Chart) => {
-  const a = kid(kid(kid(parse(chartToMusicXml(c)), "part")!, "measure")!, "attributes")!;
+const attrs = (c: Chart, song = c) => {
+  const a = kid(kid(kid(parse(chartToMusicXml(c, song)), "part")!, "measure")!, "attributes")!;
   const key = kid(a, "key")!;
   const time = kid(a, "time")!;
   return { fifths: num(kid(key, "fifths")), mode: kid(key, "mode")!.text, beats: num(kid(time, "beats")), beatType: num(kid(time, "beat-type")) };
@@ -172,6 +172,13 @@ describe("fixed cases", () => {
   it("Für Elise is 3/8 and spells MIDI 75 as D♯5", () => {
     expect(attrs(byId("fur-elise"))).toMatchObject({ beats: 3, beatType: 8 });
     expect(spelled(byId("fur-elise"), 75)).toBe("D♯5");
+  });
+
+  it("a transformed chart keeps its song's key: Für Elise's right hand alone is still A minor", () => {
+    const song = byId("fur-elise");
+    const right = { ...song, notes: song.notes.filter((n) => n.hand === "R") }; // what ?hands=R plays
+    expect(keyAndMeter(right, song).key).toEqual({ fifths: 0, mode: "minor" });
+    expect(attrs(right, song)).toMatchObject({ fifths: 0, mode: "minor" });
   });
 
   it("moonlight-3, in C♯ minor, spells MIDI 72 as B♯4", () => {

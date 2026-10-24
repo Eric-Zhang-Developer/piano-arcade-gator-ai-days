@@ -3,7 +3,7 @@ On a phone or tablet (`(hover: none) and (pointer: coarse)`, or a window 480 px 
 ## Where it lives
 `web/src/game/phone-guard/` (#529; `verify-phone.mjs` with #535), `<PhoneGuard />` in `web/src/app/layout.tsx` (#535), screenshots in `specs/features/phone-guard/screens/`.
 ## How to check it
-`node web/src/game/phone-guard/verify-phone.mjs --out <dir>`: pass locally (iPhone 13, Pixel 7, iPad Pro 11 landscape on `/` and `/play`; Play anyway, reload, new context; `/calibrate`; laptops 1280×720 and 1920×1080 with `display: none` and the first song focused). verify: pending.
+`node web/src/game/phone-guard/verify-phone.mjs --out <dir>`: pass locally (iPhone 13, Pixel 7, iPad Pro 11 landscape on `/` and `/play`; Play anyway, reload, new context; `/calibrate`; laptops 1280×720 and 1920×1080 with `display: none` and the first song focused); it also passed in CI's browser job on #535. verify: `pnpm -C web verify` + `verify-sim.mjs` pass at 25f4508 (evidence: `.git/agent-evidence/phone-guard/20261024T185606Z`).
 ## Gaps
 - Not verified by Eric on his phone and Mac (the spec's last step).
 - `videoUrl` is empty: no "Watch the video" link until Eric gives the URL.

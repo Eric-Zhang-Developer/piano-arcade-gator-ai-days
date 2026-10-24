@@ -28,6 +28,27 @@ ship = ""
 features = ["song-select", "minuet-g", "operator-board", "piano-sim", "hud", "juice-visual", "juice-sound", "midi-watchdog", "fever-stage"]
 cut = []
 
+# frontend: eric-agent-1's lane (#157). Every feature here is assigned to eric-agent-1, so other workers skip it, and
+# it sits first in eric-agent-1's pick order. Chains (note-pills -> hit-line -> key-skin) edit the same files.
+[[milestone]]
+name = "frontend"
+ship = ""
+features = [
+  "ui-tokens",
+  "song-card",
+  "song-jacket",
+  "select-layout",
+  "hud-skin",
+  "note-pills",
+  "hit-line",
+  "key-skin",
+  "stage-card",
+  "results-layout",
+  "results-tally",
+  "rank-stamp",
+]
+cut = []
+
 [[milestone]]
 name = "library"
 ship = ""

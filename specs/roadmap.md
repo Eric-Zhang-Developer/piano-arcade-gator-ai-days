@@ -30,6 +30,13 @@ Milestone **lights**, between `arcade` and `submission`: `led-strip` (Sharan) an
 up: the next note glows before it arrives, and every hit shows on the piano itself. `led-strip` needs no game and
 can start now.
 
+## Frontend
+Milestone **frontend**, right after `arcade`, worked by `eric-agent-1` alone (#157): the look in
+`specs/context/visual-direction.md` (Synthesia at the center, an arcade cabinet around it) applied to the screens
+the video shows. `ui-tokens` first; then the music select (`song-card`, `song-jacket`, `select-layout`), the
+playfield (`hud-skin`; `note-pills` -> `hit-line` -> `key-skin`), the `stage-card`, and the results
+(`results-layout`, `results-tally`, `rank-stamp`).
+
 ## Library
 Milestone **library**, between `arcade` and `lights`: `song-pack-1` (Ode to Joy, Chopin's Prelude Op. 28 No. 4,
 Für Elise, plus a MIDI-to-chart converter and one test over every chart), then `song-pack-2` (Gymnopédie No. 1,

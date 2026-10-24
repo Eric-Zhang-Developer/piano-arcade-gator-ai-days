@@ -8,8 +8,11 @@ export const KEYS_VELOCITY = 80;
 export const settings = {
   lookaheadMs: 2000,
   perspective: 0, // 0 flat … 0.3: top of the highway is (1 - p) × the bottom's width
-  countInBeats: 4,
+  countInBeats: 8, // two bars: time to get hands on the keys after Start (playtest, findings.md)
   noteColor: "#5ef2c4",
+  noteHeadColor: "#ffffff", // the leading edge: the moment to press
+  noteHeadPx: 6,
+  noteGapPx: 8, // space at the end of each note, so repeated notes read as separate
   missColor: "#6b5560",
   keyLitColor: "#5ef2c4",
 };

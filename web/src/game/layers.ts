@@ -13,6 +13,7 @@ import { scenes } from "./scenes";
 import { evenness } from "./evenness";
 import { dynamics } from "./dynamics";
 import { records } from "./records";
+import { replayView } from "./replay-view";
 import { eventSounds } from "./sound";
 import { simPlugin } from "./sim/plugin";
 import { weakBars } from "./weak-bars";
@@ -33,6 +34,7 @@ export const plugins: GamePlugin[] = [
   midiWatchdog(), // reconnects a piano that goes silent mid-song
   records(), // results panel: NEW RECORD, initials and the top 5, first under the score
   dynamics(), // results panel: how loud you played against the score, above "Replay on piano"
+  replayView(), // results panel: Watch replay, the take on the highway in time with piano-out
   pianoOut(), // records the take for "Replay on piano"
   feverStage(), // three.js stage behind the highway (background hook only, no 2D layer)
   weakBars(), // results panel: accuracy per phrase, and a link to loop the weakest

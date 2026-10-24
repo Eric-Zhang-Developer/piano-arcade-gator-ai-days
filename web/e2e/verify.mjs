@@ -113,8 +113,12 @@ async function main() {
     if (results?.counts?.PERFECT !== n) fail.push(`results PERFECT ${results?.counts?.PERFECT}/${n}`);
     if (results?.counts?.MISS !== 0 || results?.counts?.extra !== 0) fail.push("results has MISS or extras");
     if (results?.counts?.GOOD !== 0 || results?.counts?.wrong !== 0) fail.push("results has GOOD or wrong");
+    // play-slots: the results screen renders its plugin panels without errors.
+    const slots = await page.locator('[data-testid^="slot-"]').evaluateAll((els) => els.map((e) => e.dataset.testid));
+    const slotErrors = consoleLines.filter((l) => l.startsWith("pageerror") || l.includes("play-slots:"));
+    if (slotErrors.length) fail.push(`results screen errors: ${slotErrors.join(" | ")}`);
     if (fail.length) throw new Error(fail.join("; "));
-    say(`verify: test input pass, ${n}/${n} PERFECT`);
+    say(`verify: test input pass, ${n}/${n} PERFECT; results panels: ${slots.join(", ") || "none"}, no errors`);
 
     await page.goto(`${base}/sim`);
     await page.getByRole("button", { name: "Watch the bot" }).click({ timeout: 60_000 }); // enabled once the game is ready

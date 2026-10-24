@@ -32,12 +32,21 @@ export function loadPrefs(): Prefs {
   }
 }
 
-let prefs: Prefs = DEFAULT_PREFS;
+let prefs: Prefs | null = null; // read from localStorage on first use, in the browser
 let master: GainNode | null = null;
 const gainFor = (p: Prefs) => (p.muted ? 0 : p.volume);
+const listeners = new Set<() => void>();
+
+// For useSyncExternalStore: the same object until it changes.
+export const getPrefs = (): Prefs => (prefs ??= loadPrefs());
+export function subscribePrefs(f: () => void): () => void {
+  listeners.add(f);
+  return () => listeners.delete(f);
+}
 
 export function savePrefs(p: Prefs): void {
   prefs = p;
+  listeners.forEach((f) => f());
   if (master) master.gain.value = gainFor(p);
   try {
     localStorage.setItem(KEY.volume, String(p.volume));
@@ -144,13 +153,12 @@ export function eventSounds(): GamePlugin {
     onEvent(e) {
       if (e.type === "songStart") {
         zeroPerf = performance.now() - e.atMs;
-        prefs = loadPrefs();
         try {
           audio ??= new AudioContext(); // songStart comes from the Start press, so Chrome lets audio start
           void audio.resume().catch(() => {});
           master ??= audio.createGain();
           master.connect(audio.destination);
-          master.gain.value = gainFor(prefs);
+          master.gain.value = gainFor(getPrefs());
         } catch {
           audio = null;
         }
@@ -161,7 +169,7 @@ export function eventSounds(): GamePlugin {
       const stamp = audio.getOutputTimestamp?.();
       const [ctxT, perfT] = stamp?.performanceTime ? [stamp.contextTime ?? 0, stamp.performanceTime] : [audio.currentTime, performance.now()];
       const audioAtZero = ctxT + (zeroPerf - perfT) / 1000;
-      for (const s of soundsFor([e], audioAtZero, prefs.missCue)) play(audio, master, s.sound, Math.max(s.startTime, audio.currentTime));
+      for (const s of soundsFor([e], audioAtZero, getPrefs().missCue)) play(audio, master, s.sound, Math.max(s.startTime, audio.currentTime));
     },
   };
 }

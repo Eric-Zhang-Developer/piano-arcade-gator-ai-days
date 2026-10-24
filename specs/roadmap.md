@@ -10,8 +10,6 @@ the order only: `start` in `milestones.toml` is empty, so no deadlines are enfor
   screen. The skeleton and the shared formats everyone builds on.
 - **arcade:** `hud`, `juice-visual`, `juice-sound`, `midi-watchdog`. It feels like an arcade, and the one known MIDI
   risk is handled. These run in parallel once `core-loop` merges.
-- **lights:** `led-strip` (Sharan) and `led-game`. The keys light up: the next note glows before it arrives, and
-  every hit shows on the piano itself. `led-strip` needs no game and can start now.
 - **submission:** `bar-loop`, `piano-out`, `song-select`. The coach's drill can play, the piano plays your take back,
   and there's a front door for the library.
 
@@ -19,6 +17,11 @@ the order only: `start` in `milestones.toml` is empty, so no deadlines are enfor
 `coach`, `practice-mode`, `chart-compiler`, `song-rip-spike`. Their specs record what was discussed; the learning
 lane's person fills them in, sets an `assignee` and adds them to a milestone. The game lane provides `Results`,
 `Take` and `Chart` (`web/src/contracts/`) and the `bar-loop` link.
+
+## Lights
+Milestone **lights**, between `arcade` and `submission`: `led-strip` (Sharan) and `led-game` (Eric). The keys light
+up: the next note glows before it arrives, and every hit shows on the piano itself. `led-strip` needs no game and
+can start now.
 
 ## Open
 - The challenge statement's technology (first public in the past 12 months, central to the project) isn't chosen.

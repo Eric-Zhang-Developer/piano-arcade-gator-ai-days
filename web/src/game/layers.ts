@@ -18,6 +18,7 @@ import { records } from "./records";
 import { replayView } from "./replay-view";
 import { eventSounds } from "./sound";
 import { simPlugin } from "./sim/plugin";
+import { tempoCurve } from "./tempo-curve";
 import { weakBars } from "./weak-bars";
 import { feverStage } from "./stage";
 import { takeGraph } from "./take-graph";
@@ -43,6 +44,7 @@ export const plugins: GamePlugin[] = [
   replayView(), // results panel: Watch replay, the take on the highway in time with piano-out
   pianoOut(), // records the take for "Replay on piano"
   feverStage(), // three.js stage behind the highway (background hook only, no 2D layer)
+  tempoCurve(), // results panel: a rubato score beside the strict one
   weakBars(), // results panel: accuracy per phrase, and a link to loop the weakest
   evenness(), // results panel: how even each hand's runs were
   takeGraph(), // results panel: every note's timing over the song

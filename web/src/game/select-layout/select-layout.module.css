@@ -50,6 +50,23 @@
   animation: enter 200ms ease-out;
 }
 
+/* The left column: the focused song, then the footer pushed to the bottom. All in flow, so nothing in it can overlap;
+   a tall song pushes the footer down rather than under it. */
+.left {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.footer {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6em 1.2em;
+  padding: 1.2vh 0 2vh;
+}
+
 @keyframes enter {
   from {
     opacity: 0;

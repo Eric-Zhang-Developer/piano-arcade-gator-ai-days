@@ -39,7 +39,8 @@ through `/api/takes`, checks the stored rows and `/api/progress`, and deletes wh
 A finished take of a committed song, played by a person, on the chart as committed. Not saved: test input, bots
 (`?bot=`), the fake piano (`?midi=sim`), versus, wait mode, local songs, and any take whose chart a plugin changed
 (bar-loop, one hand, chunk practice, another tempo): the server re-judges against the committed chart, so those scores
-would be wrong. The rule lives in `web/src/data/save-plugin.ts` (`unsavableReason`, `sameChart`).
+would be wrong. The rule lives in `web/src/data/save-plugin.ts` (`unsavableReason`, `sameChart`). The results screen says which it was:
+"Saved to your account ✓", "Saved as a guest ✓", "Not saved yet: …" (kept, sent later) or "Not saved: …" (`SaveStatus.tsx`).
 
 ## Adding something (a column, a table, a view, seed rows)
 1. **Make the file:** `npx -y supabase@2.122.0 migration new <what_it_does>` creates

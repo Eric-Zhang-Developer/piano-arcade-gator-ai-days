@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Chart } from "../../contracts";
 import { blackKeyLaneSettings } from "../black-key-lanes";
 import { handColor } from "../hand-colors";
+import { splitHands } from "../hand-mode/hands";
 import { whiteIndex } from "../highway-zoom";
 import { meterLayout } from "../fever-gauge";
 import { readFileSync } from "node:fs";
@@ -28,15 +29,31 @@ describe("the static keyboard (#384): one range per song, C to C", () => {
     expect(staticRange(chart([61, 94]))).toEqual({ lowPitch: 60, highPitch: 96 }); // black ends snap to Cs too
   });
 
-  it("is at least two octaves: Twinkle and the Minuet get C4–C6", () => {
+  it("is at least two octaves, the missing ones split with the odd one above", () => {
     expect(staticRange(song("twinkle"))).toEqual({ lowPitch: 60, highPitch: 84 }); // C4–A4 -> C4–C5 -> C4–C6
     expect(staticRange(song("minuet-g"))).toEqual({ lowPitch: 60, highPitch: 84 }); // F#4–G5 -> C4–C6
-    expect(staticRange(chart([72]))).toEqual({ lowPitch: 72, highPitch: 96 }); // one C: two octaves up from it
+    expect(staticRange(chart([60]))).toEqual({ lowPitch: 48, highPitch: 72 }); // only C4: one octave each side
   });
 
-  it("keeps to the piano's 21–108", () => {
+  it("keeps to the piano's 21–108 and still two octaves wide", () => {
     expect(staticRange(chart([21, 108]))).toEqual({ lowPitch: 21, highPitch: 108 });
-    expect(staticRange(chart([100, 105]))).toEqual({ lowPitch: 84, highPitch: 108 }); // no room above: it grows down
+    expect(staticRange(chart([100, 105]))).toEqual({ lowPitch: 84, highPitch: 108 }); // no room above: it goes below
+    expect(staticRange(chart([108]))).toEqual({ lowPitch: 84, highPitch: 108 });
+    expect(staticRange(chart([21, 30]))).toEqual({ lowPitch: 21, highPitch: 48 }); // A0–C3 is 15: an octave above
+    for (const c of [chart([21]), chart([22, 23]), chart([107, 108])]) {
+      const r = staticRange(c);
+      expect(r.lowPitch).toBeGreaterThanOrEqual(21);
+      expect(r.highPitch).toBeLessThanOrEqual(108);
+      expect(r.highPitch - r.lowPitch).toBeGreaterThanOrEqual(24);
+    }
+  });
+
+  it("a hands=R take keeps the whole song's keyboard: Für Elise stays C2–C7", () => {
+    const full = song("fur-elise");
+    const right = splitHands(full, "R").judged;
+    expect(staticRange(right)).not.toEqual(staticRange(full)); // why /play keeps the loaded chart's range
+    const L = makeLayout(right, 1920, 1080, 0, undefined, staticRange(full));
+    expect([L.lowPitch, L.highPitch]).toEqual([36, 96]);
   });
 
   it("makeLayout lays exactly that range, white keys at both ends", () => {

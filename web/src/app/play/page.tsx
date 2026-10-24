@@ -7,7 +7,7 @@ import type { Chart, GameEvent, InputDevice, InputEvent, Results, Take } from ".
 import { validateChart } from "../../contracts";
 import { plugins } from "../../game/layers";
 import { barLines } from "../../game/bar-lines";
-import { drawHighway, makeLayout, type HighwayState, type Layout } from "../../game/core/highway";
+import { drawHighway, makeLayout, staticRange, type HighwayState, type KeyRange, type Layout } from "../../game/core/highway";
 import { createZoom, zoomOn } from "../../game/highway-zoom";
 import { Judge, noteTimeMs } from "../../game/core/judge";
 import { keysDevice, midiDevice, testDevice } from "../../game/core/input";
@@ -66,6 +66,7 @@ export default function Play() {
   const [countdown, setCountdown] = useState(0);
 
   const chartRef = useRef<Chart | null>(null);
+  const keysRef = useRef<KeyRange | null>(null); // the keyboard for every take: the chart as loaded, before transforms
   const paramsRef = useRef<URLSearchParams | null>(null);
   const latencyRef = useRef(0);
   const backgroundRef = useRef<HTMLDivElement>(null);
@@ -91,6 +92,7 @@ export default function Play() {
         if (!live) return;
         const problems = validateChart(raw);
         if (problems.length) throw new Error(`Bad chart: ${problems.join("; ")}`);
+        keysRef.current = staticRange(raw as Chart); // hands=, loops and practice keep the whole song's keyboard
         chartRef.current = plugins.reduce((c, p) => p.transformChart?.(c, params) ?? c, raw as Chart);
         setLoaded({ chart: chartRef.current, params });
         setLatency(latencyRef.current);
@@ -195,6 +197,7 @@ export default function Play() {
     const ctx = canvas.getContext("2d")!;
     const layerCtxs = layerRefs.current.map((c) => c?.getContext("2d") ?? null);
     let layout: Layout | null = null;
+    const keys = keysRef.current ?? staticRange(chart);
     // highway-zoom: on wide charts (or ?zoom=on) the layout follows the music, rebuilt each frame from its range.
     const zoom = zoomOn(chart, params) ? createZoom(chart) : null;
     let w = window.innerWidth;
@@ -209,7 +212,7 @@ export default function Play() {
         c.height = h * dpr;
         c.getContext("2d")!.setTransform(dpr, 0, 0, dpr, 0, 0);
       }
-      layout = makeLayout(chart, w, h, perspective);
+      layout = makeLayout(chart, w, h, perspective, undefined, keys); // a resize changes the width, never the keys
     };
     resize();
     window.addEventListener("resize", resize);

@@ -78,6 +78,7 @@ export async function POST(request: Request) {
     return fail(502, "save failed");
   }
   if (outcome === "conflict") return fail(409, "that take id belongs to someone else");
+  if (outcome === "limited") return fail(429, "too many saves in a few minutes; kept for later");
   return Response.json(
     { id, outcome, accuracy: results.accuracy, rank: results.rank, counts: results.counts },
     { status: outcome === "saved" ? 201 : 200 },

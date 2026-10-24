@@ -6,7 +6,7 @@ import { judgeTake, noteTimeMs } from "../game/core/judge";
 import { barOf, takeRows } from "./mapping";
 import { enqueue, flush, readOutbox } from "./outbox";
 import { barTrends, formatDuration, sessionsFrom, sessionSummary, takeHistory, weakestBars } from "./progress";
-import { createSavePlugin, report, sameChart, unsavableReason, type LoadChart } from "./save-plugin";
+import { createSavePlugin, report, sameChart, sendResultFor, unsavableReason, type LoadChart } from "./save-plugin";
 
 const chart: Chart = JSON.parse(readFileSync(new URL("../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
 const N = chart.notes.length;
@@ -242,6 +242,13 @@ describe("save plugin", () => {
     expect(await statusAfter("", { kind: "test" })).toEqual({ state: "skipped", why: "test input" });
     const looped = { ...chart, notes: chart.notes.slice(0, 5) };
     expect((await statusAfter("", { played: looped }))?.state).toBe("skipped");
+  });
+
+  it("maps the server's answer to what the outbox does: saving too fast keeps the take for later", () => {
+    expect([201, 200].map(sendResultFor)).toEqual(["ok", "ok"]);
+    expect([424, 429].map(sendResultFor)).toEqual(["later", "later"]);
+    expect([400, 409, 413, 422].map(sendResultFor)).toEqual(["drop", "drop", "drop", "drop"]);
+    expect([401, 500, 502, 503].map(sendResultFor)).toEqual(["retry", "retry", "retry", "retry"]);
   });
 
   it("sameChart compares notes, tempo and meter", () => {

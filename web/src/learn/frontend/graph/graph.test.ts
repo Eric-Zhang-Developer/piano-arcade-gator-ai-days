@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { actionFor, byId, demoGoal, demoLearner, recommendation, rootRelationships, skills } from './data';
-import { activityCamera, cameraAt } from './camera';
-import { layoutGraph, neighbor } from './layout';
-import { anchorLabels, followLabels, overviewCamera, viewPoints, mapSize, placeLabels, presentation, projectGraph } from './projection';
+import { journeyFrame } from './guided-motion';
+import { layoutGraph } from './layout';
+import { anchorLabels, followLabels, viewPoints, mapSize, placeLabels, presentation, projectGraph } from './projection';
 
 describe('demo graph activity choices', () => {
   it('selects goal-related reachable activities that match available lesson content', () => {
@@ -28,7 +28,7 @@ describe('demo graph activity choices', () => {
     expect(actionFor(byId.get('theory.phrasing')!).action).toBeUndefined();
   });
 });
-describe('stable subject layout and navigation', () => {
+describe('stable subject layout', () => {
   it('places every node once, with readable broad clusters and separate hierarchy/prerequisites', () => {
     for (const domain of ['theory', 'procedure'] as const) {
       const points = layoutGraph(domain, rootRelationships);
@@ -56,13 +56,7 @@ describe('stable subject layout and navigation', () => {
       expect(overlaps, `${label.text} obscures ${point.node.title}`).toBe(false);
     }
   });
-  it('moves selection spatially without changing learner state', () => {
-    const points = layoutGraph('theory'), before = JSON.stringify(demoLearner);
-    const next = neighbor(points, 'theory.phrase-endings', 'ArrowLeft');
-    expect(next).not.toBe('theory.phrase-endings');
-    expect(byId.has(next)).toBe(true);
-    expect(JSON.stringify(demoLearner)).toBe(before);
-  });
+
 });
 
 it('keeps the prepared target caption on its original side throughout entry instead of reselecting candidates', () => {
@@ -75,7 +69,7 @@ it('keeps the prepared target caption on its original side throughout entry inst
     const initialCaption = initial.find(label => label.id === target.node.id)!;
     const offset = { x: initialCaption.x - target.screenX, y: initialCaption.y - target.screenY };
     for (let frame = 0; frame <= 44; frame++) {
-      const points = viewPoints(projected, cameraAt(overviewCamera, activityCamera(target, width, height), frame / 44), width, height);
+      const points = viewPoints(projected, journeyFrame({source:{x:88,y:106},target:{x:target.screenX,y:target.screenY},bounds:{left:24,top:128,width,height},href:'/learn/understand',title:'Phrase endings'}, frame/44*1200).camera, width, height);
       const labels = followLabels(captions, points), caption = labels.find(label => label.id === target.node.id)!;
       const node = points.find(point => point.node.id === target.node.id)!;
       expect(labels.map(label => label.id)).toEqual(initial.map(label => label.id));

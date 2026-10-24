@@ -13,7 +13,7 @@ await page.eval(async () => {
   await delay(100);
   delete navigator.onLine;
   window.dispatchEvent(new Event('online'));
-  await delay(1000);
+  await delay(1600);
   const guide = document.querySelector('aside[aria-label="Your next activity"]');
   if (location.pathname !== '/learn' || document.querySelector('[data-entering]')?.dataset.entering !== 'false' || !guide || guide.querySelector('button').disabled || getComputedStyle(guide).opacity !== '1') {
     throw new Error('Interrupted entry navigated late or failed to restore the prepared action');

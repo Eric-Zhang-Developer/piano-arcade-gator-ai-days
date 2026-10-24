@@ -22,7 +22,6 @@ type Sessions = {
   playThrough: TakePhase; dispatchPlayThrough: Dispatch<'start' | 'counted' | 'finish' | 'stop' | 'again'>;
   started: Partial<Record<ActivityId, boolean>>; last: ActivityId | null;
   markStarted: (id: ActivityId) => void; restart: (id: ActivityId) => void;
-  companionCollapsed: boolean; setCompanionCollapsed: Dispatch<SetStateAction<boolean>>;
   graphContext: GraphContext | null; setGraphContext: Dispatch<SetStateAction<GraphContext | null>>;
 };
 const SessionContext = createContext<Sessions | null>(null);
@@ -36,7 +35,6 @@ export function LearningSessionsProvider({ children }: { children: React.ReactNo
   const [playThrough, dispatchPlayThrough] = useReducer(takeTransition, 'ready' as TakePhase);
   const [started, setStarted] = useState<Sessions['started']>({});
   const [last, setLast] = useState<ActivityId | null>(null);
-  const [companionCollapsed, setCompanionCollapsed] = useState(false);
   const [graphContext, setGraphContext] = useState<GraphContext | null>(null);
   const markStarted = useCallback((id: ActivityId) => { setStarted(current => current[id] ? current : { ...current, [id]: true }); setLast(id); }, []);
   const restart = (id: ActivityId) => {
@@ -45,7 +43,7 @@ export function LearningSessionsProvider({ children }: { children: React.ReactNo
     if (id === 'learn-practice') setPractice(initialPractice);
     if (id === 'review-practice') dispatchPlayThrough('again');
   };
-  return <SessionContext value={{ theory, setTheory, review, setReview, practice, dispatchPractice, playThrough, dispatchPlayThrough, started, last, markStarted, restart, graphContext, setGraphContext, companionCollapsed, setCompanionCollapsed }}>{children}</SessionContext>;
+  return <SessionContext value={{ theory, setTheory, review, setReview, practice, dispatchPractice, playThrough, dispatchPlayThrough, started, last, markStarted, restart, graphContext, setGraphContext }}>{children}</SessionContext>;
 }
 export function useLearningSessions() {
   const sessions = useContext(SessionContext);

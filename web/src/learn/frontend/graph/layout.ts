@@ -97,13 +97,3 @@ export function layoutGraph(domain: Domain, relationships: readonly RootRelation
   });
   return result;
 }
-
-export function neighbor(points: Point[], selected: string, key: string): string {
-  const origin = points.find(point => point.node.id === selected);
-  if (!origin) return points[0]?.node.id ?? selected;
-  const direction: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
-  const axis = direction[key]; if (!axis) return selected;
-  return points.filter(point => (point.x - origin.x) * axis[0] + (point.y - origin.y) * axis[1] > 1)
-    .map(point => ({ point, cost: Math.hypot(point.x - origin.x, point.y - origin.y) + Math.abs((point.x - origin.x) * axis[1] - (point.y - origin.y) * axis[0]) * 1.2 }))
-    .sort((a, b) => a.cost - b.cost)[0]?.point.node.id ?? selected;
-}

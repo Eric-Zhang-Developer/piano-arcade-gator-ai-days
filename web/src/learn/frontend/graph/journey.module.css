@@ -1,0 +1,8 @@
+.overlay { position:fixed; inset:0; z-index:30; pointer-events:none; }
+.character { position:absolute; left:0; top:0; width:112px; height:112px; transform:translate3d(var(--pet-x),var(--pet-y),0) translate(-50%,-50%) rotate(var(--pet-tilt)) scale(var(--pet-scale)) scaleY(var(--pet-squash)); transform-origin:50% 70%; will-change:transform; }
+.character img { width:112px; height:112px; display:block; }
+.overlay[data-guided-phase=revealing] { animation:guide-arrived 280ms ease-out forwards; }
+.overlay[data-reduced=true] { display:none; }
+.status { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+@keyframes guide-arrived { from { opacity:1; } to { opacity:0; } }
+@media (prefers-reduced-motion:reduce) { .overlay { display:none; } }

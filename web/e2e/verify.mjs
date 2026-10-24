@@ -88,7 +88,7 @@ async function main() {
 
     await page.waitForSelector('[data-testid="results"]', { timeout: lastBeat * msPerBeat + 30_000 });
     const dom = {};
-    for (const k of ["PERFECT", "GREAT", "MISS", "extra"]) {
+    for (const k of ["PERFECT", "GREAT", "GOOD", "MISS", "wrong", "extra"]) {
       dom[k] = Number(await page.textContent(`[data-testid="count-${k}"]`));
     }
     const results = await page.evaluate(() => window.__pianoArcade.results);
@@ -100,8 +100,10 @@ async function main() {
     if (dom.PERFECT !== n) fail.push(`screen PERFECT ${dom.PERFECT}/${n}`);
     if (dom.MISS !== 0) fail.push(`screen MISS ${dom.MISS}`);
     if (dom.extra !== 0) fail.push(`screen extras ${dom.extra}`);
+    if (dom.GOOD !== 0 || dom.wrong !== 0) fail.push(`screen GOOD ${dom.GOOD}, wrong ${dom.wrong}`);
     if (results?.counts?.PERFECT !== n) fail.push(`results PERFECT ${results?.counts?.PERFECT}/${n}`);
     if (results?.counts?.MISS !== 0 || results?.counts?.extra !== 0) fail.push("results has MISS or extras");
+    if (results?.counts?.GOOD !== 0 || results?.counts?.wrong !== 0) fail.push("results has GOOD or wrong");
     if (fail.length) throw new Error(fail.join("; "));
     say(`verify: test input pass, ${n}/${n} PERFECT`);
 

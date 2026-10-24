@@ -9,7 +9,7 @@ import { Judge, noteTimeMs } from "../../game/core/judge";
 import { keysDevice, midiDevice, testDevice } from "../../game/core/input";
 import { describeTiming, timingSummary, type TimingSummary } from "../../game/timing";
 import {
-  GREAT_MS,
+  GOOD_MS,
   LATENCY_MAX,
   LATENCY_MIN,
   loadLatencyOffset,
@@ -109,6 +109,7 @@ export default function Play() {
     const emit = (e: GameEvent) => {
       if (e.type === "noteHit") hw.latest = { judgment: e.judgment, offsetMs: e.offsetMs, atMs: e.atMs };
       if (e.type === "noteMiss") hw.latest = { judgment: "MISS", offsetMs: null, atMs: e.atMs };
+      if (e.type === "wrongNote") hw.latest = { judgment: "WRONG", offsetMs: null, atMs: e.atMs };
       for (const p of plugins) p.onEvent?.(e);
     };
     const judge = new Judge(chart, emit);
@@ -185,7 +186,7 @@ export default function Play() {
         p.draw(lc, f);
       });
 
-      if (now > lastNoteMs + GREAT_MS + Math.max(0, latencyRef.current) + INPUT_GRACE_MS + END_TAIL_MS) return finish(now);
+      if (now > lastNoteMs + GOOD_MS + Math.max(0, latencyRef.current) + INPUT_GRACE_MS + END_TAIL_MS) return finish(now);
       if (!done) raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
@@ -271,8 +272,10 @@ function ResultsScreen({
   const rows: [string, string, number | string][] = [
     ["PERFECT", "count-PERFECT", counts.PERFECT],
     ["GREAT", "count-GREAT", counts.GREAT],
+    ["GOOD", "count-GOOD", counts.GOOD ?? 0],
     ["MISS", "count-MISS", counts.MISS],
-    ["Extras", "count-extra", counts.extra],
+    ["Wrong notes", "count-wrong", counts.wrong ?? 0],
+    ["Extra presses", "count-extra", counts.extra],
     ["Accuracy", "accuracy", `${(results.accuracy * 100).toFixed(1)}%`],
     ["Max combo", "max-combo", results.maxCombo],
   ];

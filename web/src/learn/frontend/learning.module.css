@@ -23,10 +23,6 @@
 .main { flex:1; min-width:0; }
 .preview { display:block; font-size:11px; margin-bottom:14px; color:var(--learn-muted); }
 .content { padding:44px 40px 36px; }
-.activityHeading { display:flex; align-items:center; justify-content:space-between; margin-bottom:30px; }
-.activityHeading h1 { margin:0; font-size:34px; font-family:var(--font-learning-serif),Georgia,serif; font-weight:400; letter-spacing:-.025em; line-height:1.2; }
-.activityHeading>span { color:var(--learn-muted); font-variant-numeric:tabular-nums; }
-.studio { display:grid; grid-template-columns:minmax(300px,.78fr) minmax(420px,1.5fr); grid-template-rows:minmax(0,1fr); min-height:610px; height:calc(100dvh - 152px); border:1px solid var(--learn-border); border-radius:5px; overflow:hidden; }
 .questionPane { display:flex; flex-direction:column; min-height:0; background:var(--learn-surface); border-right:1px solid var(--learn-border); }
 .questionBody { padding:32px 28px; overflow-y:auto; flex:1; }
 .questionBody h2 { font-size:23px; line-height:1.4; font-weight:500; margin:0 0 28px; text-wrap:pretty; }
@@ -48,9 +44,6 @@
 .feedback strong { color:var(--learn-accent); }
 .feedback p { margin:8px 0 0; }
 .hint,.muted { color:var(--learn-muted); }
-.history { margin-top:32px; color:var(--learn-muted); font-size:12px; }
-.history div { border-bottom:1px solid var(--learn-border); padding:12px 0; }
-.history p { color:var(--learn-text); }
 .workspace { min-width:0; min-height:0; display:flex; flex-direction:column; background:#1e2421; }
 .workspaceTabs { height:54px; display:flex; gap:28px; padding:0 28px; border-bottom:1px solid var(--learn-border); flex:none; }
 .workspaceTabs button { border:0; border-bottom:2px solid transparent; border-radius:0; padding:0; background:none; color:var(--learn-muted); font-size:14px; }
@@ -63,7 +56,7 @@
 .phrase { margin:20px 0 0; }
 .phrase figcaption { display:flex; justify-content:space-between; font-size:12px; color:#585c55; }
 .phrase svg { width:100%; display:block; }
-.audioControls { display:flex; justify-content:center; gap:12px; margin-top:6px; }
+.audioControls { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-top:6px; }
 .audioControls button { display:flex; align-items:center; gap:8px; padding:8px 12px; font-size:14px; border:1px solid #b8b7ae; background:none; color:var(--learn-paper-text); }
 .audioControls button:hover { background:#e2ded2; }
 .audioControls svg { width:12px; height:12px; fill:currentColor; }
@@ -82,5 +75,34 @@
 .srOnly,.skip { position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
 .skip:focus { width:auto; height:auto; clip-path:none; top:8px; left:8px; padding:12px; background:var(--learn-accent); color:#222; z-index:10; }
 .app * { scrollbar-width:thin; scrollbar-color:var(--learn-border) transparent; }
-@media (max-width:1300px) { .rail { width:192px; padding:30px 16px 22px; } .content { padding:36px 28px 28px; } .studio { grid-template-columns:minmax(290px,.85fr) minmax(380px,1.5fr); min-height:540px; height:calc(100dvh - 138px); } .questionBody { padding:28px 24px; } .questionBody h2 { font-size:21px; } .paper { padding:26px; } .workspaceBody { padding:24px; } }
+@media (max-width:1300px) { .rail { width:192px; padding:30px 16px 22px; } .content { padding:36px 28px 28px; } .questionBody { padding:28px 24px; } .questionBody h2 { font-size:21px; } .paper { padding:26px; } .workspaceBody { padding:24px; } }
 @media (prefers-reduced-motion:no-preference) { .app button,.app a { transition:background-color .15s ease-out,color .15s ease-out; } }
+
+/* Theory follows the reading workspace: persistent focus, pinned answer, independent source pane. */
+.content:has(> .theoryActivity) { padding:0; }
+.theoryActivity { height:100dvh; min-height:640px; }
+.theoryStudio { display:grid; grid-template-columns:minmax(330px,min(var(--question-width),calc(100% - 431px))) 1px minmax(430px,1fr); grid-template-rows:minmax(0,1fr); height:100%; }
+.theoryStudio .questionPane { border:0; min-width:0; }
+.lessonFocus { padding:30px 28px 24px; border-bottom:1px solid var(--learn-border); flex:none; }
+.lessonFocus h1 { margin:0; max-width:18ch; font-family:var(--font-learning-serif),Georgia,serif; font-size:32px; font-weight:400; line-height:1.15; letter-spacing:-.025em; text-wrap:balance; }
+.lessonFocus p { margin:14px 0 12px; color:var(--learn-muted); font-size:13px; max-width:45ch; }
+.lessonFocus>span { color:var(--learn-muted); font-size:12px; font-variant-numeric:tabular-nums; }
+.theoryStudio .questionBody { padding:28px; scrollbar-gutter:stable; overflow-wrap:anywhere; }
+.theoryStudio .questionBody h2 { font-size:21px; margin-bottom:20px; }
+.answerComposer { flex:none; padding:20px 28px 24px; border-top:1px solid var(--learn-border); }
+.answerComposer .answers { gap:8px; }
+.answerComposer .answers legend { color:var(--learn-muted); font-size:12px; margin-bottom:10px; }
+.answerComposer .answers label { padding:10px 14px; }
+.answerComposer .explanation textarea { min-height:96px; max-height:170px; }
+.answerComposer .questionActions { padding:20px 0 0; border:0; }
+.answerHistory article { border-bottom:1px solid var(--learn-border); padding-bottom:24px; margin-bottom:28px; font-size:13px; color:var(--learn-muted); }
+.answerHistory article h2 { font-size:15px!important; color:var(--learn-text); margin-bottom:12px!important; }
+.answerHistory .studentAnswer { color:var(--learn-text); }
+.answerHistory strong { font-weight:500; }
+.paneDivider { background:var(--learn-border); cursor:col-resize; touch-action:none; position:relative; z-index:1; }
+.paneDivider::before { content:''; position:absolute; inset:0 -4px; }
+.paneDivider:hover,.paneDivider:focus-visible { background:var(--learn-accent); }
+.theoryStudio .workspaceTabs { height:64px; }
+.theoryStudio .workspaceBody { padding:32px; scrollbar-gutter:stable; }
+.theoryStudio .paper { min-height:0; }
+@media (max-width:1300px) { .lessonFocus { padding:26px 24px 20px; } .lessonFocus h1 { font-size:30px; } .theoryStudio .questionBody { padding:24px; } .answerComposer { padding:18px 24px 22px; } .theoryStudio .workspaceBody { padding:24px; } .theoryStudio .paper { padding:26px; } }

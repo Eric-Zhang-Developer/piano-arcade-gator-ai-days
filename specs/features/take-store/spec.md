@@ -31,8 +31,10 @@ The game never waits on any of this. Judging, rendering, sound and LEDs stay loc
   `coach_feedback` (the coach's report, the exact summary it was checked against, whether the check passed).
 - Views, never stored copies: `bar_trends` (per bar over a player's last 5 takes of a song: notes, misses, mean
   signed offset, spread, mean velocity) and `take_history` (one row per take).
-- CHECK constraints carry the mission's rules: `offset_ms` within ±50, a MISS has no offset, pitch 21–108,
-  `input_device` is `midi` or `keys` (test takes are never stored).
+- CHECK constraints guard shape and sanity, not the judging rule (the server re-judges with the game's judge): a
+  MISS has no offset, pitch 21–108, `input_device` is `midi` or `keys` (test takes are never stored), `offset_ms`
+  within ±1000. Judgment and rank are any upper-case name, so a judgment or rank the contract adds later saves with
+  no migration. A take the database still refuses is kept in the outbox and resent later, never dropped.
 - `save_take(take, notes)` writes a take and its notes in one transaction and does nothing on a retry of the same id.
 
 **Access:**
@@ -42,6 +44,8 @@ The game never waits on any of this. Judging, rendering, sound and LEDs stay loc
   committed. The browser gets `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 
 **Saving a take:**
+- A `GamePlugin` registered in `web/src/game/layers.ts` rebuilds the `Take` from `transformChart`, `wrapInput` and
+  `songStart`, so the play screen needs no change. Drills (`from`/`to`/`tempo` in the URL) aren't saved yet.
 - The results screen renders from local `Results` first. Saving runs after, in the background, and never blocks.
 - The take goes into a `localStorage` outbox under a browser-made UUID, then `POST /api/takes` with the user's
   session token. Failed sends retry on the next page load. A retry never creates a duplicate.
@@ -53,6 +57,10 @@ The game never waits on any of this. Judging, rendering, sound and LEDs stay loc
 - On the first save, the browser calls `signInAnonymously()`. No sign-in screen; the player just plays.
 - A "Keep my progress" button calls `linkIdentity({ provider: 'google' })`: same user id, history kept. Optional for
   the demo; the game is complete without it.
+- "Sign in with Google" on another device returns to that account. If the device had played anonymously, its takes
+  move into the account (`merge_player`, via `/auth/merge`, which only ever merges an anonymous user into a Google
+  one) and the anonymous user is deleted. "Keep my progress" with a Google account that's already linked falls back
+  to this. "Sign out" forgets the session on this device only.
 - Anonymous sign-ins are limited per IP (30 an hour by default). The venue shares one IP, so raise it in the dashboard
   before the demo.
 
@@ -63,15 +71,19 @@ The game never waits on any of this. Judging, rendering, sound and LEDs stay loc
   owner before step 4 merges.
 
 ## Validation
-- SQL test (`supabase/migrations/test_take_store.sql` on a fresh Postgres 16): a saved take shows in both views; a
+- SQL test (`psql -f supabase/tests/take_store.sql` from the repo root on a fresh Postgres 16): a saved take shows in both views; a
   retry is a no-op; `anon` can't read players, takes, notes or views and can't write; player A can't see player B's rows.
 - Vitest: the mapping turns the Twinkle Perfect player's `Take` + `Results` into the exact rows; the outbox keeps a
   take after a failed send and sends it once after a success.
-- `verify.py`: the verify run plays Twinkle with `?input=test` and shows that nothing was sent; a second run with a
-  scripted `keys` take against the dev project shows one new `takes` row and its `note_judgments`.
+- `verify.py`: the verify run plays Twinkle with `?input=test` and still passes 42/42 PERFECT; test takes are never sent.
+- End to end (`supabase/tests/local-stack/`): a scripted laptop-keys take in Chrome against Postgres + PostgREST and a
+  local Auth stand-in shows one new `takes` row, its `note_judgments`, the missed bar first on `/progress`, and no
+  duplicate after a reload.
+- Live project: `node supabase/tests/live-smoke.mjs` passes (grants, RLS, anonymous sign-in, `save_take`).
 - By hand (Sharan): play with Wi-Fi off, see the results screen at once; turn Wi-Fi on, reload, see the take on `/progress`.
 
 ## Defaults
 - Prefer the `localStorage` store if Supabase is unreachable or not configured; the game must not care which one runs.
 - Store raw, derive on read. Add a stored aggregate only with a measured slow query.
-- No ORM, no `@supabase/ssr`, no extra auth screens. One new dependency: `@supabase/supabase-js`.
+- No ORM, no `@supabase/ssr`, no extra auth screens, and no new dependency: Auth and PostgREST are called over
+  `fetch` (decision `take-store-rest-client`). Swap in `@supabase/supabase-js` later through a `contract:` PR if needed.

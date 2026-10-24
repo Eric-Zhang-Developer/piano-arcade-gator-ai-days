@@ -16,7 +16,8 @@
 }
 
 .card {
-  width: min(100%, 440px);
+  box-sizing: border-box; /* the padding inside the width, or a phone's card runs edge to edge */
+  width: min(100%, 480px);
   padding: 28px 24px;
   border-radius: 14px;
   background: var(--pa-panel);
@@ -40,6 +41,7 @@
 .lead {
   margin: 0 0 8px;
   font-size: 19px;
+  text-wrap: balance;
 }
 
 .hint {

@@ -1,0 +1,79 @@
+/* Hidden everywhere but a touch device or a phone-narrow window. Keep the query in step with PHONE_QUERY. */
+.guard {
+  display: none;
+}
+@media (hover: none) and (pointer: coarse), (max-width: 480px) {
+  .guard:not([data-ok]) {
+    position: fixed;
+    inset: 0;
+    z-index: 10000; /* above every layer, toasts (950) included */
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: var(--pa-sky);
+    overflow-y: auto;
+  }
+}
+
+.card {
+  width: min(100%, 440px);
+  padding: 28px 24px;
+  border-radius: 14px;
+  background: var(--pa-panel);
+  box-shadow: 0 0 0 1px rgba(255, 47, 208, 0.35), 0 0 32px rgba(255, 47, 208, 0.18);
+  color: var(--pa-ink);
+  font: 400 17px / 1.45 system-ui, sans-serif;
+  text-align: center;
+}
+
+.wordmark {
+  margin: 0 0 18px;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: 36px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.lead {
+  margin: 0 0 8px;
+  font-size: 19px;
+}
+
+.hint {
+  margin: 0 0 22px;
+  color: var(--pa-ink-dim);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 20px;
+  margin-bottom: 22px;
+}
+
+.link {
+  color: var(--pa-cyan);
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+
+.link:focus-visible,
+.anyway:focus-visible {
+  outline: 2px solid var(--pa-magenta);
+  outline-offset: 3px;
+}
+
+.anyway {
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid var(--pa-ink-dim);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--pa-ink);
+  font: 600 16px system-ui, sans-serif;
+  cursor: pointer;
+}

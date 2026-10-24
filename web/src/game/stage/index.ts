@@ -57,8 +57,8 @@ export function reduceStage(s: StageState, e: GameEvent): StageState {
     case "noteMiss":
     case "wrongNote": // both break the combo: speed back to tier 1
       return { ...s, tier: 0, dipAtMs: e.atMs };
-    case "feverStart":
-      return { ...s, fever: true, feverAtMs: e.atMs };
+    case "feverStart": // the count-in's grid flash too, so fever's start is a moment (fever-moment)
+      return { ...s, fever: true, feverAtMs: e.atMs, flashAtMs: e.atMs };
     case "feverEnd":
       return { ...s, fever: false, feverAtMs: e.atMs };
     case "countInBeat":

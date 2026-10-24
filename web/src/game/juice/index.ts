@@ -122,8 +122,11 @@ export function juiceVisual(): GamePlugin {
       lastNow = f.nowMs;
       const line = f.judgmentLineY;
 
-      // Fever: the one whole-screen state. Edges only, so notes keep their color.
+      // Fever: the one whole-screen state. Edges only, so notes keep their color. The edges stop where notes become due
+      // within clearMs, fading out above that, since the edge lanes hold the chart's lowest and highest notes (#280).
       if (fever) {
+        const cut = line * (1 - s.clearMs / settings.lookaheadMs);
+        ctx.save();
         for (const [x0, x1] of [
           [0, s.feverEdgePx],
           [f.width, f.width - s.feverEdgePx],
@@ -132,8 +135,17 @@ export function juiceVisual(): GamePlugin {
           g.addColorStop(0, `rgba(${s.feverColor}, 0.38)`);
           g.addColorStop(1, `rgba(${s.feverColor}, 0)`);
           ctx.fillStyle = g;
-          ctx.fillRect(Math.min(x0, x1), 0, s.feverEdgePx, f.height);
+          ctx.fillRect(Math.min(x0, x1), 0, s.feverEdgePx, cut);
         }
+        // Erase the strips' lowest quarter along a vertical ramp, so they fade instead of ending at a hard line.
+        const fade = ctx.createLinearGradient(0, cut * 0.75, 0, cut);
+        fade.addColorStop(0, "rgba(0, 0, 0, 0)");
+        fade.addColorStop(1, "rgba(0, 0, 0, 1)");
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.fillStyle = fade;
+        ctx.fillRect(0, cut * 0.75, s.feverEdgePx, cut * 0.25);
+        ctx.fillRect(f.width - s.feverEdgePx, cut * 0.75, s.feverEdgePx, cut * 0.25);
+        ctx.restore();
         const top = ctx.createLinearGradient(0, 0, 0, line * 0.25);
         top.addColorStop(0, `rgba(${s.feverColor}, 0.22)`);
         top.addColorStop(1, `rgba(${s.feverColor}, 0)`);

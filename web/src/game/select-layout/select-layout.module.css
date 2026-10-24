@@ -37,6 +37,12 @@
   color: var(--pa-ink-dim);
 }
 
+/* The keys in full ink, the verbs dim: the one-letter L is easy to miss otherwise. */
+.hint b {
+  font-weight: 600;
+  color: var(--pa-ink);
+}
+
 .focus {
   display: flex;
   flex-direction: column;

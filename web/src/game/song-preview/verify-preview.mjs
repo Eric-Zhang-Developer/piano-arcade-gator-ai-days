@@ -1,7 +1,7 @@
 // Headless proof of song preview (spec: song-preview, the Chrome steps). On /: nothing sounds before a key press; ↓
 // shows the panel and plays the opening as tones; ↓ again stops it and starts the next; PRACTICE 70% opens bar-loop.
 // Then with a stand-in "Portable Grand" MIDI output: the opening goes to the piano on channel 1, and moving on sends
-// All Notes Off.
+// All Notes Off, and L (learn-from-select) does the same on its way to wait mode.
 // Usage: node web/src/game/song-preview/verify-preview.mjs --out <dir>
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -138,6 +138,14 @@ await page.keyboard.press("ArrowDown");
 await page.waitForTimeout(100);
 const tail = await page.evaluate(() => window.__sent.slice(window.__sent.findIndex((m) => m[0] === "clear")));
 check(tail[0]?.[0] === "clear" && JSON.stringify(tail[1]) === JSON.stringify([0xb0, 123, 0]), "moving on clears the queue and sends All Notes Off");
+// L (learn-from-select) leaves for wait mode and stops the opening at once, as Enter does.
+await page.getByTestId("preview-status").filter({ hasText: "on the piano" }).waitFor({ timeout: 10_000 });
+await page.waitForFunction(() => window.__sent.at(-1)?.[0] === 0x80 || window.__sent.at(-1)?.[0] === 0x90, null, { timeout: 10_000 });
+const mark = await page.evaluate(() => window.__sent.length);
+await page.keyboard.press("l");
+await page.waitForURL(/mode=wait/, { timeout: 15_000 });
+const afterL = await page.evaluate((n) => window.__sent.slice(n), mark);
+check(afterL[0]?.[0] === "clear" && JSON.stringify(afterL[1]) === JSON.stringify([0xb0, 123, 0]), `L clears the queue and sends All Notes Off, then opens ${new URL(page.url()).search}`);
 
 check(errors.length === 0, `no page errors${errors.length ? `: ${errors.join("; ")}` : ""}`);
 writeFileSync(join(out, "verify-preview.json"), JSON.stringify({ failures, errors }, null, 2));

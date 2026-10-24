@@ -1,0 +1,4 @@
+# Songs that stay on this machine (decision 003): all-rights-reserved charts, never committed.
+# Put each at web/public/songs/local/<id>/chart.json; song select lists it and /play?song=local/<id> plays it.
+*
+!.gitignore

@@ -1,0 +1,138 @@
+/* Chunk practice's panels, in visual-direction.md's tokens and results-layout's button shapes. */
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* One pip per chunk: cleared ones cyan, this one magenta and wider, the rest dim. */
+.pips {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pips li {
+  width: 18px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgb(242 242 245 / 0.18);
+  transform: skewX(-18deg);
+}
+
+.pips li.done {
+  background: var(--pa-cyan);
+}
+
+.pips li.here {
+  width: 34px;
+  background: var(--pa-magenta);
+  box-shadow: 0 0 10px rgb(255 47 208 / 0.7);
+}
+
+.line {
+  margin: 0;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pa-ink);
+}
+
+.after {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.verdict {
+  margin: 0;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--pa-ink);
+}
+
+.clear {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--pa-gold);
+  text-transform: uppercase;
+  text-shadow: 0 0 16px rgb(255 226 122 / 0.45);
+}
+
+/* How far a take fell short: the fill is its accuracy, the gold tick the gate. */
+.meter {
+  position: relative;
+  width: 280px;
+  height: 8px;
+  border-radius: 4px;
+  background: rgb(242 242 245 / 0.14);
+}
+
+.fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--acc) * 100%);
+  border-radius: 4px;
+  background: var(--pa-miss);
+}
+
+.gate {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  left: calc(var(--gate) * 100%);
+  width: 3px;
+  border-radius: 1px;
+  background: var(--pa-gold);
+}
+
+.dim {
+  color: var(--pa-ink-dim);
+}
+
+.next,
+.ghost {
+  display: inline-block;
+  padding: 12px 36px;
+  border-radius: 6px;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.next {
+  background: var(--pa-gold);
+  color: var(--pa-bg);
+}
+
+.ghost {
+  border: 1px solid var(--pa-ink-dim);
+  color: var(--pa-ink);
+}
+
+.next:focus-visible,
+.ghost:focus-visible {
+  outline: 2px solid var(--pa-magenta);
+  outline-offset: 3px;
+}
+
+.next:focus {
+  box-shadow: 0 0 0 2px var(--pa-bg), 0 0 18px rgb(255 226 122 / 0.6);
+}

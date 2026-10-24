@@ -1,0 +1,22 @@
+.jacket {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  container-type: size;
+}
+
+/* Set large and pushed past the bottom-left edge, so the square crops it like a record sleeve. */
+.word {
+  position: absolute;
+  left: -4cqh;
+  bottom: -10cqh;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: 56cqh;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}

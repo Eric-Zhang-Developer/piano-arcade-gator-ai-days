@@ -1,0 +1,126 @@
+/* Sizes scale with the viewport so text stays readable on video: 16 px at 1280 wide, 24 px at 1920. */
+.card {
+  --h: clamp(80px, 6.25vw, 120px);
+  height: var(--h);
+  display: flex;
+  align-items: stretch;
+  gap: clamp(12px, 1vw, 20px);
+  padding-right: clamp(12px, 1vw, 20px);
+  box-sizing: border-box;
+  border: 2px solid rgba(242, 242, 245, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--pa-panel);
+  color: var(--pa-ink);
+  transition:
+    transform 200ms ease-out,
+    border-color 200ms ease-out,
+    background-color 200ms ease-out,
+    box-shadow 200ms ease-out;
+}
+
+.card[data-focused] {
+  border-color: var(--pa-magenta);
+  background: var(--pa-sky);
+  box-shadow: 0 0 24px rgba(255, 47, 208, 0.4);
+  transform: scale(1.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+  .card[data-focused] {
+    transform: none;
+  }
+}
+
+/* song-jacket fills this; empty, it's a dim square so the layout doesn't jump when jackets land. */
+.jacket {
+  flex: none;
+  width: calc(var(--h) - 4px);
+  background: rgba(242, 242, 245, 0.04);
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.title {
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: clamp(24px, 1.9vw, 36px);
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.composer {
+  font-size: clamp(16px, 1.25vw, 24px);
+  color: var(--pa-ink-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.best,
+.count,
+.level {
+  flex: none;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.count {
+  padding: 5px 0 3px;
+}
+
+.best {
+  padding: 5px 0 3px;
+}
+
+.best .number {
+  color: var(--pa-gold);
+}
+
+.level {
+  min-width: calc(var(--h) * 0.62);
+  padding: 4px 0 2px;
+  border: 1px solid rgba(39, 225, 255, 0.5);
+  border-radius: 4px;
+  background: rgba(11, 2, 32, 0.8);
+}
+
+.label {
+  font-size: clamp(11px, 0.7vw, 14px);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pa-ink-dim);
+}
+
+.number {
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: clamp(22px, 1.8vw, 36px);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.count .number {
+  font-size: clamp(18px, 1.3vw, 26px);
+}
+
+.level .number {
+  font-weight: 900;
+}

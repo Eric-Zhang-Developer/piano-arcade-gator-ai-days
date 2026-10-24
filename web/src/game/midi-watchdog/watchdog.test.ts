@@ -151,3 +151,31 @@ describe("without Active Sensing (the 10 s fallback)", () => {
     expect(stalls()).toBe(0);
   });
 });
+
+describe("pause (play-slots)", () => {
+  it("counts no stall while paused, and the 10 s fallback starts over at resume", async () => {
+    const { wd, stalls } = await connect();
+    wd.transformChart!(chart, new URLSearchParams());
+    wd.onEvent!({ type: "songStart", atMs: 0 });
+    // Synchronous ticks through the pause: nothing in it awaits, and the async advance yields to the real event loop
+    // between each of its ~800 checks, which ran past vitest's 5 s once under full-suite load (#314). One assertion.
+    await vi.advanceTimersByTimeAsync(1000);
+    wd.onEvent!({ type: "pause", atMs: 1000 });
+    vi.advanceTimersByTime(30_000); // notes would be due on the wall clock; the chart clock stood still
+    const paused = stalls();
+    wd.onEvent!({ type: "resume", atMs: 1000 });
+    vi.advanceTimersByTime(9000);
+    const resumed = stalls(); // 40 s since the last message, but only 9 s of play
+    await vi.advanceTimersByTimeAsync(1200);
+    expect([paused, resumed, stalls()]).toEqual([0, 0, 1]); // a silent piano is still caught after the pause
+  });
+
+  it("with Active Sensing, a pause longer than 3 s of silence isn't a stall", async () => {
+    const { sim, wd, stalls } = await connect(SENSING);
+    await vi.advanceTimersByTimeAsync(1000);
+    wd.onEvent!({ type: "pause", atMs: 0 });
+    sim.stall(5000);
+    await vi.advanceTimersByTimeAsync(6000);
+    expect(stalls()).toBe(0);
+  });
+});

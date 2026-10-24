@@ -25,13 +25,115 @@ cut = []
 [[milestone]]
 name = "arcade"
 ship = ""
-features = ["song-select", "minuet-g", "operator-board", "piano-sim", "hud", "juice-visual", "juice-sound", "midi-watchdog"]
+features = ["song-select", "minuet-g", "operator-board", "piano-sim", "hud", "juice-visual", "juice-sound", "midi-watchdog", "fever-stage"]
+cut = []
+
+# frontend: eric-agent-1's lane (#157). Every feature here is assigned to eric-agent-1, so other workers skip it, and
+# it sits first in eric-agent-1's pick order. Chains (note-pills -> hit-line -> key-skin) edit the same files.
+[[milestone]]
+name = "frontend"
+ship = ""
+features = [
+  "ui-tokens",
+  "song-card",
+  "song-jacket",
+  "select-layout",
+  "hud-skin",
+  "note-pills",
+  "hit-line",
+  "key-skin",
+  "stage-card",
+  "results-layout",
+  "results-tally",
+  "rank-stamp",
+]
+cut = []
+
+[[milestone]]
+name = "library"
+ship = ""
+features = ["song-pack-1", "song-pack-2"]
 cut = []
 
 [[milestone]]
 name = "lights"
 ship = ""
 features = ["led-strip", "led-game"]
+cut = []
+
+# showcase: what the 3-minute video shows, ranked for it (decision of 2026-10-24). encore: the rest, by dependency.
+[[milestone]]
+name = "showcase"
+ship = ""
+features = [
+  "play-slots",
+  "scenes",
+  "fever-gauge",
+  "dynamics",
+  "evenness",
+  "take-graph",
+  "weak-bars",
+  "records",
+  "difficulty",
+  "hand-colors",
+  "note-labels",
+  "calibration",
+  "hand-mode",
+]
+cut = []
+
+[[milestone]]
+name = "encore"
+ship = ""
+features = [
+  "replay-view",
+  "wait-mode",
+  "highway-zoom",
+  "ghost",
+  "chord-sync",
+  "tempo-curve",
+  "song-preview",
+  "song-requests",
+  "piano-voice",
+  "take-midi",
+  "versus",
+  "cabinet",
+]
+cut = []
+
+# polish: Eric's 25 polish features (2026-10-24), ranked by a hackathon-coach pass for the 90-second video and the
+# judges' hands-on demo: quick practice mode first, then what protects and lights up the video. The last ten were
+# promoted from backlog, in two steps, as the queue ran low (closest to the video and practice first).
+[[milestone]]
+name = "polish"
+ship = ""
+features = [
+  "learn-from-select",
+  "wait-hud",
+  "chunk-practice",
+  "capture-mode",
+  "song-sweep",
+  "fever-moment",
+  "clear-card",
+  "combo-hud",
+  "laptop-octaves",
+  "perf-budget",
+  "chart-lint",
+  "sheet-xml",
+  "sheet-view",
+  "bar-lines",
+  "select-stage",
+  "select-to-stage",
+  "ui-sounds",
+  "score-rollup",
+  "wait-hint",
+  "wait-hands",
+  "pause-skin",
+  "options-panel",
+  "notice-toast",
+  "black-key-lanes",
+  "pill-match",
+]
 cut = []
 
 [[milestone]]

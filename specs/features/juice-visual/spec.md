@@ -19,7 +19,8 @@ Make every hit feel good without hiding the next note. Effects rise *above* the 
 - **Lane light:** a pressed key's lane glows faintly up from the line, even when no note is there.
 - **Miss:** no burst; a brief desaturated flash on the line at that key.
 - **Fever** (`feverStart` to `feverEnd`): the one whole-screen state. The highway edges glow and the background
-  warms. Notes keep their color.
+  warms. Notes keep their color. While `fever-stage` is mounted, the background is the stage's job: draw only the
+  edges.
 - **Full combo:** on `fullCombo`, a large FULL COMBO banner over a dimmed highway for about 2 s, before the results.
 - **Rank reveal:** the results screen's rank letter appears with a short scale-in.
 - **Readability rule:** effects never cover a note that is less than 500 ms from the line, and dense passages cap
@@ -32,4 +33,5 @@ Make every hit feel good without hiding the next note. Effects rise *above* the 
 - Eric judges the feel on the piano (`not verified on the piano` until he does).
 
 ## Defaults
-- Canvas 2D only; no WebGL or effect libraries without a `contract:` PR.
+- Canvas 2D only; no WebGL or effect libraries without a `contract:` PR. (The 3D stage behind the highway is
+  `fever-stage`, not this feature.)

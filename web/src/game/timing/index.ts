@@ -54,8 +54,9 @@ export function timingSummary(chart: Chart, take: Take, results: Results, curren
     timed: all.length,
     meanMs: enough ? round(mean) : null,
     sdMs: enough ? round(sd) : null,
-    early: all.filter((x) => x < 0).length,
-    late: all.filter((x) => x > 0).length,
+    // Counted at the precision the mean is shown in, so sub-ms clock noise on a perfect press counts as neither.
+    early: all.filter((x) => round(x) < 0).length,
+    late: all.filter((x) => round(x) > 0).length,
     misses: missed.length,
     nearMisses: near.length,
     suggestedLatencyMs: suggest ? Math.min(LATENCY_MAX, Math.max(LATENCY_MIN, round(currentLatencyMs + mean))) : null,

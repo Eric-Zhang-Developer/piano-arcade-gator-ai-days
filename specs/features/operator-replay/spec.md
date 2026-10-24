@@ -1,5 +1,5 @@
 ---
-name: "Operator replay: watch the build, one merge per note of Twinkle, on the piano"
+name: "Operator replay: watch the build in 3D, one merge per note of Twinkle, on the piano"
 depends_on: ["operator-board"]
 owns: ["web/src/app/attract/", "web/src/replay/"]
 assignee: "eric"
@@ -18,11 +18,17 @@ them): live from `/api/operator`, or from the snapshot with `/attract?snapshot`.
 Inspired by KnightHacks' foreman tour (`specs/features/foreman/spec.md` there): take its ideas, not its code.
 
 ## Requirements
-**The graph:**
-- One node per feature spec, with an edge per `depends_on`.
-- Layered by depth (roots on the left). Nodes are labelled by slug.
-- Nodes are colored by state in `operator-board`'s states, plus a label or glyph, never color alone.
-- Clicking a node opens its spec, its PR and its done note on GitHub.
+**The graph** is a three.js scene (amended 2026-10-24, #72; `three` is in `web/package.json`):
+- A synthwave stage: a neon grid floor running to a horizon, a low sun, a dark sky. The camera orbits slowly.
+- One **pillar** per feature spec, standing on the grid, with a glowing line on the floor per `depends_on`.
+- Layered by depth: roots at the front, each layer of dependents a row further back. The layout is a pure function
+  (slug -> grid position), a few lines of layering, not a library.
+- Each pillar carries its slug as a label that faces the camera.
+- Pillars are colored by state in `operator-board`'s states, plus a glyph on the label, never color alone. A
+  pillar that isn't done yet is a low, dim outline on the grid.
+- Clicking a pillar (a raycast) opens its spec, its PR and its done note on GitHub.
+- No WebGL: the same graph as a flat list of features with their states and links, and the replay still steps,
+  counts and plays.
 
 **The replay:**
 - **Order:** it steps through merged PRs in merge order.
@@ -32,8 +38,9 @@ Inspired by KnightHacks' foreman tour (`specs/features/foreman/spec.md` there): 
 
   That way the melody comes out in rhythm. Wall-clock spacing would scatter it.
 - **What a step shows:**
-  - a `feat(<slug>)` merge turns its node to done with a flash and a ring;
-  - edges to the features it unblocks draw outward;
+  - a `feat(<slug>)` merge **raises its pillar out of the grid** to full height, with a flash and a ring of light on
+    the floor, and the camera eases toward it;
+  - floor lines to the features it unblocks draw outward;
   - any merge bumps the counters and slides into a 3-line ticker (number, type, title).
 - **Counters,** large, for the current step:
   - features done of planned;
@@ -66,11 +73,15 @@ Inspired by KnightHacks' foreman tour (`specs/features/foreman/spec.md` there): 
 - Hovering shows the number, title, worker and times; clicking opens the PR.
 - It's plain SVG, with a `<details>` table version for screen readers.
 
-**The style:** `operator-board`'s synthwave look. Done nodes glow neon. With reduced motion the replay still steps
-and plays notes, but no flash, ring, bump or slide animates.
+**The style:** `operator-board`'s synthwave look. Done pillars glow neon. Counters, ticker, chapters and the
+controls are HTML over the scene; the crew timeline stays SVG below it. With reduced motion the camera doesn't orbit,
+pillars appear at full height, and no flash, ring, bump or slide animates; the replay still steps and plays notes.
+The renderer caps its pixel ratio at 2 and frees its WebGL resources when you leave the page.
 
 ## Validation
 - `pnpm -C web test`, Vitest, no network, on fixed inputs:
+  - The layout: every spec gets one position; a feature sits a row behind everything in its `depends_on`; no two
+    pillars share a position.
   - The steps: N merged PRs give N steps in merge order. Step times follow the chart's beats and durations at its
     BPM. The merge after the chart's last note wraps to its first.
   - The counters at the last step equal the board's.
@@ -80,18 +91,20 @@ and plays notes, but no flash, ring, bump or slide animates.
   - The piano output: it picks "Portable Grand" over another output, and stopping sends CC 123 on 16 channels. Use a
     fake `MIDIAccess`; `piano-sim`'s is fine to import.
 - In Chrome, `action -> what you should see`:
-  1. Open `/attract`, press Space -> the graph fills in step by step, the counters climb, chapters caption, and
-     Twinkle plays in rhythm from the laptop.
+  1. Open `/attract`, press Space -> pillars rise out of the grid step by step, the counters climb, chapters
+     caption, and Twinkle plays in rhythm from the laptop.
   2. With the piano on USB TO HOST, play it again -> the DGX plays the melody. Pause mid-way -> silence, no stuck
      note.
-  3. Click a done node -> its spec, PR and done note open.
+  3. Click a done pillar -> its spec, PR and done note open.
   4. Hover a timeline bar -> its tooltip.
   5. `/attract?snapshot` with the network off -> the replay plays from the snapshot.
+  6. Disable WebGL (`--disable-webgl`, or DevTools rendering) -> the flat list shows and the replay still plays.
 
   Keep a screenshot mid-replay and one of the timeline.
 - On the piano (Eric; mark it in the done note): step 2, and whether Twinkle is recognizable. Don't count this as
   passed by hand-waving.
 
 ## Defaults
-- Prefer the smaller option. No new dependencies; the graph layout is a few lines of layering, not a library.
+- Prefer the smaller option. `three` is the only dependency this uses: plain meshes, lines and built-in materials,
+  labels as sprites or HTML, no postprocessing library and no graph-layout library.
 - Notes come from the committed Twinkle chart, never typed from memory.

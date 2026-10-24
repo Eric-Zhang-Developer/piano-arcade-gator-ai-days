@@ -53,6 +53,12 @@ for Eric. Eric checks it by playing.
 it loads Twinkle. An unknown id shows a clear message and a link to `/`, never a blank page. `?input=test` and the
 verify script keep working. This lands as a `fix(core-loop)` PR.
 
+**Background layer** (added after core-loop shipped, #91): `/play` mounts the first plugin's `background` hook
+(`GamePlugin.background` in `web/src/contracts/`) behind the highway canvas, calls its `frame` once per animation
+frame and its `dispose` when the take ends or the page unmounts. While one is mounted, the highway's full-screen
+backdrop is drawn at the stage's backdrop alpha instead of opaque. With none, nothing changes. This lands as a
+`fix(core-loop)` PR; `fever-stage`'s spec has the details.
+
 **Input:**
 - MIDI: Chrome Web MIDI. Pick the port whose name contains "Portable Grand", else the first input. Ignore `0xFE` and
   `0xF8`. A note-on with velocity 0 is a release. Use the message's `timeStamp` for time.
@@ -63,7 +69,7 @@ verify script keep working. This lands as a `fix(core-loop)` PR.
   `pianoArcade.latencyOffsetMs`. A key's judged time is its arrival time minus the offset.
 
 **Judging** (pure functions, no React): exactly the rule in `mission.md`. Superseded in part by `judging-tiers`
-(GOOD, WRONG notes, the new accuracy); the original rule follows for history. Match each key press to the nearest
+(GOOD, WRONG notes, the new accuracy) and by `fever-gauge` (when fever starts); the original rule follows for history. Match each key press to the nearest
 unmatched chart note of the same pitch within ±50 ms. Combo counts consecutive PERFECT and GREAT; a MISS resets it;
 extras don't. Fever starts at a combo of 50 and ends at the next MISS. Accuracy = (PERFECT + 0.5 × GREAT) / notes.
 Rank: S ≥ 95%, A ≥ 90%, B ≥ 80%, C ≥ 70%, else D.

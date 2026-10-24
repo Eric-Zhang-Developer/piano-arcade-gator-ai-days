@@ -1,5 +1,6 @@
-// Verify: start the app, play Twinkle headless as the Perfect player, fail unless every note is PERFECT. Twice: with
-// the test input, then on /sim through the MIDI path (raw bytes from the fake piano into core's real MIDI input).
+// Verify: start the app, pick Twinkle on the song list at /, then play it headless as the Perfect player, failing
+// unless every note is PERFECT. Twice: with the test input, then on /sim through the MIDI path (raw bytes from the
+// fake piano into core's real MIDI input).
 // Usage: pnpm -C web verify --out <dir>
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -75,6 +76,14 @@ async function main() {
   page.on("pageerror", (e) => consoleLines.push(`pageerror: ${e.message}`));
 
   try {
+    // The front door: Enter on Twinkle's row opens it. (Playing needs ?input=test, so the run below reloads with it.)
+    await page.goto(`${base}/`);
+    await page.getByTestId("song-twinkle").focus();
+    await page.keyboard.press("Enter");
+    await page.waitForURL(/\/play\?song=twinkle$/, { timeout: 60_000 });
+    await page.getByRole("heading", { name: "Twinkle, Twinkle, Little Star" }).waitFor({ timeout: 60_000 });
+    say("verify: / lists Twinkle, Enter opens /play?song=twinkle");
+
     await page.goto(url);
     await page.waitForFunction(() => window.__pianoArcade?.ready === true, null, { timeout: 60_000 });
     const chart = await page.evaluate(() => window.__pianoArcade.chart);
@@ -104,8 +113,12 @@ async function main() {
     if (results?.counts?.PERFECT !== n) fail.push(`results PERFECT ${results?.counts?.PERFECT}/${n}`);
     if (results?.counts?.MISS !== 0 || results?.counts?.extra !== 0) fail.push("results has MISS or extras");
     if (results?.counts?.GOOD !== 0 || results?.counts?.wrong !== 0) fail.push("results has GOOD or wrong");
+    // play-slots: the results screen renders its plugin panels without errors.
+    const slots = await page.locator('[data-testid^="slot-"]').evaluateAll((els) => els.map((e) => e.dataset.testid));
+    const slotErrors = consoleLines.filter((l) => l.startsWith("pageerror") || l.includes("play-slots:"));
+    if (slotErrors.length) fail.push(`results screen errors: ${slotErrors.join(" | ")}`);
     if (fail.length) throw new Error(fail.join("; "));
-    say(`verify: test input pass, ${n}/${n} PERFECT`);
+    say(`verify: test input pass, ${n}/${n} PERFECT; results panels: ${slots.join(", ") || "none"}, no errors`);
 
     await page.goto(`${base}/sim`);
     await page.getByRole("button", { name: "Watch the bot" }).click({ timeout: 60_000 }); // enabled once the game is ready
@@ -116,14 +129,24 @@ async function main() {
       sim[k] = Number(await game.locator(`[data-testid="count-${k}"]`).textContent());
     }
     const midiStatus = await game.locator("main").textContent();
+    // The sim bot presses exactly on the clock songStart implies, so its mean offset is how far that clock sits from
+    // the judge's. It read 8–9 ms late while /play fixed zero before building the stage (#173).
+    const mean = midiStatus?.match(/On time on average|(Late|Early) by (\d+) ms on average/);
+    const meanMs = mean?.[1] ? (mean[1] === "Late" ? 1 : -1) * Number(mean[2]) : 0;
     const types = await page.locator('[data-testid="midi-log"] tbody tr td:nth-child(4)').allTextContents();
     const keyMessages = types.filter((t) => t === "note_on" || t === "release(v0)").length;
     await page.screenshot({ path: join(out, "sim-results.png") });
-    writeFileSync(join(out, "sim-results.json"), JSON.stringify({ dom: sim, keyMessages }, null, 2));
+    writeFileSync(join(out, "sim-results.json"), JSON.stringify({ dom: sim, keyMessages, mean: mean?.[0] ?? null }, null, 2));
 
     if (sim.PERFECT !== n || sim.MISS !== 0 || sim.extra !== 0) fail.push(`/sim screen ${JSON.stringify(sim)}, want ${n} PERFECT`);
     if (!midiStatus?.includes("MIDI: Portable Grand")) fail.push("/sim: the game didn't pick the fake Portable Grand");
     if (keyMessages !== 2 * n) fail.push(`/sim log shows ${keyMessages} key messages, want ${2 * n}`);
+    if (!mean) fail.push("/sim results: no mean timing line");
+    else if (Math.abs(meanMs) > 4) fail.push(`/sim bot's mean offset is ${meanMs} ms, want within ±4: songStart's clock is off the judge's`);
+    // play-slots: piano-out's "Replay on piano" is a results panel now, in its own slot.
+    if ((await game.locator('[data-testid="slot-piano-out"] [data-testid="replay"]').count()) !== 1) {
+      fail.push('/sim results: no "Replay on piano" inside slot-piano-out');
+    }
     if (fail.length) throw new Error(fail.join("; "));
     say(`verify: pass, ${n}/${n} PERFECT with test input and through the MIDI path on /sim (evidence: ${out})`);
   } catch (e) {

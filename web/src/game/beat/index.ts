@@ -1,5 +1,6 @@
 // Beat track: a drum beat on the piano from the count-in to the end, so players hear the time (spec: beat-track).
 import type { Chart, GameEvent, GamePlugin } from "../../contracts";
+import { captureOn } from "../capture-mode";
 import { msPerBeat, settings as core } from "../core/settings";
 
 // General MIDI drums, channel 10.
@@ -57,6 +58,7 @@ export function beatTrack(): GamePlugin {
   let off = false;
   let output: MIDIOutput | null = null;
   let audio: AudioContext | null = null;
+  let bus: GainNode | null = null; // this run's clicks; disconnecting it silences clicks already queued
   let zero = 0; // performance.now() at chart time 0
   let scheduledUntil = 0;
   let active = false;
@@ -83,7 +85,7 @@ export function beatTrack(): GamePlugin {
     osc.frequency.value = h.accent ? beatSettings.clickAccentHz : beatSettings.clickHz;
     gain.gain.setValueAtTime(beatSettings.clickVolume, t);
     gain.gain.exponentialRampToValueAtTime(0.001, t + beatSettings.clickLengthS);
-    osc.connect(gain).connect(audio.destination);
+    osc.connect(gain).connect(bus ?? audio.destination);
     osc.start(t);
     osc.stop(t + beatSettings.clickLengthS);
   };
@@ -104,11 +106,32 @@ export function beatTrack(): GamePlugin {
     output?.send([0xb9, 123, 0], performance.now() + beatSettings.lookaheadMs + beatSettings.noteLengthMs);
   };
 
+  // Pause and quit (play-slots): silent now, including what's already queued.
+  const silence = () => {
+    stop();
+    bus?.disconnect();
+    bus = null;
+    // Web MIDI's clear() drops queued sends. Not every browser has it, and TypeScript's types leave it out.
+    (output as (MIDIOutput & { clear?(): void }) | null)?.clear?.();
+  };
+
+  // From chart time atMs on: songStart, or resume after a pause (the clock stood still, so atMs maps to now).
+  const begin = (atMs: number) => {
+    zero = performance.now() - atMs;
+    if (audio) {
+      bus = audio.createGain();
+      bus.connect(audio.destination);
+    }
+    scheduledUntil = atMs;
+    active = true;
+    schedule(atMs);
+  };
+
   return {
     id: "beat-track",
     transformChart(c, params) {
       chart = c;
-      off = params.get("beat") === "off";
+      off = params.get("beat") === "off" || params.get("mode") === "wait"; // wait mode stops the clock at every note
       if (!off && typeof navigator !== "undefined" && navigator.requestMIDIAccess) {
         navigator
           .requestMIDIAccess()
@@ -123,9 +146,11 @@ export function beatTrack(): GamePlugin {
     },
     onEvent(e: GameEvent) {
       if (e.type === "songEnd") return stop();
-      if (e.type !== "songStart" || off || !chart) return;
-      stop();
-      zero = performance.now() - e.atMs;
+      if (e.type === "pause" || e.type === "quit") return silence();
+      if (off || !chart) return;
+      if (e.type === "resume") return begin(e.atMs);
+      if (e.type !== "songStart") return;
+      silence();
       if (!output) {
         try {
           audio ??= new AudioContext();
@@ -135,12 +160,11 @@ export function beatTrack(): GamePlugin {
         }
       }
       where = output ? "Beat: piano" : audio ? "Beat: laptop" : "Beat: unavailable";
-      scheduledUntil = e.atMs;
-      active = true;
-      schedule(e.atMs);
+      begin(e.atMs);
     },
     draw(ctx, frame) {
       schedule(frame.nowMs);
+      if (captureOn()) return; // ?capture=1: the beat plays, its status text stays out of the video (capture-mode)
       ctx.font = "13px system-ui, sans-serif";
       ctx.textAlign = "right";
       ctx.fillStyle = "rgba(255,255,255,0.45)";

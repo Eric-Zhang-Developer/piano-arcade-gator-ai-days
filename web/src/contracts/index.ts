@@ -1,6 +1,8 @@
 // Shared formats for both lanes. Frozen once merged: change only through a `contract:` PR.
 // Times are ms on the chart clock: 0 is beat 0 of bar 1. Pitches are MIDI note numbers.
 
+import type { ReactNode } from "react";
+
 export type Hand = "R" | "L";
 
 export interface ChartNote {
@@ -9,6 +11,7 @@ export interface ChartNote {
   beat: number; // start, from beat 0 of bar 1
   duration: number; // beats
   hand: Hand;
+  velocity?: number; // 1–127, from the score's notation export (dynamics); absent: the score gives none
 }
 
 export interface Chart {
@@ -19,6 +22,7 @@ export interface Chart {
   source: string; // public-domain score (URL or citation), or "Eric"
   bpm: number;
   beatsPerBar: number;
+  voice?: number; // General MIDI program, 1–128 as the GM table numbers them; absent: leave the piano's voice alone
   notes: ChartNote[];
 }
 
@@ -75,6 +79,9 @@ export type GameEvent = At &
     | { type: "feverEnd" }
     | { type: "fullCombo" }
     | { type: "songEnd"; results: Results }
+    | { type: "pause" } // Esc during a take: the chart clock stops at atMs
+    | { type: "resume" } // the clock runs on from the same atMs: no chart time passes while paused
+    | { type: "quit" } // the take ends without results: no songEnd follows
   );
 
 export interface InputEvent {
@@ -100,12 +107,36 @@ export interface Frame {
   height: number;
 }
 
+// A layer under the highway that its plugin renders itself (WebGL, e.g. three.js). /play gives it an empty element
+// the size of the window, behind the highway canvas, calls frame() once per animation frame after the plugins' draw,
+// and dispose() when the take ends or the page unmounts. At most one plugin provides one.
+export interface BackgroundLayer {
+  frame(frame: Frame): void;
+  dispose(): void;
+}
+
+// What /play hands a plugin's panels. A panel only reads: it never changes the take or its results. Return an element
+// (`<MyPanel ... />`), not markup built inline, so the panel can use hooks; return null for no panel this time.
+export interface PanelContext {
+  chart: Chart; // after every plugin's transformChart
+  params: URLSearchParams;
+}
+
+export interface ResultsPanelContext extends PanelContext {
+  take: Take;
+  results: Results;
+  retry(): void; // the same as the Retry button
+}
+
 export interface GamePlugin {
   id: string;
+  background?(el: HTMLElement): BackgroundLayer | null; // null: no stage this time (no WebGL, switched off)
   draw?(ctx: CanvasRenderingContext2D, frame: Frame): void;
   onEvent?(event: GameEvent): void;
   transformChart?(chart: Chart, params: URLSearchParams): Chart;
   wrapInput?(input: InputDevice): InputDevice;
+  startPanel?(ctx: PanelContext): ReactNode; // on /play's start screen, under Start, in plugin order
+  resultsPanel?(ctx: ResultsPanelContext): ReactNode; // on the results screen, under the score, in plugin order
 }
 
 // Validators: return a list of problems, empty when valid.
@@ -120,6 +151,7 @@ export function validateChart(c: unknown): string[] {
   for (const k of ["id", "title", "composer", "source"] as const) if (!isStr(o[k])) p.push(`${k} missing`);
   if (!isNum(o.bpm) || o.bpm <= 0) p.push("bpm must be > 0");
   if (!isNum(o.beatsPerBar) || o.beatsPerBar <= 0) p.push("beatsPerBar must be > 0");
+  if (o.voice !== undefined && !(Number.isInteger(o.voice) && o.voice >= 1 && o.voice <= 128)) p.push("voice must be 1–128");
   if (!Array.isArray(o.notes) || o.notes.length === 0) return [...p, "notes missing"];
   const ids = new Set<string>();
   o.notes.forEach((n, i) => {
@@ -129,6 +161,8 @@ export function validateChart(c: unknown): string[] {
     if (!isNum(n.beat) || n.beat < 0) p.push(`note ${i}: beat must be >= 0`);
     if (!isNum(n.duration) || n.duration <= 0) p.push(`note ${i}: duration must be > 0`);
     if (n.hand !== "R" && n.hand !== "L") p.push(`note ${i}: hand must be R or L`);
+    if (n.velocity !== undefined && !(Number.isInteger(n.velocity) && n.velocity >= 1 && n.velocity <= 127))
+      p.push(`note ${i}: velocity must be 1–127`);
   });
   return p;
 }

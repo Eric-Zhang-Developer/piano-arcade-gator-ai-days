@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { afterEach, expect, test, vi } from "vitest";
-import type { Chart } from "../../contracts";
+import type { Chart, Frame } from "../../contracts";
 import { settings } from "../core/settings";
 import { beatHits, beatTrack, endBeat } from "./index";
 
@@ -66,4 +66,64 @@ test("laptop clicks: songStart before the audio runs schedules at non-negative t
   expect(audio.times.length).toBeGreaterThan(0);
   expect(Math.min(...audio.times)).toBeGreaterThanOrEqual(0);
   vi.restoreAllMocks();
+});
+
+test("pause silences the laptop clicks, queued ones included; resume brings them back on the beat", () => {
+  const buses: { connected: boolean }[] = [];
+  const starts: number[] = [];
+  const audio = {
+    currentTime: 0,
+    destination: {},
+    getOutputTimestamp: () => ({ contextTime: 0, performanceTime: 1000 }),
+    resume: () => Promise.resolve(),
+    createGain() {
+      const node = { connected: false, gain: { setValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect: (d: unknown) => ((node.connected = true), d), disconnect: () => void (node.connected = false) };
+      buses.push(node);
+      return node;
+    },
+    createOscillator: () => ({ frequency: { value: 0 }, connect: (g: unknown) => g, start: (t: number) => starts.push(t), stop() {} }),
+  };
+  vi.stubGlobal("AudioContext", function () {
+    return audio;
+  });
+  vi.spyOn(performance, "now").mockReturnValue(1000);
+  const plugin = beatTrack();
+  plugin.transformChart!(chart, new URLSearchParams());
+  plugin.onEvent!({ type: "songStart", atMs: 0 }); // beat 0 queued (lookahead 300 ms)
+  const bus = buses[0];
+  expect(bus.connected).toBe(true);
+  expect(starts).toHaveLength(1);
+
+  plugin.onEvent!({ type: "pause", atMs: 100 });
+  expect(bus.connected).toBe(false); // what was queued can't be heard
+  plugin.draw!({ fillText() {} } as unknown as CanvasRenderingContext2D, { nowMs: 100, width: 800 } as Frame);
+  expect(starts).toHaveLength(1); // nothing new while paused
+
+  plugin.onEvent!({ type: "resume", atMs: 500 }); // chart time stood still; beat 1 is at 600 ms
+  expect(buses.at(-1)!.connected).toBe(true);
+  expect(starts).toHaveLength(2);
+  expect(starts[1]).toBeCloseTo((600 - 500) / 1000); // 100 ms after the resume, on the beat
+  vi.restoreAllMocks();
+});
+
+test("?mode=wait plays no beat: the clock stops at every note", () => {
+  const AudioContext = vi.fn();
+  vi.stubGlobal("AudioContext", AudioContext);
+  const plugin = beatTrack();
+  plugin.transformChart!(chart, new URLSearchParams("mode=wait"));
+  plugin.onEvent!({ type: "songStart", atMs: -count * mpb });
+  expect(AudioContext).not.toHaveBeenCalled();
+});
+
+test("?capture=1: draw writes no Beat: text, and the beat still plays", () => {
+  const texts: string[] = [];
+  const ctx = { fillText: (t: string) => void texts.push(t) } as unknown as CanvasRenderingContext2D;
+  const plugin = beatTrack();
+  plugin.transformChart!(chart, new URLSearchParams("beat=off"));
+  plugin.draw!(ctx, { nowMs: 0, width: 800 } as Frame);
+  expect(texts).toEqual(["Beat: off"]); // without capture: today's status text
+  vi.stubGlobal("document", { documentElement: { hasAttribute: (a: string) => a === "data-capture" } });
+  texts.length = 0;
+  plugin.draw!(ctx, { nowMs: 0, width: 800 } as Frame);
+  expect(texts).toEqual([]);
 });

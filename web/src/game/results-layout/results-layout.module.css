@@ -1,0 +1,237 @@
+.results {
+  flex-shrink: 0; /* a flex item of the page's overlay: grow with the details, so the backdrop covers them */
+  width: 100%;
+  min-height: 100%;
+  color: var(--pa-ink);
+  text-align: center;
+  /* Over the page's dimmed overlay: the frozen highway (combo, keys) stays a hint, not a second layer of text. */
+  background: radial-gradient(ellipse at 50% 35%, rgb(11 2 32 / 0.6), rgb(0 0 0 / 0.7) 70%);
+}
+
+.song {
+  margin: 0 0 -0.6vh;
+  font-size: clamp(12px, 0.9vw, 17px);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pa-ink-dim);
+}
+
+/* The ceremony: exactly one window tall, so the rank, counts, featured panel and buttons need no scroll. */
+.ceremony {
+  box-sizing: border-box;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 2.4vh, 32px);
+  padding: 3vh 4vw 1.5vh;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: clamp(24px, 4vw, 80px);
+}
+
+.rank {
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(120px, 27vh, 320px);
+  line-height: 0.8;
+  padding-right: 0.08em; /* the italic's overhang */
+  color: var(--pa-gold);
+  text-shadow: 0 0 0.25em rgb(255 226 122 / 0.35);
+}
+
+.tally {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 2vh, 24px);
+  text-align: left;
+}
+
+.counts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(6.5em, auto));
+  gap: clamp(8px, 1.6vh, 18px) clamp(16px, 2.2vw, 40px);
+  margin: 0;
+}
+
+.count {
+  padding-left: 0.7em;
+  border-left: 3px solid var(--tone);
+}
+
+.count dt,
+.stats dt {
+  font-size: clamp(11px, 0.8vw, 15px);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.count dt {
+  color: var(--tone);
+}
+
+.count dd,
+.stats dd {
+  margin: 0;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+}
+
+.count dd {
+  font-size: clamp(28px, 2.6vw, 52px);
+}
+
+.stats {
+  display: flex;
+  gap: clamp(20px, 3vw, 56px);
+  margin: 0;
+  padding-top: clamp(8px, 1.6vh, 18px);
+  border-top: 1px solid rgb(242 242 245 / 0.15);
+}
+
+.stats dt {
+  color: var(--pa-ink-dim);
+}
+
+.stats dd {
+  font-size: clamp(22px, 1.9vw, 38px);
+}
+
+.unscored {
+  margin: 0;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: clamp(28px, 3vw, 56px);
+}
+
+.timing {
+  color: var(--pa-ink-dim);
+}
+
+/* The page's timing panel and the slots carry their own top margins; the gap spaces the ceremony instead. */
+.timing > *,
+.featured > *,
+.actions > * {
+  margin-top: 0 !important;
+}
+
+.featured {
+  width: min(1100px, 92vw);
+}
+
+.featured:empty {
+  display: none;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.retry,
+.songs {
+  padding: 12px 36px;
+  border-radius: 6px;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.retry {
+  border: none;
+  background: var(--pa-cyan);
+  color: var(--pa-bg);
+}
+
+.songs {
+  border: 1px solid var(--pa-ink-dim);
+  color: var(--pa-ink);
+}
+
+.retry:focus-visible,
+.songs:focus-visible,
+.cue:focus-visible {
+  outline: 2px solid var(--pa-magenta);
+  outline-offset: 3px;
+}
+
+.cue {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--pa-ink-dim);
+}
+
+/* Details: every other panel, a card each, in layers.ts order. */
+.details {
+  width: min(1200px, 94vw);
+  margin: 0 auto;
+  padding: 4vh 0 8vh;
+  border-top: 1px solid rgb(242 242 245 / 0.12);
+}
+
+.detailsName {
+  margin: 0 0 16px;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pa-ink-dim);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 16px;
+}
+
+@media (min-width: 1280px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.card {
+  height: 100%;
+  box-sizing: border-box;
+  padding: 14px 20px 18px;
+  background: var(--pa-panel);
+  border: 1px solid rgb(242 242 245 / 0.1);
+  border-top: 2px solid var(--pa-magenta);
+  border-radius: 6px;
+}
+
+.cardName {
+  margin: 0 0 10px;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pa-cyan);
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 24px;
+}

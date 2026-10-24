@@ -1,0 +1,136 @@
+/* The score window: black like every screen, the music in ink, the cabinet only in the header's hairline. */
+.sheet {
+  min-height: 100vh;
+  background: var(--pa-bg);
+  color: var(--pa-ink);
+}
+
+.message {
+  display: grid;
+  place-content: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.message a {
+  color: var(--pa-cyan);
+}
+
+.head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.25rem clamp(1rem, 4vw, 3rem) 1rem;
+  background: var(--pa-bg);
+  border-bottom: 1px solid color-mix(in srgb, var(--pa-magenta) 45%, transparent);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: clamp(1.5rem, 2.6vw, 2.5rem);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+}
+
+.composer {
+  margin: 0.3rem 0 0;
+  font-size: 1rem;
+  color: var(--pa-ink);
+}
+
+.note {
+  margin: 0.2rem 0 0;
+  font-size: 0.875rem;
+  color: var(--pa-ink-dim);
+}
+
+.zoom {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: none;
+}
+
+.zoom button {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--pa-ink-dim);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--pa-ink);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 150ms ease-out, background-color 150ms ease-out;
+}
+
+.zoom button:hover:not(:disabled) {
+  border-color: var(--pa-ink);
+  background: rgba(242, 242, 245, 0.08);
+}
+
+.zoom button:focus-visible {
+  outline: 2px solid var(--pa-magenta);
+  outline-offset: 2px;
+}
+
+.zoom button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.zoom output {
+  min-width: 3.5rem;
+  text-align: center;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.score {
+  padding: 0.5rem clamp(1rem, 4vw, 3rem) 4rem; /* the header's inline padding */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zoom button {
+    transition: none;
+  }
+}
+
+/* Names the notehead colors, so color is never alone. */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  align-items: center;
+  min-height: 2.5rem; /* the zoom buttons' height: both sit on the header's bottom, so their centers line up */
+  margin: 0 0 0 auto;
+  padding: 0;
+  list-style: none;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.swatch {
+  width: 0.7rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  transform: rotate(-20deg); /* a notehead's tilt */
+}

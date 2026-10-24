@@ -33,6 +33,11 @@ python3.12 -m venv .venv && .venv/bin/pip install mido==1.3.3 python-rtmidi==1.5
 .venv/bin/python player.py out/06-var13a-cathedral.mid   # one file
 ```
 
+Or in Chrome, with play buttons per file and a ratings form that copies its answers as Markdown:
+`python3 -m http.server 8013 -d spikes/twinkle-13`, then open <http://localhost:8013/> and allow MIDI.
+`index.html`'s MIDI parser matches `mido` on all 8 files (same events and note-ons; end times within 1 ms).
+It hasn't been played through yet: the Chrome test was skipped.
+
 ## What the agent checked (no ears involved)
 
 Run on 2026-10-24, MacBook Air, Python 3.12.13, `mido` 1.3.3, `python-rtmidi` 1.5.8.

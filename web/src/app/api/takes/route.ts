@@ -35,6 +35,7 @@ export async function POST(request: Request) {
   // Keep only the contract's fields, so nothing extra a client adds ends up stored.
   const raw = body.take as Take;
   const take: Take = {
+    ...(raw.scoringVersion !== undefined ? { scoringVersion: raw.scoringVersion } : {}),
     chartId: raw.chartId,
     startedAt: raw.startedAt,
     latencyOffsetMs: raw.latencyOffsetMs,

@@ -11,6 +11,9 @@ from the request to the saved level (the bar is 4 of 5, each under 2 minutes). T
 96.4% and 100% of the committed notes over the beats both cover (the bar is 95%). What a level costs in the app is
 still open: see Cost.
 
+**Recommendation: promote to phase 2 on Eric's go.** The scripts are ready to be its tools unchanged, and phase 2
+answers what phase 1 can't: the cost per level, and a blind re-forge of the two library pieces.
+
 ## The five forges
 
 | # | Piece | Result | Request to saved | Session token counter | Source and choices |

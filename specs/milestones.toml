@@ -137,10 +137,27 @@ features = [
 ]
 cut = []
 
+# judging: batch two (2026-10-24), ranked by a hackathon-coach pass: keep the live demo alive first, then what the
+# video and a judge's first two minutes show. The other 17 batch-two specs and the 3 spikes stay backlog.
+[[milestone]]
+name = "judging"
+ship = ""
+features = [
+  "crash-guard",
+  "offline-ready",
+  "demo-reset",
+  "hero-replay",
+  "record-moment",
+  "song-sources",
+  "easy-charts",
+  "first-run",
+]
+cut = []
+
 [[milestone]]
 name = "submission"
 ship = ""
 final = true
-features = ["bar-loop", "piano-out", "operator-replay"]
+features = ["bar-loop", "piano-out", "operator-replay", "take-store"]
 cut = []
 allow = []

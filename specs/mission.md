@@ -45,4 +45,5 @@ decides (see the `needs-human` issue). Until then, nothing may claim to meet it.
   line aligned to the keys.
 - AI in the core playing loop. AI lives in the learning lane.
 - Sheet music on the arcade screen (deferred to practice mode).
-- Accounts, logins, an online leaderboard, mobile apps, live transcription on stage.
+- Sign-in screens or required accounts: a player is an anonymous user, and linking Google is optional. Also not doing:
+  an online leaderboard, mobile apps, live transcription on stage.

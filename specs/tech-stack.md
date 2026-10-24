@@ -9,10 +9,16 @@ New dependencies only through a `contract:` PR (`web/package.json` and `web/pnpm
 | Rendering | One 2D canvas per layer, driven by `requestAnimationFrame`. Game state per frame lives in refs, never React state; React renders menus and the results screen only. |
 | Input | Chrome Web MIDI (`navigator.requestMIDIAccess`) and laptop keys, behind one input interface. Client components only. |
 | Sound | Web Audio API, scheduled on the audio clock. No audio libraries unless a `contract:` PR adds one. |
-| Data / database | None. Charts are JSON files in `web/public/songs/`. Settings (latency offset) live in `localStorage`. |
+| Data / database | Supabase Postgres (free tier) for take history only (`take-store`). Written only by Next.js server routes with the secret key; migrations in `supabase/migrations/`. Charts stay JSON files in `web/public/songs/`; settings (latency offset) stay in `localStorage`. The game is fully playable with the database unreachable: nothing in the playing loop touches the network. |
+| Accounts | Supabase Auth. A player becomes an anonymous user on their first save, with no sign-in screen. Linking Google (`linkIdentity`) is optional and keeps the same user id. |
 | Hosting | Local only for now (`pnpm dev`). A Vercel deploy is a later, deliberate step. |
 | Tests | Vitest for pure functions, with synthetic players; Playwright for `[verify].command`. |
 | Learning lane | Provisional: decided by its person. The coach is expected to run on Gemini behind one Next.js route. |
+
+## Environment
+`NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (browser), `SUPABASE_SECRET_KEY` (server only,
+never `NEXT_PUBLIC_`). They live in `web/.env.local`, which is never committed. Without them, the take store falls back
+to `localStorage`. `@supabase/supabase-js` is added to `web/package.json` by a `contract:` PR once `core-loop` creates it.
 
 ## Layout
 Created by the bootstrap feature (`core-loop`).

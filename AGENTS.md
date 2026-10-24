@@ -27,6 +27,7 @@ Each person owns a lane: their features, their folder, and the final say over bo
 |---|---|---|---|
 | `eric` | `@Eric-Zhang-Developer` | game: playing, highway, judging, HUD, juice, MIDI in and out | `web/src/game/` |
 | not set yet | not set yet | learning: coach, practice mode, chart compiler, song ripping | `web/src/learn/`, `tools/` |
+| `sharan` | `@iKnow24` | backend: take store, Supabase, accounts, progress page; LED strip firmware | `supabase/`, `web/src/data/`, `web/src/app/api/takes/`, `web/src/app/api/progress/`, `web/src/app/progress/`, `web/src/app/auth/`, `firmware/` |
 
 - The shared formats in `web/src/contracts/` are frozen: change them only through a `contract:` PR, which both people see.
 - Never change another lane's folder. If you need something from it, file a `needs-human` issue for its person.

@@ -6,7 +6,7 @@ A three.js synthwave stage behind the 2D highway on `/play`: a grid floor to a h
 `verify.py --slug fever-stage` passed at 6424ef9 (evidence `.git/agent-evidence/fever-stage/20261024T073551Z`). `node web/src/game/stage/verify-stage.mjs --out <dir>` passed: 42/42 PERFECT with the stage on (1 stage canvas) and with `?stage=off` (none). In Chrome on Eric's laptop:
 - Six takes with five Retries kept one stage canvas. Its context was never lost, and the console showed no WebGL warning.
 - Frame times measured with `requestAnimationFrame`: 6.9 ms mean per second after a 348 ms first frame.
-- Fever on the Minuet looked hot (screenshot in #102).
+- Fever on the Minuet looked hot. Screenshots are in `specs/features/fever-stage/screens/`.
 ## Gaps
 - Not verified on the piano: Eric's "helps or distracts".
 - Not seen live: the miss dip, the grid's scrolling and its speed steps. They're unit-tested only.

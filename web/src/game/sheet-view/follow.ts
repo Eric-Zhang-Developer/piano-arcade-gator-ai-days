@@ -24,9 +24,16 @@ export interface Follower {
   beams: { should: number; beamed: number }; // of the notes a score would beam, how many OSMD drew under a beam
   // For headless checks: each drawn beam's notes' judgments, and the fill on its SVG.
   beamAudit(judged: ReadonlyMap<string, Judgment>): { judgments: (Judgment | null)[]; fill: string }[];
+  firstMeasure: { number: number; beats: number }; // OSMD's first measure: its printed number and its length in beats
 }
 
 export function follow(osmd: OpenSheetMusicDisplay, chart: Chart): Follower {
+  // A pickup prints as a short bar 0 whose notes start at the sheet's time 0, and the chart pads it to a full bar
+  // (sheet-pickups). So when the first measure is short, the sheet's time 0 is chart beat beatsPerBar - its length.
+  const first = osmd.Sheet.SourceMeasures[0];
+  const firstMeasure = { number: first?.MeasureNumber ?? 1, beats: (first?.Duration.RealValue ?? 0) * 4 };
+  const offset = first && firstMeasure.beats < chart.beatsPerBar - 1e-6 ? chart.beatsPerBar - firstMeasure.beats : 0;
+
   // Every notehead by (staff, onset in 16ths, MIDI pitch). A tied note's later pieces start later, so the key finds
   // its first notehead; the first written wins.
   const heads = new Map<string, GraphicalNote>();
@@ -37,7 +44,7 @@ export function follow(osmd: OpenSheetMusicDisplay, chart: Chart): Follower {
           for (const gn of voice.notes) {
             const n = gn.sourceNote;
             if (n.isRest()) continue;
-            const onset = Math.round(n.getAbsoluteTimestamp().RealValue * 4 * DIVISIONS);
+            const onset = Math.round((n.getAbsoluteTimestamp().RealValue * 4 + offset) * DIVISIONS);
             const k = key(staffIndex + 1, onset, n.halfTone + MIDI_FROM_HALFTONE);
             if (!heads.has(k)) heads.set(k, gn);
           }
@@ -65,7 +72,7 @@ export function follow(osmd: OpenSheetMusicDisplay, chart: Chart): Follower {
   const cursor = osmd.cursor;
   cursor.show();
   cursor.reset();
-  for (const it = cursor.iterator.clone(); !it.EndReached; it.moveToNext()) stops.push(it.currentTimeStamp.RealValue * 4);
+  for (const it = cursor.iterator.clone(); !it.EndReached; it.moveToNext()) stops.push(it.currentTimeStamp.RealValue * 4 + offset);
   let at = 0;
   const mpb = msPerBeat(chart.bpm);
 
@@ -105,6 +112,7 @@ export function follow(osmd: OpenSheetMusicDisplay, chart: Chart): Follower {
         }
     },
     beams,
+    firstMeasure,
     beamAudit(judged) {
       const all = new Set([...byId.keys()].map(beamOf).filter((b): b is VfBeam => !!b));
       return [...all].map((beam) => ({

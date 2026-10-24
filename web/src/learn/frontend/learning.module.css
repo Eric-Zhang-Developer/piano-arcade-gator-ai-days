@@ -130,3 +130,5 @@
 .landingNote { max-width:72ch; margin:56px 0 0; font-size:12px; color:var(--learn-muted); }
 .main { background:linear-gradient(180deg,var(--pa-bg),var(--pa-sky)); }
 @media (max-width:1300px) { .landing { padding-top:52px; } .topbar { gap:36px; } }
+
+.graphHome { max-width:1600px; margin:0 auto; padding:0 32px 20px; }

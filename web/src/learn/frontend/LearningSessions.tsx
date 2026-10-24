@@ -14,6 +14,7 @@ export type ActivityId = typeof activities[number]['id'];
 export type AnswerResult = { prompt: string; answer: string; explanation: string; outcome: ReturnType<typeof evaluateAnswer> };
 type TheoryState = { index: number; answer: string; checked: boolean; hint: boolean; tab: 'music' | 'page'; history: AnswerResult[]; paneWidth: number };
 const emptyTheory = (): TheoryState => ({ index: 0, answer: '', checked: false, hint: false, tab: 'music', history: [], paneWidth: 40 });
+type GraphContext = { activityId: ActivityId; group: 'Learn' | 'Review'; title: string; demoActivity: string };
 type Sessions = {
   theory: TheoryState; setTheory: Dispatch<SetStateAction<TheoryState>>;
   review: TheoryState; setReview: Dispatch<SetStateAction<TheoryState>>;
@@ -21,6 +22,7 @@ type Sessions = {
   playThrough: TakePhase; dispatchPlayThrough: Dispatch<'start' | 'counted' | 'finish' | 'stop' | 'again'>;
   started: Partial<Record<ActivityId, boolean>>; last: ActivityId | null;
   markStarted: (id: ActivityId) => void; restart: (id: ActivityId) => void;
+  graphContext: GraphContext | null; setGraphContext: Dispatch<SetStateAction<GraphContext | null>>;
 };
 const SessionContext = createContext<Sessions | null>(null);
 
@@ -33,6 +35,7 @@ export function LearningSessionsProvider({ children }: { children: React.ReactNo
   const [playThrough, dispatchPlayThrough] = useReducer(takeTransition, 'ready' as TakePhase);
   const [started, setStarted] = useState<Sessions['started']>({});
   const [last, setLast] = useState<ActivityId | null>(null);
+  const [graphContext, setGraphContext] = useState<GraphContext | null>(null);
   const markStarted = useCallback((id: ActivityId) => { setStarted(current => current[id] ? current : { ...current, [id]: true }); setLast(id); }, []);
   const restart = (id: ActivityId) => {
     if (id === 'learn-theory') setTheory(emptyTheory());
@@ -40,7 +43,7 @@ export function LearningSessionsProvider({ children }: { children: React.ReactNo
     if (id === 'learn-practice') setPractice(initialPractice);
     if (id === 'review-practice') dispatchPlayThrough('again');
   };
-  return <SessionContext value={{ theory, setTheory, review, setReview, practice, dispatchPractice, playThrough, dispatchPlayThrough, started, last, markStarted, restart }}>{children}</SessionContext>;
+  return <SessionContext value={{ theory, setTheory, review, setReview, practice, dispatchPractice, playThrough, dispatchPlayThrough, started, last, markStarted, restart, graphContext, setGraphContext }}>{children}</SessionContext>;
 }
 export function useLearningSessions() {
   const sessions = useContext(SessionContext);

@@ -40,6 +40,7 @@ export function MusicSelect({ songs }: { songs: Song[] }) {
 
   // A plain click or Enter (a click with detail 0) moves into the stage; modifier and middle clicks stay links.
   function onPlay(e: MouseEvent<HTMLAnchorElement>) {
+    uiSound("confirm"); // Enter on a link clicks it too
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
     goToStage(e.currentTarget.getAttribute("href")!, router);
@@ -87,7 +88,6 @@ export function MusicSelect({ songs }: { songs: Song[] }) {
               data-testid={`song-${s.id}`}
               onClick={onPlay}
               onFocus={() => setFocused(i)}
-              onClick={() => uiSound("confirm")} // Enter on a link clicks it too
               onMouseEnter={(e) => e.currentTarget.focus({ preventScroll: true })} // hover highlights too (song-preview)
             >
               <SongCard

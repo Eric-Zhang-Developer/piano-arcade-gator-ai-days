@@ -80,3 +80,9 @@ export async function mergePlayer(from: string, to: string): Promise<number> {
 export async function deleteAuthUser(id: string): Promise<void> {
   await rest(`/auth/v1/admin/users/${encodeURIComponent(id)}`, { method: "DELETE" });
 }
+
+/** Every session the signed-in player has played, newest first (RLS: their rows only), optionally for one song. */
+export async function readSessions(userToken: string, songId?: string) {
+  const song = songId ? `&song_id=eq.${encodeURIComponent(songId)}` : "";
+  return rest(`/rest/v1/session_history?select=*&order=created_at.desc&limit=500${song}`, { userToken }).then((r) => r.json());
+}

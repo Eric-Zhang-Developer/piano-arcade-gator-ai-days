@@ -6,6 +6,7 @@ import type { Chart, GameEvent, InputDevice, InputEvent, Results, Take } from ".
 import { validateChart } from "../../contracts";
 import { plugins } from "../../game/layers";
 import { drawHighway, makeLayout, type HighwayState, type Layout } from "../../game/core/highway";
+import { createZoom, zoomOn } from "../../game/highway-zoom";
 import { Judge, noteTimeMs } from "../../game/core/judge";
 import { keysDevice, midiDevice, testDevice } from "../../game/core/input";
 import { describeTiming, timingSummary, type TimingSummary } from "../../game/timing";
@@ -177,9 +178,13 @@ export default function Play() {
     const ctx = canvas.getContext("2d")!;
     const layerCtxs = layerRefs.current.map((c) => c?.getContext("2d") ?? null);
     let layout: Layout | null = null;
+    // highway-zoom: on wide charts (or ?zoom=on) the layout follows the music, rebuilt each frame from its range.
+    const zoom = zoomOn(chart, params) ? createZoom(chart) : null;
+    let w = window.innerWidth;
+    let h = window.innerHeight;
     const resize = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
+      w = window.innerWidth;
+      h = window.innerHeight;
       const dpr = window.devicePixelRatio || 1;
       for (const c of [canvas, ...layerRefs.current]) {
         if (!c) continue;
@@ -266,6 +271,7 @@ export default function Play() {
       lastBeat = beat;
       judge.advance(now - Math.max(0, latencyRef.current) - INPUT_GRACE_MS);
 
+      if (zoom) layout = makeLayout(chart, w, h, perspective, zoom(now));
       drawHighway(ctx, layout!, chart, hw);
       const f = { ...layout!, nowMs: now };
       plugins.forEach((p, i) => {

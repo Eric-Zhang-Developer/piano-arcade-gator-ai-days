@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Chart } from "../../contracts";
 import { handColor } from "../hand-colors";
+import { fullRange, whiteIndex } from "../highway-zoom";
 import { drawHighway, isBlack, makeLayout, type HighwayState } from "./highway";
 import { settings } from "./settings";
 
@@ -111,5 +112,28 @@ describe("drawHighway hand colors (hand-colors)", () => {
     const none = draw(twoHands, { pressed: new Set([62]), pressedHand: new Map() });
     expect(none).toContain(settings.keyLitColor);
     expect(none.filter((f) => f === handColor("L")).length).toBe(draw(twoHands).filter((f) => f === handColor("L")).length);
+  });
+});
+
+describe("makeLayout with a view (highway-zoom)", () => {
+  const wide = chart([40, 61, 88]);
+  it("a view of the whole range lays every key exactly as without one", () => {
+    const plain = makeLayout(wide, 1280, 720, 0);
+    const viewed = makeLayout(wide, 1280, 720, 0, fullRange(wide));
+    expect([viewed.lowPitch, viewed.highPitch, viewed.judgmentLineY]).toEqual([plain.lowPitch, plain.highPitch, plain.judgmentLineY]);
+    for (let p = plain.lowPitch; p <= plain.highPitch; p++) {
+      expect(viewed.keyX(p).x).toBeCloseTo(plain.keyX(p).x);
+      expect(viewed.keyX(p).width).toBeCloseTo(plain.keyX(p).width);
+    }
+  });
+
+  it("a narrower view widens the keys and keeps the judgment line where it was", () => {
+    const plain = makeLayout(wide, 1280, 720, 0);
+    const lo = whiteIndex(60);
+    const zoomed = makeLayout(wide, 1280, 720, 0, { lo, hi: lo + 15 });
+    expect(zoomed.keyX(60)).toEqual({ x: 0, width: 1280 / 15 });
+    expect(zoomed.keyX(60).width).toBeGreaterThan(plain.keyX(60).width);
+    expect(zoomed.judgmentLineY).toBe(plain.judgmentLineY);
+    expect([zoomed.lowPitch, zoomed.highPitch]).toEqual([60, 84]);
   });
 });

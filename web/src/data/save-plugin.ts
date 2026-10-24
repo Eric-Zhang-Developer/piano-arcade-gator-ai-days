@@ -13,6 +13,34 @@ export interface TakeSink {
   (id: string, take: Take): void;
 }
 
+/** The chart as committed, for comparing with the chart that was played. */
+export type LoadChart = (songId: string) => Promise<Chart | null>;
+const loadCommittedChart: LoadChart = (songId) =>
+  fetch(`/songs/${songId}/chart.json`).then((r) => (r.ok ? (r.json() as Promise<Chart>) : null), () => null);
+
+/**
+ * Why a take can't be stored as a plain take of its song, or null when it can. The server re-judges every take
+ * against the song's committed chart, so only takes played on that exact chart, by a person, judged normally, fit.
+ */
+export function unsavableReason(params: URLSearchParams): string | null {
+  const song = params.get("song") || "twinkle";
+  if (song.includes("/")) return "local song: all-rights-reserved charts stay on this machine (decision 003)";
+  if (params.has("bot")) return "a bot played it";
+  if (params.get("midi") === "sim") return "the fake piano played it";
+  if (params.has("versus")) return "two players shared the take";
+  if (params.get("mode") === "wait") return "wait mode: nothing is judged in time";
+  return null;
+}
+
+/** Same notes, tempo and meter. Any plugin that changes what's played (loops, one hand, chunks, tempo) fails this. */
+export function sameChart(a: Chart, b: Chart): boolean {
+  if (a.id !== b.id || a.bpm !== b.bpm || a.beatsPerBar !== b.beatsPerBar || a.notes.length !== b.notes.length) return false;
+  return a.notes.every((n, i) => {
+    const m = b.notes[i];
+    return n.id === m.id && n.pitch === m.pitch && n.beat === m.beat && n.hand === m.hand;
+  });
+}
+
 interface Recording {
   zeroPerf: number;
   latency: number;
@@ -21,9 +49,9 @@ interface Recording {
   events: Take["events"];
 }
 
-export function createSavePlugin(sink: TakeSink): GamePlugin {
+export function createSavePlugin(sink: TakeSink, loadChart: LoadChart = loadCommittedChart): GamePlugin {
   let chart: Chart | null = null;
-  let drill = false;
+  let skip: string | null = null;
   let rec: Recording | null = null;
 
   const record = (kind: InputKind, type: "on" | "off", pitch: number, velocity: number, perfMs: number) => {
@@ -42,8 +70,7 @@ export function createSavePlugin(sink: TakeSink): GamePlugin {
     id: "take-store",
     transformChart(c, params) {
       chart = c;
-      // Drills (bar-loop) judge a transformed chart the server can't rebuild yet: not saved for now.
-      drill = params.has("from") || params.has("to") || params.has("tempo");
+      skip = unsavableReason(params);
       return c;
     },
     wrapInput(input: InputDevice): InputDevice {
@@ -62,14 +89,20 @@ export function createSavePlugin(sink: TakeSink): GamePlugin {
         rec = { zeroPerf: performance.now() - e.atMs, latency: loadLatencyOffset(), startedAt: new Date().toISOString(), kind: null, events: [] };
       } else if (e.type === "songEnd" && rec && chart) {
         const r = rec;
+        const played = chart;
         rec = null;
-        if (drill || r.kind === "test" || r.events.length === 0) return;
-        sink(crypto.randomUUID(), {
-          chartId: chart.id,
+        if (skip || r.kind === "test" || r.events.length === 0) return;
+        const take: Take = {
+          chartId: played.id,
           startedAt: r.startedAt,
           latencyOffsetMs: r.latency,
           inputDevice: r.kind ?? "keys",
           events: r.events,
+        };
+        // Drills and variants (bar-loop, hand-mode, chunk practice, tempo) play a changed chart the server can't
+        // rebuild: only a take of the committed chart is saved, so stored scores always match what was played.
+        void loadChart(played.id).then((committed) => {
+          if (committed && sameChart(committed, played)) sink(crypto.randomUUID(), take);
         });
       }
     },

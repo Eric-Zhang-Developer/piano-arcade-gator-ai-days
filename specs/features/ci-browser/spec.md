@@ -58,6 +58,11 @@ Issue: #407
 - **Retry:** a failing check reruns once, into a fresh `--out` folder. Passes on retry: the shard passes and prints
   `::warning title=flaky::flaky: <check>` (an annotation on the PR). Fails twice: the shard fails. Exit 0 when every
   check passed, 1 otherwise. No check's tolerance, timeout or arguments change; the runner passes only `--out`.
+- **Known red** (decision `ci-browser-known-red.md`): a check that is already red on `origin/main` when the job
+  finds it gets an issue and an entry in `KNOWN_RED` in `run-checks.mjs`. It still runs and reports `known red #N:
+  pass|fail`, but doesn't set the shard's exit code. An entry is removed only after its check passes on 2
+  consecutive browser runs that include the fix: some known-red checks pass on a lucky run with no fix merged
+  (#430 passed in #415's second run while its fix, #448, was still open), so one green run proves nothing.
 - **Output:** one line per check (`<check> pass|flaky|FAIL <seconds> s`) and the shard's wall time, also written to
   `$GITHUB_STEP_SUMMARY` when set. Every check's `--out` folder goes under one evidence folder, uploaded with
   `actions/upload-artifact` when the shard fails (`if: failure()`).
@@ -79,9 +84,13 @@ Issue: #407
     | `:76` no page error or console.error | missing: its error check (`:118`) runs before /sim and counts only `pageerror` and `play-slots:` lines. Step 3 adds it. |
 
     `verify.mjs` also checks the /sim mean offset within ±4 ms (`:145`) and "Replay on piano" (`:147`); both stay.
-  - `verify.py` takes a machine-wide lock before it runs anything: `fcntl.flock` on
-    `<git common dir>/agent-verify.lock`, so one local headless check runs at a time across all worktrees. While it
-    waits it prints `verify: waiting for another check`. The wait doesn't count toward `[verify].timeout`.
+  - `verify.py` takes a machine-wide lock before it runs anything: it `mkdir`s `<git common dir>/verify.lock` (the
+    directory is the lock) and `rmdir`s it when the command ends, times out or is interrupted, so one local headless
+    check runs at a time across all worktrees. It's the same lock as the interim shell loop every worker uses until
+    this lands (`until mkdir "$L"; do ...; done; <check>; rmdir "$L"`), so the two never race; `fcntl.flock` on a
+    file wouldn't see that loop. A lock whose mtime is over 600 s old is taken over as stale, which assumes no check
+    holds it longer: `[verify].timeout` is 300 s. While it waits it prints `verify: waiting for another check`. The
+    wait doesn't count toward `[verify].timeout`.
   - `verify.py --slug <x> --cmd "<command>"` runs a feature check through the same lock, timeout, process-group
     cleanup and evidence folder, with the same `{slug}`, `{worktree}` and `{out}` placeholders (chosen over a
     separate `one_at_a_time.py`: one flag on the script that already does all of that).

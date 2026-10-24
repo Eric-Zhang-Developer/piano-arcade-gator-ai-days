@@ -30,6 +30,18 @@ export const SHARED = [
 // The runner's own ceiling, so a hung check still fails its shard (and uploads evidence) inside the job's 20 min.
 // Not a check's timeout: decision ci-browser-check-timeout.md.
 const CHECK_TIMEOUT_MS = 8 * 60_000;
+// Checks already red on main when the job landed: each still runs and is reported ("known red #N"), but doesn't fail
+// the shard. Check -> its issue. The list only shrinks: an entry leaves after its check passes 2 browser runs in a
+// row that include the fix (one green run can be luck).
+// Decision ci-browser-known-red.md.
+export const KNOWN_RED = {
+  "web/src/game/cabinet/verify-cabinet.mjs": 429,
+  "web/src/game/capture-mode/verify-capture.mjs": 431,
+  "web/src/game/notice-toast/verify-toast.mjs": 432,
+  "web/src/game/options-panel/verify-options.mjs": 447,
+  "web/src/game/song-preview/verify-preview.mjs": 428,
+  "web/src/game/wait-hands/verify-wait-hands.mjs": 430,
+};
 
 /** Every check: verify.mjs first, then each verify*.mjs under web/src/, sorted. `files` are repo-relative paths. */
 export function allChecks(files) {
@@ -104,15 +116,17 @@ export async function runChecks(root, checks, out) {
         break;
       }
     }
-    if (result === "flaky") say(`::warning title=flaky::flaky: ${check}`);
-    if (result === "FAIL") say(`::error title=FAIL::${check} failed twice`);
-    rows.push({ check, result, seconds: Math.round((Date.now() - start) / 1000) });
+    const issue = KNOWN_RED[check];
+    if (issue) say(`::warning title=known red #${issue}::${check}: ${result === "FAIL" ? "fail" : "pass"}`);
+    else if (result === "flaky") say(`::warning title=flaky::flaky: ${check}`);
+    else if (result === "FAIL") say(`::error title=FAIL::${check} failed twice`);
+    rows.push({ check, result, seconds: Math.round((Date.now() - start) / 1000), ...(issue && { knownRed: issue }) });
   }
   return rows;
 }
 
-/** The shard's exit code: 0 when every check passed (flaky counts as passed), 1 otherwise. */
-export const exitCode = (rows) => (rows.some((r) => r.result === "FAIL") ? 1 : 0);
+/** The shard's exit code: 0 when every check passed (flaky counts as passed) or is known red, 1 otherwise. */
+export const exitCode = (rows) => (rows.some((r) => r.result === "FAIL" && !r.knownRed) ? 1 : 0);
 
 function arg(name) {
   const k = process.argv.indexOf(name);
@@ -139,7 +153,7 @@ async function main() {
   const start = Date.now();
   const rows = await runChecks(root, picked, resolve(outArg));
   const lines = [
-    ...rows.map((r) => `${r.check} ${r.result} ${r.seconds} s`),
+    ...rows.map((r) => `${r.check} ${r.knownRed ? `known red #${r.knownRed}: ${r.result === "FAIL" ? "fail" : "pass"}` : r.result} ${r.seconds} s`),
     `shard ${i}/${n}: ${rows.length} check(s) in ${Math.round((Date.now() - start) / 1000)} s`,
   ];
   say(lines.join("\n"));

@@ -37,16 +37,18 @@ The code lives in other features' folders, so it lands as fixes to them, each st
 ## Requirements
 - **The range:** from the C at or below the chart's lowest pitch to the C at or above its highest; a chart whose
   highest note is a C ends on it. Both ends are C, so the keyboard starts and ends on a white key with no padding.
-- **Minimum 2 octaves:** if that is under 24 semitones, add the missing octaves split between the ends, the odd one
-  above (a one-octave chart gets the octave above it). Clamp both ends to 21–108; an octave that can't go on one side
-  goes on the other.
+- **Minimum 4 octaves** (`specs/decisions/static-keyboard-min-4-octaves.md`, which replaced 2 octaves): a chart whose
+  range fits inside C2–C6 (36–84) gets exactly C2–C6, so most songs share one keyboard. Any other range under 48
+  semitones gets the missing octaves split between the ends, the odd one above. Clamp both ends to 21–108; an octave
+  that can't go on one side goes on the other. Wider songs keep their own C-to-C range: sizes vary at most 1.5×
+  (29–43 white keys).
 - **The library at 198c902** (lowest and highest pitch from each `web/public/songs/<id>/chart.json` → range, white
   keys; today's padded range in brackets):
 
   | Song | Pitches | Range | White keys |
   |---|---|---|---|
-  | twinkle | 60–69 (C4–A4) | C4–C6 (60–84) | 15 [8] |
-  | minuet-g | 66–79 (F#4–G5) | C4–C6 (60–84) | 15 [11] |
+  | twinkle | 60–69 (C4–A4) | C2–C6 (36–84) | 29 [8] |
+  | minuet-g | 66–79 (F#4–G5) | C2–C6 (36–84) | 29 [11] |
   | ode-to-joy | 43–74 (G2–D5) | C2–C6 (36–84) | 29 [21] |
   | chopin-prelude-4 | 47–74 (B2–D5) | C2–C6 (36–84) | 29 [19] |
   | clair-de-lune | 44–80 (G#2–G#5) | C2–C6 (36–84) | 29 [25] |
@@ -71,9 +73,9 @@ The code lives in other features' folders, so it lands as fixes to them, each st
   key's lane lines up with its key (`keyX` serves both). `verify.py`'s Twinkle run stays 42/42 PERFECT.
 
 ## Validation
-- `pnpm -C web test`: the range function gives twinkle C4–C6, minuet-g C4–C6, fur-elise C2–C7 and moonlight-3 C1–C7
-  from their real charts; a chart of only C4 gives C3–C5; a chart reaching 21 or 108 stays inside 21–108 and at
-  least 24 semitones wide; Für Elise after hand-mode's `transformChart` with `hands=R` still lays out C2–C7. `zoomOn` is
+- `pnpm -C web test`: the range function gives twinkle C2–C6, minuet-g C2–C6, fur-elise C2–C7, moonlight-3 and
+  nocturne-op9-2 C1–C7 from their real charts; a chart of only C4 gives C2–C6; a chart reaching 21 or 108 stays inside
+  21–108 and at least 48 semitones wide; Für Elise after hand-mode's `transformChart` with `hands=R` still lays out C2–C7. `zoomOn` is
   false with no `zoom` param on fur-elise and true with `?zoom=on`. On a laptop-octaves plugin fed frames whose
   range jumps, k stays put; the hint shows on fur-elise and not on twinkle or minuet-g. Each fix PR's new test fails
   on `origin/main` before its fix.

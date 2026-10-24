@@ -145,6 +145,7 @@ ship = ""
 features = [
   "ci-browser",
   "build-stamp",
+  "how-it-works",
   "crash-guard",
   "offline-ready",
   "demo-reset",

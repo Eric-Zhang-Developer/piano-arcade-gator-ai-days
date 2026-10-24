@@ -17,8 +17,10 @@ export interface TakeRow {
   tempo_pct: number;
   perfect: number;
   great: number;
+  good: number;
   miss: number;
   extras: number;
+  wrong: number;
   accuracy: number;
   max_combo: number;
   rank: Results["rank"];
@@ -104,8 +106,10 @@ export function takeRows(
       tempo_pct: 100,
       perfect: results.counts.PERFECT,
       great: results.counts.GREAT,
+      good: results.counts.GOOD ?? 0,
       miss: results.counts.MISS,
       extras: results.counts.extra,
+      wrong: results.counts.wrong ?? 0,
       accuracy: Math.round(results.accuracy * 10000) / 10000,
       max_combo: results.maxCombo,
       rank: results.rank,

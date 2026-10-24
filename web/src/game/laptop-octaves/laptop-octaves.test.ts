@@ -52,16 +52,16 @@ beforeEach(() => vi.stubGlobal("window", new EventTarget()));
 afterEach(() => vi.unstubAllGlobals());
 
 describe("laptop octaves", () => {
-  it("on Twinkle's static keyboard (C4–C6), Z is refused and X reaches the top octave", () => {
-    const { plugin, key, a, lowest } = setup(song("twinkle"));
-    const v = { lo: 60, hi: 84 }; // makeLayout's static range for Twinkle (#384)
-    plugin.draw!(canvas().ctx, frame(v));
-    key("KeyZ"); // C3–E4: no key on screen
-    plugin.draw!(canvas().ctx, frame(v));
-    expect(a("on")).toBe(lowest);
-    key("KeyX"); // C5–E6: C5..C6 on screen
-    plugin.draw!(canvas().ctx, frame(v));
-    expect(a("on")).toBe(lowest + 12);
+  it("on Twinkle's static keyboard (C2–C6), Z goes down to C2 and X up to C5, and no further", () => {
+    const v = { lo: 36, hi: 84 }; // makeLayout's static range for Twinkle (static-keyboard, four octaves)
+    const down = setup(song("twinkle"));
+    down.plugin.draw!(canvas().ctx, frame(v));
+    for (let i = 0; i < 3; i++) down.key("KeyZ"); // C3–E4, C2–E3, then C1–E2 (C2, D2, E2 on screen): refused
+    expect(down.a("on")).toBe(down.lowest - 24);
+    const up = setup(song("twinkle"));
+    up.plugin.draw!(canvas().ctx, frame(v));
+    for (let i = 0; i < 2; i++) up.key("KeyX"); // C5–E6 (C5..C6 on screen), then C6–E7 (only C6): refused
+    expect(up.a("on")).toBe(up.lowest + 12);
   });
 
   it("never moves by itself: on frames whose range jumps from C2 to C6, k stays put (static-keyboard)", () => {

@@ -14,10 +14,10 @@ naming the source and the style for at least 3 of the 4.
 | `twinkle-trap` | pass | 1 | 42 / 24 | 140, 4 | `/play?song=local/twinkle-trap&hands=R&beat=trap` |
 | `ode-to-joy-waltz` | pass | 1 | 62 / 160 | 132, 3 | `/play?song=local/ode-to-joy-waltz&hands=R&beat=waltz` |
 | `minuet-g-ragtime` | pass | 1 | 128 / 512 | 96, 2 | `/play?song=local/minuet-g-ragtime&hands=R&beat=ragtime` |
-| `fur-elise-lullaby` | pass | 1 | 186 / 108 | 48, 3 | `/play?song=local/fur-elise-lullaby&hands=R&beat=lullaby` |
+| `fur-elise-lullaby` | pass | 1 | 186 / 92 | 48, 3 | `/play?song=local/fur-elise-lullaby&hands=R&beat=lullaby` |
 
-- **Minutes:** about 6 minutes of session time for all four, from the brief to four passing charts (21:07 to 21:13
-  UTC). The runs weren't one at a time, as the plan says: the session wrote one script (`restyle.py`) with a function
+- **Minutes:** about 4 minutes of session time for all four, from the brief to four passing charts with their harmony
+  fixed (21:07 to 21:11 UTC). The runs weren't one at a time, as the plan says: the session wrote one script (`restyle.py`) with a function
   per style, then ran them in order.
 - **Tokens:** not measured. The session's usage tool reports its context window, not tokens per run.
 - **The lock never failed.** Every restyle moves onsets through a monotonic warp of each source bar, so order and

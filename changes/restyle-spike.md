@@ -8,7 +8,7 @@ Elise (lullaby). All four pass the lock and the library test. The charts stay in
 `specs/decisions/restyle-spike-one-script.md`
 ## How to check it
 `python3 spikes/restyle/restyle.py <id>` for each id, then `pnpm -C web exec vitest run src/game/restyle
-src/game/songs/library.test.ts`: 34 passed at 21:13 UTC, the four restyles included. CI has no restyles, so it runs
+src/game/songs/library.test.ts`: 34 passed at 21:11 UTC, the four restyles included. CI has no restyles, so it runs
 the synthetic cases only. verify.py: see the PR.
 ## Gaps
 - **Eric hasn't listened yet (the spike's question):** FINDINGS.md says "listen pending".

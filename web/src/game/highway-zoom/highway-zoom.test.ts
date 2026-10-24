@@ -70,10 +70,11 @@ describe("when it's on", () => {
     expect(fullRange(twinkle)).toEqual({ lo: whiteIndex(L.lowPitch), hi: whiteIndex(L.highPitch) + 1 });
   });
 
-  it("a wide chart is on by default; ?zoom= overrides either way", () => {
+  it("is off by default even on a wide chart (#384); only ?zoom=on turns it on", () => {
     const furElise = song("fur-elise");
-    expect(zoomOn(furElise, new URLSearchParams())).toBe(true);
+    expect(zoomOn(furElise, new URLSearchParams())).toBe(false);
     expect(zoomOn(furElise, new URLSearchParams("zoom=off"))).toBe(false);
+    expect(zoomOn(furElise, new URLSearchParams("zoom=on"))).toBe(true);
     expect(zoomOn(song("twinkle"), new URLSearchParams("zoom=on"))).toBe(true);
   });
 

@@ -31,7 +31,8 @@ export const SHARED = [
 // Not a check's timeout: decision ci-browser-check-timeout.md.
 const CHECK_TIMEOUT_MS = 8 * 60_000;
 // Checks already red on main when the job landed: each still runs and is reported ("known red #N"), but doesn't fail
-// the shard. Check -> its issue. The list only shrinks: the PR that fixes a check removes its entry.
+// the shard. Check -> its issue. The list only shrinks: an entry leaves after its check passes 2 browser runs in a
+// row that include the fix (one green run can be luck).
 // Decision ci-browser-known-red.md.
 export const KNOWN_RED = {
   "web/src/game/cabinet/verify-cabinet.mjs": 429,

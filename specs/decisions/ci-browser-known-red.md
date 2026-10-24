@@ -11,7 +11,8 @@ in `run-checks.mjs`: those checks run and are reported, but don't fail the shard
 
 **Choice.** C (eric-planning-agent, 2026-10-24). `KNOWN_RED` maps each check to its issue. A known-red check runs as
 usual (with its rerun) and prints `known red #N: pass|fail` in the log, an annotation and the step summary. It never
-sets the shard's exit code. The list only shrinks: the PR that fixes a check removes its entry. `run-checks.test.mjs`
+sets the shard's exit code. The list only shrinks: an entry leaves once its check passes on 2 consecutive browser
+runs that include the fix (added after #429, #430 and #432 each passed one run with no fix merged). `run-checks.test.mjs`
 fails if an entry has no issue number or names a file that doesn't exist.
 
 **How to undo.** Empty `KNOWN_RED` (every check gates), or delete it and its three uses in `run-checks.mjs`.

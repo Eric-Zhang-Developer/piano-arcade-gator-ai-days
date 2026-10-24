@@ -129,7 +129,7 @@ export function createStage(
   // One floor line per depends_on, from the dependency to the dependent. Lit once the dependency is built.
   const lines: { from: string; to: string; line: THREE.Line; mat: THREE.LineBasicMaterial }[] = [];
   for (const f of features)
-    for (const d of f.dependsOn) {
+    for (const d of f.dependsOn ?? []) { // a snapshot from before #109 has no dependsOn
       if (!pillars.has(d)) continue;
       const a = at(d).setY(0.03);
       const mat = new THREE.LineBasicMaterial({ color: 0x4ef6ff, transparent: true, opacity: 0.18 });
@@ -197,6 +197,8 @@ export function createStage(
 
   const stage: Stage = {
     setBuilt(built) {
+      for (const t of tweens) t.fn(1); // finish (and clean up) anything mid-rise before jumping
+      tweens.clear();
       for (const [slug, p] of pillars) {
         p.built = built.has(slug);
         shape(p, p.built ? TALL : LOW);
@@ -220,6 +222,7 @@ export function createStage(
       focusGoal = center.clone().lerp(p.group.position.clone().setY(1), 0.6);
     },
     dispose() {
+      delete (window as Window & { __attract?: unknown }).__attract;
       cancelAnimationFrame(raf);
       observer.disconnect();
       renderer.domElement.removeEventListener("pointerdown", onPointer);

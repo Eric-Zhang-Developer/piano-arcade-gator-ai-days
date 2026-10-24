@@ -67,6 +67,12 @@ export function steps(prs: BoardPr[], chart: Chart): Step[] {
   });
 }
 
+// How long step s's note should still sound when its timer fires at `now`: it ends 20 ms before its intended end,
+// however late the timer was, so its note-off always lands before the next step's note-on (which matters on a
+// repeated pitch: an off arriving after the next on would cut that note short). At least 30 ms.
+export const noteLeftMs = (originMs: number, s: Pick<Step, "atMs" | "noteMs">, nowMs: number) =>
+  Math.max(30, originMs + s.atMs + s.noteMs - 20 - nowMs);
+
 // The step at which each feature counts as built: its last feat merge (its done note lands with it). A feature the
 // board says is done without a feat merge in the data counts at the last step, so the end matches the board.
 export function doneAt(board: Board, ss: Step[]): Map<string, number> {

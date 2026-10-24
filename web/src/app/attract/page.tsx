@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Chart } from "../../contracts";
 import type { Board } from "../../operator/board";
-import { chapters, counters, doneAt, layout, steps, timeline, type Kind, type Timeline } from "../../replay/model";
+import { chapters, counters, doneAt, layout, noteLeftMs, steps, timeline, type Kind, type Timeline } from "../../replay/model";
 import { pianoVoice, pickOutput, toneVoice, type Voice } from "../../replay/piano";
 import { createStage, GLYPH, type Stage } from "../../replay/stage";
 import op from "../operator/operator.module.css";
@@ -48,6 +48,7 @@ export default function AttractPage() {
   const voice = useRef<Voice | null>(null);
   const audio = useRef<AudioContext | null>(null);
   const shownK = useRef(-1);
+  const starting = useRef(false);
   const origin = useRef(0); // performance.now() of step time 0, so steps don't drift by each timer's lateness
 
   useEffect(() => {
@@ -101,8 +102,9 @@ export default function AttractPage() {
   useEffect(() => {
     if (!data) return;
     const s = data.ss[k];
-    if (k === shownK.current + 1 && s?.feat && data.done.get(s.feat) === k) stage.current?.raise(s.feat);
-    else if (k !== shownK.current + 1) stage.current?.setBuilt(new Set([...data.done].filter(([, at]) => at <= k).map(([slug]) => slug)));
+    if (k === shownK.current + 1 && s) {
+      for (const [slug, at] of data.done) if (at === k) stage.current?.raise(slug); // incl. done without a feat merge
+    } else if (k !== shownK.current + 1) stage.current?.setBuilt(new Set([...data.done].filter(([, at]) => at <= k).map(([slug]) => slug)));
     shownK.current = k;
   }, [k, data]);
 
@@ -115,7 +117,7 @@ export default function AttractPage() {
     if (!playing || !data) return;
     const { ss } = data;
     const next = k + 1;
-    const delay = next >= ss.length ? 0 : origin.current + (wall ? ss[next].wallMs : ss[next].atMs) - performance.now();
+    const delay = next >= ss.length ? (k >= 0 && !wall ? ss[k].noteMs : 0) : origin.current + (wall ? ss[next].wallMs : ss[next].atMs) - performance.now();
     const t = setTimeout(() => {
       if (next >= ss.length) {
         voice.current?.stop();
@@ -124,30 +126,43 @@ export default function AttractPage() {
       // Badly late (a stalled tab, the first WebGL frames): move the clock on rather than rush notes to catch up.
       const late = performance.now() - (origin.current + (wall ? ss[next].wallMs : ss[next].atMs));
       if (late > MAX_LATE_MS) origin.current += late;
-      if (!wall) voice.current?.note(ss[next].note.pitch, ss[next].noteMs);
+      if (!wall) {
+        const left = noteLeftMs(origin.current, ss[next], performance.now());
+        try {
+          voice.current?.note(ss[next].note.pitch, left);
+        } catch {
+          fallBackToTone(); // the piano went away mid-replay (send throws on a disconnected port)
+          voice.current?.note(ss[next].note.pitch, left);
+        }
+      }
       setK(next);
     }, Math.max(0, delay));
     return () => clearTimeout(t);
   }, [playing, k, wall, data]);
+
+  function fallBackToTone() {
+    audio.current ??= new AudioContext();
+    voice.current = toneVoice(audio.current);
+    setVoiceName("♪ laptop tone (no Portable Grand found)");
+  }
 
   async function toggle() {
     if (playing) {
       voice.current?.stop();
       return setPlaying(false);
     }
+    if (starting.current) return; // a second Space while Chrome asks about MIDI
+    starting.current = true;
     if (!voice.current) {
       const access = await navigator.requestMIDIAccess?.().catch(() => null);
       const out = pickOutput(access ?? null);
       if (out) {
         voice.current = pianoVoice(out);
         setVoiceName(`🎹 ${out.name}`);
-      } else {
-        audio.current = new AudioContext();
-        voice.current = toneVoice(audio.current);
-        setVoiceName("♪ laptop tone (no Portable Grand found)");
-      }
+      } else fallBackToTone();
     }
     await audio.current?.resume();
+    starting.current = false;
     const from = data && k >= data.ss.length - 1 ? -1 : k;
     setK(from);
     anchor(from);
@@ -164,17 +179,21 @@ export default function AttractPage() {
       e.preventDefault();
       toggleRef.current();
     };
+    const leave = () => voice.current?.stop(); // leaving the page: no stuck notes
     window.addEventListener("keydown", onKey);
+    window.addEventListener("pagehide", leave); // a full navigation, reload or closed tab never unmounts
     return () => {
       window.removeEventListener("keydown", onKey);
-      voice.current?.stop(); // leaving the page: no stuck notes
+      window.removeEventListener("pagehide", leave);
+      leave();
       audio.current?.close();
     };
   }, []);
 
   const repo = board?.prs?.[0]?.url.match(/^https:\/\/github\.com\/[^/]+\/[^/]+/)?.[0] ?? null;
   const c = board && data ? counters(board, data.ss, data.done, k) : null;
-  const chapter = data?.chs.filter((x) => x.step <= k && k - x.step < 8).at(-1);
+  const latest = data?.chs.filter((x) => x.step <= k && k - x.step < 8).at(-1);
+  const chapter = latest && { step: latest.step, text: data!.chs.filter((x) => x.step === latest.step).map((x) => x.text).join(" · ") };
   const ticker = data ? data.ss.slice(Math.max(0, k - 2), k + 1).reverse() : [];
   const snapQ = mode === "SNAPSHOT" ? "?snapshot" : "";
 
@@ -320,7 +339,7 @@ function FlatList({ board, pos, built, onPick }: { board: Board; pos: Map<string
   for (const [slug, p] of pos) rows.set(p.z, [...(rows.get(p.z) ?? []), slug]);
   return (
     <div className={styles.flat}>
-      <p className={op.dim}>No WebGL here: the graph as a list, front row first.</p>
+      <p className={op.dim}>No WebGL here: the graph as a list, front row first. ▲ rose in this replay; the rest show their state.</p>
       {[...rows].sort(([a], [b]) => a - b).map(([z, slugs]) => (
         <div key={z} className={styles.flatRow}>
           <span className={op.dim}>row {z + 1}</span>
@@ -328,8 +347,8 @@ function FlatList({ board, pos, built, onPick }: { board: Board; pos: Map<string
             const f = board.features.find((x) => x.slug === s)!;
             const up = built.has(s);
             return (
-              <button key={s} className={`${styles.flatItem} ${up ? styles.up : ""}`} onClick={() => onPick(s)}>
-                {up ? "▲" : "▫"} {GLYPH[f.state]} {s}
+              <button key={s} className={`${styles.flatItem} ${up ? styles.up : ""}`} onClick={() => onPick(s)} title={`${s} · ${f.state}`}>
+                {up ? `▲ ${s}` : `${GLYPH[f.state]} ${s}`}
               </button>
             );
           })}

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { expect, test, vi } from "vitest";
 import type { Chart } from "../contracts";
 import { buildBoard, type AnyPr, type Inputs } from "../operator/board";
-import { boardCounters, chapters, counters, doneAt, layout, msPerBeat, steps, timeline } from "./model";
+import { boardCounters, chapters, counters, doneAt, layout, msPerBeat, noteLeftMs, steps, timeline } from "./model";
 import { pianoVoice, pickOutput } from "./piano";
 
 const chart: Chart = JSON.parse(readFileSync(new URL("../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
@@ -123,4 +123,15 @@ test("piano: picks Portable Grand over another output; stop sends CC 123 on all 
   voice.stop();
   expect(grand.send.mock.calls.map((c) => c[0])).toEqual(Array.from({ length: 16 }, (_, ch) => [0xb0 | ch, 123, 0]));
   expect(other.send).not.toHaveBeenCalled();
+});
+
+test("a late step's note still ends before the next step's note-on, so a repeated pitch isn't cut short", () => {
+  const [a, b] = steps(board(PRS).prs!, chart); // Twinkle opens C C: the same pitch twice
+  expect(a.note.pitch).toBe(b.note.pitch);
+  const origin = 1000;
+  for (const late of [0, 40, 300]) {
+    const on = origin + a.atMs + late;
+    const off = on + noteLeftMs(origin, a, on);
+    expect(off).toBeLessThan(origin + b.atMs); // b's note-on fires no earlier than its own time
+  }
 });

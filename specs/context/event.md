@@ -1,231 +1,212 @@
-# Event: Gator Hack V, what judges score and how we win it
+# Event: Gator Hack V rules, judging and prizes
 
-Refs #35. Research only: no spec, no milestone, no code. Facts read on the open web on 2026-10-24, 02:00–03:00 ET,
-by Claude for Sharan, with a browser that returns each page's full text. Every fact has a source in the table at the
-bottom; quotes are kept short, so open the source for the full wording.
+Refs #35. Research only: no spec, no milestone, no code. Read on the open web on 2026-10-24: first pass 00:40–00:50
+ET, full re-read 02:00–03:00 ET, by Claude for Sharan.
 
-Labels: **[verified]** read on the primary page; **[unverified]** secondhand; **[guess]** our reading of the facts,
-never a fact. "Not found" means we looked and found nothing.
+Labels follow `competitors.md`: **[verified]** read on a primary page; **[unverified]** secondhand or not confirmed;
+"not found" means we looked and found nothing.
 
-## For agents: read this first
-
-1. **The challenge statement is public now** (section 1). It asks for something first made public in the past 12
-   months, *central* to the build, and the video must say what it does, what was hard, and why it's recent. #10
-   (which technology) is still a one-way door: no spec, done note or pitch line may claim we meet it until #10 is
-   answered.
-2. **Round 1 is judged offline from the Devpost page alone**: title, description, public repo, a video of 3 minutes
-   or less. Only the top 10 present live. So for round 1, a feature exists only if it shows in the video or
-   the write-up (section 2).
-3. **Score against five criteria**: impact, technicality, design, novelty, presentation (section 3). Novelty includes
-   how new the *tools* are. Section 4 maps each criterion to our features and names the gaps.
-4. **Evidence beats claims.** Past winners solved a named problem for named users and showed it working (section 6).
-   For us that means real counts from real takes (`mission.md`), the timing data, and the before/after from
-   `specs/context/findings.md`.
-5. **No winner we found in four years was a game** [verified for the winners listed in section 6]. Lead with *it
-   teaches*, and show the arcade as the reason people keep practicing [guess].
-6. When you write a done note, the story (`docs/story.md`) or pitch material, say which criterion it serves and what
-   evidence a judge would see. Don't invent numbers to fill a criterion; leave it empty and visible.
-
-## 1. The challenge statement
-
-**[verified, Site home]**, under "Friday, 5:00 PM opening ceremony": the title is **"Fresh off the frontier"**.
-
-What it asks, closely summarized:
-- Build a project that uses a **technology, dataset or discovery first made publicly available within the past 12
-  months** to solve a problem, explore an idea or create an experience in a field you care about.
-- Bringing your own field is encouraged; the page names **music** as an example, next to biology and history.
-- The new thing must be **central** to what you build.
-- Be ready to show **what it does, what difficulties you faced, and what makes it recent**.
-
-Window [guess, from the event dates]: first public on or after about 2025-10-23.
-
-Devpost overview and the Site FAQ still say "build anything you're excited about"; the statement adds to that, and
-the Vobile Prize is judged on it (section 5). The opening-ceremony schedule line says challenge statements, plural; we found
-only this one.
-
-### Candidates for #10, with checked dates
-
-This list is input for #10, not a pick. #10 is a one-way door and the learning lane's call; each entry still needs
-a person to decide whether it is honestly *central*.
-
-| Candidate | First public | Where it would be central | Fit [guess] | Source |
-|---|---|---|---|---|
-| Claude Opus 5 / Opus 5.5 driving the spec-driven agent workflow (Eric's direction in #10) | Opus 5: 2026-07-24; Opus 5.5: 2026-09-22 [verified] | "The arcade that builds its own levels" (#10, catalog G17); `operator-board`, `operator-replay` show the build | Recent: yes. Central only if a level-building or build-replay flow is in the product, not just how we coded it | anthropic.com announcements and system cards |
-| Lyria 3.5 (Google music generation) | September 2026; available in Google AI Studio [verified] | A generated backing track or practice accompaniment | Recent: yes. Also counts for Best Use of Gemini (AI Studio). Conflicts with `mission.md` if it writes chart notes; audio only | Google's September 2026 AI roundup |
-| Gemini 3.8 Live (speech-to-speech) | September 2026; in Google AI Studio and the Gemini API [verified] | A coach you talk to after a take | Recent: yes; Gemini prize too. The coach is still provisional (`coach` spec) | Same roundup |
-| MuScriptor (open multi-instrument transcription) | arXiv v1 2026-07-09; open weights [verified on arXiv; weight host not stated there] | `song-rip-spike`: a recording becomes a chart | Recent: yes. Riskiest piece in the plan; no solo-piano results stated | arXiv 2607.08168 |
-| PDMX (public-domain MusicXML dataset) | 2024 [verified] | `chart-compiler` | **Too old**: doesn't qualify | arXiv 2409.10831 |
-| Web MIDI, Demucs, Basic Pitch | before 2025 | | **Too old** (#10) | #10 |
-
-## 2. How judging works
-
-| Step | What happens | Source |
-|---|---|---|
-| Submit | Devpost, by Sun Oct 25, 5:00 PM ET. Title and short description, public repo link, demo video (3 min max) or slides, full roster (2–5, all registered), sponsor prizes picked. Late submissions are refused | Devpost overview [verified] |
-| Round 1 | Offline, after 5 PM Sunday, "by a panel of UF graduate students" (Devpost rules); "a panel of assigned judges" (Site prizes, FAQ). They pick 10 finalists | [verified] |
-| Finalists | Announced live at Monday's ceremony, not before | Devpost overview, Site schedule [verified] |
-| Round 2 | Mon Oct 26, 10:15–11:15 AM, Reitz Union: the 10 finalists present live on stage | Devpost rules [verified] |
-| Awards | Mon Oct 26, 12:15 PM, AI Student Competition Awards | Devpost rules [verified] |
-| Attendance | At least one team member at the 10:15 AM finals, or the team can't win | Devpost rules, Site FAQ [verified] |
-
-**Judges named on Devpost** [verified]:
-- **Matheus Kunzler Maldaner**: student organizer; graduate student in AI Systems and former DSI president (Site
-  team page). He was on the **2025 first-place team**, Plato's Cave (UF ECE article).
-- **Sanethia Thomas**: faculty organizer. Devpost calls her "Associate Professor"; the Site team page calls her
-  "Senior Lecturer, UF CISE" (minor conflict). She is also listed as a judge on the 2023 Devpost page.
-
-Ten-minute window for ten finalists [guess, from 10:15–11:15]: roughly 5–6 minutes each, including changeover. The
-v4 plan's stage version (about 6 minutes, stop at 3½) fits.
-
-## 3. The judging criteria
-
-Two versions are published (conflict 3, #43). Devpost **rules** (what round 1 judges by) and the **Site prizes** page
-list five; the Devpost **overview** lists four and has no novelty. No page gives weights [verified: none found].
-Plan for all five.
-
-| Criterion | Site prizes, in short | Devpost overview, in short |
-|---|---|---|
-| Impact | How much positive change it creates | How meaningful the problem is, how useful the solution is to its users |
-| Technicality | Complexity and quality of the solution | "Technical Execution": does it work; ambition, implementation quality, creativity, what was done in the hacking period |
-| Design | User experience and visual appeal | "Design & Usability": intuitive, accessible, the interface helps people use it |
-| Novelty | How new the idea is, **and how new the tools behind it are** | not listed |
-| Presentation | How well the idea and demo are communicated | "Presentation & Demo": explains problem, solution, technical approach **and limitations**; the demo shows it working |
-
-Two phrases to design for: **"limitations"** (judges are told to reward a team that names them) and **"during the
-hacking period"** (the fresh-code rule; our git history shows it).
-
-**Past years' criteria** (2022–2024 Devpost pages, identical each year) [verified]: Potential Value, Quality of the
-Idea, Functionality, Quality of Presentation. Presentation asked for an "interesting and captivating" video with a
-**statement of how teammates from different disciplines collaborated**, and the submission video had to list each
-teammate's responsibilities. 2026's pages don't ask for this, but the rules call interdisciplinary collaboration
-Gator Hack's "core mission" [verified]. Saying who did what costs about ten seconds of video [guess].
-
-## 4. Playbook: each criterion against Piano Arcade
-
-Status words follow `AGENTS.md`: merged, checked by CI, verified live, tried by a user are different things. Feature
-status is from `main` at `8d087a6` (2026-10-24); re-check before citing.
-
-| Criterion | What a judge needs to see | What we have | Gap |
-|---|---|---|---|
-| **Impact** | A real problem, a real user, and that it helps | Problem: apps grade *which* notes, not *how* (`competitors.md`, four apps checked). Playtests: Eric about 10% at first, 40% later; 71.4% with the beat track (`findings.md`). The **beat track** turned "unplayable" into "much much better", a real before/after from real takes | No "it teaches" evidence yet: the coach is provisional. One player's improvement across sessions, shown with real counts, would be the strongest proof [guess]. `take-store` (#60, #61) would keep that history |
-| **Technicality** | It works, it's ambitious, it was built this weekend | Millisecond judging on a real DGX-660 (`core-loop`); MIDI spike measured a 3.1 ms key pair and 1 ms clock agreement (`RESULTS.md`); `piano-sim` tests the MIDI path in CI; `judging-tiers`, `timing-feedback` done; take-store re-judges server-side with abuse checks | Show it, don't list it: the 3.1 ms log line and a CI run are 5-second shots [guess]. `[verify].command` results belong in the write-up |
-| **Design** | Intuitive, accessible, good-looking | Synthesia look plus arcade layer (decision 001); `hud` done, `juice-visual` and `juice-sound` not yet; laptop-keys fallback so judges can play | Accessibility isn't covered by any spec: color isn't the only signal for a miss (decision 001 row 6 uses color). Not checked: contrast, a reduced-motion setting |
-| **Novelty** | A new idea, *and new tools* | An arcade on a real 88-key piano that judges timing direction and plays your take back; no app we checked grades early/late or dynamics (`competitors.md`) | "New tools" waits on #10. Every candidate in section 1 has a date; none is picked |
-| **Presentation** | Problem, solution, approach, **limitations**, a working demo, in ≤ 3 min | The v4 video plan (two wows, Twinkle hook, Var. XII "I can't play this yet"); `docs/story.md` has filmable beats; `operator-replay` shows the build | Add a limitations beat (the Chrome MIDI stall, latency calibration, what's provisional). Add who did what. The 3-minute cap is hard: the deep dive goes in the write-up (decision 001 row 14) |
-
-### Submission checklist (owner: whoever submits; the agents prepare it)
-
-- [ ] Devpost title and short description: what it does, how it was built.
-- [ ] Public repo link. The repo has **no `LICENSE` file** on `main` [verified]; Best Open Source needs "a clear
-      open-source license". Choosing one is a team decision.
-- [ ] Video ≤ 3:00, public link. It covers the challenge statement's three asks (what it does, what was hard, why it's
-      recent), limitations, and who did what.
-- [ ] Roster: 2–5, every member registered.
-- [ ] Sponsor prizes ticked: only ones we actually qualify for (section 5).
-- [ ] Submitted with buffer before Sun 5:00 PM ET; late is refused.
-- [ ] Monday: at least one member at the Reitz Union by 10:15 AM.
-
-## 5. Prizes and what each sponsor wants
-
-The Site prizes page now matches Devpost's prize list [verified 2026-10-24 02:30 ET]: the four $200 category prizes
-and DSI's Best Use of ML that the Site listed earlier are gone. That answers most of #41. Only the total differs:
-the Site says "$5,000+", Devpost says "$6,000+" in its prize header and "$5,000+" in its text.
-
-| Prize | Value | To qualify | Our fit [guess] |
-|---|---|---|---|
-| 1st / 2nd / 3rd | $2,000 / $1,000 / $500 cash | The main judging (sections 2–3) | The target |
-| Vobile Prize | "A major prize", amount TBA | Vobile's top pick, **judged on the challenge statement** | Vobile does copyright protection and content monetization for studios, labels and rights holders, "powered by AI" (us.vobile.com). Cited public-domain and openly licensed sources (decision 003 loosens this to CC BY / CC BY-SA with credit) fit that. A ripped copyrighted song ("Golden") works against it |
-| Best Use of Gemini (MLH) | MLH swag per member | Use the Gemini API or Google AI Studio | The coach "expected on Gemini" (`coach` spec, provisional). Lyria 3.5 and Gemini 3.8 Live are both in AI Studio |
-| Best Open Source (MLH) | $25 gift card per member | Public GitHub repo with a clear open-source license | One `LICENSE` file away, once the team picks a license. Check every dependency's license first |
-| Best Use of the Twinly API | 1st: internship interview fast-track, $750 usage credit, 3 months Twinly Max each; 2nd: $500 credit, 3 months Pro | Use Twinly's computer-use, voice-clone calling or iMessage APIs; macOS only | Weak and not in any spec. Twinly's endpoints run on the key owner's Mac and act as them (texts from their number, calls in their voice). One honest fit: text a player their practice summary. Not planned |
-
-"Twinly $1,250 in cash" on Devpost is credits, subscriptions and an interview in its own breakdown [verified].
-One project can win a main award and sponsor prizes (Site FAQ) [verified]. Prizes split evenly among members.
-
-## 6. Past winners and what they had in common
-
-| Year | Theme (challenge) | Winners [verified, Devpost galleries and UF pages] |
-|---|---|---|
-| 2022 | "AI for Social Good": the UN's 17 sustainable development goals | K-Boston Analysis (k-means on climate data for underserved Boston neighborhoods), GuppyAI (a conversational companion by language and education level), WeatherOrNot (climate what-if viewer), I2T-ASL (sign language to text and art), Automotive Mileage Monitor (traffic video to fuel cost), GatorTells |
-| 2023 | Verizon: "Reimagine Digital Experience with GenAI" | Where's My Water! (1st: groundwater prediction from USGS data; soil and water science, CS and data science), A.I.R.A (voice shopping assistant), ChatGIT (chat for the git CLI) |
-| 2024 | UF/IBM, disasters (all 24 projects are disaster tools) | **AidLink (1st)**: phone a number, an IBM Watson voice agent takes your location and needs, responders see requests on a map. Also BeHeal, Atlas, EcoLogic, ClaimGuard |
-| 2025 | Not found | **Plato's Cave (1st)**: agents split a research paper into claims, verify them on the web, and the user explores them as a flowchart; judges cited the human-in-the-loop design. Team included this year's judge Matheus Kunzler Maldaner. 2nd and 3rd: not found in text (the AI² Center page links a video) |
-
-Patterns [guess, from the table]:
-- **A named problem, a named user, a working thing.** AidLink had a real phone number judges could call. Plato's Cave
-  made AI checkable by a person.
-- **The year's sponsor tech, used centrally.** AidLink ran on IBM Watson in the IBM year. This year the statement
-  itself asks for a recent technology, which is the same pattern.
-- **Trust in AI is a theme the judge pool rewarded**: Plato's Cave won on verifying AI output. Our `mission.md`
-  rule "anything an LLM says about a take must be checked against the results data" is the same idea; show it.
-- **Every winner was a tool, not a game.** Our risk; our answer is "it teaches" (section 4, Impact).
-- Each AidLink teammate wrote their own contribution on Devpost. Past rules required it.
-
-## 7. Workshops still ahead (Site schedule, tentative)
-
-| When | Workshop | Why it might matter [guess] |
-|---|---|---|
-| Sat 1:30 PM | "Can AI Hear? Audio to ML Features" (IEEE Signal Processing Society) | Audio features for the coach or song ripping |
-| Sat 4:00 PM | SQLite & Relational Databases (Society of Software Developers) | Not needed: take-store is on Supabase |
-| Sat 7:30 PM | Agents 101 (UF AI Club) | Our build story is agents |
-| Sun 11:00 AM | **How to Nail the Pitch** (SwampHacks) | Before the video is cut |
-| Sun 1:00 PM | How to Use Claude (Data Science & Informatics, the organizing club) | The organizers' own view of Claude, relevant if #10 picks Opus 5.x |
-| Sun 9:30 AM | Mentor office hours (Devpost overview) | Ask about #43 and the license |
-
-## 8. Hard dates
-
-| What | When (ET) | Source |
-|---|---|---|
-| Fresh-code window | Fri Oct 23, 5:00 PM to Sun Oct 25, 5:00 PM | Devpost rules |
-| Submission deadline | Sun Oct 25, 5:00 PM EDT | Devpost overview |
-| Finals | Mon Oct 26, 10:15–11:15 AM, Reitz Union | Devpost rules |
-| Awards | Mon Oct 26, 12:15 PM | Devpost rules |
-
-Agents plan by `specs/milestones.toml` only (its `start` is empty); these dates are for the submission.
-
-## 9. Open questions
-
-| # | Question | Status, 2026-10-24 03:00 ET |
-|---|---|---|
-| #10 | Which recent technology is central | Open (one-way door). Candidates with dates: section 1 |
-| #41 | Which prize list is real | **Mostly answered**: the Site now matches Devpost. Only the total differs |
-| #42 | Two-UF-department rule | Devpost rules require members from two UF departments; the FAQ says any school. Sharan reports the team covers it (2026-10-24); organizers not asked |
-| #43 | Is novelty judged | Still two versions. The rules (round 1) and the Site include it: plan for it |
-| #44 | Exact challenge statement | **Answered**: on the Site home (section 1). The opening ceremony may have added detail; the Discord wasn't read |
-| #45 | Who judges round 1 | **Mostly answered**: UF graduate students per the rules; Devpost names Matheus Kunzler Maldaner and Sanethia Thomas |
-
-## Not read
-
-- The event Discord (login). Anything said only at the opening ceremony.
-- The 2024 and 2025 recap and winners videos (video, not text); 2025's 2nd and 3rd place.
-- MLH's own pages for its two prizes (Devpost's text is used).
+**About the quotes.** Quoted lines below are exact, but long sections are given as short exact excerpts with
+summaries between them, never as one full block. Before relying on a section, open its URL and paste the full text
+under it, marked **[pasted by Eric]**. The Re-check checklist at the end covers this.
 
 ## Sources
 
-All read 2026-10-24 between 02:00 and 03:00 ET unless marked.
+| Short name | URL | Read (ET) |
+|---|---|---|
+| Site home | https://ufgatorhack.com/ | 2026-10-24 02:10 |
+| Site prizes | https://ufgatorhack.com/prizes.html | 2026-10-24 02:30 |
+| Site FAQ | https://ufgatorhack.com/faq.html | 2026-10-24 02:35 |
+| Site schedule | https://ufgatorhack.com/schedule.html | 2026-10-24 02:30 |
+| Site sponsors | https://ufgatorhack.com/sponsors.html | 2026-10-24 02:30 |
+| Site about | https://ufgatorhack.com/about.html | 2026-10-24 02:40 |
+| Devpost overview | https://gatorhack2026.devpost.com/ (linked from the site as "View Devpost") | 2026-10-24 02:05 |
+| Devpost rules | https://gatorhack2026.devpost.com/rules | 2026-10-24 02:10 |
+| Twinly developer API | https://www.twinly.tech/docs/developer-api (linked from Devpost's Twinly prize) | 2026-10-24 02:50 |
+| Vobile | https://us.vobile.com/ | 2026-10-24 02:50 |
 
-| Short name | URL |
-|---|---|
-| Site home | https://ufgatorhack.com/ |
-| Site about | https://ufgatorhack.com/about.html |
-| Site prizes | https://ufgatorhack.com/prizes.html |
-| Site FAQ | https://ufgatorhack.com/faq.html |
-| Site schedule | https://ufgatorhack.com/schedule.html |
-| Site sponsors | https://ufgatorhack.com/sponsors.html |
-| Site team | https://ufgatorhack.com/team.html |
-| Devpost overview | https://gatorhack2026.devpost.com/ |
-| Devpost rules | https://gatorhack2026.devpost.com/rules |
-| 2024 Devpost (UF/IBM) | https://uf-aidays-hackathon.devpost.com/ and /project-gallery |
-| 2023 Devpost (Verizon) | https://ufgatorhackathon.devpost.com/ and /project-gallery |
-| 2022 Devpost | https://ufai-days-hackathon.devpost.com/ and /project-gallery |
-| AidLink write-up | https://devpost.com/software/aidlink-isoz04 |
-| 2025 winner (UF ECE) | https://ece.ufl.edu/2025/11/10/uf-student-hackers-enter-platos-cave-for-first-place-win/ |
-| 2023 winner (UF IFAS) | https://blogs.ifas.ufl.edu/swsdept/2023/10/20/wheres-my-water-wins-uf-ai-days-hackathon/ (read 2026-10-24 00:47 ET) |
-| AI² Center, AI Days | https://www.ai.ufl.edu/ai-days/ |
-| Twinly developer API | https://www.twinly.tech/docs/developer-api |
-| Vobile | https://us.vobile.com/ |
-| Claude Opus 5 | https://www.anthropic.com/news/claude-opus-5 (system card dated 2026-07-24) |
-| Claude Opus 5.5 | https://www.anthropic.com/claude-opus-5-5 (system card dated 2026-09-22) |
-| Google, September 2026 AI updates | https://blog.google/innovation-and-ai/technology/ai/google-ai-updates-september-2026/ (dated 2026-10-02) |
-| MuScriptor | https://arxiv.org/abs/2607.08168 |
-| PDMX | https://arxiv.org/abs/2409.10831 |
+## 1. The challenge statement
+
+**[verified, Site home]**, under "Friday, 5:00 PM opening ceremony":
+
+> **"Fresh off the frontier"**
+
+Exact excerpts, with the rest summarized:
+- > "a technology, dataset, or discovery first made publicly available within the past 12 months"
+
+  used to solve a problem, explore an idea or create an experience in a field you care about.
+- Teams are encouraged to bring their own field; the page names biology, music and history as examples.
+- > "The new technology or resource should be central to what you build."
+- Be ready to show what it does and the difficulties faced, and to explain what makes it recent.
+
+The public pages also say, unchanged since the first pass:
+
+> "Anything you are excited about!" (Devpost overview)
+
+> "build anything you’re excited about!" (Site FAQ)
+
+The Site schedule lists "challenge statements" (plural) for the opening ceremony; only this one is published.
+The first pass found the statement on Discord only; it has since been posted on the Site home (#44).
+
+## 2. Judging criteria
+
+Three pages list criteria, and they differ (conflict 3, #43). No page gives weights [verified: none found].
+
+**Devpost overview** [verified], four criteria. Short exact excerpts plus a summary:
+- **Impact:** how meaningful the problem is and how useful the solution is to its users.
+- **Technical Execution:** how well it works, including technical ambition, implementation quality, creativity, and
+  what the team accomplished during the hacking period.
+- **Design & Usability:** whether the experience is intuitive, accessible, and well designed.
+- **Presentation & Demo:** how clearly the team explains "the problem, solution, technical approach, and
+  limitations", and whether the demo shows the project working.
+
+**Devpost rules** [verified]:
+> "based on impact, technicality, design, novelty, and presentation"
+
+**Site prizes** [verified], five criteria:
+- **Impact:** "How much positive change your project creates."
+- **Technicality:** "The complexity and quality of your solution."
+- **Design:** "The user experience and visual appeal."
+- **Novelty:** "How new your idea is, and how new the tools behind it are."
+- **Presentation:** "How well you communicate your idea and demo."
+
+**Process:**
+> "Round one is judged offline by a panel of UF graduate students after submissions close" (Devpost rules)
+
+> "A panel of assigned judges reviews every project and selects the top 10 finalists." (Site prizes)
+
+> "Judges' decisions are final." (Devpost rules)
+
+The Devpost overview lists two judges by name: Matheus Kunzler Maldaner ("Student Organizer") and Sanethia Thomas
+("Associate Professor") [verified]. The Site team page's Judges section says "Coming soon" [verified].
+
+## 3. Submission requirements
+
+**Devpost overview** [verified], summarized from the "what to submit" list (exact phrases in quotes):
+- A project title and a short description of what it does and how it was built.
+- A link to a public code repository.
+- A demo video, "3 minutes maximum", or slides. An honest work-in-progress demo is acceptable.
+- A full team roster of 2 to 5 members, all registered.
+- The sponsor prizes the team wants considered.
+- > "Late submissions cannot be accepted, so leave buffer time before the deadline."
+
+**Devpost rules** [verified]:
+> "Projects must be submitted through Devpost by the deadline. One project per team."
+
+**Site FAQ** [verified]: a working demo (or honest progress), the code repository, and a brief write-up of what it
+does and how it was built.
+
+The rules page states no video length, repo or license rule [verified: not found there]. A **license** is required
+only for the Best Open Source prize (section 5). As of `8d087a6` this repo has no `LICENSE` file [verified].
+
+## 4. Eligibility
+
+| Rule | Exact text | Source |
+|---|---|---|
+| Who | "open to currently enrolled students from any school, and participation is in person only" | Devpost rules |
+| Who | "Any currently enrolled student from any school is welcome" | Site FAQ |
+| Age | "Participants must be at least 18 years old (the age of majority)." Under-18s email the organizers first (summary) | Devpost rules |
+| Team size | "Teams must have 2 to 5 members." Solo registration is allowed; solo submissions aren't eligible (summary) | Devpost rules |
+| Team size | "Teams must have 2 to 5 people, so solo projects are not eligible." | Site FAQ |
+| **Departments** | "Each team must include members from at least two different UF departments" | Devpost rules |
+| Departments | "Every major is welcome, and there’s no coding requirement to attend." | Site FAQ |
+| Fresh code | "All project code must be written during the hacking period" | Devpost rules |
+| Fresh code | "All code must be written during the hacking period" and "Projects must be started at the event." | Site FAQ |
+| Allowed | Open-source libraries, frameworks and public APIs are allowed; pre-written project code is not (summary) | Devpost rules |
+
+The department rule is conflict 2 (#42). Sharan reports the team meets it (2026-10-24); organizers weren't asked.
+
+## Hard deadlines
+
+Agents plan by `specs/milestones.toml` only; these dates are facts for the pitch and submission.
+
+| What | When | Source |
+|---|---|---|
+| Fresh-code window | Fri Oct 23, 5:00 PM to Sun Oct 25, 5:00 PM ET | Devpost rules |
+| Submission deadline | Sun Oct 25, 5:00 PM ET (submissions due on Devpost) | Devpost overview; Site schedule |
+| Finalists announced | Live at Monday's ceremony | Devpost overview; Site schedule |
+| Finals | Mon Oct 26, 10:15 to 11:15 AM, Reitz Union, top 10 present live | Devpost rules; Site prizes |
+| Attendance | "At least one member of each team must be physically present at the Monday, October 26 finals" | Devpost rules |
+| Attendance | "If no team member is present, the team cannot win." | Site FAQ |
+| Awards | Mon Oct 26, 12:15 PM, AI Student Competition Awards | Devpost rules; Site schedule |
+
+> "All times and events are subject to change." (Site schedule)
+
+## 5. Prizes
+
+Since the first pass, the Site prizes page has changed to **the same prize list as Devpost** [verified 02:30 ET]:
+its four $200 category prizes (Beginner, Design, AI, Social Impact) and DSI's Best Use of ML are gone. Only the total
+still differs (#41).
+
+| Prize | Site prizes [verified] | Devpost overview [verified] |
+|---|---|---|
+| 1st / 2nd / 3rd | $2,000 "Best overall project." / $1,000 "Runner-up team award." / $500 "Third overall winner." | $2,000 / $1,000 / $500 cash, 1 winner each |
+| Best Use of Gemini (MLH) | "Assorted swag from MLH." | MLH swag per member; build with the Google Gemini API or Google AI Studio |
+| Best Use of the Twinly API | $1,250. 1st: a fast-tracked internship interview, $750 credit, 3 months Twinly Max per member; 2nd: $500 credit, 3 months Twinly Pro per member | Same breakdown, listed as "$1,250 in cash", 2 winners. Uses Twinly's "computer use, voice-clone calling and iMessage" APIs; "macOS only" |
+| Best Open Source Project (MLH) | "$25 gift cards", one per member | $25 gift card per member; needs "a public GitHub repository with a clear open-source license" |
+| Vobile Prize | "Prize TBA". "judged on the same challenge statement" | "amount to be announced". Judged on the same challenge statement as the main awards |
+| Total | "$5,000+" | "$6,000+" in the prize header; "$5,000+" in the overview text |
+
+From the Site FAQ: "a project can take a main award and also win sponsor prizes it qualifies for." and "Prizes are
+split evenly among team members and paid out after the event."
+
+**Note on Twinly's "$1,250 cash":** the Devpost breakdown is usage credit, subscriptions and an interview, not cash
+[verified from the same page]. Read the real value as credits.
+
+### What each sponsor says it wants
+
+| Sponsor | Role (Site sponsors) | What it says it wants |
+|---|---|---|
+| Vobile | "Gator Hack Sponsor" | Not stated beyond judging on the challenge statement. Its own site: copyright protection and content monetization "powered by AI technologies", for platforms, film studios, TV networks, sports leagues, music labels and other rights holders (VideoTracker, RightsID, ChannelID, Vobile Insights) [verified]. It acquired Pex, a music-identification company, in 2025 ([Digital Music News](https://www.digitalmusicnews.com/2025/04/14/vobile-pex-acquisition/)) [verified, first pass] |
+| Twinly | "Gator Hack Sponsor" | Use of its new computer-use, voice-clone calling and iMessage APIs (Devpost). Its docs: one API key acts as the key owner; Mac endpoints (send and read iMessages, place a call in the owner's cloned voice, run a task) run in the Twinly app on the owner's Mac; cloud endpoints (chat, images, computer-use next action) answer from Twinly's servers [verified] |
+| MLH | "Best Use of Gemini" | Gemini API or Google AI Studio (Devpost). Open Source: a public repo with a clear license (Devpost) |
+| UF DSI | "Organizing club" | Not stated |
+| NVIDIA | "AI Days Platinum Sponsor" (AI Days, not a Gator Hack prize) | Not stated |
+
+## Past winners, to show the bar
+
+| Year | Challenge | Winner | One line | Source |
+|---|---|---|---|---|
+| 2025 | not found | Plato's Cave (FINS team), 1st | Splits a research paper into claims, agents verify them on the web, the user explores a flowchart; judges cited the human-in-the-loop design | [UF ECE](https://ece.ufl.edu/2025/11/10/uf-student-hackers-enter-platos-cave-for-first-place-win/) |
+| 2024 | UF/IBM, natural disasters | AidLink, 1st | Phone a number and an IBM Watson voice agent records your location and needs; responders see requests on a map | [Devpost](https://devpost.com/software/aidlink-isoz04) |
+| 2024 | | BeHeal; Atlas; EcoLogic; ClaimGuard | Disaster mental-health volunteer training; hospital-load forecasts after hurricanes; logic-gate networks on FPGAs for climate; insurance-claim error checks. All marked "Winner" | [Gallery](https://uf-aidays-hackathon.devpost.com/project-gallery) |
+| 2023 | Verizon, "Reimagine Digital Experience with GenAI" | Where's My Water!, 1st | Generative AI web app that visualizes and predicts U.S. groundwater levels from USGS data | [UF IFAS](https://blogs.ifas.ufl.edu/swsdept/2023/10/20/wheres-my-water-wins-uf-ai-days-hackathon/) |
+| 2023 | | A.I.R.A; ChatGIT | A voice-controlled shopping assistant; a chat interface for the git CLI. Both marked "Winner" | [Gallery](https://ufgatorhackathon.devpost.com/project-gallery) |
+| 2022 | "AI for Social Good" (the UN sustainable development goals) | K-Boston Analysis; GuppyAI; WeatherOrNot; I2T-ASL; Automotive Mileage Monitor; GatorTells | Climate clustering for Boston neighborhoods; a conversational companion; climate what-if viewer; sign language to text and art; traffic video to fuel cost; data for sustainability. All marked "Winner" | [Gallery](https://ufai-days-hackathon.devpost.com/project-gallery) |
+
+Past Devpost pages (2022–2024) also required the video to show how teammates from different disciplines
+collaborated and each teammate's responsibilities [verified]. The 2026 pages don't ask for this.
+
+## Conflicts
+
+Each has its own `needs-human` issue. Until it's answered, agents treat both sides as unconfirmed and plan on neither.
+
+1. **Prize list** (#41). Now the same prizes on both pages (section 5); only the total differs: Site "$5,000+",
+   Devpost "$6,000+" and "$5,000+".
+2. **Department rule** (#42). Devpost rules: "Each team must include members from at least two different UF
+   departments". Site FAQ and Devpost rules' own eligibility line: students "from any school".
+3. **Judging criteria** (#43). Devpost overview has four (no novelty); Devpost rules and the Site have five, with
+   novelty (section 2).
+4. **Challenge statement** (#44). Devpost and the FAQ say build anything; the Site home has "Fresh off the frontier"
+   (section 1). The first pass couldn't find the statement; now it's published.
+5. **Round 1 judges** (#45). Devpost rules: "a panel of UF graduate students". Site prizes and FAQ: "a panel of
+   assigned judges". Devpost names two judges (section 2).
+
+## Not read
+
+- The event Discord (login), and anything said only at the opening ceremony.
+- Registration emails to participants (login).
+- MLH's own pages for Best Use of Gemini and Best Open Source (not found by search; the Devpost text is used).
+- The 2024 recap and 2025 winners videos on YouTube (video, not text); 2025's 2nd and 3rd place.
+- Devpost's "Updates" tab had no posts on Oct 24, 00:44 ET.
+
+## Re-check before submitting
+
+Once, before Eric submits, re-read each source and diff it against this doc:
+- [ ] Section 1: the challenge statement on the Site home, pasted in full and marked **[pasted by Eric]**, plus
+      anything added at the opening ceremony or on Discord.
+- [ ] Section 2: judging criteria on Devpost overview, Devpost rules and Site prizes.
+- [ ] Section 3: the Devpost "what to submit" list, especially the video cap.
+- [ ] Section 4: eligibility, especially the two-department rule.
+- [ ] Section 5: every prize on Devpost, and that the ones we tick in the submission exist there.
+- [ ] Every conflict issue has an answer, or the doc says it's still open.

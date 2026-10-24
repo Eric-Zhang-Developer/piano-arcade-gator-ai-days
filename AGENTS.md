@@ -6,8 +6,7 @@ The spec is the source of truth. Chat and memory aren't. Everything you need is 
 1. `git fetch origin`. If a `STOP` file exists on `origin/main`, stop: comment on your open PR and push nothing.
 2. Write your heartbeat: `d="$(git rev-parse --git-common-dir)/agent-heartbeats"; mkdir -p "$d"; pwd > "$d/<your-worker-name>"`.
 3. Read from `origin/main`: `specs/mission.md`, `specs/tech-stack.md`, `specs/roadmap.md`, `specs/milestones.toml`,
-   then your feature's `specs/features/<slug>/spec.md`. Planning, or writing a done note, the story or pitch
-   material? Also read "For agents" in `specs/context/event.md` (what judges score).
+   then your feature's `specs/features/<slug>/spec.md`.
 4. Finish your own open PRs first (fix red ones). Then pick new work.
 5. Before re-taking a feature with earlier PRs, read its open and closed PRs: `gh pr list --search "<slug> in:title" --state all`.
 
@@ -34,11 +33,37 @@ Each person owns a lane: their features, their folder, and the final say over bo
 |---|---|---|---|
 | `eric` | `@Eric-Zhang-Developer` | game: playing, highway, judging, HUD, juice, MIDI in and out | `web/src/game/` |
 | not set yet | not set yet | learning: coach, practice mode, chart compiler, song ripping | `web/src/learn/`, `tools/` |
+| `sharan` | `@iKnow24` | backend: take store, Supabase, accounts, progress page; LED strip firmware | `supabase/`, `web/src/data/`, `web/src/app/api/takes/`, `web/src/app/api/progress/`, `web/src/app/progress/`, `web/src/app/auth/`, `firmware/` |
 
 - The shared formats in `web/src/contracts/` are frozen: change them only through a `contract:` PR, which both people see.
 - Never change another lane's folder. If you need something from it, file a `needs-human` issue for its person.
 - **Blocked?** Don't wait. File a `needs-human` issue (below), note it on your PR, and take the next ready feature.
-- **Nothing ready?** Say so in your PR or in an issue and stop. Never invent scope.
+- **Nothing ready?** Take a song request if one is open (below). Otherwise say so in your PR or in an issue and
+  stop. Never invent scope.
+
+## Song requests
+An open issue labeled `song-request` asks for one piece to play. The label is the approval: only people with write
+access can set it, so an unlabeled request is only an idea.
+- It's work for `eric`'s workers once `changes/song-requests.md` is on `main`, and only when no milestone feature is
+  ready for you. Oldest request first. It needs no spec and no plan PR.
+- Claim it with a draft PR titled `chore(song-requests): chart <piece>` with `Closes #<n>`, then follow
+  `specs/features/song-requests/spec.md`: a source decision 003 lets you commit, the converter, the library test.
+- A request adds one chart, nothing else: no game code, no new scope, no notes from memory. A credit the source asks
+  for goes in `CREDITS.md` through a `docs:` PR.
+- No allowed source, or the piece is unclear? Comment what you searched, label it `needs-info`, and switch.
+
+## The database
+Supabase Postgres, in `sharan`'s lane. `supabase/README.md` lists what's in it and is the recipe for adding anything.
+- Every change is a new file in `supabase/migrations/` (`npx -y supabase@2.122.0 migration new <name>`). Never edit one
+  that's already live; add another.
+- `npm --prefix supabase/tests ci && node supabase/tests/migrations.mjs` must pass before the PR is ready. It applies
+  every migration to an in-memory Postgres and fails on a table without RLS, a browser write grant, an unsafe view or
+  an open function.
+- The browser never writes: only Next.js server routes, with `SUPABASE_SECRET_KEY`. CHECKs guard shape, not game rules.
+- Applying to the live project is a one-way door: after merge, a person runs `supabase/push.sh` (tests, dry run, asks,
+  applies, then `supabase/tests/live-smoke.mjs`). Agents don't apply migrations.
+- Another lane needs data stored or read (the coach, say)? File a `needs-human` issue for `sharan`, as for any folder.
+- `SUPABASE_SECRET_KEY` and `SUPABASE_DB_URL` stay in `web/.env.local`: never committed, never in a `NEXT_PUBLIC_` name.
 
 ## The loop
 1. Work in a worktree outside the project folder:

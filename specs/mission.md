@@ -18,8 +18,7 @@ real piano, see exactly how they played it, and be told what to practice next.
 
 The project answers the event's challenge statement, "Fresh off the frontier": a technology, dataset or discovery
 first made public in the past 12 months, central to the project. **Which one is still open**; the learning lane
-decides (see the `needs-human` issue). Until then, nothing may claim to meet it. The statement's wording, what
-judges score, and how each criterion maps to our features: `specs/context/event.md`.
+decides (see the `needs-human` issue). Until then, nothing may claim to meet it.
 
 ## Non-negotiables
 - Never invent data. Unknown stays empty and visible. Any number shown to a user is a real count from a real take.
@@ -51,4 +50,5 @@ judges score, and how each criterion maps to our features: `specs/context/event.
   line aligned to the keys.
 - AI in the core playing loop. AI lives in the learning lane.
 - Sheet music on the arcade screen (deferred to practice mode).
-- Accounts, logins, an online leaderboard, mobile apps, live transcription on stage.
+- Sign-in screens or required accounts: a player is an anonymous user, and linking Google is optional. Also not doing:
+  an online leaderboard, mobile apps, live transcription on stage.

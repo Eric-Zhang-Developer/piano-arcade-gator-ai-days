@@ -77,8 +77,8 @@ export class Judge {
     if (this.results) return this.results;
     for (const i of this.byTime) if (!this.judgments[i]) this.miss(i);
     const judgments = this.judgments as NoteJudgment[];
-    const counts = { PERFECT: 0, GREAT: 0, MISS: 0, extra: this.extras.length };
-    for (const j of judgments) counts[j.judgment]++;
+    const counts: Results["counts"] = { PERFECT: 0, GREAT: 0, MISS: 0, extra: this.extras.length };
+    for (const j of judgments) counts[j.judgment] = (counts[j.judgment] ?? 0) + 1; // tolerates judgments added later
     const accuracy = judgments.length ? (counts.PERFECT + 0.5 * counts.GREAT) / judgments.length : 0;
     this.results = {
       chartId: this.chart.id,

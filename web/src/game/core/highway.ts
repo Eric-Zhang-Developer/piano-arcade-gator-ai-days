@@ -3,7 +3,8 @@ import type { Chart, Frame, Judgment } from "../../contracts";
 import { msPerBeat, settings } from "./settings";
 
 const JUDGMENT_SHOW_MS = 600;
-const JUDGMENT_COLORS: Record<Judgment, string> = { PERFECT: "#ffe27a", GREAT: "#5ef2c4", MISS: "#c98a9a" };
+// Keyed by name, not Record<Judgment>, so a judgment added to the contract doesn't break the build first.
+const JUDGMENT_COLORS: Record<string, string> = { PERFECT: "#ffe27a", GREAT: "#5ef2c4", MISS: "#c98a9a" };
 const BLACK_KEY_WIDTH = 0.6; // × white key width
 const MAX_PERSPECTIVE = 0.3;
 

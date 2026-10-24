@@ -133,6 +133,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
               autoFocus={i === 0}
               className={styles.link}
               data-testid={`song-${s.id}`}
+              aria-current={i === focused ? "true" : undefined}
               onClick={onPlay}
               onFocus={() => setFocused(i)}
               onMouseEnter={(e) => e.currentTarget.focus({ preventScroll: true })} // hover highlights too (song-preview)

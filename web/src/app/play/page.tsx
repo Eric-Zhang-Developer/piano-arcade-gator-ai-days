@@ -20,6 +20,8 @@ import { Slots } from "../../game/play-slots/ui";
 import { PauseMenu } from "../../game/pause-skin";
 import { beatTiming, countdownSettings } from "../../game/beat/timing";
 import { scoringVersion } from "../../game/core/sustain";
+import { setNavigationPhase } from "../../game/navigation/state";
+import { stopLobbyMusic } from "../../game/navigation/music";
 import { ResultsLayout } from "../../game/results-layout";
 import { emptyHud, reduceHud } from "../../game/hud";
 import { barStep, holdClock, isWaitMode } from "../../game/wait-mode";
@@ -104,6 +106,7 @@ export default function Play() {
         setLatency(latencyRef.current);
         setIsTest(params.get("input") === "test");
         setPhase("ready");
+        setNavigationPhase("ready");
       })
       .catch((e: Error) => {
         if (!live) return;
@@ -120,7 +123,9 @@ export default function Play() {
     const chart = chartRef.current;
     const canvas = highwayRef.current;
     if (!chart || !canvas) return;
+    stopLobbyMusic();
     stopRef.current();
+    setNavigationPhase("playing");
     setResults(null);
     setPhase("playing");
     setPauseMode("playing");
@@ -289,6 +294,7 @@ export default function Play() {
         emit({ type: "resume", atMs: clock.now(perf), performanceMs: perf });
       }
       mode = next;
+      setNavigationPhase(next === "menu" ? "paused" : "playing");
       setPauseMode(next);
       if (next !== "quit") return;
       emit({ type: "quit", atMs: clock.now(perf), performanceMs: perf });
@@ -345,6 +351,7 @@ export default function Play() {
       setScore(hud.score);
       setTiming(timingSummary(chart, take, r, latencyRef.current));
       setPhase("results");
+      setNavigationPhase("results");
     };
     const frame = () => {
       try {
@@ -400,6 +407,7 @@ export default function Play() {
       stop();
       cancelAnimationFrame(idleRaf);
       background?.dispose();
+      setNavigationPhase("ready");
     };
 
     if (window.__pianoArcade) {

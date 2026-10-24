@@ -7,6 +7,8 @@ import type { Chart, Rank } from "../../contracts";
 import { difficultyInputs } from "../difficulty";
 import { pickOutput } from "../../replay/piano";
 import { modeUrl } from "../wait-mode/plugin";
+import { lobbyServerSnapshot, lobbySnapshot, subscribeLobby } from "../navigation/music";
+import { pianoMenuServerSnapshot, pianoMenuSnapshot, subscribePianoMenu } from "../navigation/PianoMenu";
 import { opening, openingMs, playAsTones, playOnPiano, practiceUrl, previewSettings } from "./opening";
 import { SongSource } from "../song-sources";
 import { useLevel, withLevel } from "../easy-charts";
@@ -45,6 +47,9 @@ function subscribe(l: () => void) {
 }
 
 export function SongPreview({ id, best }: { id: string; best?: { rank: Rank; accuracy: number } }) {
+  const lobby = useSyncExternalStore(subscribeLobby, lobbySnapshot, lobbyServerSnapshot);
+  const pianoMenu = useSyncExternalStore(subscribePianoMenu, pianoMenuSnapshot, pianoMenuServerSnapshot);
+  const quietPreview = lobby.playing || pianoMenu.enabled;
   const isArmed = useSyncExternalStore(subscribe, () => armed, () => false);
   const [chart, setChart] = useState<Chart | null>(null);
   const [voice, setVoice] = useState<"piano" | "tones" | null>(null);
@@ -62,6 +67,7 @@ export function SongPreview({ id, best }: { id: string; best?: { rank: Rank; acc
       const c = await loadChart(id).catch(() => null);
       if (!live || !c) return;
       setChart(c);
+      if (quietPreview) return;
       if (!armed) return;
       const out = await output;
       if (!live) return;
@@ -91,7 +97,7 @@ export function SongPreview({ id, best }: { id: string; best?: { rank: Rank; acc
       window.removeEventListener("keydown", onEnter);
       window.removeEventListener("pagehide", end);
     };
-  }, [id, isArmed]);
+  }, [id, isArmed, quietPreview]);
 
   const nps = chart ? difficultyInputs(chart).nps : null;
   return (
@@ -124,7 +130,7 @@ export function SongPreview({ id, best }: { id: string; best?: { rank: Rank; acc
       {/* song-sources: the cited score, one click away; the proof, not setup, so ?capture=1 keeps it */}
       {chart && <SongSource source={chart.source} />}
       <p data-testid="preview-status" data-capture-hide style={status}>
-        {!isArmed ? "Press any key for previews" : voice === "piano" ? "Preview: on the piano" : voice === "tones" ? "Preview: laptop tones" : "\u00a0"}
+        {quietPreview ? "Song previews paused for lobby music / piano menus" : !isArmed ? "Press any key for previews" : voice === "piano" ? "Preview: on the piano" : voice === "tones" ? "Preview: laptop tones" : "\u00a0"}
       </p>
     </div>
   );

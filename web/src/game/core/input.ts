@@ -1,5 +1,6 @@
 import type { InputDevice, InputEvent } from "../../contracts";
 import { KEYS_VELOCITY } from "./settings";
+import { subscribeMidi } from "./midi-hub";
 
 const isBlack = (pitch: number) => [1, 3, 6, 8, 10].includes(pitch % 12);
 
@@ -10,6 +11,7 @@ export function midiDevice(onStatus: (status: string) => void): InputDevice {
   let access: MIDIAccess | null = null;
   const held = new Set<number>();
   let onState: (() => void) | null = null;
+  let unsubscribe: (() => void) | null = null;
   return {
     kind: "midi",
     async start(onEvent) {
@@ -24,7 +26,8 @@ export function midiDevice(onStatus: (status: string) => void): InputDevice {
         input = inputs.find((i) => i.name?.includes("Portable Grand")) ?? inputs[0] ?? null;
         if (!input) return onStatus("MIDI: no device, laptop keys only");
         onStatus(`MIDI: ${input.name}`);
-        input.onmidimessage = (m) => {
+        unsubscribe?.();
+        unsubscribe = subscribeMidi(input, (m) => {
           const d = m.data;
           if (!d || d[0] === 0xfe || d[0] === 0xf8) return;
           const cmd = d[0] & 0xf0;
@@ -32,7 +35,7 @@ export function midiDevice(onStatus: (status: string) => void): InputDevice {
           const on = cmd === 0x90 && d[2] > 0; // note-on with velocity 0 is a release
           if (on) held.add(d[1]); else held.delete(d[1]);
           onEvent({ type: on ? "on" : "off", pitch: d[1], velocity: on ? d[2] : 0, timeMs: m.timeStamp });
-        };
+        });
         onState = () => {
           if (run !== generation || input?.state !== "disconnected") return;
           for (const pitch of held) onEvent({ type: "off", pitch, velocity: 0, timeMs: performance.now(), cancelled: true });
@@ -46,7 +49,8 @@ export function midiDevice(onStatus: (status: string) => void): InputDevice {
     },
     stop() {
       generation++;
-      if (input) input.onmidimessage = null;
+      unsubscribe?.();
+      unsubscribe = null;
       if (onState) access?.removeEventListener?.("statechange", onState);
       held.clear();
       access = null;

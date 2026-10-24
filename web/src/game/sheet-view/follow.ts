@@ -22,6 +22,8 @@ export interface Follower {
   // The beam over this note, colored by sheet-beams' rule from the take's judgments; ink until they all agree.
   paintBeam(noteId: string, judged: ReadonlyMap<string, Judgment>, colors: Record<Judgment, string>, ink: string): void;
   beams: { should: number; beamed: number }; // of the notes a score would beam, how many OSMD drew under a beam
+  // For headless checks: each drawn beam's notes' judgments, and the fill on its SVG.
+  beamAudit(judged: ReadonlyMap<string, Judgment>): { judgments: (Judgment | null)[]; fill: string }[];
 }
 
 export function follow(osmd: OpenSheetMusicDisplay, chart: Chart): Follower {
@@ -51,6 +53,10 @@ export function follow(osmd: OpenSheetMusicDisplay, chart: Chart): Follower {
     if (note) idsOf.set(note, [...(idsOf.get(note) ?? []), id]);
   }
   const beamOf = (id: string) => vf(byId.get(id))?.beam ?? null;
+  const notesOf = (beam: VfBeam) => beam.notes.flatMap((n) => idsOf.get(n) ?? [undefined]);
+  // VexFlow draws each of a beam's lines (one per 8th, 16th…) in a group named for its first note,
+  // "vf-<first StaveNote's id>-beam<n>". OSMD rebuilds its Beam objects after drawing, so not the beam's own id.
+  const lines = (beam: VfBeam) => document.querySelectorAll<SVGGElement>(`[id^="vf-${CSS.escape(beam.notes[0].attrs.id)}-beam"]`);
   const should = shouldBeam(placed, keyAndMeter(chart).meter).flat();
   const beams = { should: should.length, beamed: should.filter((id) => beamOf(id)).length };
 
@@ -90,16 +96,21 @@ export function follow(osmd: OpenSheetMusicDisplay, chart: Chart): Follower {
     paintBeam(noteId, judged, colors, ink) {
       const beam = beamOf(noteId);
       if (!beam) return;
-      const j = beamJudgment(beam.notes.flatMap((n) => idsOf.get(n) ?? [undefined]).map((id) => (id ? judged.get(id) : undefined)));
+      const j = beamJudgment(notesOf(beam).map((id) => (id ? judged.get(id) : undefined)));
       const color = j ? colors[j] : ink;
-      // VexFlow draws each of a beam's lines (one per 8th, 16th…) in a group named for its first note,
-      // "vf-<first StaveNote's id>-beam<n>". OSMD rebuilds its Beam objects after drawing, so not the beam's own id.
-      for (const g of document.querySelectorAll<SVGGElement>(`[id^="vf-${CSS.escape(beam.notes[0].attrs.id)}-beam"]`))
+      for (const g of lines(beam))
         for (const el of [g, ...g.querySelectorAll<SVGElement>("*")]) {
           el.setAttribute("fill", color);
           el.setAttribute("stroke", color);
         }
     },
     beams,
+    beamAudit(judged) {
+      const all = new Set([...byId.keys()].map(beamOf).filter((b): b is VfBeam => !!b));
+      return [...all].map((beam) => ({
+        judgments: notesOf(beam).map((id) => (id && judged.get(id)) || null),
+        fill: lines(beam)[0]?.getAttribute("fill")?.toLowerCase() ?? "none",
+      }));
+    },
   };
 }

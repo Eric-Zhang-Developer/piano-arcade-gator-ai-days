@@ -26,6 +26,7 @@ interface SheetHook {
   cursorMs: number | null;
   colored: Record<Judgment, number>;
   beams: { should: number; beamed: number }; // sheet-beams: notes a score would beam, and how many OSMD did
+  beamAudit: () => { judgments: (Judgment | null)[]; fill: string }[]; // each drawn beam, read when called
 }
 declare global {
   interface Window {
@@ -91,7 +92,12 @@ export function SheetView() {
   const publish = () => {
     const colored = { PERFECT: 0, GREAT: 0, GOOD: 0, MISS: 0 };
     for (const j of paintedRef.current.values()) colored[j]++;
-    window.__pianoArcadeSheet = { cursorMs: clockRef.current, colored, beams: followerRef.current?.beams ?? { should: 0, beamed: 0 } };
+    window.__pianoArcadeSheet = {
+      cursorMs: clockRef.current,
+      colored,
+      beams: followerRef.current?.beams ?? { should: 0, beamed: 0 },
+      beamAudit: () => followerRef.current?.beamAudit(judgedRef.current) ?? [],
+    };
   };
   const paint = (id: string, j: Judgment) => {
     if (followerRef.current?.paint(id, COLORS[j])) paintedRef.current.set(id, j);

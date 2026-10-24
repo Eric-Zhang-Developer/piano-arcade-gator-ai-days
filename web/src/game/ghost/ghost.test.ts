@@ -3,7 +3,8 @@ import { describe, expect, it } from "vitest";
 import type { Chart, Frame, GameEvent } from "../../contracts";
 import { msPerBeat, settings } from "../core/settings";
 import { ghost } from ".";
-import { emptyGhost, ghostKey, ghostOff, recordGhost, yAt } from "./ghost";
+import { pillRect } from "../note-pills";
+import { emptyGhost, ghostKey, ghostOff, ghostOutline, recordGhost, yAt } from "./ghost";
 
 const twinkle: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
 const mpb = msPerBeat(twinkle.bpm);
@@ -20,11 +21,11 @@ const take: GameEvent[] = [
   { type: "noteMiss", noteId: twinkle.notes[2].id, pitch: twinkle.notes[2].pitch, atMs: 1400 },
 ];
 
-// Every dashed outline the plugin draws in one frame, as [x, y, w, h].
+// Every dashed outline the plugin draws in one frame, as [x, y, w, h, radius].
 function outlines(plugin: ReturnType<typeof ghost>, nowMs: number): number[][] {
   const rects: number[][] = [];
   const ctx = new Proxy({} as Record<string, unknown>, {
-    get: (t, k) => (k === "strokeRect" ? (...r: number[]) => rects.push(r) : k in t ? t[k as string] : () => {}),
+    get: (t, k) => (k === "roundRect" ? (...r: number[]) => rects.push(r) : k in t ? t[k as string] : () => {}),
     set: (t, k, v) => ((t[k as string] = v), true),
   }) as unknown as CanvasRenderingContext2D;
   const frame: Frame = { nowMs, lowPitch: 48, highPitch: 84, judgmentLineY: 500, width: 1000, height: 600, keyX: (p) => ({ x: (p - 48) * 20, width: 20 }) };
@@ -74,5 +75,28 @@ describe("ghost", () => {
     p.onEvent!({ type: "songStart", atMs: -4800 });
     expect(outlines(p, 0)).toEqual([]);
     expect([ghostOff("off", null), ghostOff(null, "off"), ghostOff(null, null)]).toEqual([true, true, false]);
+  });
+
+  it("outlines a hit on its pill: pillRect's x and width, the highway's corner rule, on white and black keys", () => {
+    const white = { x: 100, width: 20 };
+    const black = { x: 112, width: 12 };
+    for (const [key, black_] of [[white, false], [black, true]] as const) {
+      const pill = pillRect(key, black_);
+      const o = ghostOutline(key, black_, 0, 200);
+      expect([o.x, o.width]).toEqual([pill.x, pill.width]);
+      expect(o.radius).toBeLessThanOrEqual(Math.min(pill.radius, pill.width / 3));
+    }
+    expect(ghostOutline(white, false, 0, 4).radius).toBe(2); // a short hit: at most half its height
+  });
+
+  it("strokes each hit with roundRect at its outline's numbers", () => {
+    const p = ghost();
+    p.transformChart!(twinkle, new URLSearchParams("song=twinkle"));
+    for (const e of take) p.onEvent!(e);
+    p.onEvent!({ type: "songEnd", atMs: 30_000, results: {} as never });
+    p.onEvent!({ type: "songStart", atMs: -4800 });
+    const [x, y, w, h, r] = outlines(p, 0)[0];
+    const o = ghostOutline({ x: (n0.pitch - 48) * 20, width: 20 }, false, y, y + h);
+    expect([x, w, r]).toEqual([o.x, o.width, o.radius]);
   });
 });

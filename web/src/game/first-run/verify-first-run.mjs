@@ -113,15 +113,19 @@ for (const [w, h] of [
   await page.waitForFunction(() => window.__pianoArcade?.ready === true, null, { timeout: 60_000 });
   const chart = await page.evaluate(() => window.__pianoArcade.chart);
   await page.evaluate(([notes, mpb]) => notes.forEach((n) => window.__pianoArcade.press(n.pitch, n.beat * mpb + 5)), [chart.notes, 60000 / chart.bpm]);
+  // Early in each cue's window (fall from -4800, press from -1500, perfect from the first hit at +5), since a 1080p
+  // screenshot can take a second under load. The cue is read before and after, so a late screenshot still fails.
+  const cueNow = () => page.evaluate(() => window.__pianoArcadeFirstRun?.cue);
   for (const [n, ms, id] of [
-    [1, -4000, "fall"],
-    [2, -1000, "press"],
-    [3, 300, "perfect"],
+    [1, -4600, "fall"],
+    [2, -1400, "press"],
+    [3, 100, "perfect"],
   ]) {
     await chartAt(page, ms);
+    const before = await cueNow();
     await page.screenshot({ path: join(out, `${size}-cue${n}.png`) });
-    const cue = await page.evaluate(() => window.__pianoArcadeFirstRun?.cue);
-    check(cue === id, `${size} 2: cue ${n} at ${ms} ms is ${id} (${cue})`);
+    const after = await cueNow();
+    check(before === id && after === id, `${size} 2: cue ${n} at ${ms} ms is ${id}, in the screenshot too (${before}, then ${after})`);
   }
   await page.getByTestId("results").waitFor({ timeout: 120_000 });
   const seen = await page.evaluate(() => window.__pianoArcadeFirstRun?.seen.join(","));

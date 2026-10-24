@@ -2,6 +2,7 @@
 // This file is the pure part (state, grid phase, frame budget, off switches) and the plugin; three.js is in scene.ts.
 import type { Chart, GameEvent, GamePlugin } from "../../contracts";
 import { hudSettings, tierFor } from "../hud";
+import { blackKeyLaneSettings } from "../black-key-lanes";
 import { msPerBeat, settings as core } from "../core/settings";
 import { makeScene } from "./scene";
 
@@ -126,6 +127,15 @@ export function frameBudget(budgetMs = stageSettings.budgetMs, windowMs = stageS
   };
 }
 
+// ---------- lane cap (pure) ----------
+
+// The stage canvas's opacity. The highway's backdrop lets (1 - stageBackdropAlpha) of the stage through, and a black
+// key's lane lays white at tint over that (black-key-lanes), so its brightest pixel is
+// tint + (1 - tint) × opacity × (1 - stageBackdropAlpha). Cap it at maxLaneLuma, so the lanes stay readable.
+export function stageOpacity(tint = blackKeyLaneSettings.tint): number {
+  return Math.min(1, (stageSettings.maxLaneLuma - tint) / ((1 - tint) * (1 - core.stageBackdropAlpha)));
+}
+
 // ---------- off switches ----------
 
 export function stageOff(params: URLSearchParams): boolean {
@@ -157,10 +167,7 @@ export function feverStage(): GamePlugin {
       if (off || !chart || typeof window === "undefined") return null;
       const bpm = chart.bpm;
       const still = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
-      // The highway's backdrop lets (1 - stageBackdropAlpha) of the stage through; cap the stage so the lanes stay
-      // readable at its brightest.
-      const opacity = Math.min(1, stageSettings.maxLaneLuma / (1 - core.stageBackdropAlpha));
-      const scene = makeScene(el, opacity);
+      const scene = makeScene(el, stageOpacity());
       if (!scene) return null; // no WebGL
       const overBudget = frameBudget();
       const mountedAt = performance.now();

@@ -8,7 +8,10 @@ import { whiteIndex as whiteIndexOf, type Range } from "../highway-zoom";
 import { drawBlackKey, drawWhiteKey } from "../key-skin";
 import { brightness, pillRect } from "../note-pills";
 import { gold, good, handR, miss, whenDisplayFontReady, wrong } from "../ui-tokens";
+import { staticRange } from "./range";
 import { msPerBeat, settings } from "./settings";
+
+export { staticRange } from "./range";
 
 const JUDGMENT_SHOW_MS = 600;
 // Keyed by name, not Record<Judgment>, so a judgment added to the contract doesn't break the build first.
@@ -66,8 +69,6 @@ const reducedMotion = () => (motionQuery ??= typeof matchMedia === "function" ? 
 
 export const isBlack = (pitch: number) => [1, 3, 6, 8, 10].includes(((pitch % 12) + 12) % 12);
 // The white key one step away. A black key's neighbours are always white.
-const whiteBelow = (p: number) => (isBlack(p - 1) ? p - 2 : p - 1);
-const whiteAbove = (p: number) => (isBlack(p + 1) ? p + 2 : p + 1);
 
 const WHITE_IN_OCTAVE = [0, 2, 4, 5, 7, 9, 11];
 const whitePitch = (k: number) => Math.floor(k / 7) * 12 + WHITE_IN_OCTAVE[((k % 7) + 7) % 7]; // inverse of whiteIndex
@@ -75,11 +76,7 @@ const whitePitch = (k: number) => Math.floor(k / 7) * 12 + WHITE_IN_OCTAVE[((k %
 // view (highway-zoom): the visible range in white-key units, [lo, hi), fractional while it eases. The keyboard height
 // stays the whole chart's, so the judgment line never moves while the view pans and zooms. Without a view: today's.
 export function makeLayout(chart: Chart, width: number, height: number, perspective: number, view?: Range): Layout {
-  const pitches = chart.notes.map((n) => n.pitch);
-  const lo = Math.min(...pitches);
-  const hi = Math.max(...pitches);
-  const lowPitch = whiteBelow(isBlack(lo) ? lo - 1 : lo);
-  const highPitch = whiteAbove(isBlack(hi) ? hi + 1 : hi);
+  const { lowPitch, highPitch } = staticRange(chart);
 
   const whiteIndex = new Map<number, number>();
   for (let p = lowPitch; p <= highPitch; p++) if (!isBlack(p)) whiteIndex.set(p, whiteIndex.size);

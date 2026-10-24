@@ -4,7 +4,7 @@ import { execFile } from "node:child_process";
 import { existsSync } from "node:fs";
 import { readdir, readFile, stat } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { buildBoard, parseMilestones, specFrom, type Board, type Ci, type Gh, type Inputs, type OpenPr } from "./board";
+import { buildBoard, parseMilestones, specFrom, type Board, type Ci, type Gh, type AnyPr, type Inputs, type OpenPr } from "./board";
 
 export type GhResult = { code: number; stdout: string; stderr: string };
 export type GhRun = (args: string[]) => Promise<GhResult>;
@@ -111,8 +111,8 @@ export async function collect(opts: { root: string; gh?: GhRun; now?: Date }): P
     "pr", "list", "--state", "open", "--limit", "200",
     "--json", "number,title,body,isDraft,url,createdAt,updatedAt,statusCheckRollup",
   ]);
-  const all = await ghJson<{ number: number; title: string; state: string; createdAt: string; mergedAt: string | null; url: string }[]>([
-    "pr", "list", "--state", "all", "--limit", "1000", "--json", "number,title,state,createdAt,mergedAt,url",
+  const all = await ghJson<AnyPr[]>([
+    "pr", "list", "--state", "all", "--limit", "1000", "--json", "number,title,body,state,createdAt,mergedAt,closedAt,url",
   ]);
   const issues = await ghJson<{ number: number; title: string; url: string; labels: { name: string }[] }[]>([
     "issue", "list", "--state", "open", "--limit", "300", "--json", "number,title,url,labels",

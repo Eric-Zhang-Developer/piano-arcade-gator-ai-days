@@ -14,7 +14,16 @@ export type OpenPr = {
   updatedAt: string;
   ci: Ci;
 };
-export type AnyPr = { number: number; title: string; state: string; createdAt: string; mergedAt: string | null; url: string };
+export type AnyPr = {
+  number: number;
+  title: string;
+  state: string; // OPEN | MERGED | CLOSED
+  createdAt: string;
+  mergedAt: string | null;
+  closedAt: string | null;
+  url: string;
+  body?: string; // for the worker; dropped from the board
+};
 export type Issue = { number: number; title: string; url: string; labels: string[] };
 export type MainRun = { conclusion: string; url: string; updatedAt: string };
 export type Heartbeat = { worker: string; at: string };
@@ -38,9 +47,18 @@ export type Inputs = {
 };
 
 export type State = "done" | "in flight" | "ready" | "blocked" | "backlog" | "cut" | "unknown";
-export type Feature = { slug: string; name: string; state: State; milestone: string | null; assignee: string; pr: string | null };
+export type Feature = {
+  slug: string;
+  name: string;
+  state: State;
+  milestone: string | null;
+  assignee: string;
+  pr: string | null; // its open feat PR
+  dependsOn: string[];
+};
 export type NeedItem = { kind: string; text: string; url: string | null };
 export type CrewPr = { number: number; title: string; url: string; ci: Ci; isDraft: boolean };
+export type BoardPr = Omit<AnyPr, "body"> & { worker: string };
 export type Board = {
   at: string;
   sha: string;
@@ -51,6 +69,7 @@ export type Board = {
   needs: NeedItem[];
   needsUnknown: string[]; // parts of "needs a person" the data can't answer
   crew: { worker: string; prs: CrewPr[] }[] | null;
+  prs: BoardPr[] | null; // every PR, oldest first, for the replay at /attract
   heartbeats: Heartbeat[] | null; // live only; never in a snapshot
   books: {
     milestones: { name: string; done: number; planned: number; cut: number }[];
@@ -152,6 +171,7 @@ export function buildBoard(i: Inputs): Board {
     milestone: milestoneOf(s.slug),
     assignee: s.assignee,
     pr: prOf.get(s.slug) ?? null,
+    dependsOn: s.dependsOn,
   }));
 
   let crew: Board["crew"] = null;
@@ -192,6 +212,10 @@ export function buildBoard(i: Inputs): Board {
     features,
     ...needsPerson(i),
     crew,
+    prs:
+      i.allPrs
+        ?.map(({ body, ...p }) => ({ ...p, worker: workerOf({ title: p.title, body: body ?? "" }) }))
+        .sort((a, b) => a.number - b.number) ?? null,
     heartbeats: i.heartbeats,
     books: {
       milestones: (i.milestones ?? []).map((m) => ({

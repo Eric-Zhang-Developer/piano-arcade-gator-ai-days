@@ -42,6 +42,7 @@ test("in flight comes from open feat(<slug>) PR titles only", () => {
   }));
   expect(b.features.map((f) => f.state)).toEqual(["in flight", "ready"]);
   expect(b.features.map((f) => f.pr)).toEqual(["https://github.com/o/r/pull/1", null]);
+  expect(buildBoard(inputs({ specs: [spec("b", ["a"])] })).features[0].dependsOn).toEqual(["a"]);
 });
 
 test("milestones reader on the real milestones.toml; one spec per feature folder", () => {
@@ -99,7 +100,7 @@ test("needs a person: plan/contract PRs, needs-human and blocked issues, stale d
 
 test("bookkeeping: done of planned per milestone, merged by type, median merge time, longest builds, first PR", () => {
   const merged = (n: number, title: string, mins: number, created = minsBefore(1000)) => ({
-    number: n, title, state: "MERGED", createdAt: created, mergedAt: new Date(Date.parse(created) + mins * 60_000).toISOString(), url: `u${n}`,
+    number: n, title, state: "MERGED", createdAt: created, mergedAt: new Date(Date.parse(created) + mins * 60_000).toISOString(), closedAt: null, url: `u${n}`,
   });
   const b = buildBoard(inputs({
     done: ["a"],
@@ -111,7 +112,7 @@ test("bookkeeping: done of planned per milestone, merged by type, median merge t
       merged(4, "feat(c): c", 60),
       merged(5, "feat(d): d", 20),
       merged(6, 'Revert "feat(d): d"', 5),
-      { number: 7, title: "feat(e): open", state: "OPEN", createdAt: minsBefore(10), mergedAt: null, url: "u7" },
+      { number: 7, title: "feat(e): open", state: "OPEN", createdAt: minsBefore(10), mergedAt: null, closedAt: null, url: "u7" },
     ],
   }));
   expect(b.books.milestones).toEqual([{ name: "m1", done: 1, planned: 2, cut: 1 }]);
@@ -120,7 +121,7 @@ test("bookkeeping: done of planned per milestone, merged by type, median merge t
   expect(b.books.longest?.map((l) => [l.number, l.minutes])).toEqual([[3, 90], [4, 60], [1, 30]]);
   expect(b.books.firstPrAt).toBe(minsBefore(2000));
   const none = buildBoard(inputs({ openPrs: null, allPrs: null }));
-  expect([none.books.mergedByType, none.books.medianMergeMin, none.books.longest, none.books.firstPrAt, none.crew]).toEqual([null, null, null, null, null]);
+  expect([none.books.mergedByType, none.books.medianMergeMin, none.books.longest, none.books.firstPrAt, none.crew, none.prs]).toEqual([null, null, null, null, null, null]);
 });
 
 test("crew groups open PRs by worker", () => {
@@ -180,4 +181,17 @@ test("STOP links to the file on main when any PR says where the repo is", () => 
   const url = (more: Partial<Inputs>) => needsPerson(inputs({ stop: true, ...more })).needs[0].url;
   expect(url({ openPrs: [pr(1, "feat(a): x")] })).toBe("https://github.com/o/r/blob/main/STOP");
   expect(url({ openPrs: null, allPrs: null })).toBeNull();
+});
+
+test("every PR, oldest first, with its worker and no body", () => {
+  const b = buildBoard(inputs({
+    allPrs: [
+      { number: 3, title: "feat(a): x", body: "Worker: eric-1", state: "CLOSED", createdAt: minsBefore(9), mergedAt: null, closedAt: minsBefore(1), url: "u3" },
+      { number: 2, title: "plan: y", state: "MERGED", createdAt: minsBefore(20), mergedAt: minsBefore(10), closedAt: minsBefore(10), url: "u2" },
+    ],
+  }));
+  expect(b.prs).toEqual([
+    { number: 2, title: "plan: y", state: "MERGED", createdAt: minsBefore(20), mergedAt: minsBefore(10), closedAt: minsBefore(10), url: "u2", worker: "planner" },
+    { number: 3, title: "feat(a): x", state: "CLOSED", createdAt: minsBefore(9), mergedAt: null, closedAt: minsBefore(1), url: "u3", worker: "eric-1" },
+  ]);
 });

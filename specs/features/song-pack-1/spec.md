@@ -71,6 +71,9 @@ adds five harder songs with both.
 **The converter:**
 - It refuses a file whose notes fall off a 1/12-beat grid (a performance, not notation), and says how many did.
 - It refuses a chosen track with no notes in the bar range.
+- Each note's `velocity` (dynamics, decided on #181): the note-on velocities if they vary within the chosen notes;
+  else the CC7 (channel volume) value in force on the note's channel at its note-on, clamped to 1–127, if that varies
+  and every note has one; else no `velocity` at all. It says on stderr which rule applied.
 - A self-check in the script (`python3 game-tools/midi-to-chart/convert.py --self-test`) converts a small MIDI file
   it builds in memory and asserts the beats, durations and the meter's `beatsPerBar`.
 - A `README.md` there: install, one example command, and what it refuses.

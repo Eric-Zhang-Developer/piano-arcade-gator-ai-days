@@ -1,8 +1,8 @@
 ## What shipped
-`/` is the song list: every `chart.json` under `web/public/songs/` (any depth), read at build time, sorted by title. Each row shows title, composer · catalog, note count and "Difficulty —". Click, or ↑/↓ and Enter, opens `/play?song=<id>`. Invalid charts are skipped and named in the build log.
+`/` is the song list: every `chart.json` under `web/public/songs/` (any depth), read at build time, easiest first (#182). Since #198 it renders select-layout's `MusicSelect` (cards with jackets and levels) instead of plain rows. Click, or ↑/↓ and Enter, opens `/play?song=<id>`. Invalid charts are skipped and named in the build log.
 
 ## Where it lives
-`web/src/app/page.tsx`, `web/src/game/song-select/load.ts` (+ `load.test.ts`), `web/src/game/song-select/SongList.tsx`
+`web/src/app/page.tsx`, `web/src/game/song-select/load.ts` (+ `load.test.ts`) (the view is `web/src/game/select-layout/`)
 
 ## How to check it
 verify: `pnpm -C /Users/ericzhang/.worktrees/gator-ai-days-2026/song-select/web verify --out /Users/ericzhang/code/hackathons/gator-ai-days-2026/.git/agent-evidence/song-select/20261024T065443Z && node /Users/ericzhang/.worktrees/gator-ai-days-2026/song-select/web/src/game/sim/verify-sim.mjs --out /Users/ericzhang/code/hackathons/gator-ai-days-2026/.git/agent-evidence/song-select/20261024T065443Z/sim` pass at 1cb70c0

@@ -25,7 +25,7 @@ cut = []
 [[milestone]]
 name = "arcade"
 ship = ""
-features = ["song-select", "minuet-g", "operator-board", "piano-sim", "hud", "juice-visual", "juice-sound", "midi-watchdog"]
+features = ["song-select", "minuet-g", "operator-board", "piano-sim", "hud", "ui-foundation", "juice-visual", "juice-sound", "midi-watchdog"]
 cut = []
 
 [[milestone]]

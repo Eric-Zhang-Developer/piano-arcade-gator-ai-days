@@ -2,11 +2,13 @@ import type { GamePlugin } from "../contracts";
 import { barLoop } from "./bar-loop";
 import { chordSync } from "./chord-sync";
 import { chunkPractice } from "./chunk-practice";
+import { easyCharts } from "./easy-charts";
 import { beatTrack } from "./beat";
 import { handColors } from "./hand-colors";
 import { ghost } from "./ghost";
 import { handMode } from "./hand-mode";
 import { hud } from "./hud";
+import { firstRun } from "./first-run";
 import { waitHud } from "./wait-hud";
 import { warningCard } from "./difficulty";
 import { stageCard } from "./stage-card";
@@ -31,6 +33,7 @@ import { weakBars } from "./weak-bars";
 import { feverStage } from "./stage";
 import { takeGraph } from "./take-graph";
 import { cabinet } from "./cabinet/plugin";
+import { demoReset } from "./demo-reset";
 import { versus } from "./versus";
 import { takeMidi } from "./take-midi";
 import { waitMode } from "./wait-mode/plugin";
@@ -42,6 +45,7 @@ import { crashGuard } from "./crash-guard";
 // Open file: each game feature registers its plugin here, one line each. /play draws every plugin's layer on its
 // own canvas above the highway, forwards every GameEvent, and applies transformChart and wrapInput in this order.
 export const plugins: GamePlugin[] = [
+  easyCharts(), // ?level=easy: first, so every later plugin (chunks, loops, hands, bots, the judge) sees the Easy chart
   chunkPractice(), // before bar-loop, so it sees the whole chart to cut into chunks (returns it unchanged)
   barLoop(), // first: every later plugin (the sim's bot included) sees the looped chart
   handMode(), // ?hands=R|L: before scenes and the sim, so their bots and the judge get only the played hand
@@ -55,6 +59,7 @@ export const plugins: GamePlugin[] = [
   juiceVisual(), // under the HUD: wisps and flares never cover the score
   handColors(), // the L/R legend during the count-in, two-hand charts only
   hud(), // before beat-track, so beat-track's status line draws over the HUD's top panel
+  firstRun(), // ?firstrun=1: its text cues draw over the HUD's layer, between the band and the 1 s mark
   waitHud(), // wait mode: LEARN and note n / N in the HUD's band, where the counters and score were
   feverMoment(), // fever's start: the edge flash and a FEVER banner over the HUD band, under beat-track's status line
   beatTrack(),
@@ -78,6 +83,7 @@ export const plugins: GamePlugin[] = [
   warningCard(), // after every transformChart too: the level is the chart the player gets; WARNING at Lv 13+
   stageCard(), // start panel: ARE YOU READY, the jacket, title and level, above Start
   cabinet(), // ?cabinet=1 returns a finished game to /cabinet; ?cabinet=demo starts the demo and reports it
+  demoReset(), // 60 s with no input on a plain take's results (not ?cabinet) loads / clean
   createSavePlugin(queueAndSend), // take-store: saves finished takes after the results screen
   sheetView(), // last: posts the chart as played (after every transformChart) to /sheet; "Sheet music ↗" on the start screen
   crashGuard(), // ?crash=draw|event: a plugin that throws on purpose, for crash-guard's check; inert without ?crash

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { finishRedirect } from "../../../data/auth";
+import { finishRedirect, takeNext } from "../../../data/auth";
 
 // Google sends the player back here after "Keep my progress" or "Sign in with Google". The session arrives in the URL hash.
 export default function AuthCallback() {
@@ -10,7 +10,7 @@ export default function AuthCallback() {
     void finishRedirect(window.location.hash).then((err) => {
       if (err === "redirecting") return; // on to Google sign-in
       if (err) setError(err);
-      else window.location.replace("/progress");
+      else window.location.replace(takeNext()); // the menu, unless sign-in started somewhere else
     });
   }, []);
   return (

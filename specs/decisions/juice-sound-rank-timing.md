@@ -12,3 +12,7 @@ C: hit at `songEnd`, no drumroll.
 combo's fanfare follows the hit by 150 ms so the two don't stack. juice-visual (PR #99) is told the offset.
 
 **How to undo.** Change `rankHitMs` (0 with no drumroll is option C), or schedule from `songStart` for option B.
+
+**Update (rank-stamp).** The rank hit now lands on rank-stamp's impact, `stampImpactMs`: about 1.3 s after `songEnd`,
+or about 2.1 s after a full combo, whose banner the stamp waits for. The 900 ms `rankHitMs` is gone; the drumroll
+fills the gap to the plain stamp's impact (`specs/decisions/rank-stamp-timing.md`).

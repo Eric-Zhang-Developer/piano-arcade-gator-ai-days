@@ -9,6 +9,7 @@ export interface Particle {
   life: number; // ms
   size: number; // px
   bright: number; // 0–1 at birth
+  color?: string; // the hit note's hand color (hand-colors); absent: the note color
 }
 
 export const particleSettings = {
@@ -33,6 +34,7 @@ export function spawn(
   y: number,
   bright: number,
   r: () => number,
+  color?: string,
 ): Particle[] {
   const s = particleSettings;
   const wisp = kind === "wisp";
@@ -45,6 +47,7 @@ export function spawn(
     life: between(r, wisp ? s.wispLifeMs : s.sparkLifeMs),
     size: wisp ? 1.5 + r() * 2 : 1 + r() * 0.8,
     bright,
+    color,
   }));
   const all = [...ps, ...born];
   return all.length > s.cap ? all.slice(all.length - s.cap) : all;

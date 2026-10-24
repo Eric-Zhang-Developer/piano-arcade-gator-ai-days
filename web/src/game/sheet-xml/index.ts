@@ -57,6 +57,18 @@ export function keyAndMeter(chart: Chart, song: Chart = chart): { key: Key; mete
   return { key, meter };
 }
 
+// A pickup's length in beats (sheet-pickups): the song's first note's beat short of a bar, when the table says the
+// source opens with one and that note falls inside bar 1 after beat 0. 0 when `chart` (a hand, a loop) has a note
+// before it. A length that isn't a whole number of 16ths throws, as a bar does.
+export function pickupBeats(chart: Chart, song: Chart = chart): number {
+  if (!overrides[song.id]?.pickup || !song.notes.length) return 0;
+  const first = Math.min(...song.notes.map((n) => n.beat));
+  if (first <= 0 || first >= chart.beatsPerBar || chart.notes.some((n) => n.beat < first)) return 0;
+  const beats = chart.beatsPerBar - first;
+  if (!Number.isInteger(beats * DIVISIONS)) throw new Error(`${chart.id}: a pickup of ${beats} beats isn't a whole number of 16ths`);
+  return beats;
+}
+
 export interface Placed {
   id: string;
   staff: 1 | 2; // 1 treble (right hand), 2 bass (left hand)
@@ -126,6 +138,7 @@ export function chartToMusicXml(chart: Chart, song: Chart = chart): string {
     }
   }
   const bars = Math.max(1, Math.ceil(Math.max(0, ...placed.map((p) => p.end)) / barLen));
+  const pickup = pickupBeats(chart, song) * DIVISIONS; // bar 0 is only the padded first bar's last `pickup` divisions
   const staves: [1 | 2, Chord[]][] = [
     [1, voices(placed, 1)],
     [2, voices(placed, 2)],
@@ -139,8 +152,9 @@ export function chartToMusicXml(chart: Chart, song: Chart = chart): string {
 
   const measures: string[] = [];
   for (let b = 0; b < bars; b++) {
-    const start = b * barLen;
-    const stop = start + barLen;
+    const start = b === 0 && pickup ? barLen - pickup : b * barLen;
+    const stop = (b + 1) * barLen;
+    const len = stop - start;
     const parts: string[] = [];
     for (const [staff, chords] of staves) {
       const used = [...new Set(chords.map((c) => c.voice))].sort((x, y) => x - y);
@@ -150,7 +164,7 @@ export function chartToMusicXml(chart: Chart, song: Chart = chart): string {
         const here = chords.filter((c) => c.voice === v && c.end > start && c.onset < stop);
         if (v !== first && !here.length) continue;
         if (v === first && !here.length) {
-          parts.push(`<note><rest measure="yes"/><duration>${barLen}</duration><voice>${v}</voice><staff>${staff}</staff></note>`);
+          parts.push(`<note><rest measure="yes"/><duration>${len}</duration><voice>${v}</voice><staff>${staff}</staff></note>`);
           continue;
         }
         let at = start;
@@ -183,7 +197,8 @@ export function chartToMusicXml(chart: Chart, song: Chart = chart): string {
           `<time><beats>${meter.beats}</beats><beat-type>${meter.beatType}</beat-type></time><staves>2</staves>` +
           `<clef number="1"><sign>G</sign><line>2</line></clef><clef number="2"><sign>F</sign><line>4</line></clef></attributes>`
         : "";
-    measures.push(`<measure number="${b + 1}">${attributes}${parts.join(`<backup><duration>${barLen}</duration></backup>`)}</measure>`);
+    const head = pickup && !b ? `<measure number="0" implicit="yes">` : `<measure number="${pickup ? b : b + 1}">`;
+    measures.push(`${head}${attributes}${parts.join(`<backup><duration>${len}</duration></backup>`)}</measure>`);
   }
 
   return (

@@ -1,11 +1,13 @@
 import type { GamePlugin } from "../contracts";
 import { barLoop } from "./bar-loop";
 import { chordSync } from "./chord-sync";
+import { chunkPractice } from "./chunk-practice";
 import { beatTrack } from "./beat";
 import { handColors } from "./hand-colors";
 import { ghost } from "./ghost";
 import { handMode } from "./hand-mode";
 import { hud } from "./hud";
+import { waitHud } from "./wait-hud";
 import { warningCard } from "./difficulty";
 import { stageCard } from "./stage-card";
 import { feverGauge } from "./fever-gauge";
@@ -33,6 +35,7 @@ import { waitMode } from "./wait-mode/plugin";
 // Open file: each game feature registers its plugin here, one line each. /play draws every plugin's layer on its
 // own canvas above the highway, forwards every GameEvent, and applies transformChart and wrapInput in this order.
 export const plugins: GamePlugin[] = [
+  chunkPractice(), // before bar-loop, so it sees the whole chart to cut into chunks (returns it unchanged)
   barLoop(), // first: every later plugin (the sim's bot included) sees the looped chart
   handMode(), // ?hands=R|L: before scenes and the sim, so their bots and the judge get only the played hand
   versus(), // ?versus=1: before scenes and the sim, so their bots and the judge get both players' copies
@@ -43,6 +46,7 @@ export const plugins: GamePlugin[] = [
   juiceVisual(), // under the HUD: wisps and flares never cover the score
   handColors(), // the L/R legend during the count-in, two-hand charts only
   hud(), // before beat-track, so beat-track's status line draws over the HUD's top panel
+  waitHud(), // wait mode: LEARN and note n / N in the HUD's band, where the counters and score were
   beatTrack(),
   midiWatchdog(), // reconnects a piano that goes silent mid-song
   waitMode(), // start panel: Learn it first; results panel after a wait-mode take: Play it judged, on top

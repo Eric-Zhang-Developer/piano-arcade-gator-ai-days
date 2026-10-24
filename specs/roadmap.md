@@ -24,11 +24,16 @@ the order only: `start` in `milestones.toml` is empty, so no deadlines are enfor
 lane's person fills them in, sets an `assignee` and adds them to a milestone. The game lane provides `Results`,
 `Take` and `Chart` (`web/src/contracts/`) and the `bar-loop` link.
 
+## Lights
+Milestone **lights**, between `arcade` and `submission`: `led-strip` (Sharan) and `led-game` (Eric). The keys light
+up: the next note glows before it arrives, and every hit shows on the piano itself. `led-strip` needs no game and
+can start now.
+
 ## Open
 - The challenge statement's technology (first public in the past 12 months, central to the project) isn't chosen.
 - The learning lane's person and GitHub handle, for `AGENTS.md` Lanes and `.github/CODEOWNERS`.
 - Flat or mild perspective: Eric decides after playing both (`core-loop`'s perspective setting).
 
 ## Not doing
-See `mission.md` Not doing. Also out for now: the mascot (a Maybe if there's time), the LED strip, the in-app camera
+See `mission.md` Not doing. Also out for now: the mascot (a Maybe if there's time), the in-app camera
 overlay (the overhead hands shot is made in the video edit), and "Golden" unless `song-rip-spike` passes.

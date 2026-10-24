@@ -50,19 +50,31 @@ for (let end = Date.now() + 120_000; ; ) {
   await new Promise((r) => setTimeout(r, 500));
 }
 
-// In the page: every frame from the first toast until it's gone, its box and text.
+// In the page: when the first toast is put in the DOM and when the last one leaves it, timed exactly by a
+// MutationObserver (an animation-frame poll is up to a frame late, 30–50 ms on a CI runner: #432), and every frame's
+// box and text while it shows.
 const TRACK = `new Promise((done) => {
   const samples = [];
   let seenAt = null;
-  const tick = () => {
-    const t = document.querySelector('[data-testid="toast"]');
+  let goneAt = null;
+  const toastIn = (n) => n.nodeType === 1 && (n.matches('[data-testid="toast"]') || n.querySelector('[data-testid="toast"]'));
+  const watch = new MutationObserver((records) => {
     const now = performance.now();
+    if (seenAt === null && records.some((r) => [...r.addedNodes].some(toastIn))) seenAt = now;
+    if (seenAt !== null && !document.querySelector('[data-testid="toast"]')) {
+      goneAt = now;
+      watch.disconnect();
+    }
+  });
+  watch.observe(document, { childList: true, subtree: true });
+  const tick = () => {
+    if (goneAt !== null) return done({ samples, goneMs: goneAt - seenAt });
+    const t = document.querySelector('[data-testid="toast"]');
     if (t) {
-      seenAt ??= now;
       const r = t.getBoundingClientRect();
-      samples.push({ ms: now - seenAt, left: r.left, right: r.right, top: r.top, bottom: r.bottom, text: t.textContent,
+      samples.push({ ms: performance.now() - seenAt, left: r.left, right: r.right, top: r.top, bottom: r.bottom, text: t.textContent,
         font: parseFloat(getComputedStyle(t).fontSize), count: document.querySelectorAll('[data-testid="toast"]').length });
-    } else if (seenAt !== null) return done({ samples, goneMs: now - seenAt });
+    }
     requestAnimationFrame(tick);
   };
   tick();

@@ -1,6 +1,7 @@
 // The highway: a flat-or-mildly-tilted lane per key, notes falling to the keyboard. Canvas 2D, no React.
 import type { Chart, Frame, Hand, Judgment } from "../../contracts";
 import { noteColorFor } from "../hand-colors";
+import { hitLinePath } from "../hit-line";
 import { whiteIndex as whiteIndexOf, type Range } from "../highway-zoom";
 import { brightness, pillRect } from "../note-pills";
 import { msPerBeat, settings } from "./settings";
@@ -33,6 +34,10 @@ export interface HighwayState {
   countInBeat: number | null; // 1..countInBeats while counting in, else null
   backdropAlpha?: number; // below 1 while a background layer is mounted; default opaque
 }
+
+// Read once and kept live, so a frame doesn't build a new query; absent (tests, server) means motion is fine.
+let motionQuery: MediaQueryList | undefined;
+const reducedMotion = () => (motionQuery ??= typeof matchMedia === "function" ? matchMedia("(prefers-reduced-motion: reduce)") : undefined)?.matches ?? false;
 
 export const isBlack = (pitch: number) => [1, 3, 6, 8, 10].includes(((pitch % 12) + 12) % 12);
 // The white key one step away. A black key's neighbours are always white.
@@ -198,8 +203,47 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
     ctx.fillStyle = s.pressed.has(p) ? lit(p) : "#16161a";
     ctx.fillRect(k.x, line, k.width, kbH * 0.62);
   }
-  ctx.fillStyle = settings.noteColor;
-  ctx.fillRect(0, line - 1, L.width, 2);
+  // The hit line (hit-line): a gently moving white stroke with a soft glow, brighter over each pressed key in that
+  // key's light. Flat under reduced motion.
+  const path = hitLinePath(L.width, s.nowMs, reducedMotion());
+  const trace = () => {
+    ctx.beginPath();
+    path.forEach((p, i) => (i ? ctx.lineTo(p.x, line + p.dy) : ctx.moveTo(p.x, line + p.dy)));
+  };
+  ctx.save();
+  // A soft shadow on the key tops, so the white line reads against white keys.
+  const shade = ctx.createLinearGradient(0, line, 0, line + 8);
+  shade.addColorStop(0, "rgba(0,0,0,0.6)");
+  shade.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = shade;
+  ctx.fillRect(0, line, L.width, 8);
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  trace();
+  ctx.strokeStyle = "rgba(255,255,255,0.6)";
+  ctx.lineWidth = 3;
+  ctx.shadowColor = "rgba(255,255,255,0.8)";
+  ctx.shadowBlur = 10;
+  ctx.stroke();
+  for (const p of s.pressed) {
+    const k = L.keyX(p);
+    const cx = k.x + k.width / 2;
+    const glow = ctx.createRadialGradient(cx, line, 0, cx, line, k.width * 1.2);
+    glow.addColorStop(0, "rgba(255,255,255,0.95)");
+    glow.addColorStop(0.3, lit(p));
+    glow.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.ellipse(cx, line, k.width * 1.2, 10, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.shadowBlur = 0;
+  trace();
+  ctx.strokeStyle = settings.noteHeadColor;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.restore();
 
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";

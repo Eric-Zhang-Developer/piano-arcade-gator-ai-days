@@ -8,7 +8,8 @@ the order only: `start` in `milestones.toml` is empty, so no deadlines are enfor
 ## Milestones
 - **playable:** `core-loop`. Twinkle plays on the real piano and on laptop keys, every note judged, with a results
   screen. The skeleton and the shared formats everyone builds on.
-- **audible:** `beat-track`. A drum beat on the piano from count-in to the end, so players can hear the time.
+- **audible:** `beat-track`, `timing-feedback`. A drum beat on the piano from count-in to the end, so players can
+  hear the time; then the results screen says how early or late they played.
   Added after the first playtest (`specs/context/findings.md`): without it the game was unplayable.
 - **arcade:** `piano-sim`, `hud`, `juice-visual`, `juice-sound`, `midi-watchdog`. It feels like an arcade, MIDI
   features are testable without the piano, and the one known MIDI risk is handled. These run in parallel once

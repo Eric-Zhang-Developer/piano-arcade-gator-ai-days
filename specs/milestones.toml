@@ -19,7 +19,7 @@ cut = []
 [[milestone]]
 name = "audible"
 ship = ""
-features = ["beat-track"]
+features = ["beat-track", "timing-feedback"]
 cut = []
 
 [[milestone]]

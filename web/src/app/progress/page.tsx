@@ -93,7 +93,8 @@ function ProgressPage() {
         } catch {
           // offline: fall through to this device's takes
         }
-        if (live) setNote("Couldn't reach the server, so this shows the takes saved on this device.");
+        // Saving isn't affected (takes wait in the outbox); only reading the account's history failed.
+        if (live) setNote("Your account's history didn't load just now, so this shows the takes saved in this browser. Refresh to try again.");
       }
       const local = await localData(song);
       if (live) {

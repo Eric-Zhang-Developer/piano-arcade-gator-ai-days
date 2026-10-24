@@ -74,7 +74,7 @@ const state = (page) =>
       covers: !!r && r.left <= 0 && r.top <= 0 && r.right >= innerWidth && r.bottom >= innerHeight,
       links,
       focusInCard: !!g && g.contains(document.activeElement) && document.activeElement === g.querySelector("a"),
-      focusFirstSong: document.activeElement === document.querySelector('[data-testid^="song-"]'),
+      focusFirstSong: document.activeElement === document.querySelector('ol a[data-testid^="song-"]'), // not song-preview
     };
   });
 const settle = (page) => page.waitForTimeout(1500); // hydration and the focus effect

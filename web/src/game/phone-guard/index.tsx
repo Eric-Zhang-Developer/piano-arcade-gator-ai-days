@@ -32,6 +32,13 @@ export function PhoneGuard() {
     }
     if (stored) card.current?.setAttribute("data-ok", "");
     else if (window.matchMedia(PHONE_QUERY).matches) first.current?.focus();
+    // A modal keeps focus while it shows: /play focuses its own controls once the chart loads, behind the card.
+    const keep = (e: FocusEvent) => {
+      const c = card.current;
+      if (c && !c.hasAttribute("data-ok") && window.matchMedia(PHONE_QUERY).matches && !c.contains(e.target as Node)) first.current?.focus();
+    };
+    document.addEventListener("focusin", keep);
+    return () => document.removeEventListener("focusin", keep);
   }, [path]);
 
   if (!phoneGuardSettings.routes.includes(path)) return null;

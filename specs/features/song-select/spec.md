@@ -9,6 +9,11 @@ assignee: "eric"
 
 The front door, and a 3-second shot in the video. It reads like a concert program: piece, composer, catalog number.
 
+## Plan
+1. If `/play` still ignores `?song` (it was hardcoded to Twinkle, #75), first make the `fix(core-loop)` PR that
+   core-loop's spec now requires. `/play` is core-loop's, so song select's own PR can't change it.
+2. Then build the list.
+
 ## Requirements
 - `/` lists every chart under `web/public/songs/` (any `chart.json`, at any depth, including the chart compiler's
   `library/` folder), read at build time, so there's no index file to keep in sync.
@@ -19,6 +24,7 @@ The front door, and a 3-second shot in the video. It reads like a concert progra
 
 ## Validation
 - Vitest: the chart loader returns every valid chart and skips (and reports) an invalid one.
+- In Chrome: open `/`, pick each row in turn -> `/play` loads that song, not Twinkle every time.
 - `verify.py`: the verify run opens `/`, selects Twinkle and reaches `/play`.
 
 ## Defaults

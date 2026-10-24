@@ -49,6 +49,10 @@ look). Copy the spike's lessons, not its code.
 `source`. Don't write the notes from memory. If you can't get a source, file a `needs-human` issue and leave the chart
 for Eric. Eric checks it by playing.
 
+**Songs** (added after core-loop shipped, #75): `/play?song=<id>` loads `/songs/<id>/chart.json`. With no `song`
+it loads Twinkle. An unknown id shows a clear message and a link to `/`, never a blank page. `?input=test` and the
+verify script keep working. This lands as a `fix(core-loop)` PR.
+
 **Input:**
 - MIDI: Chrome Web MIDI. Pick the port whose name contains "Portable Grand", else the first input. Ignore `0xFE` and
   `0xF8`. A note-on with velocity 0 is a release. Use the message's `timeStamp` for time.

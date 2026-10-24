@@ -2,7 +2,7 @@
 
 An arcade rhythm game played on a real 88-key piano (a Yamaha DGX-660) in Chrome. Notes fall toward the keys,
 every note you play is judged against the chart's clock to the millisecond, and the results screen shows how you
-played it: PERFECT, GREAT, MISS and extras, how early or late, combo and rank. A learning lane will read your takes
+played it: note judgments, timing, combo and rank. A learning lane will read your takes
 and tell you what to practice next.
 
 Built at Gator Hack V (UF AI Days, Oct 23 to 25, 2026). Why we're building it and what's out of scope:
@@ -15,7 +15,7 @@ Needs Node.js, pnpm (pinned in `web/package.json`; run `corepack enable` once) a
 ```bash
 cd web
 pnpm install
-pnpm dev            # http://localhost:3000 redirects to /play
+pnpm dev            # http://localhost:3000 opens the song selector
 ```
 
 | Route | What it is |
@@ -23,8 +23,19 @@ pnpm dev            # http://localhost:3000 redirects to /play
 | `/play` | The game. Plug a MIDI piano in over USB and Chrome asks for MIDI access. With no piano, the home row plays the white keys (`A` through `;`) and the row above plays the black keys between them. |
 | `/play?midi=sim` | The game on a virtual DGX-660 instead of real MIDI. |
 | `/sim` | The piano simulator: the game, a virtual keyboard, a raw MIDI log, fault buttons (stall, unplug, jitter, stuck note) and a bot that plays the song perfectly. `/sim?record` records a real piano into a test fixture. |
+| `/learn` or `/learn/understand` | Desktop learning preview: questions beside a music/reference workspace. Listen to phrases, check choices and compare your explanation with a reference. |
+| `/learn/practice` | Scripted practice preview with tempo and note-name controls, self-reported repetitions and gradual support removal. |
+| `/learn/review` | Theory recall; the reference unlocks after submitting each answer. |
+| `/learn/play-through` | A count-in and silent full-melody playhead, followed by illustrative feedback. |
 
 Web MIDI works in Chrome only. Laptop keys always work, so the game is playable with the piano unplugged.
+
+The learning preview is separate from the arcade. Open `/learn` directly and use its four activity links.
+It does not record or grade piano input, save learning progress, sync an account or connect to AI grading.
+Activity state is in memory, not persistent storage; leaving the activity or reloading resets it.
+A temporary connection loss hides the activity and stops audio, count-ins and preview takes, but keeps answers,
+history, practice settings and completed results. Reconnect to continue; interrupted playback must be restarted.
+Detailed requirements and learning-specific checks live in the [learning UI spec](specs/features/learning-ui/spec.md).
 
 ## How it works
 
@@ -40,10 +51,10 @@ Web MIDI works in Chrome only. Laptop keys always work, so the game is playable 
 - **Charts** are JSON files in `web/public/songs/<id>/chart.json`, each citing its source score. Twinkle is the
   first one.
 - **Judging** (`web/src/game/core/judge.ts`) is a pure function of the chart and the key presses, after the
-  latency offset: PERFECT within 25 ms, GREAT within 50 ms, MISS when no key of the same pitch arrives in time. A
-  key press that matches no note is an extra, never a MISS. The same judge runs in tests with synthetic players.
-- **Rendering** is one 2D canvas per layer on `requestAnimationFrame`. Per-frame game state lives in refs, not React
-  state. React draws menus and the results screen only.
+  latency offset. Judgment tiers and matching rules are defined in [the mission](specs/mission.md#non-negotiables).
+  The same judge runs in tests with synthetic players.
+- **Game rendering** is one 2D canvas per layer on `requestAnimationFrame`. Per-frame game state lives in refs,
+  not React state. React handles the surrounding UI and the learning preview.
 - **Sound** is scheduled ahead on the chart clock. The beat track (`web/src/game/beat/`) sends a drum beat to the
   piano's own drum kit over MIDI out from the count-in to the end, and falls back to laptop clicks with no piano.
 - **Plug-in layers.** Each game feature registers itself with one line in `web/src/game/layers.ts`, so features
@@ -59,7 +70,8 @@ Stack: Next.js (App Router) and TypeScript, pnpm, Vitest, Playwright. Details: [
 |---|---|
 | `web/src/game/` | Game lane: clock, input, judging, highway (`core/`), beat track, timing feedback, piano simulator |
 | `web/src/contracts/` | Frozen shared formats |
-| `web/src/app/` | Next.js routes (`/play`, `/sim`) |
+| `web/src/app/` | Next.js routes; see [Run it](#run-it) for entry points |
+| `web/src/learn/frontend/` | Learning preview components, lesson content and scripted practice state |
 | `web/public/songs/` | One folder per chart |
 | `web/e2e/verify.mjs` | Starts the app, plays Twinkle headless as the perfect player, fails unless every note is PERFECT |
 | `specs/` | The source of truth: mission, tech stack, roadmap, milestones, one folder per feature, decisions, playtest findings |

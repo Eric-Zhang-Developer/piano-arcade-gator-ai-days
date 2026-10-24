@@ -105,3 +105,12 @@ test("pause silences the laptop clicks, queued ones included; resume brings them
   expect(starts[1]).toBeCloseTo((600 - 500) / 1000); // 100 ms after the resume, on the beat
   vi.restoreAllMocks();
 });
+
+test("?mode=wait plays no beat: the clock stops at every note", () => {
+  const AudioContext = vi.fn();
+  vi.stubGlobal("AudioContext", AudioContext);
+  const plugin = beatTrack();
+  plugin.transformChart!(chart, new URLSearchParams("mode=wait"));
+  plugin.onEvent!({ type: "songStart", atMs: -count * mpb });
+  expect(AudioContext).not.toHaveBeenCalled();
+});

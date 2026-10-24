@@ -14,6 +14,7 @@ export const resultsLayoutSettings = {
   practiceFeatured: ["chunk-practice"], // a practice=1 take: chunk practice's way on in place of the graph (#294)
   newRecordFeatured: ["record-moment"], // a NEW RECORD take: the moment alone; at 1280×720 the graph pushed Retry off
   // the first view, so it moves to the details for that take (spec: record-moment, First view)
+  demoFeatured: ["watch-demo"], // a demo=1 take: its way back to the songs, so its focused button scrolls nothing
   actions: ["piano-out", "wait-mode"], // panels that are buttons: they join Retry and Songs
   names: { "take-midi": "MIDI", "replay-view": "Replay", "weak-bars": "Phrases", "tempo-curve": "Tempo" } as Record<string, string>,
 };
@@ -28,9 +29,11 @@ export function panelName(id: string): string {
 export const featuredFor = (params: URLSearchParams, newRecord = false) =>
   params.get("practice") === "1"
     ? resultsLayoutSettings.practiceFeatured
-    : newRecord
-      ? resultsLayoutSettings.newRecordFeatured
-      : resultsLayoutSettings.featured;
+    : params.get("demo") === "1"
+      ? resultsLayoutSettings.demoFeatured
+      : newRecord
+        ? resultsLayoutSettings.newRecordFeatured
+        : resultsLayoutSettings.featured;
 
 export function countRows(results: Results): { label: string; id: string; value: number; tone: string }[] {
   const { counts } = results;

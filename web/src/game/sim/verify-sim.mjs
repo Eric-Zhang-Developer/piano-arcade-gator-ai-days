@@ -1,4 +1,4 @@
-// Headless proof of the MIDI path: /play?midi=sim, the bot plays Twinkle as raw bytes through the fake piano and
+// Headless proof of the MIDI path: /sim's "Watch the bot" plays Twinkle as raw bytes through the fake piano and
 // core's real MIDI input, and every note must judge PERFECT. Web MIDI itself is never touched, so it runs headless.
 // Usage: node web/src/game/sim/verify-sim.mjs --out <dir>
 import { spawn } from "node:child_process";
@@ -48,34 +48,30 @@ for (let end = Date.now() + 120_000; ; ) {
 const browser = await chromium.launch({ headless: true });
 const fail = [];
 try {
-  const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
-  // A second page on the same origin plays the /sim side of the channel.
-  const control = await context.newPage();
-  await control.goto(`${base}/`);
-  await control.evaluate(() => {
-    window.__sim = [];
-    window.__ch = new BroadcastChannel("pianoArcade.sim");
-    window.__ch.onmessage = (e) => e.data.simId === "verify" && window.__sim.push(e.data);
-  });
-  const game = await context.newPage();
+  const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   const errors = [];
-  game.on("pageerror", (e) => errors.push(e.message));
-  await game.goto(`${base}/play?midi=sim&simId=verify`);
-  await control.waitForFunction(() => window.__sim.some((m) => m.type === "ready"), null, { timeout: 60_000 });
-  await control.evaluate(() => window.__ch.postMessage({ simId: "verify", type: "bot" }));
-  say("verify-sim: bot armed, game started");
+  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+  await page.goto(`${base}/sim`);
+  const bot = page.getByRole("button", { name: "Watch the bot" });
+  await bot.waitFor();
+  await page.waitForFunction(() => [...document.querySelectorAll("button")].some((b) => b.textContent === "Watch the bot" && !b.disabled), null, { timeout: 60_000 });
+  await bot.click();
+  say("verify-sim: clicked Watch the bot on /sim");
 
-  await game.waitForSelector('[data-testid="results"]', { timeout: 90_000 });
-  await game.screenshot({ path: join(out, "results.png") });
+  const game = page.frameLocator('iframe[title="game"]');
+  await game.locator('[data-testid="results"]').waitFor({ timeout: 90_000 });
+  await page.screenshot({ path: join(out, "sim-results.png") });
   const dom = {};
-  for (const k of ["PERFECT", "GREAT", "MISS", "extra"]) dom[k] = Number(await game.textContent(`[data-testid="count-${k}"]`));
-  const status = await game.textContent("main");
-  const logged = await control.evaluate(() => window.__sim.filter((m) => m.type === "log" && m.log.kind === "message").length);
+  for (const k of ["PERFECT", "GREAT", "MISS", "extra"]) dom[k] = Number(await game.locator(`[data-testid="count-${k}"]`).textContent());
+  const status = await game.locator("main").textContent();
+  const types = await page.locator('[data-testid="midi-log"] tbody tr td:nth-child(4)').allTextContents();
+  const logged = types.filter((t) => t === "note_on" || t === "release(v0)").length;
   writeFileSync(join(out, "results.json"), JSON.stringify({ dom, logged, errors }, null, 2));
 
   const n = (await (await fetch(`${base}/songs/twinkle/chart.json`)).json()).notes.length;
   if (dom.PERFECT !== n || dom.MISS || dom.extra) fail.push(`screen ${JSON.stringify(dom)}, want ${n} PERFECT`);
-  if (logged !== 2 * n) fail.push(`fake delivered ${logged} messages, want ${2 * n} (on + release per note)`);
+  if (logged !== 2 * n) fail.push(`/sim log shows ${logged} key messages, want ${2 * n} (on + release per note)`);
   if (!status?.includes("MIDI: Portable Grand")) fail.push("game didn't pick the fake Portable Grand");
   if (errors.length) fail.push(`page errors: ${errors.join("; ")}`);
   if (!fail.length) say(`verify-sim: pass, ${n}/${n} PERFECT through the MIDI path (evidence: ${out})`);

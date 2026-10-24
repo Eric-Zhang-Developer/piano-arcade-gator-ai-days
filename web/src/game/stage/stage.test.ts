@@ -22,6 +22,13 @@ describe("reduceStage", () => {
     expect(look(emptyStage(), 0).heat).toBe(0);
   });
 
+  it("flashes the grid on feverStart, as on a count-in beat, and not on feverEnd", () => {
+    const on = run([{ type: "feverStart", atMs: 1000 }]);
+    expect(look(on, 1000).flash).toBeGreaterThan(0);
+    expect(look(on, 1000 + stageSettings.flashMs).flash).toBe(0);
+    expect(reduceStage(on, { type: "feverEnd", atMs: 5000 }).flashAtMs).toBe(1000);
+  });
+
   it("dips on a miss and on a WRONG for about 300 ms, and drops the speed to tier 1", () => {
     for (const bad of [
       { type: "noteMiss", noteId: "n", pitch: 60, atMs: 2000 },

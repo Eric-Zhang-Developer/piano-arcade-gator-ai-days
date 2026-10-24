@@ -15,22 +15,25 @@ export interface LoopPlan {
   tempo: number; // percent of the chart's bpm
   passes: number;
   passBeats: number; // one pass plus its one-bar count-in gap
+  whole: boolean; // tempo alone: the whole song once at that tempo (song-options' Speed), not a practice loop
   notesPerPass: number;
 }
 
 const int = (v: string | null) => (v !== null && /^\d+$/.test(v) ? Number(v) : NaN);
 
 // Pure: bars from..to of the chart, re-timed to tempo%, repeated `passes` times with an empty bar before each repeat.
-// Returns null when the URL asks for no loop; throws (shown by /play as its error) for a bad request.
+// Returns null when the URL asks for no loop; throws (shown by /play as its error) for a bad request. tempo with no
+// from or to is the whole song, once, at that tempo.
 export function loopChart(chart: Chart, params: URLSearchParams): { chart: Chart; plan: LoopPlan } | null {
-  if (!params.has("from") && !params.has("to")) return null;
+  const whole = !params.has("from") && !params.has("to");
+  if (whole && !params.has("tempo")) return null;
   const s = barLoopSettings;
-  const from = int(params.get("from"));
-  const to = int(params.get("to"));
-  const tempo = params.has("tempo") ? int(params.get("tempo")) : 100;
-  const passes = params.has("passes") ? int(params.get("passes")) : s.defaultPasses;
   const bpb = chart.beatsPerBar;
   const bars = Math.ceil(Math.max(...chart.notes.map((n) => n.beat + n.duration)) / bpb);
+  const from = whole ? 1 : int(params.get("from"));
+  const to = whole ? bars : int(params.get("to"));
+  const tempo = params.has("tempo") ? int(params.get("tempo")) : 100;
+  const passes = params.has("passes") ? int(params.get("passes")) : whole ? 1 : s.defaultPasses;
   if (!(from >= 1 && to >= from && to <= bars))
     throw new Error(`Bar loop: bars ${params.get("from")}–${params.get("to")} aren't in this chart (bars 1–${bars})`);
   if (!(tempo >= s.tempoMin && tempo <= s.tempoMax)) throw new Error(`Bar loop: tempo must be ${s.tempoMin}–${s.tempoMax}%`);
@@ -49,10 +52,10 @@ export function loopChart(chart: Chart, params: URLSearchParams): { chart: Chart
       duration: Math.min(n.duration, end - n.beat), // a note held past the last bar stops at it
     })),
   ).flat();
-  const title = `${chart.title} · bars ${from}–${to} at ${tempo}%`;
+  const title = whole ? `${chart.title} · ${tempo}%` : `${chart.title} · bars ${from}–${to} at ${tempo}%`;
   return {
     chart: { ...chart, title, bpm: (chart.bpm * tempo) / 100, notes },
-    plan: { from, to, tempo, passes, passBeats, notesPerPass: inRange.length },
+    plan: { from, to, tempo, passes, passBeats, notesPerPass: inRange.length, whole },
   };
 }
 
@@ -99,7 +102,7 @@ export function barLoop(): GamePlugin & { passes(): number[] } {
         const k = Math.floor(e.atMs / (plan.passBeats * msPerBeat(bpm)));
         if (tally[k]) tally[k].wrong++;
       }
-      if (e.type === "songEnd" && !wait) showPasses(accuracies());
+      if (e.type === "songEnd" && !wait && !(plan.whole && plan.passes === 1)) showPasses(accuracies()); // one pass: the results say it
     },
   };
 }

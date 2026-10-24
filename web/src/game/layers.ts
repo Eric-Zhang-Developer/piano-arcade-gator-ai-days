@@ -42,6 +42,7 @@ import { takeMidi } from "./take-midi";
 import { waitMode } from "./wait-mode/plugin";
 import { waitHint } from "./wait-hint";
 import { sheetView } from "./sheet-view/plugin";
+import { leds } from "./leds";
 import { createSavePlugin, queueAndSend } from "../data/save-plugin";
 import { crashGuard } from "./crash-guard";
 
@@ -92,5 +93,6 @@ export const plugins: GamePlugin[] = [
   demoReset(), // 60 s with no input on a plain take's results (not ?cabinet) loads / clean
   createSavePlugin(queueAndSend), // take-store: saves finished takes after the results screen
   sheetView(), // last: posts the chart as played (after every transformChart) to /sheet; "Sheet music ↗" on the start screen
+  leds(), // after every transformChart: guide lights, hits and misses on the LED strip; "Connect lights" on the start screen
   crashGuard(), // ?crash=draw|event: a plugin that throws on purpose, for crash-guard's check; inert without ?crash
 ];

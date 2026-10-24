@@ -53,7 +53,6 @@ export default function Play() {
   const [latency, setLatency] = useState(0);
   const [midiStatus, setMidiStatus] = useState("MIDI: connects when you press Start");
   const [isTest, setIsTest] = useState(false);
-  const [title, setTitle] = useState("");
   const [take, setTake] = useState<Take | null>(null);
   const [loaded, setLoaded] = useState<{ chart: Chart; params: URLSearchParams } | null>(null); // for the panels
   const [pauseMode, setPauseMode] = useState<PauseMode>("playing");
@@ -86,7 +85,6 @@ export default function Play() {
         const problems = validateChart(raw);
         if (problems.length) throw new Error(`Bad chart: ${problems.join("; ")}`);
         chartRef.current = plugins.reduce((c, p) => p.transformChart?.(c, params) ?? c, raw as Chart);
-        setTitle(chartRef.current.title);
         setLoaded({ chart: chartRef.current, params });
         setLatency(latencyRef.current);
         setIsTest(params.get("input") === "test");
@@ -368,7 +366,6 @@ export default function Play() {
           )}
           {phase === "ready" && (
             <>
-              <h1 style={{ margin: 0 }}>{title}</h1>
               <p style={{ opacity: 0.7 }}>Laptop keys: A S D F G H J K L ; (white) · W E T Y U O P (black)</p>
               <button style={button} onClick={start} autoFocus>
                 Start

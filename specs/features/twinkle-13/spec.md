@@ -15,9 +15,8 @@ This is throwaway evidence, like `piano-midi-spike`. No feature imports from `sp
 worker picks it up: a session Eric starts runs it.
 
 ## Plan
-1. **Source:** get a public-domain machine-readable score of K. 265 (MusicXML or MIDI). IMSLP lists a MIDI from the
-   Werner Icking collection. Check the exact file's license before using it, and record the URL and license.
-   If no file's license allows it, stop and file a `needs-human` issue.
+1. **Source:** get a machine-readable score of K. 265 (MusicXML or MIDI) under any license decision 003 allows for
+   committed files. Record the URL and license, and credit it in `CREDITS.md`.
 2. **Study Mozart's moves:** compare the theme with Variation 12, and skim the variations between. List what Mozart
    changes (figuration, meter, mode, register, texture, tempo), each with the bars where it happens. Read it from the
    score, not from memory.
@@ -67,4 +66,4 @@ worker picks it up: a session Eric starts runs it.
 - If the source's notes look wrong (the wrong note count, or missing bars), fix them only by checking against a
   scanned public-domain edition on IMSLP, and log each fix in `SOURCE.md`.
 - If every Variation 13 rates 2 or lower, say so in `RESULTS.md`. That's a valid answer to the question.
-- No MP3s or recordings of other performers: they're copyrighted even when the composition isn't.
+- Recordings of other performers are fine as local reference (decision 003). Never commit them.

@@ -5,6 +5,7 @@
   "source": "Mutopia 23 (https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=23), Public Domain",
   "bpm": 100.0,
   "beatsPerBar": 2,
+  "voice": 4,
   "notes": [
     {
       "id": "n1",

@@ -1,0 +1,158 @@
+# inputs (1): ['IAC Driver Bus 1']
+# outputs (1): ['IAC Driver Bus 1']
+# scale  in='IAC Driver Bus 1' out='IAC Driver Bus 1'
+#     t_ms   gap_ms ch   type            bytes
+# playing sequence.mid (6.48 s)
+     110.0          ch1   note_on         90 3C 5A
+     531.6          ch1   note_off        80 3C 40
+     614.3    504.3 ch1   note_on         90 3E 5A
+    1030.8          ch1   note_off        80 3E 40
+    1112.6    498.2 ch1   note_on         90 40 5A
+    1530.2          ch1   note_off        80 40 40
+    1614.2    501.7 ch1   note_on         90 41 5A
+    2030.2          ch1   note_off        80 41 40
+    2115.6    501.4 ch1   note_on         90 43 5A
+    2531.5          ch1   note_off        80 43 40
+    2614.1    498.5 ch1   note_on         90 45 5A
+    3031.2          ch1   note_off        80 45 40
+    3114.9    500.9 ch1   note_on         90 47 5A
+    3531.1          ch1   note_off        80 47 40
+    3614.8    499.9 ch1   note_on         90 48 5A
+    4030.5          ch1   note_off        80 48 40
+    4613.3    998.5 ch1   note_on         90 48 5A
+    4718.7          ch1   note_off        80 48 40
+    4738.4    125.1 ch1   note_on         90 48 5A
+    4843.3          ch1   note_off        80 48 40
+    4863.4    125.0 ch1   note_on         90 48 5A
+    4966.9          ch1   note_off        80 48 40
+    4988.9    125.5 ch1   note_on         90 48 5A
+    5094.0          ch1   note_off        80 48 40
+    5113.2    124.3 ch1   note_on         90 48 5A
+    5219.0          ch1   note_off        80 48 40
+    5238.2    125.0 ch1   note_on         90 48 5A
+    5343.2          ch1   note_off        80 48 40
+    5361.3    123.1 ch1   note_on         90 48 5A
+    5468.2          ch1   note_off        80 48 40
+    5487.9    126.6 ch1   note_on         90 48 5A
+    5591.3          ch1   note_off        80 48 40
+    5615.0    127.1 ch1   note_on         90 48 5A
+    5715.5          ch1   note_off        80 48 40
+    5736.2    121.3 ch1   note_on         90 48 5A
+    5844.1          ch1   note_off        80 48 40
+    5864.4    128.2 ch1   note_on         90 48 5A
+    5967.7          ch1   note_off        80 48 40
+    5988.9    124.5 ch1   note_on         90 48 5A
+    6093.4          ch1   note_off        80 48 40
+    6113.8    124.9 ch1   note_on         90 48 5A
+    6217.4          ch1   note_off        80 48 40
+    6235.3    121.5 ch1   note_on         90 48 5A
+    6339.8          ch1   note_off        80 48 40
+    6363.2    127.9 ch1   note_on         90 48 5A
+    6467.5          ch1   note_off        80 48 40
+    6490.3    127.1 ch1   note_on         90 48 5A
+    6593.3          ch1   note_off        80 48 40
+# sent All Notes Off (CC 123) on 16 channels
+    6593.7          ch1   control_change  B0 7B 00
+    6594.5          ch2   control_change  B1 7B 00
+    6594.6          ch3   control_change  B2 7B 00
+    6594.6          ch4   control_change  B3 7B 00
+    6594.7          ch5   control_change  B4 7B 00
+    6594.7          ch6   control_change  B5 7B 00
+    6594.8          ch7   control_change  B6 7B 00
+    6594.8          ch8   control_change  B7 7B 00
+    6594.9          ch9   control_change  B8 7B 00
+    6594.9          ch10  control_change  B9 7B 00
+    6595.0          ch11  control_change  BA 7B 00
+    6595.0          ch12  control_change  BB 7B 00
+    6595.1          ch13  control_change  BC 7B 00
+    6595.1          ch14  control_change  BD 7B 00
+    6595.2          ch15  control_change  BE 7B 00
+    6595.2          ch16  control_change  BF 7B 00
+# note-ons: 24  velocity min 90 max 90
+# gaps ms: min 121.3 median 127.1 max 998.5  under 2 ms: 0  most common (1 ms bins): 125 ms x5 of 23
+# (IAC band run that hung on SIGINT in a non-interactive shell trimmed; the rerun follows)
+# band  in='IAC Driver Bus 1' out='IAC Driver Bus 1'
+#     t_ms   gap_ms ch   type            bytes
+# playing band.mid (16.00 s) on loop, Ctrl-C to stop
+     139.9          ch2   program_change  C1 21
+     140.0          ch10  note_on         99 2A 46
+     140.1      0.1 ch10  note_on         99 24 64
+     140.1      0.1 ch2   note_on         91 24 64
+     202.6          ch10  note_off        89 2A 40
+     202.8          ch10  note_off        89 24 40
+     351.9          ch2   note_off        81 24 40
+     393.2    253.1 ch10  note_on         99 2A 46
+     393.9      0.7 ch2   note_on         91 30 64
+     456.1          ch10  note_off        89 2A 40
+     601.0          ch2   note_off        81 30 40
+     641.3    247.4 ch10  note_on         99 2A 46
+     642.0      0.8 ch10  note_on         99 26 64
+     642.5      0.4 ch2   note_on         91 24 64
+     705.9          ch10  note_off        89 2A 40
+     706.8          ch10  note_off        89 26 40
+     851.8          ch2   note_off        81 24 40
+     891.1    248.7 ch10  note_on         99 2A 46
+     891.9      0.8 ch2   note_on         91 30 64
+     956.0          ch10  note_off        89 2A 40
+    1101.5          ch2   note_off        81 30 40
+    1140.1    248.2 ch10  note_on         99 2A 46
+    1140.9      0.8 ch10  note_on         99 24 64
+    1141.4      0.5 ch2   note_on         91 2B 64
+    1206.2          ch10  note_off        89 2A 40
+    1207.0          ch10  note_off        89 24 40
+    1351.1          ch2   note_off        81 2B 40
+    1389.5    248.1 ch10  note_on         99 2A 46
+    1390.3      0.8 ch2   note_on         91 37 64
+    1455.9          ch10  note_off        89 2A 40
+    1601.1          ch2   note_off        81 37 40
+    1641.9    251.7 ch10  note_on         99 2A 46
+    1642.7      0.7 ch10  note_on         99 26 64
+    1642.9      0.2 ch2   note_on         91 2B 64
+    1702.5          ch10  note_off        89 2A 40
+    1703.3          ch10  note_off        89 26 40
+    1848.2          ch2   note_off        81 2B 40
+    1893.6    250.7 ch10  note_on         99 2A 46
+    1894.2      0.5 ch2   note_on         91 37 64
+    1953.1          ch10  note_off        89 2A 40
+    2097.2          ch2   note_off        81 37 40
+    2143.6    249.4 ch10  note_on         99 2A 46
+    2144.2      0.6 ch10  note_on         99 24 64
+    2144.6      0.3 ch2   note_on         91 24 64
+    2206.3          ch10  note_off        89 2A 40
+    2207.1          ch10  note_off        89 24 40
+    2349.5          ch2   note_off        81 24 40
+    2393.6    249.0 ch10  note_on         99 2A 46
+    2394.2      0.7 ch2   note_on         91 30 64
+    2456.2          ch10  note_off        89 2A 40
+# stopped
+# sent All Notes Off (CC 123) on 16 channels
+    2519.0          ch1   control_change  B0 7B 00
+    2519.4          ch2   control_change  B1 7B 00
+    2519.6          ch3   control_change  B2 7B 00
+    2519.8          ch4   control_change  B3 7B 00
+    2520.1          ch5   control_change  B4 7B 00
+    2520.5          ch6   control_change  B5 7B 00
+    2520.8          ch7   control_change  B6 7B 00
+    2521.1          ch8   control_change  B7 7B 00
+    2521.3          ch9   control_change  B8 7B 00
+    2521.4          ch10  control_change  B9 7B 00
+    2521.6          ch11  control_change  BA 7B 00
+    2521.7          ch12  control_change  BB 7B 00
+    2521.8          ch13  control_change  BC 7B 00
+    2521.9          ch14  control_change  BD 7B 00
+    2522.0          ch15  control_change  BE 7B 00
+    2522.2          ch16  control_change  BF 7B 00
+# note-ons: 25  velocity min 70 max 100
+# gaps ms: min 0.1 median 0.8 max 253.1  under 2 ms: 15  most common (1 ms bins): 1 ms x9 of 24
+# local off in='IAC Driver Bus 1' out='IAC Driver Bus 1'
+#     t_ms   gap_ms ch   type            bytes
+# sent Local Control off (CC 122 = 0) on ch1
+     103.4          ch1   control_change  B0 7A 00
+# listening, Ctrl-C to stop
+# reset  in='IAC Driver Bus 1' out='IAC Driver Bus 1'
+#     t_ms   gap_ms ch   type            bytes
+# sent GM System On
+     100.0          ch-   sysex           F0 7E 7F 09 01 F7
+# listening, Ctrl-C to stop
+# inputs (2): ['IAC Driver Bus 1', 'Portable Grand']
+# outputs (2): ['IAC Driver Bus 1', 'Portable Grand']

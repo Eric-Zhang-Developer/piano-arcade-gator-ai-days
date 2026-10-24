@@ -1,0 +1,1219 @@
+# listen  in='Portable Grand' out='Portable Grand'
+#     t_ms   gap_ms ch   type            bytes
+# listening, Ctrl-C to stop
+# listen  in='Portable Grand' out='Portable Grand'
+#     t_ms   gap_ms ch   type            bytes
+# listening, Ctrl-C to stop
+   45732.3          ch1   note_on         90 59 23
+   45742.1      9.9 ch1   note_on         90 5B 2B
+   45911.7          ch1   release(v0)     90 5B 00
+   45917.8          ch1   release(v0)     90 59 00
+   46012.9    270.7 ch1   note_on         90 59 46
+   46146.8          ch1   release(v0)     90 59 00
+   46254.8    241.9 ch1   note_on         90 59 3B
+   46411.8          ch1   release(v0)     90 59 00
+   46485.9    231.1 ch1   note_on         90 59 46
+   46622.8          ch1   release(v0)     90 59 00
+   46711.9    226.0 ch1   note_on         90 59 43
+   46842.9          ch1   release(v0)     90 59 00
+  104061.0  57349.0 ch1   note_on         90 3C 32
+  105416.7          ch1   release(v0)     90 3C 00
+  105877.9   1817.0 ch1   note_on         90 3C 66
+  109258.8          ch1   release(v0)     90 3C 00
+  112841.6          ch1   control_change  B0 40 03
+  112842.1          ch2   control_change  B1 40 03
+  112847.1          ch1   control_change  B0 40 14
+  112847.5          ch2   control_change  B1 40 14
+  112853.1          ch1   control_change  B0 40 25
+  112853.5          ch2   control_change  B1 40 25
+  112859.6          ch1   control_change  B0 40 37
+  112859.7          ch2   control_change  B1 40 37
+  112865.7          ch1   control_change  B0 40 3F
+  112866.5          ch2   control_change  B1 40 3F
+  112871.2          ch1   control_change  B0 40 7F
+  112871.5          ch2   control_change  B1 40 7F
+  114797.0          ch1   control_change  B0 40 4A
+  114797.7          ch2   control_change  B1 40 4A
+  114802.9          ch1   control_change  B0 40 3A
+  114803.6          ch2   control_change  B1 40 3A
+  114809.0          ch1   control_change  B0 40 22
+  114809.5          ch2   control_change  B1 40 22
+  114815.8          ch1   control_change  B0 40 0B
+  114816.2          ch2   control_change  B1 40 0B
+  114821.0          ch1   control_change  B0 40 00
+  114821.5          ch2   control_change  B1 40 00
+# note-ons: 8  velocity min 35 max 102
+# gaps ms: min 9.9 median 241.9 max 57349.0  under 2 ms: 0  most common (1 ms bins): 10 ms x1 of 7
+# listen  in='Portable Grand' out='Portable Grand'
+#     t_ms   gap_ms ch   type            bytes
+# listening, Ctrl-C to stop
+   18230.7          ch1   note_on         90 3C 50
+   18406.1    175.4 ch1   note_on         90 3E 43
+   18440.5          ch1   release(v0)     90 3C 00
+   18601.5    195.4 ch1   note_on         90 40 4A
+   18694.4          ch1   release(v0)     90 3E 00
+   18812.7    211.1 ch1   note_on         90 41 49
+   18816.2          ch1   release(v0)     90 40 00
+   19001.6    188.9 ch1   note_on         90 43 4B
+   19026.4          ch1   release(v0)     90 41 00
+   19169.3    167.7 ch1   note_on         90 45 4C
+   19239.4          ch1   release(v0)     90 43 00
+   19352.0    182.7 ch1   note_on         90 43 19
+   19355.8      3.8 ch1   note_on         90 47 4E
+   19405.3          ch1   release(v0)     90 45 00
+   19411.2          ch1   release(v0)     90 43 00
+   19556.4          ch1   release(v0)     90 47 00
+   19570.2    214.4 ch1   note_on         90 48 50
+   19769.3    199.1 ch1   note_on         90 4A 45
+   19820.4          ch1   release(v0)     90 48 00
+   19951.7    182.4 ch1   note_on         90 4C 4E
+   20055.3          ch1   release(v0)     90 4A 00
+   20188.8    237.1 ch1   note_on         90 4D 4D
+   20200.3          ch1   release(v0)     90 4C 00
+   20227.3     38.6 ch1   note_on         90 4F 32
+   20292.2          ch1   release(v0)     90 4F 00
+   20403.2    175.9 ch1   note_on         90 4F 3C
+   20443.5          ch1   release(v0)     90 4D 00
+   20603.3    200.1 ch1   note_on         90 51 4C
+   20650.3          ch1   release(v0)     90 4F 00
+   20758.7    155.4 ch1   note_on         90 4F 2F
+   20786.3     27.6 ch1   note_on         90 53 4C
+   20809.4          ch1   release(v0)     90 51 00
+   20854.3          ch1   release(v0)     90 4F 00
+   20973.3    186.9 ch1   note_on         90 54 48
+   21011.3          ch1   release(v0)     90 53 00
+   21171.2    197.9 ch1   note_on         90 53 3E
+   21228.2          ch1   release(v0)     90 54 00
+   21363.2    192.0 ch1   note_on         90 51 43
+   21466.3          ch1   release(v0)     90 53 00
+   21504.1    140.9 ch1   note_on         90 4F 43
+   21569.3          ch1   release(v0)     90 51 00
+   21680.5    176.5 ch1   note_on         90 4D 45
+   21698.5          ch1   release(v0)     90 4F 00
+   21863.4    182.9 ch1   note_on         90 4C 4C
+   21911.3          ch1   release(v0)     90 4D 00
+   22025.1    161.7 ch1   note_on         90 4A 4C
+   22062.3          ch1   release(v0)     90 4C 00
+   22192.7    167.6 ch1   note_on         90 48 4B
+   22215.3          ch1   release(v0)     90 4A 00
+   22409.4    216.7 ch1   note_on         90 47 40
+   22412.5      3.1 ch1   note_on         90 45 3F
+   22423.1          ch1   release(v0)     90 48 00
+   22640.2          ch1   release(v0)     90 47 00
+   22799.5    387.0 ch1   note_on         90 43 43
+   22844.4          ch1   release(v0)     90 45 00
+   23044.2    244.7 ch1   note_on         90 41 49
+   23107.4          ch1   release(v0)     90 43 00
+   23263.8    219.6 ch1   note_on         90 40 4C
+   23299.4          ch1   release(v0)     90 41 00
+   23450.2    186.4 ch1   note_on         90 3E 46
+   23685.4    235.1 ch1   note_on         90 3C 53
+   23715.4          ch1   release(v0)     90 3E 00
+   23730.3          ch1   release(v0)     90 40 00
+   24029.4          ch1   release(v0)     90 3C 00
+# listen  in='Portable Grand' out='Portable Grand'
+#     t_ms   gap_ms ch   type            bytes
+# listening, Ctrl-C to stop
+   16485.1          ch1   note_on         90 3C 56
+   16487.7      2.6 ch1   note_on         90 43 4B
+   16488.1      0.4 ch1   note_on         90 48 53
+   16491.8      3.7 ch1   note_on         90 40 4C
+   19113.0          ch1   release(v0)     90 3C 00
+   19117.7          ch1   release(v0)     90 48 00
+   19162.9          ch1   release(v0)     90 43 00
+   19178.8          ch1   release(v0)     90 40 00
+   20201.8   3710.0 ch1   note_on         90 3C 49
+   20398.5    196.7 ch1   note_on         90 40 40
+   20485.9          ch1   release(v0)     90 3C 00
+   20561.5    163.0 ch1   note_on         90 43 47
+   20733.9    172.4 ch1   note_on         90 48 4F
+   20752.0          ch1   release(v0)     90 40 00
+   20766.7          ch1   release(v0)     90 43 00
+   20923.8    189.8 ch1   note_on         90 43 40
+   21055.0          ch1   release(v0)     90 48 00
+   21073.3    149.6 ch1   note_on         90 40 4A
+   21268.0    194.7 ch1   note_on         90 3C 50
+   21310.9          ch1   release(v0)     90 43 00
+   21376.9          ch1   release(v0)     90 40 00
+   22435.1          ch1   release(v0)     90 3C 00
+   23515.2   2247.2 ch1   note_on         90 4A 54
+   23521.6      6.4 ch1   note_on         90 42 4F
+   23522.2      0.6 ch1   note_on         90 3E 51
+   23525.7      3.5 ch1   note_on         90 45 4E
+   24703.9          ch1   release(v0)     90 42 00
+   24705.6          ch1   release(v0)     90 45 00
+   24717.7          ch1   release(v0)     90 3E 00
+   24720.7          ch1   release(v0)     90 4A 00
+   25634.1   2108.4 ch1   note_on         90 4C 59
+   25636.8      2.7 ch1   note_on         90 40 57
+   25638.6      1.8 ch1   note_on         90 43 56
+   25644.3      5.7 ch1   note_on         90 47 51
+   26559.8          ch1   release(v0)     90 43 00
+   26601.9          ch1   release(v0)     90 47 00
+   26603.7          ch1   release(v0)     90 4C 00
+   26609.8          ch1   release(v0)     90 40 00
+   27260.4   1616.0 ch1   note_on         90 4C 53
+   27261.6      1.2 ch1   note_on         90 44 56
+   27262.0      0.4 ch1   note_on         90 47 50
+   27265.3      3.3 ch1   note_on         90 40 57
+   28410.1          ch1   release(v0)     90 44 00
+   28450.9          ch1   release(v0)     90 40 00
+   28456.7          ch1   release(v0)     90 4C 00
+   28457.6          ch1   release(v0)     90 47 00
+   29404.0   2138.7 ch1   note_on         90 46 52
+   29405.1      1.1 ch1   note_on         90 4C 57
+   29410.0      4.9 ch1   note_on         90 43 54
+   29412.6      2.7 ch1   note_on         90 40 52
+   30447.9          ch1   release(v0)     90 4C 00
+   30492.0          ch1   release(v0)     90 43 00
+   30496.7          ch1   release(v0)     90 46 00
+   30507.3          ch1   release(v0)     90 40 00
+   31265.8   1853.2 ch1   note_on         90 48 52
+   31270.9      5.1 ch1   note_on         90 43 4E
+   31274.7      3.8 ch1   note_on         90 3C 56
+   31278.7      4.0 ch1   note_on         90 40 52
+   32566.8          ch1   release(v0)     90 48 00
+   32587.7          ch1   release(v0)     90 40 00
+   32645.9          ch1   release(v0)     90 3C 00
+   32656.8          ch1   release(v0)     90 43 00
+   33211.3   1932.6 ch1   note_on         90 48 4C
+   33216.1      4.8 ch1   note_on         90 43 4A
+   33217.1      1.0 ch1   note_on         90 3C 4E
+   33219.0      1.9 ch1   note_on         90 3F 53
+   34477.9          ch1   release(v0)     90 3C 00
+   34485.8          ch1   release(v0)     90 43 00
+   34499.9          ch1   release(v0)     90 3F 00
+   34521.1          ch1   release(v0)     90 48 00
+   35039.6   1820.6 ch1   note_on         90 48 41
+   35041.0      1.5 ch1   note_on         90 3F 38
+   35057.8     16.8 ch1   note_on         90 3C 43
+   35065.7      7.8 ch1   note_on         90 44 49
+   35095.9     30.2 ch1   note_on         90 3E 35
+   35175.1          ch1   release(v0)     90 3E 00
+   36108.8          ch1   release(v0)     90 44 00
+   36222.8          ch1   release(v0)     90 48 00
+   36244.9          ch1   release(v0)     90 3C 00
+   36247.6          ch1   release(v0)     90 3F 00
+   37796.0   2700.2 ch1   note_on         90 3C 4B
+   37801.7      5.7 ch1   note_on         90 3F 54
+   37803.1      1.3 ch1   note_on         90 48 4F
+   37806.2      3.1 ch1   note_on         90 42 53
+   38691.2          ch1   release(v0)     90 42 00
+   38695.7          ch1   release(v0)     90 3F 00
+   38703.7          ch1   release(v0)     90 3C 00
+   38708.9          ch1   release(v0)     90 48 00
+   39136.0   1329.8 ch1   note_on         90 48 50
+   39137.1      1.1 ch1   note_on         90 3F 53
+   39137.7      0.6 ch1   note_on         90 3C 4B
+   39146.2      8.6 ch1   note_on         90 43 51
+   39643.9          ch1   release(v0)     90 3C 00
+   39663.8          ch1   release(v0)     90 3F 00
+   39667.6          ch1   release(v0)     90 43 00
+   39695.9          ch1   release(v0)     90 48 00
+# note-ons: 48  velocity min 53 max 89
+# gaps ms: min 0.4 median 5.1 max 3710.0  under 2 ms: 12  most common (1 ms bins): 1 ms x8 of 47
+# scale  in='Portable Grand' out='Portable Grand'
+#     t_ms   gap_ms ch   type            bytes
+# playing sequence.mid (6.48 s)
+# sent All Notes Off (CC 123) on 16 channels
+# scale  in='Portable Grand' out='Portable Grand'
+#     t_ms   gap_ms ch   type            bytes
+# playing sequence.mid (6.48 s)
+    6055.0          ch1   note_on         90 48 42
+    6067.1     12.2 ch1   note_on         90 4A 42
+    6121.1          ch1   release(v0)     90 4A 00
+    6150.4          ch1   release(v0)     90 48 00
+    6199.1    132.0 ch1   note_on         90 48 44
+    6249.1          ch1   release(v0)     90 48 00
+    6309.7    110.6 ch1   note_on         90 48 4C
+    6354.3          ch1   release(v0)     90 48 00
+    6438.4    128.7 ch1   note_on         90 48 36
+    6503.3          ch1   release(v0)     90 48 00
+    6559.4    121.0 ch1   note_on         90 48 4C
+# sent All Notes Off (CC 123) on 16 channels
+    6607.6          ch1   release(v0)     90 48 00
+    6665.2    105.8 ch1   note_on         90 48 4E
+    6718.3          ch1   release(v0)     90 48 00
+    6796.5    131.3 ch1   note_on         90 48 4D
+    6860.3          ch1   release(v0)     90 48 00
+    6936.8    140.3 ch1   note_on         90 48 53
+    7033.7          ch1   release(v0)     90 48 00
+# note-ons: 9  velocity min 54 max 83
+# gaps ms: min 12.2 median 124.8 max 140.3  under 2 ms: 0  most common (1 ms bins): 12 ms x1 of 8
+# band  in='Portable Grand' out='Portable Grand'
+#     t_ms   gap_ms ch   type            bytes
+# playing band.mid (16.00 s) on loop, Ctrl-C to stop
+# stopped
+# sent All Notes Off (CC 123) on 16 channels
+# band  in='Portable Grand' out='Portable Grand'
+#     t_ms   gap_ms ch   type            bytes
+# playing band.mid (16.00 s) on loop, Ctrl-C to stop
+    4421.3          ch1   note_on         90 3C 55
+    4765.9    344.6 ch1   note_on         90 3E 4A
+    4801.1          ch1   release(v0)     90 3C 00
+    5109.3    343.4 ch1   note_on         90 40 4A
+    5185.9          ch1   release(v0)     90 3E 00
+    5443.9    334.6 ch1   note_on         90 41 4D
+    5464.0          ch1   release(v0)     90 40 00
+    5783.0    339.1 ch1   note_on         90 43 4E
+    5818.0          ch1   release(v0)     90 41 00
+    6085.0    302.0 ch1   note_on         90 45 4D
+    6177.9          ch1   release(v0)     90 43 00
+    6400.4    315.5 ch1   note_on         90 47 4C
+    6482.5          ch1   release(v0)     90 45 00
+    6710.2    309.8 ch1   note_on         90 48 53
+    6712.9          ch1   release(v0)     90 47 00
+    7026.0    315.8 ch1   note_on         90 4A 4E
+    7060.2          ch1   release(v0)     90 48 00
+    7319.9    293.9 ch1   note_on         90 4C 4C
+    7402.0          ch1   release(v0)     90 4A 00
+    7612.4    292.5 ch1   note_on         90 4D 47
+    7628.0          ch1   release(v0)     90 4C 00
+    7916.4    304.1 ch1   note_on         90 4F 49
+    7953.0          ch1   release(v0)     90 4D 00
+    8219.3    302.8 ch1   note_on         90 51 4C
+    8315.4          ch1   release(v0)     90 4F 00
+    8517.6    298.4 ch1   note_on         90 53 4D
+    8556.2          ch1   release(v0)     90 51 00
+    8791.2    273.5 ch1   note_on         90 54 52
+    8819.3          ch1   release(v0)     90 53 00
+    9087.7    296.6 ch1   note_on         90 53 4D
+    9171.2          ch1   release(v0)     90 54 00
+    9372.1    284.3 ch1   note_on         90 51 4C
+    9676.7    304.6 ch1   note_on         90 4F 4A
+    9692.1          ch1   release(v0)     90 53 00
+    9749.0          ch1   release(v0)     90 51 00
+    9972.1    295.4 ch1   note_on         90 4D 4E
+   10017.9          ch1   release(v0)     90 4F 00
+   10269.6    297.5 ch1   note_on         90 4C 4D
+   10334.3          ch1   release(v0)     90 4D 00
+   10542.4    272.8 ch1   note_on         90 4A 4B
+   10590.9          ch1   release(v0)     90 4C 00
+   10829.1    286.7 ch1   note_on         90 48 4D
+   10862.1          ch1   release(v0)     90 4A 00
+   11097.5    268.4 ch1   note_on         90 47 49
+   11172.4          ch1   release(v0)     90 48 00
+   11401.2    303.8 ch1   note_on         90 45 4E
+   11509.0          ch1   release(v0)     90 47 00
+   11676.1    274.9 ch1   note_on         90 43 4A
+   11736.2          ch1   release(v0)     90 45 00
+   11947.4    271.2 ch1   note_on         90 41 4C
+   11985.4          ch1   release(v0)     90 43 00
+   12237.5    290.1 ch1   note_on         90 40 4D
+   12303.1          ch1   release(v0)     90 41 00
+   12508.8    271.3 ch1   note_on         90 3E 4B
+   12540.1          ch1   release(v0)     90 40 00
+   12817.5    308.7 ch1   note_on         90 3C 56
+   12860.8          ch1   release(v0)     90 3E 00
+   13849.1          ch1   release(v0)     90 3C 00
+# stopped
+# sent All Notes Off (CC 123) on 16 channels
+# note-ons: 29  velocity min 71 max 86
+# gaps ms: min 268.4 median 297.9 max 344.6  under 2 ms: 0  most common (1 ms bins): 304 ms x2 of 28
+# local off in='Portable Grand' out='Portable Grand'
+#     t_ms   gap_ms ch   type            bytes
+# sent Local Control off (CC 122 = 0) on ch1
+# listening, Ctrl-C to stop
+   14427.4          ch1   note_on         90 3C 4F
+   14719.9    292.5 ch1   note_on         90 3E 45
+   14739.8          ch1   release(v0)     90 3C 00
+   15002.8    282.9 ch1   note_on         90 40 48
+   15074.8          ch1   release(v0)     90 3E 00
+   15286.7    283.9 ch1   note_on         90 41 49
+   15305.8          ch1   release(v0)     90 40 00
+   15562.7    276.1 ch1   note_on         90 43 46
+   15582.7          ch1   release(v0)     90 41 00
+   15843.9    281.2 ch1   note_on         90 45 4B
+   15958.7          ch1   release(v0)     90 43 00
+   16074.7    230.8 ch1   note_on         90 47 4A
+   16079.7      4.9 ch1   note_on         90 43 20
+   16106.0          ch1   release(v0)     90 45 00
+   16159.8          ch1   release(v0)     90 43 00
+   16318.8    239.1 ch1   note_on         90 48 54
+   16328.6          ch1   release(v0)     90 47 00
+   17082.6          ch1   release(v0)     90 48 00
+# local on in='Portable Grand' out='Portable Grand'
+#     t_ms   gap_ms ch   type            bytes
+# sent Local Control on (CC 122 = 127) on ch1
+# listening, Ctrl-C to stop
+   17427.9          ch1   note_on         90 3C 4B
+   17431.3      3.4 ch1   note_on         90 40 3D
+   17431.6      0.3 ch1   note_on         90 43 4E
+   17864.8          ch1   release(v0)     90 3C 00
+   17875.7          ch1   release(v0)     90 40 00
+   17877.5          ch1   release(v0)     90 43 00
+   18545.9   1114.2 ch1   note_on         90 48 4C
+   18547.0      1.1 ch1   note_on         90 43 38
+   18547.5      0.5 ch1   note_on         90 40 47
+   18547.9      0.4 ch1   note_on         90 3C 43
+   18588.0     40.1 ch1   note_on         90 46 2D
+   18708.7          ch1   release(v0)     90 46 00
+   18934.6          ch1   release(v0)     90 3C 00
+   18946.6          ch1   release(v0)     90 43 00
+   18950.4          ch1   release(v0)     90 48 00
+   18963.6          ch1   release(v0)     90 40 00
+# listen  in='Portable Grand' out='Portable Grand'
+#     t_ms   gap_ms ch   type            bytes
+# listening, Ctrl-C to stop
+   52168.0          ch1   note_on         90 3C 50
+   52494.7          ch1   release(v0)     90 3C 00
+   55964.1   3796.2 ch1   note_on         90 48 46
+   55972.5      8.3 ch1   note_on         90 3C 3E
+   55979.9      7.4 ch1   note_on         90 43 40
+   55984.9      5.0 ch1   note_on         90 40 3B
+   56584.8          ch1   release(v0)     90 43 00
+   56598.9          ch1   release(v0)     90 3C 00
+   56619.8          ch1   release(v0)     90 48 00
+   56621.7          ch1   release(v0)     90 40 00
+   57067.2   1082.3 ch1   note_on         90 43 41
+   57068.7      1.5 ch1   note_on         90 48 3F
+   57069.8      1.2 ch1   note_on         90 3C 39
+   57072.0      2.2 ch1   note_on         90 40 3D
+   57546.5          ch1   release(v0)     90 43 00
+   57558.5          ch1   release(v0)     90 48 00
+   57570.5          ch1   release(v0)     90 40 00
+   57575.6          ch1   release(v0)     90 3C 00
+  158040.6          ch1   control_change  B0 40 05
+  158042.4          ch2   control_change  B1 40 05
+  158045.5          ch1   control_change  B0 40 0D
+  158045.8          ch2   control_change  B1 40 0D
+  158051.5          ch1   control_change  B0 40 15
+  158051.8          ch2   control_change  B1 40 15
+  158057.4          ch1   control_change  B0 40 1C
+  158057.7          ch2   control_change  B1 40 1C
+  158063.5          ch1   control_change  B0 40 24
+  158063.9          ch2   control_change  B1 40 24
+  158069.4          ch1   control_change  B0 40 2A
+  158069.8          ch2   control_change  B1 40 2A
+  158075.5          ch1   control_change  B0 40 36
+  158075.9          ch2   control_change  B1 40 36
+  158081.5          ch1   control_change  B0 40 3C
+  158082.1          ch2   control_change  B1 40 3C
+  158087.4          ch1   control_change  B0 40 3F
+  158087.7          ch2   control_change  B1 40 3F
+  158093.5          ch1   control_change  B0 40 4E
+  158094.0          ch2   control_change  B1 40 4E
+  158099.5          ch1   control_change  B0 40 7F
+  158100.0          ch2   control_change  B1 40 7F
+  158218.1 101146.1 ch1   note_on         90 53 51
+  158692.7          ch1   release(v0)     90 53 00
+  159228.9   1010.7 ch1   note_on         90 53 36
+  159232.4      3.5 ch1   note_on         90 54 36
+  159350.6          ch1   release(v0)     90 54 00
+  159457.6          ch1   release(v0)     90 53 00
+  159704.6    472.2 ch1   note_on         90 53 48
+  159834.9    130.3 ch1   note_on         90 52 48
+  159856.6          ch1   release(v0)     90 53 00
+  159966.1    131.2 ch1   note_on         90 53 32
+  159991.6          ch1   release(v0)     90 52 00
+  160112.1    146.0 ch1   note_on         90 52 3A
+  160142.5          ch1   release(v0)     90 53 00
+  160220.7    108.6 ch1   note_on         90 53 3F
+  160226.5          ch1   release(v0)     90 52 00
+  160330.7          ch1   release(v0)     90 53 00
+  160541.6          ch1   control_change  B0 40 4F
+  160542.3          ch2   control_change  B1 40 4F
+  160547.5          ch1   control_change  B0 40 3E
+  160548.4          ch2   control_change  B1 40 3E
+  160552.9          ch1   control_change  B0 40 36
+  160553.3          ch2   control_change  B1 40 36
+  160558.9          ch1   control_change  B0 40 25
+  160559.4          ch2   control_change  B1 40 25
+  160564.9          ch1   control_change  B0 40 14
+  160565.4          ch2   control_change  B1 40 14
+  160571.5          ch1   control_change  B0 40 04
+  160571.9          ch2   control_change  B1 40 04
+  160577.0          ch1   control_change  B0 40 00
+  160577.4          ch2   control_change  B1 40 00
+  160894.5          ch1   control_change  B0 40 01
+  160895.4          ch2   control_change  B1 40 01
+  160901.4          ch1   control_change  B0 40 08
+  160901.8          ch2   control_change  B1 40 08
+  160907.0          ch1   control_change  B0 40 0E
+  160907.4          ch2   control_change  B1 40 0E
+  160912.8          ch1   control_change  B0 40 15
+  160913.3          ch2   control_change  B1 40 15
+  160918.8          ch1   control_change  B0 40 1C
+  160919.4          ch2   control_change  B1 40 1C
+  160924.8          ch1   control_change  B0 40 23
+  160925.3          ch2   control_change  B1 40 23
+  160931.0          ch1   control_change  B0 40 28
+  160931.4          ch2   control_change  B1 40 28
+  160936.9          ch1   control_change  B0 40 2F
+  160937.3          ch2   control_change  B1 40 2F
+  160942.8          ch1   control_change  B0 40 38
+  160943.4          ch2   control_change  B1 40 38
+  160948.9          ch1   control_change  B0 40 3B
+  160949.4          ch2   control_change  B1 40 3B
+  160954.9          ch1   control_change  B0 40 3E
+  160955.4          ch2   control_change  B1 40 3E
+  160961.5          ch1   control_change  B0 40 40
+  160962.0          ch2   control_change  B1 40 40
+  160966.8          ch1   control_change  B0 40 49
+  160967.4          ch2   control_change  B1 40 49
+  160972.8          ch1   control_change  B0 40 7F
+  160973.4          ch2   control_change  B1 40 7F
+  162386.3   2165.5 ch1   note_on         90 53 3E
+  162408.3     22.0 ch1   note_on         90 52 35
+  162461.7          ch1   release(v0)     90 52 00
+  162491.7          ch1   release(v0)     90 53 00
+  162657.8    249.5 ch1   note_on         90 52 52
+  162795.6          ch1   release(v0)     90 52 00
+  163685.1   1027.3 ch1   note_on         90 44 57
+  163809.8          ch1   release(v0)     90 44 00
+  164710.8          ch1   control_change  B0 40 45
+  164711.7          ch2   control_change  B1 40 45
+  164716.6          ch1   control_change  B0 40 3D
+  164717.8          ch2   control_change  B1 40 3D
+  164722.5          ch1   control_change  B0 40 38
+  164723.5          ch2   control_change  B1 40 38
+  164728.7          ch1   control_change  B0 40 28
+  164729.4          ch2   control_change  B1 40 28
+  164734.5          ch1   control_change  B0 40 1B
+  164735.5          ch2   control_change  B1 40 1B
+  164740.5          ch1   control_change  B0 40 0B
+  164741.4          ch2   control_change  B1 40 0B
+  164747.0          ch1   control_change  B0 40 00
+  164747.7          ch2   control_change  B1 40 00
+  164962.6          ch1   control_change  B0 40 05
+  164963.5          ch2   control_change  B1 40 05
+  164968.8          ch1   control_change  B0 40 0F
+  164969.5          ch2   control_change  B1 40 0F
+  164974.7          ch1   control_change  B0 40 17
+  164975.1          ch2   control_change  B1 40 17
+  164980.5          ch1   control_change  B0 40 1E
+  164983.0          ch2   control_change  B1 40 1E
+  164986.5          ch1   control_change  B0 40 25
+  164987.6          ch2   control_change  B1 40 25
+  164992.7          ch1   control_change  B0 40 28
+  164993.0          ch2   control_change  B1 40 28
+  164998.6          ch1   control_change  B0 40 2C
+  164999.4          ch2   control_change  B1 40 2C
+  165004.5          ch1   control_change  B0 40 31
+  165005.6          ch2   control_change  B1 40 31
+  165010.5          ch1   control_change  B0 40 36
+  165011.4          ch2   control_change  B1 40 36
+  165016.6          ch1   control_change  B0 40 39
+  165017.7          ch2   control_change  B1 40 39
+  165022.7          ch1   control_change  B0 40 3A
+  165023.1          ch2   control_change  B1 40 3A
+  165028.6          ch1   control_change  B0 40 3B
+  165029.4          ch2   control_change  B1 40 3B
+  165034.4          ch1   control_change  B0 40 3C
+  165035.5          ch2   control_change  B1 40 3C
+  165040.8          ch1   control_change  B0 40 3D
+  165041.4          ch2   control_change  B1 40 3D
+  165047.0          ch1   control_change  B0 40 3E
+  165047.6          ch2   control_change  B1 40 3E
+  165052.5          ch1   control_change  B0 40 3F
+  165053.5          ch2   control_change  B1 40 3F
+  165058.7          ch1   control_change  B0 40 44
+  165059.5          ch2   control_change  B1 40 44
+  165064.7          ch1   control_change  B0 40 4B
+  165065.1          ch2   control_change  B1 40 4B
+  165070.5          ch1   control_change  B0 40 7F
+  165071.5          ch2   control_change  B1 40 7F
+  165625.6   1940.5 ch1   note_on         90 4C 3C
+  165871.6    246.0 ch1   note_on         90 4B 44
+  165877.5          ch1   release(v0)     90 4C 00
+  166041.7          ch1   release(v0)     90 4B 00
+  166064.0    192.4 ch1   note_on         90 4C 3F
+  166286.6    222.6 ch1   note_on         90 4B 3B
+  166303.5          ch1   release(v0)     90 4C 00
+  166365.8          ch1   release(v0)     90 4B 00
+  166582.7          ch1   control_change  B0 40 46
+  166583.4          ch2   control_change  B1 40 46
+  166588.6          ch1   control_change  B0 40 3D
+  166588.9          ch2   control_change  B1 40 3D
+  166594.5          ch1   control_change  B0 40 39
+  166594.8          ch2   control_change  B1 40 39
+  166600.6          ch1   control_change  B0 40 2A
+  166600.9          ch2   control_change  B1 40 2A
+  166606.6          ch1   control_change  B0 40 20
+  166607.4          ch2   control_change  B1 40 20
+  166612.7          ch1   control_change  B0 40 15
+  166613.0          ch2   control_change  B1 40 15
+  166618.5          ch1   control_change  B0 40 09
+  166618.8          ch2   control_change  B1 40 09
+  166624.5          ch1   control_change  B0 40 00
+  166624.8          ch2   control_change  B1 40 00
+  166858.6          ch1   control_change  B0 40 0A
+  166859.4          ch2   control_change  B1 40 0A
+  166864.5          ch1   control_change  B0 40 19
+  166864.8          ch2   control_change  B1 40 19
+  166870.5          ch1   control_change  B0 40 27
+  166870.8          ch2   control_change  B1 40 27
+  166876.6          ch1   control_change  B0 40 38
+  166877.3          ch2   control_change  B1 40 38
+  166882.5          ch1   control_change  B0 40 3E
+  166882.8          ch2   control_change  B1 40 3E
+  166888.6          ch1   control_change  B0 40 4A
+  166889.1          ch2   control_change  B1 40 4A
+  166894.7          ch1   control_change  B0 40 7F
+  166895.0          ch2   control_change  B1 40 7F
+  167121.6    835.0 ch1   note_on         90 41 3D
+  167124.4      2.9 ch1   note_on         90 44 44
+  167760.0    635.5 ch1   note_on         90 50 49
+  167767.6      7.6 ch1   note_on         90 4D 43
+  168362.6          ch1   release(v0)     90 50 00
+  168407.8          ch1   release(v0)     90 4D 00
+  169052.8   1285.2 ch1   note_on         90 49 47
+  169072.1     19.4 ch1   note_on         90 4D 3D
+  169279.7          ch1   release(v0)     90 44 00
+  169290.6          ch1   release(v0)     90 41 00
+  170037.5          ch1   release(v0)     90 49 00
+  170188.7   1116.5 ch1   note_on         90 49 08
+  170503.7          ch1   release(v0)     90 4D 00
+  170604.7          ch1   release(v0)     90 49 00
+  170716.1    527.5 ch1   note_on         90 42 39
+  170742.0     25.9 ch1   note_on         90 45 36
+  171058.2          ch1   control_change  B0 40 4F
+  171059.2          ch2   control_change  B1 40 4F
+  171064.0          ch1   control_change  B0 40 49
+  171064.5          ch2   control_change  B1 40 49
+  171070.0          ch1   control_change  B0 40 43
+  171070.5          ch2   control_change  B1 40 43
+  171076.2          ch1   control_change  B0 40 3F
+  171077.2          ch2   control_change  B1 40 3F
+  171082.6          ch1   control_change  B0 40 3D
+  171082.9          ch2   control_change  B1 40 3D
+  171088.0          ch1   control_change  B0 40 3C
+  171088.4          ch2   control_change  B1 40 3C
+  171094.0          ch1   control_change  B0 40 3A
+  171094.6          ch2   control_change  B1 40 3A
+  171100.0          ch1   control_change  B0 40 35
+  171100.3          ch2   control_change  B1 40 35
+  171106.0          ch1   control_change  B0 40 2D
+  171106.3          ch2   control_change  B1 40 2D
+  171112.5          ch1   control_change  B0 40 28
+  171112.8          ch2   control_change  B1 40 28
+  171118.0          ch1   control_change  B0 40 24
+  171118.6          ch2   control_change  B1 40 24
+  171124.0          ch1   control_change  B0 40 1F
+  171124.3          ch2   control_change  B1 40 1F
+  171129.9          ch1   control_change  B0 40 19
+  171130.3          ch2   control_change  B1 40 19
+  171136.0          ch1   control_change  B0 40 13
+  171136.4          ch2   control_change  B1 40 13
+  171142.5          ch1   control_change  B0 40 0D
+  171142.8          ch2   control_change  B1 40 0D
+  171147.9          ch1   control_change  B0 40 08
+  171148.3          ch2   control_change  B1 40 08
+  171154.0          ch1   control_change  B0 40 02
+  171154.3          ch2   control_change  B1 40 02
+  171159.8          ch1   control_change  B0 40 00
+  171160.3          ch2   control_change  B1 40 00
+  171361.0    619.0 ch1   note_on         90 4B 3F
+  171380.7     19.7 ch1   note_on         90 48 3C
+  171747.9          ch1   control_change  B0 40 05
+  171748.7          ch2   control_change  B1 40 05
+  171753.8          ch1   control_change  B0 40 0B
+  171754.3          ch2   control_change  B1 40 0B
+  171759.7          ch1   control_change  B0 40 0F
+  171760.3          ch2   control_change  B1 40 0F
+  171766.5          ch1   control_change  B0 40 14
+  171766.8          ch2   control_change  B1 40 14
+  171771.8          ch1   control_change  B0 40 17
+  171772.3          ch2   control_change  B1 40 17
+  171777.8          ch1   control_change  B0 40 19
+  171778.3          ch2   control_change  B1 40 19
+  171783.8          ch1   control_change  B0 40 1C
+  171784.4          ch2   control_change  B1 40 1C
+  171789.7          ch1   control_change  B0 40 1E
+  171790.3          ch2   control_change  B1 40 1E
+  171796.7          ch1   control_change  B0 40 20
+  171797.3          ch2   control_change  B1 40 20
+  171801.8          ch1   control_change  B0 40 22
+  171802.3          ch2   control_change  B1 40 22
+  171807.8          ch1   control_change  B0 40 25
+  171808.3          ch2   control_change  B1 40 25
+  171813.8          ch1   control_change  B0 40 26
+  171814.3          ch2   control_change  B1 40 26
+  171819.9          ch1   control_change  B0 40 28
+  171820.3          ch2   control_change  B1 40 28
+  171826.5          ch1   control_change  B0 40 2A
+  171826.8          ch2   control_change  B1 40 2A
+  171831.7          ch1   control_change  B0 40 2E
+  171832.3          ch2   control_change  B1 40 2E
+  171837.8          ch1   control_change  B0 40 33
+  171838.4          ch2   control_change  B1 40 33
+  171843.8          ch1   control_change  B0 40 38
+  171844.3          ch2   control_change  B1 40 38
+  171849.9          ch1   control_change  B0 40 3A
+  171850.3          ch2   control_change  B1 40 3A
+  171851.5          ch1   release(v0)     90 48 00
+  171856.5          ch1   control_change  B0 40 3B
+  171856.8          ch2   control_change  B1 40 3B
+  171861.8          ch1   control_change  B0 40 3D
+  171862.3          ch2   control_change  B1 40 3D
+  171867.9          ch1   control_change  B0 40 3F
+  171868.4          ch2   control_change  B1 40 3F
+  171873.9          ch1   control_change  B0 40 41
+  171874.3          ch2   control_change  B1 40 41
+  171879.8          ch1   control_change  B0 40 48
+  171880.3          ch2   control_change  B1 40 48
+  171886.5          ch1   control_change  B0 40 4F
+  171887.0          ch2   control_change  B1 40 4F
+  171891.8          ch1   control_change  B0 40 7F
+  171892.4          ch2   control_change  B1 40 7F
+  171959.6    578.9 ch1   note_on         90 4D 3C
+  171961.1      1.6 ch1   note_on         90 49 43
+  172039.6          ch1   release(v0)     90 4B 00
+  172585.0    623.9 ch1   note_on         90 4B 45
+  172589.9      4.9 ch1   note_on         90 48 3B
+  172674.6          ch1   release(v0)     90 49 00
+  172677.6          ch1   release(v0)     90 4D 00
+  172998.6          ch1   release(v0)     90 45 00
+  173096.7          ch1   release(v0)     90 42 00
+  173157.8          ch1   control_change  B0 40 41
+  173158.5          ch2   control_change  B1 40 41
+  173163.8          ch1   control_change  B0 40 3C
+  173164.4          ch2   control_change  B1 40 3C
+  173169.7          ch1   control_change  B0 40 32
+  173170.4          ch2   control_change  B1 40 32
+  173175.8          ch1   control_change  B0 40 26
+  173176.4          ch2   control_change  B1 40 26
+  173182.1          ch1   control_change  B0 40 1B
+  173182.5          ch2   control_change  B1 40 1B
+  173187.8          ch1   control_change  B0 40 11
+  173188.6          ch2   control_change  B1 40 11
+  173193.7          ch1   control_change  B0 40 05
+  173194.4          ch2   control_change  B1 40 05
+  173199.7          ch1   control_change  B0 40 00
+  173200.3          ch2   control_change  B1 40 00
+  173842.1          ch1   control_change  B0 40 03
+  173843.1          ch2   control_change  B1 40 03
+  173847.6          ch1   control_change  B0 40 0A
+  173848.4          ch2   control_change  B1 40 0A
+  173853.6          ch1   control_change  B0 40 11
+  173854.4          ch2   control_change  B1 40 11
+  173859.7          ch1   control_change  B0 40 16
+  173860.3          ch2   control_change  B1 40 16
+  173865.6          ch1   control_change  B0 40 1D
+  173866.4          ch2   control_change  B1 40 1D
+  173871.8          ch1   control_change  B0 40 22
+  173872.3          ch2   control_change  B1 40 22
+  173877.6          ch1   control_change  B0 40 28
+  173878.4          ch2   control_change  B1 40 28
+  173883.6          ch1   control_change  B0 40 2D
+  173884.4          ch2   control_change  B1 40 2D
+  173889.9          ch1   control_change  B0 40 36
+  173891.4          ch2   control_change  B1 40 36
+  173896.6          ch1   control_change  B0 40 3B
+  173897.1          ch2   control_change  B1 40 3B
+  173901.9          ch1   control_change  B0 40 3D
+  173902.4          ch2   control_change  B1 40 3D
+  173907.6          ch1   control_change  B0 40 41
+  173908.4          ch2   control_change  B1 40 41
+  173913.6          ch1   control_change  B0 40 4C
+  173914.4          ch2   control_change  B1 40 4C
+  173919.8          ch1   control_change  B0 40 7F
+  173920.4          ch2   control_change  B1 40 7F
+  174371.7          ch1   release(v0)     90 48 00
+  174380.0   1790.1 ch1   note_on         90 41 2B
+  174385.0      4.9 ch1   note_on         90 44 3B
+  174450.8          ch1   release(v0)     90 4B 00
+  175247.7    862.8 ch1   note_on         90 49 40
+  175255.8      8.1 ch1   note_on         90 46 41
+  175592.6          ch1   release(v0)     90 46 00
+  175683.2    427.4 ch1   note_on         90 48 3D
+  175702.2     19.0 ch1   note_on         90 4B 3E
+  175770.7          ch1   release(v0)     90 49 00
+  176054.6          ch1   release(v0)     90 48 00
+  176085.7    383.5 ch1   note_on         90 46 39
+  176115.9     30.2 ch1   note_on         90 49 3E
+  176193.8          ch1   release(v0)     90 4B 00
+  176272.7          ch1   release(v0)     90 49 00
+  176276.5          ch1   release(v0)     90 46 00
+  176589.7    473.8 ch1   note_on         90 49 40
+  176595.4      5.7 ch1   note_on         90 4D 43
+  176751.6          ch1   control_change  B0 40 50
+  176752.5          ch2   control_change  B1 40 50
+  176757.8          ch1   control_change  B0 40 41
+  176758.3          ch2   control_change  B1 40 41
+  176763.4          ch1   control_change  B0 40 3C
+  176764.4          ch2   control_change  B1 40 3C
+  176769.5          ch1   control_change  B0 40 37
+  176770.3          ch2   control_change  B1 40 37
+  176775.6          ch1   control_change  B0 40 29
+  176776.4          ch2   control_change  B1 40 29
+  176781.5          ch1   control_change  B0 40 20
+  176782.4          ch2   control_change  B1 40 20
+  176787.5          ch1   control_change  B0 40 15
+  176788.8          ch2   control_change  B1 40 15
+  176793.4          ch1   control_change  B0 40 0B
+  176794.4          ch2   control_change  B1 40 0B
+  176799.4          ch1   control_change  B0 40 01
+  176800.8          ch2   control_change  B1 40 01
+  176805.8          ch1   control_change  B0 40 00
+  176806.2          ch2   control_change  B1 40 00
+  177171.5          ch1   control_change  B0 40 01
+  177172.3          ch2   control_change  B1 40 01
+  177177.6          ch1   control_change  B0 40 07
+  177177.9          ch2   control_change  B1 40 07
+  177183.6          ch1   control_change  B0 40 0F
+  177183.9          ch2   control_change  B1 40 0F
+  177189.7          ch1   control_change  B0 40 16
+  177190.4          ch2   control_change  B1 40 16
+  177195.9          ch1   control_change  B0 40 1E
+  177196.5          ch2   control_change  B1 40 1E
+  177201.7          ch1   control_change  B0 40 26
+  177202.3          ch2   control_change  B1 40 26
+  177207.6          ch1   control_change  B0 40 2E
+  177208.0          ch2   control_change  B1 40 2E
+  177213.6          ch1   control_change  B0 40 39
+  177214.0          ch2   control_change  B1 40 39
+  177215.4          ch1   release(v0)     90 44 00
+  177219.8          ch1   control_change  B0 40 3D
+  177220.4          ch2   control_change  B1 40 3D
+  177225.7          ch1   control_change  B0 40 41
+  177226.9          ch2   control_change  B1 40 41
+  177231.5          ch1   control_change  B0 40 7F
+  177232.4          ch2   control_change  B1 40 7F
+  177275.6          ch1   release(v0)     90 41 00
+  177558.6          ch1   release(v0)     90 4D 00
+  177696.5          ch1   release(v0)     90 49 00
+  178099.5   1504.1 ch1   note_on         90 46 39
+  178107.5      7.9 ch1   note_on         90 49 45
+  178602.8          ch1   release(v0)     90 46 00
+  178628.7          ch1   release(v0)     90 49 00
+  178661.4    554.0 ch1   note_on         90 42 35
+  178662.8      1.4 ch1   note_on         90 3F 39
+  179227.0    564.2 ch1   note_on         90 44 45
+  179255.7     28.7 ch1   note_on         90 48 36
+  179673.7          ch1   release(v0)     90 44 00
+  179687.0    431.4 ch1   note_on         90 46 40
+  179692.5      5.5 ch1   note_on         90 49 41
+  179728.7          ch1   release(v0)     90 48 00
+  180139.7          ch1   release(v0)     90 46 00
+  180162.1    469.6 ch1   note_on         90 44 45
+  180175.6     13.5 ch1   note_on         90 48 36
+  180191.8          ch1   release(v0)     90 49 00
+  180464.7          ch1   release(v0)     90 42 00
+  180543.7          ch1   release(v0)     90 3F 00
+  181161.7          ch1   release(v0)     90 48 00
+  181206.7          ch1   release(v0)     90 44 00
+  181877.7   1702.1 ch1   note_on         90 42 3B
+  181887.0      9.3 ch1   note_on         90 3D 36
+  181891.5      4.5 ch1   note_on         90 3F 37
+  182181.6          ch1   control_change  B0 40 50
+  182182.4          ch2   control_change  B1 40 50
+  182187.0          ch1   control_change  B0 40 49
+  182187.4          ch2   control_change  B1 40 49
+  182193.0          ch1   control_change  B0 40 44
+  182193.4          ch2   control_change  B1 40 44
+  182199.1          ch1   control_change  B0 40 3F
+  182199.6          ch2   control_change  B1 40 3F
+  182205.2          ch1   control_change  B0 40 3E
+  182205.5          ch2   control_change  B1 40 3E
+  182211.1          ch1   control_change  B0 40 3D
+  182211.4          ch2   control_change  B1 40 3D
+  182217.1          ch1   control_change  B0 40 3B
+  182217.4          ch2   control_change  B1 40 3B
+  182223.2          ch1   control_change  B0 40 3A
+  182224.2          ch2   control_change  B1 40 3A
+  182229.0          ch1   control_change  B0 40 37
+  182229.4          ch2   control_change  B1 40 37
+  182235.0          ch1   control_change  B0 40 32
+  182235.4          ch2   control_change  B1 40 32
+  182241.1          ch1   control_change  B0 40 2D
+  182241.4          ch2   control_change  B1 40 2D
+  182247.1          ch1   control_change  B0 40 29
+  182247.4          ch2   control_change  B1 40 29
+  182253.1          ch1   control_change  B0 40 27
+  182253.7          ch2   control_change  B1 40 27
+  182259.2          ch1   control_change  B0 40 24
+  182259.8          ch2   control_change  B1 40 24
+  182265.1          ch1   control_change  B0 40 20
+  182265.5          ch2   control_change  B1 40 20
+  182271.0          ch1   control_change  B0 40 1C
+  182271.4          ch2   control_change  B1 40 1C
+  182277.0          ch1   control_change  B0 40 18
+  182277.3          ch2   control_change  B1 40 18
+  182283.0          ch1   control_change  B0 40 15
+  182283.4          ch2   control_change  B1 40 15
+  182289.2          ch1   control_change  B0 40 13
+  182289.9          ch2   control_change  B1 40 13
+  182295.6          ch1   control_change  B0 40 0F
+  182296.3          ch2   control_change  B1 40 0F
+  182300.9          ch1   control_change  B0 40 0D
+  182301.3          ch2   control_change  B1 40 0D
+  182307.0          ch1   control_change  B0 40 0A
+  182307.3          ch2   control_change  B1 40 0A
+  182313.0          ch1   control_change  B0 40 07
+  182313.3          ch2   control_change  B1 40 07
+  182319.0          ch1   control_change  B0 40 05
+  182319.4          ch2   control_change  B1 40 05
+  182325.1          ch1   control_change  B0 40 02
+  182325.5          ch2   control_change  B1 40 02
+  182331.0          ch1   control_change  B0 40 00
+  182331.4          ch2   control_change  B1 40 00
+  182366.6    475.1 ch1   note_on         90 46 3E
+  182427.5          ch1   release(v0)     90 42 00
+  182814.6    448.0 ch1   note_on         90 48 43
+  182835.6          ch1   control_change  B0 40 07
+  182836.2          ch2   control_change  B1 40 07
+  182839.4          ch1   release(v0)     90 46 00
+  182840.8          ch1   control_change  B0 40 0D
+  182841.4          ch2   control_change  B1 40 0D
+  182846.8          ch1   control_change  B0 40 14
+  182847.4          ch2   control_change  B1 40 14
+  182852.7          ch1   control_change  B0 40 1B
+  182853.4          ch2   control_change  B1 40 1B
+  182858.8          ch1   control_change  B0 40 21
+  182859.4          ch2   control_change  B1 40 21
+  182865.4          ch1   control_change  B0 40 26
+  182865.7          ch2   control_change  B1 40 26
+  182871.1          ch1   control_change  B0 40 2B
+  182872.5          ch2   control_change  B1 40 2B
+  182876.8          ch1   control_change  B0 40 34
+  182877.4          ch2   control_change  B1 40 34
+  182882.7          ch1   control_change  B0 40 3A
+  182883.4          ch2   control_change  B1 40 3A
+  182888.9          ch1   control_change  B0 40 3D
+  182889.4          ch2   control_change  B1 40 3D
+  182895.5          ch1   control_change  B0 40 3F
+  182896.4          ch2   control_change  B1 40 3F
+  182900.7          ch1   control_change  B0 40 46
+  182901.7          ch2   control_change  B1 40 46
+  182907.1          ch1   control_change  B0 40 4F
+  182908.3          ch2   control_change  B1 40 4F
+  182912.9          ch1   control_change  B0 40 7F
+  182913.3          ch2   control_change  B1 40 7F
+  183230.7    416.1 ch1   note_on         90 46 47
+  183268.5          ch1   release(v0)     90 48 00
+  183640.4    409.8 ch1   note_on         90 4B 47
+  183648.4          ch1   release(v0)     90 46 00
+  184031.0    390.6 ch1   note_on         90 46 40
+  184083.7          ch1   release(v0)     90 4B 00
+  184415.9    384.9 ch1   note_on         90 3C 38
+  184417.5      1.6 ch1   note_on         90 42 3E
+  184449.7     32.2 ch1   note_on         90 44 40
+  184489.7          ch1   release(v0)     90 46 00
+  184696.6          ch1   release(v0)     90 42 00
+  184865.2    415.5 ch1   note_on         90 46 43
+  184898.6          ch1   release(v0)     90 44 00
+  184958.7          ch1   release(v0)     90 3F 00
+  184992.1          ch1   release(v0)     90 3C 00
+  185021.6          ch1   release(v0)     90 3D 00
+  185270.7    405.6 ch1   note_on         90 44 3D
+  185278.5          ch1   release(v0)     90 46 00
+  185680.0    409.3 ch1   note_on         90 3A 3D
+  185680.7          ch1   release(v0)     90 44 00
+  185682.4      2.4 ch1   note_on         90 3D 3E
+  185715.3     32.9 ch1   note_on         90 3F 3E
+  186168.1    452.9 ch1   note_on         90 42 3F
+  186182.7          ch1   release(v0)     90 3F 00
+  186643.9    475.7 ch1   note_on         90 44 43
+  186687.8          ch1   release(v0)     90 42 00
+  187090.7          ch1   release(v0)     90 44 00
+  187107.1    463.2 ch1   note_on         90 42 3A
+  187351.5          ch1   release(v0)     90 3A 00
+  187366.5          ch1   release(v0)     90 42 00
+  187440.7          ch1   release(v0)     90 3D 00
+  187936.9    829.8 ch1   note_on         90 39 32
+  187943.4      6.6 ch1   note_on         90 3F 3B
+  187967.5     24.1 ch1   note_on         90 3C 39
+  187984.5     17.0 ch1   note_on         90 41 37
+  188519.7          ch1   release(v0)     90 3C 00
+  188548.8          ch1   release(v0)     90 39 00
+  188557.5          ch1   release(v0)     90 3F 00
+  188569.7          ch1   release(v0)     90 41 00
+  189201.8   1217.3 ch1   note_on         90 38 39
+  189203.1      1.2 ch1   note_on         90 3A 35
+  189211.9      8.8 ch1   note_on         90 3D 39
+  189470.8          ch1   control_change  B0 40 41
+  189472.1          ch2   control_change  B1 40 41
+  189476.6          ch1   control_change  B0 40 3C
+  189477.4          ch2   control_change  B1 40 3C
+  189482.6          ch1   control_change  B0 40 35
+  189483.4          ch2   control_change  B1 40 35
+  189488.6          ch1   control_change  B0 40 28
+  189489.4          ch2   control_change  B1 40 28
+  189495.2          ch1   control_change  B0 40 1D
+  189495.6          ch2   control_change  B1 40 1D
+  189501.4          ch1   control_change  B0 40 11
+  189502.5          ch2   control_change  B1 40 11
+  189506.6          ch1   control_change  B0 40 05
+  189507.4          ch2   control_change  B1 40 05
+  189513.5          ch1   control_change  B0 40 00
+  189514.5          ch2   control_change  B1 40 00
+  189646.7          ch1   release(v0)     90 3D 00
+  189694.3    482.4 ch1   note_on         90 41 1A
+  189758.9          ch1   control_change  B0 40 02
+  189760.1          ch2   control_change  B1 40 02
+  189764.5          ch1   control_change  B0 40 0A
+  189765.4          ch2   control_change  B1 40 0A
+  189770.7          ch1   control_change  B0 40 12
+  189771.2          ch2   control_change  B1 40 12
+  189776.4          ch1   control_change  B0 40 19
+  189777.4          ch2   control_change  B1 40 19
+  189782.7          ch1   control_change  B0 40 1F
+  189783.0          ch2   control_change  B1 40 1F
+  189788.6          ch1   control_change  B0 40 25
+  189789.0          ch2   control_change  B1 40 25
+  189794.9          ch1   control_change  B0 40 28
+  189795.4          ch2   control_change  B1 40 28
+  189801.0          ch1   control_change  B0 40 2A
+  189801.4          ch2   control_change  B1 40 2A
+  189806.5          ch1   control_change  B0 40 2F
+  189807.4          ch2   control_change  B1 40 2F
+  189812.9          ch1   control_change  B0 40 35
+  189813.4          ch2   control_change  B1 40 35
+  189818.7          ch1   control_change  B0 40 39
+  189819.3          ch2   control_change  B1 40 39
+  189825.0          ch1   control_change  B0 40 3B
+  189825.3          ch2   control_change  B1 40 3B
+  189830.5          ch1   control_change  B0 40 3D
+  189831.4          ch2   control_change  B1 40 3D
+  189837.2          ch1   control_change  B0 40 3E
+  189838.4          ch2   control_change  B1 40 3E
+  189842.6          ch1   control_change  B0 40 41
+  189843.0          ch2   control_change  B1 40 41
+  189848.6          ch1   control_change  B0 40 48
+  189848.9          ch2   control_change  B1 40 48
+  189854.6          ch1   control_change  B0 40 7F
+  189855.5          ch2   control_change  B1 40 7F
+  190171.1    476.8 ch1   note_on         90 42 3F
+  190249.8          ch1   release(v0)     90 41 00
+  190544.8          ch1   release(v0)     90 42 00
+  190568.6    397.6 ch1   note_on         90 41 35
+  190951.1    382.5 ch1   note_on         90 46 47
+  191023.7          ch1   release(v0)     90 41 00
+  191304.7    353.6 ch1   note_on         90 41 3B
+  191318.8          ch1   release(v0)     90 46 00
+  191508.8          ch1   release(v0)     90 41 00
+  191745.2    440.4 ch1   note_on         90 3D 38
+  191766.1     20.9 ch1   note_on         90 3F 44
+  191781.5     15.4 ch1   note_on         90 36 37
+  191942.2          ch1   control_change  B0 40 4C
+  191943.0          ch2   control_change  B1 40 4C
+  191948.7          ch1   control_change  B0 40 43
+  191949.4          ch2   control_change  B1 40 43
+  191954.2          ch1   control_change  B0 40 3E
+  191954.6          ch2   control_change  B1 40 3E
+  191960.0          ch1   control_change  B0 40 3B
+  191960.6          ch2   control_change  B1 40 3B
+  191966.1          ch1   control_change  B0 40 36
+  191966.7          ch2   control_change  B1 40 36
+  191972.1          ch1   control_change  B0 40 2C
+  191972.7          ch2   control_change  B1 40 2C
+  191978.1          ch1   control_change  B0 40 26
+  191978.5          ch2   control_change  B1 40 26
+  191984.1          ch1   control_change  B0 40 1F
+  191984.5          ch2   control_change  B1 40 1F
+  191990.0          ch1   control_change  B0 40 19
+  191990.3          ch2   control_change  B1 40 19
+  191996.1          ch1   control_change  B0 40 12
+  191996.5          ch2   control_change  B1 40 12
+  192002.1          ch1   control_change  B0 40 0B
+  192002.8          ch2   control_change  B1 40 0B
+  192008.1          ch1   control_change  B0 40 04
+  192008.4          ch2   control_change  B1 40 04
+  192014.1          ch1   control_change  B0 40 00
+  192014.4          ch2   control_change  B1 40 00
+  192019.6          ch1   release(v0)     90 3D 00
+  192213.6    432.1 ch1   note_on         90 41 3A
+  192268.7          ch1   release(v0)     90 3F 00
+  192278.1          ch1   control_change  B0 40 09
+  192278.6          ch2   control_change  B1 40 09
+  192284.0          ch1   control_change  B0 40 13
+  192284.5          ch2   control_change  B1 40 13
+  192290.1          ch1   control_change  B0 40 1D
+  192290.5          ch2   control_change  B1 40 1D
+  192296.6          ch1   control_change  B0 40 26
+  192296.8          ch2   control_change  B1 40 26
+  192302.0          ch1   control_change  B0 40 2E
+  192302.3          ch2   control_change  B1 40 2E
+  192308.1          ch1   control_change  B0 40 39
+  192308.6          ch2   control_change  B1 40 39
+  192314.1          ch1   control_change  B0 40 3C
+  192314.3          ch2   control_change  B1 40 3C
+  192320.0          ch1   control_change  B0 40 3E
+  192320.3          ch2   control_change  B1 40 3E
+  192326.6          ch1   control_change  B0 40 41
+  192326.9          ch2   control_change  B1 40 41
+  192332.0          ch1   control_change  B0 40 49
+  192332.3          ch2   control_change  B1 40 49
+  192338.1          ch1   control_change  B0 40 7F
+  192338.4          ch2   control_change  B1 40 7F
+  192430.6          ch1   release(v0)     90 36 00
+  192452.4          ch1   release(v0)     90 3A 00
+  192513.6          ch1   release(v0)     90 38 00
+  192610.8    397.1 ch1   note_on         90 3F 3F
+  192616.6          ch1   release(v0)     90 41 00
+  193037.7          ch1   release(v0)     90 3F 00
+  193043.8    433.0 ch1   note_on         90 35 39
+  193061.9     18.1 ch1   note_on         90 3A 3F
+  193068.6      6.7 ch1   note_on         90 38 3D
+  193507.6    439.0 ch1   note_on         90 3D 42
+  193522.7          ch1   release(v0)     90 3A 00
+  194004.8    497.2 ch1   note_on         90 3F 41
+  194070.6          ch1   release(v0)     90 3D 00
+  194426.8    422.0 ch1   note_on         90 3D 45
+  194481.5          ch1   release(v0)     90 3F 00
+  194622.5          ch1   release(v0)     90 35 00
+  194693.6          ch1   release(v0)     90 38 00
+  194754.6          ch1   release(v0)     90 3D 00
+  195613.5   1186.7 ch1   note_on         90 38 3C
+  195635.2     21.7 ch1   note_on         90 33 42
+  195636.0      0.8 ch1   note_on         90 36 3E
+  195656.8     20.8 ch1   note_on         90 3C 33
+  197096.4          ch1   control_change  B0 40 4C
+  197098.0          ch2   control_change  B1 40 4C
+  197101.7          ch1   control_change  B0 40 40
+  197102.5          ch2   control_change  B1 40 40
+  197107.8          ch1   control_change  B0 40 3C
+  197108.5          ch2   control_change  B1 40 3C
+  197113.8          ch1   control_change  B0 40 37
+  197114.5          ch2   control_change  B1 40 37
+  197119.6          ch1   control_change  B0 40 29
+  197120.4          ch2   control_change  B1 40 29
+  197125.6          ch1   control_change  B0 40 20
+  197126.4          ch2   control_change  B1 40 20
+  197131.7          ch1   control_change  B0 40 15
+  197132.6          ch2   control_change  B1 40 15
+  197137.6          ch1   control_change  B0 40 0A
+  197138.5          ch2   control_change  B1 40 0A
+  197144.2          ch1   control_change  B0 40 00
+  197144.8          ch2   control_change  B1 40 00
+  197544.9          ch1   release(v0)     90 38 00
+  197559.7          ch1   release(v0)     90 33 00
+  197560.4          ch1   release(v0)     90 36 00
+  197581.9          ch1   release(v0)     90 3C 00
+  207343.9          ch1   control_change  B0 40 0F
+  207345.9          ch2   control_change  B1 40 0F
+  207348.7          ch1   control_change  B0 40 20
+  207349.2          ch2   control_change  B1 40 20
+  207354.5          ch1   control_change  B0 40 30
+  207355.5          ch2   control_change  B1 40 30
+  207360.5          ch1   control_change  B0 40 3D
+  207361.7          ch2   control_change  B1 40 3D
+  207366.6          ch1   control_change  B0 40 4A
+  207367.4          ch2   control_change  B1 40 4A
+  207372.7          ch1   control_change  B0 40 7F
+  207373.5          ch2   control_change  B1 40 7F
+  207484.9  11828.1 ch1   note_on         90 3C 50
+  207599.8          ch1   release(v0)     90 3C 00
+  207759.2    274.2 ch1   note_on         90 3C 5A
+  207871.8          ch1   release(v0)     90 3C 00
+  208053.6    294.4 ch1   note_on         90 3C 56
+  208172.7          ch1   release(v0)     90 3C 00
+  208337.8    284.1 ch1   note_on         90 3C 58
+  208443.6          ch1   release(v0)     90 3C 00
+  208652.6    314.9 ch1   note_on         90 3C 5C
+  209070.9          ch1   control_change  B0 40 3E
+  209071.1          ch1   release(v0)     90 3C 00
+  209071.8          ch2   control_change  B1 40 3E
+  209076.6          ch1   control_change  B0 40 2F
+  209076.7          ch2   control_change  B1 40 2F
+  209082.7          ch1   control_change  B0 40 1B
+  209083.3          ch2   control_change  B1 40 1B
+  209088.7          ch1   control_change  B0 40 07
+  209088.9          ch2   control_change  B1 40 07
+  209094.6          ch1   control_change  B0 40 00
+  209094.8          ch2   control_change  B1 40 00
+  209386.5    733.9 ch1   note_on         90 3C 5B
+  209586.4          ch1   release(v0)     90 3C 00
+  209694.6    308.1 ch1   note_on         90 3C 45
+  209834.7          ch1   release(v0)     90 3C 00
+  210003.7    309.0 ch1   note_on         90 3C 5C
+  210142.8          ch1   release(v0)     90 3C 00
+  210281.7    278.1 ch1   note_on         90 3C 52
+  210404.6          ch1   release(v0)     90 3C 00
+  210590.0    308.3 ch1   note_on         90 3C 58
+  211064.8          ch1   release(v0)     90 3C 00
+  268513.3  57923.3 ch1   note_on         90 3C 43
+  268649.1    135.7 ch1   note_on         90 40 39
+  268761.7          ch1   release(v0)     90 3C 00
+  268771.2    122.1 ch1   note_on         90 43 40
+  268938.3    167.2 ch1   note_on         90 48 41
+  269015.7          ch1   release(v0)     90 40 00
+  269026.0          ch1   release(v0)     90 43 00
+  269326.5          ch1   release(v0)     90 48 00
+  269330.4    392.1 ch1   note_on         90 43 3F
+  269472.0    141.6 ch1   note_on         90 40 35
+  269564.4          ch1   release(v0)     90 43 00
+  269580.9    108.9 ch1   note_on         90 3C 45
+  269641.6          ch1   release(v0)     90 40 00
+  269746.7          ch1   release(v0)     90 3C 00
+  270069.2    488.3 ch1   note_on         90 3C 49
+  270170.8    101.6 ch1   note_on         90 40 42
+  270209.7          ch1   release(v0)     90 3C 00
+  270284.9    114.1 ch1   note_on         90 43 40
+  270414.6          ch1   release(v0)     90 40 00
+  270422.7    137.7 ch1   note_on         90 48 41
+  270451.6          ch1   release(v0)     90 43 00
+  270556.5    133.8 ch1   note_on         90 43 35
+  270582.5          ch1   release(v0)     90 48 00
+  270667.0    110.5 ch1   note_on         90 40 3D
+  270758.8          ch1   release(v0)     90 43 00
+  270815.6    148.6 ch1   note_on         90 3C 45
+  270844.0          ch1   release(v0)     90 40 00
+  270926.5          ch1   release(v0)     90 3C 00
+  271152.8    337.2 ch1   note_on         90 3C 4A
+  271276.7    123.9 ch1   note_on         90 40 45
+  271310.5          ch1   release(v0)     90 3C 00
+  271375.2     98.5 ch1   note_on         90 43 3F
+  271485.9    110.7 ch1   note_on         90 48 46
+  271496.8          ch1   release(v0)     90 40 00
+  271533.7          ch1   release(v0)     90 43 00
+  271614.5    128.7 ch1   note_on         90 43 40
+  271654.5          ch1   release(v0)     90 48 00
+  271716.5    102.0 ch1   note_on         90 40 40
+  271790.5          ch1   release(v0)     90 43 00
+  271843.0    126.5 ch1   note_on         90 3C 4C
+  271875.8          ch1   release(v0)     90 40 00
+  271957.8          ch1   release(v0)     90 3C 00
+  280663.9   8820.9 ch1   note_on         90 42 01
+  280754.6          ch1   release(v0)     90 42 00
+  281004.7    340.8 ch1   note_on         90 3F 1A
+  281225.7          ch1   release(v0)     90 3F 00
+  332704.1  51699.4 ch1   note_on         90 3C 45
+  332881.8    177.7 ch1   note_on         90 3E 48
+  332921.6          ch1   release(v0)     90 3C 00
+  333060.7    178.9 ch1   note_on         90 40 43
+  333185.8          ch1   release(v0)     90 3E 00
+  333299.6    238.8 ch1   note_on         90 41 4B
+  333335.6          ch1   release(v0)     90 40 00
+  333746.8    447.2 ch1   note_on         90 43 58
+  333752.6          ch1   release(v0)     90 41 00
+  333978.7    231.9 ch1   note_on         90 45 50
+  334007.7          ch1   release(v0)     90 43 00
+  334176.8    198.2 ch1   note_on         90 47 4C
+  334286.9          ch1   release(v0)     90 45 00
+  334372.8    196.0 ch1   note_on         90 48 56
+  334393.7          ch1   release(v0)     90 47 00
+  335231.8          ch1   release(v0)     90 48 00
+  336066.8   1693.9 ch1   note_on         90 48 59
+  336214.8    148.1 ch1   note_on         90 4A 4B
+  336288.8          ch1   release(v0)     90 48 00
+  336347.9    133.1 ch1   note_on         90 4C 4C
+  336432.8          ch1   release(v0)     90 4A 00
+  336518.0          ch1   release(v0)     90 4C 00
+  336527.8    179.9 ch1   note_on         90 4D 50
+  336666.6    138.8 ch1   note_on         90 4F 49
+  336722.6          ch1   release(v0)     90 4D 00
+  336823.7    157.1 ch1   note_on         90 51 45
+  336829.6      5.9 ch1   note_on         90 53 45
+  336870.6          ch1   release(v0)     90 4F 00
+  336964.6    135.1 ch1   note_on         90 4F 35
+  336999.7          ch1   release(v0)     90 51 00
+  337036.6          ch1   release(v0)     90 4F 00
+  337054.6     90.0 ch1   note_on         90 54 51
+  337095.7          ch1   release(v0)     90 53 00
+  337230.8    176.2 ch1   note_on         90 53 41
+  337277.9          ch1   release(v0)     90 54 00
+  337322.8     92.0 ch1   note_on         90 51 41
+  337443.8    121.0 ch1   note_on         90 4F 50
+  337474.5          ch1   release(v0)     90 53 00
+  337494.6          ch1   release(v0)     90 51 00
+  337578.6    134.9 ch1   note_on         90 4D 4E
+  337606.6          ch1   release(v0)     90 4F 00
+  337723.7    145.1 ch1   note_on         90 4C 49
+  337767.7          ch1   release(v0)     90 4D 00
+  337841.7    118.0 ch1   note_on         90 4A 4B
+  337868.6          ch1   release(v0)     90 4C 00
+  337953.6    111.9 ch1   note_on         90 48 57
+  337992.6          ch1   release(v0)     90 4A 00
+  338084.8          ch1   release(v0)     90 48 00

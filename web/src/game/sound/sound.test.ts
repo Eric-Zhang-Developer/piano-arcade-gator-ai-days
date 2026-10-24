@@ -1,5 +1,6 @@
 import { expect, test, vi } from "vitest";
 import type { GameEvent, Results } from "../../contracts";
+import { stampImpactMs } from "../rank-stamp";
 import { eventSounds, soundSettings, soundsFor } from "./index";
 
 const results = {} as Results;
@@ -19,15 +20,22 @@ const events: GameEvent[] = [
 ];
 
 test("events map to sounds on the audio clock, exactly", () => {
-  const { rankHitMs, fanfareAfterHitMs } = soundSettings;
+  const { fanfareAfterHitMs } = soundSettings;
   expect(soundsFor(events, 10)).toEqual([
     { sound: "miss", startTime: 10.7 },
     { sound: "stinger", startTime: 25 },
     { sound: "sweep", startTime: 28 },
-    { sound: "fanfare", startTime: 10 + (29000 + rankHitMs + fanfareAfterHitMs) / 1000 },
+    { sound: "fanfare", startTime: 10 + (29000 + stampImpactMs(true) + fanfareAfterHitMs) / 1000 },
     { sound: "drumroll", startTime: 39 },
-    { sound: "rankHit", startTime: 10 + (29000 + rankHitMs) / 1000 },
+    { sound: "rankHit", startTime: 10 + (29000 + stampImpactMs(true)) / 1000 }, // after the full combo's banner
   ]);
+});
+
+test("the rank hit lands with the stamp: at its impact, later after a full combo", () => {
+  const end = (fc: boolean) => soundsFor([{ type: "songEnd", results, atMs: 29000 }], 0, true, fc).find((s) => s.sound === "rankHit")!.startTime;
+  expect(end(false)).toBe((29000 + stampImpactMs(false)) / 1000);
+  expect(end(true)).toBe((29000 + stampImpactMs(true)) / 1000);
+  expect(stampImpactMs(true)).toBeGreaterThan(stampImpactMs(false));
 });
 
 test("the miss cue can be turned off; hits, combos, extras and the count-in make no sound", () => {

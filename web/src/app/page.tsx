@@ -11,8 +11,8 @@ export default function Home() {
   return (
     <>
       <MusicSelect songs={songs} />
-      {/* calibration: tap along to clicks to set the latency offset before a first game */}
-      <Link href="/calibrate" style={calibrateLink}>
+      {/* calibration: tap along to clicks to set the latency offset before a first game; setup, so ?capture=1 hides it */}
+      <Link href="/calibrate" style={calibrateLink} data-capture-hide>
         Calibrate latency
       </Link>
     </>

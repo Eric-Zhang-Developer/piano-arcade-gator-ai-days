@@ -1,0 +1,112 @@
+/* The pause menu over the playfield: a dim, PAUSED in the display face, then Resume, Retry and Quit stacked. */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4vh;
+  background: rgba(4, 2, 12, 0.72);
+  backdrop-filter: blur(10px); /* the frozen playfield (the count-in's digit, notes) recedes behind the menu */
+  color: var(--pa-ink);
+  animation: dim 200ms ease-out;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(72px, 9vw, 176px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  animation: enter 220ms ease-out;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4vh;
+  min-width: clamp(240px, 22vw, 420px);
+  padding: 1.4vh;
+  border-radius: 8px;
+  background: var(--pa-panel);
+  animation: enter 220ms ease-out;
+}
+
+.item {
+  appearance: none;
+  border: 0;
+  border-radius: 4px;
+  padding: 0.55em 1em;
+  background: transparent;
+  color: var(--pa-ink-dim);
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  font-size: clamp(20px, 1.6vw, 32px);
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* The focus is the menu's cursor: always shown, keyboard or mouse. */
+.item:focus {
+  outline: 3px solid var(--pa-magenta);
+  outline-offset: 0;
+  color: var(--pa-ink);
+  background: rgba(255, 47, 208, 0.12);
+}
+
+.hint {
+  margin: 0;
+  font-size: clamp(16px, 1.25vw, 24px);
+  color: var(--pa-ink-dim);
+}
+
+.hint b {
+  font-weight: 600;
+  color: var(--pa-ink);
+}
+
+.count {
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(120px, 16vw, 300px);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  animation: beat 300ms ease-out;
+}
+
+@keyframes dim {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes beat {
+  from {
+    opacity: 0.4;
+    transform: scale(1.25);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .title,
+  .menu,
+  .count {
+    animation: none;
+  }
+}

@@ -36,6 +36,9 @@ export interface TakeEvent {
 }
 
 export interface Take {
+  // Missing/1 is the original onset-only policy. Only explicit 2 earns sustain
+  // credit; old files/outbox entries must never be silently reinterpreted.
+  scoringVersion?: 1 | 2;
   chartId: string;
   startedAt: string; // ISO
   latencyOffsetMs: number;
@@ -54,6 +57,9 @@ export interface NoteJudgment {
 }
 
 export interface Results {
+  // Additive local policy v2. Timing judgments/rank remain onset-only;
+  // bounded long-note credit is a separately labelled score component.
+  sustain?: SustainSummary;
   chartId: string;
   judgments: NoteJudgment[];
   extras: { eventIndex: number }[];
@@ -62,6 +68,22 @@ export interface Results {
   accuracy: number; // 0–1: (PERFECT + 0.5 × GREAT + 0.25 × GOOD) / (notes + wrong)
   maxCombo: number;
   rank: Rank;
+}
+
+export interface SustainNote {
+  noteId: string;
+  heldMs: number;
+  targetMs: number;
+  earnedPoints: number;
+  possiblePoints: number;
+  releasedEarly: boolean;
+}
+
+export interface SustainSummary {
+  version: 2;
+  earnedPoints: number;
+  possiblePoints: number;
+  notes: SustainNote[];
 }
 
 type At = { atMs: number };
@@ -174,6 +196,7 @@ export function validateTake(t: unknown): string[] {
   if (!isStr(o.chartId)) p.push("chartId missing");
   if (!isStr(o.startedAt) || Number.isNaN(Date.parse(o.startedAt))) p.push("startedAt must be ISO");
   if (!isNum(o.latencyOffsetMs)) p.push("latencyOffsetMs missing");
+  if (o.scoringVersion !== undefined && o.scoringVersion !== 1 && o.scoringVersion !== 2) p.push("scoringVersion must be 1 or 2");
   if (!["midi", "keys", "test"].includes(o.inputDevice as string)) p.push("inputDevice invalid");
   if (!Array.isArray(o.events)) return [...p, "events missing"];
   o.events.forEach((e, i) => {
@@ -181,6 +204,7 @@ export function validateTake(t: unknown): string[] {
     if (!Number.isInteger(e.velocity) || e.velocity < 1 || e.velocity > 127) p.push(`event ${i}: velocity invalid`);
     if (!isNum(e.timeMs)) p.push(`event ${i}: timeMs missing`);
     if (e.offTimeMs !== null && !isNum(e.offTimeMs)) p.push(`event ${i}: offTimeMs must be a number or null`);
+    if (o.scoringVersion === 2 && e.offTimeMs !== null && e.offTimeMs < e.timeMs) p.push(`event ${i}: release precedes press`);
   });
   return p;
 }
@@ -200,5 +224,15 @@ export function validateResults(r: unknown): string[] {
   if (!isNum(o.accuracy) || o.accuracy < 0 || o.accuracy > 1) p.push("accuracy must be 0–1");
   if (!isNum(o.maxCombo)) p.push("maxCombo missing");
   if (!["S", "A", "B", "C", "D"].includes(o.rank as string)) p.push("rank invalid");
+  if (o.sustain !== undefined) {
+    const s = o.sustain;
+    if (!s || s.version !== 2 || !Array.isArray(s.notes)) p.push("sustain must be a version 2 summary");
+    else {
+      for (const n of s.notes) {
+        if (!isStr(n.noteId) || !isNum(n.targetMs) || n.targetMs <= 0 || !isNum(n.heldMs) || n.heldMs < 0 || n.heldMs > n.targetMs || !Number.isInteger(n.earnedPoints) || !Number.isInteger(n.possiblePoints) || n.earnedPoints < 0 || n.earnedPoints > n.possiblePoints || n.possiblePoints < 0 || typeof n.releasedEarly !== "boolean") p.push("invalid sustain note");
+      }
+      if (s.earnedPoints !== s.notes.reduce((sum, n) => sum + n.earnedPoints, 0) || s.possiblePoints !== s.notes.reduce((sum, n) => sum + n.possiblePoints, 0)) p.push("sustain totals do not match notes");
+    }
+  }
   return p;
 }

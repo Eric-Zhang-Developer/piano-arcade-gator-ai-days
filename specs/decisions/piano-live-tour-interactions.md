@@ -12,3 +12,7 @@ User requirements relayed through firstmate on2026-10-24: working Home links, fa
 Validation: silent behavioral tests for normal/reduced tempo and4/4/12/8; cancel before MIDI permission resolves; isolated muted browser tests of initial skip, pause, resume skip and Home; repository lint/typecheck/unit/build checks. Prior longer-countdown assertions change because the user explicitly requested shorter counts; musical pulse/epoch assertions remain.
 
 Later stages must document any versioned scoring/shared-format boundary before implementation. No commercial score transcription or fake song entries.
+
+## Local additive sustain contract (firstmate authorization011)
+
+New takes explicitly opt into scoringVersion2. Missing/1 remains original onset-only; no migration or re-judgment of stored rows. Version2 Results may add a sustain summary with per-note bounded hold credit, distinct from timing grade/rank. Existing note-on/off fields carry performance evidence. No new GameEvent shape is required. The API must preserve/check the version; row metadata and local record namespaces follow the actual policy, not a global reinterpretation. Unknown releases cannot earn invented duration. This local-only additive contract draft has no upstream/other-lane approval and does not authorize database/schema/auth changes.

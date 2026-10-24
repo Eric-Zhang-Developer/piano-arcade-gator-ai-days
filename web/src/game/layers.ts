@@ -2,6 +2,7 @@ import type { GamePlugin } from "../contracts";
 import { barLoop } from "./bar-loop";
 import { beatTrack } from "./beat";
 import { handColors } from "./hand-colors";
+import { ghost } from "./ghost";
 import { handMode } from "./hand-mode";
 import { hud } from "./hud";
 import { warningCard } from "./difficulty";
@@ -28,6 +29,7 @@ export const plugins: GamePlugin[] = [
   handMode(), // ?hands=R|L: before scenes and the sim, so their bots and the judge get only the played hand
   scenes(), // ?bot=<name>: after bar-loop, so the bot plays the looped chart
   simPlugin, // piano-sim: /play?midi=sim only. First, so later plugins asking for MIDI get the fake piano.
+  ghost(), // the last take, dashed: under every layer that draws, after every plugin that changes the chart
   noteLabels(), // after bar-loop, scenes and the sim: it labels the final chart and sees which device really played
   juiceVisual(), // under the HUD: wisps and flares never cover the score
   handColors(), // the L/R legend during the count-in, two-hand charts only

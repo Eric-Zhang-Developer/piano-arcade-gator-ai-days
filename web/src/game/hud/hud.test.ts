@@ -3,7 +3,7 @@ import type { Chart, GameEvent } from "../../contracts";
 import { makeLayout } from "../core/highway";
 import { Judge } from "../core/judge";
 import { GOOD_MS, msPerBeat } from "../core/settings";
-import { emptyHud, hud, hudBottom, hudLayout, reduceHud, tierFor, tierProgress } from ".";
+import { emptyHud, hud, hudBottom, hudLayout, hudSettings, reduceHud, rollup, tierFlash, tierFor, tierProgress } from ".";
 
 // What the judge sends for a hit: noteHit, then combo, then comboMilestone at 25.
 function hits(judgment: "PERFECT" | "GREAT", n: number, comboBefore: number): GameEvent[] {
@@ -251,6 +251,128 @@ describe("the combo in the band (combo-hud)", () => {
       const d = drawAt(0, null, 0, w, h);
       const title = d.fills.find((f) => f.text === chart.title);
       expect(title?.px).toBe(Math.round(d.band * 0.3));
+    }
+  });
+});
+
+describe("score roll-up and tier flash (score-rollup)", () => {
+  it("rollup: from at 0, exactly to at 200 ms and after, whole, never down, never past", () => {
+    expect(hudSettings.rollMs).toBe(200);
+    for (const [from, to] of [[0, 100], [3450, 3850], [10, 11], [0, 214800]]) {
+      expect(rollup(from, to, 0)).toBe(from);
+      expect(rollup(from, to, 200)).toBe(to);
+      expect(rollup(from, to, 5000)).toBe(to);
+      let last = from;
+      for (let ms = 0; ms <= 220; ms++) {
+        const v = rollup(from, to, ms);
+        expect(Number.isInteger(v)).toBe(true);
+        expect(v).toBeGreaterThanOrEqual(last);
+        expect(v).toBeLessThanOrEqual(to);
+        last = v;
+      }
+    }
+  });
+
+  it("a hit mid-roll continues from the shown value, and dense hits never take the shown score down", () => {
+    const p = hud();
+    const shown: number[] = [];
+    const r = record();
+    const events: GameEvent[] = [{ type: "songStart", atMs: 0 }];
+    // maple-leaf-rag's density: a hit every ~69 ms, so each roll restarts before it ends.
+    for (let i = 0; i < 30; i++) {
+      events.push({ type: "noteHit", noteId: `n${i}`, pitch: 60, judgment: "PERFECT", offsetMs: 0, atMs: i * 69 }, { type: "combo", count: i + 1, atMs: i * 69 });
+    }
+    p.onEvent!(events[0]);
+    for (let i = 0; i < 30; i++) {
+      p.onEvent!(events[1 + 2 * i]);
+      p.onEvent!(events[2 + 2 * i]);
+      for (const dt of [0, 30, 60]) shown.push(scoreShown(p, r, i * 69 + dt));
+    }
+    for (let i = 1; i < shown.length; i++) expect(shown[i]).toBeGreaterThanOrEqual(shown[i - 1]);
+    const exact = events.reduce(reduceHud, emptyHud()).score;
+    expect(scoreShown(p, r, 29 * 69 + 199)).toBeLessThan(exact); // still rolling just before 200 ms…
+    expect(scoreShown(p, r, 29 * 69 + 200)).toBe(exact); // …and settled at 200 ms after the last hit
+  });
+
+  it("tierFlash is 1 at the tier-up and 0 from 250 ms", () => {
+    expect(tierFlash(0)).toBe(1);
+    expect(tierFlash(100)).toBeGreaterThan(0);
+    expect(tierFlash(250)).toBe(0);
+    expect(tierFlash(1000)).toBe(0);
+    expect(tierFlash(-1)).toBe(0);
+  });
+
+  // A fake context recording fillText with the shadow it was drawn with.
+  function record() {
+    const texts: { text: string; blur: number }[] = [];
+    const t: Record<string | symbol, unknown> = { globalAlpha: 1, shadowBlur: 0 };
+    const stack: unknown[] = [];
+    const ctx = new Proxy(t, {
+      get: (o, k) => {
+        if (k in o) return o[k];
+        if (k === "save") return () => stack.push(o.shadowBlur);
+        if (k === "restore") return () => (o.shadowBlur = stack.pop() ?? 0);
+        if (k === "fillText") return (s: string) => texts.push({ text: s, blur: o.shadowBlur as number });
+        if (k === "measureText") return (s: string) => ({ width: s.length * 10 });
+        return () => {};
+      },
+      set: (o, k, v) => ((o[k] = v), true),
+    }) as unknown as CanvasRenderingContext2D;
+    return { ctx, texts };
+  }
+  const frame = (nowMs: number) => ({ width: 1280, height: 720, judgmentLineY: 560, nowMs }) as never;
+  const isScore = (s: string) => /^[\d,]+$/.test(s);
+  // The score's text: the last all-digit fill after the counters and the combo (the score draws right after the badge).
+  function scoreShown(p: ReturnType<typeof hud>, r: ReturnType<typeof record>, nowMs: number): number {
+    r.texts.length = 0;
+    p.draw!(r.ctx, frame(nowMs));
+    const i = r.texts.findIndex((x) => /^x\d$/.test(x.text));
+    return Number(r.texts.slice(i).find((x) => isScore(x.text))!.text.replaceAll(",", ""));
+  }
+  const badge = (p: ReturnType<typeof hud>, r: ReturnType<typeof record>, nowMs: number) => {
+    r.texts.length = 0;
+    p.draw!(r.ctx, frame(nowMs));
+    return r.texts.find((x) => /^x\d$/.test(x.text))!;
+  };
+  const hit = (p: ReturnType<typeof hud>, i: number, atMs: number) => {
+    p.onEvent!({ type: "noteHit", noteId: `n${i}`, pitch: 60, judgment: "PERFECT", offsetMs: 0, atMs });
+    p.onEvent!({ type: "combo", count: i + 1, atMs });
+  };
+
+  it("the drawn score: strictly between at 100 ms, exactly the new value at 200 ms", () => {
+    const p = hud();
+    const r = record();
+    p.onEvent!({ type: "songStart", atMs: 0 });
+    hit(p, 0, 1000);
+    const mid = scoreShown(p, r, 1100);
+    expect(mid).toBeGreaterThan(0);
+    expect(mid).toBeLessThan(100);
+    expect(scoreShown(p, r, 1200)).toBe(100);
+  });
+
+  it("the badge glows within 250 ms of x1 → x2, not after it, and not after a drop", () => {
+    const p = hud();
+    const r = record();
+    p.onEvent!({ type: "songStart", atMs: 0 });
+    for (let i = 0; i < 10; i++) hit(p, i, i * 100); // combo 10 at 900 ms: x2
+    expect(badge(p, r, 900 + 100)).toMatchObject({ text: "x2" });
+    expect(badge(p, r, 900 + 100).blur).toBeGreaterThan(0);
+    expect(badge(p, r, 900 + 250).blur).toBe(0);
+    p.onEvent!({ type: "noteMiss", noteId: "m", pitch: 60, atMs: 2000 }); // back to x1
+    expect(badge(p, r, 2050)).toEqual({ text: "x1", blur: 0 });
+  });
+
+  it("under reduced motion: the target at once and no glow", () => {
+    vi.stubGlobal("matchMedia", () => ({ matches: true }));
+    try {
+      const p = hud();
+      const r = record();
+      p.onEvent!({ type: "songStart", atMs: 0 });
+      for (let i = 0; i < 10; i++) hit(p, i, i * 100);
+      expect(scoreShown(p, r, 900)).toBe(1000);
+      expect(badge(p, r, 950).blur).toBe(0);
+    } finally {
+      vi.unstubAllGlobals();
     }
   });
 });

@@ -1,5 +1,6 @@
 // The highway: a flat-or-mildly-tilted lane per key, notes falling to the keyboard. Canvas 2D, no React.
 import type { Chart, Frame, Hand, Judgment } from "../../contracts";
+import { drawBarLines, type BarLine } from "../bar-lines";
 import { noteColorFor } from "../hand-colors";
 import { hitLinePath } from "../hit-line";
 import { meterLayout } from "../fever-gauge";
@@ -56,6 +57,7 @@ export interface HighwayState {
   latest: { judgment: Judgment | "WRONG"; offsetMs: number | null; atMs: number } | null;
   countInBeat: number | null; // 1..countInBeats while counting in, else null
   backdropAlpha?: number; // below 1 while a background layer is mounted; default opaque
+  barLines?: BarLine[]; // bar-lines: a faint line per bar start, under the notes; absent draws none
 }
 
 // Read once and kept live, so a frame doesn't build a new query; absent (tests, server) means motion is fine.
@@ -170,6 +172,7 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
     ctx.lineTo(x, line);
     ctx.stroke();
   }
+  if (s.barLines) drawBarLines(ctx, L, s.barLines, s.nowMs);
 
   // Notes, clipped to the highway so they slide into the keys.
   ctx.save();

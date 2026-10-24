@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Chart, GameEvent, InputDevice, InputEvent, Results, Take } from "../../contracts";
 import { validateChart } from "../../contracts";
 import { plugins } from "../../game/layers";
+import { barLines } from "../../game/bar-lines";
 import { drawHighway, makeLayout, type HighwayState, type Layout } from "../../game/core/highway";
 import { createZoom, zoomOn } from "../../game/highway-zoom";
 import { Judge, noteTimeMs } from "../../game/core/judge";
@@ -137,6 +138,7 @@ export default function Play() {
       latest: null,
       countInBeat: null,
       backdropAlpha: background ? settings.stageBackdropAlpha : 1,
+      barLines: barLines(chart, params), // the chart /play plays: a loop's bars carry the song's numbers
     };
     const handOf = new Map(chart.notes.map((n) => [n.id, n.hand]));
     let hud = emptyHud(); // rebuilt with the HUD's own reducer, as records does

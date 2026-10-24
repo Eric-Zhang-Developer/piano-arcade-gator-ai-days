@@ -7,6 +7,7 @@ import { difficultyInputs } from "../difficulty";
 import { pickOutput } from "../../replay/piano";
 import { modeUrl } from "../wait-mode/plugin";
 import { opening, openingMs, playAsTones, playOnPiano, practiceUrl, previewSettings } from "./opening";
+import { SongSource } from "../song-sources";
 
 // The music select's L (learn-from-select): plain l or L, no Ctrl, Meta or Alt (Cmd+L stays the browser's), no repeat.
 export const isLearnKey = (e: Pick<KeyboardEvent, "key" | "ctrlKey" | "metaKey" | "altKey" | "repeat">) =>
@@ -109,6 +110,8 @@ export function SongPreview({ id, best }: { id: string; best?: { rank: Rank; acc
           )}
         </span>
       </div>
+      {/* song-sources: the cited score, one click away; the proof, not setup, so ?capture=1 keeps it */}
+      {chart && <SongSource source={chart.source} />}
       <p data-testid="preview-status" data-capture-hide style={status}>
         {!isArmed ? "Press any key for previews" : voice === "piano" ? "Preview: on the piano" : voice === "tones" ? "Preview: laptop tones" : "\u00a0"}
       </p>

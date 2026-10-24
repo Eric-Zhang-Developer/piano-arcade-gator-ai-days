@@ -49,13 +49,26 @@ const check = (ok, line) => {
   if (!ok) failures.push(line);
 };
 
-// Counts the tones started and the buses disconnected; with `piano`, a stand-in DGX records every MIDI send.
+// Counts the tones started and the buses disconnected; with `piano`, a stand-in DGX records every MIDI send. A tone
+// started inside a key's dispatch is a UI sound (ui-sounds' ↓ blip runs in the list's keydown handler), counted in
+// __uiTones; the preview starts its tones from a timer previewSettings.delayMs later, counted in __tones (#428).
 const instrument = (piano) => {
   window.__tones = 0;
+  window.__uiTones = 0;
   window.__disconnects = 0;
+  let inKey = false;
+  window.addEventListener(
+    "keydown",
+    () => {
+      inKey = true;
+      setTimeout(() => (inKey = false));
+    },
+    true,
+  );
   const osc = AudioContext.prototype.createOscillator;
   AudioContext.prototype.createOscillator = function () {
-    window.__tones++;
+    if (inKey) window.__uiTones++;
+    else window.__tones++;
     return osc.call(this);
   };
   const disc = AudioNode.prototype.disconnect;
@@ -100,7 +113,7 @@ await page.addInitScript(instrument, false);
 await open(page);
 await page.waitForTimeout(1500);
 check((await page.getByTestId("preview-status").textContent()) === "Press any key for previews", "before a key press the panel says 'Press any key for previews'");
-check((await page.evaluate(() => window.__tones + window.__midiAsked)) === 0, "nothing plays and no MIDI is asked for on page load");
+check((await page.evaluate(() => window.__tones + window.__uiTones + window.__midiAsked)) === 0, "nothing plays and no MIDI is asked for on page load");
 const list = (await page.locator("ol a").evaluateAll((as) => as.map((a) => a.getAttribute("href").replace("/play?song=", ""))));
 await page.keyboard.press("ArrowDown");
 await page.getByTestId("preview-status").filter({ hasText: "laptop tones" }).waitFor({ timeout: 10_000 });
@@ -108,6 +121,7 @@ const second = list[1];
 check(/\d/.test(await page.getByTestId("preview-nps").textContent()), `↓ shows ${second}'s notes per second (${await page.getByTestId("preview-nps").textContent()})`);
 const want = await opening(page, second);
 check((await page.evaluate(() => window.__tones)) === want, `its opening plays as tones: ${await page.evaluate(() => window.__tones)} of ${want} notes in bars 1–2`);
+check((await page.evaluate(() => window.__uiTones)) === 1, `… apart from ui-sounds' one ↓ blip (${await page.evaluate(() => window.__uiTones)} UI tones)`);
 await page.screenshot({ path: join(out, "preview-tones.png") });
 const before = await page.evaluate(() => [window.__tones, window.__disconnects]);
 await page.keyboard.press("ArrowDown");

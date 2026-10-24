@@ -41,8 +41,9 @@ select-stage and fever-moment need their own `fix(fever-stage)` PRs meanwhile.
 
 ## Validation
 - `pnpm -C web test`: stage: at the default tint the worst case above is at most `maxLaneLuma`, and at tint 0 the
-  opacity is today's 0.35 / 0.45. Core: on a C4–C5 chart (core pads it to B3–D5), `drawHighway` fills 6 lanes with
-  the tint, C♯4 to C♯5, after the backdrop and before the first note's fill.
+  opacity is today's 0.35 / 0.45. Core: on a C4–C5 chart, `drawHighway` fills one lane with the tint per black key
+  the layout shows (C♯4 to A♯4 among them), after the backdrop and before the first note's fill. (Was "padded to
+  B3–D5, 6 lanes": the static keyboard, #384, now pads every chart C to C.)
 - `verify.py --slug black-key-lanes` passes. So does `node web/src/game/stage/verify-stage.mjs --out <dir>`.
 - Headless Chrome at 1920×1080, mid-song on `/play?song=fur-elise&bot=perfect`, with and without `&stage=off`
   -> the black lanes read faintly lighter, and the pills look as before. Screenshots before and after go in the PR.

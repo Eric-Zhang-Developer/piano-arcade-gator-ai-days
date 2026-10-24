@@ -1,0 +1,8 @@
+{
+  "name": "piano-arcade-db-tests",
+  "private": true,
+  "description": "Tools for supabase/ only. Not part of the web app; web/package.json stays untouched.",
+  "type": "module",
+  "scripts": { "test": "node migrations.mjs" },
+  "dependencies": { "@electric-sql/pglite": "0.2.17" }
+}

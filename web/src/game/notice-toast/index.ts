@@ -40,7 +40,9 @@ export function toastStack(render: (toasts: readonly Toast[]) => void, reduced: 
     toasts = [t, ...toasts];
     for (const old of toasts.filter((x) => !x.leaving).slice(toastSettings.max)) leave(old.id);
     render(toasts);
-    setTimeout(() => leave(t.id), reduced() ? toastSettings.ms : toastSettings.ms - toastSettings.leaveMs);
+    // Both motions leave at 3.8 s: reduced motion goes at once (no fade), so a timer firing up to 200 ms late on a busy
+    // machine still has it gone by 4 s. A 4 s timer had no slack and kept it 4141–4155 ms on CI (#584).
+    setTimeout(() => leave(t.id), toastSettings.ms - toastSettings.leaveMs);
   };
 }
 

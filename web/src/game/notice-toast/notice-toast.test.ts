@@ -49,15 +49,27 @@ describe("notice-toast", () => {
     expect(s.all()).toEqual([]); // at 4000 ms on the clock, 130 ms of fade
   });
 
-  it("under reduced motion it stays the full 4 s and leaves at once, with no fade", () => {
+  it("under reduced motion it shows until 3.8 s, as the fade would start, and leaves at once", () => {
     const s = setup(true);
     s.push("a");
-    vi.advanceTimersByTime(toastSettings.ms - 1);
+    vi.advanceTimersByTime(toastSettings.ms - toastSettings.leaveMs - 1);
     expect(s.visible()).toEqual(["a"]);
     vi.advanceTimersByTime(1);
     expect(s.all()).toEqual([]);
     ["b", "c", "d", "e"].forEach(s.push);
     expect(s.all()).toEqual(["e", "d", "c"]); // the dropped one goes at once too
+  });
+
+  it("under reduced motion it's still gone by 4 s when its timer fires late (#584)", () => {
+    const start = Date.now();
+    let goneAt: number | null = null;
+    const push = toastStack((t) => void (t.length || (goneAt ??= Date.now())), () => true);
+    push("a");
+    vi.advanceTimersByTime(toastSettings.ms - toastSettings.leaveMs - 1);
+    vi.setSystemTime(Date.now() + 150); // a busy runner: its timer fires 150 ms late (#584 saw 4141 and 4155 ms)
+    vi.advanceTimersByTime(toastSettings.leaveMs + 1);
+    expect(goneAt).not.toBeNull();
+    expect(goneAt! - start).toBeLessThanOrEqual(toastSettings.ms);
   });
 
   it("does nothing on the server", () => {

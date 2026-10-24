@@ -40,6 +40,7 @@ import { takeMidi } from "./take-midi";
 import { waitMode } from "./wait-mode/plugin";
 import { waitHint } from "./wait-hint";
 import { sheetView } from "./sheet-view/plugin";
+import { sheetReview } from "./sheet-review";
 import { createSavePlugin, queueAndSend } from "../data/save-plugin";
 import { crashGuard } from "./crash-guard";
 
@@ -88,5 +89,6 @@ export const plugins: GamePlugin[] = [
   demoReset(), // 60 s with no input on a plain take's results (not ?cabinet) loads / clean
   createSavePlugin(queueAndSend), // take-store: saves finished takes after the results screen
   sheetView(), // last: posts the chart as played (after every transformChart) to /sheet; "Sheet music ↗" on the start screen
+  sheetReview(), // results panel: "Review on sheet ↗" stores this take's judgments and opens /sheet?review=1
   crashGuard(), // ?crash=draw|event: a plugin that throws on purpose, for crash-guard's check; inert without ?crash
 ];

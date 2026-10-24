@@ -3,7 +3,7 @@
 // are checked against the server's verdict and read back through /api/progress. Deletes everything it creates.
 // With the app running (pnpm -C web dev), from the repo root:
 //   node supabase/tests/every-song.mjs [appOrigin=http://localhost:3000]
-// Reads web/.env.local and prints no keys. Uses one anonymous sign-up per song (Auth's per-IP limit applies).
+// Reads web/.env.local and prints no keys. One anonymous sign-up per run: Auth allows 30 an hour per IP by default.
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync, existsSync } from "node:fs";
@@ -38,12 +38,14 @@ const perfect = () => 0;
 const messy = (i) => (i % 7 === 3 ? null : i % 5 === 1 ? 70 : i % 3 === 2 ? 35 : 0);
 
 try {
+  const signup = await fetch(`${URL_}/auth/v1/signup`, { method: "POST", headers: { apikey: PUB, "Content-Type": "application/json" }, body: "{}" });
+  const s = await signup.json();
+  assert.ok(signup.ok && s.user, `anonymous sign-up: ${signup.status} ${s.msg ?? ""} (429 = Auth's per-IP limit; raise it or wait)`);
+  users.push(s.user.id);
+  const auth = { Authorization: `Bearer ${s.access_token}`, "Content-Type": "application/json" };
   for (const song of songs) {
     const chart = JSON.parse(readFileSync(`${songsDir}/${song}/chart.json`, "utf8"));
     try {
-      const s = await (await fetch(`${URL_}/auth/v1/signup`, { method: "POST", headers: { apikey: PUB, "Content-Type": "application/json" }, body: "{}" })).json();
-      users.push(s.user.id);
-      const auth = { Authorization: `Bearer ${s.access_token}`, "Content-Type": "application/json" };
       const saved = [];
       for (const [name, shape] of [["perfect", perfect], ["messy", messy]]) {
         const id = randomUUID();

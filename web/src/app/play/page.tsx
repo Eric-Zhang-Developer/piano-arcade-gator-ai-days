@@ -13,6 +13,8 @@ import { describeTiming, timingSummary, type TimingSummary } from "../../game/ti
 import { SfxControls } from "../../game/sound/SfxControls";
 import { nextPause, pauseClock, type PauseAction, type PauseMode } from "../../game/play-slots";
 import { PauseOverlay, Slots } from "../../game/play-slots/ui";
+import { ResultsLayout } from "../../game/results-layout";
+import { emptyHud, reduceHud } from "../../game/hud";
 import { holdClock, isWaitMode } from "../../game/wait-mode";
 import {
   GOOD_MS,
@@ -54,6 +56,7 @@ export default function Play() {
   const [midiStatus, setMidiStatus] = useState("MIDI: connects when you press Start");
   const [isTest, setIsTest] = useState(false);
   const [take, setTake] = useState<Take | null>(null);
+  const [score, setScore] = useState<number>(); // the score the player saw on the HUD
   const [loaded, setLoaded] = useState<{ chart: Chart; params: URLSearchParams } | null>(null); // for the panels
   const [pauseMode, setPauseMode] = useState<PauseMode>("playing");
   const [countdown, setCountdown] = useState(0);
@@ -136,7 +139,9 @@ export default function Play() {
       backdropAlpha: background ? settings.stageBackdropAlpha : 1,
     };
     const handOf = new Map(chart.notes.map((n) => [n.id, n.hand]));
+    let hud = emptyHud(); // rebuilt with the HUD's own reducer, as records does
     const emit = (e: GameEvent) => {
+      hud = reduceHud(hud, e);
       if (e.type === "noteHit") hw.pressedHand!.set(e.pitch, handOf.get(e.noteId)!); // the key lights in its note's hand
       if (e.type === "noteHit") hw.latest = { judgment: e.judgment, offsetMs: e.offsetMs, atMs: e.atMs };
       if (e.type === "noteMiss") hw.latest = { judgment: "MISS", offsetMs: null, atMs: e.atMs };
@@ -261,6 +266,7 @@ export default function Play() {
       if (window.__pianoArcade) window.__pianoArcade.results = r;
       setTake(take);
       setResults(r);
+      setScore(hud.score);
       setTiming(timingSummary(chart, take, r, latencyRef.current));
       setPhase("results");
     };
@@ -335,6 +341,19 @@ export default function Play() {
     saveLatencyOffset(v);
   };
 
+  // Latency, sound and MIDI status: under the start screen, and under the details on the results screen.
+  const controls = (
+    <>
+      <label style={{ marginTop: 24, display: "flex", gap: 8, alignItems: "center" }}>
+        Latency offset
+        <input type="range" min={LATENCY_MIN} max={LATENCY_MAX} step={1} value={latency} onChange={(e) => onLatency(Number(e.target.value))} />
+        <output style={{ width: 64 }}>{latency} ms</output>
+      </label>
+      <SfxControls />
+      {!isTest && <p style={{ opacity: 0.6, fontSize: 14 }}>{midiStatus}</p>}
+    </>
+  );
+
   return (
     <main style={{ position: "fixed", inset: 0, overflow: "hidden" }}>
       <div ref={backgroundRef} style={canvasStyle} />
@@ -374,88 +393,22 @@ export default function Play() {
             </>
           )}
           {phase === "results" && results && (
-            <ResultsScreen
+            <ResultsLayout
               results={results}
-              timing={timing}
-              latency={latency}
-              onLatency={onLatency}
-              onRetry={start}
+              title={loaded?.chart.title}
               scored={!(loaded && isWaitMode(loaded.params))}
-            >
-              {take && loaded && (
-                <Slots plugins={plugins} panel={(p) => p.resultsPanel?.({ ...loaded, take, results, retry: start })} />
-              )}
-            </ResultsScreen>
+              score={score}
+              timing={timing && <TimingPanel timing={timing} latency={latency} onLatency={onLatency} />}
+              plugins={take && loaded ? plugins : []}
+              panel={(p) => take && loaded && p.resultsPanel?.({ ...loaded, take, results, retry: start })}
+              onRetry={start}
+              settings={controls}
+            />
           )}
-          <label style={{ marginTop: 24, display: "flex", gap: 8, alignItems: "center" }}>
-            Latency offset
-            <input type="range" min={LATENCY_MIN} max={LATENCY_MAX} step={1} value={latency} onChange={(e) => onLatency(Number(e.target.value))} />
-            <output style={{ width: 64 }}>{latency} ms</output>
-          </label>
-          <SfxControls />
-          {!isTest && <p style={{ opacity: 0.6, fontSize: 14 }}>{midiStatus}</p>}
+          {phase !== "results" && controls}
         </div>
       )}
     </main>
-  );
-}
-
-function ResultsScreen({
-  results,
-  timing,
-  latency,
-  onLatency,
-  onRetry,
-  scored,
-  children,
-}: {
-  results: Results;
-  timing: TimingSummary | null;
-  latency: number;
-  onLatency: (ms: number) => void;
-  onRetry: () => void;
-  scored: boolean; // false in wait mode: no rank, counts or timing, just the panels and Retry
-  children?: React.ReactNode; // the plugins' results panels, between the timing panel and Retry
-}) {
-  const { counts } = results;
-  const rows: [string, string, number | string][] = [
-    ["PERFECT", "count-PERFECT", counts.PERFECT],
-    ["GREAT", "count-GREAT", counts.GREAT],
-    ["GOOD", "count-GOOD", counts.GOOD ?? 0],
-    ["MISS", "count-MISS", counts.MISS],
-    ["Wrong notes", "count-wrong", counts.wrong ?? 0],
-    ["Extra presses", "count-extra", counts.extra],
-    ["Accuracy", "accuracy", `${(results.accuracy * 100).toFixed(1)}%`],
-    ["Max combo", "max-combo", results.maxCombo],
-  ];
-  return (
-    <section data-testid="results" style={{ textAlign: "center" }}>
-      {!scored && <h2 data-testid="unscored">Wait mode: not scored</h2>}
-      {scored && (
-        <>
-          <div data-testid="rank" style={{ fontSize: 96, fontWeight: 800, color: settings.noteColor }}>
-            {results.rank}
-          </div>
-          <table style={{ margin: "0 auto", fontSize: 20, borderSpacing: "24px 4px" }}>
-            <tbody>
-              {rows.map(([label, id, value]) => (
-                <tr key={id}>
-                  <td style={{ textAlign: "left" }}>{label}</td>
-                  <td data-testid={id} style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
-                    {value}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {timing && <TimingPanel timing={timing} latency={latency} onLatency={onLatency} />}
-        </>
-      )}
-      {children}
-      <button style={{ ...button, marginTop: 24 }} onClick={onRetry} autoFocus>
-        Retry
-      </button>
-    </section>
   );
 }
 

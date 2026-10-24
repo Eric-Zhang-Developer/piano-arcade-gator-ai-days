@@ -2,15 +2,16 @@
 name: "UI foundation: clear play states and a consistent responsive shell"
 depends_on: ["core-loop", "timing-feedback", "piano-sim", "judging-tiers"]
 owns: ["web/src/ui/", "web/src/app/globals.css", "web/src/app/layout.tsx", "web/src/app/loading.tsx", "web/src/app/error.tsx", "web/src/app/not-found.tsx", "web/src/app/play/", "web/src/app/sim/", "web/ui-e2e/"]
-assignee: "piano-ui-foundation"
+assignee: ""
 ---
 
 # UI foundation
 
 Issue: [UI foundation](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/84).
 Users can identify the current screen, enter the existing game, understand real loading/device states, recover from
-failures, and reach controls on a narrow screen. Keep Piano Arcade and its existing dark, mint-accented design
-provisionally. This is a bounded foundation on the current app, not a final brand or a replacement application.
+failures, and reach controls on a narrow screen. The latest request defers the name, logo and final brand while the
+identity is decided: keep Piano Arcade and its existing dark, mint-accented design provisionally. This is a bounded
+foundation on the current app, not a final brand or a replacement application; brand work needs its own spec.
 
 ## Plan
 1. Add a few shared presentation primitives and CSS tokens, reusing current styles and components.
@@ -22,7 +23,7 @@ provisionally. This is a bounded foundation on the current app, not a final bran
 its done note is on main: the ownership lint must pass without removing any path from that feature. Its completion
 is also an implementation dependency. UI tests live separately in `web/ui-e2e/`; existing verify scripts remain
 unchanged. Core-loop, timing-feedback and piano-sim are already done, so their presentation paths can be claimed
-without changing their specs. The assignee is this task's worker identity, not a new person or game lane.
+without changing their specs. The assignee is empty: this spec claims no person or lane.
 
 The owned play/sim paths permit additive presentation and chart-request recovery only. Keep the existing
 `?song`, `?input=test`, MIDI simulation parameters, test IDs, Start/Retry controls and simulator's first-button

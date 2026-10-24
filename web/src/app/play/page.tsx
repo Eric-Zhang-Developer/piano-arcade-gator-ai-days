@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Chart, GameEvent, InputDevice, InputEvent, Results, Take } from "../../contracts";
 import { validateChart } from "../../contracts";
@@ -18,7 +19,9 @@ import {
   settings,
 } from "../../game/core/settings";
 
-const CHART_URL = "/songs/twinkle/chart.json";
+const DEFAULT_SONG = "twinkle";
+// A song id is its folder under web/public/songs/ (it may have subfolders, like library/...).
+const SONG_ID = /^[a-z0-9][a-z0-9_-]*(\/[a-z0-9][a-z0-9_-]*)*$/i;
 const END_TAIL_MS = 1000; // after the last note's window closes, before the results screen
 const INPUT_GRACE_MS = 50; // input can arrive this late after its timestamp; don't call a MISS before it could land
 
@@ -59,8 +62,12 @@ export default function Play() {
     paramsRef.current = params;
     latencyRef.current = loadLatencyOffset();
     let live = true; // StrictMode mounts twice in dev: only the live mount's load may set state
-    fetch(CHART_URL)
-      .then((r) => r.json())
+    const song = params.get("song") || DEFAULT_SONG;
+    (SONG_ID.test(song) ? fetch(`/songs/${song}/chart.json`) : Promise.reject(new Error(`No song called "${song}".`)))
+      .then((r) => {
+        if (!r.ok) throw new Error(`No song called "${song}".`);
+        return r.json();
+      })
       .then((raw: unknown) => {
         if (!live) return;
         const problems = validateChart(raw);
@@ -230,7 +237,14 @@ export default function Play() {
       {phase !== "playing" && (
         <div style={overlay}>
           {phase === "loading" && <p>Loading chart…</p>}
-          {phase === "error" && <p role="alert">{error}</p>}
+          {phase === "error" && (
+            <>
+              <p role="alert">{error}</p>
+              <Link href="/" style={{ color: settings.noteColor }}>
+                Back to the song list
+              </Link>
+            </>
+          )}
           {phase === "ready" && (
             <>
               <h1 style={{ margin: 0 }}>{title}</h1>

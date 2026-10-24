@@ -69,3 +69,26 @@ it("the run: gh run view's fields, a missing one null", () => {
   expect(r).toEqual({ run: { id: 7, url: "u", sha: "abc", createdAt: "t", conclusion: "success" }, jobs: [{ name: "ci", conclusion: "success" }, { name: "browser (1)", conclusion: null }] });
   expect(parseRun({}).jobs).toBeNull();
 });
+
+// The contract with ci-browser's runner (#540): a real runChecks run, read back the way freeze reads an artifact.
+it("reads what run-checks actually writes: results.json and each check's evidence folder", async () => {
+  const { runChecks } = await import("../../e2e/run-checks.mjs");
+  const { mkdtempSync, readFileSync, readdirSync, writeFileSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const dir = mkdtempSync(join(tmpdir(), "veritas-freeze-"));
+  // A check that leaves two screenshots in its --out folder, and one that fails both times.
+  writeFileSync(
+    join(dir, "verify-shot.mjs"),
+    `import { writeFileSync } from "node:fs";\nconst out = process.argv[process.argv.indexOf("--out") + 1];\n` +
+      `writeFileSync(out + "/b.png", "b");\nwriteFileSync(out + "/a.png", "a");\n`,
+  );
+  writeFileSync(join(dir, "verify-red.mjs"), "process.exit(1);\n");
+  const out = join(dir, "out");
+  await runChecks(dir, ["verify-shot.mjs", "verify-red.mjs"], out, "3/8");
+  const rows = parseResults([JSON.parse(readFileSync(join(out, "results.json"), "utf8"))]);
+  expect(rows.map((r) => [r.check, r.result])).toEqual([["verify-red.mjs", "FAIL"], ["verify-shot.mjs", "pass"]]);
+  const pngs = readdirSync(out, { recursive: true }).map(String).filter((p) => p.endsWith(".png"));
+  expect(pickShot(rows[1], pngs)).toBe("verify-shot/a.png");
+  expect(pickShot(rows[0], pngs)).toBeNull();
+}, 30_000);

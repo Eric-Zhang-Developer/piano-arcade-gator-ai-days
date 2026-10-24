@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Saira } from "next/font/google";
 import { CaptureMode } from "../game/capture-mode";
 import { GameBoundary } from "../game/crash-guard/boundary";
+import { DemoReset } from "../game/demo-reset";
 import "./globals.css";
 
 // The display face (visual-direction.md), exposed as --pa-font-display only: the body stays system-ui.
@@ -26,6 +27,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <GameBoundary>{children}</GameBoundary>
         {/* ?capture=1: no cursor or setup text while the video is recorded (capture-mode) */}
         <CaptureMode />
+        {/* Shift+Esc loads / clean between judges, even from crash-guard's card (demo-reset) */}
+        <DemoReset />
       </body>
     </html>
   );

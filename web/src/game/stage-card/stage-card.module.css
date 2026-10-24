@@ -48,7 +48,6 @@
 }
 
 .jacket {
-  view-transition-name: stage-jacket; /* select-to-stage: the select's focused jacket moves into this one */
   flex: none;
   width: clamp(88px, 15vh, 170px);
   aspect-ratio: 1;

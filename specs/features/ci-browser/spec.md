@@ -58,6 +58,9 @@ Issue: #407
 - **Retry:** a failing check reruns once, into a fresh `--out` folder. Passes on retry: the shard passes and prints
   `::warning title=flaky::flaky: <check>` (an annotation on the PR). Fails twice: the shard fails. Exit 0 when every
   check passed, 1 otherwise. No check's tolerance, timeout or arguments change; the runner passes only `--out`.
+- **Known red** (decision `ci-browser-known-red.md`): a check that is already red on `origin/main` when the job
+  finds it gets an issue and an entry in `KNOWN_RED` in `run-checks.mjs`. It still runs and reports `known red #N:
+  pass|fail`, but doesn't set the shard's exit code. The entry leaves in the PR that fixes the check.
 - **Output:** one line per check (`<check> pass|flaky|FAIL <seconds> s`) and the shard's wall time, also written to
   `$GITHUB_STEP_SUMMARY` when set. Every check's `--out` folder goes under one evidence folder, uploaded with
   `actions/upload-artifact` when the shard fails (`if: failure()`).

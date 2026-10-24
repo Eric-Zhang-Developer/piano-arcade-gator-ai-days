@@ -52,7 +52,7 @@
 }
 
 .jacket {
-  width: min(100%, 48vh);
+  width: min(100%, 38vh); /* leaves room under the stats for song-preview's row */
   aspect-ratio: 1;
   flex: none;
   border-radius: 6px;

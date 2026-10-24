@@ -48,14 +48,16 @@ Milestone **showcase**, between `lights` and `submission`: what the 3-minute vid
 2026-10-24). First `play-slots` (plugins get panels on the start and results screens, so results features stop
 editing `/play`), then `scenes` (fever, full combo and every rank on demand, for screenshots and B-roll) and
 `fever-gauge` (fever on every song). Then the results panels that grade what competitors don't: `dynamics` and
-`evenness` (with `timing-feedback`: timing direction, evenness and dynamics, `mission.md`), `take-graph` and
-`weak-bars`. After those: `difficulty`, `hand-colors`, `note-labels`, `calibration` and `hand-mode`. `main`
-freezes Sun Oct 25 5:00 PM ET; whatever hasn't landed by then lands after the awards.
+`evenness` (with `timing-feedback`: timing direction, evenness and dynamics, `mission.md`), `take-graph`,
+`weak-bars` and `records` (best grades and a local top 5; no online leaderboard). After those: `difficulty`,
+`hand-colors`, `note-labels`, `calibration` and `hand-mode`. `main` freezes Sun Oct 25 5:00 PM ET; whatever hasn't
+landed by then lands after the awards.
 
 ## Encore
 Milestone **encore**, after `showcase`: the rest of the overnight batch, by dependency and by what the stage demo
-shows. In order: `replay-view`, `wait-mode`, `highway-zoom`, `ghost`, `chord-sync`, `tempo-curve`, `piano-voice`,
-`take-midi`, and last `versus`, which is made for the booth.
+shows. In order: `replay-view`, `wait-mode`, `highway-zoom`, `ghost`, `chord-sync`, `tempo-curve`, `song-preview`,
+`song-requests` (an issue labeled `song-request` becomes a chart; `AGENTS.md`, Song requests), `piano-voice`,
+`take-midi`, and last `versus` and `cabinet`, which are made for the booth.
 
 ## Open
 - The challenge statement's technology (first public in the past 12 months, central to the project) isn't chosen.

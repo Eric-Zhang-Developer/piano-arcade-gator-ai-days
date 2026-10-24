@@ -1,6 +1,6 @@
 // Judging, exactly mission.md's rule. Pure: no React, no clock. Live play and judgeTake share this one class.
 import type { Chart, ChartNote, GameEvent, Judgment, NoteJudgment, Rank, Results, Take } from "../../contracts";
-import { FEVER_COMBO, GREAT_MS, PERFECT_MS, msPerBeat } from "./settings";
+import { FEVER_COMBO, GOOD_MS, GOOD_WEIGHT, GREAT_MS, NEAR_MISS_MS, PERFECT_MS, msPerBeat } from "./settings";
 
 export function noteTimeMs(chart: Chart, note: ChartNote): number {
   return note.beat * msPerBeat(chart.bpm);
@@ -22,6 +22,7 @@ export class Judge {
   private readonly byTime: number[]; // note indices, earliest first
   private readonly judgments: (NoteJudgment | null)[];
   private readonly extras: { eventIndex: number }[] = [];
+  private readonly wrong: { eventIndex: number }[] = [];
   private combo = 0;
   private maxCombo = 0;
   private fever = false;
@@ -42,16 +43,13 @@ export class Judge {
     for (const i of this.byTime) {
       if (this.judgments[i] || this.chart.notes[i].pitch !== pitch) continue;
       const d = Math.abs(timeMs - this.times[i]);
-      if (d <= GREAT_MS && (best < 0 || d < Math.abs(timeMs - this.times[best]))) best = i;
+      if (d <= GOOD_MS && (best < 0 || d < Math.abs(timeMs - this.times[best]))) best = i;
     }
-    if (best < 0) {
-      this.extras.push({ eventIndex });
-      this.onEvent({ type: "extra", pitch, atMs: timeMs });
-      return;
-    }
+    if (best < 0) return this.extra(pitch, timeMs, eventIndex);
     const note = this.chart.notes[best];
     const offsetMs = timeMs - this.times[best];
-    const judgment = Math.abs(offsetMs) <= PERFECT_MS ? "PERFECT" : "GREAT";
+    const d = Math.abs(offsetMs);
+    const judgment = d <= PERFECT_MS ? "PERFECT" : d <= GREAT_MS ? "GREAT" : "GOOD";
     this.judgments[best] = { noteId: note.id, judgment, offsetMs, eventIndex };
     this.noteState.set(note.id, judgment);
     this.combo++;
@@ -68,7 +66,7 @@ export class Judge {
   advance(nowMs: number): void {
     if (this.results) return;
     for (const i of this.byTime) {
-      if (this.times[i] + GREAT_MS >= nowMs) break;
+      if (this.times[i] + GOOD_MS >= nowMs) break;
       if (!this.judgments[i]) this.miss(i);
     }
   }
@@ -77,30 +75,50 @@ export class Judge {
     if (this.results) return this.results;
     for (const i of this.byTime) if (!this.judgments[i]) this.miss(i);
     const judgments = this.judgments as NoteJudgment[];
-    const counts: Results["counts"] = { PERFECT: 0, GREAT: 0, MISS: 0, extra: this.extras.length };
-    for (const j of judgments) counts[j.judgment] = (counts[j.judgment] ?? 0) + 1; // tolerates judgments added later
-    const accuracy = judgments.length ? (counts.PERFECT + 0.5 * counts.GREAT) / judgments.length : 0;
+    const counts: Results["counts"] = { PERFECT: 0, GREAT: 0, GOOD: 0, MISS: 0, extra: this.extras.length, wrong: this.wrong.length };
+    for (const j of judgments) counts[j.judgment] = (counts[j.judgment] ?? 0) + 1;
+    const scored = counts.PERFECT + 0.5 * counts.GREAT + GOOD_WEIGHT * (counts.GOOD ?? 0);
+    const accuracy = judgments.length ? scored / (judgments.length + this.wrong.length) : 0;
     this.results = {
       chartId: this.chart.id,
       judgments,
       extras: this.extras,
+      wrong: this.wrong,
       counts,
       accuracy,
       maxCombo: this.maxCombo,
       rank: rankFor(accuracy),
     };
-    if (counts.MISS === 0) this.onEvent({ type: "fullCombo", atMs });
+    if (counts.MISS === 0 && this.wrong.length === 0) this.onEvent({ type: "fullCombo", atMs });
     this.onEvent({ type: "songEnd", results: this.results, atMs });
     return this.results;
   }
 
+  // A press that matched no note. It's WRONG, breaking the combo, unless it's near a note of its own pitch (that
+  // note's timing) or outside the song (count-in, after the end).
+  private extra(pitch: number, timeMs: number, eventIndex: number): void {
+    this.extras.push({ eventIndex });
+    this.onEvent({ type: "extra", pitch, atMs: timeMs });
+    const first = this.times[this.byTime[0]];
+    const last = this.times[this.byTime[this.byTime.length - 1]];
+    if (timeMs < first - GOOD_MS || timeMs > last + GOOD_MS) return;
+    if (this.chart.notes.some((n, i) => n.pitch === pitch && Math.abs(timeMs - this.times[i]) <= NEAR_MISS_MS)) return;
+    this.wrong.push({ eventIndex });
+    this.onEvent({ type: "wrongNote", pitch, atMs: timeMs });
+    this.breakCombo(timeMs);
+  }
+
   private miss(i: number): void {
     const note = this.chart.notes[i];
-    const atMs = this.times[i] + GREAT_MS;
+    const atMs = this.times[i] + GOOD_MS;
     this.judgments[i] = { noteId: note.id, judgment: "MISS", offsetMs: null, eventIndex: null };
     this.noteState.set(note.id, "MISS");
-    this.combo = 0;
     this.onEvent({ type: "noteMiss", noteId: note.id, pitch: note.pitch, atMs });
+    this.breakCombo(atMs);
+  }
+
+  private breakCombo(atMs: number): void {
+    this.combo = 0;
     if (this.fever) {
       this.fever = false;
       this.onEvent({ type: "feverEnd", atMs });
@@ -117,5 +135,5 @@ export function judgeTake(chart: Chart, take: Take): Results {
   }
   const lastNote = Math.max(0, ...chart.notes.map((n) => noteTimeMs(chart, n)));
   const lastEvent = order.length ? take.events[order[order.length - 1]].timeMs : 0;
-  return judge.finish(Math.max(lastNote + GREAT_MS, lastEvent));
+  return judge.finish(Math.max(lastNote + GOOD_MS, lastEvent));
 }

@@ -16,8 +16,8 @@ Register as one `GamePlugin` in `web/src/game/layers.ts`.
 - **Local Control:** before a replay, send CC 122 = 0 so the piano's own keys go silent; after it ends or stops,
   send CC 122 = 127.
 - **Stop:** a Stop button ends a replay at once and sends All Notes Off (CC 123) on all 16 channels.
-- **Count-in from the piano:** a setting, "count-in source: laptop | piano", default laptop. On piano, each
-  `countInBeat` sends a short note on channel 10 (drums).
+- **Count-in from the piano:** covered by `beat-track`, which plays the count-in and the beat on the piano
+  (decision `beat-track-accompaniment.md`). Not built here.
 - With no MIDI output (laptop keys), the replay button is hidden; nothing errors.
 
 ## Validation

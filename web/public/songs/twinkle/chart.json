@@ -1,0 +1,305 @@
+{
+  "id": "twinkle",
+  "title": "Twinkle, Twinkle, Little Star",
+  "composer": "Traditional (French melody \"Ah! vous dirai-je, maman\")",
+  "catalog": "first verse, right hand",
+  "source": "Score transcribed from the LilyPond <score> in Wikipedia, \"Twinkle, Twinkle, Little Star\", section Lyrics, revision 1378689555: https://en.wikipedia.org/w/index.php?title=Twinkle,_Twinkle,_Little_Star&oldid=1378689555 (traditional melody, public domain; the page text is CC BY-SA 4.0). Pitches cross-checked against Mozart's theme of K.265 (Paris: Porro, Plate 79), Mutopia-2018/12/07-2236, Public Domain: https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2236",
+  "bpm": 100,
+  "beatsPerBar": 4,
+  "notes": [
+    {
+      "id": "n1",
+      "pitch": 60,
+      "beat": 0,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n2",
+      "pitch": 60,
+      "beat": 1,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n3",
+      "pitch": 67,
+      "beat": 2,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n4",
+      "pitch": 67,
+      "beat": 3,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n5",
+      "pitch": 69,
+      "beat": 4,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n6",
+      "pitch": 69,
+      "beat": 5,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n7",
+      "pitch": 67,
+      "beat": 6,
+      "duration": 2,
+      "hand": "R"
+    },
+    {
+      "id": "n8",
+      "pitch": 65,
+      "beat": 8,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n9",
+      "pitch": 65,
+      "beat": 9,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n10",
+      "pitch": 64,
+      "beat": 10,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n11",
+      "pitch": 64,
+      "beat": 11,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n12",
+      "pitch": 62,
+      "beat": 12,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n13",
+      "pitch": 62,
+      "beat": 13,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n14",
+      "pitch": 60,
+      "beat": 14,
+      "duration": 2,
+      "hand": "R"
+    },
+    {
+      "id": "n15",
+      "pitch": 67,
+      "beat": 16,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n16",
+      "pitch": 67,
+      "beat": 17,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n17",
+      "pitch": 65,
+      "beat": 18,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n18",
+      "pitch": 65,
+      "beat": 19,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n19",
+      "pitch": 64,
+      "beat": 20,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n20",
+      "pitch": 64,
+      "beat": 21,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n21",
+      "pitch": 62,
+      "beat": 22,
+      "duration": 2,
+      "hand": "R"
+    },
+    {
+      "id": "n22",
+      "pitch": 67,
+      "beat": 24,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n23",
+      "pitch": 67,
+      "beat": 25,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n24",
+      "pitch": 65,
+      "beat": 26,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n25",
+      "pitch": 65,
+      "beat": 27,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n26",
+      "pitch": 64,
+      "beat": 28,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n27",
+      "pitch": 64,
+      "beat": 29,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n28",
+      "pitch": 62,
+      "beat": 30,
+      "duration": 2,
+      "hand": "R"
+    },
+    {
+      "id": "n29",
+      "pitch": 60,
+      "beat": 32,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n30",
+      "pitch": 60,
+      "beat": 33,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n31",
+      "pitch": 67,
+      "beat": 34,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n32",
+      "pitch": 67,
+      "beat": 35,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n33",
+      "pitch": 69,
+      "beat": 36,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n34",
+      "pitch": 69,
+      "beat": 37,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n35",
+      "pitch": 67,
+      "beat": 38,
+      "duration": 2,
+      "hand": "R"
+    },
+    {
+      "id": "n36",
+      "pitch": 65,
+      "beat": 40,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n37",
+      "pitch": 65,
+      "beat": 41,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n38",
+      "pitch": 64,
+      "beat": 42,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n39",
+      "pitch": 64,
+      "beat": 43,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n40",
+      "pitch": 62,
+      "beat": 44,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n41",
+      "pitch": 62,
+      "beat": 45,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n42",
+      "pitch": 60,
+      "beat": 46,
+      "duration": 2,
+      "hand": "R"
+    }
+  ]
+}

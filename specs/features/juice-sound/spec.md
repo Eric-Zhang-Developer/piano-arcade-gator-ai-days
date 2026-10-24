@@ -13,11 +13,12 @@ four-click count-in and end-of-song payoffs.
 
 ## Requirements
 - Web Audio only, scheduled on the audio clock from `GameEvent.atMs`, not with timers.
-- Sounds: a click on each `countInBeat` (accent on beat 1); a short stinger on each `comboMilestone`; a rising sweep
+- Sounds: no count-in click (`beat-track` plays the count-in, decision `beat-track-accompaniment.md`); a short stinger on each `comboMilestone`; a rising sweep
   on `feverStart`; a fanfare on `fullCombo`; a drumroll before the rank reveal and a hit when it lands; a quiet,
   low, distinct cue on `noteMiss` that can be turned off.
-- Every sound comes from a file in `web/public/sounds/` with its license in `web/public/sounds/LICENSES.md` (public
-  domain or CC0 only), or is synthesized in code. Nothing without a stated license.
+- Every sound comes from a file in `web/public/sounds/` with its license in `web/public/sounds/LICENSES.md` (any
+  license decision 003 allows for committed files, credited), or is synthesized in code. Nothing without a stated
+  license.
 - One master volume slider for effects, saved in `localStorage` as `pianoArcade.sfxVolume`, default 0.5. A mute
   toggle.
 - Audio starts only after a user gesture (Chrome's autoplay rule).

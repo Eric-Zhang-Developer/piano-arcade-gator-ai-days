@@ -19,6 +19,12 @@ The spec is the source of truth. Chat and memory aren't. Everything you need is 
   empty. Never take a feature assigned to another person. Specs in no milestone are backlog: don't pick them.
   `python3 .agents/scripts/status.py --out -` prints the order, but it ignores `assignee`: apply that filter yourself.
 
+## Ideas and the planner
+- Ideas live in `specs/context/catalog.md` and in issues Eric opens with the `idea` label.
+- An idea gets its issue first (labels `feature` and `proposal`, body ending in `<!-- spec: <slug> -->`), then its
+  spec. One issue follows the idea to done; it links the spec and never copies it.
+- The overnight planner follows `specs/decisions/002-overnight-planner.md`.
+
 ## Lanes
 Each person owns a lane: their features, their folder, and the final say over both. A worker is named
 `<person>-<n>` (for example `eric-1`); the part before the first `-` is its person. Workers serve only their person.
@@ -49,9 +55,9 @@ Each person owns a lane: their features, their folder, and the final say over bo
    Validation step you skipped, with the reason). A person follows the release from these.
 6. Wait for CI, check GitHub's whole verdict, then squash-merge it yourself:
    `gh pr checks --watch && python3 .agents/scripts/pr_ready.py && gh pr merge --squash --delete-branch`.
-   Not for `plan:` PRs, `contract:` PRs that change `AGENTS.md` (rules bind every future agent), or PRs that touch a
-   path `.github/CODEOWNERS` assigns to a person other than your own: those wait for that person. Paths assigned to
-   your own person don't stop you; that's your lane.
+   Not for `plan:` PRs (except those `specs/decisions/002-overnight-planner.md` allows), `contract:` PRs that change
+   `AGENTS.md` (rules bind every future agent), or PRs that touch a path `.github/CODEOWNERS` assigns to a person other
+   than your own: those wait for that person. Paths assigned to your own person don't stop you; that's your lane.
 
 **PR titles** ([Conventional Commits](https://www.conventionalcommits.org/)); CI checks the files against the title:
 

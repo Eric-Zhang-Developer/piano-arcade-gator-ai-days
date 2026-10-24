@@ -29,7 +29,7 @@ look). Copy the spike's lessons, not its code.
 **Shared formats** (`web/src/contracts/`, frozen once merged; both lanes read them):
 - `Chart`: `{ id, title, composer, catalog?, source, bpm, beatsPerBar, notes: ChartNote[] }`. `ChartNote`:
   `{ id, pitch (MIDI 21–108), beat (start, from beat 0 of bar 1), duration (beats), hand: "R" | "L" }`. `source`
-  is the public-domain score the notes came from (a URL or citation), or `"Eric"`.
+  is the score the notes came from (a URL or citation; licenses per decision 003), or `"Eric"`.
 - `Take`: `{ chartId, startedAt (ISO), latencyOffsetMs, inputDevice: "midi" | "keys" | "test", events: TakeEvent[] }`.
   `TakeEvent`: `{ pitch, velocity (1–127; laptop keys use 80), timeMs, offTimeMs | null }`, with times in ms on the
   chart clock (0 is beat 0 of bar 1).
@@ -45,9 +45,13 @@ look). Copy the spike's lessons, not its code.
   position, so a layer can draw aligned to keys.
 
 **Chart:** Twinkle, the first verse (all six phrases), right hand, at 100 BPM in 4/4, in
-`web/public/songs/twinkle/chart.json`. The notes come from a public-domain score of the melody; put the citation in
+`web/public/songs/twinkle/chart.json`. The notes come from a cited score of the melody (decision 003); put the citation in
 `source`. Don't write the notes from memory. If you can't get a source, file a `needs-human` issue and leave the chart
 for Eric. Eric checks it by playing.
+
+**Songs** (added after core-loop shipped, #75): `/play?song=<id>` loads `/songs/<id>/chart.json`. With no `song`
+it loads Twinkle. An unknown id shows a clear message and a link to `/`, never a blank page. `?input=test` and the
+verify script keep working. This lands as a `fix(core-loop)` PR.
 
 **Input:**
 - MIDI: Chrome Web MIDI. Pick the port whose name contains "Portable Grand", else the first input. Ignore `0xFE` and
@@ -58,7 +62,8 @@ for Eric. Eric checks it by playing.
 - Latency offset: a slider from -150 to +150 ms in 1 ms steps, saved in `localStorage` as
   `pianoArcade.latencyOffsetMs`. A key's judged time is its arrival time minus the offset.
 
-**Judging** (pure functions, no React): exactly the rule in `mission.md`. Match each key press to the nearest
+**Judging** (pure functions, no React): exactly the rule in `mission.md`. Superseded in part by `judging-tiers`
+(GOOD, WRONG notes, the new accuracy); the original rule follows for history. Match each key press to the nearest
 unmatched chart note of the same pitch within ±50 ms. Combo counts consecutive PERFECT and GREAT; a MISS resets it;
 extras don't. Fever starts at a combo of 50 and ends at the next MISS. Accuracy = (PERFECT + 0.5 × GREAT) / notes.
 Rank: S ≥ 95%, A ≥ 90%, B ≥ 80%, C ≥ 70%, else D.
@@ -71,7 +76,9 @@ Rank: S ≥ 95%, A ≥ 90%, B ≥ 80%, C ≥ 70%, else D.
 - Lookahead: 2000 ms by default (a setting).
 - Perspective: a setting from 0 (flat, the default) to 0.3, where the top of the highway is (1 - p) times as wide as
   the bottom. The judgment line stays aligned with the keys at every value. Settable with `?perspective=0.15`.
-- A count-in of 4 beats before beat 0: show the beats; emit `countInBeat`. No sound in this feature.
+- A count-in of 8 beats (two bars) before beat 0: show the beats; emit `countInBeat`. No sound in this feature
+  (`beat-track` plays it). Each note ends with a gap and starts with a bright leading edge, so repeated notes read
+  as separate (playtest, `specs/context/findings.md`).
 - The judgment word for the latest note (PERFECT, GREAT or MISS) and its offset in ms, once, centered above the line.
 
 **Results screen** (React): counts of PERFECT, GREAT, MISS and extras, accuracy, max combo, rank, and a Retry button.
@@ -85,8 +92,10 @@ draws each plugin's layer on its own canvas above the highway, forwards every `G
   - Perfect player: every note at offset 0 gives all PERFECT, accuracy 100%, rank S.
   - Skipper: drops notes 3 and 10 gives exactly 2 MISS, 0 extras.
   - Late40: every note at +40 ms gives all GREAT.
-  - Boundary: +25 ms gives PERFECT, -50 ms gives GREAT, +51 ms gives a MISS plus an extra.
-  - Wrong pitch: one note a semitone off gives a MISS plus an extra.
+  - Boundary: +25 ms gives PERFECT, -50 ms gives GREAT, +51 ms gives a MISS plus an extra (GOOD since
+    `judging-tiers`; that spec's Validation replaces this line).
+  - Wrong pitch: one note a semitone off gives a MISS plus an extra (since `judging-tiers` that extra is also a
+    WRONG note).
 - `[verify].command`: `pnpm -C {worktree}/web verify --out {out}`. It starts the app, opens `/play?input=test`
   headless, plays the Perfect player, and fails unless the results screen shows every note PERFECT. It saves a
   screenshot of the results screen to `{out}`.

@@ -1,0 +1,200 @@
+<!doctype html>
+<!-- Twinkle 13 player page: plays out/*.mid to the DGX over Web MIDI and collects Eric's ratings.
+     Serve this folder (Web MIDI needs localhost) and open it in Chrome:
+       python3 -m http.server 8013 -d spikes/twinkle-13   ->   http://localhost:8013/ -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Twinkle 13</title>
+<style>
+  :root { --bg: #0d0f14; --card: #161a22; --line: #262c38; --text: #e8ebf2; --dim: #8a93a6; --accent: #7cc4ff; --on: #ffd36e; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 system-ui, sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { margin: 0 0 4px; font-size: 26px; }
+  .sub { color: var(--dim); margin: 0 0 20px; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
+  select, input[type=text], button { font: inherit; color: var(--text); background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
+  button { cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button.stop { border-color: #ff7a7a; }
+  #status { color: var(--dim); }
+  .track { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+  .track.playing { border-color: var(--on); }
+  .head { display: flex; gap: 10px; align-items: baseline; }
+  .head .name { font-weight: 600; flex: 1; }
+  .head .len { color: var(--dim); font-variant-numeric: tabular-nums; }
+  .desc { color: var(--dim); margin: 2px 0 8px; }
+  progress { width: 100%; height: 6px; accent-color: var(--on); }
+  .rate { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; margin-top: 8px; }
+  .rate label { color: var(--dim); }
+  .stars button { padding: 2px 9px; }
+  .stars button.sel, .yn button.sel { background: var(--accent); color: #0d0f14; border-color: var(--accent); }
+  .rate input[type=text] { flex: 1; min-width: 180px; }
+  textarea { width: 100%; min-height: 150px; font: 13px ui-monospace, monospace; color: var(--text); background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Twinkle 13</h1>
+  <p class="sub">Mozart's theme, Variation 12, three remixes and three tries at a 13th, played on the DGX-660.</p>
+
+  <div class="bar">
+    <select id="port"><option>waiting for MIDI: allow it in Chrome's prompt</option></select>
+    <button id="all">▶ Play all</button>
+    <button id="stop" class="stop">■ Stop</button>
+    <span id="status"></span>
+  </div>
+
+  <div id="tracks"></div>
+
+  <h2>Ratings</h2>
+  <div class="bar">
+    <label>Best Var 13 <select id="best"><option value="">–</option><option>13a</option><option>13b</option><option>13c</option></select></label>
+    <label>Phone recording <input type="text" id="rec" placeholder="file name"></label>
+  </div>
+  <textarea id="md" readonly></textarea>
+  <div class="bar"><button id="copy">Copy for RESULTS.md</button></div>
+</main>
+
+<script>
+const TRACKS = [
+  ["01-theme.mid", "Theme", "Mozart's theme as written, with its repeats and the scan's dynamics"],
+  ["02-var12.mid", "Variation 12", "As written: repeats, first and second endings, coda, the scan's dynamics"],
+  ["03-var12-band.mid", "Var 12 + band", "Drums (ch 10) and an electric bass (ch 2) under it"],
+  ["04-var12-minore.mid", "Var 12, minore", "In C minor (E to Eb, A to Ab), Mozart's Var 8 move"],
+  ["05-var12-harpsichord.mid", "Var 12, harpsichord", "A GM program change to harpsichord"],
+  ["06-var13a-cathedral.mid", "Var 13a: cathedral", "Music box, four-voice canon, apotheosis"],
+  ["07-var13b-storm.mid", "Var 13b: storm", "Minor storm, Var 12 with the band at 152 BPM, apotheosis"],
+  ["08-var13c-full-arc.mid", "Var 13c: full arc", "All five movements, music box to apotheosis"],
+];
+const $ = id => document.getElementById(id);
+const store = (() => { try { return JSON.parse(localStorage.getItem("t13") || "{}"); } catch { return {}; } })();
+const save = () => { try { localStorage.setItem("t13", JSON.stringify(store)); } catch {} renderMd(); };
+
+// ---------- a Standard MIDI File -> [{t: seconds, data: [bytes]}] (channel messages only) ----------
+function parseMidi(buf) {
+  const b = new Uint8Array(buf); let p = 0;
+  const u32 = () => (b[p++] << 24 | b[p++] << 16 | b[p++] << 8 | b[p++]) >>> 0, u16 = () => b[p++] << 8 | b[p++];
+  const vlq = () => { let v = 0, c; do { c = b[p++]; v = v << 7 | c & 0x7f; } while (c & 0x80); return v; };
+  p = 8; u16(); const ntracks = u16(), tpq = u16();
+  const raw = [];  // {tick, data} or {tick, tempo}
+  for (let k = 0; k < ntracks; k++) {
+    p += 4; const end = u32() + p; let tick = 0, run = 0;
+    while (p < end) {
+      tick += vlq(); let s = b[p];
+      if (s === 0xff) { const type = b[p + 1]; p += 2; const len = vlq();
+        if (type === 0x51) raw.push({tick, tempo: b[p] << 16 | b[p + 1] << 8 | b[p + 2]});
+        p += len; continue; }
+      if (s === 0xf0 || s === 0xf7) { p++; p += vlq(); continue; }
+      if (s & 0x80) { run = s; p++; } else s = run;
+      const n = (s & 0xf0) === 0xc0 || (s & 0xf0) === 0xd0 ? 1 : 2;
+      raw.push({tick, data: [s, ...b.slice(p, p + n)]}); p += n;
+    }
+  }
+  raw.sort((a, c) => a.tick - c.tick || (a.tempo ? -1 : 0) - (c.tempo ? -1 : 0));
+  let us = 500000, lastTick = 0, t = 0; const out = [];
+  for (const e of raw) {
+    t += (e.tick - lastTick) * us / tpq / 1e6; lastTick = e.tick;
+    if (e.tempo) us = e.tempo; else out.push({t, data: e.data});
+  }
+  return out;
+}
+
+// ---------- playing ----------
+let midi, output, play = null;  // play: {i, events, k, start, timer}
+const songs = {};
+
+async function load(i) {
+  const f = TRACKS[i][0];
+  if (!songs[f]) songs[f] = parseMidi(await (await fetch("out/" + f)).arrayBuffer());
+  return songs[f];
+}
+
+function silence() {
+  if (!output) return;
+  try { output.clear(); } catch {}
+  for (let ch = 0; ch < 16; ch++) { output.send([0xb0 | ch, 64, 0]); output.send([0xb0 | ch, 123, 0]); }
+}
+
+function stop() {
+  if (play) { clearInterval(play.timer); document.querySelectorAll(".track")[play.i].classList.remove("playing"); }
+  play = null; silence(); setTimeout(silence, 300);  // queued notes can still go out after the first
+  $("status").textContent = "";
+}
+
+async function start(i, thenNext) {
+  stop();
+  if (!output) return $("status").textContent = "No MIDI output. Open this in Chrome, with the piano on USB TO HOST.";
+  const events = await load(i);
+  const el = document.querySelectorAll(".track")[i];
+  el.classList.add("playing"); el.scrollIntoView({block: "nearest", behavior: "smooth"});
+  const len = events.at(-1).t, start = performance.now() + 300;
+  play = {i, k: 0, timer: setInterval(tick, 50)};
+  function tick() {
+    const now = performance.now(), horizon = (now - start) / 1000 + 0.25;  // schedule 250 ms ahead
+    while (play.k < events.length && events[play.k].t <= horizon) {
+      const e = events[play.k++]; output.send(e.data, start + e.t * 1000);
+    }
+    const pos = Math.max(0, (now - start) / 1000);
+    el.querySelector("progress").value = Math.min(1, pos / len);
+    $("status").textContent = `${TRACKS[i][1]}  ${fmt(pos)} / ${fmt(len)}`;
+    if (pos > len + 0.5) {
+      stop(); el.querySelector("progress").value = 1;
+      if (thenNext && i + 1 < TRACKS.length) setTimeout(() => start(i + 1, true), 3000);
+    }
+  }
+}
+
+const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+
+// ---------- page ----------
+TRACKS.forEach(([file, name, desc], i) => {
+  const r = store[file] ||= {};
+  const el = document.createElement("div"); el.className = "track";
+  el.innerHTML = `<div class="head"><button class="go">▶</button><span class="name">${name}</span><span class="len">${file}</span></div>
+    <div class="desc">${desc}</div><progress max="1" value="0"></progress>
+    <div class="rate"><label>Rating</label><span class="stars">${[1, 2, 3, 4, 5].map(n => `<button data-n="${n}">${n}</button>`).join("")}</span>
+    <label>Melody recognizable?</label><span class="yn"><button data-v="yes">yes</button><button data-v="no">no</button></span>
+    <input type="text" placeholder="your words"></div>`;
+  const mark = () => {
+    el.querySelectorAll(".stars button").forEach(b => b.classList.toggle("sel", +b.dataset.n === r.rating));
+    el.querySelectorAll(".yn button").forEach(b => b.classList.toggle("sel", b.dataset.v === r.melody));
+  };
+  el.querySelector(".go").onclick = () => start(i, false);
+  el.querySelectorAll(".stars button").forEach(b => b.onclick = () => { r.rating = +b.dataset.n; mark(); save(); });
+  el.querySelectorAll(".yn button").forEach(b => b.onclick = () => { r.melody = b.dataset.v; mark(); save(); });
+  const note = el.querySelector("input"); note.value = r.note || ""; note.oninput = () => { r.note = note.value; save(); };
+  mark(); $("tracks").append(el);
+});
+$("best").value = store.best || ""; $("best").onchange = () => { store.best = $("best").value; save(); };
+$("rec").value = store.rec || ""; $("rec").oninput = () => { store.rec = $("rec").value; save(); };
+
+function renderMd() {
+  const rows = TRACKS.map(([f]) => { const r = store[f] || {};
+    return `| \`out/${f}\` | ${r.rating ?? ""} | ${r.melody ?? ""} | ${(r.note || "").replace(/\|/g, "/")} |`; });
+  $("md").value = ["| File | Rating (1-5) | Melody recognizable? | Eric's words |", "|---|---|---|---|", ...rows, "",
+    `Best Var 13: ${store.best || ""}`, `Phone recording: ${store.rec || ""}`].join("\n");
+}
+renderMd();
+$("copy").onclick = () => navigator.clipboard.writeText($("md").value).then(() => $("copy").textContent = "Copied ✓");
+$("all").onclick = () => start(0, true);
+$("stop").onclick = stop;
+addEventListener("pagehide", silence);
+
+navigator.requestMIDIAccess().then(m => {
+  midi = m;
+  const fill = () => {
+    const outs = [...midi.outputs.values()];
+    $("port").innerHTML = outs.length ? outs.map(o => `<option value="${o.id}">${o.name}</option>`).join("") : "<option>no MIDI outputs</option>";
+    const pick = outs.find(o => o.id === store.port) || outs.find(o => /portable grand/i.test(o.name)) || outs[0];
+    if (pick) $("port").value = pick.id;
+    output = pick || null;
+  };
+  fill(); midi.onstatechange = fill;
+  $("port").onchange = () => { stop(); output = midi.outputs.get($("port").value); store.port = output.id; save(); };
+}, e => $("status").textContent = `Web MIDI unavailable (${e.name}). Use Chrome on localhost.`);
+</script>
+</body>
+</html>

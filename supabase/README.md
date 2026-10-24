@@ -28,6 +28,19 @@ own session, so it can read that player's rows and nothing else. Auth: anonymous
 | `SUPABASE_SECRET_KEY` | server only | Project Settings > API Keys: `sb_secret_...`. Never in a `NEXT_PUBLIC_` variable. |
 | `SUPABASE_DB_URL` | `supabase/push.sh` only | Connect > Direct > Session pooler URI, with the database password filled in: `postgresql://postgres.umswmcehegvggcfcjdfy:<password>@aws-0-us-east-1.pooler.supabase.com:5432/postgres`. Not the direct `db.<ref>.supabase.co` one: it's IPv6-only and refused on most networks. |
 
+## Adding a song
+Nothing to do in the database: a song's row in `songs` is written (or updated, with the chart's new SHA-256) the first
+time anyone saves a take of it. Put the chart at `web/public/songs/<id>/chart.json`, then prove every song still saves,
+with the app running locally: `node supabase/tests/every-song.mjs`. It plays a perfect and a messy take of each song
+through `/api/takes`, checks the stored rows and `/api/progress`, and deletes what it made. Charts under
+`songs/local/` are never stored (decision 003).
+
+## What gets saved
+A finished take of a committed song, played by a person, on the chart as committed. Not saved: test input, bots
+(`?bot=`), the fake piano (`?midi=sim`), versus, wait mode, local songs, and any take whose chart a plugin changed
+(bar-loop, one hand, chunk practice, another tempo): the server re-judges against the committed chart, so those scores
+would be wrong. The rule lives in `web/src/data/save-plugin.ts` (`unsavableReason`, `sameChart`).
+
 ## Adding something (a column, a table, a view, seed rows)
 1. **Make the file:** `npx -y supabase@2.122.0 migration new <what_it_does>` creates
    `supabase/migrations/<timestamp>_<what_it_does>.sql`. Never edit a migration that's already live: add a new one.

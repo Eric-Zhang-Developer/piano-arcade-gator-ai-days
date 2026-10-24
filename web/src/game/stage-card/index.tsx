@@ -15,7 +15,7 @@ export function StageCard({ id, title, composer, catalog, level }: Pick<Chart, "
         <p className={styles.ready}>Are you ready?</p>
       </div>
       <div className={styles.track}>
-        <div className={styles.jacket}>
+        <div className={styles.jacket} style={{ viewTransitionName: "stage-jacket" }}>
           <SongJacket id={id} title={title} composer={composer} />
         </div>
         <div className={styles.text}>

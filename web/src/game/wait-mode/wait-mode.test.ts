@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Chart, Judgment } from "../../contracts";
 import { Judge } from "../core/judge";
 import { holdClock, shouldHold } from ".";
+import { modeUrl } from "./plugin";
 
 // 60 bpm: beat n is at n * 1000 ms. A note at beat 1, a two-hand chord at beat 2.
 const chart: Chart = {
@@ -66,5 +67,13 @@ describe("holdClock", () => {
     clock.update(2200);
     expect(clock.holding).toBe(false);
     expect(judge.finish(3000).judgments.map((j) => j.offsetMs)).toEqual([0, 0, 0]);
+  });
+});
+
+describe("modeUrl", () => {
+  it("adds mode=wait and takes it away, keeping every other param", () => {
+    const p = new URLSearchParams("song=fur-elise&hands=R&from=1&to=2");
+    expect(modeUrl(p, true)).toBe("/play?song=fur-elise&hands=R&from=1&to=2&mode=wait");
+    expect(modeUrl(new URLSearchParams(modeUrl(p, true).slice(6)), false)).toBe("/play?song=fur-elise&hands=R&from=1&to=2");
   });
 });

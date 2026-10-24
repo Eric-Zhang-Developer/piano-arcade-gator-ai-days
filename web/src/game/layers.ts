@@ -21,6 +21,7 @@ import { simPlugin } from "./sim/plugin";
 import { weakBars } from "./weak-bars";
 import { feverStage } from "./stage";
 import { takeGraph } from "./take-graph";
+import { waitMode } from "./wait-mode/plugin";
 
 // Open file: each game feature registers its plugin here, one line each. /play draws every plugin's layer on its
 // own canvas above the highway, forwards every GameEvent, and applies transformChart and wrapInput in this order.
@@ -36,6 +37,7 @@ export const plugins: GamePlugin[] = [
   hud(), // before beat-track, so beat-track's status line draws over the HUD's top panel
   beatTrack(),
   midiWatchdog(), // reconnects a piano that goes silent mid-song
+  waitMode(), // start panel: Learn it first; results panel after a wait-mode take: Play it judged, on top
   records(), // results panel: NEW RECORD, initials and the top 5, first under the score
   dynamics(), // results panel: how loud you played against the score, above "Replay on piano"
   replayView(), // results panel: Watch replay, the take on the highway in time with piano-out

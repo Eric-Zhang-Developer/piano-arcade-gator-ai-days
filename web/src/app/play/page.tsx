@@ -11,6 +11,8 @@ import { keysDevice, midiDevice, testDevice } from "../../game/core/input";
 import { describeTiming, timingSummary, type TimingSummary } from "../../game/timing";
 import { SfxControls } from "../../game/sound/SfxControls";
 import { ReplayOnPiano } from "../../game/piano-out/ReplayOnPiano";
+import { nextPause, pauseClock, type PauseAction, type PauseMode } from "../../game/play-slots";
+import { PauseOverlay, Slots } from "../../game/play-slots/ui";
 import {
   GOOD_MS,
   LATENCY_MAX,
@@ -50,6 +52,10 @@ export default function Play() {
   const [midiStatus, setMidiStatus] = useState("MIDI: connects when you press Start");
   const [isTest, setIsTest] = useState(false);
   const [title, setTitle] = useState("");
+  const [take, setTake] = useState<Take | null>(null);
+  const [loaded, setLoaded] = useState<{ chart: Chart; params: URLSearchParams } | null>(null); // for the panels
+  const [pauseMode, setPauseMode] = useState<PauseMode>("playing");
+  const [countdown, setCountdown] = useState(0);
 
   const chartRef = useRef<Chart | null>(null);
   const paramsRef = useRef<URLSearchParams | null>(null);
@@ -58,6 +64,8 @@ export default function Play() {
   const highwayRef = useRef<HTMLCanvasElement>(null);
   const layerRefs = useRef<(HTMLCanvasElement | null)[]>([]);
   const stopRef = useRef<() => void>(() => {});
+  const pauseRef = useRef<(a: PauseAction) => void>(() => {});
+  const startRef = useRef<() => void>(() => {}); // Retry from the pause menu, inside start itself
 
   // Load settings and the chart once.
   useEffect(() => {
@@ -77,6 +85,7 @@ export default function Play() {
         if (problems.length) throw new Error(`Bad chart: ${problems.join("; ")}`);
         chartRef.current = plugins.reduce((c, p) => p.transformChart?.(c, params) ?? c, raw as Chart);
         setTitle(chartRef.current.title);
+        setLoaded({ chart: chartRef.current, params });
         setLatency(latencyRef.current);
         setIsTest(params.get("input") === "test");
         setPhase("ready");
@@ -99,6 +108,7 @@ export default function Play() {
     stopRef.current();
     setResults(null);
     setPhase("playing");
+    setPauseMode("playing");
 
     const params = paramsRef.current ?? new URLSearchParams();
     const test = params.get("input") === "test";
@@ -106,6 +116,7 @@ export default function Play() {
     const mpb = msPerBeat(chart.bpm);
     const startPerf = performance.now();
     const zeroPerf = startPerf + settings.countInBeats * mpb; // chart clock 0 = beat 0 of bar 1
+    const clock = pauseClock(zeroPerf); // stands still while paused (play-slots)
     const lastNoteMs = Math.max(...chart.notes.map((n) => noteTimeMs(chart, n)));
 
     const take: Take = {
@@ -139,7 +150,8 @@ export default function Play() {
     // Input: every device feeds one handler; a key's judged time is its arrival minus the latency offset.
     let firstKind = true;
     const onInput = (kind: Take["inputDevice"]) => (e: InputEvent) => {
-      const t = e.timeMs - zeroPerf - latencyRef.current;
+      if (clock.paused) return; // keys while paused are neither judged nor recorded
+      const t = clock.now(e.timeMs) - latencyRef.current;
       if (e.type === "on") {
         if (firstKind && !test) take.inputDevice = kind;
         firstKind = false;
@@ -180,9 +192,48 @@ export default function Play() {
     let idleRaf = 0;
     let lastBeat = 0;
     let done = false;
+    let mode: PauseMode = "playing";
+    let countdownUntil = 0; // wall time the resume countdown ends
+    let shownCount = 0;
+    // Pause, Resume, Retry and Quit (play-slots). Esc and the menu's buttons both come here.
+    const act = (a: PauseAction) => {
+      const next = nextPause(mode, a);
+      if (next === mode) return;
+      const perf = performance.now();
+      if (next === "menu") {
+        clock.pause(perf);
+        const at = clock.now(perf);
+        emit({ type: "pause", atMs: at });
+        // Held keys end at the pause: their releases arrive while paused, where input is ignored.
+        for (const pitch of hw.pressed) {
+          const ev = take.events.findLast((x) => x.pitch === pitch && x.offTimeMs === null);
+          if (ev) ev.offTimeMs = at - latencyRef.current;
+        }
+        hw.pressed.clear();
+      }
+      if (next === "countdown") countdownUntil = perf + chart.beatsPerBar * mpb;
+      if (next === "playing") {
+        clock.resume(perf);
+        emit({ type: "resume", atMs: clock.now(perf) });
+      }
+      mode = next;
+      setPauseMode(next);
+      if (next !== "quit") return;
+      emit({ type: "quit", atMs: clock.now(perf) });
+      if (a === "retry") return startRef.current();
+      stopRef.current();
+      setPhase("ready");
+    };
+    pauseRef.current = act;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || e.repeat) return;
+      e.preventDefault();
+      act("esc");
+    };
+    if (!test) window.addEventListener("keydown", onKey); // ?input=test never pauses
     // After the take, the background keeps animating behind the results screen until the next take or unmount.
     const idle = () => {
-      background?.frame({ ...layout!, nowMs: performance.now() - zeroPerf });
+      background?.frame({ ...layout!, nowMs: clock.now(performance.now()) });
       idleRaf = requestAnimationFrame(idle);
     };
     const finish = (now: number) => {
@@ -191,12 +242,18 @@ export default function Play() {
       stop();
       if (background) idleRaf = requestAnimationFrame(idle);
       if (window.__pianoArcade) window.__pianoArcade.results = r;
+      setTake(take);
       setResults(r);
       setTiming(timingSummary(chart, take, r, latencyRef.current));
       setPhase("results");
     };
     const frame = () => {
-      const now = performance.now() - zeroPerf;
+      if (mode === "countdown") {
+        const left = countdownUntil - performance.now();
+        if (left <= 0) act("countdownDone");
+        else if (Math.ceil(left / mpb) !== shownCount) setCountdown((shownCount = Math.ceil(left / mpb)));
+      }
+      const now = clock.now(performance.now());
       hw.nowMs = now;
       const beat = now < 0 ? Math.floor(now / mpb) + settings.countInBeats + 1 : 0;
       hw.countInBeat = beat > 0 ? beat : null;
@@ -222,6 +279,7 @@ export default function Play() {
     function stop() {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
+      window.removeEventListener("keydown", onKey);
       for (const d of devices) d.stop();
     }
     stopRef.current = () => {
@@ -234,10 +292,14 @@ export default function Play() {
       Object.assign(window.__pianoArcade, {
         ready: true,
         results: null,
-        press: (pitch: number, chartTimeMs: number, velocity = 80) => tester?.queue(pitch, zeroPerf + chartTimeMs + latencyRef.current, velocity),
+        press: (pitch: number, chartTimeMs: number, velocity = 80) => tester?.queue(pitch, clock.toPerf(chartTimeMs) + latencyRef.current, velocity),
       });
     }
   }, []);
+
+  useEffect(() => {
+    startRef.current = start;
+  }, [start]);
 
   // Test hook (?input=test only), then auto-start so the verify script needs no clicks.
   useEffect(() => {
@@ -260,6 +322,16 @@ export default function Play() {
         <canvas key={p.id} ref={(c) => void (layerRefs.current[i] = c)} style={canvasStyle} />
       ))}
 
+      {phase === "playing" && (
+        <PauseOverlay
+          mode={pauseMode}
+          count={countdown}
+          button={button}
+          onResume={() => pauseRef.current("resume")}
+          onRetry={() => pauseRef.current("retry")}
+          onQuit={() => pauseRef.current("quit")}
+        />
+      )}
       {phase !== "playing" && (
         <div style={overlay}>
           {phase === "loading" && <p>Loading chart…</p>}
@@ -278,10 +350,15 @@ export default function Play() {
               <button style={button} onClick={start} autoFocus>
                 Start
               </button>
+              {loaded && <Slots plugins={plugins} panel={(p) => p.startPanel?.(loaded)} />}
             </>
           )}
           {phase === "results" && results && (
-            <ResultsScreen results={results} timing={timing} latency={latency} onLatency={onLatency} onRetry={start} />
+            <ResultsScreen results={results} timing={timing} latency={latency} onLatency={onLatency} onRetry={start}>
+              {take && loaded && (
+                <Slots plugins={plugins} panel={(p) => p.resultsPanel?.({ ...loaded, take, results, retry: start })} />
+              )}
+            </ResultsScreen>
           )}
           <label style={{ marginTop: 24, display: "flex", gap: 8, alignItems: "center" }}>
             Latency offset
@@ -302,12 +379,14 @@ function ResultsScreen({
   latency,
   onLatency,
   onRetry,
+  children,
 }: {
   results: Results;
   timing: TimingSummary | null;
   latency: number;
   onLatency: (ms: number) => void;
   onRetry: () => void;
+  children?: React.ReactNode; // the plugins' results panels, between the timing panel and Retry
 }) {
   const { counts } = results;
   const rows: [string, string, number | string][] = [
@@ -338,6 +417,7 @@ function ResultsScreen({
         </tbody>
       </table>
       {timing && <TimingPanel timing={timing} latency={latency} onLatency={onLatency} />}
+      {children}
       <button style={{ ...button, marginTop: 24 }} onClick={onRetry} autoFocus>
         Retry
       </button>

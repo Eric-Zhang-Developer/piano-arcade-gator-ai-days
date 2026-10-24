@@ -22,7 +22,7 @@ export function performMenuAction(action: MenuAction) {
   const dialog = document.querySelector<HTMLDialogElement>("dialog[open]");
   if (action === "home") {
     if (dialog) dialog.close();
-    else document.querySelector<HTMLAnchorElement>('a[aria-label="Home — song selection"],a[href="/"]')?.click();
+    else document.querySelector<HTMLAnchorElement>('a[aria-label="Home — song selection"],a[href="/"],button[data-home]')?.click();
     return;
   }
   const controls = focusables(dialog ?? document);

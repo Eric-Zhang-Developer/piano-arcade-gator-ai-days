@@ -3,7 +3,7 @@
 // SVG, no chart library (spec: take-graph).
 import { useState } from "react";
 import type { Chart, Results, Take } from "../../contracts";
-import { GOOD_MS, GREAT_MS, PERFECT_MS } from "../core/settings";
+import { timingWindows } from "../core/settings";
 import { handColor } from "../hand-colors";
 import { hudSettings } from "../hud";
 import { bg, gold, ink, inkDim } from "../ui-tokens";
@@ -17,6 +17,7 @@ const plotH = H - M.top - M.bottom;
 const c = hudSettings.judgmentColors;
 
 export function TakeGraph({ chart, take, results }: { chart: Chart; take: Take; results: Results }) {
+  const { good: GOOD_MS, great: GREAT_MS, perfect: PERFECT_MS } = timingWindows(take.scoringVersion);
   const [table, setTable] = useState(false);
   const points = graphPoints(chart, take, results);
   const wrong = wrongMarks(chart, take, results);

@@ -25,29 +25,37 @@ export function pianoVoice(out: Pick<MIDIOutput, "send">): Voice {
   };
 }
 
+// Browser fallback: a percussive fundamental with faster-decaying upper partials.
+// Synthesized piano-like audio, not sampled piano. It never sends MIDI or changes a device voice.
+export function pianoTone(ctx: AudioContext, pitch: number, ms: number, at = ctx.currentTime, destination: AudioNode = ctx.destination, velocity = 80, ended = () => {}): () => void {
+  const duration = Math.max(.08, ms / 1000);
+  const voices: OscillatorNode[] = [];
+  let finished = false;
+  for (const [harmonic, weight] of [[1, .5], [2, .16], [3, .06]]) {
+    const osc = ctx.createOscillator(); const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = 440 * 2 ** ((pitch - 69) / 12) * harmonic;
+    const peak = Math.max(.001, weight * velocity / 127);
+    const end = at + Math.min(duration, harmonic === 1 ? 3 : 1.2 / harmonic);
+    gain.gain.setValueAtTime(.0001, at);
+    gain.gain.linearRampToValueAtTime(peak, at + .004);
+    gain.gain.exponentialRampToValueAtTime(peak * .18, at + Math.min(.3 / harmonic, (end - at) * .65));
+    gain.gain.exponentialRampToValueAtTime(.0001, end);
+    osc.connect(gain).connect(destination); osc.start(at); osc.stop(end + .015);
+    osc.onended = () => { osc.disconnect(); gain.disconnect(); if (harmonic === 1 && !finished) { finished = true; ended(); } };
+    voices.push(osc);
+  }
+  return () => { for (const osc of voices) { try { osc.stop(); } catch { /* Already ended. */ } } };
+}
+
 export function toneVoice(ctx: AudioContext): Voice {
-  const live = new Set<OscillatorNode>();
+  const live = new Set<() => void>();
   return {
     kind: "tone",
     note(pitch, ms) {
-      const t = ctx.currentTime;
-      const end = t + Math.min(ms, 900) / 1000;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "triangle";
-      osc.frequency.value = 440 * 2 ** ((pitch - 69) / 12);
-      gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.exponentialRampToValueAtTime(0.25, t + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, end);
-      osc.connect(gain).connect(ctx.destination);
-      osc.onended = () => live.delete(osc);
-      live.add(osc);
-      osc.start(t);
-      osc.stop(end + 0.05);
+      const stop = pianoTone(ctx, pitch, ms, ctx.currentTime, ctx.destination, 80, () => live.delete(stop));
+      live.add(stop);
     },
-    stop() {
-      live.forEach((o) => o.stop());
-      live.clear();
-    },
+    stop() { live.forEach(stop => stop()); live.clear(); },
   };
 }

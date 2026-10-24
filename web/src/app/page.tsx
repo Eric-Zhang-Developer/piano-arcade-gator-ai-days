@@ -5,8 +5,6 @@ import { FirstRunLink } from "@/game/first-run";
 import { OptionsDrawer } from "@/game/options-panel";
 import { MusicSelect } from "@/game/select-layout";
 import { loadSongs } from "@/game/song-select/load";
-import { PianoMenuControls } from "@/game/navigation/PianoMenu";
-import { LobbyMusic } from "@/game/navigation/LobbyMusic";
 
 // The music select, read from web/public/songs at build time: add a chart.json anywhere under it and it shows up here.
 export default function Home() {
@@ -24,8 +22,6 @@ export default function Home() {
           <>
             <OptionsDrawer />
             <FirstRunLink />
-            <LobbyMusic />
-            <PianoMenuControls />
           </>
         }
       />

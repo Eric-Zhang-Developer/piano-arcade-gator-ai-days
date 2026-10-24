@@ -141,8 +141,8 @@ export function ResultsLayout({
             Retry
           </button>
           <Slots plugins={only(actions)} panel={panel} />
-          <Link href="/" className={styles.songs}>
-            Songs
+          <Link href="/" className={styles.songs} aria-label="Home — song selection">
+            Home
           </Link>
         </div>
         <a href="#results-details" className={styles.cue}>

@@ -1,7 +1,7 @@
 // Timing feedback: how early or late a take was, from its Take and Results (spec: timing-feedback). Pure.
 import type { Chart, Results, Take } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
-import { LATENCY_MAX, LATENCY_MIN, NEAR_MISS_MS } from "../core/settings";
+import { LATENCY_MAX, LATENCY_MIN, NEAR_MISS_MS, timingWindows } from "../core/settings";
 
 // A near miss: a MISS note with a same-pitch press within NEAR_MISS_MS (150 ms, osu!'s outermost window at OD 5).
 // Since judging-tiers, a press within GOOD_MS (100 ms) is a GOOD hit, so near misses lie between 100 and 150 ms.
@@ -10,6 +10,7 @@ export const MIN_TIMED_FOR_SUGGESTION = 10;
 export const SUGGEST_FROM_MS = 10; // |mean| at least this before suggesting a latency change
 
 export interface TimingSummary {
+  nearMissWindowMs?: number;
   timed: number; // hits plus near misses
   meanMs: number | null; // signed, negative is early; null below MIN_TIMED
   sdMs: number | null;
@@ -21,6 +22,7 @@ export interface TimingSummary {
 }
 
 export function timingSummary(chart: Chart, take: Take, results: Results, currentLatencyMs: number): TimingSummary {
+  const nearWindow = timingWindows(take.scoringVersion).nearMiss;
   const notes = new Map(chart.notes.map((n) => [n.id, n]));
   const offsets = results.judgments.flatMap((j) => (j.offsetMs === null ? [] : [j.offsetMs]));
 
@@ -30,7 +32,7 @@ export function timingSummary(chart: Chart, take: Take, results: Results, curren
     results.extras.flatMap(({ eventIndex }) => {
       const e = take.events[eventIndex];
       const d = e.timeMs - noteTimeMs(chart, n);
-      return e.pitch === n.pitch && Math.abs(d) <= NEAR_MISS_MS ? [{ noteId: n.id, eventIndex, d }] : [];
+      return e.pitch === n.pitch && Math.abs(d) <= nearWindow ? [{ noteId: n.id, eventIndex, d }] : [];
     }),
   );
   pairs.sort((a, b) => Math.abs(a.d) - Math.abs(b.d));
@@ -51,6 +53,7 @@ export function timingSummary(chart: Chart, take: Take, results: Results, curren
   const suggest = all.length >= MIN_TIMED_FOR_SUGGESTION && Math.abs(mean) >= SUGGEST_FROM_MS;
   const round = (x: number) => Math.round(x) + 0; // + 0 turns -0 into 0
   return {
+    ...(take.scoringVersion === 3 ? { nearMissWindowMs: nearWindow } : {}),
     timed: all.length,
     meanMs: enough ? round(mean) : null,
     sdMs: enough ? round(sd) : null,
@@ -71,7 +74,7 @@ export function describeTiming(s: TimingSummary): string[] {
   const lines = [`${avg}, spread ±${s.sdMs} ms`, `${s.early} early · ${s.late} late`];
   if (s.misses > 0)
     lines.push(
-      `${s.nearMisses} of ${s.misses} ${s.misses === 1 ? "miss was" : "misses were"} within ${NEAR_MISS_MS} ms`,
+      `${s.nearMisses} of ${s.misses} ${s.misses === 1 ? "miss was" : "misses were"} within ${s.nearMissWindowMs ?? NEAR_MISS_MS} ms`,
     );
   return lines;
 }

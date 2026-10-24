@@ -53,7 +53,7 @@ export function PauseMenu({
   const items: [string, () => void][] = [
     ["Resume", onResume],
     ["Retry", onRetry],
-    ["Quit", onQuit],
+    ["Home", onQuit],
   ];
   // ↑/↓ move the focus and stop at the ends; Esc sounds back here, and /play's own listener resumes.
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -77,6 +77,7 @@ export function PauseMenu({
             key={label}
             type="button"
             role="menuitem"
+            data-home={label === "Home" ? "" : undefined}
             className={styles.item}
             autoFocus={i === 0}
             // Hover moves the focus only on a real move: a mouse resting where the menu appears (on Start, say)

@@ -2,7 +2,7 @@
 import type { Chart, ChartNote, GameEvent, Judgment, NoteJudgment, Rank, Results, Take, TakeEvent } from "../../contracts";
 import { evaluateSustain } from "./sustain";
 import { type Gauge, emptyGauge, reduceGauge } from "../fever-gauge/gauge";
-import { GOOD_MS, GOOD_WEIGHT, GREAT_MS, NEAR_MISS_MS, PERFECT_MS, msPerBeat } from "./settings";
+import { GOOD_WEIGHT, timingWindows, msPerBeat } from "./settings";
 
 export function noteTimeMs(chart: Chart, note: ChartNote): number {
   return note.beat * msPerBeat(chart.bpm);
@@ -37,13 +37,15 @@ export class Judge {
   constructor(
     private readonly chart: Chart,
     private readonly onEvent: (e: GameEvent) => void = () => {},
-    private readonly opts: { scored?: boolean; scoringVersion?: 1 | 2 } = {},
+    private readonly opts: { scored?: boolean; scoringVersion?: 1 | 2 | 3 } = {},
   ) {
     this.times = chart.notes.map((n) => noteTimeMs(chart, n));
     this.byTime = chart.notes.map((_, i) => i).sort((a, b) => this.times[a] - this.times[b]);
     this.judgments = chart.notes.map(() => null);
     this.gauge = emptyGauge(chart.notes.length);
   }
+
+  private get windows() { return timingWindows(this.opts.scoringVersion); }
 
   press(pitch: number, timeMs: number, eventIndex: number): void {
     if (this.results) return;
@@ -54,13 +56,13 @@ export class Judge {
     for (const i of this.byTime) {
       if (this.judgments[i] || this.chart.notes[i].pitch !== pitch) continue;
       const d = Math.abs(timeMs - this.times[i]);
-      if (d <= GOOD_MS && (best < 0 || d < Math.abs(timeMs - this.times[best]))) best = i;
+      if (d <= this.windows.good && (best < 0 || d < Math.abs(timeMs - this.times[best]))) best = i;
     }
     if (best < 0) return this.extra(pitch, timeMs, eventIndex);
     const note = this.chart.notes[best];
     const offsetMs = timeMs - this.times[best];
     const d = Math.abs(offsetMs);
-    const judgment = d <= PERFECT_MS ? "PERFECT" : d <= GREAT_MS ? "GREAT" : "GOOD";
+    const judgment = d <= this.windows.perfect ? "PERFECT" : d <= this.windows.great ? "GREAT" : "GOOD";
     this.judgments[best] = { noteId: note.id, judgment, offsetMs, eventIndex };
     this.noteState.set(note.id, judgment);
     this.combo++;
@@ -89,13 +91,13 @@ export class Judge {
   sustainAt(nowMs: number, final = false) {
     const active = new Set(this.held.values());
     const evidence = new Map([...this.presses].filter(([i, e]) => e.offTimeMs !== null || active.has(i)));
-    return this.opts.scoringVersion === 2 ? evaluateSustain(this.chart, this.judgments.filter((j): j is NoteJudgment => j !== null), evidence, nowMs, final) : undefined;
+    return (this.opts.scoringVersion ?? 1) >= 2 ? evaluateSustain(this.chart, this.judgments.filter((j): j is NoteJudgment => j !== null), evidence, nowMs, final) : undefined;
   }
 
   advance(nowMs: number): void {
     if (this.results) return;
     for (const i of this.byTime) {
-      if (this.times[i] + GOOD_MS >= nowMs) break;
+      if (this.times[i] + this.windows.good >= nowMs) break;
       if (!this.judgments[i]) this.miss(i);
     }
   }
@@ -129,7 +131,7 @@ export class Judge {
       accuracy,
       maxCombo: this.maxCombo,
       rank: rankFor(accuracy),
-      ...(this.opts.scoringVersion === 2 ? { sustain: this.sustainAt(atMs, true) } : {}),
+      ...((this.opts.scoringVersion ?? 1) >= 2 ? { sustain: this.sustainAt(atMs, true) } : {}),
     };
     if (this.scored && counts.MISS === 0 && this.wrong.length === 0) this.onEvent({ type: "fullCombo", atMs });
     this.onEvent({ type: "songEnd", results: this.results, atMs });
@@ -143,15 +145,15 @@ export class Judge {
     this.onEvent({ type: "extra", pitch, atMs: timeMs });
     const first = this.times[this.byTime[0]];
     const last = this.times[this.byTime[this.byTime.length - 1]];
-    if (timeMs < first - GOOD_MS || timeMs > last + GOOD_MS) return;
-    if (this.chart.notes.some((n, i) => n.pitch === pitch && Math.abs(timeMs - this.times[i]) <= NEAR_MISS_MS)) return;
+    if (timeMs < first - this.windows.good || timeMs > last + this.windows.good) return;
+    if (this.chart.notes.some((n, i) => n.pitch === pitch && Math.abs(timeMs - this.times[i]) <= this.windows.nearMiss)) return;
     this.wrong.push({ eventIndex });
     this.breakCombo({ type: "wrongNote", pitch, atMs: timeMs });
   }
 
   private miss(i: number): void {
     const note = this.chart.notes[i];
-    const atMs = this.times[i] + GOOD_MS;
+    const atMs = this.times[i] + this.windows.good;
     this.judgments[i] = { noteId: note.id, judgment: "MISS", offsetMs: null, eventIndex: null };
     this.noteState.set(note.id, "MISS");
     this.breakCombo({ type: "noteMiss", noteId: note.id, pitch: note.pitch, atMs });
@@ -175,7 +177,7 @@ export function judgeTake(chart: Chart, take: Take): Results {
   const judge = new Judge(chart, undefined, { scoringVersion: take.scoringVersion ?? 1 });
   const timeline = take.events.flatMap((e, i) => [
     { time: e.timeMs, i, off: false },
-    ...(take.scoringVersion === 2 && e.offTimeMs !== null ? [{ time: e.offTimeMs, i, off: true }] : []),
+    ...((take.scoringVersion ?? 1) >= 2 && e.offTimeMs !== null ? [{ time: e.offTimeMs, i, off: true }] : []),
   ]).sort((a, b) => a.time - b.time || a.i - b.i || Number(a.off) - Number(b.off));
   const active = new Map<number, number>();
   for (const e of timeline) {
@@ -188,12 +190,12 @@ export function judgeTake(chart: Chart, take: Take): Results {
       const previous = active.get(pitch);
       // Canonical live retriggers already have an offTime. A still-null
       // predecessor may be an unplugged/unconfirmed key; never fill its gap.
-      if (take.scoringVersion === 2 && previous !== undefined && take.events[previous].offTimeMs === null) judge.cancel(pitch);
+      if ((take.scoringVersion ?? 1) >= 2 && previous !== undefined && take.events[previous].offTimeMs === null) judge.cancel(pitch);
       judge.press(pitch, e.time, e.i);
       active.set(pitch, e.i);
     }
   }
   const lastNote = Math.max(0, ...chart.notes.map((n) => noteTimeMs(chart, n)));
   const lastEvent = timeline.at(-1)?.time ?? 0;
-  return judge.finish(Math.max(lastNote + GOOD_MS, lastEvent));
+  return judge.finish(Math.max(lastNote + timingWindows(take.scoringVersion).good, lastEvent));
 }

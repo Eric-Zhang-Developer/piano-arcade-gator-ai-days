@@ -15,6 +15,9 @@
 
 .band {
   width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
   padding: 1.4vh 0;
   background: var(--pa-sky);
   border-block: 2px solid var(--pa-magenta);
@@ -34,7 +37,7 @@
   font-family: var(--pa-font-display), system-ui, sans-serif;
   font-style: italic;
   font-weight: 900;
-  font-size: clamp(44px, 5.2vw, 100px);
+  font-size: clamp(28px, 5.2vw, 100px);
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.01em;
@@ -107,4 +110,16 @@
   .band {
     animation: none;
   }
+}
+
+.navigation { justify-self: start; padding-inline: 20px; }
+
+/* Keep the existing jacket/text/badge readable after the phone guard is dismissed. */
+@media (max-width: 600px) {
+  .track { display: grid; grid-template-columns: 72px minmax(0, 1fr); width: 90vw; gap: 12px; align-items: start; }
+  .jacket { width: 72px; }
+  .text { grid-column: 2; grid-row: 1 / span 2; }
+  .title { font-size: 24px; }
+  .level { grid-column: 1; grid-row: 2; min-width: 0; padding: 4px; }
+  .number { font-size: 32px; }
 }

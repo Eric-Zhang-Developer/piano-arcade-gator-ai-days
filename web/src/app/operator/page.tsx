@@ -1,4 +1,5 @@
 "use client";
+import { Home } from "../../game/navigation/Home";
 
 // The arcade's operator menu: what needs a person, who's working, and the bookkeeping. LIVE polls /api/operator
 // (development only); SNAPSHOT (?snapshot, or any production build) reads only the frozen file.
@@ -105,6 +106,7 @@ export default function OperatorPage() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
+        <Home />
         <div className={styles.titleRow}>
           <h1 className={styles.title}>OPERATOR MODE</h1>
           <a className={styles.attract} href={`/attract${mode === "SNAPSHOT" ? "?snapshot" : ""}`}>ATTRACT MODE ▶</a>

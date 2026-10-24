@@ -4,7 +4,7 @@ import { createElement } from "react";
 import type { Chart, GamePlugin, Judgment, Results, Take } from "../../contracts";
 import { passAccuracy } from "../bar-loop";
 import { noteTimeMs } from "../core/judge";
-import { GOOD_MS, GREAT_MS, msPerBeat, PERFECT_MS } from "../core/settings";
+import { timingWindows, msPerBeat } from "../core/settings";
 
 export const tempoCurveSettings = {
   windowBars: 2, // the local fit reaches this many bars each side; wider bends less (spec: prefer wider)
@@ -58,8 +58,10 @@ export interface Rubato {
   judgments: { noteId: string; judgment: Judgment; offsetMs: number | null }[];
 }
 
-const judge = (offset: number): Judgment =>
-  Math.abs(offset) <= PERFECT_MS ? "PERFECT" : Math.abs(offset) <= GREAT_MS ? "GREAT" : Math.abs(offset) <= GOOD_MS ? "GOOD" : "MISS";
+const judge = (offset: number, version = 1): Judgment => {
+  const w = timingWindows(version);
+  return Math.abs(offset) <= w.perfect ? "PERFECT" : Math.abs(offset) <= w.great ? "GREAT" : Math.abs(offset) <= w.good ? "GOOD" : "MISS";
+};
 
 export function rubato(chart: Chart, take: Take, results: Results): Rubato {
   const s = tempoCurveSettings;
@@ -101,7 +103,7 @@ export function rubato(chart: Chart, take: Take, results: Results): Rubato {
   let recovered = 0;
   const judgments = notes.map((n) => {
     const offsetMs = pressOf.has(n.id) ? take.events[pressOf.get(n.id)!].timeMs - curve.at(n.t) : null;
-    const judgment = offsetMs === null ? "MISS" : judge(offsetMs);
+    const judgment = offsetMs === null ? "MISS" : judge(offsetMs, take.scoringVersion);
     counts[judgment]++;
     if (judgment !== "MISS" && strictOf.get(n.id)?.judgment === "MISS") recovered++;
     return { noteId: n.id, judgment, offsetMs };

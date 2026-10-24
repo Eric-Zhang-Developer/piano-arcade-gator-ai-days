@@ -1,5 +1,6 @@
 // /play's start screen as an arcade stage card (Chunithm's opening card): ARE YOU READY across the screen, then the
 // song's jacket, title, composer and level. It's a start panel, so it goes when Start unmounts the start screen.
+import { Home } from "../navigation/Home";
 import { useEffect } from "react";
 import type { Chart, GamePlugin } from "../../contracts";
 import { difficulty } from "../difficulty/difficulty";
@@ -12,6 +13,7 @@ export function StageCard({ id, title, composer, catalog, level }: Pick<Chart, "
   return (
     <section className={styles.card} aria-label="Stage">
       <div className={styles.band}>
+        <nav className={styles.navigation}><Home /></nav>
         <p className={styles.ready}>Are you ready?</p>
       </div>
       <div className={styles.track}>

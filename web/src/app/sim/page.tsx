@@ -1,4 +1,5 @@
 "use client";
+import { Home } from "../../game/navigation/Home";
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -152,6 +153,7 @@ function SimPage() {
   return (
     <main style={{ display: "grid", gridTemplateColumns: "minmax(0, 2fr) minmax(320px, 1fr)", gap: 16, padding: 16, height: "100vh", boxSizing: "border-box" }}>
       <section style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0 }}>
+        <nav><Home /></nav>
         <iframe key={gameKey} title="game" src={`/play?midi=sim&simId=${simId}`} style={{ flex: 1, border: "1px solid #333", borderRadius: 8, minHeight: 0 }} />
         <div aria-label="virtual keyboard" style={{ display: "flex", gap: 2, height: 96 }}>
           {keys.map((p) => (
@@ -326,7 +328,7 @@ function Record() {
 
   return (
     <main style={{ padding: 16, display: "flex", flexDirection: "column", gap: 12, height: "100vh", boxSizing: "border-box" }}>
-      <h1 style={{ margin: 0 }}>Record a fixture</h1>
+      <Home /><h1 style={{ margin: 0 }}>Record a fixture</h1>
       <p style={{ margin: 0, opacity: 0.7 }}>
         With the real piano in Chrome: connect, leave the piano idle for 60 s, play Twinkle once, then download. Nothing is
         filtered.

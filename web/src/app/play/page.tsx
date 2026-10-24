@@ -26,7 +26,7 @@ import { ResultsLayout } from "../../game/results-layout";
 import { emptyHud, reduceHud } from "../../game/hud";
 import { barStep, holdClock, isWaitMode } from "../../game/wait-mode";
 import {
-  GOOD_MS,
+  timingWindows,
   LATENCY_MAX,
   LATENCY_MIN,
   loadLatencyOffset,
@@ -199,14 +199,14 @@ export default function Play() {
     let firstKind = true;
     const activeEvents = new Map<number, number>();
     const onInput = (kind: Take["inputDevice"]) => (e: InputEvent) => {
-      if (pauses.paused && (scoringVersion(params) !== 2 || e.type === "on")) return;
+      if (pauses.paused && (scoringVersion(params) < 2 || e.type === "on")) return;
       // A press during a hold lands on the held note's time; taking off the latency could put it outside GOOD.
       const t = wait?.holding ? clock.now(e.timeMs) : clock.now(e.timeMs) - latencyRef.current;
       if (e.type === "on") {
         if (firstKind) take.scoringVersion = scoringVersion(params);
         if (firstKind && !test) take.inputDevice = kind;
         firstKind = false;
-        if (take.scoringVersion === 2 && hw.pressed.has(e.pitch)) {
+        if ((take.scoringVersion ?? 1) >= 2 && hw.pressed.has(e.pitch)) {
           const previous = take.events.findLast(x => x.pitch === e.pitch && x.offTimeMs === null);
           if (previous) previous.offTimeMs = Math.max(previous.timeMs, t);
         }
@@ -218,9 +218,9 @@ export default function Play() {
         hw.pressed.delete(e.pitch);
         hw.pressedHand!.delete(e.pitch);
         const index = activeEvents.get(e.pitch);
-        const ev = take.scoringVersion === 2 ? index === undefined ? undefined : take.events[index] : take.events.findLast((x) => x.pitch === e.pitch && x.offTimeMs === null);
+        const ev = (take.scoringVersion ?? 1) >= 2 ? index === undefined ? undefined : take.events[index] : take.events.findLast((x) => x.pitch === e.pitch && x.offTimeMs === null);
         activeEvents.delete(e.pitch);
-        if (e.cancelled && take.scoringVersion === 2) judge.cancel(e.pitch);
+        if (e.cancelled && (take.scoringVersion ?? 1) >= 2) judge.cancel(e.pitch);
         else {
           if (ev) ev.offTimeMs = Math.max(ev.timeMs, t);
           judge.release(e.pitch, t);
@@ -282,8 +282,8 @@ export default function Play() {
         pauses.pause(perf);
         const at = clock.now(perf);
         emit({ type: "pause", atMs: at, performanceMs: perf });
-        // Policy v2 keeps confirmed holds through the pause; older takes end held keys here.
-        if (take.scoringVersion !== 2) endHeld(at);
+        // Policies v2 and up keep confirmed holds through the pause; older takes end held keys here.
+        if ((take.scoringVersion ?? 1) < 2) endHeld(at);
       }
       if (next === "countdown") {
         countdownUntil = perf + countdownSettings.resumePulses * pulse.pulseMs;
@@ -304,7 +304,7 @@ export default function Play() {
     };
     pauseRef.current = act;
     skipRef.current = () => {
-      if (mode !== "playing" || clock.now(performance.now()) >= -GOOD_MS) return;
+      if (mode !== "playing" || clock.now(performance.now()) >= -timingWindows(scoringVersion(params)).good) return;
       // A fresh songStart keeps all recording plugins on the same epoch.
       // The old transport is cancelled, never finished or saved.
       startRef.current(true);
@@ -371,7 +371,7 @@ export default function Play() {
       const now = clock.now(perf);
       hw.nowMs = now;
       hw.sustain = judge.sustainAt(now);
-      if (skipVisible && now >= -GOOD_MS) { skipVisible = false; setCanSkip(false); }
+      if (skipVisible && now >= -timingWindows(scoringVersion(params)).good) { skipVisible = false; setCanSkip(false); }
       const beat = now < 0 ? Math.floor(now / pulse.pulseMs) + pulse.countInPulses + 1 : 0;
       hw.countInBeat = beat > 0 ? beat : null;
       if (beat > lastBeat) emit({ type: "countInBeat", beat, atMs: (beat - 1 - pulse.countInPulses) * pulse.pulseMs });
@@ -389,7 +389,7 @@ export default function Play() {
       });
       if (background) guard.run(bgId, "background", () => background.frame(f));
 
-      if (now > (scoringVersion(params) === 2 ? lastEndMs : lastNoteMs) + GOOD_MS + Math.max(0, latencyRef.current) + INPUT_GRACE_MS + END_TAIL_MS) finish(now);
+      if (now > (scoringVersion(params) >= 2 ? lastEndMs : lastNoteMs) + timingWindows(scoringVersion(params)).good + Math.max(0, latencyRef.current) + INPUT_GRACE_MS + END_TAIL_MS) finish(now);
     };
     raf = requestAnimationFrame(frame);
 
@@ -496,6 +496,7 @@ export default function Play() {
               <button style={button} onClick={() => start()} autoFocus>
                 Start
               </button>
+              <p style={{ margin: "8px 0", color: "var(--pa-ink-dim)", fontSize: 13 }}>Hold long notes until their tails reach the keys.</p>
               {loaded && <Slots plugins={plugins} panel={(p) => p.startPanel?.(loaded)} />}
             </>
           )}

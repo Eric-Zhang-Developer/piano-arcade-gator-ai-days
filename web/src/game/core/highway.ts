@@ -224,10 +224,15 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
     }
     ctx.globalAlpha = 1;
     if (s.sustain && n.duration >= sustainSettings.minDurationBeats) {
-      ctx.fillStyle = "#151020";
-      ctx.font = "bold 12px system-ui";
-      ctx.textAlign = "center";
-      ctx.fillText("HOLD", pill.x + pill.width / 2, Math.max(14, Math.min(line - 16, yBottom - 12)));
+      // A restrained note-attached duration cue; no repeated labels over the highway.
+      const w = Math.max(2, pill.width - 4);
+      const y = Math.min(line - 6, yBottom - 10);
+      ctx.fillStyle = "rgba(21,16,32,.65)";
+      ctx.fillRect(pill.x + 2, y, w, 3);
+      if (hold && state && state !== "MISS") {
+        ctx.fillStyle = hold.releasedEarly ? settings.missColor : "#ffffff";
+        ctx.fillRect(pill.x + 2, y, w * hold.earnedPoints / hold.possiblePoints, 3);
+      }
     }
   }
   ctx.restore();
@@ -325,24 +330,6 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
       const label = judgment === "PERFECT" ? signed : `${offsetMs < 0 ? "EARLY" : "LATE"} ${signed}`;
       ctx.fillText(label, cx, readoutY);
     }
-    ctx.restore();
-  }
-  if (s.sustain) {
-    const current = chart.notes.flatMap(n => {
-      const h = holds.get(n.id);
-      const state = s.noteState.get(n.id);
-      return h && state && state !== "MISS" && s.nowMs >= n.beat * beatMs - 100 && s.nowMs <= (n.beat + n.duration) * beatMs + 700 ? [{ n, h }] : [];
-    }).slice(-4);
-    ctx.save();
-    ctx.textAlign = "left";
-    ctx.font = "bold 15px system-ui";
-    current.forEach(({ n, h }, i) => {
-      const pct = Math.floor(100 * h.earnedPoints / h.possiblePoints);
-      const down = s.pressed.has(n.pitch);
-      const label = h.releasedEarly ? "RELEASED EARLY" : pct === 100 ? down ? "HOLD TARGET MET · RELEASE" : "HOLD COMPLETE" : down ? "HOLD" : pct > 0 ? "HOLD CREDIT" : "HOLD UNCONFIRMED";
-      ctx.fillStyle = h.releasedEarly ? miss : "#5ef2c4";
-      ctx.fillText(`${label} · ${pct}%`, 16, line - 30 - i * 22);
-    });
     ctx.restore();
   }
 }

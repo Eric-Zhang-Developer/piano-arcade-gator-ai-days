@@ -7,6 +7,8 @@ import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent }
 import { LATENCY_MAX, LATENCY_MIN, loadLatencyOffset, saveLatencyOffset } from "../core/settings";
 import { LABEL_SETTINGS, LABELS_KEY, labelSetting, type LabelSetting } from "../note-labels/labels";
 import { DEFAULT_PREFS, getPrefs, savePrefs, subscribePrefs, type Prefs } from "../sound";
+import { LobbyMusic } from "../navigation/LobbyMusic";
+import { PianoMenuControls } from "../navigation/PianoMenu";
 import styles from "./options-panel.module.css";
 
 export const LABEL_NAMES: Record<LabelSetting, string> = { auto: "Auto", notes: "Note names", keys: "Laptop keys", off: "Off" };
@@ -208,6 +210,7 @@ export function OptionsDrawer() {
             requestAnimationFrame(() => ref.current?.querySelector<HTMLElement>(`[data-testid="opt-labels-${s}"]`)?.focus());
           }}
         />
+        <div className={styles.rows}><LobbyMusic /><PianoMenuControls /></div>
         <p className={styles.note}>Latency and labels apply from the next song.</p>
       </dialog>
     </>

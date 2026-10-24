@@ -52,7 +52,7 @@ describe("explicit local hold policy", () => {
     expect(judgeTake(chart, take([event(-101, 1000)])).counts.MISS).toBe(1);
   });
   it("validates policy and release direction without changing legacy validation", () => {
-    expect(validateTake({ ...take([]), scoringVersion: 3 })).toContain("scoringVersion must be 1 or 2");
+    expect(validateTake({ ...take([]), scoringVersion: 4 })).toContain("scoringVersion must be 1, 2 or 3");
     expect(validateTake(take([event(20, 10)]))).toContain("event 0: release precedes press");
     expect(validateTake(take([event(20, 10)], null))).toEqual([]);
   });

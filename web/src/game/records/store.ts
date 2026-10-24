@@ -57,9 +57,9 @@ export function setInitials(records: Records, chartId: string, date: string, ini
 }
 
 // A take's records key: an Easy take (easy-charts, ?level=easy) keeps its own best and top 5 under <id>@easy.
-export function recordKey(chartId: string, params: URLSearchParams, version: 1 | 2 = 1): string {
+export function recordKey(chartId: string, params: URLSearchParams, version: 1 | 2 | 3 = 1): string {
   const key = params.get("level") === "easy" ? `${chartId}@easy` : chartId;
-  return version === 2 ? `${key}@scoring-v2` : key;
+  return version >= 2 ? `${key}@scoring-v${version}` : key;
 }
 
 // A practice take isn't a record: a loop, a slower tempo, a mode, a bot, versus, or one hand.

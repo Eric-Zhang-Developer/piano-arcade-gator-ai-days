@@ -2,6 +2,7 @@
 // (songEnd), so leaving the results screen without entering initials keeps it as "---".
 import { createElement } from "react";
 import type { GamePlugin } from "../../contracts";
+import { scoringVersion } from "../core/sustain";
 import { emptyHud, reduceHud } from "../hud";
 import { RecordsPanel, type Outcome } from "./panel";
 import { addTake, browserStorage, loadRecords, practiceReason, recordKey, saveRecords } from "./store";
@@ -32,7 +33,7 @@ export function records(): GamePlugin {
       hud = reduceHud(hud, e);
       if (e.type === "songStart") outcome = current = null;
       if (e.type !== "songEnd") return;
-      chartId = recordKey(songId, params, e.results.sustain ? 2 : 1);
+      chartId = recordKey(songId, params, scoringVersion(params));
       if (practiceReason(params)) {
         outcome = current = { kind: "practice" };
         return;

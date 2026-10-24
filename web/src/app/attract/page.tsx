@@ -1,4 +1,5 @@
 "use client";
+import { Home } from "../../game/navigation/Home";
 
 // Attract mode: the build replayed, one merged PR per note of Twinkle, with the crew timeline below. Reads
 // operator-board's board: live from /api/operator (development), or the snapshot (?snapshot, or any production build).
@@ -202,6 +203,7 @@ export default function AttractPage() {
 
   return (
     <main className={op.page}>
+      <Home />
       <header className={op.header}>
         <div className={op.titleRow}>
           <h1 className={op.title}>ATTRACT MODE</h1>

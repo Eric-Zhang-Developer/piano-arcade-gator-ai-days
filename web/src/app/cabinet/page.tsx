@@ -1,4 +1,5 @@
 "use client";
+import { Home } from "../../game/navigation/Home";
 // The cabinet (spec: cabinet): PRESS ANY KEY, then attract and a bot's demo in full-screen iframes, then the title
 // again, unattended. This page keeps the keyboard and listens to the piano itself; the iframes never take input.
 import { useEffect, useRef, useState, type CSSProperties } from "react";
@@ -120,7 +121,7 @@ export default function Cabinet() {
     <main data-testid="cabinet" data-phase={phase} style={screen}>
       {phase === "title" ? (
         <>
-          <h1 style={wordmark}>Piano Arcade</h1>
+          <Home /><h1 style={wordmark}>Piano Arcade</h1>
           <p data-testid="press-any-key" style={press}>
             PRESS ANY KEY
           </p>

@@ -130,7 +130,7 @@ export function SongPreview({ id, best }: { id: string; best?: { rank: Rank; acc
       {/* song-sources: the cited score, one click away; the proof, not setup, so ?capture=1 keeps it */}
       {chart && <SongSource source={chart.source} />}
       <p data-testid="preview-status" data-capture-hide style={status}>
-        {quietPreview ? "Song previews paused for lobby music / piano menus" : !isArmed ? "Press any key for previews" : voice === "piano" ? "Preview: on the piano" : voice === "tones" ? "Preview: laptop tones" : "\u00a0"}
+        {quietPreview ? "Song previews paused for lobby music / piano menus" : !isArmed ? "Press any key for previews" : voice === "piano" ? "Preview: on the piano" : voice === "tones" ? "Preview: synthesized piano" : "\u00a0"}
       </p>
     </div>
   );

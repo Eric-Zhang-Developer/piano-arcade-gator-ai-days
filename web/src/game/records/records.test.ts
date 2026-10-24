@@ -88,22 +88,28 @@ describe("the plugin", () => {
     return { p, store };
   }
 
+  it("separates new forgiving records from legacy and sustain-only versions", () => {
+    const { store } = play("song=twinkle");
+    expect(Object.keys(JSON.parse(store.get(RECORDS_KEY)!))).toEqual(["twinkle@scoring-v3"]);
+    expect(recordKey("twinkle", new URLSearchParams(), 2)).toBe("twinkle@scoring-v2");
+  });
+
   it("publishes the take's outcome for record-moment: recorded with newRecord, then practice", () => {
-    play("song=twinkle");
+    play("song=twinkle&scoring=1");
     expect(takeOutcome()).toMatchObject({ kind: "recorded", chartId: "twinkle", newRecord: true, inTop: true });
     play("song=twinkle&bot=perfect");
     expect(takeOutcome()).toEqual({ kind: "practice" });
   });
 
   it("records the take at songEnd with the HUD's score and initials ---", () => {
-    const { store } = play("song=twinkle");
+    const { store } = play("song=twinkle&scoring=1");
     const saved = JSON.parse(store.get(RECORDS_KEY)!);
     expect(saved.twinkle.top).toHaveLength(1);
     expect(saved.twinkle.top[0]).toMatchObject({ score: 300, rank: "S", initials: NO_INITIALS }); // 3 PERFECT at x1
   });
 
   it("an Easy take saves under <id>@easy and leaves the Normal records alone (easy-charts)", () => {
-    const { store } = play("song=twinkle&level=easy");
+    const { store } = play("song=twinkle&level=easy&scoring=1");
     const saved = JSON.parse(store.get(RECORDS_KEY)!);
     expect(Object.keys(saved)).toEqual(["twinkle@easy"]);
     expect(recordKey("fur-elise", new URLSearchParams("level=easy"))).toBe("fur-elise@easy");

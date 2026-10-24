@@ -1,16 +1,14 @@
 "use client";
-import styles from "./controls.module.css";
 import { useEffect, useSyncExternalStore } from "react";
+import styles from "../options-panel/options-panel.module.css";
 import { hydrateLobby, lobbyServerSnapshot, lobbySnapshot, playLobbyMusic, setLobbyVolume, stopLobbyMusic, subscribeLobby } from "./music";
-
 export function LobbyMusic() {
   const state = useSyncExternalStore(subscribeLobby, lobbySnapshot, lobbyServerSnapshot);
   useEffect(() => { hydrateLobby(); return () => stopLobbyMusic(); }, []);
-  return <section aria-label="Lobby music" className={styles.controls}>
-    <button onClick={() => state.playing ? stopLobbyMusic(true) : void playLobbyMusic()}>{state.playing ? "Stop lobby music" : "Play lobby music"}</button>
-    <button aria-label="Lobby volume down" onClick={() => setLobbyVolume(state.volume - .05)}>−</button>
-    <label style={{ margin: "0 8px" }}>Volume <input aria-label="Lobby music volume" type="range" min="0" max="1" step="0.01" value={state.volume} onChange={e => setLobbyVolume(Number(e.target.value))} style={{ width: 80, verticalAlign: "middle" }} /></label>
-    <button aria-label="Lobby volume up" onClick={() => setLobbyVolume(state.volume + .05)}>+</button>
-    <div role="status">{state.status}</div>
+  return <section aria-label="Lobby music" className={styles.row}>
+    <label className={styles.label} htmlFor="opt-lobby">Lobby music</label>
+    <input id="opt-lobby" aria-label="Lobby music" data-row className={styles.check} type="checkbox" checked={state.playing} onChange={() => state.playing ? stopLobbyMusic(true) : void playLobbyMusic()} />
+    <label className={styles.control}>Volume <input aria-label="Lobby music volume" data-row type="range" min="0" max="1" step="0.01" value={state.volume} onChange={e => setLobbyVolume(Number(e.target.value))} /><output className={styles.value}>{Math.round(state.volume * 100)}%</output></label>
+    <small role="status" style={{ gridColumn: "1 / -1", color: "var(--pa-ink-dim)" }}>{state.status}</small>
   </section>;
 }

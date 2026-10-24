@@ -41,3 +41,10 @@ export function saveLatencyOffset(ms: number): void {
 }
 
 export const msPerBeat = (bpm: number) => 60000 / bpm;
+
+// Serialized policy: historical v1/v2 retain their original windows. V3 scales
+// all onset tiers by1.25; pitch and sustained-duration requirements are unchanged.
+export function timingWindows(version = 1) {
+  const scale = version === 3 ? 1.25 : 1;
+  return { perfect: PERFECT_MS * scale, great: GREAT_MS * scale, good: GOOD_MS * scale, nearMiss: NEAR_MISS_MS * scale };
+}

@@ -15,3 +15,7 @@
   outline-offset: 2px;
 }
 .controls input { accent-color: #27e1ff; }
+
+.home { color: var(--pa-ink-dim); text-decoration: none; font: 700 14px system-ui, sans-serif; white-space: nowrap; }
+.home:hover { color: var(--pa-ink); }
+.home:focus-visible { outline: 2px solid var(--pa-cyan); outline-offset: 4px; }

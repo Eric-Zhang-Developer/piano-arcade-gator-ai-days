@@ -1,5 +1,6 @@
 // Song preview's opening: the chart's first two bars, and the players that sound them (spec: song-preview).
 import type { Chart } from "../../contracts";
+import { pianoTone } from "../../replay/piano";
 import { msPerBeat } from "../core/settings";
 
 export const previewSettings = {
@@ -58,17 +59,6 @@ export function playAsTones(ctx: AudioContext, notes: PreviewNote[]): () => void
   bus.gain.value = previewSettings.toneVolume;
   bus.connect(ctx.destination);
   const t0 = ctx.currentTime + 0.02;
-  for (const n of notes) {
-    const t = t0 + n.startMs / 1000;
-    const osc = ctx.createOscillator();
-    const env = ctx.createGain();
-    osc.type = "triangle";
-    osc.frequency.value = 440 * 2 ** ((n.pitch - 69) / 12);
-    env.gain.setValueAtTime(n.velocity / 127, t);
-    env.gain.exponentialRampToValueAtTime(0.001, t + Math.max(0.05, n.durMs / 1000));
-    osc.connect(env).connect(bus);
-    osc.start(t);
-    osc.stop(t + Math.max(0.05, n.durMs / 1000));
-  }
-  return () => bus.disconnect();
+  const stops = notes.map(n => pianoTone(ctx, n.pitch, n.durMs, t0 + n.startMs / 1000, bus, n.velocity));
+  return () => { bus.disconnect(); stops.forEach(stop => stop()); };
 }

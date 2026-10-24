@@ -1,10 +1,9 @@
 "use client";
-import styles from "./controls.module.css";
-import { usePathname } from "next/navigation";
+import styles from "../options-panel/options-panel.module.css";
 import { useSyncExternalStore } from "react";
 import { midiDevice } from "../core/input";
 import { menuInput, performMenuAction } from "./menu";
-import { menuAllowed, navigationPhase, subscribePhase } from "./state";
+import { menuAllowed } from "./state";
 import type { InputDevice } from "../../contracts";
 
 let snapshot = { enabled: false, status: "Piano menu off" };
@@ -14,7 +13,6 @@ export const subscribePianoMenu = (callback: () => void) => { listeners.add(call
 export const pianoMenuSnapshot = () => snapshot;
 const serverSnapshot = { enabled: false, status: "Piano menu off" };
 export const pianoMenuServerSnapshot = () => serverSnapshot;
-const noSubscription = () => () => {};
 let device: InputDevice | null = null;
 
 export async function enablePianoMenu() {
@@ -33,18 +31,10 @@ export function disablePianoMenu() {
 
 export function PianoMenuControls() {
   const state = useSyncExternalStore(subscribePianoMenu, pianoMenuSnapshot, () => serverSnapshot);
-  return <section aria-label="Piano menu controls" className={styles.controls}>
-    <button onClick={() => state.enabled ? disablePianoMenu() : void enablePianoMenu()}>{state.enabled ? "Disable piano menu" : "Enable piano menu"}</button>
-    <span role="status" style={{ marginLeft: 8 }}>{state.status}</span>
-    <div>B2 Home/close · C3 Previous · D3 Next · E3 Select</div>
-    <small>One press per action. Menu keys are off during countdown and playing.</small>
+  return <section aria-label="Piano menu controls" className={styles.row}>
+    <label className={styles.label} htmlFor="opt-piano-menu">Piano navigation</label>
+    <input id="opt-piano-menu" aria-label="Piano navigation" data-row className={styles.check} type="checkbox" checked={state.enabled} onChange={() => state.enabled ? disablePianoMenu() : void enablePianoMenu()} />
+    <small role="status" style={{ gridColumn: "1 / -1", color: "var(--pa-ink-dim)" }}>{state.status}</small>
+    <small style={{ gridColumn: "1 / -1" }}>B2 Home · C3 Previous · D3 Next · E3 Select. Release between presses; off while playing.</small>
   </section>;
-}
-
-export function PianoMenuOverlay() {
-  const path = usePathname();
-  const top = useSyncExternalStore(noSubscription, () => window.top === window.self, () => false);
-  const phase = useSyncExternalStore(subscribePhase, navigationPhase, () => "ready");
-  if (!top || path !== "/play" || phase === "playing") return null;
-  return <aside style={{ position: "fixed", bottom: 12, left: 12, maxWidth: 320, zIndex: 3000, padding: 10, borderRadius: 6, background: "#141022", color: "#f2f2f5" }}><PianoMenuControls /></aside>;
 }

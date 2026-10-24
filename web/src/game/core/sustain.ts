@@ -5,8 +5,11 @@ export const sustainSettings = { minDurationBeats: 1.5, pointsPerTarget: 100 };
 
 // New live play opts in; a historical MIDI file without a policy marker is
 // deliberately legacy. Serialized Takes default independently to version 1.
-export const scoringVersion = (params: URLSearchParams): 1 | 2 =>
-  params.get("scoring") === "1" || (params.get("bot") === "take" && params.get("scoring") !== "2") ? 1 : 2;
+export const scoringVersion = (params: URLSearchParams): 1 | 2 | 3 => {
+  const policy = params.get("scoring");
+  if (policy === "1" || policy === "2" || policy === "3") return Number(policy) as 1 | 2 | 3;
+  return params.get("bot") === "take" ? 1 : 3;
+};
 
 export function evaluateSustain(chart: Chart, judgments: readonly NoteJudgment[], events: ReadonlyMap<number, TakeEvent>, nowMs: number, final = false): SustainSummary {
   const judged = new Map(judgments.map(j => [j.noteId, j]));

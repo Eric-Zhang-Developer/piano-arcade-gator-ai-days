@@ -4,6 +4,7 @@ import { noteTimeMs } from "../core/judge";
 import { msPerBeat, settings } from "../core/settings";
 import { seededRandom } from "../sim/fake";
 import { alphaOf, spawn, step, type Particle } from "./particles";
+import { impactT, stampKeyframes, stampSettings, stampStartMs } from "../rank-stamp";
 
 export const juiceSettings = {
   clearMs: 500, // spec: effects never cover a note less than 500 ms from the line
@@ -261,12 +262,12 @@ function showFullCombo() {
   setTimeout(() => el.remove(), juiceSettings.fullComboMs);
 }
 
-// Rank reveal: the results screen's rank letter scales in (after the full-combo banner, when there is one).
-// The results screen is core-loop's, so this styles its rank element by test id instead of editing it.
-function rankReveal(afterBanner: boolean) {
+// Rank reveal: the results screen's rank letter stamps down (rank-stamp) once the tally ends, or after the full-combo
+// banner. The results screen is results-layout's, so this styles its rank element by test id instead of editing it.
+function rankReveal(fullCombo: boolean) {
   if (typeof document === "undefined") return;
   ensureStyles();
-  document.documentElement.style.setProperty("--juice-rank-delay", afterBanner ? `${juiceSettings.fullComboMs}ms` : "0ms");
+  document.documentElement.style.setProperty("--juice-rank-delay", `${stampStartMs(fullCombo)}ms`);
 }
 
 function ensureStyles() {
@@ -275,8 +276,12 @@ function ensureStyles() {
   css.id = "juice-visual-css";
   css.textContent = `
 @keyframes juice-banner { 0% { opacity: 0; transform: scale(1.15) } 12% { opacity: 1; transform: scale(1) } 80% { opacity: 1 } 100% { opacity: 0 } }
-@keyframes juice-rank { from { opacity: 0; transform: scale(0.3) } to { opacity: 1; transform: scale(1) } }
-[data-testid="rank"] { animation: juice-rank 450ms cubic-bezier(0.2, 1.4, 0.4, 1) var(--juice-rank-delay, 0ms) both; }
-@media (prefers-reduced-motion: reduce) { [data-testid="rank"], [data-testid="full-combo"] { animation: none; } }`;
+${stampKeyframes("juice-rank")}
+@keyframes juice-rank-ring { from { opacity: 0.95; transform: scale(0.55) } to { opacity: 0; transform: scale(1.9) } }
+[data-testid="rank"] { position: relative; animation: juice-rank ${stampSettings.durationMs}ms linear var(--juice-rank-delay, 0ms) both; }
+[data-testid="rank"]::after { content: ""; position: absolute; inset: 4% -8%; border-radius: 50%; pointer-events: none;
+  border: 3px solid var(--pa-gold); box-shadow: 0 0 28px var(--pa-gold), inset 0 0 28px var(--pa-gold); opacity: 0;
+  animation: juice-rank-ring ${stampSettings.flashMs}ms ease-out calc(var(--juice-rank-delay, 0ms) + ${Math.round(impactT * stampSettings.durationMs)}ms) forwards; }
+@media (prefers-reduced-motion: reduce) { [data-testid="rank"], [data-testid="rank"]::after, [data-testid="full-combo"] { animation: none; } }`;
   document.head.appendChild(css);
 }

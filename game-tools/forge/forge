@@ -1,0 +1,4 @@
+#!/bin/sh
+# forge.py with the converter's venv (mido). Usage: game-tools/forge/forge <step> ... (see forge.py)
+d="$(dirname "$0")"
+exec "$d/../midi-to-chart/.venv/bin/python" "$d/forge.py" "$@"

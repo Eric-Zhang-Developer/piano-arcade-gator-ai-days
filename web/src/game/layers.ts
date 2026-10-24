@@ -16,6 +16,7 @@ import { eventSounds } from "./sound";
 import { simPlugin } from "./sim/plugin";
 import { weakBars } from "./weak-bars";
 import { feverStage } from "./stage";
+import { takeGraph } from "./take-graph";
 
 // Open file: each game feature registers its plugin here, one line each. /play draws every plugin's layer on its
 // own canvas above the highway, forwards every GameEvent, and applies transformChart and wrapInput in this order.
@@ -34,6 +35,7 @@ export const plugins: GamePlugin[] = [
   feverStage(), // three.js stage behind the highway (background hook only, no 2D layer)
   weakBars(), // results panel: accuracy per phrase, and a link to loop the weakest
   evenness(), // results panel: how even each hand's runs were
+  takeGraph(), // results panel: every note's timing over the song
   eventSounds(), // laptop sounds at combo milestones, fever, full combo, rank and (optionally) misses
   feverGauge(), // late: its gauge sizes from the chart after every transformChart, as the judge does
   warningCard(), // after every transformChart too: the level is the chart the player gets; WARNING at Lv 13+

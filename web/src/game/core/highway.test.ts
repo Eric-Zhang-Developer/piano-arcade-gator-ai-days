@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { Chart } from "../../contracts";
+import { handColor } from "../hand-colors";
 import { drawHighway, isBlack, makeLayout, type HighwayState } from "./highway";
+import { settings } from "./settings";
 
 const chart = (pitches: number[]): Chart => ({
   id: "t",
@@ -75,5 +77,39 @@ describe("drawHighway backdrop", () => {
     const { ctx, calls } = recorder();
     drawHighway(ctx, makeLayout(c, 800, 600, 0), c, state(0.55));
     expect(calls.slice(0, 2)).toEqual(["clearRect", "fillRect rgba(0,0,0,0.55)"]);
+  });
+});
+
+describe("drawHighway hand colors (hand-colors)", () => {
+  // Records the fill style of every fill and fillRect.
+  const recorder = () => {
+    const fills: string[] = [];
+    const state: Record<string | symbol, unknown> = {};
+    const ctx = new Proxy(state, {
+      get: (t, k) => (k in t ? t[k] : k === "fill" || k === "fillRect" ? () => fills.push(String(t.fillStyle)) : () => ({ width: 0 })),
+      set: (t, k, v) => ((t[k] = v), true),
+    }) as unknown as CanvasRenderingContext2D;
+    return { ctx, fills };
+  };
+  const twoHands: Chart = { ...chart([60, 64]), notes: chart([60, 64]).notes.map((n, i) => ({ ...n, beat: 0.5, hand: i ? "L" : "R" })) };
+  const draw = (c: Chart, s: Partial<HighwayState> = {}) => {
+    const { ctx, fills } = recorder();
+    drawHighway(ctx, makeLayout(c, 800, 600, 0), c, { nowMs: 0, noteState: new Map(), pressed: new Set(), latest: null, countInBeat: null, ...s });
+    return fills;
+  };
+
+  it("a two-hand chart falls in both hands' colors; a one-hand chart in today's color only", () => {
+    expect(draw(twoHands)).toEqual(expect.arrayContaining([handColor("R"), handColor("L")]));
+    const oneHand = { ...twoHands, notes: twoHands.notes.map((n) => ({ ...n, hand: "L" as const })) };
+    expect(draw(oneHand)).not.toContain(handColor("L"));
+    expect(draw(oneHand)).toContain(settings.noteColor);
+  });
+
+  it("a key lights in the hand of the note it hit, and as before when it hit nothing", () => {
+    const hit = draw(twoHands, { pressed: new Set([64]), pressedHand: new Map([[64, "L"]]) });
+    expect(hit.filter((f) => f === handColor("L")).length).toBeGreaterThan(draw(twoHands).filter((f) => f === handColor("L")).length);
+    const none = draw(twoHands, { pressed: new Set([62]), pressedHand: new Map() });
+    expect(none).toContain(settings.keyLitColor);
+    expect(none.filter((f) => f === handColor("L")).length).toBe(draw(twoHands).filter((f) => f === handColor("L")).length);
   });
 });

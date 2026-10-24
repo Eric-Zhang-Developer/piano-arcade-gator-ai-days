@@ -23,6 +23,13 @@ test("no level never renders a number besides the note count", () => {
   expect(numbers).toEqual(["294"]);
 });
 
+test("a best grade renders its rank and accuracy; none renders nothing", () => {
+  const html = text(renderToStaticMarkup(<SongCard {...card} best={{ rank: "A", accuracy: 0.912 }} />));
+  expect(html).toContain("|Best 91.2%|");
+  expect(html).toContain("|A|");
+  expect(renderToStaticMarkup(<SongCard {...card} />)).not.toContain('data-testid="best"');
+});
+
 test("focused marks the card", () => {
   expect(renderToStaticMarkup(<SongCard {...card} focused />)).toContain("data-focused");
   expect(renderToStaticMarkup(<SongCard {...card} />)).not.toContain("data-focused");

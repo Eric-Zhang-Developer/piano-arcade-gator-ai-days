@@ -1,5 +1,6 @@
 // The highway: a flat-or-mildly-tilted lane per key, notes falling to the keyboard. Canvas 2D, no React.
-import type { Chart, Frame, Judgment } from "../../contracts";
+import type { Chart, Frame, Hand, Judgment } from "../../contracts";
+import { noteColorFor } from "../hand-colors";
 import { msPerBeat, settings } from "./settings";
 
 const JUDGMENT_SHOW_MS = 600;
@@ -25,6 +26,7 @@ export interface HighwayState {
   nowMs: number; // chart clock
   noteState: Map<string, Judgment>; // judged notes
   pressed: Set<number>; // pitches held right now
+  pressedHand?: Map<number, Hand>; // a held key's hand, when its press hit a note (hand-colors); absent: today's color
   latest: { judgment: Judgment | "WRONG"; offsetMs: number | null; atMs: number } | null;
   countInBeat: number | null; // 1..countInBeats while counting in, else null
   backdropAlpha?: number; // below 1 while a background layer is mounted; default opaque
@@ -114,6 +116,7 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
   ctx.beginPath();
   ctx.rect(0, 0, L.width, line);
   ctx.clip();
+  const color = noteColorFor(chart);
   for (const n of chart.notes) {
     const state = s.noteState.get(n.id);
     if (state && state !== "MISS") continue; // consumed on hit
@@ -126,7 +129,7 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
     const x1 = k.x + inset;
     const x2 = k.x + k.width - inset;
     const top = Math.min(yTop + settings.noteGapPx, yBottom - settings.noteHeadPx * 2);
-    ctx.fillStyle = state === "MISS" ? settings.missColor : settings.noteColor;
+    ctx.fillStyle = state === "MISS" ? settings.missColor : color(n.hand);
     bar(ctx, L, x1, x2, top, yBottom - 1);
     if (state !== "MISS") {
       ctx.fillStyle = settings.noteHeadColor;
@@ -135,18 +138,23 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
   }
   ctx.restore();
 
-  // Keyboard: whites, then blacks on top. Its top edge is the judgment line.
+  // Keyboard: whites, then blacks on top. Its top edge is the judgment line. A key that hit a note lights in that
+  // note's color; a key that hit nothing lights as before.
+  const lit = (p: number) => {
+    const hand = s.pressedHand?.get(p);
+    return hand ? color(hand) : settings.keyLitColor;
+  };
   const kbH = L.keyboardHeight;
   for (let p = L.lowPitch; p <= L.highPitch; p++) {
     if (L.isBlack(p)) continue;
     const k = L.keyX(p);
-    ctx.fillStyle = s.pressed.has(p) ? settings.keyLitColor : "#e8e8ec";
+    ctx.fillStyle = s.pressed.has(p) ? lit(p) : "#e8e8ec";
     ctx.fillRect(k.x + 0.5, line, k.width - 1, kbH);
   }
   for (let p = L.lowPitch; p <= L.highPitch; p++) {
     if (!L.isBlack(p)) continue;
     const k = L.keyX(p);
-    ctx.fillStyle = s.pressed.has(p) ? settings.keyLitColor : "#16161a";
+    ctx.fillStyle = s.pressed.has(p) ? lit(p) : "#16161a";
     ctx.fillRect(k.x, line, k.width, kbH * 0.62);
   }
   ctx.fillStyle = settings.noteColor;

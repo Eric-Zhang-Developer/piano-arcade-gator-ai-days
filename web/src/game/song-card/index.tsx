@@ -1,5 +1,5 @@
-// One song as a music-select card: jacket slot, title, composer, note count and level. select-layout places the
-// cards and makes them links; this only draws one.
+// One song as a music-select card: jacket slot, title, composer, note count, level, and the player's best grade when
+// they have one (records). select-layout places the cards and makes them links; this only draws one.
 import type { ReactNode } from "react";
 import styles from "./song-card.module.css";
 
@@ -11,9 +11,10 @@ export type SongCardProps = {
   level?: number;
   focused: boolean;
   jacket?: ReactNode;
+  best?: { rank: string; accuracy: number }; // from records; absent for a song never played
 };
 
-export function SongCard({ title, composer, catalog, noteCount, level, focused, jacket }: SongCardProps) {
+export function SongCard({ title, composer, catalog, noteCount, level, focused, jacket, best }: SongCardProps) {
   return (
     <div className={styles.card} data-focused={focused || undefined}>
       <div className={styles.jacket}>{jacket}</div>
@@ -26,6 +27,12 @@ export function SongCard({ title, composer, catalog, noteCount, level, focused, 
           {catalog && ` · ${catalog}`}
         </div>
       </div>
+      {best && (
+        <div className={styles.best} data-testid="best">
+          <span className={styles.label}>Best {(best.accuracy * 100).toFixed(1)}%</span>
+          <span className={styles.number}>{best.rank}</span>
+        </div>
+      )}
       <div className={styles.count}>
         <span className={styles.label}>Notes</span>
         <span className={styles.number}>{noteCount}</span>

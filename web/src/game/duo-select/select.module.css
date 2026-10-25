@@ -9,9 +9,10 @@
 }
 
 .roll {
-  flex: 0 1 28vh; /* the one piece that gives way when the panel runs out of room */
-  min-height: 10vh;
-  max-height: 300px;
+  /* Fixed, so nothing in the panel shrinks (song-options' check): 20vh fits a two-line title, the Hands row and the
+     footer at 1280×720 and 1920×1080. */
+  flex: none;
+  height: min(20vh, 300px);
   border: 1px solid var(--pa-line);
   background: var(--pa-bg);
 }

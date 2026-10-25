@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Chart, Frame, GameEvent, InputDevice, InputEvent, Results, Take } from "../../contracts";
 import { validateChart } from "../../contracts";
+import { APP_NAME } from "../../game/app-name";
 import { plugins } from "../../game/layers";
 import { barLines } from "../../game/bar-lines";
 import { coreGuard, createGuard } from "../../game/crash-guard";
@@ -100,6 +101,7 @@ export default function Play() {
         keysRef.current = staticRange(raw as Chart); // hands=, loops and practice keep the whole song's keyboard
         chartRef.current = plugins.reduce((c, p) => p.transformChart?.(c, params) ?? c, raw as Chart);
         setLoaded({ chart: chartRef.current, params });
+        document.title = `${(raw as Chart).title} · ${APP_NAME}`; // the tab names the song (#953)
         setLatency(latencyRef.current);
         setIsTest(params.get("input") === "test");
         setPhase("ready");

@@ -66,6 +66,8 @@ test("a chunk-practice step features chunk practice's panel, and the graph moves
   expect(details).toContain('aria-label="Take graph"');
   const plain = render({ plugins: all, params: new URLSearchParams("song=twinkle") });
   expect(between(plain, 'data-testid="results"', 'id="results-details"')).toContain("GRAPH");
+  const adapt = render({ plugins: all, params: new URLSearchParams("song=twinkle&from=1&to=4&practice=adapt&ok=0&ko=0&clean=0") });
+  expect(between(adapt, 'data-testid="results"', 'id="results-details"')).toContain("NEXT"); // adaptive-chunks' step too
 });
 
 test("a watch-demo take features its way back, and the graph moves to the details", () => {

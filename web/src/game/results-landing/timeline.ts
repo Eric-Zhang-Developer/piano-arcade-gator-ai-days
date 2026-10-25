@@ -48,7 +48,7 @@ export type LandingState = {
   combo: number | null; // MAX COMBO's shown value, null while the number is in flight
   acc: number; // ACC's opacity: it arrives with the last count
   rank: { opacity: number; scale: number; x: number; tint: boolean };
-  brackets: number; // the rank's bracket corners snapped in (0 out, 1 in)
+  brackets: number; // the rank's bracket corners: 0 out (8 px wide of their place), 1 home, in two frames from impact
   after: number; // NEW RECORD and the tutor's opacity
 };
 
@@ -116,7 +116,7 @@ export function landingAt(t: number, plan: LandingPlan): LandingState {
       x: stampU >= 0 ? stampShake(stampU) : 0,
       tint: stampU >= 0 && at - plan.stampAtMs < s.frameMs, // one 60 fps frame at impact
     },
-    brackets: stampU >= 0 ? 1 : 0,
+    brackets: clamp01((at - plan.stampAtMs + s.frameMs) / (2 * s.frameMs)),
     after: clamp01((at - plan.afterAtMs) / s.afterFadeMs),
   };
 }

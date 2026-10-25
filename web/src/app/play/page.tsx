@@ -20,7 +20,8 @@ import { StartScreen } from "../../game/duo-start/StartScreen";
 import { PauseMenu } from "../../game/pause-skin";
 import { Button, MonoLabel, Panel, kitButton } from "../../game/duo-tokens";
 import { ResultsLayout } from "../../game/results-layout";
-import { emptyHud, reduceHud } from "../../game/hud";
+import { emptyHud, hudLayout, reduceHud } from "../../game/hud";
+import { landingAt, landingCounts, landingMounted, landingPlan, landingRuns, landingSettings, landingT, startLanding, stopLanding } from "../../game/results-landing";
 import { barStep, holdClock, isWaitMode } from "../../game/wait-mode";
 import { isFlowMode } from "../../game/flow-mode/clock";
 import { FlowJudge } from "../../game/flow-mode/judge";
@@ -158,8 +159,12 @@ export default function Play() {
     const bgId = plugins.find((p) => p.background)?.id ?? "";
     const handOf = new Map(chart.notes.map((n) => [n.id, n.hand]));
     let hud = emptyHud(); // rebuilt with the HUD's own reducer, as records does
+    let judged = 0; // results-landing's T0: every note judged …
+    let maxCombo = 0;
     const emit = (e: GameEvent) => {
       hud = reduceHud(hud, e);
+      if (e.type === "noteHit" || e.type === "noteMiss") judged++;
+      if (e.type === "combo") maxCombo = Math.max(maxCombo, e.count);
       if (e.type === "noteHit") hw.pressedHand!.set(e.pitch, handOf.get(e.noteId)!); // the key lights in its note's hand
       if (e.type === "noteHit") hw.latest = { judgment: e.judgment, offsetMs: e.offsetMs, atMs: e.atMs };
       if (e.type === "noteMiss") hw.latest = { judgment: "MISS", offsetMs: null, atMs: e.atMs };
@@ -328,18 +333,43 @@ export default function Play() {
       if (background) guard.run(bgId, "background", () => background.frame({ ...layout!, nowMs: clock.now(performance.now()) }));
       idleRaf = requestAnimationFrame(idle);
     };
-    const finish = (now: number) => {
+    // ?x=results-landing (spec: results-landing): from T0 the drawn clock eases to a stop and the keyboard dims while
+    // the judge runs on the real clock, so the take is judged as before; the results mount when the out ends.
+    const landing = landingRuns(params);
+    let t0Chart: number | null = null;
+    const drawDim = (f: Frame, dim: number) => {
+      if (!octx || dim <= 0) return;
+      octx.fillStyle = `rgba(0,0,0,${dim.toFixed(3)})`;
+      octx.fillRect(0, layout!.judgmentLineY, f.width, layout!.keyboardHeight);
+    };
+    const beginLanding = (now: number) => {
+      t0Chart = now;
+      const r = canvas.getBoundingClientRect();
+      const hl = hudLayout(layout!.width, layout!.judgmentLineY);
+      const size = hl.panel.h * 0.42;
+      startLanding(
+        { bpm: chart.bpm, mountChartMs: now + landingSettings.outMs, counts: landingCounts(hud), combo: hud.combo, maxCombo },
+        {
+          score: { x: r.left + (hl.slots.score.x0 + hl.slots.score.x1) / 2, y: r.top + hl.panel.h * 0.4, size },
+          combo: { x: r.left + hl.combo.cx, y: r.top + hl.combo.cy, size: hl.combo.size },
+        },
+        hud.score,
+      );
+    };
+    const finish = (now: number, drawn = now) => {
       done = true;
       const r = judge.finish(now);
       // The last frame behind the results: songEnd has gone out, so a plugin that ends with the song draws nothing now
       // and every other one leaves its final state, as their own canvases did.
-      drawLayers({ ...layout!, nowMs: now });
+      drawLayers({ ...layout!, nowMs: drawn });
+      if (t0Chart !== null) drawDim({ ...layout!, nowMs: drawn }, landingAt(landingT(), landingPlan()!).keyboardDim);
       stop();
       if (background) idleRaf = requestAnimationFrame(idle);
       if (window.__pianoArcade) window.__pianoArcade.results = r;
       setTake(take);
       setResults(r);
       setScore(hud.score);
+      if (t0Chart !== null) landingMounted(landingCounts(r.counts), r.maxCombo, hud.score);
       setTiming(timingSummary(chart, take, r, latencyRef.current));
       setPhase("results");
     };
@@ -359,7 +389,9 @@ export default function Play() {
       const perf = performance.now();
       held?.update(pauses.now(perf));
       const now = clock.now(perf);
-      hw.nowMs = now;
+      const out = t0Chart === null ? null : landingAt(landingT(), landingPlan()!);
+      const drawn = out ? t0Chart! + out.clockMs : now;
+      hw.nowMs = drawn;
       const beat = now < 0 ? Math.floor(now / mpb) + settings.countInBeats + 1 : 0;
       hw.countInBeat = beat > 0 ? beat : null;
       if (beat > lastBeat) emit({ type: "countInBeat", beat, atMs: (beat - 1 - settings.countInBeats) * mpb });
@@ -367,13 +399,20 @@ export default function Play() {
       // Flow's advance never MISSes: it only notices a stop past the free beats.
       if (!wait) core("the judge", () => judge.advance(now - Math.max(0, latencyRef.current) - INPUT_GRACE_MS));
 
-      if (zoom) layout = makeLayout(chart, w, h, perspective, zoom(now));
+      if (zoom) layout = makeLayout(chart, w, h, perspective, zoom(drawn));
       core("drawHighway", () => drawHighway(ctx, layout!, chart, hw));
-      const f = { ...layout!, nowMs: now };
+      const f = { ...layout!, nowMs: drawn };
       drawLayers(f);
+      if (out) drawDim(f, out.keyboardDim);
       if (background) guard.run(bgId, "background", () => background.frame(f));
 
-      if (now > lastNoteMs + GOOD_MS + Math.max(0, latencyRef.current) + INPUT_GRACE_MS + END_TAIL_MS) finish(now);
+      const tail = now > lastNoteMs + GOOD_MS + Math.max(0, latencyRef.current) + INPUT_GRACE_MS + END_TAIL_MS;
+      if (!landing) {
+        if (tail) finish(now);
+      } else if (!out) {
+        // … and no key held, or today's finish time: a key held past it doesn't hold the cut back
+        if (tail || (judged >= chart.notes.length && hw.pressed.size === 0)) beginLanding(now);
+      } else if (out.mounted) finish(now, drawn);
     };
     raf = requestAnimationFrame(frame);
 
@@ -388,6 +427,7 @@ export default function Play() {
       stop();
       cancelAnimationFrame(idleRaf);
       background?.dispose();
+      stopLanding();
     };
 
     if (window.__pianoArcade) {

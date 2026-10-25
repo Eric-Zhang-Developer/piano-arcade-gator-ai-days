@@ -192,7 +192,7 @@ export function ResultsLayout({
         </div>
         <Panel style={{ width: "100%", boxSizing: "border-box" }}>
           <div className={styles.bottom}>
-            <div className={styles.tutor}>
+            <div className={styles.tutor} data-landing-after>
               <Slots plugins={tutor} panel={panel} />
             </div>
             <div className={styles.actions}>

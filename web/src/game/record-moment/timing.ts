@@ -1,6 +1,6 @@
 // Record moment's timing (spec: record-moment), in ms after the results show. Pure, so it tests without a page.
 import type { Outcome } from "../records";
-import { stampSettings, stampStartMs } from "../rank-stamp";
+import { stampAfterMs, stampSettings } from "../rank-stamp";
 
 export const momentSettings = {
   stampMs: stampSettings.durationMs, // NEW RECORD stamps on rank-stamp's curve, for as long
@@ -8,7 +8,7 @@ export const momentSettings = {
 };
 
 export function momentTimes() {
-  const startMs = stampStartMs() + stampSettings.durationMs; // when the rank stamp ends
+  const startMs = stampAfterMs(); // when the rank stamp ends (results-landing: 250 ms after its stamp)
   const cellsAtMs = startMs + momentSettings.stampMs;
   return { startMs, cellsAtMs, endMs: cellsAtMs + momentSettings.cellsMs };
 }

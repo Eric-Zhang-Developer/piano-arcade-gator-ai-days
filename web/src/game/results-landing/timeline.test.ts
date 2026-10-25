@@ -104,3 +104,19 @@ test("a frame is a function of t: the same t gives the same state", () => {
   const plan = planLanding(take(60));
   for (const t of [0, 200, 500, 1500, plan.stampAtMs + 5]) expect(landingAt(t, plan)).toEqual(landingAt(t, plan));
 });
+
+test("sound and record-moment follow the landing's stamp, and today's come back without it", async () => {
+  const { setStampTiming, stampImpactMs, stampStartMs, impactT } = await import("../rank-stamp");
+  const { momentTimes } = await import("../record-moment/timing");
+  const { mountTimes } = await import("./timeline");
+  const today = { impact: stampImpactMs(), moment: momentTimes().startMs };
+  const plan = planLanding(take(100));
+  setStampTiming(mountTimes(plan));
+  expect(stampImpactMs()).toBe(plan.stampAtMs - s.outMs); // ms after the results show, where songEnd goes out
+  expect(stampStartMs()).toBe(stampImpactMs()); // it lands at 1.08: its start is its impact
+  expect(momentTimes().startMs).toBe(plan.afterAtMs - s.outMs);
+  setStampTiming(null);
+  expect(stampImpactMs()).toBe(today.impact);
+  expect(today.impact).toBe(1200 + Math.round(impactT * 300));
+  expect(momentTimes().startMs).toBe(today.moment);
+});

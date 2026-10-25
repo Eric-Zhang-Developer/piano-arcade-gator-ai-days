@@ -156,7 +156,7 @@ export function compose(letters: string, cipher: Cipher): Theme | null {
   let inner: [number, number] | null = null;
   const left: { beat: number; dur: number; pitches: [number, number, number]; theme: boolean }[] = [];
   let parallels = 0;
-  let prevOuter: [number, number] | null = null;
+  let prevMel: number | null = null;
   for (const e of evs) {
     const [r, t, f] = chordPcs(e.root);
     const at = (pc: number, lo: number, hi: number) => {
@@ -179,14 +179,12 @@ export function compose(letters: string, cipher: Cipher): Theme | null {
     const ref: [number, number] = inner ?? [b + 7, b + 12];
     const pair: [number, number] = pairs.sort((p, q) => Math.abs(p[0] - ref[0]) + Math.abs(p[1] - ref[1]) - (Math.abs(q[0] - ref[0]) + Math.abs(q[1] - ref[1])) || p[0] - q[0])[0];
     left.push({ beat: e.beat, dur: e.dur, pitches: [b, pair[0], pair[1]], theme: e.theme });
-    const mel = toPitch(e.step);
-    if (prevOuter) {
-      const [pm, pb]: [number, number] = prevOuter;
+    const mel: number = toPitch(e.step);
+    if (prevMel !== null && bass !== null) {
       const iv = (mel - b) % 12;
-      const piv = (pm - pb) % 12;
-      if ((iv === 7 || iv === 0) && iv === piv && mel !== pm && b !== pb) parallels++;
+      if ((iv === 7 || iv === 0) && iv === (prevMel - bass) % 12 && mel !== prevMel && b !== bass) parallels++;
     }
-    prevOuter = [mel, b];
+    prevMel = mel;
     bass = b;
     inner = pair;
   }

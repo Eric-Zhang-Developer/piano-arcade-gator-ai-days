@@ -22,7 +22,8 @@ For the demo: a judge should see in 5 seconds that the app found the hard passag
 ## Plan
 1. **`feat(adaptive-chunks)`, part 1:** `web/src/game/adaptive-chunks/next.ts` and its tests. A pure function, no UI.
 2. **`feat(adaptive-chunks)`, part 2:** the wiring in `web/src/game/chunk-practice/`, the strip, `verify-adaptive.mjs`,
-   the shots and the done note. No other feature's files change.
+   the shots and the done note. No other feature's files change, except one condition in results-layout's
+   `featuredFor`: an adaptive step's panel is featured too, so its focused link scrolls nothing (#606, `fix(results-layout)`).
 
 ## The window rule (`next.ts`, pure)
 Units are weak-bars' phrases: 2 bars each, from bar 1, the last maybe shorter, empty ones skipped. A window is a run

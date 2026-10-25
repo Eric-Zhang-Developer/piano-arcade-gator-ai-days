@@ -110,29 +110,47 @@ export function scenes(): GamePlugin {
   let emit: ((e: InputEvent) => void) | null = null; // the bot device's handler, while it runs
   let out: MIDIOutput | null = null;
   let zeroPerf: number | null = null; // chart clock 0, in performance.now() time
+  let pumpPerf: number | null = null; // when this frame's pump ran: just before /play read its clock
   let fromMs = -Infinity; // after a resume, only what is still ahead
+  let latency = 0;
+  // The presses and releases still to send, in time order, each at its chart time. A timer sends each on time, so a
+  // piano hears it on time; the pump sends whatever a starved timer hasn't yet (#586).
+  let queue: { atMs: number; type: InputEvent["type"]; pitch: number; velocity?: number; sent: boolean }[] = [];
+  let next = 0;
   const timers: ReturnType<typeof setTimeout>[] = [];
   const cancel = () => {
     timers.forEach(clearTimeout);
     timers.length = 0;
+    [queue, next] = [[], 0];
   };
-  const at = (perfMs: number, f: () => void) => timers.push(setTimeout(f, perfMs - performance.now()));
-  const send = (type: InputEvent["type"], pitch: number, timeMs: number, onVelocity = KEYS_VELOCITY) => {
-    const velocity = type === "on" ? onVelocity : 0;
-    emit?.({ type, pitch, velocity, timeMs });
-    out?.send([0x90, pitch, velocity]);
+  // /play judges arrival - zero - latency, so an event's time is read from the best zero so far, when it's sent.
+  const perfOf = (chartMs: number) => zeroPerf! + latency + chartMs;
+  const fire = (e: (typeof queue)[number]) => {
+    if (e.sent || !emit) return;
+    e.sent = true;
+    const velocity = e.type === "on" ? (e.velocity ?? KEYS_VELOCITY) : 0;
+    emit({ type: e.type, pitch: e.pitch, velocity, timeMs: perfOf(e.atMs) });
+    out?.send([0x90, e.pitch, velocity]);
+  };
+  // Run from a frame callback queued during /play's frame, so it runs before /play's next one: every event due by now
+  // reaches the judge before that frame sweeps late notes to MISS. On a starved page each frame is a long task and
+  // Chrome runs frames ahead of timers; a timer alone kept a press past its note's window (MISS plus an extra).
+  const pump = () => {
+    pumpPerf = performance.now();
+    if (zeroPerf === null) return;
+    while (next < queue.length && perfOf(queue[next].atMs) <= pumpPerf) fire(queue[next++]);
   };
   const play = () => {
     cancel();
     if (!bot || !chart || !emit || zeroPerf === null) return;
     if (bot === "take" && !take) return; // still reading: start() plays once it has
-    const shift = zeroPerf + loadLatencyOffset(); // /play judges arrival - zero - latency
+    latency = loadLatencyOffset();
     for (const p of bot === "take" ? take! : botPresses(chart, bot)) {
-      const on = shift + p.timeMs;
-      const off = on + p.holdMs;
-      if (p.timeMs >= fromMs) at(on, () => send("on", p.pitch, on, p.velocity));
-      if (p.timeMs + p.holdMs >= fromMs) at(off, () => send("off", p.pitch, off));
+      if (p.timeMs >= fromMs) queue.push({ atMs: p.timeMs, type: "on", pitch: p.pitch, velocity: p.velocity, sent: false });
+      if (p.timeMs + p.holdMs >= fromMs) queue.push({ atMs: p.timeMs + p.holdMs, type: "off", pitch: p.pitch, sent: false });
     }
+    queue.sort((a, b) => a.atMs - b.atMs); // stable: a press before its own release at the same time, as the timers were
+    for (const e of queue) timers.push(setTimeout(() => fire(e), perfOf(e.atMs) - performance.now()));
   };
 
   // bot=take: read the file once, for both devices. Refused -> a toast, and the take plays normally.
@@ -178,9 +196,19 @@ export function scenes(): GamePlugin {
       } else if (e.type === "pause" || e.type === "quit" || e.type === "songEnd") cancel();
     },
     draw(_ctx, f) {
-      if (!bot || zeroPerf !== null) return;
-      zeroPerf = performance.now() - f.nowMs;
-      play();
+      if (!bot) return;
+      requestAnimationFrame(pump);
+      if (pumpPerf === null) return; // the first frame: no pump has run yet
+      // Chart zero, from the frame clock. The pump ran just before /play read its clock, so pumpPerf - nowMs is under
+      // the judge's zero by about a callback's dispatch. performance.now() here would be over it by every draw before
+      // this one: tens of ms on a starved page, every press judged that much late. Through the count-in the
+      // estimate rises to the best one seen; from the first note wait mode's holds move the clock, and zero stays put.
+      const estimate = pumpPerf - f.nowMs;
+      pumpPerf = null;
+      if (zeroPerf === null) {
+        zeroPerf = estimate;
+        play();
+      } else if (f.nowMs < 0 && estimate > zeroPerf) zeroPerf = estimate;
     },
     wrapInput(device) {
       if (bot === "take" && device.kind === "midi") return silentWhileReplaying(device, loadTake);

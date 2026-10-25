@@ -6,7 +6,8 @@ played it: PERFECT, GREAT, MISS and extras, how early or late, combo and rank. A
 and tell you what to practice next.
 
 Built at Gator Hack V (UF AI Days, Oct 23 to 25, 2026). Why we're building it and what's out of scope:
-[`specs/mission.md`](specs/mission.md).
+[`specs/mission.md`](specs/mission.md). Product, UI and code decisions start with the frozen
+[Product philosophy](PRODUCT_PHILOSOPHY.md).
 
 ## Run it
 
@@ -25,6 +26,37 @@ pnpm dev            # http://localhost:3000 redirects to /play
 | `/sim` | The piano simulator: the game, a virtual keyboard, a raw MIDI log, fault buttons (stall, unplug, jitter, stuck note) and a bot that plays the song perfectly. `/sim?record` records a real piano into a test fixture. |
 
 Web MIDI works in Chrome only. Laptop keys always work, so the game is playable with the piano unplugged.
+
+## Learning preview
+
+The current editable learning frontend is at
+[http://localhost:3000/learn/brand-preview](http://localhost:3000/learn/brand-preview)
+after starting the development server above. Open that path explicitly: `/`
+starts the arcade. The authored local demo supports a guided map, a real
+question/score workspace and Start/Resume; it is not connected to an adaptive
+agent, account sync or persistent learning progress.
+
+Start with the [product and design handoff](PRODUCT_AND_DESIGN.md) for the frozen
+purpose, selected assets, current typography/colors, motion boundaries and edit
+map. [Product philosophy](PRODUCT_PHILOSOPHY.md) is the canonical purpose.
+
+| Edit | Location |
+|---|---|
+| Current frontend composition, styling and motion | `web/src/learn/frontend/brand-preview/` |
+| Route and font loading | `web/src/app/learn/brand-preview/page.tsx` |
+| Shared question/score/reference workspace and local state | `web/src/learn/frontend/TheoryWorkspace.tsx`, `LearningSessions.tsx` |
+| Selected mascot and previous character | `web/public/learning/` |
+| Graph nodes, mastery fixtures, layout and preparation | `web/src/learn/frontend/graph/` |
+
+`/learn` is explicitly labelled Prior UI and remains available for comparison.
+The four existing activity routes remain `/learn/understand`, `/learn/practice`,
+`/learn/review/theory` and `/learn/play-through`; the current prepared assignment
+leads directly into theory without asking the learner to manage those categories.
+The proposed preview has its own in-memory session: Back to your map and Resume
+preserve it; Replay from home, leaving `/learn/brand-preview`, or refreshing
+clears it. Prior UI sessions survive navigation among learning routes, but
+refreshing or leaving the learning layout clears them. The two previews do not
+share session progress.
 
 ## How it works
 

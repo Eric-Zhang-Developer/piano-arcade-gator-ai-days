@@ -21,6 +21,8 @@ import { PauseMenu } from "../../game/pause-skin";
 import { ResultsLayout } from "../../game/results-layout";
 import { emptyHud, reduceHud } from "../../game/hud";
 import { barStep, holdClock, isWaitMode } from "../../game/wait-mode";
+import { isFlowMode } from "../../game/flow-mode/clock";
+import { FlowJudge } from "../../game/flow-mode/judge";
 import {
   GOOD_MS,
   LATENCY_MAX,
@@ -43,6 +45,7 @@ interface TestHook {
   ready: boolean;
   chart: Chart | null;
   press(pitch: number, chartTimeMs: number, velocity?: number): void;
+  pressNow?(pitch: number, velocity?: number): void; // at the current wall time, for flow mode's moving clock
   now?(): number; // the chart clock (holds and pauses taken out)
   results: Results | null;
 }
@@ -166,7 +169,10 @@ export default function Play() {
       if (e.type === "wrongNote") hw.latest = { judgment: "WRONG", offsetMs: null, atMs: e.atMs };
       for (const p of plugins) if (p.onEvent) guard.run(p.id, "onEvent", () => p.onEvent!(e));
     };
-    const judge = new Judge(chart, emit, { scored: !isWaitMode(params) }); // wait mode: no score moments
+    // ?mode=flow: the flow judge, which owns a clock that waits at each note and follows your tempo (flow-mode). With
+    // ?tempo= the chart is already slowed by bar-loop, so rate 1 is the asked tempo and the steadiness reference.
+    const flowJudge = isFlowMode(params) ? new FlowJudge(chart, emit, { startRate: params.has("tempo") ? 1 : undefined }) : null;
+    const judge = flowJudge ?? new Judge(chart, emit, { scored: !isWaitMode(params) }); // wait mode: no score moments
     hw.noteState = judge.noteState;
     // Zero is fixed here, after the stage and judge are built, so songStart's atMs is the chart time now and a plugin's
     // performance.now() - atMs is the same zero the judge uses. Fixed before the build, it trailed by the build (#173).
@@ -174,9 +180,10 @@ export default function Play() {
     const pauses = pauseClock(zeroPerf); // stands still while paused (play-slots)
     // ?mode=wait: the chart clock also holds at each note until it's pressed, and nothing is a MISS (wait-mode).
     const wait = isWaitMode(params) ? holdClock(chart, judge.noteState) : null;
+    const held = wait ?? flowJudge?.clock ?? null; // either clock runs over the pause clock
     const clock = {
-      now: (perf: number) => (wait ? wait.now(pauses.now(perf)) : pauses.now(perf)),
-      toPerf: (chartMs: number) => pauses.toPerf(wait ? wait.toOuter(chartMs) : chartMs),
+      now: (perf: number) => (held ? held.now(pauses.now(perf)) : pauses.now(perf)),
+      toPerf: (chartMs: number) => pauses.toPerf(held ? held.toOuter(chartMs) : chartMs),
     };
     emit({ type: "songStart", atMs: hw.nowMs });
 
@@ -185,13 +192,15 @@ export default function Play() {
     const onInput = (kind: Take["inputDevice"]) => (e: InputEvent) => {
       if (pauses.paused) return; // keys while paused are neither judged nor recorded
       // A press during a hold lands on the held note's time; taking off the latency could put it outside GOOD.
-      const t = wait?.holding ? clock.now(e.timeMs) : clock.now(e.timeMs) - latencyRef.current;
+      const t = held?.holding ? clock.now(e.timeMs) : clock.now(e.timeMs) - latencyRef.current;
       if (e.type === "on") {
         if (firstKind && !test) take.inputDevice = kind;
         firstKind = false;
         hw.pressed.add(e.pitch);
         take.events.push({ pitch: e.pitch, velocity: e.velocity, timeMs: t, offTimeMs: null });
-        judge.press(e.pitch, t, take.events.length - 1);
+        // Flow judges steadiness in wall time (the pause clock's), so it gets the press's own, latency taken off.
+        if (flowJudge) flowJudge.press(e.pitch, t, take.events.length - 1, pauses.now(e.timeMs) - latencyRef.current);
+        else judge.press(e.pitch, t, take.events.length - 1);
       } else {
         hw.pressed.delete(e.pitch);
         hw.pressedHand!.delete(e.pitch);
@@ -329,13 +338,14 @@ export default function Play() {
         else if (Math.ceil(left / mpb) !== shownCount) setCountdown((shownCount = Math.ceil(left / mpb)));
       }
       const perf = performance.now();
-      wait?.update(pauses.now(perf));
+      held?.update(pauses.now(perf));
       const now = clock.now(perf);
       hw.nowMs = now;
       const beat = now < 0 ? Math.floor(now / mpb) + settings.countInBeats + 1 : 0;
       hw.countInBeat = beat > 0 ? beat : null;
       if (beat > lastBeat) emit({ type: "countInBeat", beat, atMs: (beat - 1 - settings.countInBeats) * mpb });
       lastBeat = beat;
+      // Flow's advance never MISSes: it only notices a stop past the free beats.
       if (!wait) core("the judge", () => judge.advance(now - Math.max(0, latencyRef.current) - INPUT_GRACE_MS));
 
       if (zoom) layout = makeLayout(chart, w, h, perspective, zoom(now));
@@ -371,6 +381,7 @@ export default function Play() {
         ready: true,
         results: null,
         press: (pitch: number, chartTimeMs: number, velocity = 80) => tester?.queue(pitch, clock.toPerf(chartTimeMs) + latencyRef.current, velocity),
+        pressNow: (pitch: number, velocity = 80) => tester?.queue(pitch, performance.now() + latencyRef.current, velocity),
         now: () => clock.now(performance.now()),
       });
     }

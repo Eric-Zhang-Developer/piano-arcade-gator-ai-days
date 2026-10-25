@@ -1,0 +1,149 @@
+/* /lab: a cabinet's test menu. Calm: ink on black, magenta only for the frame lines and focus, cyan for the targets.
+   Type scales with the width (16 px at 1280, 24 px at 1920), so a layout that fits 1280×720 fits 1920×1080. */
+.lab {
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: 1.6em 2.5em 1.5em;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(255, 47, 208, 0.08), transparent 70%),
+    var(--pa-bg);
+  color: var(--pa-ink);
+  font: 400 clamp(14px, 1.25vw, 28px) / 1.35 system-ui, sans-serif;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2em;
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid rgba(255, 47, 208, 0.45);
+}
+
+.title {
+  margin: 0;
+  font: italic 900 2.6em/1 var(--pa-font-display), system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.sub {
+  margin: 0;
+  color: var(--pa-ink-dim);
+}
+
+.back {
+  margin-left: auto;
+  color: var(--pa-ink-dim);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.back:hover,
+.back:focus-visible {
+  color: var(--pa-ink);
+}
+
+/* Columns, so the groups' unequal lengths balance on their own. */
+.groups {
+  margin-top: 1em;
+  columns: 3;
+  column-gap: 2.2em;
+}
+
+.group {
+  break-inside: avoid;
+  margin-bottom: 1em;
+}
+
+.groupTitle {
+  margin: 0 0 0.3em;
+  font: italic 800 0.8em/1.2 var(--pa-font-display), system-ui, sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pa-magenta);
+}
+
+.entries {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entry {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  column-gap: 1em;
+  row-gap: 0.1em;
+  padding: 0.35em 0.6em;
+  margin: 0 -0.6em;
+  border-radius: 6px;
+  color: inherit;
+  text-decoration: none;
+  outline: 1px solid transparent;
+  transition:
+    background-color 150ms ease-out,
+    outline-color 150ms ease-out;
+}
+
+.entry:hover {
+  background: var(--pa-panel);
+}
+
+.entry:focus-visible {
+  background: var(--pa-panel);
+  outline: 2px solid var(--pa-magenta);
+}
+
+.name {
+  grid-column: 1;
+  font: italic 800 1.05em/1.2 var(--pa-font-display), system-ui, sans-serif;
+}
+
+/* Must-read on video: the base size, 16 px at 1280 and 24 px at 1920. */
+.desc {
+  grid-column: 1 / -1;
+  color: var(--pa-ink-dim);
+}
+
+/* The notes' lines often start mid-sentence; capitalize on screen, so the copy stays exact. */
+.desc::first-letter {
+  text-transform: uppercase;
+}
+
+.open {
+  grid-column: 2;
+  grid-row: 1;
+  color: var(--pa-cyan);
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entry {
+    transition: none;
+  }
+}
+
+/* LabLink, in the select's footer row after first-run's link: the same quiet look. */
+.footerLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--pa-ink-dim);
+  font: clamp(13px, 1.6vh, 18px) system-ui, sans-serif;
+  text-decoration: none;
+}
+
+.footerLink:hover {
+  color: var(--pa-ink);
+}
+
+.kbd {
+  min-width: 1.4em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgb(242 242 245 / 0.12);
+  font: 700 1em system-ui, sans-serif;
+  text-align: center;
+}

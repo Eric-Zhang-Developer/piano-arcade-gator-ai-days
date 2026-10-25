@@ -238,7 +238,7 @@ Readers: judges · team
 [flow-mode's spec](../specs/features/flow-mode/spec.md), [#625], [flow-mode's done note](../changes/flow-mode.md).*
 
 **A real pianist couldn't pass.** Eric played Flower Dance on the DGX and called strict mode "completely
-undemoable". He scored 10 to 20%, got lost, and couldn't rejoin because "the song was already ahead" ([#618]).
+undemoable". As relayed in [#618], he scored 10 to 20%, got lost, and couldn't rejoin because the song had already moved on.
 
 **The audience rule.** Eric's point: listeners forgive a lot, and "most people won't even notice if you're a little
 off in dynamics or your tempo" ([spec](../specs/features/flow-mode/spec.md)). They do notice wrong notes and
@@ -314,7 +314,7 @@ Readers: team
 
 [@abbasi2010](https://github.com/abbasi2010) opened two PRs. [#92], a plan for a UI foundation, was closed by Eric:
 "features implemented partially, PR is stale now." [#600] (Sat 20:25) proposes scoring policy v3: new timing windows
-(±31.25 ms PERFECT to ±125 ms GOOD), credit for held notes and clearer early/late feedback, over 1,530 added
+(±31.25 ms PERFECT to ±125 ms GOOD), credit for held notes and clearer early/late feedback, 1,530 added
 lines. It is open, and its CI was failing when this was written.
 
 ## Timeline

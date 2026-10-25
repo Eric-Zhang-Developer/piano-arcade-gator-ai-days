@@ -16,6 +16,10 @@ const SNAPSHOT_URL = "/operator/snapshot.json";
 const CHART_URL = "/songs/twinkle/chart.json";
 const LEAD_MS = 600; // from Play to the first step
 const MAX_LATE_MS = 150;
+// ?film=1 (#1286's shot for the video): the whole build in FILM_MS, eased out (fast, then settling), on the snapshot,
+// silent and with no controls, then the hero frame holds.
+const FILM_MS = 16_000; // the last of ~840 steps lands near 16.7 s (measured), then the hero holds
+const filmMs = (i: number, n: number) => FILM_MS * (1 - Math.sqrt(1 - (i + 1) / n));
 
 const isBoard = (b: unknown): b is Board => {
   const x = b as Board | null;
@@ -44,6 +48,7 @@ export default function AttractPage() {
   const [wall, setWall] = useState(false);
   const [picked, setPicked] = useState<string | null>(null);
   const [voiceName, setVoiceName] = useState("");
+  const [film, setFilm] = useState(false);
   const host = useRef<HTMLDivElement>(null);
   const stage = useRef<Stage | null>(null);
   const voice = useRef<Voice | null>(null);
@@ -57,12 +62,14 @@ export default function AttractPage() {
     let stopped = false;
     (async () => {
       const get = (url: string) => fetch(url, { cache: "no-store" }).catch(() => null);
-      let r = params.has("snapshot") ? null : await get("/api/operator");
+      const filming = params.has("film");
+      let r = params.has("snapshot") || filming ? null : await get("/api/operator");
       const live = !!r && r.status !== 404;
       if (!live) r = await get(SNAPSHOT_URL); // a production build has no live data
       const [b, c] = await Promise.all([r?.ok ? r.json().catch(() => null) : null, get(CHART_URL).then((x) => x?.json().catch(() => null))]);
       if (stopped) return;
       setMode(live ? "LIVE" : "SNAPSHOT");
+      setFilm(filming);
       setEnv({ webgl: hasWebGL() && !params.has("webgl-off"), reduced: window.matchMedia("(prefers-reduced-motion: reduce)").matches });
       if (!c?.notes?.length) return setNote("The Twinkle chart couldn't be loaded.");
       setChart(c);
@@ -80,7 +87,11 @@ export default function AttractPage() {
     const ss = steps(board.prs ?? [], chart);
     const done = doneAt(board, ss);
     const tl = timeline(board.prs ?? [], Date.parse(board.at));
-    return { ss, done, tl, chs: chapters(board, ss, done, tl.peak), pos: layout(board.features) };
+    // Each named worker's first PR, for the film's AGENTS counter: the crew so far, not the ones at work right now.
+    const joined = [...(board.prs ?? []).reduce((m, p) => (p.worker === "planner" || p.worker === "unnamed" || (m.get(p.worker) ?? Infinity) <= Date.parse(p.createdAt) ? m : m.set(p.worker, Date.parse(p.createdAt))), new Map<string, number>()).values()];
+    const first = Math.min(...(board.prs ?? []).map((p) => Date.parse(p.createdAt)));
+    const hours = ss.length ? Math.round((Date.parse(ss.at(-1)!.pr.mergedAt!) - first) / 3_600_000) : 0;
+    return { ss, done, tl, chs: chapters(board, ss, done, tl.peak), pos: layout(board.features), joined, hours };
   }, [board, chart]);
 
   // The stage lives as long as the data; leaving the page frees its WebGL resources.
@@ -109,7 +120,8 @@ export default function AttractPage() {
     shownK.current = k;
   }, [k, data]);
 
-  const time = (i: number) => (data ? (wall ? data.ss[i].wallMs : data.ss[i].atMs) : 0);
+  const timeOf = (i: number) => (!data ? 0 : film ? filmMs(i, data.ss.length) : wall ? data.ss[i].wallMs : data.ss[i].atMs);
+  const time = timeOf;
   // Step k is "now": anchor the clock there (on play, scrub or a wall-clock switch).
   const anchor = (at: number) => (origin.current = performance.now() - (at >= 0 ? time(at) : -LEAD_MS));
 
@@ -118,19 +130,19 @@ export default function AttractPage() {
     if (!playing || !data) return;
     const { ss } = data;
     const next = k + 1;
-    const delay = next >= ss.length ? (k >= 0 && !wall ? ss[k].noteMs : 0) : origin.current + (wall ? ss[next].wallMs : ss[next].atMs) - performance.now();
+    const delay = next >= ss.length ? (k >= 0 && !wall && !film ? ss[k].noteMs : 0) : origin.current + timeOf(next) - performance.now();
     const t = setTimeout(() => {
       if (next >= ss.length) {
         voice.current?.stop();
         return setPlaying(false);
       }
       // Badly late (a stalled tab, the first WebGL frames): move the clock on rather than rush notes to catch up.
-      const dueMs = origin.current + (wall ? ss[next].wallMs : ss[next].atMs);
+      const dueMs = origin.current + timeOf(next);
       const late = performance.now() - dueMs;
       // The clock's own record of each step, for verify-replay: when it was due and how late its timer fired.
       performance.mark("attract-step", { detail: { step: next, dueMs, late, reanchored: late > MAX_LATE_MS } });
       if (late > MAX_LATE_MS) origin.current += late;
-      if (!wall) {
+      if (!wall && !film) {
         const left = noteLeftMs(origin.current, ss[next], performance.now());
         try {
           voice.current?.note(ss[next].note.pitch, left);
@@ -142,7 +154,14 @@ export default function AttractPage() {
       setK(next);
     }, Math.max(0, delay));
     return () => clearTimeout(t);
-  }, [playing, k, wall, data]);
+  }, [playing, k, wall, data, film]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // The film starts itself, silent, once the stage is up.
+  useEffect(() => {
+    if (!film || !data?.ss.length || playing || k !== -1) return;
+    anchor(-1);
+    setPlaying(true);
+  }, [film, data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function fallBackToTone() {
     audio.current ??= new AudioContext();
@@ -200,6 +219,43 @@ export default function AttractPage() {
   const chapter = latest && { step: latest.step, text: data!.chs.filter((x) => x.step === latest.step).map((x) => x.text).join(" · ") };
   const ticker = data ? data.ss.slice(Math.max(0, k - 2), k + 1).reverse() : [];
   const snapQ = mode === "SNAPSHOT" ? "?snapshot" : "";
+
+  if (film && board && data && c) {
+    const t = k === data.ss.length - 1 ? Infinity : k >= 0 ? Date.parse(data.ss[k].pr.mergedAt!) : -Infinity;
+    const agents = data.joined.filter((at) => at <= t).length;
+    const end = k === data.ss.length - 1 && !playing;
+    return (
+      <main className={styles.film} data-testid="attract-film">
+        {env.webgl ? <div ref={host} className={styles.stage} /> : <FlatList board={board} pos={data.pos} built={new Set([...data.done].filter(([, at]) => at <= k).map(([s]) => s))} onPick={() => {}} />}
+        <p className={styles.filmTitle}>Built by an AI crew in {data.hours} hours, one feature at a time</p>
+        {!end && <dl className={styles.filmCounters}>
+          <div>
+            <dt>FEATURES DONE</dt>
+            <dd>{c.done}</dd>
+          </div>
+          <div>
+            <dt>PRS MERGED</dt>
+            <dd>{c.merged}</dd>
+          </div>
+          <div>
+            <dt>AGENTS</dt>
+            <dd>{agents}</dd>
+          </div>
+        </dl>}
+        {end && (
+          <div className={styles.hero} data-testid="attract-hero">
+            <p className={styles.heroBig}>
+              {c.merged} <span>PRs merged</span>
+            </p>
+            <p className={styles.heroBig}>
+              {c.done} <span>features built</span>
+            </p>
+            <p className={styles.heroSub}>by {agents} AI agents in {data.hours} hours</p>
+          </div>
+        )}
+      </main>
+    );
+  }
 
   return (
     <main className={op.page}>

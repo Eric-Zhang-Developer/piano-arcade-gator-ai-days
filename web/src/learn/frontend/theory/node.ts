@@ -1,9 +1,9 @@
-import { colourOf, deviceStore, freshState, replay } from '../mastery/engine';
+import { learnerId } from '../mastery/diagnostic/learner';
+import { colourOf, freshState, replay } from '../mastery/engine';
+import { remoteStore } from '../mastery/remote';
 import type { Attempt as MasteryAttempt, Curriculum, Layer, Node, TheoryItem } from '../mastery/schema';
 import { type Attempt, type ClosedQuestion, type Gate, isCorrect } from './model';
 
-/** The spec decision "one learner id": every attempt on this device is this learner's until accounts land. */
-export const LEARNER_ID = 'local';
 const LAYER_RANK: Record<Layer, number> = { backbone: 3, concept: 2, detail: 1 };
 
 /** A node's theory items as one gate, or null when the node is unknown or has no theory items. */
@@ -42,6 +42,7 @@ export function nodeScreen(curriculum: Curriculum, nodeId: string): NodeScreen |
  */
 export function masteryAttempt(p: {
   id: string;
+  learnerId: string;
   at: string;
   nodeId: string;
   question: ClosedQuestion;
@@ -51,7 +52,7 @@ export function masteryAttempt(p: {
   const before = p.earlier.filter(a => a.questionId === p.question.id);
   return {
     id: p.id,
-    learnerId: LEARNER_ID,
+    learnerId: p.learnerId,
     at: p.at,
     itemId: p.question.id,
     nodeId: p.nodeId,
@@ -66,8 +67,9 @@ export function masteryAttempt(p: {
 }
 
 /** Appends a checked answer to this device's attempts. Resolves false when storage refuses, so the screen can say so. */
-export function recordAnswer(p: Omit<Parameters<typeof masteryAttempt>[0], 'id' | 'at'>): Promise<boolean> {
-  return deviceStore.append(masteryAttempt({ ...p, id: crypto.randomUUID(), at: new Date().toISOString() }));
+export async function recordAnswer(p: Omit<Parameters<typeof masteryAttempt>[0], 'id' | 'at' | 'learnerId'>): Promise<boolean> {
+  const attempt = masteryAttempt({ ...p, learnerId: await learnerId(), id: crypto.randomUUID(), at: new Date().toISOString() });
+  return remoteStore().append(attempt);
 }
 
 /**
@@ -91,5 +93,5 @@ export function exploreNodes(curriculum: Curriculum, nodeId: string, attempts: r
 
 /** Next's keywords for this node from this device's attempts. */
 export async function nodesToExplore(screen: NodeScreen): Promise<readonly Node[]> {
-  return exploreNodes(screen.around, screen.gate.id, await deviceStore.list(LEARNER_ID));
+  return exploreNodes(screen.around, screen.gate.id, await remoteStore().list(await learnerId()));
 }

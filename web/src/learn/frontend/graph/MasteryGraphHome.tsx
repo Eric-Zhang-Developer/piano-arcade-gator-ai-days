@@ -4,11 +4,12 @@ import { useRouter } from 'next/navigation';
 import { kitChip } from '../../../game/duo-tokens';
 import { DuoScope } from '../duo';
 import { curriculum } from '../mastery/curriculum';
-import { deviceStore } from '../mastery/engine';
+import { learnerId } from '../mastery/diagnostic/learner';
+import { remoteStore } from '../mastery/remote';
 import type { Attempt, Colour, Goals } from '../mastery/schema';
 import { layoutCurriculum } from './layout';
 import { anchorLabels, followLabels, type AnchoredLabel, branchCurve, curve, mapSize, overviewCamera, placeLabels, presentation, projectGraph, viewPoints } from './projection';
-import { activityHref, activityLabel, fetchNext, learnerId, maxGoals, noGoals, paint, shortTitle, tally, toggleGoal, type NextResult } from './student';
+import { activityHref, activityLabel, fetchNext, maxGoals, noGoals, paint, shortTitle, tally, toggleGoal, type NextResult } from './student';
 import { GraphCompanion } from './GraphCompanion';
 import { useGuidedEntry } from './GuidedEntry';
 import type { PreparedActivity } from './prepared';
@@ -17,7 +18,8 @@ export type MasteryGraphHomeProps = { guide: { activity: PreparedActivity; href:
 const colourWords: Record<Colour, string> = { unknown: 'Not yet', 'in-progress': 'In progress', mastered: 'Mastered' };
 const legend: readonly Colour[] = ['unknown', 'in-progress', 'mastered'];
 const titles = new Map(curriculum.nodes.map(node => [node.id, node.title]));
-type Loaded = { attempts: readonly Attempt[]; goals: Goals };
+type Loaded = { learner: string; attempts: readonly Attempt[]; goals: Goals };
+const store = remoteStore();
 /** How far the graph sits below centre when there is room, so it clears the companion in the top-left corner. */
 const companionLift = 120;
 /** Room kept clear along the bottom of the map for the colour legend, so no node or caption sits under it. */
@@ -43,9 +45,9 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
   }, []);
   useEffect(() => {
     let live = true;
-    Promise.all([deviceStore.list(learnerId), deviceStore.getGoals(learnerId)])
-      .then(([attempts, goals]) => { if (live) setLoaded({ attempts, goals }); })
-      .catch(() => { if (live) setLoaded({ attempts: [], goals: noGoals }); });
+    learnerId().then(learner => Promise.all([store.list(learner), store.getGoals(learner)])
+      .then(([attempts, goals]) => { if (live) setLoaded({ learner, attempts, goals }); })
+      .catch(() => { if (live) setLoaded({ learner, attempts: [], goals: noGoals }); }));
     return () => { live = false; };
   }, []);
   useEffect(() => {
@@ -79,7 +81,7 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
     if (!loaded) return;
     const previous = loaded.goals, goals = { songIds: [...toggleGoal(previous.songIds, songId)] };
     setLoaded({ ...loaded, goals });
-    deviceStore.setGoals(learnerId, goals).then(saved => {
+    store.setGoals(loaded.learner, goals).then(saved => {
       setGoalsSaved(saved);
       if (!saved) setLoaded(current => current && { ...current, goals: previous });
     });

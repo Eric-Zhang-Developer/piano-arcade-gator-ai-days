@@ -1,8 +1,6 @@
 import { colourOf, replay } from '../mastery/engine';
 import type { Activity, Attempt, Colour, Curriculum, Goals, NextActivity, NextRequest, NextSession } from '../mastery/schema';
 
-/** The learner on this device (spec Q12): one local student until accounts carry the graph. */
-export const learnerId = 'local';
 export const maxGoals = 3;
 
 /** A map caption: the title up to its first colon or bracket, which carries the detail. */

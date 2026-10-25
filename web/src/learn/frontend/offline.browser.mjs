@@ -22,9 +22,9 @@ await page.eval(async () => {
   }
 });
 
-async function open(path) {
+async function open(path, ready = 'main h2') {
   await page.open(`${origin}/learn/${path}`);
-  await page.wait('main h2');
+  await page.wait(ready);
   await page.eval(() => {
     const contexts = [];
     const NativeAudioContext = window.AudioContext;
@@ -49,7 +49,7 @@ async function open(path) {
       await flush();
     }
     async function choose(value) {
-      document.querySelector(`input[value=${JSON.stringify(value)}]`).click();
+      document.querySelector(`main input[value=${JSON.stringify(value)}]`).click();
       await flush();
     }
     async function connect(online) {
@@ -72,61 +72,72 @@ async function open(path) {
   });
 }
 
-await open('understand');
+await page.eval(() => localStorage.removeItem('pianoArcade.theory.v1'));
+await open('understand', 'main h1');
 await page.eval(async () => {
-  const { assert, flush, text, click, choose, connect, recover, playingAudio, stoppedAudio } = window.learningOfflineTest;
-  await choose('Phrase 2');
-  await click('Check answer');
-  await click('Continue');
-  const input = document.querySelector('textarea');
-  Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set.call(input, 'C sounds like home to me.');
+  const { assert, flush, text, until, click, choose, connect, recover, playingAudio, stoppedAudio } = window.learningOfflineTest;
+  const gates = () => [...document.querySelectorAll('ol[aria-label="Gates"] li[data-gate]')].map(li => li.dataset.state).join(' ');
+  const result = () => document.querySelector('main [role=status][data-result]')?.dataset.result;
+  const tab = async id => { document.querySelector(`main button[role=tab][data-tab=${id}]`).click(); await flush(); };
+  const answer = async value => { await choose(value); await click('Check'); assert(result() === 'correct', `${value} was not judged correct`); await click('Next'); };
+  assert(gates() === 'current open open', 'Understand did not start on the first gate');
+  assert([...document.querySelectorAll('main button')].find(b => b.textContent.trim() === 'Check')?.disabled, 'Check starts enabled with nothing chosen');
+  const input = document.querySelector('#chat-input');
+  Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set.call(input, 'G sounds like home to me.');
   input.dispatchEvent(new Event('input', { bubbles: true }));
-  await flush();
-  await click('Need a hint?');
-  await click('Listen to phrase 1');
+  await choose('g');
+  await recover();
+  assert(document.querySelector('main input[value="g"]').checked && document.querySelector('#chat-input').value === 'G sounds like home to me.', 'Understand lost the choice or the chat draft');
+  await click('Check');
+  await recover();
+  assert(result() === 'wrong' && text().includes('Next'), 'Understand lost the judged answer');
+  await click('Next');
+  await answer('1');
+  await answer('g');
+  await answer('c');
+  await recover();
+  assert(gates() === 'passed current open', 'Understand lost a passed gate');
+  await tab('score');
+  await click('Listen');
   await playingAudio();
-  assert(text().includes('Stop phrase 1'), 'Phrase ended before cancellation');
   await connect(false);
   await stoppedAudio();
   await connect(true);
-  assert(document.querySelector('textarea')?.value === 'C sounds like home to me.' && text().includes('Previous answers (1)') && text().includes('Hide hint'), 'Understand lost draft, history or hint');
-  assert(!text().includes('Stop phrase'), 'Theory listening control stayed active');
-  await click('Listen to phrase 2');
-  await playingAudio();
-  await click('Stop phrase 2');
-  await click('Compare answer');
+  assert(![...document.querySelectorAll('main button')].some(b => b.textContent.trim() === 'Stop'), 'Score listening control stayed active');
+  await tab('gates');
+  for (const value of ['g', 'c', 'phrase-2', 'steps', 'second-line', 'ledger', 'no']) await answer(value);
+  await choose('half');
+  await click('Check');
+  assert(result() === 'correct', 'half was not judged correct');
+  const done = () => gates() === 'passed passed passed' && text().includes('All three gates passed');
+  if (!done()) await click('Next');
+  await until(done, 'Understand did not finish the gates');
   await recover();
-  assert(document.querySelector('textarea').readOnly && text().includes('Compare your explanation.'), 'Comparison state reset');
-  await click('Continue');
-  await choose('G');
-  await click('Check answer');
-  await click('Finish');
-  await recover();
-  assert(text().includes('That’s the idea.'), 'Completed Understand reset');
+  assert(done(), 'Completed Understand reset');
 });
 
-await open('review/theory');
+await open('review/theory', 'main h1');
 await page.eval(async () => {
-  const { assert, text, click, choose, recover } = window.learningOfflineTest;
-  const reference = () => [...document.querySelectorAll('button')].find(b => b.textContent.startsWith('Reference'));
-  assert(reference().disabled, 'Review reference starts unlocked');
-  await choose('C');
+  const { assert, text, until, click, choose, recover } = window.learningOfflineTest;
+  const verdict = value => document.querySelector(`main input[value=${JSON.stringify(value)}]`).closest('[data-verdict]')?.dataset.verdict;
+  const check = () => [...document.querySelectorAll('main button')].find(b => b.textContent.trim() === 'Check');
+  assert(check()?.disabled, 'Review Check starts enabled with nothing chosen');
+  await choose('g');
   await recover();
-  assert(document.querySelector('input[value="C"]').checked, 'Review selection reset');
-  await click('Check answer');
-  await click('Reference');
+  assert(document.querySelector('main input[value="g"]').checked, 'Review selection reset');
+  await click('Check');
   await recover();
-  assert(text().includes('Correct.') && document.querySelector('section[aria-label="Music and reference workspace"] article h2')?.textContent === 'A sense of home', 'Review feedback or reference state reset');
-  await click('Continue');
-  assert(reference().disabled && text().includes('Previous answers (1)'), 'Review did not advance with a fresh reference gate');
-  await choose('Phrase 2');
-  await click('Check answer');
-  await click('Continue');
-  await choose('No');
-  await click('Check answer');
-  await click('Finish');
+  assert(verdict('g') === 'wrong' && text().includes('Next'), 'Review lost the checked answer');
+  await click('Next');
+  for (const value of ['1', 'g', 'g', 'c', 'phrase-2', 'steps', 'second-line', 'ledger', 'no', 'half']) {
+    await choose(value);
+    await click('Check');
+    assert(verdict(value) === 'correct', `${value} was not judged correct`);
+    await click('Next');
+  }
+  await until(() => text().includes('10 of 11 right on the first try'), 'Review did not finish');
   await recover();
-  assert(text().includes('Review complete.') && text().includes('3 of 3 answers correct'), 'Completed review or answers reset');
+  assert(text().includes('10 of 11 right on the first try') && text().includes('To revisit') && !!document.querySelector('main a[href="/learn"]'), 'Completed review reset');
 });
 
 await open('practice');

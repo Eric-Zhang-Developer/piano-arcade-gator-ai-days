@@ -8,7 +8,7 @@ import { exploreNodes, masteryAttempt, nodeGate, nodeScreen } from './node';
 const gate = nodeGate(curriculum, 'keys')!;
 const question = gate.questions[0];
 const record = (choiceId: string, earlier: readonly Attempt[] = []) =>
-  masteryAttempt({ id: 'a1', at: new Date(start).toISOString(), nodeId: 'keys', question, choiceId, earlier });
+  masteryAttempt({ id: 'a1', learnerId: 'local', at: new Date(start).toISOString(), nodeId: 'keys', question, choiceId, earlier });
 
 describe('a node as a gate', () => {
   it('holds exactly the node\'s theory items, under its title', () => {

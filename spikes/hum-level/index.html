@@ -168,22 +168,40 @@ const WORKLET = `registerProcessor("tap", class extends AudioWorkletProcessor {
 });`;
 
 let session = null;
+let starting = false; // set before the first await, so a double-click opens one mic (#1322)
 
 async function record() {
+  if (session || starting) return;
   $("error").hidden = true;
   $("result").hidden = true;
   const bpm = Number($("bpm").value);
   const bpb = Number($("bpb").value);
   if (!(bpm >= 30 && bpm <= 240) || !(bpb >= 2 && bpb <= 7)) return fail("BPM must be 30–240 and beats a bar 2–7.");
-  let stream;
+  starting = true;
+  $("record").disabled = true;
+  let stream, ctx;
   try {
-    // Chrome's defaults treat music as noise; hum.mjs needs the raw voice.
-    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 } });
+    try {
+      // Chrome's defaults treat music as noise; hum.mjs needs the raw voice.
+      stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 } });
+    } catch (e) {
+      return fail(`No mic: ${e.message}`);
+    }
+    ctx = new AudioContext();
+    await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([WORKLET], { type: "text/javascript" })));
+    begin(stream, ctx, bpm, bpb);
   } catch (e) {
-    return fail(`No mic: ${e.message}`);
+    // A start that fails after the mic opened lets it go.
+    stream?.getTracks().forEach((t) => t.stop());
+    ctx?.close();
+    fail(`Couldn't start: ${e.message}`);
+  } finally {
+    starting = false;
+    if (!session) $("record").disabled = false;
   }
-  const ctx = new AudioContext();
-  await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([WORKLET], { type: "text/javascript" })));
+}
+
+function begin(stream, ctx, bpm, bpb) {
   const tap = new AudioWorkletNode(ctx, "tap");
   const mute = ctx.createGain();
   mute.gain.value = 0;

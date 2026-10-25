@@ -15,6 +15,7 @@ import { Button, MonoLabel, kitChip } from "../../duo-tokens";
 import { canvasFonts } from "../../duo-tokens/canvas";
 import { noteColorFor } from "../../hand-colors";
 import { hitParticles, type HitParticles } from "../../hit-particles/gl";
+import { mediaRun, stopTracks } from "../media-run";
 import { hud } from "../../hud";
 import { primary, wrong as wrongColor } from "../../ui-tokens";
 import { apply, homography, mul, type H, type Pt } from "./homography";
@@ -181,39 +182,46 @@ export function RealKeys() {
     return () => navigator.mediaDevices.removeEventListener?.("devicechange", list);
   }, [clipMode, stream]);
 
+  // The camera is held by its start as soon as it opens (#1317): a second start, Stop, unmount or pagehide stops it,
+  // even mid-start.
+  const [runs] = useState(mediaRun);
   const stopCamera = useCallback(() => {
-    stream?.getTracks().forEach((t) => t.stop());
+    runs.stop();
     setStream(null);
     setGave(null);
-  }, [stream]);
+  }, [runs]);
   useEffect(() => {
-    const end = () => stream?.getTracks().forEach((t) => t.stop());
-    window.addEventListener("pagehide", end);
+    window.addEventListener("pagehide", runs.stop);
     return () => {
-      window.removeEventListener("pagehide", end);
-      end();
+      window.removeEventListener("pagehide", runs.stop);
+      runs.stop();
     };
-  }, [stream]);
+  }, [runs]);
 
   const startCamera = useCallback(async () => {
     stopCamera();
+    const run = runs.start();
     try {
       const s = await navigator.mediaDevices.getUserMedia({
         video: { deviceId: deviceId ? { exact: deviceId } : undefined, width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 60 } },
         audio: false,
       });
+      if (!run.hold(() => stopTracks(s))) return;
       const v = videoRef.current!;
       v.srcObject = s;
       await v.play();
+      if (!run.live()) return;
       const st = s.getVideoTracks()[0]?.getSettings();
       setGave(`${st?.width ?? v.videoWidth}×${st?.height ?? v.videoHeight} at ${Math.round(st?.frameRate ?? 0)} fps`);
       if (!deviceId && st?.deviceId) setDeviceId(st.deviceId);
       setStream(s);
       setStep((x) => (x === "source" ? "corners" : x));
     } catch (e) {
+      if (!run.live()) return; // superseded: the newer start says what happened
+      runs.stop();
       setError(`Camera: ${(e as Error).name}`);
     }
-  }, [deviceId, stopCamera]);
+  }, [deviceId, runs, stopCamera]);
 
   const hasLog = log.length > 0;
   const openClip = useCallback((file: File | undefined) => {
@@ -513,6 +521,7 @@ export function RealKeys() {
     return () => {
       cancelAnimationFrame(raf);
       if (vfc && "cancelVideoFrameCallback" in v) v.cancelVideoFrameCallback(vfc);
+      sparks?.dispose(); // its WebGL context, one per run of this effect (#1318)
     };
   }, [chart, clipMode, clock, composite, log, onKey]);
 

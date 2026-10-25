@@ -11,6 +11,7 @@ export interface HitParticles {
   hold(x: number, width: number, y: number, color: string, dtMs: number): void; // a held hit key's stream
   draw(ctx: CanvasRenderingContext2D, f: Frame, dtMs: number): void;
   reset(): void;
+  dispose(): void; // frees the renderer's WebGL context; the page made this one, so the page lets it go
 }
 
 const LIFE_MS = 3000; // the longest any particle lives (the shader's dust)
@@ -167,6 +168,12 @@ export function hitParticles(): HitParticles | null {
     },
     reset() {
       clock += LIFE_MS + 1; // every particle is past its life; nothing is written
+    },
+    dispose() {
+      geometry.dispose();
+      material.dispose();
+      renderer.dispose();
+      renderer.forceContextLoss(); // Chrome keeps about 16 contexts a page; dispose alone leaves this one counted
     },
   };
 }

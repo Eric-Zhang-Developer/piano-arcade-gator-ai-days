@@ -165,6 +165,24 @@ describe("leaving mid-hold (speak-polish, #1201)", () => {
     expect(onTake).toHaveBeenCalledTimes(1);
     expect(mic.stopped).toBe(1);
   });
+
+  it("let go while the mic is opening: it stops as it arrives, and no 3 s take follows (#1319)", async () => {
+    vi.useFakeTimers();
+    const mic = stubMic();
+    let resolve!: (m: typeof mic) => void;
+    const onTake = vi.fn();
+    const hold = micHold(() => new Promise((r) => (resolve = r)), 3000, onTake);
+    const down = hold.down();
+    hold.up();
+    resolve(mic);
+    await down;
+    expect(mic.stopped).toBe(1);
+    expect(onTake).toHaveBeenCalledTimes(1); // the short take, which the page answers with "hold a little longer"
+    vi.advanceTimersByTime(3000);
+    expect(onTake).toHaveBeenCalledTimes(1);
+    expect(mic.stopped).toBe(1);
+    expect(hold.open).toBe(false);
+  });
 });
 
 describe("the page's type and notes (speak-polish, #1202, #1203)", () => {

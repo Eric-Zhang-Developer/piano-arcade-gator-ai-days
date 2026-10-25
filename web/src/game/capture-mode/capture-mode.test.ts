@@ -1,5 +1,5 @@
-import { expect, it } from "vitest";
-import { CAPTURE_KEY, CAPTURE_SCRIPT, isCapture } from ".";
+import { afterEach, expect, it, vi } from "vitest";
+import { CAPTURE_KEY, CAPTURE_SCRIPT, isCapture, syncCapture } from ".";
 
 it("?capture=1 turns it on", () => {
   expect(isCapture("?capture=1", null)).toBe(true);
@@ -30,3 +30,16 @@ it("the inline script agrees with isCapture, and never throws", () => {
   expect(run("?capture=1", "0", true)).toBe(true);
   expect(run("", "1", true)).toBe(false);
 });
+
+it("a query-only navigation to ?capture=1 sets the flag and stores it (#1321)", () => {
+  const flag = new Set<string>();
+  const store = new Map<string, string>();
+  vi.stubGlobal("document", { documentElement: { toggleAttribute: (name: string, on: boolean) => void (on ? flag.add(name) : flag.delete(name)) } });
+  vi.stubGlobal("sessionStorage", { getItem: (k: string) => store.get(k) ?? null, setItem: (k: string, v: string) => void store.set(k, v) });
+  syncCapture("?"); // /shots, its index
+  expect(flag.has("data-capture")).toBe(false);
+  syncCapture("?card=title&capture=1"); // the card's link, same page
+  expect(flag.has("data-capture")).toBe(true);
+  expect(store.get(CAPTURE_KEY)).toBe("1");
+});
+afterEach(() => vi.unstubAllGlobals());

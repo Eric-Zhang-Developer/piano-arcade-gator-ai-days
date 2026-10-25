@@ -12,6 +12,7 @@ export interface Mic {
 export function micHold(open: () => Promise<Mic>, ms: number, onTake: (take: Take) => void) {
   let mic: Mic | null = null;
   let opening = false;
+  let letGo = false; // released while the mic was still opening (#1319)
   let timer: ReturnType<typeof setTimeout> | null = null;
   let gone = false;
   const clearTimer = () => {
@@ -20,6 +21,7 @@ export function micHold(open: () => Promise<Mic>, ms: number, onTake: (take: Tak
   };
   const up = () => {
     clearTimer();
+    if (opening) letGo = true;
     const m = mic;
     mic = null;
     if (m && !gone) onTake(m.stop());
@@ -32,12 +34,15 @@ export function micHold(open: () => Promise<Mic>, ms: number, onTake: (take: Tak
     async down() {
       if (gone || opening || mic) return;
       opening = true;
+      letGo = false;
       try {
         const m = await open();
         if (gone) {
           m.stop();
           return;
         }
+        // Let go before it opened: the take ends now, as short as it is, not after ms.
+        if (letGo) return onTake(m.stop());
         mic = m;
         timer = setTimeout(up, ms);
       } finally {

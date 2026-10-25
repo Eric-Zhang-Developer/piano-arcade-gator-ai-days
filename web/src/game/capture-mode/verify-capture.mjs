@@ -167,6 +167,20 @@ for (const capture of [false, true]) {
   await page.close();
 }
 
+// #1321: a client-side Link that only changes the query, as /shots' index does, turns capture on with no reload.
+{
+  const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+  await page.goto(`${base}/shots?capture=0`);
+  const link = page.locator('a[href*="capture=1"]').first();
+  await link.waitFor({ timeout: 30_000 });
+  await link.click();
+  await page.waitForURL(/capture=1/);
+  await page.waitForFunction(() => document.documentElement.hasAttribute("data-capture"), null, { timeout: 5000 }).catch(() => {});
+  check(await page.evaluate(() => document.documentElement.hasAttribute("data-capture")), "a /shots index link turns capture on, with no reload");
+  check(!(await page.locator('[data-testid="nav-bar"]').isVisible()), "and hides the nav bar there");
+  await page.close();
+}
+
 writeFileSync(join(out, "verify-capture.json"), JSON.stringify({ failures, on: on.screens, off: off.screens }, null, 2));
 await browser.close();
 say(`verify-capture: videos and screenshots in ${out}`);

@@ -1,7 +1,8 @@
 "use client";
 // Capture mode (spec: capture-mode): ?capture=1 hides the cursor, debug text and setup controls while the video is
 // recorded, and changes nothing else. Elements opt in with data-capture-hide in their owners' files.
-import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
 
 export const CAPTURE_KEY = "pianoArcade.capture";
 
@@ -37,22 +38,35 @@ const CSS = `html[data-capture], html[data-capture] * { cursor: none !important;
 html[data-capture] [data-capture-hide] { display: none !important; }`;
 
 // Mounted once in the root layout, with CaptureScript in <head> setting the flag before the first paint; this effect
-// stores ?capture for the tab and keeps the flag right after client navigation. Storage blocked: the URL alone decides.
+// stores ?capture for the tab and keeps the flag right after client navigation, including a Link that only changes the
+// query, as /shots' index does (#1321). Storage blocked: the URL alone decides.
 export function CaptureMode() {
-  useEffect(() => {
-    let stored: string | null = null;
-    try {
-      stored = sessionStorage.getItem(CAPTURE_KEY);
-    } catch {
-      // blocked storage
-    }
-    const on = isCapture(window.location.search, stored);
-    try {
-      if (new URLSearchParams(window.location.search).has("capture")) sessionStorage.setItem(CAPTURE_KEY, on ? "1" : "0");
-    } catch {
-      // blocked storage
-    }
-    document.documentElement.toggleAttribute("data-capture", on);
-  }, []);
+  // useSearchParams needs a Suspense boundary, or every static page in the layout renders client-side only.
+  return (
+    <Suspense fallback={null}>
+      <SyncCapture />
+    </Suspense>
+  );
+}
+
+function SyncCapture() {
+  const search = useSearchParams().toString();
+  useEffect(() => syncCapture(`?${search}`), [search]);
   return null;
+}
+
+export function syncCapture(search: string) {
+  let stored: string | null = null;
+  try {
+    stored = sessionStorage.getItem(CAPTURE_KEY);
+  } catch {
+    // blocked storage
+  }
+  const on = isCapture(search, stored);
+  try {
+    if (new URLSearchParams(search).has("capture")) sessionStorage.setItem(CAPTURE_KEY, on ? "1" : "0");
+  } catch {
+    // blocked storage
+  }
+  document.documentElement.toggleAttribute("data-capture", on);
 }

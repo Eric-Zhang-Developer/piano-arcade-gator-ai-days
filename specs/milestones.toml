@@ -236,6 +236,7 @@ features = [
   "select-lab-charts", # polish refill (#1165): charts under songs/x/ stay off the select
   "learn-titles", # polish refill (#1141): each /learn page names its own tab
   "docs-refresh", # polish refill (#1140, #1142): README routes and devpost.md experiments; docs only
+  "name-theme", # Eric, 2026-10-25 (#1190): wow feeder; a judge's name as a musical cryptogram the DGX plays, an experiment
 ]
 cut = []
 

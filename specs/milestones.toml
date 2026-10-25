@@ -249,6 +249,7 @@ features = [
   "play-polish", # polish sweep 3 (#1239, #1240): the start screen reads on video, the toast ring off the old cyan
   "take-seams", # polish sweep 3 (#1241, #1242, #1243): Back says quit, WARNING upright, the broken combo as the HUD
   "results-polish", # polish sweep 3 (#1244-#1247): PRACTICE BARS a link, Watch replay a kit dialog, initials heard
+  "record-follows", # Eric, 2026-10-25 (#1261): wow feeder; the real recording stretches to follow the player, an experiment
 ]
 cut = []
 

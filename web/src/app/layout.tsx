@@ -7,6 +7,7 @@ import { DemoReset } from "../game/demo-reset";
 import { HelpOverlay } from "../game/help-overlay";
 import { LaptopSound } from "../game/laptop-sound/install";
 import "./globals.css";
+import { APP_NAME } from "@/game/app-name";
 
 // The display face (visual-direction.md), exposed as --pa-font-display only: the body stays system-ui. Duo: upright,
 // variable weight, with the width axis so numerals can be condensed (font-stretch); italic isn't loaded.
@@ -25,7 +26,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Piano Arcade",
+  title: APP_NAME,
   description: "An arcade rhythm game played on a real piano",
 };
 

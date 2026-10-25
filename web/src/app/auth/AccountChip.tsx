@@ -2,16 +2,24 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { fetchHandle, fetchUserDetails } from "../../data/account";
 import { googleSession, signOut, type Session } from "../../data/auth";
 import { isConfigured } from "../../data/config";
 
-// Who's playing, for a menu corner: "Sign in" for guests, or the Google player (click the name for the profile:
-// every session, when and for how long) with History and Sign out.
+// Who's playing, for a menu corner: "Sign in" for guests, or the Google player (their handle, else their Google
+// name, else their email's name; click it for the profile: every session, when and for how long) with History and
+// Sign out.
 // One line to mount (`<AccountChip />`); it hides itself when Supabase isn't configured and in capture mode.
 export function AccountChip() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
+  const [label, setLabel] = useState<string | null>(null);
   useEffect(() => {
-    void googleSession().then(setSession);
+    void googleSession().then(async (s) => {
+      setSession(s);
+      if (!s) return;
+      const [handle, details] = await Promise.all([fetchHandle(s), fetchUserDetails(s)]);
+      setLabel(handle || details?.name || null);
+    });
   }, []);
   if (!isConfigured() || session === undefined) return null;
 
@@ -21,7 +29,7 @@ export function AccountChip() {
         <>
           <span style={{ color: "var(--pa-cyan)" }}>●</span>
           <Link href="/progress" style={{ ...item, ...name, color: "var(--pa-ink)" }} title={`${session.email ?? ""}: your profile`} data-testid="account-profile">
-            {session.email?.split("@")[0] ?? "Profile"}
+            {label ?? session.email?.split("@")[0] ?? "Profile"}
           </Link>
           <Link href="/progress" style={item}>
             History
@@ -64,7 +72,7 @@ const chip: React.CSSProperties = {
   letterSpacing: 1,
   textTransform: "uppercase",
 };
-const name: React.CSSProperties = { maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textTransform: "none" };
+const name: React.CSSProperties = { maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textTransform: "none", color: "var(--pa-ink)", textDecoration: "none" };
 const item: React.CSSProperties = {
   border: 0,
   padding: 0,

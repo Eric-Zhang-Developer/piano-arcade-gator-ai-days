@@ -1,4 +1,4 @@
-# Piano Arcade
+# Étude
 
 An arcade rhythm game played on a real 88-key piano (a Yamaha DGX-660) in Chrome. Notes fall toward the keys,
 every note you play is judged against the chart's clock to the millisecond, and the results screen shows how you

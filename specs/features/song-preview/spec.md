@@ -21,6 +21,10 @@ beside the list shows its level, notes per second, best grade and a PRACTICE 70%
 - **The panel:** title, composer, level and notes per second (both from `difficulty`, imported), and the best grade
   from `records`, blank if the song was never played. Plus a **PRACTICE 70%** button that opens bar-loop on the whole
   song: `/play?song=<id>&from=1&to=<last bar>&tempo=70&passes=1`.
+  **Since duo-select (#646):** level, notes, best and the practice button live in the select's panel (LV, NOTES,
+  BEST, and PRACTICE as adaptive practice), and this row keeps the opening, Hands and Speed, the source and the
+  status line. The panel and Chrome steps below that name notes per second, best or PRACTICE 70% are duo-select's
+  to check now (decision `duo-select-controls`).
 - **The opening:** the chart's first 2 bars at its own tempo, capped at 8 s. It plays on the piano when connected:
   find the output by `name` "Portable Grand", channel 1, with the chart's velocities when present and 80 otherwise.
   Without a piano, it plays as quiet Web Audio tones.

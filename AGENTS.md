@@ -26,6 +26,7 @@ The spec is the source of truth. Chat and memory aren't. Everything you need is 
 - An idea gets its issue first (labels `feature` and `proposal`, body ending in `<!-- spec: <slug> -->`), then its
   spec. One issue follows the idea to done; it links the spec and never copies it.
 - The overnight planner follows `specs/decisions/002-overnight-planner.md`.
+- Spikes follow `specs/decisions/004-spikes.md`: one question, code committed and content local, ends in findings.
 
 ## Lanes
 Each person owns a lane: their features, their folder, and the final say over both. A worker is named

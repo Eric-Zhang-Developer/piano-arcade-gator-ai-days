@@ -1,5 +1,6 @@
 // Headless proof of song preview (spec: song-preview, the Chrome steps). On /?midi=off: nothing sounds before a key press; ↓
-// shows the panel and plays the opening as tones; ↓ again stops it and starts the next; PRACTICE 70% opens bar-loop.
+// plays the opening as tones; ↓ again stops it and starts the next. (Level, notes, best and PRACTICE live in duo-select's
+// panel, and its own check covers them.)
 // Then with a stand-in "Portable Grand" MIDI output: the opening goes to the piano on channel 1, and moving on sends
 // All Notes Off, and L (learn-from-select) does the same on its way to wait mode.
 // Usage: node web/src/game/song-preview/verify-preview.mjs --out <dir>
@@ -120,7 +121,6 @@ const list = (await page.locator("ol a").evaluateAll((as) => as.map((a) => a.get
 await page.keyboard.press("ArrowDown");
 await page.getByTestId("preview-status").filter({ hasText: "laptop tones" }).waitFor({ timeout: 10_000 });
 const second = list[1];
-check(/\d/.test(await page.getByTestId("preview-nps").textContent()), `↓ shows ${second}'s notes per second (${await page.getByTestId("preview-nps").textContent()})`);
 const want = await opening(page, second);
 check((await page.evaluate(() => window.__tones)) === want, `its opening plays as tones: ${await page.evaluate(() => window.__tones)} of ${want} notes in bars 1–2`);
 check((await page.evaluate(() => window.__uiTones)) === 1, `… apart from ui-sounds' one ↓ blip (${await page.evaluate(() => window.__uiTones)} UI tones)`);
@@ -131,12 +131,6 @@ await page.waitForTimeout(100);
 check((await page.evaluate(() => window.__disconnects)) > before[1], "↓ again mid-preview stops the first (its bus is disconnected)");
 await page.waitForFunction((n) => window.__tones > n, before[0], { timeout: 10_000 });
 check(true, `… and ${list[2]}'s opening starts`);
-await page.getByTestId("preview-practice").click();
-await page.waitForURL(/tempo=70/);
-const url = new URL(page.url());
-check(url.searchParams.get("song") === list[2] && url.searchParams.get("from") === "1" && url.searchParams.get("passes") === "1", `PRACTICE 70% opens ${url.pathname}${url.search}`);
-await page.getByText("at 70%").first().waitFor({ timeout: 30_000 });
-check(true, "… bar-loop at 70%");
 await page.close();
 
 // The piano.

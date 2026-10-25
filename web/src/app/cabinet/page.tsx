@@ -7,6 +7,7 @@ import { echoGuard } from "../../game/hand-mode/hands";
 import { cabinetSettings, demoResults, demoUrl, keyUrl, start, tick, timers, type Loop } from "../../game/cabinet/loop";
 import type { CabinetMessage } from "../../game/cabinet/plugin";
 import { pickOutput } from "../../replay/piano";
+import { APP_NAME } from "@/game/app-name";
 
 const ALL_NOTES_OFF_CH1 = [0xb0, 123, 0];
 
@@ -120,7 +121,7 @@ export default function Cabinet() {
     <main data-testid="cabinet" data-phase={phase} style={screen}>
       {phase === "title" ? (
         <>
-          <h1 style={wordmark}>Piano Arcade</h1>
+          <h1 style={wordmark}>{APP_NAME}</h1>
           <p data-testid="press-any-key" style={press}>
             PRESS ANY KEY
           </p>

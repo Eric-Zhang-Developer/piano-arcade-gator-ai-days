@@ -1,5 +1,6 @@
 import type { GamePlugin } from "../contracts";
 import { barLoop } from "./bar-loop";
+import { audioTrack } from "./audio-track";
 import { chordSync } from "./chord-sync";
 import { chunkPractice } from "./chunk-practice";
 import { easyCharts } from "./easy-charts";
@@ -57,6 +58,7 @@ export const plugins: GamePlugin[] = [
   easyCharts(), // ?level=easy: first, so every later plugin (chunks, loops, hands, bots, the judge) sees the Easy chart
   scoreCard(), // results panel: Save card, the take as a PNG; before bar-loop, so it keeps the song's own title
   chunkPractice(), // before bar-loop, so it sees the whole chart to cut into chunks (returns it unchanged)
+  audioTrack(), // ?song=local/…: before bar-loop, so it sees the song's own bars to map a loop window into the recording
   barLoop(), // first: every later plugin (the sim's bot included) sees the looped chart
   handMode(), // ?hands=R|L: before scenes and the sim, so their bots and the judge get only the played hand
   versus(), // ?versus=1: before scenes and the sim, so their bots and the judge get both players' copies

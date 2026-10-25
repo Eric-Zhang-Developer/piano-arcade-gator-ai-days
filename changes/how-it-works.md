@@ -1,0 +1,8 @@
+## What shipped
+`/how`: how the agents built Piano Arcade, in four server-drawn diagrams (who does what, a feature's life, lines per folder, merges per hour) and three incidents. Every number comes from the operator snapshot, git and the repo's own files; a missing one reads `unknown`.
+## Where it lives
+`web/src/app/how/page.tsx`, `web/src/how/` (data.ts, read.ts, diagrams.tsx, how.module.css, verify-how.mjs, fixture-snapshot.json), screenshots in `specs/features/how-it-works/`.
+## How to check it
+verify: `pnpm -C web verify && verify-sim.mjs` pass at c1355de, with main's snapshot copied in (evidence: .git/agent-evidence/how-it-works/20261024T183440Z). `node web/src/how/verify-how.mjs --out <dir>` passes with no snapshot (63 values), main's snapshot (133) and the fixture (78). By hand against main's snapshot at 2008f7c: 272 PRs merged and a 4 min median on both /how and /operator?snapshot, and /how's kinds sum /operator's types (feat 106; fix 110 + test 5 + refactor 2 = 117; plan 23 + contract 14 = 37; chore 8 + docs 4 = 12).
+## Gaps
+The deployed /how isn't checked yet: without git at build time, the lines and known-red counts read `unknown`. The `/how` link in /operator's header (#462) and a link to /veritas are follow-up fix PRs once this is on main. #444 (/how vs /about) is still open for Eric and Sharan.

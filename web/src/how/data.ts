@@ -150,6 +150,12 @@ export function incident(prs: BoardPr[] | null | undefined): { gapSec: number; f
   return { gapSec: Math.round(Math.abs(b - a) / 1000), fixMin: Math.round((fix - Math.max(a, b)) / 60_000) };
 }
 
+// git@github.com:o/r.git or https://github.com/o/r(.git) -> https://github.com/o/r
+export function githubUrl(remote: string | null): string | null {
+  const m = remote && /github\.com[:/]([^/\s]+)\/([^/\s]+?)(?:\.git)?\s*$/.exec(remote);
+  return m ? `https://github.com/${m[1]}/${m[2]}` : null;
+}
+
 // --- everything the page shows ------------------------------------------------------------------------------------
 
 export type Inputs = {
@@ -159,6 +165,7 @@ export type Inputs = {
   runChecksNow: string | null;
   codeowners: string | null;
   agentsMd: string | null;
+  remote: string | null; // git's origin URL, for links when there's no snapshot
 };
 
 export function howData(i: Inputs) {
@@ -187,7 +194,7 @@ export function howData(i: Inputs) {
     ciBrowser: featState("ci-browser"),
     knownRedFirst: knownRedCount(i.runChecksAt433),
     knownRedNow: knownRedCount(i.runChecksNow),
-    repo: prs?.[0]?.url.match(/^https:\/\/github\.com\/[^/]+\/[^/]+/)?.[0] ?? null,
+    repo: githubUrl(i.remote) ?? prs?.[0]?.url.match(/^https:\/\/github\.com\/[^/]+\/[^/]+/)?.[0] ?? null,
   };
 }
 export type HowData = ReturnType<typeof howData>;

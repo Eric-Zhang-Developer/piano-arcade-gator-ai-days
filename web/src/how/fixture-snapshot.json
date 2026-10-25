@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-24T16:00:00Z",
+  "mainSha": "f1x7ure",
+  "features": [
+    { "slug": "fixture-a", "name": "fixture", "state": "done", "milestone": null, "assignee": "", "pr": null, "dependsOn": [] },
+    { "slug": "fixture-b", "name": "fixture", "state": "in flight", "milestone": null, "assignee": "", "pr": null, "dependsOn": [] },
+    { "slug": "fixture-c", "name": "fixture", "state": "ready", "milestone": null, "assignee": "", "pr": null, "dependsOn": [] },
+    { "slug": "fixture-d", "name": "fixture", "state": "blocked", "milestone": null, "assignee": "", "pr": null, "dependsOn": [] },
+    { "slug": "fixture-e", "name": "fixture", "state": "backlog", "milestone": null, "assignee": "", "pr": null, "dependsOn": [] },
+    { "slug": "build-stamp", "name": "fixture", "state": "done", "milestone": null, "assignee": "", "pr": null, "dependsOn": [] },
+    { "slug": "ci-browser", "name": "fixture", "state": "in flight", "milestone": null, "assignee": "", "pr": null, "dependsOn": [] }
+  ],
+  "prs": [
+    { "number": 1, "title": "feat(fixture-a): one", "state": "MERGED", "createdAt": "2026-10-24T13:00:00Z", "mergedAt": "2026-10-24T13:10:00Z", "closedAt": "2026-10-24T13:10:00Z", "url": "https://github.com/fixture/fixture/pull/1", "worker": "eric-agent-1" },
+    { "number": 2, "title": "refactor(fixture-a): two", "state": "MERGED", "createdAt": "2026-10-24T13:20:00Z", "mergedAt": "2026-10-24T13:59:59Z", "closedAt": "2026-10-24T13:59:59Z", "url": "https://github.com/fixture/fixture/pull/2", "worker": "eric-agent-2" },
+    { "number": 3, "title": "plan: three", "state": "MERGED", "createdAt": "2026-10-24T15:00:00Z", "mergedAt": "2026-10-24T15:20:00Z", "closedAt": "2026-10-24T15:20:00Z", "url": "https://github.com/fixture/fixture/pull/3", "worker": "eric-planning-agent" },
+    { "number": 4, "title": "feat(fixture-b): open", "state": "OPEN", "createdAt": "2026-10-24T15:30:00Z", "mergedAt": null, "closedAt": null, "url": "https://github.com/fixture/fixture/pull/4", "worker": "eric-agent-4" },
+    { "number": 387, "title": "chore(fixture-a): a", "state": "MERGED", "createdAt": "2026-10-24T14:50:00Z", "mergedAt": "2026-10-24T15:00:00Z", "closedAt": "2026-10-24T15:00:00Z", "url": "https://github.com/fixture/fixture/pull/387", "worker": "eric-agent-3" },
+    { "number": 391, "title": "fix(fixture-b): b", "state": "MERGED", "createdAt": "2026-10-24T14:50:00Z", "mergedAt": "2026-10-24T15:00:30Z", "closedAt": "2026-10-24T15:00:30Z", "url": "https://github.com/fixture/fixture/pull/391", "worker": "fixture-worker" },
+    { "number": 397, "title": "docs: c", "state": "MERGED", "createdAt": "2026-10-24T15:01:00Z", "mergedAt": "2026-10-24T15:07:30Z", "closedAt": "2026-10-24T15:07:30Z", "url": "https://github.com/fixture/fixture/pull/397", "worker": "eric-agent-1" }
+  ],
+  "books": { "milestones": [], "mergedByType": {}, "medianMergeMin": 12, "longest": null, "firstPrAt": "2026-10-24T13:00:00Z" }
+}

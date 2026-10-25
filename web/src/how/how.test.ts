@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import type { BoardPr } from "../operator/board";
-import { countLines, folderLines, folderOf, howData, incident, knownRedCount, mergesPerHour, ownerOf, parseCodeowners, parseLanes } from "./data";
+import { countLines, folderLines, folderOf, githubUrl, howData, incident, knownRedCount, mergesPerHour, ownerOf, parseCodeowners, parseLanes } from "./data";
 
 const pr = (number: number, title: string, mergedAt: string | null, worker = "eric-agent-1"): BoardPr => ({
   number, title, state: mergedAt ? "MERGED" : "OPEN", createdAt: "2026-10-24T10:00:00Z", mergedAt, closedAt: mergedAt,
@@ -69,6 +69,7 @@ test("no snapshot: every snapshot value is unknown, and git and repo values stil
     runChecksNow: "KNOWN_RED = {\n}",
     codeowners: "/web/src/game/ @e",
     agentsMd: null,
+    remote: null,
   });
   expect([d.at, d.mainSha, d.byWorker, d.stages, d.medianMergeMin, d.hours, d.totalMerged, d.busiest, d.incident, d.buildStamp, d.ciBrowser, d.repo]).toEqual(
     Array(12).fill(null),
@@ -76,4 +77,11 @@ test("no snapshot: every snapshot value is unknown, and git and repo values stil
   expect(d.others).toEqual([]);
   expect(d.folders).toEqual([{ folder: "web/src/game/", lines: 3, owner: "@e" }]);
   expect([d.knownRedFirst, d.knownRedNow]).toEqual([1, 0]);
+});
+
+test("links: the repo URL from git's remote, either form", () => {
+  expect(githubUrl("git@github.com:o/r.git")).toBe("https://github.com/o/r");
+  expect(githubUrl("https://github.com/o/r.git\n")).toBe("https://github.com/o/r");
+  expect(githubUrl("https://github.com/o/r")).toBe("https://github.com/o/r");
+  expect(githubUrl(null)).toBeNull();
 });

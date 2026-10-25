@@ -85,7 +85,7 @@
   line-height: 1;
   letter-spacing: -0.035em;
   --kern-et: -0.02em;
-  --kern-tu: 0em;
+  --kern-tu: -0.015em;
 }
 .letter {
   position: relative;
@@ -101,6 +101,29 @@
 .letter[data-on] {
   opacity: 1;
   animation: land 160ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+/* Each landing lights the hit line under its letter, as a hit does in the game. */
+.letter::after {
+  content: "";
+  position: absolute;
+  left: 0.04em;
+  right: 0.04em;
+  bottom: calc(0.06em - 0.42vh);
+  height: 1.3vh;
+  background: var(--pa-flare);
+  opacity: 0;
+}
+.letter[data-on]::after {
+  animation: hit 420ms ease-out both;
+}
+/* The title's hit line: drawn in on the first note. */
+.hitline {
+  opacity: 0;
+  animation: none;
+}
+.hitline[data-on] {
+  opacity: 1;
+  animation: draw 300ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 /* The É's acute, its own part: it lands last, on the motif's final note. */
 .acute {
@@ -130,10 +153,16 @@
   height: 100%;
   pointer-events: none;
 }
-/* Reduced motion, or the card told to hold still: every part in its place from the first frame. */
+/* Reduced motion, or the card told to hold still: every part in its place from the first frame. A part set
+   data-frozen (?t=) is shown at rest. */
 .card[data-still] .letter,
 .card[data-still] .acute,
-.card[data-still] .title + .tagline {
+.card[data-still] .title + .tagline,
+.card[data-still] .hitline,
+.hitline[data-frozen],
+.letter[data-frozen],
+.acute[data-frozen],
+.title + .tagline[data-frozen] {
   opacity: 1;
   animation: none;
 }
@@ -234,13 +263,16 @@
   .tagline,
   .links,
   .letter[data-on],
+  .letter[data-on]::after,
   .acute[data-on],
-  .title + .tagline[data-on] {
+  .title + .tagline[data-on],
+  .hitline[data-on] {
     animation: none;
   }
   .letter,
   .acute,
-  .title + .tagline {
+  .title + .tagline,
+  .hitline {
     opacity: 1;
   }
 }

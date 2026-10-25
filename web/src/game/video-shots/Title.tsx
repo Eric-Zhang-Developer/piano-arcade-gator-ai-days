@@ -4,7 +4,7 @@
 // attached, else the laptop voice; the letters follow the same scheduled times, revealed on the frame their note
 // sounds. The laptop voice can only start after a press (the browser's audio rule), so with no DGX the card stays
 // black until the first key or click (decision video-cards-motif). Reduced motion: every part is there from the first
-// frame and the motif still plays.
+// frame and the motif still plays. ?t=<ms> shows the frame at that time, still and silent, for review strips.
 import { useEffect, useRef } from "react";
 import { APP_NAME, clauses, TAGLINE } from ".";
 import styles from "./cards.module.css";
@@ -31,6 +31,7 @@ export function TitleCard() {
     const parts = [...root.querySelectorAll<HTMLElement>("[data-letter]")];
     const acute = root.querySelector<HTMLElement>("[data-acute]")!;
     const tagline = root.querySelector<HTMLElement>("[data-tagline]")!;
+    const line = root.querySelector<HTMLElement>("[data-hitline]")!;
     let raf = 0;
     let gone = false;
     let started = false;
@@ -55,6 +56,7 @@ export function TitleCard() {
       const frame = (now: number) => {
         const t = now - t0;
         // a letter revealed on this frame is painted with it: its mark is this frame's time
+        if (t >= times.notes[0].atMs) line.setAttribute("data-on", "");
         while (shown < parts.length && t >= times.notes[shown].atMs) {
           parts[shown].setAttribute("data-on", "");
           hook.letters[shown] = now;
@@ -83,6 +85,15 @@ export function TitleCard() {
       raf = requestAnimationFrame(frame);
     };
 
+    // ?t=<ms>: the frame as it stands that long after the start, silent and still (the review strips).
+    const at = Number(new URLSearchParams(location.search).get("t"));
+    if (location.search.includes("t=") && Number.isFinite(at)) {
+      parts.forEach((p, i) => times.notes[i].atMs <= at && p.setAttribute("data-frozen", ""));
+      if (at >= times.accentMs) acute.setAttribute("data-frozen", "");
+      if (at >= times.taglineMs + titleSettings.riseMs) tagline.setAttribute("data-frozen", "");
+      if (at >= times.notes[0].atMs) line.setAttribute("data-frozen", "");
+      return;
+    }
     // The DGX if it's there; else the laptop voice after the first press; else silent, at once.
     (async () => {
       const access = navigator.requestMIDIAccess ? await navigator.requestMIDIAccess().catch(() => null) : null;
@@ -105,6 +116,7 @@ export function TitleCard() {
   const letters = titleLetters();
   return (
     <main ref={card} className={styles.card} data-card="title">
+      <div className={`${styles.line} ${styles.hitline}`} data-hitline aria-hidden />
       <h1 className={styles.title} aria-label={APP_NAME}>
         {letters.map((l, i) => (
           <span key={i} className={styles.letter} data-letter={i} aria-hidden>

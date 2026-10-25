@@ -10,6 +10,7 @@ import { FlowJudge } from "../flow-mode/judge";
 import { playMode } from "../play-modes/modes";
 import { OptionsDrawer } from "../options-panel";
 import { Slots } from "../play-slots/ui";
+import { watchUrl } from "../watch-demo/demo";
 import { showsMoment } from "../record-moment/timing";
 import { takeOutcome } from "../records";
 import { Tally } from "../results-tally";
@@ -202,6 +203,12 @@ export function ResultsLayout({
                 Retry
               </Button>
               <Slots plugins={only(actions)} panel={panel} />
+              {/* select-calm (#1411): Watch left the select; after a take is when the perfect bot is worth watching. */}
+              {params.get("demo") !== "1" && (
+                <Link href={watchUrl(results.chartId)} data-testid="results-watch">
+                  Watch
+                </Link>
+              )}
               <Link href="/">
                 Songs
               </Link>

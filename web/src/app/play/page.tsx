@@ -564,12 +564,15 @@ const overlay: React.CSSProperties = {
 
 // The play corner (mouse-first): small square kit buttons in the HUD's top-right status gutter (hudSettings.statusGutterPx,
 // 120 px), under beat-track's status line at y = 20 and inside the band, so they cover neither the HUD nor the lanes.
-const corner: React.CSSProperties = { position: "fixed", top: 28, right: 12, display: "flex", gap: 4, zIndex: 5 };
+// Mouse-first's only way to pause or rewind with a mouse: sized with the window (about 45 px at 1080p), and under the
+// HUD band (hudLayout's clamp(44, 11% of the judgment line, 84) px, about 8.4vh), clear of its badge and the beat
+// track's status line (#888).
+const corner: React.CSSProperties = { position: "fixed", top: "calc(clamp(44px, 8.4vh, 84px) + 8px)", right: 12, display: "flex", gap: 6, zIndex: 5 };
 const cornerButton: React.CSSProperties = {
-  width: 28,
-  height: 28,
+  width: "clamp(36px, 4.2vh, 56px)",
+  height: "clamp(36px, 4.2vh, 56px)",
   padding: 0,
-  fontSize: 12,
+  fontSize: "clamp(14px, 1.8vh, 22px)",
   background: "color-mix(in srgb, var(--pa-panel) 80%, transparent)",
-  color: "var(--pa-ink-dim)",
+  color: "var(--pa-ink)", // full ink: read from playing distance
 };

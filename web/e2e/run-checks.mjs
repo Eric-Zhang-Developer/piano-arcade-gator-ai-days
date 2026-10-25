@@ -38,7 +38,7 @@ export const KNOWN_RED = {
   "web/src/game/results-landing/verify-landing.mjs": 754, // `results` of undefined: drift since #978 (PR run 40194634606)
   "web/src/game/sheet-beams/verify-beams.mjs": 1053, // the paper's darker hues (#730)
   "web/src/game/song-finder/verify-finder.mjs": 754, // focus on BODY after the reload (#1074 and #1124 runs)
-  "web/src/game/song-options/verify-options.mjs": 754, // hands-R times out after a take, under repro
+  "web/src/game/song-options/verify-options.mjs": 1066, // a focus before hydration is lost (the check races song-finder)
   "web/src/game/take-graph/verify-take-graph.mjs": 1032, // the +60 ms late bot (#859), the graph across its card (#839)
   "web/src/game/wait-mode/verify-wait.mjs": 1034, // the Flow rung read mid-take (#841)
   "web/src/game/watch-demo/verify-watch.mjs": 1100, // AutoStart clicks the first button, not Start, since #763
@@ -123,17 +123,20 @@ function runOnce(root, check, out) {
 }
 
 /**
- * Run each check once; with `attempts` 2, rerun a failure once into a fresh folder. Returns
+ * Run each check once; with `attempts` 2, rerun a failure once into a fresh folder. A known-red check gets one
+ * attempt whatever `attempts` says: it doesn't gate, so its rerun only spends the shard's time. Returns
  * [{ check, result, seconds, knownRed? }], and keeps them with the shard in <out>/results.json, rewritten after each
  * check so a job cut short keeps what ran.
  */
-export async function runChecks(root, checks, out, shardLabel = "1/1", attempts = 2) {
+export async function runChecks(root, checks, out, shardLabel = "1/1", attempts = 2, knownRed = KNOWN_RED) {
   const rows = [];
   for (const check of checks) {
     const name = check.replace(/\.mjs$/, "").replaceAll("/", "_");
     const start = Date.now();
     let result = "FAIL";
-    for (let attempt = 1; attempt <= attempts; attempt++) {
+    const issue = knownRed[check];
+    const tries = issue ? 1 : attempts;
+    for (let attempt = 1; attempt <= tries; attempt++) {
       const dir = join(out, attempt === 1 ? name : `${name}-retry`);
       mkdirSync(dir, { recursive: true });
       say(`::group::${check}${attempt === 2 ? " (retry)" : ""}`);
@@ -144,10 +147,9 @@ export async function runChecks(root, checks, out, shardLabel = "1/1", attempts 
         break;
       }
     }
-    const issue = KNOWN_RED[check];
     if (issue) say(`::warning title=known red #${issue}::${check}: ${result === "FAIL" ? "fail" : "pass"}`);
     else if (result === "flaky") say(`::warning title=flaky::flaky: ${check}`);
-    else if (result === "FAIL") say(`::error title=FAIL::${check} failed${attempts > 1 ? " twice" : ""}`);
+    else if (result === "FAIL") say(`::error title=FAIL::${check} failed${tries > 1 ? " twice" : ""}`);
     rows.push({ check, result, seconds: Math.round((Date.now() - start) / 1000), ...(issue && { knownRed: issue }) });
     writeFileSync(join(out, "results.json"), `${JSON.stringify({ shard: shardLabel, rows }, null, 2)}\n`);
   }

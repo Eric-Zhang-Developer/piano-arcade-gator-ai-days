@@ -1,5 +1,6 @@
-/* NEW RECORD in Saira 900 gold, upright as the Duo look sets it, stamped on rank-stamp's curve; the cells rise in
-   under it. Times come from timing.ts as custom properties, measured from the results showing (when this panel mounts). */
+/* NEW RECORD in Saira 900 gold, upright and flat as the Duo look sets it, stamped on rank-stamp's curve; the cells
+   rise in under it. Times come from timing.ts as custom properties, measured from the results showing (when this
+   panel mounts). */
 .moment {
   display: grid;
   justify-items: center;
@@ -12,7 +13,6 @@
   line-height: 1;
   letter-spacing: 0.02em;
   color: var(--pa-gold);
-  text-shadow: 0 0 24px rgb(255 226 122 / 0.45);
   animation: record-moment-stamp var(--rm-stamp) linear var(--rm-start) both;
 }
 
@@ -42,7 +42,6 @@
 
 .lit {
   border-color: var(--pa-magenta);
-  box-shadow: 0 0 16px rgb(255 47 208 / 0.45);
 }
 
 /* The cursor: the one thing that blinks once the moment has settled. */
@@ -59,7 +58,8 @@
 
 .hint {
   color: var(--pa-ink-dim);
-  font: clamp(16px, 2.223vh, 24px) system-ui, sans-serif; /* 16 px at 720, 24 px at 1080: read on video */
+  /* 16 px at 720 tall, 24 px at 1080: read on video */
+  font: clamp(16px, 2.223vh, 24px) var(--pa-font-data), ui-monospace, monospace;
 }
 
 .saved {

@@ -39,8 +39,8 @@ describe("the entry during the reveal", () => {
 
 describe("record-moment's look (Duo kit, #1138)", () => {
   const css = readFileSync(new URL("./record-moment.module.css", import.meta.url), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
-  it("sets nothing in italic and rounds no corner", () => {
-    expect(css).not.toMatch(/italic/);
+  it("sets nothing in italic, rounds no corner and glows nothing", () => {
+    expect(css).not.toMatch(/italic|text-shadow|box-shadow/);
     expect(css.match(/border-radius:\s*([^;]+);/g) ?? []).toEqual(["border-radius: 0;"]);
   });
   it("sizes the hint 16 px at 720 tall and 24 px at 1080, the video rule", () => {

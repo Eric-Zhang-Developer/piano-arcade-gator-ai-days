@@ -95,7 +95,7 @@ export function Conduct() {
   const session = useRef<Session | null>(null);
   // The camera, the tracker and the session, each held by its start as it opens (#1315): Stop, a newer start, a song
   // change (#1316), pagehide and unmount stop all of them, even mid-start.
-  const runs = useRef(mediaRun()).current;
+  const [runs] = useState(mediaRun);
   const pedal = useRef<Awaited<ReturnType<typeof loadPedal>>>(null);
 
   useEffect(() => {

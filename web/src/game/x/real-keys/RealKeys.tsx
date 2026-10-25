@@ -184,7 +184,7 @@ export function RealKeys() {
 
   // The camera is held by its start as soon as it opens (#1317): a second start, Stop, unmount or pagehide stops it,
   // even mid-start.
-  const runs = useRef(mediaRun()).current;
+  const [runs] = useState(mediaRun);
   const stopCamera = useCallback(() => {
     runs.stop();
     setStream(null);

@@ -166,6 +166,46 @@ assert.deepEqual(left, [activeGuest, oldGoogle, recentPlayer].sort());
 assert.equal((await rows(`select count(*)::int as n from takes where player_id = '${idleGuest}'`))[0].n, 0, "the idle guest's takes cascade");
 say("ok  cleanup removes only guests idle 30 days; Google users, recent sign-ins and recent players stay");
 
+// Learning lane (#753): append-only attempts and goals, saved by the server, read only by their player.
+const learner = randomUUID(), guest2 = randomUUID();
+await db.exec(`insert into auth.users(id) values ('${learner}'), ('${guest2}');`);
+const attempt = (extra = {}) => ({ id: randomUUID(), player_id: learner, item_id: "q-intervals-3", node_id: "intervals", kind: "theory",
+  mode: "diagnostic", correct: true, cold: true, help_share: 0, details: { answer: "M3" }, ...extra });
+const saveAttempt = async (a) => (await db.query("select save_learning_attempt($1::jsonb) as r", [a])).rows[0].r;
+const a1 = attempt();
+assert.equal(await saveAttempt(a1), "saved");
+assert.equal(await saveAttempt(a1), "duplicate");
+assert.equal(await saveAttempt({ ...a1, player_id: guest2 }), "conflict");
+for (const [why, bad] of [["kind", { kind: "quiz" }], ["mode", { mode: "exam" }], ["help_share", { help_share: 1.5 }],
+  ["details over 8 KB", { details: { blob: "x".repeat(9000) } }], ["empty item", { item_id: "" }]]) {
+  await assert.rejects(() => saveAttempt(attempt(bad)), undefined, `refused: ${why}`);
+}
+assert.deepEqual((await rows(`select set_learner_goals('${learner}', array['twinkle','fur-elise']) as g`))[0].g, ["twinkle", "fur-elise"]);
+await assert.rejects(() => db.query(`select set_learner_goals('${learner}', array['a','b','c','d'])`), undefined, "at most 3 goals");
+say("ok  learning attempts save once, refuse bad values, and goals hold at most 3 songs");
+
+for (let i = 0; i < 299; i++) assert.equal(await saveAttempt(attempt({ node_id: `n${i % 7}` })), "saved");
+assert.equal(await saveAttempt(attempt()), "limited");
+await db.exec(`update learning_attempts set created_at = now() - interval '6 minutes' where player_id = '${learner}'`);
+assert.equal(await saveAttempt(attempt()), "saved");
+say("ok  300 learning attempts per player per 5 minutes, then 'limited'");
+
+const g2a = attempt({ player_id: guest2 });
+assert.equal(await saveAttempt(g2a), "saved");
+await db.query(`select set_learner_goals('${guest2}', array['minuet-g'])`);
+const [{ n: movedTakes }] = await rows(`select merge_player('${guest2}', '${learner}') as n`);
+assert.equal(movedTakes, 0);
+assert.equal((await rows(`select count(*)::int as n from learning_attempts where player_id = '${learner}' and id = '${g2a.id}'`))[0].n, 1);
+assert.deepEqual((await rows(`select song_ids from learner_goals where player_id = '${learner}'`))[0].song_ids, ["twinkle", "fur-elise"], "the account's goals win");
+say("ok  a guest's attempts merge into the account; the account's goals win");
+
+const studious = randomUUID();
+await db.exec(`insert into auth.users(id, is_anonymous, created_at, last_sign_in_at) values ('${studious}', true, now() - interval '40 days', now() - interval '40 days');`);
+assert.equal(await saveAttempt(attempt({ player_id: studious })), "saved");
+await db.query("select cleanup_stale_guests()");
+assert.equal((await rows(`select count(*)::int as n from auth.users where id = '${studious}'`))[0].n, 1);
+say("ok  cleanup keeps a guest who answered theory recently");
+
 const [trend] = await rows(`select notes, misses from bar_trends where player_id = '${player}' and song_id = 'twinkle'`);
 assert.deepEqual([Number(trend.notes), Number(trend.misses)], [6, 1]);
 say("ok  bar_trends counts the saved notes");

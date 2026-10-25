@@ -36,6 +36,7 @@ import { tempoCurve } from "./tempo-curve";
 import { weakBars } from "./weak-bars";
 import { feverStage } from "./stage";
 import { takeGraph } from "./take-graph";
+import { duoResults, duoTutor } from "./duo-results";
 import { cabinet } from "./cabinet/plugin";
 import { demoReset } from "./demo-reset";
 import { helpOverlay } from "./help-overlay";
@@ -94,6 +95,8 @@ export const plugins: GamePlugin[] = [
   evenness(), // results panel: how even each hand's runs were
   chordSync(), // results panel: chords rolled by more than 30 ms, per hand
   takeGraph(), // results panel: every note's timing over the song
+  duoResults(), // results panel: BY BAR and TIMING, the Duo results' middle band
+  duoTutor(), // results panel: the tutor's line and PRACTICE BARS X–Y on the weakest bars
   eventSounds(), // laptop sounds at combo milestones, fever, full combo, rank and (optionally) misses
   feverGauge(), // late: its gauge sizes from the chart after every transformChart, as the judge does
   clearCard(), // over the HUD and the meter: ALL PERFECT, FULL COMBO or CLEAR from the last note to the results

@@ -101,14 +101,17 @@ export interface TutorInput {
 
 const bars = (r: { from: number; to: number }) => (r.from === r.to ? `bar ${r.from}` : `bars ${r.from}–${r.to}`);
 
-// The template line: a drifting hand if one is past driftMs (the larger if both), else the run's accuracy.
+// The hand whose mean offset is past driftMs (the larger if both), with that offset; [null, null] for neither.
+export const driftingHand = (drift: Record<Hand, number | null>): [Hand, number] | [null, null] =>
+  ((["L", "R"] as const)
+    .map((h) => [h, drift[h]] as [Hand, number | null])
+    .filter(([, d]) => d !== null && Math.abs(d) > duoResultsSettings.driftMs)
+    .sort((a, b) => Math.abs(b[1]!) - Math.abs(a[1]!))[0] as [Hand, number] | undefined) ?? [null, null];
+
+// The template line: a drifting hand if one is past driftMs, else the run's accuracy.
 export function tutorLine({ run, accuracy, drift }: TutorInput): string[] {
   if (!run) return ["Clean take. Try it faster, or pick the next song."];
-  const { driftMs } = duoResultsSettings;
-  const [hand, ms] = (["L", "R"] as const)
-    .map((h) => [h, drift[h]] as const)
-    .filter(([, d]) => d !== null && Math.abs(d) > driftMs)
-    .sort((a, b) => Math.abs(b[1]!) - Math.abs(a[1]!))[0] ?? [null, null];
+  const [hand, ms] = driftingHand(drift);
   const first =
     hand && ms !== null
       ? `Your ${hand === "L" ? "left" : "right"} hand ${ms > 0 ? "drags" : "rushes"} in ${bars(run)}, about ${Math.round(Math.abs(ms))} ms ${ms > 0 ? "late" : "early"}.`

@@ -63,8 +63,29 @@ def reverted_files(root, base: str) -> set[str]:
     return {f for sha in shas for f in git(root, "show", "--name-only", "--format=", sha, check=False).split()}
 
 
-def allowed(title: str, cfg: dict, specs: dict, shipped: dict, done: set, revert_files=None):
-    """(predicate(path) -> bool, description). Raises ValueError for an unusable title."""
+# A game-lane feature PR may add its own mount to these files whoever owns them: an import plus the mount line, or a
+# layer entry. 4 added / 2 removed per file fits that with a line of slack (a wrapper, a moved neighbour) and nothing
+# bigger; over it, the file falls back to the owner rule. layers.ts is also `open` in config.toml, so this only
+# matters there if `open` ever narrows. Never Sharan's paths or contracts: these three are neither.
+MOUNTS = ("web/src/app/layout.tsx", "web/src/app/page.tsx", "web/src/game/layers.ts")
+MOUNT_LANE, MOUNT_MAX_ADDED, MOUNT_MAX_REMOVED = "eric", 4, 2
+# A song pack ships with its credits: feat(song-pack-<n>) may append to CREDITS.md, never remove a line from it.
+CREDITS, SONG_PACK = "CREDITS.md", re.compile(r"song-pack-\d+")
+
+
+def numstat(root, base: str) -> dict[str, tuple[int, int]]:
+    """{path: (added, removed)} for the branch's diff. Binary files ('-') count as unlimited."""
+    out = {}
+    for line in git(root, "diff", "--numstat", "--no-renames", f"{base}...HEAD").splitlines():
+        a, r, path = line.split("\t", 2)
+        out[path] = (int(a) if a.isdigit() else 10**9, int(r) if r.isdigit() else 10**9)
+    return out
+
+
+def allowed(title: str, cfg: dict, specs: dict, shipped: dict, done: set, revert_files=None, stat=None):
+    """(predicate(path) -> bool, description). Raises ValueError for an unusable title.
+
+    `stat` is numstat()'s {path: (added, removed)}; without it the line-limited rules (mounts, credits) never pass."""
     t = parse_title(title)
     if t is None:
         raise ValueError(f"title {title!r} isn't one of: {TITLE_HELP}")
@@ -104,7 +125,27 @@ def allowed(title: str, cfg: dict, specs: dict, shipped: dict, done: set, revert
             return (lambda p: True), f"{scope} is bootstrap: anything"
         spec_dir = fm["_path"].rsplit("/", 1)[0] + "/"
         prefixes = as_list(fm.get("owns")) + open_paths + [f"{changes}/{scope}.md", spec_dir, f"{sp}/decisions/{scope}-"]
+        mine, theirs, person = [], [], lane(fm)
+        if person:
+            # The lane widens to its other features' owns, never to a path an in-flight feature of another lane holds.
+            # "No open PR is working on them" is on the agent (AGENTS.md): this script doesn't ask GitHub.
+            mine = [e for s, o in {**shipped, **specs}.items() if s != scope and lane(o) == person
+                    for e in as_list(o.get("owns"))]
+            theirs = [e for o in in_flight(specs, done).values() if lane(o) != person for e in as_list(o.get("owns"))]
+        stat = stat or {}
+        small = {p for p in MOUNTS if person == MOUNT_LANE and p in stat
+                 and stat[p][0] <= MOUNT_MAX_ADDED and stat[p][1] <= MOUNT_MAX_REMOVED}
+        if kind == "feature" and SONG_PACK.fullmatch(scope) and stat.get(CREDITS, (0, 1))[1] == 0:
+            small.add(CREDITS)
+        return (lambda p: under(p, prefixes) or p in small or (under(p, mine) and not under(p, theirs))), \
+            f"{prefixes}" + (f", plus {person}'s lane: {mine}" if person else "") + \
+            (f", plus small edits to {sorted(small)}" if small else "")
     return (lambda p: under(p, prefixes)), f"{prefixes}"
+
+
+def lane(fm: dict) -> str | None:
+    """The person whose lane a feature is in: its assignee up to the first `-` (eric-agent-1 -> eric), or None."""
+    return str(fm.get("assignee") or "").split("-", 1)[0].strip() or None
 
 
 def hint(path: str, cfg: dict, specs: dict, shipped: dict, done: set) -> str:
@@ -156,7 +197,7 @@ def main(argv=None) -> int:
         revert_files = reverted_files(root, args.base) if t and t["kind"] == "revert" else None
         try:
             done = done_at(root, cfg, args.base)
-            ok, desc = allowed(args.title, cfg, specs, shipped, done, revert_files)
+            ok, desc = allowed(args.title, cfg, specs, shipped, done, revert_files, numstat(root, args.base))
         except ValueError as e:
             print(f"ownership: {e}")
             return 1

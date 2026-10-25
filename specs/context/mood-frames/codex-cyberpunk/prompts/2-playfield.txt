@@ -1,0 +1,7 @@
+Screen: gameplay mid-song, the hero shot of the demo video.
+
+Layout: the bottom 17% is a full 88-key piano keyboard seen straight-on from above, white and black keys rendered cleanly and realistically. Directly above the keys, a thin bright hit line in the accent color across the full width. Above it, a dark, calm highway: 88 extremely faint vertical lanes aligned to the keys. Rounded note bars fall down the lanes: right-hand notes in the right-hand color, left-hand notes in the left-hand color; far notes dim, near notes bright. Three notes are being hit right now: at each, a small, crisp, bright spark of tiny particles bursts upward from the hit line, and the pressed keys glow in their hand's color. About eighteen notes on screen, in two clear clusters, one per hand. The lanes themselves stay clean: no decoration over them.
+
+HUD, edges only: top left, a hairline-framed tag with "FÜR ELISE" and "BAR 14 / 32" in small monospace, plus a thin progress line. Top right, the arcade moment: a huge condensed numeral "128" with "COMBO" in small caps beneath it, then smaller "ACC 98.4%" and "SCORE 412,550" in monospace, inside corner brackets. Just above the right end of the hit line, a crisp judgment "PERFECT" with "−3 MS" beneath it in tiny monospace.
+
+Mood: a concert hall turned into a cockpit. Dark, precise, electric, thrilling.

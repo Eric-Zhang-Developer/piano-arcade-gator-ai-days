@@ -1,0 +1,130 @@
+{
+  "id": "hot-cross-buns",
+  "title": "Hot Cross Buns",
+  "composer": "Traditional",
+  "catalog": "the 'Alternative' tune, right hand",
+  "source": "Wikipedia, \"Hot Cross Buns (song)\" (https://en.wikipedia.org/w/index.php?title=Hot_Cross_Buns_(song)&oldid=1380991341), the article's LilyPond <score>, read 2026-10-25, CC BY-SA 4.0 (traditional tune, public domain). The score prints two tunes; this chart is the 4 bars marked \"Alternative\" (B A G), compiled to MIDI with LilyPond 2.26. Source tempo 4 = 120.",
+  "bpm": 100.0,
+  "beatsPerBar": 4,
+  "notes": [
+    {
+      "id": "n1",
+      "pitch": 71,
+      "beat": 0,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n2",
+      "pitch": 69,
+      "beat": 1,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n3",
+      "pitch": 67,
+      "beat": 2,
+      "duration": 2,
+      "hand": "R"
+    },
+    {
+      "id": "n4",
+      "pitch": 71,
+      "beat": 4,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n5",
+      "pitch": 69,
+      "beat": 5,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n6",
+      "pitch": 67,
+      "beat": 6,
+      "duration": 2,
+      "hand": "R"
+    },
+    {
+      "id": "n7",
+      "pitch": 67,
+      "beat": 8,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n8",
+      "pitch": 67,
+      "beat": 8.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n9",
+      "pitch": 67,
+      "beat": 9,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n10",
+      "pitch": 67,
+      "beat": 9.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n11",
+      "pitch": 69,
+      "beat": 10,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n12",
+      "pitch": 69,
+      "beat": 10.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n13",
+      "pitch": 69,
+      "beat": 11,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n14",
+      "pitch": 69,
+      "beat": 11.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n15",
+      "pitch": 71,
+      "beat": 12,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n16",
+      "pitch": 69,
+      "beat": 13,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n17",
+      "pitch": 67,
+      "beat": 14,
+      "duration": 2,
+      "hand": "R"
+    }
+  ]
+}

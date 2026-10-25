@@ -127,7 +127,7 @@ describe("take-graph-pass", () => {
     ]);
     expect(trendLabel(rollingMedian(pts, "R"), "R")).toBe("RH +55 ms late");
     expect(trendLabel([{ ms: -4.2 }], "L")).toBe("LH −4 ms early");
-    expect(trendLabel([{ ms: 0.3 }], "L")).toBe("LH ±0 ms");
+    expect(trendLabel([{ ms: 0.3 }], "L")).toBe("LH ±0 ms on time");
   });
 
   it("a hand with fewer than 8 hits gets no trend and no label", () => {

@@ -106,7 +106,7 @@ export function rollingMedian(points: GraphPoint[], hand: GraphPoint["hand"], n 
 export function trendLabel(trend: { ms: number }[], hand: GraphPoint["hand"]): string | null {
   if (!trend.length) return null;
   const ms = trend[trend.length - 1].ms;
-  const word = Math.round(ms) > 0 ? " late" : Math.round(ms) < 0 ? " early" : "";
+  const word = Math.round(ms) > 0 ? " late" : Math.round(ms) < 0 ? " early" : " on time";
   return `${hand === "R" ? "RH" : "LH"} ${fmtMs(ms)}${word}`;
 }
 

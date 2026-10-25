@@ -99,7 +99,7 @@ try {
     });
     check(inks.length > 0 && inks.every(Boolean), `${w}×${h} /: each label is dim ink, the current one primary (${inks})`);
     const repo = await page.$eval('[data-testid="nav-github"]', (a) => [a.href, a.target, a.rel, a.getAttribute("aria-label")].join(" ")).catch(() => "missing");
-    check(repo === "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days _blank noopener noreferrer GitHub repository", `${w}×${h} /: the GitHub link opens the repo in a new tab, labeled (${repo})`);
+    check(repo === "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days _blank noopener noreferrer GitHub (opens in a new tab)", `${w}×${h} /: the GitHub link opens the repo in a new tab, labeled (${repo})`);
     // Off the link row, a mark in the bottom-right corner (Eric, 2026-10-25).
     const corner = await page.$eval('[data-testid="nav-github"]', (a) => {
       const b = a.getBoundingClientRect();

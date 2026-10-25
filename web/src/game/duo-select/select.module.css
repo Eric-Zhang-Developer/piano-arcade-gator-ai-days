@@ -197,3 +197,13 @@
 .cellLabel {
   font-size: clamp(16px, 1.25vw, 24px);
 }
+
+/* Read by screen readers, not drawn. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

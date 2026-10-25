@@ -43,7 +43,11 @@ export function FocusPanel(p: FocusPanelProps) {
   return (
     <Brackets style={{ ...fill, flex: "1 1 auto" }}>
       <Panel style={{ ...fill, flex: "1 1 auto", padding: "clamp(14px, 1.4vw, 26px)" }}>
-        <section ref={ref} className={styles.panel} aria-live="polite" data-testid="focus-panel">
+        <section ref={ref} className={styles.panel} data-testid="focus-panel">
+          {/* An arrow step reads the song, not the whole panel and its buttons (#1236). */}
+          <p className={styles.srOnly} aria-live="polite" data-testid="focus-live">
+            {`${p.title}, ${shortComposer(p.composer)}, level ${p.level}`}
+          </p>
           <div className={styles.roll} style={{ viewTransitionName: "stage-jacket" }}>
             <PianoRoll roll={p.roll} />
           </div>

@@ -34,7 +34,7 @@ export function NavLinks({ slots }: { slots: Slot[] }) {
         target="_blank"
         rel="noopener noreferrer"
         className={styles.repo}
-        aria-label="GitHub repository"
+        aria-label="GitHub (opens in a new tab)"
         title="GitHub repository"
         data-capture-hide
         data-testid="nav-github"

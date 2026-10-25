@@ -53,6 +53,18 @@ if (typeof window !== "undefined")
   for (const type of ["keydown", "pointerdown"])
     window.addEventListener?.(type, (e) => void (pressed ||= e.isTrusted), { capture: true, passive: true });
 
+// "Now" for every sound asked for in one synchronous run: the audio clock read once, at the run's first call. Each
+// sound renders its samples before it starts, and the clock moves on meanwhile, so a countdown's four ticks read
+// one by one landed up to 5 ms off their beats (full-run-reds, #1284).
+let runNowS: number | null = null;
+const nowS = (c: AudioContext): number => {
+  if (runNowS === null) {
+    runNowS = c.currentTime;
+    queueMicrotask(() => (runNowS = null));
+  }
+  return runNowS;
+};
+
 type Playing = Voice & { src: AudioBufferSourceNode; gain: GainNode };
 let voices: Playing[] = [];
 let last = { atS: -Infinity, velocity: 1 };
@@ -66,7 +78,7 @@ export function uiSound(name: UiSound, delayMs = 0, opts: { key?: Key } = {}): v
   if (getPrefs().muted) return;
   const { ctx: c, out: o } = audio();
   if (c.state === "suspended") void c.resume(); // allowed now: there has been a gesture
-  const t = c.currentTime + delayMs / 1000;
+  const t = nowS(c) + delayMs / 1000;
   if (name === "move") step = t - last.atS > uiSoundSettings.restartS ? 0 : step + 1;
   const { live, steal, velocity } = admit(voices, last, t);
   for (const v of steal) {

@@ -1,4 +1,4 @@
-/* The score window: black like every screen, the music in ink, the cabinet only in the header's hairline. */
+/* The score window: the dark Duo page and header, the music on a lit paper panel (sheet-paper), never inverted. */
 .sheet {
   min-height: 100vh;
   background: var(--pa-bg);

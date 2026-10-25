@@ -5,7 +5,8 @@ import { noteTimeMs } from "../core/judge";
 import type { SheetMessage } from "../sheet-view/plugin";
 
 export interface Moment {
-  atMs: number; // the chart clock when it happened
+  atMs: number; // the page's own clock (performance.now) when it arrived: effects play out even while Flow's chart
+  // clock holds, and after the end, when /play stops sending it
 }
 export interface Hit extends Moment {
   noteId: string;
@@ -28,13 +29,12 @@ export const emptyStage: StageState = { chart: null, nowMs: null, judged: new Ma
 // Effects older than this are dropped from `hits`, so a long take doesn't grow the list. Longer than any effect.
 const keepMs = 2000;
 
-export function reduceStage(s: StageState, m: SheetMessage): StageState {
-  const at = s.nowMs ?? 0;
+export function reduceStage(s: StageState, m: SheetMessage, at: number): StageState {
   switch (m.type) {
     case "take":
       return { ...emptyStage, chart: m.chart }; // the latest take wins, as on /sheet
     case "clock":
-      return { ...s, nowMs: m.nowMs, hits: s.hits.length && s.hits[0].atMs < m.nowMs - keepMs ? s.hits.filter((h) => h.atMs >= m.nowMs - keepMs) : s.hits };
+      return { ...s, nowMs: m.nowMs, hits: s.hits.length && s.hits[0].atMs < at - keepMs ? s.hits.filter((h) => h.atMs >= at - keepMs) : s.hits };
     case "judgment": {
       const judged = new Map(s.judged).set(m.noteId, m.judgment);
       return { ...s, judged, hits: [...s.hits, { noteId: m.noteId, judgment: m.judgment, atMs: at }] };

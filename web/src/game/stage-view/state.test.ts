@@ -13,7 +13,8 @@ const chart: Chart = {
   beatsPerBar: 4,
   notes: [0, 1, 2, 3].map((b) => ({ id: `n${b + 1}`, pitch: 60 + b, beat: b, duration: 1, hand: b % 2 ? ("L" as const) : ("R" as const) })),
 };
-const run = (ms: SheetMessage[]) => ms.reduce(reduceStage, emptyStage);
+// Each message arrives 10 ms of page time after the last, from page time 1000.
+const run = (ms: SheetMessage[], s = emptyStage) => ms.reduce((st, m, i) => reduceStage(st, m, 1000 + 10 * i), s);
 
 describe("stage-view's state", () => {
   it("waits with no take, and the latest take starts it clean", () => {
@@ -41,25 +42,29 @@ describe("stage-view's state", () => {
       { type: "clock", nowMs: 900 },
     ]);
     expect(s1.combo).toBe(2);
-    expect(s1.hits.map((h) => [h.noteId, h.judgment, h.atMs])).toEqual([["n1", "PERFECT", 2], ["n2", "GREAT", 505]]);
-    expect(s1.milestone).toEqual({ count: 2, atMs: 505 });
+    expect(s1.hits.map((h) => [h.noteId, h.judgment, h.atMs])).toEqual([["n1", "PERFECT", 1020], ["n2", "GREAT", 1050]]);
+    expect(s1.milestone).toEqual({ count: 2, atMs: 1070 });
     expect(onLane(s1, 1000).map((n) => n.id)).toEqual(["n3", "n4"]); // judged notes leave the lane
 
-    const s2 = [
-      { type: "judgment", noteId: "n3", judgment: "MISS" },
-      { type: "combo", count: 0 },
-      { type: "clock", nowMs: 1600 },
-      { type: "fullCombo" },
-      { type: "end" },
-    ].reduce((s, m) => reduceStage(s, m as SheetMessage), s1);
+    const s2 = run(
+      [
+        { type: "judgment", noteId: "n3", judgment: "MISS" },
+        { type: "combo", count: 0 },
+        { type: "clock", nowMs: 1600 },
+        { type: "fullCombo" },
+        { type: "end" },
+      ],
+      s1,
+    );
     expect(s2.combo).toBe(0);
-    expect(s2.fullCombo).toEqual({ atMs: 1600 });
-    expect(s2.ended).toEqual({ atMs: 1600 });
+    expect(s2.fullCombo).toEqual({ atMs: 1030 });
+    expect(s2.ended).toEqual({ atMs: 1040 });
   });
 
-  it("drops hit effects older than 2 s, and ignores messages it doesn't read", () => {
-    const s = run([{ type: "take", chart }, { type: "clock", nowMs: 0 }, { type: "judgment", noteId: "n1", judgment: "PERFECT" }, { type: "clock", nowMs: 2500 }]);
-    expect(s.hits).toEqual([]);
-    expect(reduceStage(s, { type: "pedal" } as unknown as SheetMessage)).toBe(s);
+  it("drops hit effects older than 2 s of page time, and ignores messages it doesn't read", () => {
+    const s = run([{ type: "take", chart }, { type: "clock", nowMs: 0 }, { type: "judgment", noteId: "n1", judgment: "PERFECT" }]);
+    expect(reduceStage(s, { type: "clock", nowMs: 0 }, 3000).hits).toHaveLength(1); // Flow holding: page time decides
+    expect(reduceStage(s, { type: "clock", nowMs: 0 }, 3100).hits).toEqual([]);
+    expect(reduceStage(s, { type: "pedal" } as unknown as SheetMessage, 3100)).toBe(s);
   });
 });

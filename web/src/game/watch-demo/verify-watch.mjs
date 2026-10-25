@@ -100,7 +100,7 @@ for (const [w, h, reducedMotion] of [
   await page.waitForURL(/\/play\?/, { timeout: 60_000 });
   const query = new URL(page.url()).search.slice(1);
   const started = await page
-    .waitForFunction(() => window.__pianoArcadeDemo?.on === true && !document.querySelector("main button"), null, { timeout: 60_000 })
+    .waitForFunction(() => window.__pianoArcadeDemo?.on === true && !document.querySelector("[data-testid=start]"), null, { timeout: 60_000 })
     .then(() => true, () => false);
   if (first) {
     check(query === WANT, `W opens /play?${query}`);

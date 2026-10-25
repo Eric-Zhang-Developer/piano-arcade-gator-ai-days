@@ -47,7 +47,7 @@ export function StartScreen({
             {slots(groups.card)}
           </div>
           <div className={styles.side}>
-            <Button kind="primary" onClick={onStart} autoFocus style={start}>
+            <Button kind="primary" onClick={onStart} autoFocus style={start} data-testid="start">
               Start
             </Button>
             <div className={styles.notes} data-group="notes">

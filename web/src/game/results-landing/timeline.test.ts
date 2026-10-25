@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { endState, landingAt, landingSettings as s, planLanding, stampLandingScale, stampShake, tallyGrid, type LandingInput } from "./timeline";
+import { clickFollows, endState, landingAt, landingSettings as s, pauseRefused, planLanding, stampLandingScale, stampShake, tallyGrid, type LandingInput } from "./timeline";
 
 const take = (bpm: number, over: Partial<LandingInput> = {}): LandingInput => ({
   bpm,
@@ -119,4 +119,16 @@ test("sound and record-moment follow the landing's stamp, and today's come back 
   expect(stampImpactMs()).toBe(today.impact);
   expect(today.impact).toBe(1200 + Math.round(impactT * 300));
   expect(momentTimes().startMs).toBe(today.moment);
+});
+
+test("only a primary press arms the skip's click swallow (#1335)", () => {
+  expect(clickFollows(0)).toBe(true);
+  expect(clickFollows(1)).toBe(false); // middle
+  expect(clickFollows(2)).toBe(false); // right: a contextmenu follows, never a click
+});
+
+test("the out refuses Esc; after the mount the skip has it (#1336)", () => {
+  expect(pauseRefused("Escape", false)).toBe(true);
+  expect(pauseRefused("Escape", true)).toBe(false);
+  expect(pauseRefused("a", false)).toBe(false);
 });

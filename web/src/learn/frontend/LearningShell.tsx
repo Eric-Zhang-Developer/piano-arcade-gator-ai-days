@@ -32,7 +32,9 @@ function LearningChrome({ children }: { children: React.ReactNode }) {
     <header className={styles.topbar}>
       <Link href="/learn" onClick={cancel} className={styles.brand} aria-label="Piano Arcade learning home">Piano Arcade</Link>
       {pathname !== '/learn' && <nav aria-label="Learning navigation"><Link href="/learn" onClick={cancel}>Back to map</Link></nav>}
-      <details className={styles.previewInfo}><summary>Prior UI</summary><div><p><Link href="/learn/brand-preview" onClick={cancel}>Open proposed preview ↗</Link></p><p>Example activities. Sessions remain while you navigate learning pages. Refreshing or leaving learning clears them.</p><p>Practice takes and feedback are scripted demonstrations; no performance is recorded or graded. The prepared activity is an authored demo, not a live agent decision. No account, progress sync or AI grading is connected.</p><Link href="/" onClick={cancel}>Back to arcade <span aria-hidden="true">↗</span></Link></div></details>
+      {/* #944: plain words for what a judge needs to know, and the way back in view; no second learning home */}
+      <p className={styles.honest}>Sample learner · no account</p>
+      <Link href="/" onClick={cancel} className={styles.arcade}>Back to arcade</Link>
     </header></>}
     <div className={styles.main}>
       {offline && <section className={styles.offline} role="alert"><h1>You’re offline</h1><p>Reconnect to continue. This preview has no account sync; nothing has been uploaded.</p><button onClick={() => setOffline(!navigator.onLine)}>Check connection</button></section>}

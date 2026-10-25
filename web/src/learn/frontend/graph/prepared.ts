@@ -1,5 +1,5 @@
 import { activities, type ActivityId } from '../LearningSessions';
-import { actionFor, byId, recommendation, type GraphAction, type Domain } from './data';
+import { actionFor, byId, demoGoal, recommendation, type GraphAction, type Domain } from './data';
 
 const connectedSkills = new Set(['theory.tonal-center', 'theory.phrase-endings', 'procedure.steady-pulse', 'procedure.held-endings', 'procedure.short-phrase-coordination']);
 
@@ -25,3 +25,14 @@ export const preparedActivity: PreparedActivity = {
   title: 'Hearing a phrase come home',
   reason: 'Hear how phrase endings help a melody feel settled.',
 } as const;
+
+// After the first example, the goal's other targets in the goal's own order, each with its connected activity (#943):
+// finishing one never leaves the map with "Start again" as its only button. Titles and reasons come from the skill.
+export const goalActivities: PreparedActivity[] = [
+  preparedActivity,
+  ...demoGoal.targets.flatMap(id => {
+    const skill = byId.get(id)!, action = actionFor(skill).action, target = action && contextualActivity(action);
+    if (!target || id === preparedActivity.skillId) return [];
+    return [{ skillId: id, domain: skill.domain, action: action!, activityId: target.activity.id as ActivityId, title: skill.title, reason: skill.description }];
+  }),
+];

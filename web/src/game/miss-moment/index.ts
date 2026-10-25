@@ -7,13 +7,14 @@ import { noteTimeMs } from "../core/judge";
 import { isBlack } from "../core/highway";
 import { msPerBeat, settings } from "../core/settings";
 import { noteColorFor } from "../hand-colors";
-import { hudLayout, hudSettings } from "../hud";
+import { canvasFonts } from "../duo-tokens";
+import { hudLayout } from "../hud";
 import { createSynth } from "../laptop-sound/synth";
 import { DEFAULT_PIANO_VOLUME } from "../laptop-sound/volume";
 import { DEFAULT_PREFS, playMissCue, soundSettings } from "../sound";
 import { dip } from "../stage";
 import { isWaitMode } from "../wait-mode";
-import { miss as missToken, whenDisplayFontReady, wrong as wrongToken } from "../ui-tokens";
+import { miss as missToken, wrong as wrongToken } from "../ui-tokens";
 
 export const missSettings = {
   fadeMs: 120, // the missed note desaturates, thins and drops to restAlpha over this
@@ -209,12 +210,6 @@ export function missMoment(): GamePlugin {
   let combo = 0;
   let broken: { atMs: number; seenMs?: number; seenWall?: number; combo: number } | null = null;
   let wait = false; // Learn has no combo to break (#1331)
-  let display = hudSettings.font;
-  if (typeof document !== "undefined")
-    void whenDisplayFontReady().then(() => {
-      const family = getComputedStyle(document.documentElement).getPropertyValue("--pa-font-display").trim();
-      if (family) display = `${family}, ${hudSettings.font}`;
-    });
   const reset = () => {
     misses = [];
     pulses = [];
@@ -350,11 +345,11 @@ export function missMoment(): GamePlugin {
           const l = hudLayout(f.width, line);
           const text = String(broken.combo);
           let px = l.combo.size;
-          ctx.font = `900 ${Math.round(px)}px ${display}`;
+          ctx.font = canvasFonts.moment(Math.round(px));
           const room = l.combo.room;
           const w = ctx.measureText(text.length < 3 ? "888" : text).width; // the HUD's own sizing, so it doesn't jump
           if (w > room) px *= room / w;
-          ctx.font = `900 ${Math.round(px)}px ${display}`;
+          ctx.font = canvasFonts.moment(Math.round(px));
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.globalAlpha = b.alpha;

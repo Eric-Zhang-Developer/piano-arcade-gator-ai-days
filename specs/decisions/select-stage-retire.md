@@ -12,6 +12,7 @@ gradient to the retired `--pa-sky`.
 **Choice: B.** Outside fever the stars don't move, so A spends a WebGL context and a render every frame on a login
 page to draw faint dots behind a form. B is what the page looks like with `?stage=off` today, minus the gradient. It
 also stops select-stage reading fever-stage's `gridPhase`, so fever-stage can drop its dead grid state in a refactor.
-`verify-select-stage.mjs` is unchanged: since #714 it checks `/` mounts no stage and stops there.
+`verify-select-stage.mjs` now checks where the stage lives: `/` mounts none, and `/auth/login` has it on `--pa-bg`
+with no canvas and no live WebGL context.
 
 **How to undo.** Revert this PR. It brings back the scene, the driver and the gradient (with `--pa-sky`).

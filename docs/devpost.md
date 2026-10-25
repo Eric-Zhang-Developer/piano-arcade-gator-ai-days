@@ -8,12 +8,10 @@ them with a guess. Before pasting, re-read the linked sources; the numbers in th
 
 | Item | Why it's open | Where it's tracked |
 |---|---|---|
-| The "past 12 months" technology | The challenge asks for one, central to the project; which one is undecided, so nothing below claims one | [#10] |
-| A `LICENSE` file | None on `main`; Best Open Source needs "a clear open-source license" ([event.md](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/specs/context/event.md), section 5). The choice is Eric's | [#958] |
+| A `LICENSE` file | None on `main`. Only Best Open Source requires "a clear open-source license" ([event.md](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/specs/context/event.md), section 5), and we're entering the main judging only. The choice is Eric's | [#958] |
 | The live URL | Vercel needs the Supabase keys and `ANTHROPIC_API_KEY`, the repo connected and a redeploy | [#792] |
-| The demo video | Not recorded yet; Devpost allows "3 minutes maximum" | none |
+| The demo video | Eric is making it; Devpost allows "3 minutes maximum" | none |
 | The team roster | Full names and Devpost registration for every member | none |
-| The sponsor prizes to enter | A choice for the team (see [Prizes](#prizes)) | none |
 
 ## Project title
 
@@ -24,6 +22,15 @@ them with a guess. Before pasting, re-read the linked sources; the numbers in th
 
 A piano tutor for everyone: it finds what you know, picks what to practice next, and listens to every note you play
 on a real piano. The arcade is the method.
+
+## Fresh off the frontier
+
+The challenge asks for "a technology, dataset, or discovery first made publicly available within the past 12 months"
+([event.md](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/specs/context/event.md), section 1). Ours is Claude Opus 5.5, which Anthropic released on
+2026-09-22 ([announcement](https://www.anthropic.com/claude-opus-5-5), [system card](https://www-cdn.anthropic.com/fc1b44717c85dc068bc6ba5024219938094694bd/Claude%20Opus%205.5%20System%20Card.pdf)).
+It is the tutor's judgment: it picks each next step from the skill graph's candidates and runs the theory chat
+([decide/index.ts](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/src/learn/frontend/mastery/decide/index.ts), [tutor.ts](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/src/app/learn/api/chat/tutor.ts)).
+Without it the tutor falls back to a ranked list and has no chat. Decided on 2026-10-25 ([#10]).
 
 ## About the project
 
@@ -255,15 +262,16 @@ registered: open.
 
 ## Prizes
 
-The prizes and what each needs, from [event.md](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/specs/context/event.md), section 5. Which to enter: open.
+The prizes and what each needs, from [event.md](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/specs/context/event.md), section 5. We're entering the main
+judging only (decided on 2026-10-25).
 
 | Prize | What it needs | In the repo today |
 |---|---|---|
-| 1st / 2nd / 3rd | The main judging, on the challenge statement | Depends on [#10] |
+| 1st / 2nd / 3rd | The main judging, on the challenge statement | Entering: Claude Opus 5.5 (see [Fresh off the frontier](#fresh-off-the-frontier)) |
 | Best Open Source Project (MLH) | "a public GitHub repository with a clear open-source license" | Public repo; no license yet ([#958]) |
 | Best Use of Gemini (MLH) | Built with the Gemini API or Google AI Studio | No Gemini call in the code |
 | Best Use of the Twinly API | Twinly's computer-use, voice-clone calling or iMessage APIs | None |
-| Vobile Prize | Judged on the same challenge statement as the main awards | Depends on [#10] |
+| Vobile Prize | Judged on the same challenge statement as the main awards | Not entering |
 
 [#10]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/10
 [#545]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/545

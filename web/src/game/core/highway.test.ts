@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { barAlpha, dim } from "../highway-field";
 import type { Chart } from "../../contracts";
 import { blackKeyLaneSettings } from "../black-key-lanes";
 import { handColor } from "../hand-colors";
@@ -273,18 +274,21 @@ describe("drawHighway bar lines (bar-lines)", () => {
     return calls;
   };
 
-  it("strokes the bar lines after the octave lines and before the first note's fill", () => {
+  // The octave lines are in highway-field's baked layer now; the bar lines draw each frame, faded with depth as the
+  // notes are, the one at the line on its downbeat, and both under the notes.
+  it("strokes each bar line at its depth's alpha (the one at the line on its downbeat), before the first note's fill", () => {
     const calls = draw([{ atMs: 0, label: 1 }, { atMs: 600, label: 2 }]);
-    const octave = calls.lastIndexOf("stroke rgba(255,255,255,0.08)");
-    const bars = calls.flatMap((x, i) => (x === "stroke rgba(255,255,255,0.12)" ? [i] : []));
+    const line = makeLayout(c, 800, 600, 0).judgmentLineY;
+    const want = [dim("#ffffff", barAlpha(line, line, 1)), dim("#ffffff", barAlpha(line * 0.7, line, 0))].map((x) => `stroke ${x}`);
+    const bars = calls.flatMap((x, i) => (want.includes(x) ? [i] : []));
     const note = calls.findIndex((x) => x.startsWith("fill") && x !== `fill rgba(255,255,255,${blackKeyLaneSettings.tint})`); // black-key lanes fill first
-    expect(bars).toHaveLength(2);
-    expect(octave).toBeLessThan(bars[0]);
+    expect(bars.map((i) => calls[i])).toEqual(want);
+    expect(calls.filter((x) => x.startsWith("stroke rgb("))).toHaveLength(2);
     expect(bars[1]).toBeLessThan(note);
   });
 
   it("without a list, nothing changes: no bar-line strokes, the same calls as an empty list", () => {
-    expect(draw().some((x) => x.includes("0.12"))).toBe(false);
+    expect(draw().some((x) => x.startsWith("stroke rgb("))).toBe(false);
     expect(draw()).toEqual(draw([]));
   });
 });

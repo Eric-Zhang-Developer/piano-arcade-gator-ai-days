@@ -6,7 +6,7 @@ import { settings } from "../core/settings";
 import { handColorSettings } from "../hand-colors";
 import { pillSettings } from "../note-pills";
 import { ink } from "../ui-tokens";
-import { barLines, barLineSettings, drawBarLines } from ".";
+import { barLines, barLineSettings, drawBarLabels } from ".";
 
 // Notes at the given beats, each one beat long.
 const chart = (bpm: number, beatsPerBar: number, beats: number[]): Chart =>
@@ -51,7 +51,7 @@ it("calm: the line and the number are each no brighter than the dimmest note", (
   expect(barLineSettings.labelAlpha * luma(ink)).toBeLessThanOrEqual(dimmest);
 });
 
-describe("drawBarLines", () => {
+describe("drawBarLabels", () => {
   // A 1000 × 720 canvas with its line at 600: 2000 ms of lookahead over 600 px.
   const L = { width: 1000, height: 720, judgmentLineY: 600, project: (x: number) => x } as unknown as Layout;
   const record = () => {
@@ -63,7 +63,8 @@ describe("drawBarLines", () => {
     return { ctx, calls };
   };
 
-  it("strokes only the lines on the highway, and labels each numbered one", () => {
+  // The lines themselves are highway-field's (its test pins their strokes at these same y values).
+  it("labels each numbered line on the highway, and none past the line or the top", () => {
     const { ctx, calls } = record();
     const lines = [
       { atMs: -100, label: 1 }, // past the line: over the keys
@@ -71,9 +72,7 @@ describe("drawBarLines", () => {
       { atMs: 1500, label: null },
       { atMs: 2500, label: 4 }, // past the top
     ];
-    drawBarLines(ctx, L, lines, 0);
-    expect(calls.filter((c) => c === "stroke ")).toHaveLength(2);
-    expect(calls.filter((c) => c.startsWith("moveTo"))).toEqual(["moveTo 0,450.5", "moveTo 0,150.5"]);
+    drawBarLabels(ctx, L, lines, 0);
     expect(calls.filter((c) => c.startsWith("fillText"))).toEqual(["fillText 2,6,448.5"]);
   });
 });

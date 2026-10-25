@@ -62,7 +62,7 @@
   border-radius: 0;
   background: var(--pa-panel);
   color: var(--pa-ink);
-  font: italic 800 1.8em / 1.1 var(--pa-font-display), system-ui, sans-serif;
+  font: 800 1.8em / 1.1 var(--pa-font-display), system-ui, sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   padding: 0.35em 0.45em;
@@ -126,7 +126,7 @@
 }
 
 .letter {
-  font: italic 900 min(clamp(72px, 8vw, 180px), calc(118cqw / var(--n))) / 0.95 var(--pa-font-display), system-ui, sans-serif;
+  font: 900 min(clamp(72px, 8vw, 180px), calc(118cqw / var(--n))) / 0.95 var(--pa-font-moment), var(--pa-font-display), system-ui, sans-serif;
   padding: 0 0.04em 0.1em;
   border-bottom: 1px solid var(--pa-line);
   width: 100%;
@@ -157,7 +157,7 @@
 .tag {
   position: absolute;
   transform: translate(0.2em, -125%);
-  font: italic 900 clamp(13px, 1.1vw, 24px) / 1 var(--pa-font-display), system-ui, sans-serif;
+  font: 900 clamp(13px, 1.1vw, 24px) / 1 var(--pa-font-display), system-ui, sans-serif;
   color: var(--pa-ink);
   pointer-events: none;
 }

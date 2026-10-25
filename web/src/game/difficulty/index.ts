@@ -34,10 +34,10 @@ function drawWarning(ctx: CanvasRenderingContext2D, f: Frame, level: number, fon
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillStyle = ink;
-  ctx.font = `italic 900 ${Math.round(b.h * 0.46)}px ${font}`;
+  ctx.font = `900 ${Math.round(b.h * 0.46)}px ${font}`;
   ctx.fillText("WARNING", b.w / 2, b.y + b.h * 0.4);
   ctx.fillStyle = inkDim;
-  ctx.font = `italic 800 ${Math.max(16, Math.round(b.h * 0.22))}px ${font}`; // readable on video (visual-direction.md)
+  ctx.font = `800 ${Math.max(16, Math.round(b.h * 0.22))}px ${font}`; // readable on video (visual-direction.md)
   ctx.fillText(`Lv ${level}`, b.w / 2, b.y + b.h * 0.8);
 }
 

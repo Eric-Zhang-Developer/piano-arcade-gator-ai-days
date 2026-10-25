@@ -128,7 +128,7 @@ describe("drawCard", () => {
     drawCard(ctx, m);
     expect(texts).toContain(APP_NAME);
     expect(texts).not.toContain("PIANO ARCADE");
-    expect(italics).toEqual([m.jacket.word]); // the sleeve is SongJacket's artwork, italic there too
+    expect(italics).toEqual([]); // the sleeve is SongJacket's artwork, upright there too (type-moments)
     expect(fills.filter((f) => typeof f === "string" && f.toLowerCase() === hype)).toEqual([]);
   });
 });

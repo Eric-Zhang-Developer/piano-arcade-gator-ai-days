@@ -37,8 +37,9 @@ export const fontData = "var(--pa-font-data), ui-monospace, monospace";
 export function whenDisplayFontReady(): Promise<void> {
   if (typeof document === "undefined" || !document.fonts) return Promise.resolve();
   const family = getComputedStyle(document.documentElement).getPropertyValue("--pa-font-display").trim() || "Saira";
+  const moment = getComputedStyle(document.documentElement).getPropertyValue("--pa-font-moment").trim() || "Saira";
   return Promise.race([
-    document.fonts.load(`800 1em ${family}`).then(
+    Promise.all([document.fonts.load(`800 1em ${family}`), document.fonts.load(`italic 900 1em ${moment}`)]).then(
       () => undefined,
       () => undefined,
     ),

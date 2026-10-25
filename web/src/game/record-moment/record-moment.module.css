@@ -1,4 +1,4 @@
-/* NEW RECORD in Saira 900 gold, upright and flat as the Duo look sets it, stamped on rank-stamp's curve; the cells
+/* NEW RECORD in the moment face (real Saira italic 900) gold, stamped on rank-stamp's curve; the cells
    rise in under it. Times come from timing.ts as custom properties, measured from the results showing (when this
    panel mounts). */
 .moment {
@@ -9,7 +9,7 @@
 }
 
 .stamp {
-  font: 900 clamp(40px, 7vh, 76px) var(--pa-font-display), system-ui, sans-serif;
+  font: 900 clamp(40px, 7vh, 76px) var(--pa-font-moment), var(--pa-font-display), system-ui, sans-serif;
   line-height: 1;
   letter-spacing: 0.02em;
   color: var(--pa-gold);

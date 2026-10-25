@@ -110,7 +110,7 @@ function drawMoment(ctx: CanvasRenderingContext2D, f: Frame, elapsed: number, st
     ctx.fillRect(0, 0, f.width, band);
     ctx.globalAlpha = 1;
     const size = Math.round(band * 0.72);
-    ctx.font = `900 ${size}px ${display}`; // upright, the kit's display type
+    ctx.font = `900 ${size}px ${display}`; // the moment face, real italic (type-moments)
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = meterSettings.fill; // flat amber, no glow: the edges carry the light
@@ -140,7 +140,7 @@ export function feverMoment(): GamePlugin {
   let display = "system-ui, sans-serif";
   if (typeof document !== "undefined")
     void whenDisplayFontReady().then(() => {
-      const family = getComputedStyle(document.documentElement).getPropertyValue("--pa-font-display").trim();
+      const family = getComputedStyle(document.documentElement).getPropertyValue("--pa-font-moment").trim();
       if (family) display = `${family}, system-ui, sans-serif`;
     });
   const publish = () => {

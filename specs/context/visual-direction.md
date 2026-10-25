@@ -44,7 +44,7 @@ canvas code.
 | `--pa-panel` | `#0A0D15` | HUD and card panels | |
 | `--pa-line` | `--pa-ink-dim` at about 25% | 1px hairlines and frames | |
 | `--pa-ink` / `--pa-ink-dim` | `#E2E6F0` / `#7D8496` | Text | |
-| `--pa-paper` / `--pa-paper-ink` | warm off-white, about `#F4F1EA` / `#111111` | The paper panel sheet music sits on (below) | Anything but notation |
+| `--pa-paper` / `--pa-paper-ink` | warm off-white / black ink (exact values: the sheet-paper feature picks and logs them) | The paper panel sheet music sits on (below) | Anything but notation |
 | `--pa-magenta`, `--pa-cyan` | retired as chrome | Their uses move to `--pa-primary` / `--pa-secondary`; the names go once nothing reads them | New uses |
 | `--pa-sun`, `--pa-sky` | unchanged values | Fever's short stage moment only | Any screen's base, the brand |
 | Tier colors | x1 `#e8e8ec`, x2 `#ff9f43`, x3 `#8ee05e`, x4 `#c47cff` | The multiplier (the HUD's, from Guitar Hero) | |

@@ -12,7 +12,7 @@ import { scoreTake } from '../piano/score';
 import { remoteStore } from '../remote/store';
 import type { Attempt, PlayingItem, TheoryItem } from '../schema';
 import { learnerId } from './learner';
-import { diagnosticAttempts, nextItem, playingAttempt, shouldStop, theoryAttempt } from './model';
+import { nextItem, playingAttempt, shouldStop, theoryAttempt } from './model';
 import { BEATS_PER_BAR, Passage } from './Passage';
 import styles from './diagnostic.module.css';
 
@@ -24,7 +24,8 @@ type Answer = (attempt: Attempt) => Promise<void>;
 /**
  * The adaptive diagnostic at the real piano: one item at a time, chosen from the attempts so far, with no verdict
  * shown. Every answer is stored as it is given, so Stop keeps the progress and a later visit resumes where it left
- * off. When the stop rule holds, the map shows what it found.
+ * off. When the stop rule holds, the map shows what it found. Only what the student needs to answer, play, stop or
+ * recover is on screen: the engine picks every item, so there is nothing to choose.
  */
 export function Diagnostic({ store: given }: { store?: AttemptStore }) {
   const router = useRouter();
@@ -45,7 +46,10 @@ export function Diagnostic({ store: given }: { store?: AttemptStore }) {
 
   const item = loaded ? nextItem(curriculum, loaded.attempts, skip) : null;
   const done = !!loaded && (!item || shouldStop(curriculum, loaded.attempts, loaded.now, skip));
-  const asked = loaded ? diagnosticAttempts(loaded.attempts).length : 0;
+
+  useEffect(() => {
+    if (done) router.replace('/learn');
+  }, [done, router]);
 
   useEffect(() => {
     if (loaded) requestAnimationFrame(() => heading.current?.focus());
@@ -56,37 +60,27 @@ export function Diagnostic({ store: given }: { store?: AttemptStore }) {
     await store.append(attempt);
     const attempts = [...loaded.attempts, attempt];
     const now = Date.now();
-    if (shouldStop(curriculum, attempts, now, skip)) router.push('/learn');
     setLoaded({ ...loaded, attempts, now });
   }
 
   return <DuoScope className={styles.screen}>
     <div className={styles.column}>
       <div className={styles.top}>
-        <p className={styles.count}>{loaded && !done ? `Diagnostic · item ${asked + 1}` : 'Diagnostic'}</p>
-        <Link href="/learn" className={styles.stopLink}>Stop - progress is kept</Link>
+        <Link href="/learn" className={styles.stopLink}>Stop</Link>
       </div>
-      <Brackets>
+      {loaded && !done && item && <Brackets>
         <Panel style={{ padding: 40 }}>
-          {!loaded
-            ? <p className={styles.status} role="status">Loading your progress</p>
-            : done || !item
-              ? <End heading={heading}/>
-              : item.type === 'theory'
-                ? <Theory key={item.id} item={item} learner={loaded.learner} first={asked === 0} heading={heading} answer={answer}/>
-                : <Playing key={item.id} item={item} learner={loaded.learner} first={asked === 0} heading={heading} answer={answer}
-                    skip={() => setSkip(new Set([...skip, item.id]))}/>}
+          {item.type === 'theory'
+            ? <Theory key={item.id} item={item} learner={loaded.learner} heading={heading} answer={answer}/>
+            : <Playing key={item.id} item={item} learner={loaded.learner} heading={heading} answer={answer}
+                skip={() => setSkip(new Set([...skip, item.id]))}/>}
         </Panel>
-      </Brackets>
+      </Brackets>}
     </div>
   </DuoScope>;
 }
 
-function Intro({ first }: { first: boolean }) {
-  return first ? <p className={styles.note}>This finds where you are. No marks after each answer: the map shows what it found.</p> : null;
-}
-
-function Theory({ item, learner, first, heading, answer }: { item: TheoryItem; learner: string; first: boolean; heading: Heading; answer: Answer }) {
+function Theory({ item, learner, heading, answer }: { item: TheoryItem; learner: string; heading: Heading; answer: Answer }) {
   const [picked, setPicked] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   async function next(event: MouseEvent<HTMLButtonElement>) {
@@ -95,10 +89,8 @@ function Theory({ item, learner, first, heading, answer }: { item: TheoryItem; l
     await answer(theoryAttempt(learner, item, picked));
   }
   return <>
-    <Intro first={first}/>
     <h1 id="diagnostic-item" ref={heading} tabIndex={-1} className={styles.prompt}>{item.prompt}</h1>
-    <fieldset className={styles.options} aria-describedby="diagnostic-item">
-      <legend className={styles.hidden}>Your answer</legend>
+    <fieldset className={styles.options} aria-labelledby="diagnostic-item">
       {choices(item).map((choice) => <div key={choice.id} className={styles.option} data-picked={picked === choice.id || undefined}>
         <label className={styles.choice}>
           <input type="radio" name={`answer-${item.id}`} value={choice.id} checked={picked === choice.id} disabled={saving}
@@ -140,8 +132,8 @@ function countIn(bpm: number): () => void {
   }
 }
 
-function Playing({ item, learner, first, heading, answer, skip }: {
-  item: PlayingItem; learner: string; first: boolean; heading: Heading; answer: Answer; skip: () => void;
+function Playing({ item, learner, heading, answer, skip }: {
+  item: PlayingItem; learner: string; heading: Heading; answer: Answer; skip: () => void;
 }) {
   const [piano, setPiano] = useState<PianoStatus | null>(null);
   const [phase, setPhase] = useState<Phase>({ name: 'ready' });
@@ -189,42 +181,26 @@ function Playing({ item, learner, first, heading, answer, skip }: {
     setPhase({ name: 'counting', startMs });
     for (let b = 1; b < BEATS_PER_BAR; b++) timers.current.push(setTimeout(() => setBeat(b + 1), b * beat));
     timers.current.push(setTimeout(() => setPhase({ name: 'listening', startMs }), BEATS_PER_BAR * beat));
-    // The take ends a beat after the last note should have let go, or earlier on Done.
+    // The take ends a beat after the last note should have let go.
     timers.current.push(setTimeout(() => void finish(startMs), (BEATS_PER_BAR + passageBeats(item) + 1) * beat));
   }
 
   const startMs = phase.name === 'counting' || phase.name === 'listening' ? phase.startMs : undefined;
   const noPiano = piano?.state === 'no-piano';
   return <div data-start-ms={startMs} data-bpm={item.bpm} data-phase={phase.name}>
-    <Intro first={first}/>
     <h1 ref={heading} tabIndex={-1} className={styles.prompt}>{item.prompt}</h1>
     <div className={styles.paper}>
       <Passage notes={item.notes} label={`The passage to play, ${item.notes.length} notes at ${item.bpm} beats a minute`}/>
     </div>
     <p className={styles.status} role="status">
       {phase.name === 'counting' ? `Count-in ${beat} of ${BEATS_PER_BAR}`
-        : phase.name === 'listening' ? 'Listening - play the passage'
-        : phase.name === 'saving' ? 'Saving'
-        : piano === null ? 'Looking for a piano'
-        : piano.state === 'piano' ? `${piano.name} is ready · ${item.bpm} beats a minute, ${BEATS_PER_BAR} clicks first`
-        : piano.reason}
+        : phase.name === 'listening' ? 'Play'
+        : phase.name === 'ready' && piano?.state === 'no-piano' ? piano.reason
+        : ''}
     </p>
     <div className={styles.actions}>
       {phase.name === 'ready' && <Button style={{ fontSize: 16 }} disabled={piano?.state !== 'piano'} onClick={start}>Start</Button>}
-      {(phase.name === 'counting' || phase.name === 'listening') &&
-        <Button style={{ fontSize: 16 }} onClick={() => void finish(phase.startMs)}>Done</Button>}
       {noPiano && phase.name === 'ready' && <Button kind="secondary" style={{ fontSize: 16 }} onClick={skip}>Skip this one</Button>}
     </div>
   </div>;
 }
-
-function End({ heading }: { heading: Heading }) {
-  return <>
-    <h1 ref={heading} tabIndex={-1} className={styles.prompt}>The diagnostic is done</h1>
-    <p className={styles.body}>The map shows what it found.</p>
-    <div className={styles.actions}>
-      <Link href="/learn" className={styles.primaryLink}>Go to the map</Link>
-    </div>
-  </>;
-}
-

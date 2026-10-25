@@ -5,7 +5,7 @@ import { curriculum } from '../curriculum';
 import type { PlayingItem } from '../schema';
 
 vi.mock('next/font/google', () => ({ Source_Sans_3: () => ({ variable: 'reading-face', className: 'reading-face', style: { fontFamily: 'Source Sans 3' } }) }));
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: () => {} }) }));
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: () => {}, replace: () => {} }) }));
 
 const { Diagnostic } = await import('./index');
 const { Passage } = await import('./Passage');
@@ -13,10 +13,11 @@ const { Passage } = await import('./Passage');
 const css = readFileSync(new URL('./diagnostic.module.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
 
 describe('Diagnostic', () => {
-  it('loads the progress first, with Stop always there and leading to the map', () => {
+  it('shows only Stop, leading to the map, until the progress has loaded', () => {
     const html = renderToStaticMarkup(<Diagnostic/>);
-    expect(html).toContain('Loading your progress');
-    expect(html).toMatch(/<a[^>]*href="\/learn"[^>]*>Stop - progress is kept<\/a>/);
+    expect(html).toMatch(/<a[^>]*href="\/learn"[^>]*>Stop<\/a>/);
+    expect(html).not.toContain('<h1');
+    expect(html.replace(/<[^>]+>/g, '')).toBe('Stop');
   });
 });
 

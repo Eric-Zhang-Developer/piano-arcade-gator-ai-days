@@ -211,10 +211,12 @@ cut = []
 
 # spikes: after extras (Eric, 2026-10-24). About 3 hours of agent time each, findings whatever the state, never on the
 # demo path by themselves, and no new spike work after Sun Oct 25 12:00 PM ET.
+# The last three added 2026-10-25 (about 05:40 ET) on Eric's "We have a lot of agent hours ... Treat it as
+# near-infinite. But the problem is the humans": each answer is measured by code, and Eric's part is minutes.
 [[milestone]]
 name = "spikes"
 ship = ""
-features = ["simon-says-spike", "restyle-spike"]
+features = ["simon-says-spike", "restyle-spike", "score-follow-spike", "wrong-note-spike", "snap-score-spike"]
 cut = []
 
 [[milestone]]

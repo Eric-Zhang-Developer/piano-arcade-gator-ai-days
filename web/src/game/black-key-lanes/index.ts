@@ -3,7 +3,7 @@
 import type { Layout } from "../core/highway";
 
 export const blackKeyLaneSettings = {
-  tint: 0.04, // 0–1: white over a black lane; 0.04 lifts #000 to about #0a0a0a. 0 turns the shading off
+  tint: 0, // 0–1: white over a black lane; 0.04 lifts #000 to about #0a0a0a. 0 turns the shading off (Eric, 2026-10-25)
 };
 
 // Each black key's lane, exactly its keyX span at the line, from the top of the highway down, through the perspective.

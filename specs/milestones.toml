@@ -181,6 +181,7 @@ features = [
   "lab",
   "nav-bar",
   "hit-particles", # Eric, 2026-10-25 (#750): a priority, so ahead of duo-start
+  "mouse-first", # Eric, 2026-10-25 (#772): key hints off the screens, onto the ? card
   "duo-start",
   "level-forge",
   "veritas",

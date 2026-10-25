@@ -40,8 +40,18 @@ lot of frontend progress... Why did it need your permission? I thought we fuckin
 4. **A relayed go met a second gate.** This session's permission check, a harness setting the spec doesn't control,
    would not act on Eric's go relayed through another agent. Eric merged the two PRs himself minutes later.
 
+## A second instance: the mascot
+- **06:30.** mascot-spike #908 merged with sheet-06 recommended (15 of 18 sets pass, per the planner's log at 06:27).
+  The generated frames live only in the `mascot-spike` worktree's gitignored `spikes/mascot/out/`.
+- **07:24.** The planner parked #1048 (the results tutor and the select / `/learn` companion are two different gators)
+  "until Eric picks the new mascot", and no follow-up spec was written. The pick was on the morning page.
+- **About 13:50.** Eric, on the results tutor panel: "why didn't it get redesigned? I thought there was an issue on it."
+- **Impact:** about 6.5 h with a recommended, measured choice in hand and no work moving. Same failure point as
+  above: a person's pick held work that a default and a revert would have covered.
+
 ## Rules from now on
-- **No feature spec holds merges for a person's go.** Taste checks go on Eric's morning page *after* the merge
+- **No feature spec holds merges, or a start, for a person's go or pick.** Take the recommended option as the
+  default and ship it. Taste checks go on Eric's morning page *after* the merge
   (memory: humans are the bottleneck); a revert is the undo. duo-hud's gate was lifted by #1369.
 - **A blocker that waits on a person is said as a blocker** ("this holds N PRs and M features"), the first time it's
   seen, not as a queue item.

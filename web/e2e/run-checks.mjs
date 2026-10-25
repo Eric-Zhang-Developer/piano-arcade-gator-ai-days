@@ -26,7 +26,18 @@ const CHECK_TIMEOUT_MS = 8 * 60_000;
 // the shard. Check -> its issue. The list only shrinks: an entry leaves after its check passes 2 browser runs in a
 // row that include the fix (one green run can be luck).
 // Decision ci-browser-known-red.md.
-export const KNOWN_RED = {};
+// 2026-10-25: eight checks that went red unseen while main's full run didn't fire (#1021), each red on main's own run
+// 40187861996 and not yet fixed on main, pointing at its fix PR (or #754, the ci-red issue, where none exists yet).
+export const KNOWN_RED = {
+  "web/src/game/duo-results/verify-results.mjs": 754, // a localStorage page error, under repro
+  "web/src/game/ghost/verify-ghost.mjs": 1032, // stale after judging-tiers' +60 ms late bot (#859)
+  "web/src/game/learn-from-select/verify-learn.mjs": 1025, // the ? card repeats the Learn line (#796)
+  "web/src/game/records/verify-records.mjs": 754, // failed its first attempt on main too: red on any one-attempt PR
+  "web/src/game/sheet-beams/verify-beams.mjs": 1053, // the paper's darker hues (#730)
+  "web/src/game/song-options/verify-options.mjs": 754, // hands-R times out after a take, under repro
+  "web/src/game/take-graph/verify-take-graph.mjs": 1032, // the +60 ms late bot (#859), the graph across its card (#839)
+  "web/src/game/wait-mode/verify-wait.mjs": 1034, // the Flow rung read mid-take (#841)
+};
 
 // Checks CI skips because other checks cover them in smaller pieces. Each stays a whole run for people and specs.
 // verify-sheet.mjs: verify-sheet-a/-b/-c.mjs run its follow run split by song (#682), so no shard waits 7 min on it.

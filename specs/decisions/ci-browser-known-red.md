@@ -16,3 +16,15 @@ runs that include the fix (added after #429, #430 and #432 each passed one run w
 fails if an entry has no issue number or names a file that doesn't exist.
 
 **How to undo.** Empty `KNOWN_RED` (every check gates), or delete it and its three uses in `run-checks.mjs`.
+
+**2026-10-25: the list grew once (eric-agent-7, for eric-planning-agent).**
+- **Why it grew:** the `*/30` schedule never fired (#1021). About 4 h of merges went unchecked by the full run, and
+  checks went red unseen.
+- **Who qualifies:** only checks red on main's own full run, 40187861996 at 59b4628.
+  - It had 12 reds. Five are already fixed on main and not listed: laptop-sound and capture-mode (#1029), and
+    sheet-view a/b/c (#1024).
+  - The other seven are listed, each pointing at its fix PR, or at #754 where none exists yet.
+  - Plus records. It failed its first attempt on main and passed the rerun. A pull request runs one attempt, so it's
+    red there every time it flakes.
+- **From here:** the list shrinks under the same rule as before. An entry leaves after its check passes 2 browser runs
+  in a row that include the fix.

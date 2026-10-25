@@ -34,7 +34,7 @@ int main() {
   CHECK(Serial.out.find("wrong=1") != std::string::npos, "wrong keys red by default");
   CHECK(Serial.out.find("shows=1") != std::string::npos, "shows on by default");
   CHECK(Serial.out.find("demo=0") != std::string::npos, "classy by default");
-  CHECK(Serial.out.find("ramp=600") != std::string::npos, "hint ramp on by default");
+  CHECK(Serial.out.find("ramp=1500") != std::string::npos, "hint ramp on by default");
   defaults(); pump(5);
 
   // Geometry: every key 2 LEDs, positions strictly increasing, no two keys share an LED.
@@ -139,38 +139,43 @@ int main() {
   CHECK(leds[litFor(60)[0]].b >= 250, "steady hint when pulse off");
   Serial.feed({0xF0}); defaults(); pump(5);
 
-  // Hint ramp: a new hint starts nearly dark and brightens evenly as the eye sees it (duty = seen^2.2) to twice
-  // the color the game sent by 600 ms, then breathes from its peak. Sent at 60 (120 on the LEDs) so 2x isn't clipped.
-  Serial.feed({0xA0, 64, 0, 0, 60}); pump(20);
-  int r20 = leds[litFor(64)[0]].b; pump(280);
-  int r300 = leds[litFor(64)[0]].b; pump(150);
-  int r450 = leds[litFor(64)[0]].b; pump(140);
-  int r590 = leds[litFor(64)[0]].b; pump(40);
-  int r630 = leds[litFor(64)[0]].b;
-  int breathLo = 255;
-  for (int t = 0; t < 100; t++) { pump(10); breathLo = min<int>(breathLo, leds[litFor(64)[0]].b); }
-  std::printf("hint ramp (sent 120): %d @20ms, %d @300, %d @450, %d @590, %d @630, late breath down to %d\n",
-              r20, r300, r450, r590, r630, breathLo);
-  CHECK(r20 > 0 && r20 <= 12, "starts nearly dark: %d", r20);
+  // Hint ramp: a new hint starts very faint and brightens evenly as the eye sees it (duty = seen^2.2) to twice
+  // the color the game sent by 1500 ms (the note), then turns gold and breathes there: press it now.
+  // Sent at 60 (120 on the LEDs) so 2x isn't clipped.
+  Serial.feed({0xA0, 64, 0, 0, 60}); pump(50);
+  int r20 = leds[litFor(64)[0]].b; pump(700);
+  int r300 = leds[litFor(64)[0]].b; pump(375);
+  int r450 = leds[litFor(64)[0]].b; pump(350);
+  int r590 = leds[litFor(64)[0]].b; pump(200);
+  CRGB gold = leds[litFor(64)[0]];
+  int goldLo = 255;
+  for (int t = 0; t < 100; t++) { pump(10); goldLo = min<int>(goldLo, leds[litFor(64)[0]].r); }
+  std::printf("hint ramp (sent 120): %d @50ms, %d @750, %d @1125, %d @1475; gold at 1675 (%d,%d,%d), its breath down to r %d\n",
+              r20, r300, r450, r590, gold.r, gold.g, gold.b, goldLo);
+  CHECK(r20 > 0 && r20 <= 12, "starts very faint: %d", r20);
   CHECK(r300 > r20 && r450 > r300 && r590 > r450, "keeps brightening: %d %d %d %d", r20, r300, r450, r590);
   CHECK(r300 >= 55 && r300 <= 90, "halfway in what the eye sees is ~30%% of the peak in duty: %d", r300);
-  CHECK(r590 >= 220 && r630 >= 220, "about twice the sent color at the note, no dip after: %d %d", r590, r630);
-  CHECK(breathLo >= 100 && breathLo <= 125, "a late hint keeps breathing bright: %d", breathLo);
-  Serial.feed({0xA0, 64, 0, 0, 0, 0xA0, 64, 0, 0, 127}); pump(150);
+  CHECK(r590 >= 220, "about twice the sent color at the note: %d", r590);
+  CHECK(gold.r >= 180 && gold.g >= 150 && gold.b < gold.g, "then bright gold: %d %d %d", gold.r, gold.g, gold.b);
+  CHECK(goldLo >= 180, "the gold breathes but stays bright: %d", goldLo);
+  Serial.feed({0xB0, 15, 1, 0}); pump(30);
+  CHECK(countLit() == 0, "demo shows no gold (no hints at all): %d", countLit());
+  Serial.feed({0xB0, 15, 0, 0});
+  Serial.feed({0xA0, 64, 0, 0, 0, 0xA0, 64, 0, 0, 127}); pump(375);
   int restarted = leds[litFor(64)[0]].b;
   Serial.feed({0xA0, 64, 0, 127, 0}); pump(10);
   CHECK(leds[litFor(64)[0]].g > restarted / 2 && leds[litFor(64)[0]].b == 0, "recolor keeps the ramp: %d vs %d", leds[litFor(64)[0]].g, restarted);
-  CHECK(restarted >= 35 && restarted <= 80, "off then on restarts the ramp: %d at 150 ms", restarted);
+  CHECK(restarted >= 35 && restarted <= 80, "off then on restarts the ramp: %d at 375 ms", restarted);
   Serial.feed({0xF0}); defaults(); pump(5);
 
   // Repeated note: the game keeps one hint lit across both notes. Hitting the key restarts the ramp, so the next
   // note's key is near full again when it lands, not wherever the breath happened to be.
-  Serial.feed({0xA0, 65, 0, 0, 127}); pump(1300);                      // long-lit hint, breathing
-  Serial.feed({0x90, 65, 0, 127, 0}); pump(100); Serial.feed({0x80, 65}); pump(250);  // hit, release, fade out
-  int rep350 = leds[litFor(65)[0]].b; pump(240);
+  Serial.feed({0xA0, 65, 0, 0, 127}); pump(3300);                      // long-lit hint, gold
+  Serial.feed({0x90, 65, 0, 127, 0}); pump(100); Serial.feed({0x80, 65}); pump(800);  // hit, release, fade out
+  int rep350 = leds[litFor(65)[0]].b; pump(560);
   int rep590 = leds[litFor(65)[0]].b;
-  std::printf("repeated note: hint %d at 350 ms after the hit, %d at 590 ms\n", rep350, rep590);
-  CHECK(rep350 < rep590 && rep590 >= 225, "ramp restarts at the hit: %d -> %d", rep350, rep590);
+  std::printf("repeated note: hint %d at 900 ms after the hit, %d at 1460 ms\n", rep350, rep590);
+  CHECK(rep350 < rep590 && rep590 >= 225 && leds[litFor(65)[0]].r == 0, "ramp restarts at the hit (no gold yet): %d -> %d", rep350, rep590);
   Serial.feed({0xF0}); defaults(); pump(5);
 
   // Wrong key: the game sends a key off for every release but a key on only for judged notes. A release of a
@@ -350,6 +355,32 @@ int main() {
   Serial.feed({0x80, 60}); pump(1200);
   CHECK(countLit() == 0, "demo: then dark again: %d", countLit());
   std::printf("demo: a press lit %d LEDs with its ripple, everything else stayed dark\n", simpleLit);
+  // The splash: glitter flies off a press, a hard press reaches further than a soft one (the website scales a
+  // press's color by its velocity, 45% to 100%), and a three-key chord throws a shower.
+  auto reach = [](int note) {
+    auto mine = litFor(note);
+    int c = mine[mine.size() / 2], far = 0;
+    for (int i = 0; i < activeLeds; i++) if (leds[i]) far = max(far, abs(i - c));
+    return far;
+  };
+  Serial.feed({0x90, 60, 21, 77, 127}); pump(5);
+  int glitter = sparksFlying();
+  pump(345);
+  int hardReach = reach(60);
+  Serial.feed({0x80, 60}); pump(1400);
+  Serial.feed({0x90, 60, 9, 35, 57}); pump(350);
+  int softReach = reach(60);
+  Serial.feed({0x80, 60}); pump(1400);
+  int before = sparksFlying();
+  Serial.feed({0x90, 60, 21, 77, 127, 0x90, 64, 21, 77, 127, 0x90, 67, 21, 77, 127}); pump(5);
+  int chord = sparksFlying() - before;
+  std::printf("demo splash: %d glitter sparks per hard press; reach %d LEDs hard, %d soft; a chord throws %d sparks\n",
+              glitter, hardReach, softReach, chord);
+  CHECK(glitter >= 10, "demo: a hard press throws glitter: %d", glitter);
+  CHECK(hardReach > softReach + 3, "demo: a hard press reaches further: %d vs %d", hardReach, softReach);
+  CHECK(chord >= 3 * 6 + 20, "demo: a chord adds a shower: %d", chord);
+  Serial.feed({0x80, 60, 0x80, 64, 0x80, 67}); pump(1500);
+  CHECK(countLit() == 0, "demo: the splash ends dark: %d", countLit());
   Serial.feed({0xF0}); defaults(); pump(5); stopShows();
 
   // A save from older firmware (no hintRampMs at the end) still loads its calibration.

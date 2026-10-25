@@ -8,9 +8,7 @@ import { type Gauge, emptyGauge, reduceGauge } from "./gauge";
 
 export const meterSettings = {
   track: "rgba(242,242,245,0.12)", // --pa-ink, faint
-  fill: "#ffb02e", // FEVER's amber, the gauge #728 keeps; the --pa-sun token it came from is retired
-  feverFrom: "#ffe66b", // the sun gradient, lit during fever
-  feverTo: "#ff3fa4",
+  fill: "#ffb02e", // FEVER's amber, the gauge #728 keeps; the --pa-sun token it came from is retired. Fever burns it full.
   label: "rgba(242,242,245,0.6)", // --pa-ink-dim
 };
 
@@ -29,19 +27,14 @@ function drawMeter(ctx: CanvasRenderingContext2D, f: Frame, g: Gauge): void {
   ctx.fillRect(bar.x, bar.y, bar.w, bar.h);
   ctx.fillStyle = meterSettings.track;
   ctx.fillRect(bar.x, bar.y, bar.w, bar.h);
-  if (g.fever) {
-    const grad = ctx.createLinearGradient(bar.x, 0, bar.x + bar.w, 0);
-    grad.addColorStop(0, meterSettings.feverFrom);
-    grad.addColorStop(1, meterSettings.feverTo);
-    ctx.fillStyle = grad;
-    ctx.fillRect(bar.x, bar.y, bar.w, bar.h);
-  } else if (g.fill > 0) {
+  // Flat amber, filling toward fever and full while it lasts: the Duo look has no gradients (#885).
+  if (g.fever || g.fill > 0) {
     ctx.fillStyle = meterSettings.fill;
-    ctx.fillRect(bar.x, bar.y, (bar.w * g.fill) / g.size, bar.h);
+    ctx.fillRect(bar.x, bar.y, g.fever ? bar.w : (bar.w * g.fill) / g.size, bar.h);
   }
-  // A word as well as a color: FEVER, dim while filling, lit while it lasts.
-  ctx.fillStyle = g.fever ? meterSettings.feverFrom : meterSettings.label;
-  ctx.font = `italic ${g.fever ? 900 : 700} ${label.px}px ${hudSettings.font}`;
+  // A word as well as a color: FEVER, dim while filling, lit amber while it lasts. Upright, as the kit's type is.
+  ctx.fillStyle = g.fever ? meterSettings.fill : meterSettings.label;
+  ctx.font = `${g.fever ? 900 : 700} ${label.px}px ${hudSettings.font}`;
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillText("FEVER", label.x, label.y);

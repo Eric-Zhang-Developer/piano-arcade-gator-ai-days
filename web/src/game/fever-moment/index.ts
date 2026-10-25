@@ -1,11 +1,12 @@
-// Fever moment (spec: fever-moment): fever's start, loud at the edges for at most 2 s, then out of the way. A sun
+// Fever moment (spec: fever-moment): fever's start, loud at the edges for at most 2 s, then out of the way. An amber
 // flash up both edges (above the 500 ms mark only) and a FEVER banner sweeping through the HUD band. The grid flash
 // on the stage is fever-stage's.
 import type { Frame, GamePlugin } from "../../contracts";
 import { isolated } from "../core/isolated";
 import { settings } from "../core/settings";
 import { hudLayout } from "../hud";
-import { bg, sunFrom, sunTo, whenDisplayFontReady } from "../ui-tokens";
+import { meterSettings } from "../fever-gauge";
+import { bg, whenDisplayFontReady } from "../ui-tokens";
 
 export const momentSettings = {
   totalMs: 2000, // spec: all done within 2 s
@@ -59,17 +60,14 @@ function drawMoment(ctx: CanvasRenderingContext2D, f: Frame, elapsed: number, st
   const band = hudLayout(f.width, line).panel.h;
   let drew = false;
 
-  // Edge flash: the sun gradient up both edges, faded inward and toward its lowest line, so it melts into juice's
-  // steady glow instead of ending at a hard edge.
+  // Edge flash: FEVER's amber up both edges, faded inward and toward its lowest line, so it melts into juice's
+  // steady glow instead of ending at a hard edge. Flat color under the fades: no sun gradient in the Duo look (#885).
   const a = still ? 0 : flashAt(elapsed) * s.edgeAlpha;
   if (a > 0) {
     // Isolated: the fades erase, which on /play's shared overlay would reach other plugins' pixels.
     isolated(ctx, (ctx) => {
-      const sun = ctx.createLinearGradient(0, band, 0, cut);
-      sun.addColorStop(0, sunFrom);
-      sun.addColorStop(1, sunTo);
       ctx.globalAlpha = a;
-      ctx.fillStyle = sun;
+      ctx.fillStyle = meterSettings.fill;
       ctx.fillRect(0, 0, s.edgePx, cut);
       ctx.fillRect(f.width - s.edgePx, 0, s.edgePx, cut);
       ctx.globalAlpha = 1;
@@ -104,16 +102,10 @@ function drawMoment(ctx: CanvasRenderingContext2D, f: Frame, elapsed: number, st
     ctx.fillRect(0, 0, f.width, band);
     ctx.globalAlpha = 1;
     const size = Math.round(band * 0.72);
-    ctx.font = `italic 900 ${size}px ${display}`;
+    ctx.font = `900 ${size}px ${display}`; // upright, the kit's display type
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    const w = ctx.measureText("FEVER").width || size * 3;
-    const text = ctx.createLinearGradient(b.x - w / 2, 0, b.x + w / 2, 0);
-    text.addColorStop(0, sunFrom);
-    text.addColorStop(1, sunTo);
-    ctx.shadowColor = sunTo;
-    ctx.shadowBlur = size * 0.35;
-    ctx.fillStyle = text;
+    ctx.fillStyle = meterSettings.fill; // flat amber, no glow: the edges carry the light
     ctx.fillText("FEVER", b.x, band / 2);
     ctx.restore();
     drew = true;

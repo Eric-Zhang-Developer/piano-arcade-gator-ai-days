@@ -361,10 +361,67 @@
   align-items: flex-end;
   justify-content: center;
   padding: 0 32px 8vh;
+  overflow: hidden;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent 40%);
 }
 
+/* FlowLines: the lines fill the panel behind the quote; each bright stretch runs the length of its line. */
+.flow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  animation: flow-in 900ms ease-out 100ms forwards;
+}
+
+.flowRun {
+  stroke-dasharray: 0.22 0.78;
+  animation: flow-run linear infinite;
+}
+
+.rush .flowRun {
+  animation-duration: 1.6s !important;
+}
+
+@keyframes flow-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes flow-run {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow {
+    opacity: 1;
+    animation: none;
+  }
+
+  .flowRun {
+    animation: none;
+  }
+}
+
+/* Darkens the bottom of the panel over the lines, so the quote reads. */
+.visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(4, 4, 8, 0.92) 8%, transparent 55%);
+  pointer-events: none;
+}
+
 .quote {
+  position: relative;
+  z-index: 1;
   margin: 0;
   max-width: 34em;
   text-align: center;

@@ -25,6 +25,7 @@ import {
   type SessionRow,
 } from "../../data/progress";
 import { flushOutbox, signOutAfterSaving } from "../../data/save-plugin";
+import { AccountChip } from "../auth/AccountChip";
 import { useSession } from "../../data/useSession";
 import { AccuracyChart, HandsPanel, JudgmentBar, panel, panelTitle, PracticeCalendar, SongsTable, StatTile, tableStyle, td, th } from "./panels";
 
@@ -159,6 +160,7 @@ function ProgressPage() {
 
   return (
     <main style={page}>
+      <AccountChip />
       <Link href={song ? "/progress" : "/"} style={back}>
         {song ? "← All songs" : "← Menu"}
       </Link>

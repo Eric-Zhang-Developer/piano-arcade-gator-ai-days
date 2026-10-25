@@ -8,6 +8,7 @@ import { linkGoogle, safeNext, signInWithGoogle, type Session } from "../../../d
 import { isConfigured } from "../../../data/config";
 import { signOutAfterSaving } from "../../../data/save-plugin";
 import { useSession } from "../../../data/useSession";
+import { FlowLines } from "./FlowLines";
 import styles from "./login.module.css";
 
 // The front door, optional: sign in with Google so your takes follow you, or play as a guest (takes still save, on
@@ -131,6 +132,7 @@ export default function Login() {
       </section>
 
       <aside className={styles.visual} aria-label="Quotes from our playtests">
+        <FlowLines rush={busy} />
         <blockquote className={styles.quote}>
           <p>
             &ldquo;{quote.shown}

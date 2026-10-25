@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { checkHandle, HANDLE_MAX } from "../../../data/account";
 import styles from "./welcome.module.css";
 
-// The two screens after a Google sign-in: "Name" the first time (a handle to save, or skip), then "Welcome, Name"
-// over a short run up a two-octave keyboard, and on to where the player was going.
+// The one screen after a first Google sign-in: "Name" (a handle to save, or skip). Every sign-in then goes straight
+// on; the profile button says hi on the next page.
 
 // Black keys sit after these white keys in each octave (C#, D#, F#, G#, A#).
 const BLACK_AFTER = [0, 1, 3, 4, 5];
@@ -22,27 +22,6 @@ function Keyboard() {
         <div key={`b${i}`} className={styles.black} style={{ "--i": i, left: `${((i + 1) / 14) * 100}%` } as React.CSSProperties} />
       ))}
     </div>
-  );
-}
-
-/** "Welcome, Name", the keyboard run, then `onDone` after `holdMs` (or at once with Continue). */
-export function WelcomeScreen({ name, onDone, holdMs = 2400 }: { name: string; onDone: () => void; holdMs?: number }) {
-  useEffect(() => {
-    const t = setTimeout(onDone, holdMs);
-    return () => clearTimeout(t);
-  }, [onDone, holdMs]);
-  return (
-    <main className={styles.page} data-testid="welcome">
-      <div className={styles.card}>
-        <Keyboard />
-        <h1 className={styles.title}>
-          Welcome, <span className={styles.name}>{name}</span>
-        </h1>
-        <button className={styles.plain} onClick={onDone}>
-          Continue
-        </button>
-      </div>
-    </main>
   );
 }
 

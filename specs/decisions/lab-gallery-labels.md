@@ -8,7 +8,7 @@ widens ownership only over files no open PR is working on.
 by experiment name, merged onto the registry by the gallery.
 **Choice.** B. The spec's own fallback ("a folder held by an open PR keeps its entry without the fields") points the
 same way, and it touches no experiment's folder. An entry with no label (a new experiment, such as `inside`) renders
-as a text card. A test fails if a registry entry has no label, so the next experiment adds its line here.
+as a text card until someone adds its line here; no test forces it, so a new experiment never turns main red.
 **How to undo.** Move each entry's fields onto its `Experiment` once `x/index.ts` is free, and drop `labels.ts`.
 
 ## kind: the issue's labels

@@ -171,6 +171,7 @@ name = "extras"
 ship = ""
 features = [
   "golden-demo", # Eric, 2026-10-25 (#807): Golden's DGX autoplay sounds like a performance; his priority now
+  "duo-details", # Eric, 2026-10-25 (#833): the results screen's Details grid in the Duo look, settings in Options
   "laptop-sound",
   "flow-mode",
   "duo-tokens",

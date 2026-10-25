@@ -40,7 +40,8 @@ hold it until it does. Split only at a real seam, and say why.
 - **Its own WebGL canvas above the highway** (Eric, 2026-10-25, "agreed"), so the dust is drawn over the falling
   notes and under the HUD, with or without the stage. To keep a single WebGL context, fever-stage (mostly stars after
   #728) may be dropped or folded into this layer: the worker decides which and logs it. An offscreen renderer blitted
-  into the highway canvas inside `juice.draw()` also meets this. Soft sprites with additive blending; no blur or
+  into the highway canvas inside `juice.draw()` also meets this; **taken** (planner, on #750), with fever-stage kept as
+  it is in its own context (`specs/decisions/hit-particles-renderer.md`). Soft sprites with additive blending; no blur or
   full-screen bloom pass. The particle layer renders at DPR 1.
 - Cap spawns per second. A governor halves spawning when frames run slow and recovers slowly; it **never freezes**
   the layer (fever-stage's freeze guard froze the stage in 3 of 12 runs, `changes/perf-budget.md`).

@@ -1,6 +1,7 @@
 // Audio track (spec: audio-track): a local song's own recording plays under /play, in sync with the chart clock, the
 // player's piano on top. The recording comes from a sidecar next to the chart, songs/local/<id>/audio.json:
 // { "src": "golden.mp3", "offsetMs": 1234 }, where offsetMs is the file time of chart time 0. No sidecar, no audio.
+import { createElement } from "react";
 import type { Chart, GameEvent, GamePlugin } from "../../contracts";
 import { msPerBeat } from "../core/settings";
 import { loopChart } from "../bar-loop";
@@ -8,9 +9,11 @@ import { isWaitMode } from "../wait-mode";
 import { isFlowMode } from "../flow-mode/clock";
 import { savedNumber } from "../laptop-sound/volume";
 import { levelEnvelope, loudnessSettings } from "../milestone-sfx";
+import { gainAt, planTail, tailEnvelope, type GainPoint, type TailPlan } from "../record-seams";
+import { TailPanel, type TailView } from "../record-seams/tag";
 
 export const audioTrackSettings = {
-  fadeOutS: 0.25, // after songEnd: a short fade, then silence
+  fadeOutS: 0.25, // after songEnd with no tail (a bar loop, or the file already over): a short fade, then silence
   watchMs: 250, // how often a playing take checks it's still on /play (leaving by the back button sends no event)
 };
 
@@ -117,8 +120,21 @@ declare global {
 }
 
 // The recording's level (dBFS) at a chart time, for milestone-sfx's loudness rule; null when no recording is playing.
+// Under the results (record-seams' tail) it's the ducked level, until the tail ends.
 let levelNow: ((chartMs: number) => number | null) | null = null;
 export const recordingLevelAt = (chartMs: number): number | null => levelNow?.(chartMs) ?? null;
+
+// The tail under the results (record-seams), for its tag: what it does, and Stop music. One audio-track per page.
+let tailView: TailView | null = null;
+let stopTail = () => {};
+const tailListeners = new Set<() => void>();
+const setTailView = (v: TailView | null) => {
+  tailView = v;
+  for (const l of tailListeners) l();
+};
+export const subscribeTail = (l: () => void) => (tailListeners.add(l), () => void tailListeners.delete(l));
+export const tailNow = () => tailView;
+export const stopMusic = () => stopTail();
 
 export function audioTrack(): GamePlugin {
   let audio: AudioContext | null = null;
@@ -129,6 +145,8 @@ export function audioTrack(): GamePlugin {
   let bus: GainNode | null = null; // this run's sources; disconnecting it silences them at once
   let scheduled: Scheduled[] = [];
   let anchor: { perf: number; atMs: number } | null = null; // the chart clock while it runs; null while paused or done
+  let meter: Pick<Chart, "bpm" | "beatsPerBar"> = { bpm: 120, beatsPerBar: 4 };
+  let tail: { env: GainPoint[]; endMs: number; timer: number } | null = null; // the recording under the results
   let watch = 0;
   let load = 0; // StrictMode loads twice: only the latest load may set the buffer
 
@@ -140,12 +158,44 @@ export function audioTrack(): GamePlugin {
   };
   const latencyS = () => audio?.outputLatency || audio?.baseLatency || 0;
 
+  // Quit, pause, Retry, leaving /play and Stop music: silent at once, the tail included.
   const silence = () => {
     anchor = null;
     clearInterval(watch);
     bus?.disconnect();
     bus = null;
     scheduled = [];
+    if (tail) {
+      clearTimeout(tail.timer);
+      tail = null;
+      setTailView(null);
+    }
+  };
+  stopTail = silence;
+
+  // The L-cut (record-seams): at a natural songEnd the recording plays on under the results, ducked, and fades over two
+  // bars to a bar line, or plays out when it ends soon anyway. False when there's nothing to carry on.
+  const startTail = (endMs: number): boolean => {
+    if (!audio || !bus || !buffer || loop) return false; // a bar loop's passes stop on their own
+    const plan: TailPlan = planTail({ endMs, ...meter, naturalEndMs: buffer.duration * 1000 - fileOffset() });
+    if (plan.kind === "none") return false;
+    const env = tailEnvelope(plan);
+    const perf = performance.now();
+    const g = bus.gain;
+    const volume = g.value;
+    g.cancelScheduledValues(0);
+    for (const p of env) {
+      // Heard at the point's chart time, as play() maps them: one output latency early.
+      const t = Math.max(audio.currentTime, ctxAt(perf + p.ms - endMs) - latencyS());
+      const v = volume * p.gain;
+      if (p.ramp === "set") g.setValueAtTime(v, t);
+      else if (p.ramp === "linear") g.linearRampToValueAtTime(v, t);
+      else g.exponentialRampToValueAtTime(Math.max(v, 1e-6), t); // an exponential ramp can't reach 0
+    }
+    tail = { env, endMs: plan.endMs, timer: window.setTimeout(silence, plan.endMs - endMs + 100) };
+    const barMs = meter.beatsPerBar * msPerBeat(meter.bpm);
+    setTailView({ kind: plan.kind, bar: plan.kind === "fade" ? plan.bar : null, startPerf: perf, endPerf: perf + plan.endMs - endMs, barMs, barPhaseMs: ((endMs % barMs) + barMs) % barMs });
+    return true;
   };
 
   // Play from chart time atMs, which sounds now: songStart, a resume, or the buffer arriving mid-take.
@@ -205,7 +255,12 @@ export function audioTrack(): GamePlugin {
       silence();
       buffer = null;
       envelope = null;
-      levelNow = (ms) => (anchor && envelope ? (envelope[Math.floor(fileTimeAt(ms, fileOffset(), loop) / loudnessSettings.windowMs)] ?? null) : null);
+      levelNow = (ms) => {
+        const g = anchor ? 1 : tail && ms < tail.endMs ? gainAt(tail.env, ms) : 0;
+        const db = g > 0 && envelope ? envelope[Math.floor(fileTimeAt(ms, fileOffset(), loop) / loudnessSettings.windowMs)] : undefined;
+        return db === undefined ? null : db + 20 * Math.log10(g);
+      };
+      meter = { bpm: c.bpm, beatsPerBar: c.beatsPerBar };
       sidecar = null;
       loop = null;
       const song = params.get("song") ?? "";
@@ -261,7 +316,9 @@ export function audioTrack(): GamePlugin {
     onEvent(e: GameEvent) {
       if (e.type === "pause" || e.type === "quit") return silence();
       if (e.type === "songEnd") {
+        const running = anchor !== null;
         anchor = null;
+        if (running && startTail(e.atMs)) return; // the watch runs on: leaving /play from the results stops the tail
         clearInterval(watch);
         const b = bus;
         if (b && audio) {
@@ -279,5 +336,8 @@ export function audioTrack(): GamePlugin {
       }
       if (e.type === "resume") play(e.atMs);
     },
+    // The tail's tag, while it plays (record-seams). The results mount just after songEnd, so a take with no tail
+    // shows no card.
+    resultsPanel: () => (tailView ? createElement(TailPanel, { subscribe: subscribeTail, get: tailNow, onStop: stopMusic }) : null),
   };
 }

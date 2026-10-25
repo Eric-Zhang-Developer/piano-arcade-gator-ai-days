@@ -1,0 +1,88 @@
+/* The tail's lower third: docked bottom-right, in the strip under the results card, clear of Details ↓. */
+.tag {
+  position: fixed;
+  right: clamp(16px, 2vw, 40px);
+  bottom: clamp(8px, 1.4vh, 20px);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 0.9em;
+  padding: 0.3em 0.3em 0.3em 0.8em;
+  background: color-mix(in srgb, var(--pa-bg) 88%, transparent);
+  border: 1px solid var(--pa-line);
+  border-left: 3px solid var(--pa-primary);
+  animation: arrive 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.note {
+  color: var(--pa-primary);
+  font-size: clamp(18px, 1.5vw, 28px);
+  line-height: 1;
+}
+
+/* Empties as the tail runs out: on the fade's bar line, or the record's own end. */
+.drain {
+  position: absolute;
+  left: -3px;
+  right: -1px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--pa-primary);
+  transform-origin: left;
+  animation: drain linear both;
+}
+
+/* The field's bar line: a primary hairline along the bottom edge, in the strip under the card, that flares on each
+   bar line with a short glow above it and dies away before the next. */
+.pulse {
+  position: fixed;
+  inset: auto 0 0 0;
+  height: 7vh;
+  z-index: 5;
+  pointer-events: none;
+  border-bottom: 2px solid var(--pa-primary);
+  background: linear-gradient(to top, color-mix(in srgb, var(--pa-primary) 40%, transparent), transparent);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: pulse linear infinite;
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes drain {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.9;
+  }
+  45%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse {
+    display: none;
+  }
+  .tag {
+    animation: none;
+  }
+  .drain {
+    animation: none;
+    transform: scaleX(0.5);
+    opacity: 0;
+  }
+}

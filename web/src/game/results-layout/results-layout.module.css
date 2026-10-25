@@ -6,6 +6,8 @@
   text-align: center;
   /* Over the page's dimmed overlay: the frozen highway (combo, keys) stays a hint, not a second layer of text. */
   background: rgb(3 6 7 / 0.96); /* the frozen HUD showed through behind the data cells at 0.88 */
+  /* Lines a viewer reads: 13 px at 1280 wide, rising to 24 px at 1920, the video rule (visual-direction.md, #1030). */
+  --read: clamp(12px, calc(1.72vw - 9px), 24px);
 }
 
 /* The ceremony: exactly one window tall, so the rank, cells, middle band and buttons need no scroll. */
@@ -78,7 +80,7 @@
 
 .cells [data-kit="mono"],
 .extra [data-kit="mono"] {
-  font-size: clamp(12px, 0.8vw, 17px) !important;
+  font-size: var(--read) !important;
 }
 
 .unscored {
@@ -109,8 +111,13 @@
 
 /* The play-modes ladder: one slim row, as wide as the six cells' band at most, so the first view keeps Retry. */
 .ladder {
-  width: min(100%, 720px);
+  width: min(100%, max(720px, 48vw)); /* 48vw: 920 px at 1920, so the rungs keep their room at 24 px */
   align-self: center;
+}
+
+/* play-modes' ladder in this slot: its rungs are read on video like the lines above (#1030). */
+.ladder ol {
+  font-size: var(--read) !important;
 }
 
 .ladder:empty {
@@ -147,7 +154,7 @@
 .tutor:not(:empty) + .actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  width: clamp(360px, 32vw, 560px);
+  width: clamp(360px, 32vw, 640px); /* 32vw: at 1920, REVIEW ON SHEET ↗ fits a column at 24 px */
   flex-shrink: 0;
   margin-right: 0;
 }
@@ -166,7 +173,7 @@
   border-radius: 0 !important;
   background: transparent !important;
   font-family: var(--pa-font-data), ui-monospace, monospace !important;
-  font-size: clamp(13px, 0.85vw, 17px) !important; /* scales with the screen's type, readable at 1920 */
+  font-size: var(--read) !important; /* scales with the screen's type, 24 px at 1920 */
   font-style: normal !important;
   font-weight: 700 !important;
   letter-spacing: 0.1em !important;
@@ -188,9 +195,9 @@
    screen's one primary, so it can't be the smallest button on it (#883). */
 .tutor [data-testid="duo-practice"] {
   box-sizing: border-box;
-  min-width: calc((clamp(360px, 32vw, 560px) - 12px) / 2); /* one column of .actions' grid */
+  min-width: calc((clamp(360px, 32vw, 640px) - 12px) / 2); /* one column of .actions' grid */
   padding: clamp(12px, 1.6vh, 18px) 1.2em !important;
-  font-size: clamp(13px, 0.85vw, 17px) !important;
+  font-size: var(--read) !important;
 }
 
 /* A panel that wraps its button (score-card's span) still fills the cell. */

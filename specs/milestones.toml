@@ -257,6 +257,7 @@ features = [
   "flow-calm", # polish refill 4 (#886): "Take your time" upright and clear of the waiting note
   "learn-kit", # polish refill 4 (#947, #1279, #1280, #1281): /learn practice upright and square, 12 px floor, links
   "learn-a11y", # polish refill 4 (#1273-#1278): /learn's h1, planning status, focus, heard verdicts, chip titles
+  "harmony-map", # Eric, 2026-10-25 (#1299): wow feeder; chords light triangles on the Tonnetz, every song a constellation, an experiment
 ]
 cut = []
 

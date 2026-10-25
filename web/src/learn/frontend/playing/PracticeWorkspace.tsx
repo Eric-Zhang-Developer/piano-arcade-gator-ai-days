@@ -50,7 +50,7 @@ export function PracticeWorkspace() {
         {state.stage === 'drill' && <p className={styles.repetitions}>{state.repetitions} of 4 repetitions</p>}
         {demo && <p role="status">Playing the opening…</p>}
         {state.error && <p role="alert" className={styles.error}>{state.error}</p>}
-        <details className={styles.details}><summary>About this preview{state.takes > 0 ? ` · ${state.takes} example ${state.takes === 1 ? 'take' : 'takes'}` : ''}</summary><p>No piano input is recorded or graded. Example takes show a scripted practice flow, including feedback on the example and one step of support removal at a time. Repetitions are self-reported. The score stays available throughout.</p></details>
+        <details className={styles.details}><summary>About these examples{state.takes > 0 ? ` · ${state.takes} example ${state.takes === 1 ? 'take' : 'takes'}` : ''}</summary><p>No piano input is recorded or graded. Example takes show a scripted practice flow, including feedback on the example and one step of support removal at a time. Repetitions are self-reported. The score stays available throughout.</p></details>
       </div>
       <div className={styles.actions}>
         {locked ? <button type="button" className={styles.secondary} onClick={stop}>Stop {demo ? 'demo' : 'example'}</button>

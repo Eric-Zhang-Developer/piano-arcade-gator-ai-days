@@ -172,6 +172,7 @@ features = [
   "flow-mode",
   "duo-tokens",
   "duo-hud",
+  "audio-track",
   "duo-select",
   "duo-results",
   "sheet-paper",

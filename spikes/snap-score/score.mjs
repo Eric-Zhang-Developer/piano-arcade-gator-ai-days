@@ -12,10 +12,21 @@ const root = join(here, "../..");
 const local = join(here, "local");
 const say = (s) => process.stdout.write(`${s}\n`);
 
-// The committed notes a page can be scored on, in beats. minuet-g's chart writes its A section's repeat out (bars
-// 1-16 twice, its source line says), while the page prints the repeat sign and goes on to bar 32, so only the
-// first pass is the same music (decision snap-score-spike-measure).
-const WINDOW = { "minuet-g": 48 };
+// Written-out repeats to take out of a committed chart before the diff. The page prints a repeat sign and the reader
+// doesn't expand it (the prompt says so), but the committed charts play each repeat in full, so past the first one
+// the same notes sit at different beats. Each cut is [from, to) in beats, and must be an exact copy of the notes at
+// copyOf (pitch, hand, place in the span), or the scorer stops (decision snap-score-spike-measure).
+//   minuet-g: bars 1-16 played twice; the page goes on to the B section.
+//   fur-elise: bars 1-7 again after the first ending (bar 8), then the second ending; the page goes there directly.
+//     Then bars 16-30 (the C major episode and the return of the theme) again, to the chart's end; the page goes on
+//     to the F major section, which the committed chart doesn't have.
+const CUTS = {
+  "minuet-g": [{ from: 48, to: 96, copyOf: 0 }],
+  "fur-elise": [
+    { from: 13.5, to: 24, copyOf: 1.5 },
+    { from: 45, to: 66.75, copyOf: 24 },
+  ],
+};
 const SHIFTS = Array.from({ length: 33 }, (_, i) => (i - 16) / 4); // ±4 beats in 16ths: covers a pickup counted either way
 
 const diff = (forged, committed) =>
@@ -23,10 +34,16 @@ const diff = (forged, committed) =>
 
 function committedFor(id) {
   const path = join(root, "web/public/songs", id, "chart.json");
-  if (!WINDOW[id]) return path;
+  if (!CUTS[id]) return path;
   const c = JSON.parse(readFileSync(path, "utf8"));
-  const out = join(local, `${id}.committed-window.json`);
-  writeFileSync(out, JSON.stringify({ ...c, notes: c.notes.filter((n) => n.beat < WINDOW[id]) }));
+  let notes = c.notes;
+  for (const { from, to, copyOf } of [...CUTS[id]].sort((a, b) => b.from - a.from)) {
+    const span = (lo) => notes.filter((n) => n.beat >= lo - 1e-9 && n.beat < lo + (to - from) - 1e-9).map((n) => `${n.pitch}${n.hand}${(n.beat - lo).toFixed(3)}`).sort().join();
+    if (span(from) !== span(copyOf)) throw new Error(`${id}: beats ${from}-${to} aren't a copy of the notes from beat ${copyOf}`);
+    notes = notes.filter((n) => n.beat < from - 1e-9 || n.beat >= to - 1e-9).map((n) => (n.beat >= to - 1e-9 ? { ...n, beat: n.beat - (to - from) } : n));
+  }
+  const out = join(local, `${id}.committed-unrepeated.json`);
+  writeFileSync(out, JSON.stringify({ ...c, notes }));
   return out;
 }
 

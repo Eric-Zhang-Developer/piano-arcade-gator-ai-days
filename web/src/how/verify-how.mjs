@@ -1,7 +1,8 @@
 // Headless proof of /how (specs/features/how-it-works/spec.md, Validation): the four figures and the incidents, every
 // data-value checked against this script's own reading of the snapshot, git and the repo's files, (a) with whatever
 // snapshot is there and (b) with fixture-snapshot.json written in place; no request off localhost; screenshots; read
-// text at least 24 px at 1920×1080; Tab reaches every link in order. A snapshot.json that was there is put back.
+// text at least 24 px at 1920×1080; Tab reaches every link in order; /how/ci's panels and numbers. A snapshot.json
+// that was there is put back.
 // Usage: node web/src/how/verify-how.mjs --out <dir>
 import { execFileSync, spawn } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -177,6 +178,46 @@ function repoValues() {
 
 // Every data-value on the page against `want`; keys of a family (hour:, folder:, worker:) the page has and `want`
 // lacks are extra rows, which fail too.
+// /how/ci's expected values, computed here from ci-snapshot.json, not imported from ci.ts.
+function ciValues() {
+  const snap = JSON.parse(readFileSync(new URL("./ci-snapshot.json", import.meta.url), "utf8"));
+  const end = Math.round((Date.parse(snap.at) - Date.parse(snap.since)) / 1000);
+  const cut = snap.marks.find((m) => m.n === 687)?.t ?? null;
+  const before = (t) => cut === null || t < cut;
+  let peak = 0;
+  for (let t = 0; t < end && before(t); t += 300) {
+    const running = snap.jobs.filter((j) => j[1] === 1 && j[3] !== null && j[3] <= t && t < (j[4] ?? end)).length;
+    peak = Math.max(peak, running);
+  }
+  // A green PR run's time: its jobs' first queued to last completed.
+  const green = [];
+  snap.runs.forEach((r, i) => {
+    if (r[0] !== "pull_request" || r[5] !== "success") return;
+    const js = snap.jobs.filter((j) => j[0] === i);
+    const from = Math.min(...js.map((j) => j[2] ?? Infinity));
+    if (!js.length || js.some((j) => j[4] === null) || !Number.isFinite(from)) return;
+    const to = Math.max(...js.map((j) => j[4]));
+    if (to >= from) green.push({ t: from, min: Math.round(((to - from) / 60) * 10) / 10 });
+  });
+  const mins = green.filter((r) => before(r.t)).map((r) => r.min).sort((a, b) => a - b);
+  const after = cut === null ? [] : green.filter((r) => r.t >= cut);
+  const measuring = cut === null || end - cut < 3 * 3600 || after.length < 3;
+  const want = {
+    peakRunningBefore: show(peak || null),
+    greenBeforeN: show(mins.length || null),
+    greenBeforeMedian: mins.length ? `${mins[Math.ceil(mins.length / 2) - 1]} min` : U,
+    greenBeforeMax: mins.length ? `${mins.at(-1)} min` : U,
+  };
+  if (measuring) for (const k of ["flightAfter", "greenAfter", "mergesAfter", "cellAfter"]) want[k] = "measuring";
+  const start = Date.parse(snap.since);
+  for (let ms = Math.ceil(start / 3_600_000) * 3_600_000; ms + 3_600_000 <= start + end * 1000; ms += 3_600_000) {
+    const t = (ms - start) / 1000;
+    const label = new Date(ms).toLocaleTimeString("en-US", { timeZone: "America/New_York", hour: "numeric" });
+    want[`merges:${label}`] = String(snap.merges.filter((m) => m >= t && m < t + 3600).length);
+  }
+  return { want, measuring };
+}
+
 async function compare(page, want, label) {
   const got = Object.fromEntries(await page.$$eval("[data-value]", (els) => els.map((el) => [el.dataset.value, el.dataset.n])));
   const wrong = Object.entries(want).filter(([k, v]) => got[k] !== v).map(([k, v]) => `${k}: page ${got[k]}, expected ${v}`);
@@ -271,6 +312,23 @@ try {
     (await big.locator('[data-value="hour:2026-10-24T14:00:00.000Z:feat"]').getAttribute("data-n")) === "0",
     "(b) the empty hour between two busy ones is drawn with zeros",
   );
+
+  // /how/ci: three panels, the tab row on both pages, numbers from the committed CI snapshot, "after" still measuring.
+  check((await big.locator('nav a[href="/how/ci"]').count()) === 1, "/how links the CI tab");
+  const ci = await (await browser.newContext({ viewport: { width: 1920, height: 1080 } })).newPage();
+  watch(ci);
+  ci.on("pageerror", (e) => errors.push(e.message));
+  await ci.goto(`${base}/how/ci`);
+  await ci.locator('section[data-visual="merges"]').waitFor({ timeout: 60_000 });
+  for (const v of ["flight", "green", "merges"]) {
+    const sec = ci.locator(`section[data-visual="${v}"]`);
+    check((await sec.locator("svg").count()) === 1 && (await sec.locator("ul li").count()) >= 4, `/how/ci ${v} has an SVG and four beats`);
+  }
+  check((await ci.locator('nav a[href="/how"]').count()) === 1, "/how/ci links back to /how");
+  const civ = ciValues();
+  await compare(ci, civ.want, `/how/ci${civ.measuring ? ", after still measuring" : ""}`);
+  check(!(await ci.content()).includes("NaN"), "/how/ci shows no NaN");
+  await ci.screenshot({ path: join(out, "how-ci-1920.png"), fullPage: true });
 
   check(outside.length === 0, `no request off localhost${outside.length ? `: ${outside.slice(0, 5).join(", ")}` : ""}`);
   check(errors.length === 0, `no page errors${errors.length ? `: ${errors.join(" | ")}` : ""}`);

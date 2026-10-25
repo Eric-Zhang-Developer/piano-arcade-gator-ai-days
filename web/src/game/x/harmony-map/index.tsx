@@ -83,6 +83,6 @@ export const harmonyMap: Experiment = {
   group: "Wow",
   line: "Chords light triangles on Euler's Tonnetz, and every song becomes a constellation (#1299)",
   issue: 1299,
-  href: "/harmony?song=moonlight-1",
+  href: "/harmony?song=moonlight-1&x=harmony-map", // x= is the registry's own rule; /harmony ignores it
   plugin: harmonyPlugin,
 };

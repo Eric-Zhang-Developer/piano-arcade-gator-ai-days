@@ -97,3 +97,54 @@ describe("P, L and R", () => {
     }
   });
 });
+
+describe("the atlas", () => {
+  it("lists exactly song-select's songs, each with a drawing", async () => {
+    const { loadSongs } = await import("../../song-select/load");
+    const { wallSongs } = await import("./atlas");
+    const wall = wallSongs("public/songs");
+    expect(wall.map((s) => s.id)).toEqual(loadSongs("public/songs").songs.map((s) => s.id));
+    for (const s of wall) expect(s.svg, s.id).toMatch(/^<svg [^>]*viewBox="0 0 [\d.]+ [\d.]+"/);
+  });
+});
+
+describe("live", () => {
+  it("only a struck key renames: lifting off C E G keeps C lit, then A C E renames to Am by R", async () => {
+    const { liveHarmony } = await import("./live");
+    const h = liveHarmony();
+    [60, 64, 67].forEach((p, i) => h.press(p, i));
+    expect(h.view(10).triad).toEqual({ root: 0, minor: false });
+    h.release(60, 1000);
+    expect(h.view(1001).triad).toEqual({ root: 0, minor: false }); // E G alone would name Em
+    h.release(64, 1001);
+    h.release(67, 1002);
+    [57, 60, 64].forEach((p) => h.press(p, 3000));
+    expect(h.view(3001).triad).toEqual({ root: 9, minor: true });
+    expect(h.view(3001).trail.at(-1)?.move).toBe("R");
+  });
+  it("the pedal holds a released note in the sounding set until it comes up", async () => {
+    const { liveHarmony } = await import("./live");
+    const h = liveHarmony();
+    h.pedal(true, 0);
+    h.press(48, 0);
+    h.release(48, 100);
+    expect(h.view(5000).pcs.has(0)).toBe(true);
+    h.pedal(false, 5000);
+    expect(h.view(5001).pcs.has(0)).toBe(false);
+  });
+});
+
+describe("the /play corner", () => {
+  it("sits in the empty lanes beside the song's own, or nowhere", async () => {
+    const { cornerBox } = await import("./index");
+    for (const width of [1280, 1920]) {
+      // 4 octaves on screen, C3–C7; the song uses C4–C5 only
+      const keyX = (p: number) => ({ x: ((p - 48) / 48) * width, width: width / 48 });
+      const box = cornerBox({ width, judgmentLineY: width * 0.4, keyX }, 60, 72, 90)!;
+      expect(box).not.toBeNull();
+      const [l, r] = [keyX(60).x, keyX(72).x + keyX(72).width];
+      expect(box.x + box.w <= l || box.x >= r, `${width}`).toBe(true);
+      expect(cornerBox({ width, judgmentLineY: 500, keyX }, 49, 95, 90), "no room").toBeNull();
+    }
+  });
+});

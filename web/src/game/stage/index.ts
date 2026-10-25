@@ -1,4 +1,4 @@
-// Fever stage: a three.js synthwave stage behind the highway that reacts to play (spec: fever-stage).
+// Fever stage: a three.js star field behind the highway that streaks in fever (spec: fever-stage).
 // This file is the pure part (state, grid phase, frame budget, off switches) and the plugin; three.js is in scene.ts.
 import type { Chart, GameEvent, GamePlugin } from "../../contracts";
 import { hudSettings, tierFor } from "../hud";
@@ -6,6 +6,8 @@ import { blackKeyLaneSettings } from "../black-key-lanes";
 import { msPerBeat, settings as core } from "../core/settings";
 import { makeScene } from "./scene";
 
+// ponytail: linesPerBeat, glow, flashMs and burstMs (and gridPhase) drove the retired grid and sun; nothing draws them
+// now. They go in a refactor once select-stage stops reading gridPhase.
 export const stageSettings = {
   maxLaneLuma: 0.35, // 0–1: the stage's brightest pixel behind the lanes, after the highway's backdrop
   pixelRatioCap: 1.5,
@@ -19,16 +21,7 @@ export const stageSettings = {
   budgetMs: 20, // freeze if the mean frame time over budgetWindowMs goes above this
   budgetWindowMs: 1000,
   warmupMs: 1000, // frames this soon after mount don't count (shader compile)
-  sky: "#0b0220",
-  skyHot: "#2a0614",
-  grid: "#ff2fd0",
-  gridHot: "#ffb02e",
-  sunTop: "#ffe66b",
-  sunBottom: "#ff3fa4",
-  sunTopHot: "#fff4d0",
-  sunBottomHot: "#ff4a1c",
   star: "#cfd8ff",
-  sunSwell: 1.3, // sun scale in fever
   starStreak: 6, // star length in fever, world units
 };
 

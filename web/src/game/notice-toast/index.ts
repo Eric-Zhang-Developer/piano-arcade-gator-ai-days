@@ -71,7 +71,7 @@ export const toastCss = `
   align-items: flex-end; pointer-events: none; }
 .pa-toast { background: var(--pa-panel); color: var(--pa-ink); border-left: 3px solid var(--pa-cyan);
   max-width: min(18em, 40vw); padding: 0.45em 0.8em; font: 500 clamp(16px, 2.2223vh, 24px) / 1.3 system-ui, sans-serif;
-  box-shadow: 0 0 0 1px rgba(39, 225, 255, 0.18); backdrop-filter: blur(8px); animation: pa-toast-in 200ms ease-out;
+  box-shadow: 0 0 0 1px var(--pa-line); backdrop-filter: blur(8px); animation: pa-toast-in 200ms ease-out;
   transition: opacity 200ms ease-out, transform 200ms ease-out; }
 .pa-toast[data-leaving] { opacity: 0; transform: translateX(16px); }
 @keyframes pa-toast-in { from { opacity: 0; transform: translateX(16px); } }

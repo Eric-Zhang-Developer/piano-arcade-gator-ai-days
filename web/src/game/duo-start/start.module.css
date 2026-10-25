@@ -72,7 +72,7 @@
 .modes a,
 .modes button {
   box-sizing: border-box;
-  font-size: clamp(12px, 0.85vw, 16px) !important;
+  font-size: clamp(16px, 1.25vw, 24px) !important; /* read on video: 16 px at 1280, 24 px at 1920 (#1239) */
   padding: 1.3vh 0.6em !important;
   white-space: nowrap;
 }
@@ -80,7 +80,7 @@
 .modes p {
   margin: 0;
   color: var(--pa-ink-dim);
-  font-size: clamp(13px, 0.9vw, 17px);
+  font-size: clamp(16px, 1.25vw, 24px);
 }
 
 /* The hands on the left; Songs and Options on the right. */
@@ -101,7 +101,7 @@
   border-radius: 0;
   background: transparent;
   color: var(--pa-ink);
-  font: 700 clamp(12px, 0.85vw, 17px) var(--pa-font-data), ui-monospace, monospace;
+  font: 700 clamp(16px, 1.25vw, 24px) var(--pa-font-data), ui-monospace, monospace;
   font-style: normal;
   letter-spacing: 0.14em;
   cursor: pointer;

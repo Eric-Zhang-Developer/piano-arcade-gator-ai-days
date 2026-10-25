@@ -7,6 +7,7 @@ import type { Chart, Frame, GamePlugin, Hand } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
 import { msPerBeat, settings } from "../core/settings";
 import { noteColorFor } from "../hand-colors";
+import { kitSettings } from "../duo-tokens";
 import { hudLayout, hudSettings } from "../hud";
 import { bg, cyan, fontDisplay, ink, inkDim, panel, whenDisplayFontReady } from "../ui-tokens";
 import { waitHintSettings } from "../wait-hint/hint";
@@ -127,9 +128,9 @@ function drawReadout(ctx: CanvasRenderingContext2D, f: Frame, bpm: number, perce
   const bh = px * 1.5;
   ctx.fillStyle = panel;
   ctx.strokeStyle = cyan;
-  ctx.lineWidth = Math.max(1.5, h * 0.025);
+  ctx.lineWidth = kitSettings.hairline; // Duo: a square hairline frame, like every interface element
   ctx.beginPath();
-  ctx.roundRect(right - w, top, w, bh, bh * 0.28);
+  ctx.rect(right - w, top, w, bh);
   ctx.fill();
   ctx.stroke();
   ctx.textBaseline = "middle";

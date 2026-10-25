@@ -6,7 +6,7 @@ import { handColor, noteColorFor } from "../hand-colors";
 import { hudSettings } from "../hud";
 
 export const ledSettings = {
-  leadMs: 600, // a note's key glows this long before its time
+  leadMs: 1500, // a note's key glows this long before its time: very faint at first, gold when due (the board's ramp)
   hintLevel: 0.5, // hints at half the hand color, so a hit's full color reads over them
   missFlashMs: 150, // a miss lights red this long, then the board's fade (180 ms) takes it out
   heartbeatMs: 1000, // the board releases every key after 2.5 s of silence
@@ -31,12 +31,15 @@ export const hint = (pitch: number, [r, g, b]: Rgb): Message => [0xa0, pitch, r,
 // and nothing else; the site sends the presses, see everywhere.tsx). A board older than the setting ignores it.
 export type LightMode = 0 | 1;
 export const lightMode = (m: LightMode): Message => [0xb0, 15, m, 0];
+// The board's hint ramp (setting 7) matches leadMs, so a hint reaches its full color, then gold, as its note lands.
+export const hintRamp = (ms = ledSettings.leadMs): Message => [0xb0, 7, ms & 127, ms >> 7];
 // A piano's MIDI message to the board's key on or off, for demo mode on every page (everywhere.tsx): a press lights
 // its key in the hand color of its side of middle C, a release (or a note on at velocity 0) darkens it.
+// The color is scaled by how hard the key went down (45% to 100%): the board reads that as the splash's power.
 export function pressKey(data: ArrayLike<number>): Message | null {
   const kind = data[0] & 0xf0;
   const pitch = data[1];
-  if (kind === 0x90 && data[2] > 0) return keyOn(pitch, rgb7(handColor(pitch < 60 ? "L" : "R")));
+  if (kind === 0x90 && data[2] > 0) return keyOn(pitch, rgb7(handColor(pitch < 60 ? "L" : "R"), 0.45 + (0.55 * data[2]) / 127));
   if (kind === 0x80 || kind === 0x90) return keyOff(pitch);
   return null;
 }

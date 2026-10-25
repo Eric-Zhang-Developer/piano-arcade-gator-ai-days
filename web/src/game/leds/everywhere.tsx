@@ -8,7 +8,7 @@ import { captureOn } from "../capture-mode";
 import { kitChip, Panel } from "../duo-tokens";
 import { hideNav } from "../nav-bar/slots";
 import { ConnectLights, DemoLights, lightModeNow, subscribeLightMode } from ".";
-import { lightMode, pressKey } from "./messages";
+import { hintRamp, lightMode, pressKey } from "./messages";
 import { autoConnect, linkState, send, subscribe, type LinkState } from "./serial";
 
 type Midi = { inputs: Map<string, MidiInput>; onstatechange: unknown; addEventListener(t: "statechange", l: () => void): void };
@@ -66,7 +66,7 @@ export function LightsEverywhere() {
   useEffect(autoConnect, []);
   // A board that restarted is back in whatever it last saved: send the chosen mode on every connect.
   useEffect(() => {
-    if (s === "ready") send(lightMode(m));
+    if (s === "ready") for (const msg of [hintRamp(), lightMode(m)]) send(msg);
   }, [s, m]);
   if (s === "unsupported" || capture || hideNav(pathname, false)) return null;
   return (
@@ -79,7 +79,7 @@ export function LightsEverywhere() {
         className={kitChip(lit).className}
         style={kitChip(lit).style}
       >
-        {s !== "ready" ? "Lights: off" : m === 1 ? "Lights: demo" : "Lights: calm"}
+        {s !== "ready" ? "Lights: off" : m === 1 ? "Lights: demo" : "Lights: learning"}
       </button>
       {open && (
         <Panel style={{ padding: 12, display: "grid", gap: 8, justifyItems: "start" }}>

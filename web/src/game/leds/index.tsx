@@ -5,7 +5,7 @@ import { useEffect, useSyncExternalStore } from "react";
 import type { Chart, GamePlugin, InputDevice } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
 import { kitChip } from "../duo-tokens";
-import { CLEAR, hintDiff, hintsAt, judgedKey, keyOff, ledSettings, lightMode, type LightMode, type Rgb } from "./messages";
+import { CLEAR, hintDiff, hintRamp, hintsAt, judgedKey, keyOff, ledSettings, lightMode, type LightMode, type Rgb } from "./messages";
 import { autoConnect, connect, linkState, send, subscribe, type LinkState } from "./serial";
 
 export { hintDiff, hintsAt, judgedKey, ledSettings, rgb7 } from "./messages";
@@ -94,11 +94,11 @@ export function PauseLights({ midi }: { midi: string }) {
 }
 
 // The lights' mode chip: with the board on, a click flips the strip between its two modes (firmware setting 15):
-// Calm (hint build-up, red wrong keys, soft glows) and Demo (every key pressed on the piano lights with its ripple,
+// Learning (hints that build up from very faint to gold, red wrong keys, soft glows) and Demo (every key pressed on the piano lights with its ripple,
 // on every page: see everywhere.tsx). The choice is kept in this browser and sent again whenever the board
 // connects, since a board that restarted is back in whatever it last saved.
 const modeKey = "pa.lights.demo"; // "0" or "1"
-const modeNames: Record<LightMode, string> = { 0: "Calm", 1: "Demo" };
+const modeNames: Record<LightMode, string> = { 0: "Learning", 1: "Demo" };
 let mode: LightMode | null = null; // read from storage on first use
 const modeListeners = new Set<() => void>();
 export const lightModeNow = (): LightMode => {
@@ -131,7 +131,7 @@ export function DemoLights() {
   const s = useSyncExternalStore(subscribe, linkState, () => "off" as LinkState);
   const m = useSyncExternalStore(subscribeLightMode, lightModeNow, () => 0 as LightMode);
   useEffect(() => {
-    if (s === "ready") send(lightMode(m));
+    if (s === "ready") for (const msg of [hintRamp(), lightMode(m)]) send(msg);
   }, [s, m]);
   if (s !== "ready") return null;
   const other: LightMode = m === 0 ? 1 : 0;

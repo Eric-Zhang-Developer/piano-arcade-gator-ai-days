@@ -3,7 +3,7 @@
  "title": "Frère Jacques",
  "composer": "Traditional",
  "catalog": "Round in four voices",
- "source": "Wikipedia, \"Frère Jacques\" (https://en.wikipedia.org/wiki/Fr%C3%A8re_Jacques), the article's LilyPond score, read 2026-10-25, CC BY-SA 4.0. Its MIDI score stacks the four 2-bar phrases (first to fourth) as the round's four voices; this chart is the melody, the phrases in order, each twice, in F major at the score's own tempo 4=102.",
+ "source": "Wikipedia, \"Frère Jacques\" (https://en.wikipedia.org/w/index.php?title=Fr%C3%A8re_Jacques&oldid=1366602658), the article's LilyPond score, read 2026-10-25, CC BY-SA 4.0. Its MIDI score stacks the four 2-bar phrases (first to fourth) as the round's four voices; this chart is the melody, the phrases in order, each twice, in F major at the score's own tempo 4=102.",
  "bpm": 102,
  "beatsPerBar": 4,
  "notes": [

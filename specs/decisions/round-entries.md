@@ -5,7 +5,7 @@ checked and its entry interval taken from the source, not memory (eric-agent-7, 
 
 | Chart | Source | License | Notes | Entry | Where the source marks it |
 |---|---|---|---|---|---|
-| `rounds/frere-jacques` | Wikipedia, "Frère Jacques", the article's LilyPond score (https://en.wikipedia.org/wiki/Fr%C3%A8re_Jacques), read 2026-10-25 | CC BY-SA 4.0 | 32 = (4 + 3 + 6 + 3) × 2, the four phrases each `\repeat unfold 2` | every 2 bars, 4 voices | Its MIDI score stacks the four 2-bar phrases (`first` … `fourth`) as four voices sounding together: a round entering every 2 bars. F major, 4/4, `\tempo 4=102`. |
+| `rounds/frere-jacques` | Wikipedia, "Frère Jacques", the article's LilyPond score (https://en.wikipedia.org/w/index.php?title=Fr%C3%A8re_Jacques&oldid=1366602658), read 2026-10-25 | CC BY-SA 4.0 | 32 = (4 + 3 + 6 + 3) × 2, the four phrases each `\repeat unfold 2` | every 2 bars, 4 voices | Its MIDI score stacks the four 2-bar phrases (`first` … `fourth`) as four voices sounding together: a round entering every 2 bars. F major, 4/4, `\tempo 4=102`. |
 | `rounds/row-your-boat` | Wikipedia, "Row, Row, Row Your Boat", the article's LilyPond melody (cited there to Gilbert DeBenedetti, gmajormusictheory.org), read 2026-10-25 | CC BY-SA 4.0 | 27, counted from the `\relative` line | every 2 bars, 4 voices | The article's SATB table starts each voice one line later. Each line is 2 bars of 6/8 ("Row, row, row your boat," is `c4. c4. \| c4 d8 e4.`). |
 
 **Pitches** are the `\relative` reading of each line, from middle C = 60 (`c'`).

@@ -20,6 +20,8 @@ export const momentSettings = {
   stillMs: 1000, // reduced motion: the banner, still, for this long
   drainPx: 90, // fever-arc's release: juice's steady edge width and alpha, draining from the edges inward
   drainAlpha: 0.38,
+  ghostMs: 520, // the banner's ghost swells to ghostScale and fades over this, from the ignition beat
+  ghostScale: 1.7,
 };
 
 // How much of the moment is left: 1 at its start, falling to 0 at 2 s; 0 before it, from 2 s on, and once fever
@@ -115,6 +117,13 @@ function drawMoment(ctx: CanvasRenderingContext2D, f: Frame, elapsed: number, st
     ctx.textBaseline = "middle";
     ctx.fillStyle = meterSettings.fill; // flat amber, no glow: the edges carry the light
     ctx.fillText("FEVER", b.x, band / 2);
+    // The drop's punch (#1374): a ghost of the word swells out of it and fades, as NOSTALGIA's combo does.
+    if (!still && elapsed < s.ghostMs) {
+      const k = elapsed / s.ghostMs;
+      ctx.globalAlpha = 0.5 * (1 - k) ** 2;
+      ctx.font = `900 ${Math.round(size * (1 + (s.ghostScale - 1) * easeOut(k)))}px ${display}`;
+      ctx.fillText("FEVER", b.x, band / 2);
+    }
     ctx.restore();
     markLit("banner");
     drew = true;

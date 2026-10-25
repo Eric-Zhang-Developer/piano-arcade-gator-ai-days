@@ -7,6 +7,7 @@ import { msPerBeat } from "../core/settings";
 import { type Gauge, emptyGauge, reduceGauge } from "../fever-gauge/gauge";
 import { landingPlan, landingSettings, landingT } from "../results-landing";
 import { momentSettings } from "../fever-moment"; // read at call time only: fever-moment imports this module too
+import { fireLook } from "./look";
 
 export const arcSettings = {
   buildFrom: 0.8, // the gauge share where the build-up starts (spec: its last ~20%)
@@ -117,19 +118,28 @@ export function markLit(piece: string): void {
   if (typeof window !== "undefined" && window.__pianoArcadeFever) (window.__pianoArcadeFever.lit ??= new Set()).add(piece);
 }
 
+// Read once and kept live, as the highway does.
+let motionQuery: MediaQueryList | undefined;
+const reducedMotion = () => (motionQuery ??= typeof matchMedia === "function" ? matchMedia("(prefers-reduced-motion: reduce)") : undefined)?.matches ?? false;
+
 export function feverArc(): GamePlugin {
+  const look = fireLook();
   return {
     id: "fever-arc",
     transformChart(chart) {
       state = emptyArc(chart.notes.length, chart.bpm);
       heatNow = 0;
+      look.reset();
       return chart;
     },
     onEvent(e) {
       state = reduceArc(state, e);
     },
-    draw(_ctx, f) {
-      heatNow = arcNow(f.nowMs).heat;
+    draw(ctx, f) {
+      const arc = arcNow(f.nowMs);
+      heatNow = arc.heat;
+      look.draw(ctx, f, arc, reducedMotion()); // under every reader: it's mounted before them
+
       const hook = typeof window !== "undefined" ? window.__pianoArcadeFever : undefined;
       if (!hook) return;
       // The readers drew on the previous frame (they're mounted after this plugin): log that frame's set, then clear.

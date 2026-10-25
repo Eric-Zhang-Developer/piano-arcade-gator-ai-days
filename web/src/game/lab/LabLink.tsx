@@ -23,8 +23,19 @@ export function LabLink() {
     return () => window.removeEventListener("keydown", onKey);
   }, [router]);
   return (
-    <Link href="/lab" className={styles.footerLink} tabIndex={-1} onMouseDown={(e) => e.preventDefault()} data-capture-hide data-testid="lab-link">
-      Lab <kbd className={styles.kbd}>X</kbd>
+    // The word alone, no <kbd>: the footer row is one line at 1280 only with ~2 px to spare for "Lab X", and a wrap
+    // pushes the footer into the focused song (song-options' fit check). The key is in the title and aria.
+    <Link
+      href="/lab"
+      className={styles.footerLink}
+      title="Lab (X)"
+      aria-keyshortcuts="X"
+      tabIndex={-1}
+      onMouseDown={(e) => e.preventDefault()}
+      data-capture-hide
+      data-testid="lab-link"
+    >
+      Lab
     </Link>
   );
 }

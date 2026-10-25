@@ -27,7 +27,7 @@ export function firstRun(): GamePlugin & { cue(nowMs: number): Cue | null } {
   let events: GameEvent[] = [];
   let cues: Cue[] = [];
   let seen: CueId[] = [];
-  let lastCtx: CanvasRenderingContext2D | null = null;
+  let ended = false; // songEnd or quit: nothing more to draw, including /play's last frame behind the results
   let display = "system-ui, sans-serif";
   if (typeof document !== "undefined")
     void whenDisplayFontReady().then(() => {
@@ -48,14 +48,14 @@ export function firstRun(): GamePlugin & { cue(nowMs: number): Cue | null } {
       if (e.type === "songStart") {
         events = [];
         seen = [];
+        ended = false;
       }
       events.push(e);
       cues = cuesFor(chart, events);
-      if (e.type === "songEnd" || e.type === "quit") lastCtx?.clearRect(0, 0, lastCtx.canvas.width, lastCtx.canvas.height);
+      if (e.type === "songEnd" || e.type === "quit") ended = true;
     },
     draw(ctx, f) {
-      if (!chart) return;
-      lastCtx = ctx;
+      if (!chart || ended) return;
       const c = cue(f.nowMs);
       if (c && !seen.includes(c.id)) seen = [...seen, c.id];
       window.__pianoArcadeFirstRun = { cue: c?.id ?? null, seen };

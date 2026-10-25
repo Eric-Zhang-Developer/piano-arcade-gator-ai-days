@@ -1,6 +1,7 @@
 import type { Chart, Frame, GamePlugin, Hand, InputDevice } from "../../contracts";
 import { noteColorFor } from "../hand-colors";
 import { noteTimeMs } from "../core/judge";
+import { isolated } from "../core/isolated";
 import { msPerBeat, settings } from "../core/settings";
 import { seededRandom } from "../sim/fake";
 import { alphaOf, spawn, step, type Particle } from "./particles";
@@ -41,7 +42,7 @@ export function juiceVisual(): GamePlugin {
   const hitIds = new Set<string>(); // played notes no longer need to be read, so effects may cover them
   let fever = false;
   let sparkClock = 0;
-  let lastCtx: CanvasRenderingContext2D | null = null; // /play stops drawing at the results: clear what's left
+  let ended = false; // songEnd: nothing more to draw, including /play's last frame behind the results
 
   // Rectangles of the unplayed notes due within clearMs: nothing juice draws may cover them.
   function clearZone(ctx: CanvasRenderingContext2D, f: Frame) {
@@ -93,6 +94,7 @@ export function juiceVisual(): GamePlugin {
         hitIds.clear();
         fever = false;
         lastNow = null;
+        ended = false;
         rankReveal();
       }
       if (e.type === "noteHit") {
@@ -107,11 +109,11 @@ export function juiceVisual(): GamePlugin {
       if (e.type === "feverEnd") fever = false;
       if (e.type === "songEnd") {
         rankReveal();
-        lastCtx?.clearRect(0, 0, lastCtx.canvas.width, lastCtx.canvas.height);
+        ended = true;
       }
     },
     draw(ctx, f) {
-      lastCtx = ctx;
+      if (ended) return;
       const dt = lastNow === null ? 0 : Math.max(0, Math.min(100, f.nowMs - lastNow));
       lastNow = f.nowMs;
       const line = f.judgmentLineY;
@@ -120,26 +122,27 @@ export function juiceVisual(): GamePlugin {
       // within clearMs, fading out above that, since the edge lanes hold the chart's lowest and highest notes (#280).
       if (fever) {
         const cut = line * (1 - s.clearMs / settings.lookaheadMs);
-        ctx.save();
-        for (const [x0, x1] of [
-          [0, s.feverEdgePx],
-          [f.width, f.width - s.feverEdgePx],
-        ]) {
-          const g = ctx.createLinearGradient(x0, 0, x1, 0);
-          g.addColorStop(0, `rgba(${s.feverColor}, 0.38)`);
-          g.addColorStop(1, `rgba(${s.feverColor}, 0)`);
-          ctx.fillStyle = g;
-          ctx.fillRect(Math.min(x0, x1), 0, s.feverEdgePx, cut);
-        }
-        // Erase the strips' lowest quarter along a vertical ramp, so they fade instead of ending at a hard line.
-        const fade = ctx.createLinearGradient(0, cut * 0.75, 0, cut);
-        fade.addColorStop(0, "rgba(0, 0, 0, 0)");
-        fade.addColorStop(1, "rgba(0, 0, 0, 1)");
-        ctx.globalCompositeOperation = "destination-out";
-        ctx.fillStyle = fade;
-        ctx.fillRect(0, cut * 0.75, s.feverEdgePx, cut * 0.25);
-        ctx.fillRect(f.width - s.feverEdgePx, cut * 0.75, s.feverEdgePx, cut * 0.25);
-        ctx.restore();
+        // Isolated: the strips' fade erases, which on /play's shared overlay would reach other plugins' pixels.
+        isolated(ctx, (ctx) => {
+          for (const [x0, x1] of [
+            [0, s.feverEdgePx],
+            [f.width, f.width - s.feverEdgePx],
+          ]) {
+            const g = ctx.createLinearGradient(x0, 0, x1, 0);
+            g.addColorStop(0, `rgba(${s.feverColor}, 0.38)`);
+            g.addColorStop(1, `rgba(${s.feverColor}, 0)`);
+            ctx.fillStyle = g;
+            ctx.fillRect(Math.min(x0, x1), 0, s.feverEdgePx, cut);
+          }
+          // Erase the strips' lowest quarter along a vertical ramp, so they fade instead of ending at a hard line.
+          const fade = ctx.createLinearGradient(0, cut * 0.75, 0, cut);
+          fade.addColorStop(0, "rgba(0, 0, 0, 0)");
+          fade.addColorStop(1, "rgba(0, 0, 0, 1)");
+          ctx.globalCompositeOperation = "destination-out";
+          ctx.fillStyle = fade;
+          ctx.fillRect(0, cut * 0.75, s.feverEdgePx, cut * 0.25);
+          ctx.fillRect(f.width - s.feverEdgePx, cut * 0.75, s.feverEdgePx, cut * 0.25);
+        });
         const top = ctx.createLinearGradient(0, 0, 0, line * 0.25);
         top.addColorStop(0, `rgba(${s.feverColor}, 0.22)`);
         top.addColorStop(1, `rgba(${s.feverColor}, 0)`);

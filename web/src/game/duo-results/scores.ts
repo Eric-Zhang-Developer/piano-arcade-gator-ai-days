@@ -5,6 +5,7 @@ import { passAccuracy } from "../bar-loop";
 import { msPerBeat } from "../core/settings";
 import { practiceReason } from "../records/store";
 import { MIN_TIMED } from "../timing";
+import { inMode, playMode, withMode, type PlayMode } from "../play-modes/modes";
 
 export const duoResultsSettings = {
   cleanAccuracy: 0.95, // a bar at or above this isn't weak; every bar clean: no weak run
@@ -20,6 +21,7 @@ export interface BarCell {
   to: number;
   notes: number;
   accuracy: number | null; // 0–1 by the judge's formula; null for a cell with no notes
+  misses: number; // MISS judgments and WRONG presses in the cell
 }
 
 export const barCount = (chart: Chart) =>
@@ -36,7 +38,7 @@ export function rangeScore(chart: Chart, take: Take, results: Results, from: num
     const t = take.events[w.eventIndex]?.timeMs;
     if (t !== undefined && t >= (from - 1) * barMs && t < to * barMs) count.wrong++;
   }
-  return { from, to, notes: ids.size, accuracy: ids.size ? passAccuracy(count, ids.size) : null };
+  return { from, to, notes: ids.size, accuracy: ids.size ? passAccuracy(count, ids.size) : null, misses: count.MISS + count.wrong };
 }
 
 // One cell per `per` bars from bar 1 (the strip pairs bars when one per cell gets too narrow).
@@ -97,6 +99,8 @@ export interface TutorInput {
   run: { from: number; to: number } | null;
   accuracy: number | null; // the run's
   drift: Record<Hand, number | null>; // the run's
+  misses?: number; // the run's MISS and WRONG; 0 means every note was hit, only off the beat
+  flow?: boolean; // a Flow take: its practice follows the player's tempo, so it names none (play-modes)
 }
 
 const bars = (r: { from: number; to: number }) => (r.from === r.to ? `bar ${r.from}` : `bars ${r.from}–${r.to}`);
@@ -108,25 +112,28 @@ export const driftingHand = (drift: Record<Hand, number | null>): [Hand, number]
     .filter(([, d]) => d !== null && Math.abs(d) > duoResultsSettings.driftMs)
     .sort((a, b) => Math.abs(b[1]!) - Math.abs(a[1]!))[0] as [Hand, number] | undefined) ?? [null, null];
 
-// The template line: a drifting hand if one is past driftMs, else the run's accuracy.
-export function tutorLine({ run, accuracy, drift }: TutorInput): string[] {
+// The template line: a drifting hand if one is past driftMs, else the run's accuracy. "Accuracy", not "notes right":
+// it's the judge's weighted score, so a run with no misses can still be the weakest (Eric's full combo read "54% of
+// notes right" with every note hit).
+export function tutorLine({ run, accuracy, drift, misses, flow }: TutorInput): string[] {
   if (!run) return ["Clean take. Try it faster, or pick the next song."];
   const [hand, ms] = driftingHand(drift);
   const first =
     hand && ms !== null
       ? `Your ${hand === "L" ? "left" : "right"} hand ${ms > 0 ? "drags" : "rushes"} in ${bars(run)}, about ${Math.round(Math.abs(ms))} ms ${ms > 0 ? "late" : "early"}.`
-      : `${bars(run).replace(/^b/, "B")} ${run.from === run.to ? "was" : "were"} your weakest: ${Math.round((accuracy ?? 0) * 100)}% of notes right.`;
-  return [first, `Let's loop just those bars at ${duoResultsSettings.practiceTempo}%, then play it through.`];
+      : `${bars(run).replace(/^b/, "B")} ${run.from === run.to ? "was" : "were"} your weakest: ${Math.round((accuracy ?? 0) * 100)}% accuracy${misses === 0 ? ", every note hit but off the beat" : ""}.`;
+  return [first, `Let's loop just those bars ${flow ? "in Flow" : `at ${duoResultsSettings.practiceTempo}%`}, then play it through.`];
 }
 
-// bar-loop on the run at practiceTempo, keeping only the params that pick the song.
+// bar-loop on the run at practiceTempo, keeping only the params that pick the song, in the take's mode (play-modes:
+// under Flow, no tempo).
 export function practiceBarsUrl(chartId: string, params: URLSearchParams, run: { from: number; to: number }): string {
   const q = new URLSearchParams({ song: params.get("song") ?? chartId });
   if (params.has("hands")) q.set("hands", params.get("hands")!);
   q.set("from", String(run.from));
   q.set("to", String(run.to));
   q.set("tempo", String(duoResultsSettings.practiceTempo));
-  return `/play?${q}`;
+  return `/play?${inMode(q, playMode(params))}`;
 }
 
 export const nextForKey = (songId: string) => `pianoArcade.nextFor.${songId}`;
@@ -135,12 +142,15 @@ export interface NextFor {
   from: number;
   to: number;
   hand: Hand | null; // the hand the tutor named, if any
+  mode?: PlayMode; // the take's, so the select's strip practices in it too; absent is Perform
 }
 
 // "Next for you", for duo-select: only after a scored take (records' practice rule, plus demo and practice=), and
-// only with a weak run. Storage that throws saves nothing.
+// only with a weak run. A Flow take counts too: practice is something you do in your mode (play-modes). Storage that
+// throws saves nothing.
 export function saveNextFor(storage: Pick<Storage, "setItem"> | null, params: URLSearchParams, entry: NextFor | null): boolean {
-  if (!entry || !storage || practiceReason(params) || params.has("demo") || params.has("practice")) return false;
+  const scored = playMode(params) === "learn" ? params : withMode(params, "perform");
+  if (!entry || !storage || practiceReason(scored) || params.has("demo") || params.has("practice")) return false;
   try {
     storage.setItem(nextForKey(entry.song), JSON.stringify(entry));
     return true;

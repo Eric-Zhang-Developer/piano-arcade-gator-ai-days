@@ -91,14 +91,16 @@ const newPage = async (w, h, init) => {
 };
 const hex = (m) => m.map((b) => b.toString(16).padStart(2, "0")).join(" ");
 try {
-  // The start screen: the board connects with no click (Chrome granted it before), at both sizes.
+  // The start screen: the board connects with no click (Chrome granted it before), at both sizes. The button sits in
+  // the closed Options drawer (duo-start), mounted but not shown, so wait for it attached, then open the drawer.
   for (const [w, h] of [[1280, 720], [1920, 1080]]) {
     const page = await newPage(w, h, fakeBoard);
     await goto(page, "/play?song=twinkle");
     const btn = page.getByTestId("connect-lights");
-    await btn.waitFor({ timeout: 60_000 });
+    await btn.waitFor({ state: "attached", timeout: 60_000 });
     const ok = await page.waitForFunction(() => document.querySelector('[data-testid="connect-lights"]')?.dataset.state === "ready", null, { timeout: 10_000 }).then(() => true, () => false);
-    check(ok, `${w}×${h} start screen: a granted board connects by itself -> "${await btn.innerText()}"`);
+    check(ok, `${w}×${h} start screen: a granted board connects by itself -> "${await btn.textContent()}"`);
+    await page.getByTestId("options-open").click();
     await page.screenshot({ path: join(out, `start-${w}.png`) });
     await page.close();
   }
@@ -108,8 +110,8 @@ try {
     const page = await newPage(1280, 720, () => delete Navigator.prototype.serial);
     await goto(page, "/play?song=twinkle");
     const btn = page.getByTestId("connect-lights");
-    await btn.waitFor({ timeout: 60_000 });
-    const text = await btn.innerText();
+    await btn.waitFor({ state: "attached", timeout: 60_000 });
+    const text = await btn.textContent();
     check(/Chrome or Edge/.test(text) && (await btn.isDisabled()), `no Web Serial: "${text}", disabled`);
     await page.close();
   }

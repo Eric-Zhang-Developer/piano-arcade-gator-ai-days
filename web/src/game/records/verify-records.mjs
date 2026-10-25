@@ -119,14 +119,14 @@ try {
   if (top.length !== 2 || top[1].initials !== "---" || top[0].initials !== "ERI") fail.push(`2: top 5 ${JSON.stringify(top)}`);
   if (s2.twinkle?.best?.score !== s1.twinkle?.best?.score) fail.push("2: the best grade changed on a worse take");
 
-  // 3. A bot take isn't recorded.
+  // 3. A bot take isn't recorded, and its results show no records panel (duo-details hides a panel with nothing to say).
   await page.goto(`${base}/play?song=twinkle&bot=perfect&beat=off&stage=off`);
   await page.getByRole("button", { name: "Start" }).click({ timeout: 60_000 }).catch(() => {}); // bots may start themselves
-  await page.getByTestId("records").waitFor({ timeout: 120_000 });
-  const text3 = await page.getByTestId("records").innerText();
+  await page.getByTestId("results").waitFor({ timeout: 120_000 });
+  const panels3 = await page.getByTestId("records").count();
   const s3 = await stored(page);
-  say(`verify-records: take 3 (?bot=perfect) -> "${text3}", entries ${s3.twinkle?.top?.length}`);
-  if (!/Practice takes aren.t recorded/.test(text3)) fail.push(`3: panel says "${text3}"`);
+  say(`verify-records: take 3 (?bot=perfect) -> records panels ${panels3}, entries ${s3.twinkle?.top?.length}`);
+  if (panels3 !== 0) fail.push(`3: a records panel on a bot take`);
   if (s3.twinkle?.top?.length !== 2) fail.push("3: the bot take was recorded");
 
   fail.push(...errors);

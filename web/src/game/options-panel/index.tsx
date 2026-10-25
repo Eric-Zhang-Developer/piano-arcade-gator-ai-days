@@ -3,12 +3,22 @@
 // use. A native <dialog> with showModal(): it keeps Tab inside, closes on Esc, puts the focus back and makes the page
 // behind inert, so ↑/↓ never reach the song list.
 import Link from "next/link";
-import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent, type ReactNode } from "react";
 import { LATENCY_MAX, LATENCY_MIN, loadLatencyOffset, saveLatencyOffset } from "../core/settings";
 import { LABEL_SETTINGS, LABELS_KEY, labelSetting, type LabelSetting } from "../note-labels/labels";
 import { DEFAULT_PREFS, getPrefs, savePrefs, subscribePrefs, type Prefs } from "../sound";
 import { DEFAULT_PIANO_VOLUME, getPianoVolume, setPianoVolume, subscribePianoVolume } from "../laptop-sound/volume";
-import { DEFAULT_RECORDING_VOLUME, getRecordingVolume, setRecordingVolume, subscribeRecordingVolume } from "../audio-track";
+import {
+  DEFAULT_RECORDING_VOLUME,
+  getRecordingOffset,
+  getRecordingVolume,
+  RECORDING_OFFSET_MAX,
+  RECORDING_OFFSET_MIN,
+  setRecordingOffset,
+  setRecordingVolume,
+  subscribeRecordingOffset,
+  subscribeRecordingVolume,
+} from "../audio-track";
 import styles from "./options-panel.module.css";
 
 export const LABEL_NAMES: Record<LabelSetting, string> = { auto: "Auto", notes: "Note names", keys: "Laptop keys", off: "Off" };
@@ -94,6 +104,39 @@ function RecordingVolumeRow() {
   );
 }
 
+// audio-track's "Recording offset" (golden-demo): moves the recording against the chart, for a sidecar a little off on
+// this machine. The piano and the judge don't move. Positive plays the recording earlier.
+function RecordingOffsetRow() {
+  const offset = useSyncExternalStore(subscribeRecordingOffset, getRecordingOffset, () => 0);
+  return (
+    <div className={styles.row}>
+      <label className={styles.label} htmlFor="opt-recording-offset">
+        Recording offset
+      </label>
+      <div className={styles.control}>
+        <input
+          id="opt-recording-offset"
+          data-row
+          data-testid="opt-recording-offset"
+          type="range"
+          min={RECORDING_OFFSET_MIN}
+          max={RECORDING_OFFSET_MAX}
+          step={5}
+          value={offset}
+          onChange={(e) => setRecordingOffset(Number(e.target.value))}
+        />
+        <output className={styles.value} data-testid="opt-recording-offset-value">
+          {offset > 0 ? "+" : offset < 0 ? "\u2212" : ""}
+          {Math.abs(offset)} ms
+        </output>
+      </div>
+      {/* Which way it moves, in the label row's right slot (Latency's Calibrate link sits there), so the value cell
+          keeps every row's width and the tracks line up. */}
+      {offset !== 0 && <span className={styles.hint}>{offset > 0 ? "Plays early" : "Plays late"}</span>}
+    </div>
+  );
+}
+
 // The rows, in the spec's order. Each row's first control carries data-row, the target of ↑/↓.
 export function OptionsRows({
   values,
@@ -106,7 +149,7 @@ export function OptionsRows({
   onLatency(ms: number): void;
   onPrefs(p: Partial<Prefs>): void;
   onLabels(s: LabelSetting): void;
-  recording?: boolean; // a song on this machine has a recording (audio-track): only then the Recording volume row
+  recording?: boolean; // a song on this machine has a recording (audio-track): only then the Recording rows
 }) {
   const { latency, prefs, labels } = values;
   const enterToggles = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -160,6 +203,7 @@ export function OptionsRows({
       </div>
       <PianoVolumeRow />
       {recording && <RecordingVolumeRow />}
+      {recording && <RecordingOffsetRow />}
       <label className={styles.row}>
         <span className={styles.label}>Mute</span>
         <input data-row data-testid="opt-mute" type="checkbox" className={styles.check} checked={prefs.muted} onKeyDown={enterToggles} onChange={(e) => onPrefs({ muted: e.target.checked })} />
@@ -203,7 +247,22 @@ export function OptionsRows({
 const typing = (t: EventTarget | null) => t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
 
 // The Options button and its drawer. O toggles it from anywhere on the page; Esc closes it (the dialog's own).
-export function OptionsDrawer({ recording = false }: { recording?: boolean }) {
+// /play's start screen (duo-start) passes keys={false}, since O is a laptop piano key there, its own onLatency so the
+// next take uses the new offset, and the start panels that belong in it (Connect lights, the MIDI status) as children.
+// The results screen (duo-details) does the same, with its own note: there the next take starts from Retry.
+export function OptionsDrawer({
+  recording = false,
+  keys = true,
+  onLatency,
+  note,
+  children,
+}: {
+  recording?: boolean;
+  keys?: boolean;
+  onLatency?: (ms: number) => void;
+  note?: string;
+  children?: ReactNode;
+}) {
   const ref = useRef<HTMLDialogElement>(null);
   const prefs = useSyncExternalStore(subscribePrefs, getPrefs, () => DEFAULT_PREFS);
   const [latency, setLatency] = useState(0);
@@ -220,6 +279,7 @@ export function OptionsDrawer({ recording = false }: { recording?: boolean }) {
   const toggle = () => (ref.current?.open ? ref.current.close() : open());
 
   useEffect(() => {
+    if (!keys) return;
     const onKey = (e: globalThis.KeyboardEvent) => {
       if (e.key.toLowerCase() !== "o" || e.metaKey || e.ctrlKey || e.altKey || typing(e.target)) return;
       e.preventDefault();
@@ -240,8 +300,16 @@ export function OptionsDrawer({ recording = false }: { recording?: boolean }) {
 
   return (
     <>
-      <button type="button" className={styles.open} onClick={open} data-capture-hide data-testid="options-open">
-        Options <kbd className={styles.kbd}>O</kbd>
+      <button
+        type="button"
+        className={styles.open}
+        onClick={open}
+        title={keys ? "Options (O)" : undefined}
+        aria-keyshortcuts={keys ? "O" : undefined}
+        data-capture-hide
+        data-testid="options-open"
+      >
+        Options
       </button>
       <dialog ref={ref} className={styles.drawer} onKeyDown={onKeyDown} aria-labelledby="options-title" data-testid="options">
         <header className={styles.head}>
@@ -257,7 +325,8 @@ export function OptionsDrawer({ recording = false }: { recording?: boolean }) {
           recording={recording}
           onLatency={(ms) => {
             setLatency(ms);
-            saveLatencyOffset(ms);
+            if (onLatency) onLatency(ms); // saves it too
+            else saveLatencyOffset(ms);
           }}
           onPrefs={(p) => savePrefs({ ...getPrefs(), ...p })}
           onLabels={(s) => {
@@ -267,7 +336,8 @@ export function OptionsDrawer({ recording = false }: { recording?: boolean }) {
             requestAnimationFrame(() => ref.current?.querySelector<HTMLElement>(`[data-testid="opt-labels-${s}"]`)?.focus());
           }}
         />
-        <p className={styles.note}>Latency and labels apply from the next song.</p>
+        {children && <div className={styles.extra}>{children}</div>}
+        <p className={styles.note}>{note ?? (onLatency ? "Labels apply when you press Start." : `Latency, labels${recording ? " and the recording" : ""} apply from the next song.`)}</p>
       </dialog>
     </>
   );

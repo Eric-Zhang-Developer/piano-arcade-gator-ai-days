@@ -2,6 +2,21 @@
 
 What we learned from running the thing. Specs cite this file; new findings go on top, dated.
 
+## 2026-10-25: Golden's sheet has no dynamics or pedal marks (eric-agent-3, golden-demo)
+
+- All 96 bars of Eric's Golden sheet (`video-references/golden-sheet/page-*.webp`) were read for p/mp/mf/f marks,
+  hairpins and Ped. marks. There are none, so the spec's Requirement 1 fallback and a measured source take their place.
+- **Pedal, bars 1–96: the per-harmony rule** (an arrangement choice).
+  - A left-hand harmony is the set of pitch classes struck in a half bar, or a whole bar in 3/4.
+  - A pair starts at a window that strikes a new set, at the left hand's first strike in a bar (a re-pedal on a
+    re-struck chord), or after a left-hand rest of a bar or more.
+  - Down 60 ms after the pair's first onset, up 20 ms before the next pair's; a rest of a bar or more lifts it at
+    the rest.
+  - Result: 112 pairs, one bar at the median. The longest is bar 65, the bar the recording stretches.
+- **Dynamics:** from the recording's loudness per bar (`specs/decisions/golden-demo-dynamics.md`).
+- Both are written into the local charts and `pedal.json` by the local spike tool, `txt2chart.py`. Nothing goes into
+  git.
+
 ## 2026-10-24: how Eric checks on the piano (Eric)
 
 - Eric checks on the DGX about once every 1 to a few hours, and his checks are about feel and direction, so workers

@@ -28,6 +28,18 @@ test("Recording volume shows only when a song has a recording, after Piano volum
   expect(html.indexOf("Recording volume")).toBeLessThan(html.indexOf("Mute"));
 });
 
+test("Recording offset shows only with a recording, after Recording volume, at 0 ms until set", () => {
+  expect(render(0)).not.toMatch(/Recording offset/);
+  const html = renderToStaticMarkup(
+    <OptionsRows values={{ latency: 0, prefs: { volume: 0.35, muted: false, missCue: false }, labels: "off" }} onLatency={() => {}} onPrefs={() => {}} onLabels={() => {}} recording />,
+  );
+  expect(html).toMatch(/id="opt-recording-offset"[^>]*min="-300"[^>]*max="300"[^>]*value="0"/);
+  expect(html.indexOf("Recording volume")).toBeLessThan(html.indexOf("Recording offset"));
+  expect(html.indexOf("Recording offset")).toBeLessThan(html.indexOf("Mute"));
+  expect(html).not.toMatch(/Plays (early|late)/); // no direction to name at 0
+});
+
+
 test("row movement stops at the ends", () => {
   expect(rowStep(0, -1, 5)).toBe(0);
   expect(rowStep(4, 1, 5)).toBe(4);

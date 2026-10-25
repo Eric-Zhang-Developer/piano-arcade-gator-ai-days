@@ -9,12 +9,17 @@
 }
 
 .roll {
-  /* Fixed, so nothing in the panel shrinks (song-options' check): 20vh fits a two-line title, the Hands row and the
-     footer at 1280×720 and 1920×1080. */
+  /* Fixed, so nothing in the panel shrinks (song-options' check). It was 20vh before LEARN and WATCH (mouse-first),
+     and 17vh before the play-modes mark, which it pays for. Short screens take it lower (below). */
   flex: none;
-  height: min(20vh, 300px);
+  height: min(14vh, 300px);
   border: 1px solid var(--pa-line);
   background: var(--pa-bg);
+}
+
+/* With a "Next for you" strip the panel is one row taller: the roll gives it the room. */
+.panel:has(.next) .roll {
+  height: min(7vh, 300px);
 }
 
 .title {
@@ -63,7 +68,7 @@
   flex: none;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1vw;
+  gap: 0.9vh 1vw;
   margin-top: 1.8vh;
 }
 
@@ -72,19 +77,41 @@
   cursor: default;
 }
 
-/* The level toggle beside the preview's Hands, Speed, source and status. */
+/* The level toggle and the preview's Hands, Speed, source and status, placed as one grid: Hands and Speed across the
+   panel, then the level beside the source and status. With the level in a column of its own, Hands, Speed and the
+   practice note had 275 px at 1280×720 and took three rows (#863). */
 .extras {
   flex: none;
-  display: flex;
-  align-items: flex-start;
-  gap: 1.4vw;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "opts opts" "level source" "level status";
+  align-items: center;
+  column-gap: 1.4vw;
   margin-top: 1.6vh;
 }
 
-.extras > :last-child {
-  flex: 1;
-  min-width: 0;
-  margin-top: 0;
+.extras > [data-testid="song-preview"] {
+  display: contents;
+}
+
+.extras [data-testid="song-options"] {
+  grid-area: opts;
+  margin-bottom: 0.9vh;
+}
+
+.extras [data-testid="level-toggle"] {
+  grid-area: level;
+}
+
+/* The credit and the status sit on the panel's right edge, the level on its left. */
+.extras [data-testid="preview-source"] {
+  grid-area: source;
+  justify-self: end;
+}
+
+.extras [data-testid="preview-status"] {
+  grid-area: status;
+  justify-self: end;
 }
 
 /* One song in the list: a small roll, the title over its composer, and its level. */
@@ -125,6 +152,36 @@
   font-weight: 700;
   font-size: clamp(24px, 1.9vw, 36px);
   font-variant-numeric: tabular-nums;
+}
+
+/* Short screens (1280×720, the video's size): the cells and the chips under the buttons keep their pixel sizes, so
+   at 720 they take half again their share and the panel ran up to 61 px under the footer (#863). The roll, the title
+   and the gaps give it back; at 1080 nothing changes. */
+@media (max-height: 800px) {
+  .roll {
+    height: 10vh;
+  }
+
+  .panel:has(.next) .roll {
+    height: 4vh;
+  }
+
+  .next {
+    margin-top: 0.8vh;
+  }
+
+  .title {
+    margin: 1.4vh 0 0.6vh;
+    font-size: clamp(30px, 5vh, 64px);
+  }
+
+  .buttons {
+    margin-top: 1.2vh;
+  }
+
+  .extras {
+    margin-top: 1vh;
+  }
 }
 
 @keyframes enter {

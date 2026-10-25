@@ -1,6 +1,15 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { Chart } from "../../contracts";
-import { fileTimeAt, getRecordingVolume, loopWindow, parseSidecar, segmentsFrom, setRecordingVolume, skipReason, subscribeRecordingVolume } from ".";
+import {
+  audioTrack,
+  fileTimeAt,
+  getRecordingOffset,
+  getRecordingVolume,
+  RECORDING_OFFSET_MAX,
+  setRecordingOffset, loopWindow, parseSidecar, segmentsFrom, setRecordingVolume,
+  skipReason,
+  subscribeRecordingVolume,
+} from ".";
 
 // 120 bpm, 4/4: a beat is 500 ms, a bar 2000 ms. Eight bars, one note a bar.
 const chart: Chart = {
@@ -74,5 +83,43 @@ describe("audio-track timing", () => {
     off();
     setRecordingVolume(0.4);
     expect([getRecordingVolume(), heard]).toEqual([0.4, 2]);
+  });
+});
+
+describe("Recording offset (golden-demo, part 6)", () => {
+  it("is 0 until set, clamps to ±300 ms, and tells its listeners", () => {
+    expect(getRecordingOffset()).toBe(0);
+    setRecordingOffset(1000);
+    expect(getRecordingOffset()).toBe(RECORDING_OFFSET_MAX);
+    setRecordingOffset(-40);
+    expect(getRecordingOffset()).toBe(-40);
+    setRecordingOffset(0);
+  });
+
+  it("moves the recording only: file time = offsetMs + recording offset + chart time", async () => {
+    vi.stubGlobal("window", { addEventListener() {}, location: { origin: "http://localhost" } });
+    vi.stubGlobal("fetch", async (url: string) => ({
+      ok: true,
+      json: async () => ({ src: "a.mp3", offsetMs: 3000 }),
+      arrayBuffer: async () => new ArrayBuffer(8),
+      url,
+    }));
+    vi.stubGlobal(
+      "AudioContext",
+      class {
+        state = "running";
+        decodeAudioData = async () => ({ duration: 60 });
+      },
+    );
+    try {
+      audioTrack().transformChart!(chart, q("song=local/t"));
+      await vi.waitFor(() => expect(window.__pianoArcadeAudio?.loaded).toBe(true));
+      expect(window.__pianoArcadeAudio!.fileTimeAt(1000)).toBe(4000);
+      setRecordingOffset(120);
+      expect(window.__pianoArcadeAudio!.fileTimeAt(1000)).toBe(4120);
+    } finally {
+      setRecordingOffset(0);
+      vi.unstubAllGlobals();
+    }
   });
 });

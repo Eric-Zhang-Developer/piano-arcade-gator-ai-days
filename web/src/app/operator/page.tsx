@@ -3,6 +3,7 @@
 // The arcade's operator menu: what needs a person, who's working, and the bookkeeping. LIVE polls /api/operator
 // (development only); SNAPSHOT (?snapshot, or any production build) reads only the frozen file.
 import { useEffect, useState } from "react";
+import { Brackets, Button, DataCell, kitButton, Panel } from "@/game/duo-tokens";
 import type { Board, Ci, Heartbeat, State } from "../../operator/board";
 import styles from "./operator.module.css";
 
@@ -107,7 +108,9 @@ export default function OperatorPage() {
       <header className={styles.header}>
         <div className={styles.titleRow}>
           <h1 className={styles.title}>OPERATOR MODE</h1>
-          <a className={styles.attract} href={`/attract${mode === "SNAPSHOT" ? "?snapshot" : ""}`}>ATTRACT MODE ▶</a>
+          <a {...kitButton("secondary")} href={`/attract${mode === "SNAPSHOT" ? "?snapshot" : ""}`}>
+            ATTRACT MODE ▶
+          </a>
         </div>
         {mode && (
           <p className={styles.meta}>
@@ -124,20 +127,21 @@ export default function OperatorPage() {
               </>
             )}
             {mode === "LIVE" && board && (
-              <button className={styles.freeze} onClick={freeze}>
+              <Button kind="primary" className={styles.freeze} onClick={freeze}>
                 ❄ Freeze snapshot
-              </button>
+              </Button>
             )}
           </p>
         )}
+        {/* keys 1-3 still jump to each screen (the ? card lists them); no key badges on the face (#772) */}
         <nav className={styles.keys} aria-label="Screens">
-          <a href="#screen-1">[1] Needs a person</a>
-          <a href="#screen-2">[2] Crew</a>
-          <a href="#screen-3">[3] Bookkeeping</a>
+          <a href="#screen-1">Needs a person</a>
+          <a href="#screen-2">Crew</a>
+          <a href="#screen-3">Bookkeeping</a>
         </nav>
       </header>
 
-      {(note || frozen || board?.banner.length) && (
+      {!!(note || frozen || board?.banner.length) && ( // !!: an empty banner list would render a stray 0
         <div className={styles.banner} role="status">
           {board?.banner.map((b) => <p key={b}>⚠ {b}</p>)}
           {note && <p>{note}</p>}
@@ -173,24 +177,28 @@ function Totals({ board }: { board: Board }) {
     ["PRS MERGED", merged === undefined ? "?" : String(merged)],
   ];
   return (
-    <dl className={styles.totals}>
-      {cells.map(([k, v]) => (
-        <div key={k}>
-          <dt>{k}</dt>
-          <dd>{v}</dd>
-        </div>
-      ))}
-    </dl>
+    <Brackets tone="line" style={{ marginBottom: 24 }}>
+      <Panel style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)" }}>
+        {cells.map(([k, v], i) => (
+          <DataCell key={k} label={k} value={v} size={48} style={i === 0 ? { borderLeft: "none" } : undefined} />
+        ))}
+      </Panel>
+    </Brackets>
   );
 }
 
+// One screen, a bracketed panel. Needs a person gets the primary brackets: it's what the operator acts on.
 function Screen({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
     <section id={`screen-${n}`} className={styles.screen} tabIndex={-1} aria-labelledby={`screen-${n}-title`}>
-      <h2 id={`screen-${n}-title`} className={styles.screenTitle}>
-        <span className={styles.screenKey}>{n}</span> {title}
-      </h2>
-      {children}
+      <Brackets tone={n === 1 ? "primary" : "line"}>
+        <Panel style={{ padding: "18px 22px 20px" }}>
+          <h2 id={`screen-${n}-title`} className={styles.screenTitle}>
+            {title}
+          </h2>
+          {children}
+        </Panel>
+      </Brackets>
     </section>
   );
 }

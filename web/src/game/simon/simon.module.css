@@ -154,12 +154,6 @@
   cursor: pointer;
 }
 
-.again kbd {
-  margin-left: 0.6em;
-  font: 600 13px/1 system-ui;
-  color: var(--pa-ink-dim);
-}
-
 .foot {
   display: flex;
   justify-content: space-between;

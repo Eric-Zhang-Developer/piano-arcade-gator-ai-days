@@ -1,0 +1,207 @@
+/* Spot the wrong note (spec: wrong-note-spike): the Duo kit's tokens. Eight pads in a row, like a step sequencer: each
+   lights as its note sounds, and you answer by pressing one. Nothing on a pad shows pitch: that would give it away. */
+.page {
+  box-sizing: border-box;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 2vh;
+  padding: 5vh 4vw 3vh;
+  background: var(--pa-bg);
+  color: var(--pa-ink);
+  overflow: hidden;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1em 2em;
+}
+
+.mark {
+  margin: 0;
+  font: 800 clamp(28px, 3.6vw, 60px) / 1 var(--pa-font-display), system-ui, sans-serif;
+  font-stretch: 75%;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.songs {
+  display: flex;
+  gap: 1.6em;
+  font: 600 clamp(16px, 1.25vw, 24px) / 1 var(--pa-font-display), system-ui, sans-serif;
+  font-stretch: 75%;
+}
+
+.songs a {
+  color: var(--pa-ink-dim);
+  text-decoration: none;
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+}
+
+.songs a:hover {
+  color: var(--pa-ink);
+}
+
+.songs a[aria-current] {
+  color: var(--pa-primary);
+  border-bottom-color: var(--pa-primary);
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4vh;
+  min-height: 0;
+}
+
+.callRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2vh;
+  font-size: clamp(16px, 1.25vw, 24px);
+}
+
+.call {
+  margin: 0;
+  font: 700 clamp(28px, 3.4vw, 58px) / 1.1 var(--pa-font-display), system-ui, sans-serif;
+  text-align: center;
+  max-width: 30ch;
+}
+
+.call[data-tone="right"] {
+  color: var(--pa-gold);
+}
+
+.call[data-tone="wrong"] {
+  color: var(--pa-wrong);
+}
+
+.pads {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: clamp(8px, 1vw, 20px);
+}
+
+.pad {
+  width: 100%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--pa-line);
+  border-radius: 0;
+  background: var(--pa-panel);
+  color: var(--pa-ink);
+  cursor: pointer;
+  transition:
+    background 80ms,
+    border-color 80ms,
+    transform 80ms;
+}
+
+.pad:hover:not(:disabled) {
+  border-color: var(--pa-primary);
+}
+
+.pad:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.pad:focus-visible {
+  outline: 2px solid var(--pa-ink);
+  outline-offset: 2px;
+}
+
+.pad:disabled {
+  cursor: default;
+}
+
+/* Note 1 is the anchor: it never moves, so it can't be the answer. */
+.pads li:first-child .pad {
+  color: var(--pa-ink-dim);
+  border-style: dashed;
+}
+
+.num {
+  font: 800 clamp(40px, 6vw, 112px) / 1 var(--pa-font-display), system-ui, sans-serif;
+  font-stretch: 75%;
+  font-variant-numeric: tabular-nums;
+}
+
+.pads li .pad[data-lit] {
+  background: var(--pa-primary);
+  border-color: var(--pa-primary);
+  color: var(--pa-bg);
+}
+
+.pad[data-state="answer"] {
+  border: 3px solid var(--pa-gold);
+  color: var(--pa-gold);
+}
+
+.pad[data-state="chosen"] {
+  border: 3px solid var(--pa-wrong);
+  color: var(--pa-wrong);
+}
+
+/* The reveal plays the phrase as written: the answer pad lights gold as its note sounds, the wrong pick red. */
+.pads li .pad[data-lit][data-state="answer"] {
+  background: var(--pa-gold);
+  border-color: var(--pa-gold);
+}
+
+.pads li .pad[data-lit][data-state="chosen"] {
+  background: var(--pa-wrong);
+  border-color: var(--pa-wrong);
+}
+
+.score {
+  margin: 0;
+  font: 800 clamp(96px, 16vh, 220px) / 1 var(--pa-font-display), system-ui, sans-serif;
+  font-stretch: 75%;
+  font-variant-numeric: tabular-nums;
+}
+
+.score span {
+  color: var(--pa-ink-dim);
+  font-size: 0.5em;
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  min-height: 48px;
+}
+
+.foot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  font-size: clamp(12px, 0.8vw, 16px);
+}
+
+.sets {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  color: var(--pa-ink-dim);
+  max-height: 12vh;
+  overflow: auto;
+  user-select: all; /* one drag copies them into FINDINGS.md */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pad {
+    transition: none;
+  }
+}

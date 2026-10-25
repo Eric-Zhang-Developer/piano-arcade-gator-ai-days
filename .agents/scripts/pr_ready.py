@@ -52,7 +52,11 @@ def newest_runs(checks: list[dict]) -> list[dict]:
         key = c.get("context") or (c.get("workflowName"), c.get("name"))
         if key not in newest or when(c) >= when(newest[key]):
             newest[key] = c
-    return list(newest.values())
+    runs = list(newest.values())
+    # A run cancelled before its matrix expanded leaves a job named "browser (${{ matrix.shard }})" that never
+    # reruns (#726, #811). Drop it once an expanded sibling ("browser (1)") exists: that one is the real result.
+    expanded = {n.split(" (")[0] for c in runs if " (" in (n := c.get("name") or "") and "${{" not in n}
+    return [c for c in runs if not ("${{" in (c.get("name") or "") and (c.get("name") or "").split(" (")[0] in expanded)]
 
 
 def unresolved_threads(root, pr: dict) -> int | None:

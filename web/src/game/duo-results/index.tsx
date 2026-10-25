@@ -5,6 +5,7 @@ import { useEffect, type CSSProperties, type ReactNode } from "react";
 import type { Chart, GamePlugin, Results, ResultsPanelContext, Take } from "../../contracts";
 import { Brackets, Button, MonoLabel, Panel } from "../duo-tokens";
 import { isWaitMode } from "../wait-mode";
+import { playMode } from "../play-modes/modes";
 import {
   barCount,
   barScores,
@@ -31,13 +32,13 @@ export function duoTake(chart: Chart, take: Take, results: Results, params: URLS
   const per = Math.max(1, Math.ceil(barCount(chart) / duoPanelSettings.maxCells));
   const run = weakestRun(barScores(chart, take, results)); // always found bar by bar, then shown on the cells
   const drift = run ? handDrift(chart, results, run.from, run.to) : { L: null, R: null };
-  const accuracy = run ? rangeScore(chart, take, results, run.from, run.to).accuracy : null;
+  const cell = run ? rangeScore(chart, take, results, run.from, run.to) : null;
   return {
     per,
     cells: barScores(chart, take, results, per),
     run,
     timing: histogram(results),
-    lines: tutorLine({ run, accuracy, drift }),
+    lines: tutorLine({ run, accuracy: cell?.accuracy ?? null, drift, misses: cell?.misses, flow: playMode(params) === "flow" }),
     hand: driftingHand(drift)[0],
     href: run ? practiceBarsUrl(chart.id, params, run) : "/",
   };
@@ -160,7 +161,7 @@ const storage = () => {
 export function Tutor({ d, chart, params }: { d: DuoTake; chart: Chart; params: URLSearchParams }) {
   const { run, lines, href, hand } = d;
   useEffect(() => {
-    saveNextFor(storage(), params, run && { song: params.get("song") ?? chart.id, from: run.from, to: run.to, hand });
+    saveNextFor(storage(), params, run && { song: params.get("song") ?? chart.id, from: run.from, to: run.to, hand, mode: playMode(params) });
   }, [params, chart.id, run, hand]);
   return (
     <div data-testid="duo-tutor" style={{ display: "flex", alignItems: "center", gap: 20, textAlign: "left" }}>

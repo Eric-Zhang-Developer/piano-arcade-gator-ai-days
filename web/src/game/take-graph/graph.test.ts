@@ -25,12 +25,12 @@ describe("graphPoints", () => {
   });
 
   it("gives one point per chart note: a MISS has a null offset, a hit its event's velocity", () => {
-    const t = take(twinkle, (i) => (i === 3 ? null : i % 2 ? 32 : -10));
+    const t = take(twinkle, (i) => (i === 3 ? null : i % 2 ? 60 : -10));
     const r = judgeTake(twinkle, t);
     const pts = graphPoints(twinkle, t, r);
     expect(pts).toHaveLength(twinkle.notes.length);
     expect(pts[3]).toMatchObject({ judgment: "MISS", offsetMs: null, velocity: null });
-    expect(pts[1]).toMatchObject({ judgment: "GREAT", offsetMs: 32, velocity: 41 });
+    expect(pts[1]).toMatchObject({ judgment: "GREAT", offsetMs: 60, velocity: 41 });
     for (const p of pts.filter((p) => p.offsetMs !== null)) {
       const j = r.judgments.find((j) => j.noteId === p.noteId)!;
       expect(p.velocity).toBe(t.events[j.eventIndex!].velocity);

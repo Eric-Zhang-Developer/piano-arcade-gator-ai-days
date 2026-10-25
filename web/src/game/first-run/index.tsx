@@ -103,8 +103,8 @@ export function FirstRunLink() {
     return () => window.removeEventListener("keydown", onKey);
   }, [router]);
   return (
-    <Link href={firstRunUrl} className={styles.link} tabIndex={-1} onMouseDown={(e) => e.preventDefault()} data-capture-hide data-testid="first-run-link">
-      First time? 30-second first song <kbd className={styles.kbd}>F</kbd>
+    <Link href={firstRunUrl} className={styles.link} tabIndex={-1} onMouseDown={(e) => e.preventDefault()} title="First song (F)" aria-keyshortcuts="F" data-capture-hide data-testid="first-run-link">
+      First time? 30-second first song
     </Link>
   );
 }

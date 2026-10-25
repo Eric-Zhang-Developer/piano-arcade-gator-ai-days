@@ -9,6 +9,7 @@ import { laptopKey } from "../../game/laptop-sound";
 import { allNotesOff } from "../../game/piano-out";
 import { laptopReach, melody, newRun, phrase, phraseMessages, simonSettings, step, type Run, type SimonEvent } from "../../game/simon";
 import styles from "../../game/simon/simon.module.css";
+import { HelpLink } from "../../game/help-overlay";
 import { tone } from "../../game/sound";
 
 const SONGS = [
@@ -188,13 +189,14 @@ function Simon() {
         {run?.phase === "turn" && <Dots done={run.pos} of={phrase(tune, run.round).length} />}
         {chart && <Keys tune={tune} lit={lit} held={held} wrong={run?.phase === "over" ? run.wrong : null} />}
         {(!run || run.phase === "over" || run.phase === "won") && chart && (
-          <button className={styles.again} onClick={start}>
-            {run ? "Again" : "Start"} <kbd>Space</kbd>
+          <button className={styles.again} onClick={start} title={`${run ? "Again" : "Start"} (Space)`} aria-keyshortcuts="Space Enter">
+            {run ? "Again" : "Start"}
           </button>
         )}
       </section>
 
       <footer className={styles.foot}>
+        <HelpLink />
         {reach !== null && <p>Laptop keys reach round {reach} on this song</p>}
         <p>{midiStatus}</p>
         {runs.length > 0 && (

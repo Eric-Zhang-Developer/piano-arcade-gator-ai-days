@@ -170,6 +170,14 @@ cut = []
 name = "extras"
 ship = ""
 features = [
+  "golden-demo", # Eric, 2026-10-25 (#807): Golden's DGX autoplay sounds like a performance; his priority now
+  "key-polish", # Eric, 2026-10-25 (#848): the keyboard and falling notes polished to hit-particles' level; a priority
+  "stage-view", # Eric, 2026-10-25 (#875): a NOSTALGIA-style audience highway on a second display, mirroring the live take
+  "milestone-sfx", # Eric, 2026-10-25 (#877): Chunithm-level sound on milestones only, never per hit
+  "experiments", # Eric, 2026-10-25 (#878): many variations on main, off by default, reviewed from a Lab gallery, pruned later
+  "duo-details", # Eric, 2026-10-25 (#833): the results screen's Details grid in the Duo look, settings in Options
+  "play-modes", # Eric, 2026-10-25 (#835): Learn, Flow and Perform as a ladder; practice keeps your mode (#832)
+  "demo-performance", # Eric, 2026-10-25 (#814): sustain, dynamics and legato for every demo, five songs a batch
   "laptop-sound",
   "flow-mode",
   "duo-tokens",
@@ -178,11 +186,13 @@ features = [
   "duo-select",
   "duo-results",
   "sheet-paper",
+  "sheet-engraving", # Eric, 2026-10-25 (#827): clef changes, 8va, beamed eighths and a readable zoom on /sheet; after sheet-paper, same worker
   "lab",
   "nav-bar",
   "hit-particles", # Eric, 2026-10-25 (#750): a priority, so ahead of duo-start
   "mouse-first", # Eric, 2026-10-25 (#772): key hints off the screens, onto the ? card
   "foreman-duo", # Eric, 2026-10-25 (#774): the foreman's pages fully in the Duo look
+  "sampled-piano", # Eric, 2026-10-25 (#798): the laptop voice plays real piano samples
   "duo-start",
   "level-forge",
   "veritas",
@@ -205,10 +215,14 @@ cut = []
 
 # spikes: after extras (Eric, 2026-10-24). About 3 hours of agent time each, findings whatever the state, never on the
 # demo path by themselves, and no new spike work after Sun Oct 25 12:00 PM ET.
+# The last three added 2026-10-25 (about 05:40 ET) on Eric's "We have a lot of agent hours ... Treat it as
+# near-infinite. But the problem is the humans": each answer is measured by code, and Eric's part is minutes.
 [[milestone]]
 name = "spikes"
 ship = ""
-features = ["simon-says-spike", "restyle-spike"]
+features = ["simon-says-spike", "restyle-spike", "score-follow-spike", "wrong-note-spike", "snap-score-spike",
+  "mascot-spike", # Eric, 2026-10-25 (#903): "I like those 4 alright lets do a spike"
+]
 cut = []
 
 [[milestone]]

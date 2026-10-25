@@ -2,9 +2,9 @@
 // The music select (/), in the Duo look (duo-select): the focused song in a bracketed panel on the left, the song rows
 // on the right. Each row is a link, so click and Enter play (the panel's piano roll moving into the stage card,
 // select-to-stage); ↑/↓ move focus and keep the focused row centered in the list; P opens adaptive practice
-// (adaptive-chunks); L learns the focused song in wait mode (learn-from-select); W watches it; E switches Normal and
-// Easy (easy-charts), and every href and best grade follows the level. Hrefs and L also carry the song's Hands and
-// Speed (song-options).
+// (adaptive-chunks) in Flow (play-modes); L learns the focused song in Learn (learn-from-select); W watches it; E
+// switches Normal and Easy (easy-charts), and every href and best grade follows the level. Hrefs and L also carry the
+// song's Hands and Speed (song-options).
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
@@ -22,6 +22,7 @@ import type { Song } from "../song-select/load";
 import { goToStage } from "./go-to-stage";
 import styles from "./select-layout.module.css";
 import { APP_NAME } from "../app-name";
+import { HelpLink } from "../help-overlay";
 
 // footer: the left column's last row, in flow under the focused song (the Options button, first-run's link). Outside the
 // per-song section, so it isn't remounted on every ↑/↓.
@@ -59,13 +60,13 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
     return () => window.removeEventListener("keydown", onKey);
   }, [level, setLevel]);
 
-  // PRACTICE: adaptive practice from the whole song (adaptive-chunks), with the song's hands and level. It needs the
-  // chart's phrases, so it waits for the focused chart.
+  // PRACTICE: adaptive practice from the whole song (adaptive-chunks), in Flow (play-modes: practice opens Flow), with
+  // the song's hands and level. It needs the chart's phrases, so it waits for the focused chart.
   const hands = song ? options[song.id]?.hands : undefined;
   const practiceHref =
     song && chart?.id === song.id
       ? (() => {
-          const q = new URLSearchParams({ song: song.id });
+          const q = new URLSearchParams({ song: song.id, mode: "flow" });
           if (hands && hands !== "both") q.set("hands", hands);
           const list = songPhrases(chart.chart, q.get("hands"));
           return list.length ? withLevel(adaptUrl(q, list, start(list)), level) : null;
@@ -79,7 +80,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
     }
     if (isLearnKey(e) && song) {
       e.preventDefault();
-      return router.push(withOptions(withLevel(learnUrl(song.id), level), options[song.id]));
+      return router.push(learnHref(song.id));
     }
     if (isWatchKey(e) && song) {
       e.preventDefault();
@@ -106,13 +107,12 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
   }
 
   const playHref = (id: string) => withOptions(withLevel(`/play?song=${id}`, level), options[id]);
+  const learnHref = (id: string) => withOptions(withLevel(learnUrl(id), level), options[id]);
   return (
     <main className={styles.screen}>
       <header className={styles.top}>
         <h1 className={styles.wordmark}>{APP_NAME}</h1>
-        <p className={styles.hint}>
-          <b>↑↓</b> SELECT · <b>ENTER</b> PLAY · <b>P</b> PRACTICE · <b>L</b> LEARN · <b>W</b> WATCH · <b>E</b> EASY
-        </p>
+        <HelpLink />
       </header>
       <div className={styles.left}>
         {song && (
@@ -131,6 +131,8 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
               goToStage(playHref(song.id), router);
             }}
             onPractice={practiceHref ? () => router.push(practiceHref) : null}
+            onLearn={() => router.push(learnHref(song.id))}
+            onWatch={() => router.push(watchUrl(song.id))}
           >
             <LevelToggle normal={song.level} chart={chart?.id === song.id ? chart.chart : null} />
             <SongPreview id={song.id} />
@@ -138,7 +140,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
         )}
         {footer && <div className={styles.footer}>{footer}</div>}
       </div>
-      <ol className={styles.list} onKeyDown={onKeyDown}>
+      <ol className={styles.list} onKeyDown={onKeyDown} aria-label="Songs">
         {songs.map((s, i) => (
           <li key={s.id}>
             <Link

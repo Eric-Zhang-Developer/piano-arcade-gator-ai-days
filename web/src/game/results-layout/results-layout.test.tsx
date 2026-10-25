@@ -50,7 +50,7 @@ test("the featured panel and the button panels are in the first view; the rest a
   expect(ceremony).not.toContain("TOP 5");
   expect(details).toContain('aria-label="Records"');
   expect(details).toContain('aria-label="Chord sync"');
-  expect(details.indexOf("TOP 5")).toBeLessThan(details.indexOf("CHORDS")); // layers.ts order
+  expect(details.indexOf("CHORDS")).toBeLessThan(details.indexOf("TOP 5")); // How I played's order (duo-details)
   expect(html).not.toContain("slot-evenness"); // a null panel gets no card
   expect(html).toContain('data-testid="slot-duo-results"');
 });
@@ -116,6 +116,34 @@ test("the top band: the rank, the title and composer, and six data cells, PERFEC
   const numeral = (tone: string) => top.slice(top.indexOf(`color:var(--pa-${tone})`)).split('data-kit="cell"')[0];
   expect(numeral("gold")).toContain('data-testid="count-PERFECT">30<');
   expect(numeral("miss")).toContain('data-testid="count-MISS">4<');
+});
+
+test("the details come in two groups: How I played's cards in their order, then Do something's buttons (duo-details)", () => {
+  const ids = ["records", "chord-sync", "weak-bars", "bar-loop", "take-graph", "dynamics", "evenness", "tempo-curve", "replay-view", "take-midi", "dynamics-new"];
+  const html = render({ plugins: ids.map((id) => plugin(id, `<${id}>`)), timing: <p>TIMING TEXT</p> });
+  const played = between(html, 'data-group="played"', 'data-group="doing"');
+  const doing = html.slice(html.indexOf('data-group="doing"'));
+  const at = (id: string) => played.indexOf(`slot-${id}"`);
+  expect(played.indexOf("TIMING TEXT")).toBeLessThan(at("tempo-curve"));
+  const order = ["tempo-curve", "evenness", "dynamics", "take-graph", "bar-loop", "weak-bars", "chord-sync", "records", "dynamics-new"];
+  order.slice(1).forEach((id, i) => expect(at(order[i]), `${order[i]} before ${id}`).toBeLessThan(at(id))); // unlisted last
+  expect(played).toContain('aria-label="Passes"');
+  expect(between(played, 'slot-take-graph"', 'slot-bar-loop"')).toContain("data-wide"); // spans both columns
+  for (const id of ["replay-view", "take-midi"]) {
+    expect(doing).toContain(`slot-${id}"`);
+    expect(played).not.toContain(`slot-${id}"`);
+  }
+  expect(doing).not.toContain("aria-label="); // buttons in a row, not cards
+});
+
+test("the settings live in the Options drawer, with the MIDI status, and no inline controls under the details", () => {
+  const html = render({ status: <p>MIDI: DGX</p>, onLatency: () => {} });
+  const details = html.slice(html.indexOf('id="results-details"'));
+  expect(details).toContain('data-testid="options-open"');
+  const drawer = details.slice(details.indexOf('data-testid="options"'));
+  for (const row of ["Latency offset", "Effects volume", "Mute", "Miss sound", "MIDI: DGX", "press Retry"]) expect(drawer).toContain(row);
+  expect(details).not.toContain('aria-keyshortcuts="O"'); // O is a laptop piano key here
+  expect(details.slice(0, details.indexOf('data-testid="options"'))).not.toContain('type="range"');
 });
 
 test("the timing text and latency button stay reachable, as the first card in the details", () => {

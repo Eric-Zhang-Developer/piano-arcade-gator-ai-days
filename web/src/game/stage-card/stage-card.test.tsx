@@ -15,7 +15,7 @@ test("the card shows ARE YOU READY, the chart's title and composer, and — with
 
 test("a given level shows instead of the dash", () => {
   const t = text(renderToStaticMarkup(<StageCard {...song} level={7} />));
-  expect(t).toContain("|7|");
+  expect(t).toContain("|07|");
   expect(t).not.toContain("|—|");
 });
 

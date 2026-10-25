@@ -1,9 +1,10 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
-import type { Chart, Frame, GameEvent } from "../../contracts";
+import type { Chart, Frame, GameEvent, InputEvent } from "../../contracts";
+import { LATENCY_KEY } from "../core/settings";
 import { Judge } from "../core/judge";
 import { gaugeSize } from "../fever-gauge/gauge";
-import { BOTS, botPresses, feverChart, scenes, TAKE_FILE, takePresses, type BotName } from ".";
+import { BOTS, botPresses, feverChart, scenes, scenesSettings, TAKE_FILE, takePresses, type BotName } from ".";
 
 const twinkle: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
 
@@ -13,6 +14,31 @@ function judge(chart: Chart, name: BotName) {
   botPresses(chart, name).forEach((p, i) => j.press(p.pitch, p.timeMs, i));
   return { results: j.finish(1e9), events };
 }
+
+describe("bot holds", () => {
+  // 120 bpm: a beat is 500 ms. A half note, then the same pitch again; a held whole note under a second voice.
+  const chart: Chart = {
+    ...twinkle,
+    bpm: 120,
+    notes: [
+      { id: "a", pitch: 60, beat: 0, duration: 2, hand: "R" },
+      { id: "b", pitch: 60, beat: 2, duration: 1, hand: "R" },
+      { id: "c", pitch: 48, beat: 0, duration: 4, hand: "L" },
+      { id: "d", pitch: 64, beat: 3, duration: 1, hand: "R" },
+    ],
+  };
+  const hold = (pitch: number, timeMs: number) => botPresses(chart, "perfect").find((p) => p.pitch === pitch && p.timeMs === timeMs)!.holdMs;
+
+  it("holds each key for its written length, so a legato chart sounds legato", () => {
+    expect(hold(48, 0)).toBe(2000); // the whole note, under the other voice's notes
+    expect(hold(64, 1500)).toBe(500);
+  });
+
+  it("lets go just before the same pitch strikes again", () => {
+    expect(hold(60, 0)).toBe(1000 - scenesSettings.restrikeGapMs);
+    expect(hold(60, 1000)).toBe(500);
+  });
+});
 
 describe("bots on Twinkle, judged by the real judge", () => {
   it.each(BOTS)("%s presses the same notes on two runs", (name) => {
@@ -26,11 +52,11 @@ describe("bots on Twinkle, judged by the real judge", () => {
     expect(events.some((e) => e.type === "fullCombo")).toBe(true);
   });
 
-  it("late gives all GREAT with a +40 ms mean", () => {
+  it("late gives all GREAT with a +60 ms mean", () => {
     const { results } = judge(twinkle, "late");
     expect(results.counts.GREAT).toBe(twinkle.notes.length);
     const offsets = results.judgments.map((j) => j.offsetMs!);
-    expect(offsets.reduce((a, b) => a + b, 0) / offsets.length).toBe(40);
+    expect(offsets.reduce((a, b) => a + b, 0) / offsets.length).toBe(60);
   });
 
   it.each(["a", "b", "c", "d"] as const)("rank-%s lands rank %s", (r) => {
@@ -133,5 +159,154 @@ describe("bot=take", () => {
       { pitch: 60, timeMs: -120, holdMs: 320, velocity: 110 },
       { pitch: 64, timeMs: 500, holdMs: 150, velocity: 30 },
     ]);
+  });
+});
+
+// golden-demo: the bot's pedal and dynamics, heard on the piano output. Synthetic chart, 500 ms a beat.
+describe("the bot on the piano: pedal and velocity", () => {
+  const chart: Chart = {
+    ...twinkle,
+    id: "local/synthetic",
+    bpm: 120,
+    notes: [
+      { id: "a", pitch: 60, beat: 0, duration: 1, hand: "R", velocity: 40 },
+      { id: "b", pitch: 64, beat: 1, duration: 1, hand: "R", velocity: 100 },
+      { id: "c", pitch: 67, beat: 2, duration: 1, hand: "R" },
+    ],
+  };
+  const pedal = { pedal: [[0.1, 0.9], [1.1, 2.9]] }; // 50–450 ms and 550–1450 ms
+  const on = (p: number, v: number) => [0x90, p, v];
+  const off = (p: number) => [0x90, p, 0];
+  const cc = (v: number) => [0xb0, 64, v];
+
+  // A starved page, as in the #586 test: frames every 100 ms drive the pump, and no timer fires.
+  async function harness(pedalFile: () => Promise<unknown> = async () => pedal, latency = 0) {
+    let perf = 0;
+    const raf: (() => void)[] = [];
+    const sent: number[][] = [];
+    const stamps: number[] = []; // each send's Web MIDI timestamp
+    const judged: InputEvent[] = [];
+    vi.spyOn(performance, "now").mockImplementation(() => perf);
+    vi.stubGlobal("requestAnimationFrame", (cb: () => void) => raf.push(cb));
+    vi.stubGlobal("setTimeout", () => 0);
+    vi.stubGlobal("clearTimeout", () => {});
+    vi.stubGlobal("setInterval", () => 0); // the piano's ticker starves too: frames send it
+    vi.stubGlobal("clearInterval", () => {});
+    vi.stubGlobal("localStorage", { getItem: (k: string) => (k === LATENCY_KEY ? String(latency) : null) });
+    vi.stubGlobal("fetch", async () => ({ ok: true, json: pedalFile }));
+    const piano = { name: "Portable Grand", send: (d: number[], at: number) => void (sent.push([...d]), stamps.push(at)) };
+    vi.stubGlobal("navigator", { requestMIDIAccess: async () => ({ outputs: new Map([["dgx", piano]]) }) });
+    const p = scenes();
+    p.transformChart!(chart, new URLSearchParams("song=local/synthetic&bot=perfect&audible=1"));
+    await new Promise((r) => setImmediate(r)); // the pedal read
+    await p.wrapInput!({ kind: "keys", start() {}, stop() {} }).start((e) => void judged.push(e));
+    let zero = 0;
+    // Frames from chart time `fromMs` to `toMs`, with chart zero put where that makes `fromMs` now.
+    const frames = (fromMs: number, toMs: number) => {
+      zero = perf + 100 - fromMs;
+      for (let t = perf + 100; t - zero <= toMs; t += 100) {
+        perf = t;
+        raf.splice(0).forEach((cb) => cb());
+        perf = t + 40;
+        p.draw!({} as CanvasRenderingContext2D, { nowMs: t + 0.5 - zero } as Frame);
+      }
+    };
+    return { p, sent, stamps, judged, frames, zero: () => zero };
+  }
+  // What the piano heard from the first note on: the pedal-ups every cancel sends before it are housekeeping.
+  const heard = (sent: number[][]) => sent.slice(sent.findIndex((m) => m[0] === 0x90 || m[2] === 127));
+  const cleanup = () => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  };
+
+  it("presses at the chart's velocity, KEYS_VELOCITY where it has none, with CC64 on the notes' queue in time order", async () => {
+    try {
+      const { sent, frames } = await harness();
+      frames(-200, 1700);
+      expect(heard(sent)).toEqual([
+        on(60, 40), cc(127), cc(0), off(60), on(64, 100), cc(127), off(64), on(67, 80), cc(0), off(67),
+      ]);
+    } finally {
+      cleanup();
+    }
+  });
+
+  // One clock rule: the judge reads each press calibrated, the piano plays it on the chart's clock, the recording's.
+  it.each([0, 60, -60])("calibration %i ms moves the judge's times, never the piano's", async (latency) => {
+    try {
+      const { sent, stamps, judged, frames, zero } = await harness(async () => null, latency);
+      frames(-200, 1700);
+      const z = zero() - 0.5; // the bot's own zero estimate: half a ms under /play's, as in #586
+      const ons = sent.flatMap((m, i) => (m[0] === 0x90 && m[2] > 0 ? [stamps[i] - z] : []));
+      expect(ons.map(Math.round)).toEqual([0, 500, 1000]);
+      const presses = judged.filter((e) => e.type === "on").map((e) => Math.round(e.timeMs - z));
+      expect(presses).toEqual([latency, 500 + latency, 1000 + latency]);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it("pause with a key down releases it, stamped after anything already handed to the piano", async () => {
+    try {
+      const { p, sent, stamps, frames } = await harness();
+      frames(-200, 700); // 64 is down, and its release (1000) not yet handed over
+      p.onEvent!({ type: "pause" } as GameEvent);
+      const i = sent.findLastIndex((m) => m[0] === 0x90 && m[1] === 64 && m[2] === 0);
+      expect(i).toBeGreaterThan(-1);
+      expect(stamps[i]).toBeGreaterThanOrEqual(Math.max(...stamps.slice(0, i)));
+    } finally {
+      cleanup();
+    }
+  });
+
+  it.each(["pause", "quit", "songEnd"] as const)("%s mid-pair ends with the pedal up", async (type) => {
+    try {
+      const { p, sent, frames } = await harness();
+      frames(-200, 700);
+      expect(sent.at(-1)).toEqual(cc(127));
+      p.onEvent!({ type } as GameEvent);
+      expect(sent.at(-1)).toEqual(cc(0));
+    } finally {
+      cleanup();
+    }
+  });
+
+  it("a resume inside a pair puts that pair's pedal down first, then only what's ahead", async () => {
+    try {
+      const { p, sent, frames } = await harness();
+      frames(-200, 700);
+      p.onEvent!({ type: "pause" } as GameEvent);
+      const at = sent.length;
+      p.onEvent!({ type: "resume", atMs: 800 } as GameEvent);
+      frames(800, 1700);
+      expect(heard(sent.slice(at))).toEqual([cc(127), off(64), on(67, 80), cc(0), off(67)]);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it("a pedal read after the bot started still sends what's ahead of it", async () => {
+    try {
+      let arrive: (v: unknown) => void = () => {};
+      const { sent, frames } = await harness(() => new Promise((r) => (arrive = r)));
+      frames(-200, 500); // the first pair is over by now
+      arrive(pedal);
+      await new Promise((r) => setImmediate(r));
+      frames(600, 1700);
+      expect(heard(sent).filter((m) => m[0] === 0xb0)).toEqual([cc(127), cc(0)]);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it("no pedal.json, no pedal: only notes after the housekeeping", async () => {
+    try {
+      const { sent, frames } = await harness(async () => null);
+      frames(-200, 1700);
+      expect(heard(sent).some((m) => m[0] === 0xb0 && m[2] === 127)).toBe(false);
+    } finally {
+      cleanup();
+    }
   });
 });

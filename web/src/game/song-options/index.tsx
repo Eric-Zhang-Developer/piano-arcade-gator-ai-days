@@ -30,7 +30,7 @@ export function SongOptions({ id, chart }: { id: string; chart: Chart | null }) 
     <div data-testid="song-options" style={row}>
       {twoHands && (
         <span role="group" aria-label="Hands" style={group}>
-          <span style={label}>Hands <kbd style={kbd}>H</kbd></span>
+          <span style={label} title="Hands (H)" aria-keyshortcuts="H">Hands</span>
           {(["both", "R", "L"] as const).map((h) => (
             <button key={h} type="button" data-testid={`hands-${h}`} aria-pressed={o.hands === h} style={o.hands === h ? lit : half} onClick={() => set({ hands: h })}>
               {handLabels[h]}
@@ -39,7 +39,7 @@ export function SongOptions({ id, chart }: { id: string; chart: Chart | null }) 
         </span>
       )}
       <span role="group" aria-label="Speed" style={group}>
-        <span style={label}>Speed <kbd style={kbd}>← →</kbd></span>
+        <span style={label} title="Speed (← →)" aria-keyshortcuts="ArrowLeft ArrowRight">Speed</span>
         {SPEEDS.map((s) => (
           <button key={s} type="button" data-testid={`speed-${s}`} aria-pressed={o.speed === s} style={o.speed === s ? lit : half} onClick={() => set({ speed: s })}>
             {s}%
@@ -61,7 +61,6 @@ export function SongOptions({ id, chart }: { id: string; chart: Chart | null }) 
 const row: CSSProperties = { display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.4em 1.2em", marginTop: "0.6vh" };
 const group: CSSProperties = { display: "inline-flex", alignItems: "center", gap: "0.25em" };
 const label: CSSProperties = { marginRight: "0.15em", whiteSpace: "nowrap", fontSize: "clamp(12px, 0.8vw, 16px)", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--pa-ink-dim)" };
-const kbd: CSSProperties = { font: "inherit", padding: "0 0.35em", whiteSpace: "nowrap", border: "1px solid var(--pa-line)" };
 const half: CSSProperties = {
   padding: "0.2em 0.4em",
   borderRadius: 0,

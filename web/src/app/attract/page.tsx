@@ -4,6 +4,7 @@
 // operator-board's board: live from /api/operator (development), or the snapshot (?snapshot, or any production build).
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Chart } from "../../contracts";
+import { Brackets, Button, kitButton, Panel } from "@/game/duo-tokens";
 import type { Board } from "../../operator/board";
 import { chapters, counters, doneAt, layout, noteLeftMs, steps, timeline, type Kind, type Timeline } from "../../replay/model";
 import { pianoVoice, pickOutput, toneVoice, type Voice } from "../../replay/piano";
@@ -205,7 +206,7 @@ export default function AttractPage() {
       <header className={op.header}>
         <div className={op.titleRow}>
           <h1 className={op.title}>ATTRACT MODE</h1>
-          <a className={op.attract} href={`/operator${snapQ}`}>
+          <a {...kitButton("secondary")} href={`/operator${snapQ}`}>
             ◀ OPERATOR MODE
           </a>
         </div>
@@ -214,7 +215,7 @@ export default function AttractPage() {
             <span className={mode === "LIVE" ? op.live : op.snapshot}>{mode === "LIVE" ? "● LIVE" : "❄ SNAPSHOT"}</span>
             <span>data {clock(Date.parse(board.at))}</span>
             <span>files {board.sha}</span>
-            <span>Space plays and pauses</span>
+            {/* Space still plays and pauses; no key hints on the face (#772) */}
           </p>
         )}
       </header>
@@ -266,9 +267,9 @@ export default function AttractPage() {
           </section>
 
           <div className={styles.controls}>
-            <button className={op.freeze} onClick={toggle} disabled={!data.ss.length}>
+            <Button kind="primary" onClick={toggle} disabled={!data.ss.length}>
               {playing ? "❚❚ Pause" : k >= data.ss.length - 1 && k >= 0 ? "↺ Replay" : "▶ Play"}
-            </button>
+            </Button>
             <input
               className={styles.scrub}
               type="range"
@@ -329,9 +330,9 @@ function Picked({ slug, board, repo, prUrl, onClose }: { slug: string; board: Bo
           )}
         </li>
       </ul>
-      <button className={op.freeze} onClick={onClose}>
+      <Button kind="secondary" onClick={onClose} style={{ padding: "8px 18px" }}>
         Close
-      </button>
+      </Button>
     </div>
   );
 }
@@ -379,87 +380,91 @@ function CrewTimeline({ tl, marker }: { tl: Timeline; marker: number | null }) {
   const fmt = (t: number) => new Date(t).toLocaleString(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" });
   return (
     <section className={op.screen} aria-labelledby="crew-timeline">
-      <h2 id="crew-timeline" className={op.screenTitle}>
-        CREW TIMELINE · PEAK {tl.peak.open} PRS OPEN AT ONCE
-      </h2>
-      <p className={styles.legend}>
-        {(Object.keys(KIND_LABEL) as Kind[]).map((k) => (
-          <span key={k}>
-            <i className={styles[`k_${k}`]} /> {KIND_LABEL[k]}
-          </span>
-        ))}
-        <span>▭ open · ┅ closed unmerged</span>
-      </p>
-      <div className={styles.timelineWrap} onMouseLeave={() => setTip(null)}>
-        <svg viewBox={`0 0 ${W} ${y}`} className={styles.timeline} role="img" aria-label="Every PR per worker over time; table below">
-          <text x={8} y={STRIP - 4} className={styles.axis}>
-            open PRs
-          </text>
-          <path d={strip} className={styles.strip} />
-          {tl.rows.map((r, i) => (
-            <g key={r.worker}>
-              <text x={8} y={rowsY[i] + 10} className={styles.worker}>
-                {r.worker}
+      <Brackets tone="line">
+        <Panel style={{ padding: "18px 22px 20px" }}>
+          <h2 id="crew-timeline" className={op.screenTitle}>
+            CREW TIMELINE · PEAK {tl.peak.open} PRS OPEN AT ONCE
+          </h2>
+          <p className={styles.legend}>
+            {(Object.keys(KIND_LABEL) as Kind[]).map((k) => (
+              <span key={k}>
+                <i className={styles[`k_${k}`]} /> {KIND_LABEL[k]}
+              </span>
+            ))}
+            <span>▭ open · ┅ closed unmerged</span>
+          </p>
+          <div className={styles.timelineWrap} onMouseLeave={() => setTip(null)}>
+            <svg viewBox={`0 0 ${W} ${y}`} className={styles.timeline} role="img" aria-label="Every PR per worker over time; table below">
+              <text x={8} y={STRIP - 4} className={styles.axis}>
+                open PRs
               </text>
-              {r.bars.map((b) => {
-                const bx = x(b.start);
-                const bw = Math.max(2, x(b.end) - bx);
-                const text = `#${b.pr.number} ${b.pr.title} · ${b.pr.worker} · opened ${fmt(b.start)} · ${b.how === "open" ? "still open" : `${b.how} ${fmt(b.end)}`}`;
-                return (
-                  <a key={b.pr.number} href={b.pr.url} target="_blank" rel="noreferrer" aria-label={text}>
-                    <rect
-                      x={bx}
-                      y={rowsY[i] + b.lane * LANE}
-                      width={bw}
-                      height={LANE - 3}
-                      className={`${styles[`k_${b.kind}`]} ${styles[`how_${b.how}`]}`}
-                      onMouseEnter={(e) => {
-                        const r = (e.currentTarget.ownerSVGElement as SVGSVGElement).getBoundingClientRect();
-                        setTip({ x: ((bx + bw / 2) / W) * r.width, y: ((rowsY[i] + b.lane * LANE) / y) * r.height, text });
-                      }}
-                    />
-                  </a>
-                );
-              })}
-            </g>
-          ))}
-          {marker !== null && <line x1={x(marker)} x2={x(marker)} y1={0} y2={y} className={styles.marker} />}
-        </svg>
-        {tip && (
-          <div className={styles.tip} style={{ left: tip.x, top: tip.y }} role="tooltip">
-            {tip.text}
-          </div>
-        )}
-      </div>
-      <details className={styles.details}>
-        <summary>Timeline as a table</summary>
-        <table className={op.table}>
-          <thead>
-            <tr>
-              <th scope="col">Worker</th>
-              <th scope="col">PR</th>
-              <th scope="col">Opened</th>
-              <th scope="col">Ended</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tl.rows.flatMap((r) =>
-              r.bars.map((b) => (
-                <tr key={b.pr.number}>
-                  <td>{r.worker}</td>
-                  <td>
-                    <a href={b.pr.url}>
-                      #{b.pr.number} {b.pr.title}
-                    </a>
-                  </td>
-                  <td className={op.num}>{fmt(b.start)}</td>
-                  <td className={op.num}>{b.how === "open" ? "still open" : `${b.how} ${fmt(b.end)}`}</td>
-                </tr>
-              )),
+              <path d={strip} className={styles.strip} />
+              {tl.rows.map((r, i) => (
+                <g key={r.worker}>
+                  <text x={8} y={rowsY[i] + 10} className={styles.worker}>
+                    {r.worker}
+                  </text>
+                  {r.bars.map((b) => {
+                    const bx = x(b.start);
+                    const bw = Math.max(2, x(b.end) - bx);
+                    const text = `#${b.pr.number} ${b.pr.title} · ${b.pr.worker} · opened ${fmt(b.start)} · ${b.how === "open" ? "still open" : `${b.how} ${fmt(b.end)}`}`;
+                    return (
+                      <a key={b.pr.number} href={b.pr.url} target="_blank" rel="noreferrer" aria-label={text}>
+                        <rect
+                          x={bx}
+                          y={rowsY[i] + b.lane * LANE}
+                          width={bw}
+                          height={LANE - 3}
+                          className={`${styles[`k_${b.kind}`]} ${styles[`how_${b.how}`]}`}
+                          onMouseEnter={(e) => {
+                            const r = (e.currentTarget.ownerSVGElement as SVGSVGElement).getBoundingClientRect();
+                            setTip({ x: ((bx + bw / 2) / W) * r.width, y: ((rowsY[i] + b.lane * LANE) / y) * r.height, text });
+                          }}
+                        />
+                      </a>
+                    );
+                  })}
+                </g>
+              ))}
+              {marker !== null && <line x1={x(marker)} x2={x(marker)} y1={0} y2={y} className={styles.marker} />}
+            </svg>
+            {tip && (
+              <div className={styles.tip} style={{ left: tip.x, top: tip.y }} role="tooltip">
+                {tip.text}
+              </div>
             )}
-          </tbody>
-        </table>
-      </details>
+          </div>
+          <details className={styles.details}>
+            <summary>Timeline as a table</summary>
+            <table className={op.table}>
+              <thead>
+                <tr>
+                  <th scope="col">Worker</th>
+                  <th scope="col">PR</th>
+                  <th scope="col">Opened</th>
+                  <th scope="col">Ended</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tl.rows.flatMap((r) =>
+                  r.bars.map((b) => (
+                    <tr key={b.pr.number}>
+                      <td>{r.worker}</td>
+                      <td>
+                        <a href={b.pr.url}>
+                          #{b.pr.number} {b.pr.title}
+                        </a>
+                      </td>
+                      <td className={op.num}>{fmt(b.start)}</td>
+                      <td className={op.num}>{b.how === "open" ? "still open" : `${b.how} ${fmt(b.end)}`}</td>
+                    </tr>
+                  )),
+                )}
+              </tbody>
+            </table>
+          </details>
+        </Panel>
+      </Brackets>
     </section>
   );
 }

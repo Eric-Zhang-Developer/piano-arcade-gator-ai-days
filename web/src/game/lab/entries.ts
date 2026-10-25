@@ -21,10 +21,10 @@ export const labGroups: LabGroup[] = [
     entries: [
       {
         slug: "wait-mode",
-        name: "Wait mode",
+        name: "Learn mode",
         description: "the highway stops on each note (a chord waits for all its keys), never calls a MISS, plays no beat",
         href: "/play?song=twinkle&mode=wait",
-        open: "Twinkle, wait mode",
+        open: "Twinkle, Learn",
       },
       {
         slug: "flow-mode",
@@ -32,7 +32,7 @@ export const labGroups: LabGroup[] = [
         description:
           "the song waits at each note and follows your tempo (0.5–1.3×), scored on wrong notes, skipped notes and stops past 2 beats, not timing",
         href: "/play?song=twinkle&mode=flow",
-        open: "Twinkle, flow mode",
+        open: "Twinkle, Flow",
       },
       {
         slug: "adaptive-chunks",
@@ -61,7 +61,7 @@ export const labGroups: LabGroup[] = [
         name: "Rewind",
         description: "In wait mode, and so in chunk-practice's learn steps, ← moves back a bar and → skips ahead one",
         href: "/play?song=twinkle&mode=wait",
-        open: "Twinkle, wait mode",
+        open: "Twinkle, Learn",
       },
     ],
   },
@@ -85,7 +85,7 @@ export const labGroups: LabGroup[] = [
       {
         slug: "operator-replay",
         name: "Attract",
-        description: "a three.js synthwave stage (neon grid, low sun, slow orbit) with one pillar per feature spec",
+        description: "one merged PR per note of Twinkle on the chart's own rhythm, while each step's note plays",
         href: "/attract",
         open: "/attract",
       },
@@ -135,7 +135,7 @@ export const labGroups: LabGroup[] = [
       {
         slug: "operator-board",
         name: "Operator board",
-        description: "the arcade's operator menu in synthwave bookkeeping",
+        description: "a coin-counter strip, then Needs a person (non-draft plan/contract PRs, needs-human and blocked issues, drafts stale at 45 min, red main CI, STOP)",
         href: "/operator",
         open: "/operator",
       },

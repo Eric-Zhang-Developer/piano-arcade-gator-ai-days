@@ -69,10 +69,12 @@ const home = async (page) => {
 };
 const focused = (page) => page.evaluate(() => document.activeElement?.id || document.activeElement?.getAttribute("data-testid") || document.activeElement?.tagName);
 const open = (page) => page.evaluate(() => document.querySelector('[data-testid="options"]')?.open === true);
+// /play's start screen keeps its settings in this same drawer (duo-start), behind its Options button.
 const playLatency = async (page) => {
   await goto(page, "/play?song=twinkle");
-  const slider = page.locator('main input[type="range"][min="-150"]');
-  await slider.waitFor({ timeout: 60_000 });
+  await page.getByTestId("options-open").click({ timeout: 60_000 });
+  const slider = page.locator("#opt-latency");
+  await slider.waitFor({ timeout: 5_000 });
   return slider;
 };
 

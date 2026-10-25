@@ -1,5 +1,6 @@
 "use client";
-// Help overlay (spec: help-overlay): ? opens one card with every control, on / and on /play's start screen and results.
+// Help overlay (spec: help-overlay): ? opens one card with every control, on /, /simon and /play's start screen and
+// results. On / and /simon the keys are listed only here, behind the quiet HelpLink (spec: mouse-first).
 // Not during a take or its pause menu: /play's own Esc listener would see the Esc that closes the card and resume.
 // A native <dialog> (showModal): Esc, the focus trap and the inert page are the browser's.
 import { usePathname } from "next/navigation";
@@ -25,6 +26,8 @@ export function helpOverlay(): GamePlugin {
   };
 }
 
+const OPEN = "pa-help-open"; // HelpLink's click, as a window event: the card lives in the layout, the link on a page
+
 const isHelpKey = (e: Pick<KeyboardEvent, "key" | "ctrlKey" | "metaKey" | "altKey">) =>
   e.key === "?" && !e.ctrlKey && !e.metaKey && !e.altKey;
 
@@ -32,18 +35,26 @@ export function HelpOverlay() {
   const ref = useRef<HTMLDialogElement>(null);
   const back = useRef<HTMLElement | null>(null);
   const path = usePathname();
-  const here = path === "/" || path === "/play";
+  const here = path === "/" || path === "/play" || path === "/simon";
 
   useEffect(() => {
     if (!here) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (!isHelpKey(e) || e.repeat || taking || document.querySelector("dialog[open]")) return; // Options is up
-      e.preventDefault();
+    const show = () => {
+      if (taking || document.querySelector("dialog[open]")) return; // Options is up
       back.current = document.activeElement as HTMLElement | null;
       ref.current?.showModal();
     };
+    const onKey = (e: KeyboardEvent) => {
+      if (!isHelpKey(e) || e.repeat || taking || document.querySelector("dialog[open]")) return;
+      e.preventDefault();
+      show();
+    };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener(OPEN, show);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener(OPEN, show);
+    };
   }, [here]);
 
   // Keys inside the card stay in it: the page's window listeners (O, F, E, Z / X) would act behind it.
@@ -97,5 +108,25 @@ export function HelpOverlay() {
         ))}
       </div>
     </dialog>
+  );
+}
+
+// The one way to the card by mouse on / and /simon: quiet, so it never competes with the song list or Start.
+export function HelpLink() {
+  return (
+    <button
+      type="button"
+      className={styles.link}
+      onClick={() => window.dispatchEvent(new Event(OPEN))}
+      aria-keyshortcuts="?"
+      title="Controls (?)"
+      data-capture-hide
+      data-testid="help-link"
+    >
+      <span className={styles.linkMark} aria-hidden="true">
+        ?
+      </span>
+      Controls
+    </button>
   );
 }

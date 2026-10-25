@@ -1,6 +1,7 @@
 // Flow mode's plugin (spec: flow-mode): the tempo readout under the HUD band, a soft glow on the note the clock waits
-// at, a calm "Take your time" once a stop runs past the free beats, "Play in Flow" on the start screen and the results
-// headline. The page builds the judge and its clock (core-loop); this only reads them, through FlowJudge.live.
+// at, a calm "Take your time" once a stop runs past the free beats, its line on the start screen, and the results
+// headline with the tempo held and, for a steady take near tempo, "Try it in Perform" (play-modes; the way in is the
+// play-modes ladder). The page builds the judge and its clock (core-loop); this only reads them, through FlowJudge.live.
 import type { CSSProperties } from "react";
 import type { Chart, Frame, GamePlugin, Hand } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
@@ -9,9 +10,11 @@ import { noteColorFor } from "../hand-colors";
 import { hudLayout, hudSettings } from "../hud";
 import { bg, cyan, fontDisplay, ink, inkDim, panel, whenDisplayFontReady } from "../ui-tokens";
 import { waitHintSettings } from "../wait-hint/hint";
+import { kitButton } from "../duo-tokens";
+import { graduates, modeHref, withMode } from "../play-modes/modes";
 import { flowSettings, isFlowMode } from "./clock";
 import { FlowJudge } from "./judge";
-import { headline } from "./steady";
+import { headline, steadiness } from "./steady";
 
 export const flowLook = {
   breatheMs: 1800, // the glow's slow pulse while the clock holds
@@ -38,11 +41,7 @@ let motionQuery: MediaQueryList | undefined;
 const reducedMotion = () =>
   (motionQuery ??= typeof matchMedia === "function" ? matchMedia("(prefers-reduced-motion: reduce)") : undefined)?.matches ?? false;
 
-export function flowUrl(params: URLSearchParams): string {
-  const q = new URLSearchParams(params);
-  q.set("mode", "flow");
-  return `/play?${q}`;
-}
+export const flowUrl = (params: URLSearchParams): string => `/play?${withMode(params, "flow")}`;
 
 export function flowMode(): GamePlugin {
   let flow = false;
@@ -90,21 +89,22 @@ export function flowMode(): GamePlugin {
       }
       setHook({ rate: clock.rate, holding: clock.holding, slips: judge.slips, front: clock.front, calm });
     },
-    startPanel: ({ params }) =>
-      isFlowMode(params) ? (
-        <p style={{ opacity: 0.7, margin: 0 }}>Flow: the song waits for you and follows your tempo.</p>
-      ) : (
-        <a data-testid="play-flow" href={flowUrl(params)} style={link}>
-          Play in Flow
-        </a>
-      ),
+    startPanel: ({ params }) => (isFlowMode(params) ? <p style={{ opacity: 0.7, margin: 0 }}>Flow: the song waits for you and follows your tempo.</p> : null),
     resultsPanel: ({ params, results }) => {
       const judge = FlowJudge.live;
       if (!isFlowMode(params) || !judge) return null;
+      const held = judge.heldTempo;
       return (
-        <p data-testid="flow-headline" style={headlineStyle}>
-          {headline(results, judge.slips, judge.deviations)}
-        </p>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+          <p data-testid="flow-headline" style={headlineStyle}>
+            {headline(results, judge.slips, judge.deviations, held)}
+          </p>
+          {graduates(steadiness(judge.deviations), held) && (
+            <a data-testid="flow-graduate" href={modeHref(params, "perform")} {...link}>
+              Try it in Perform
+            </a>
+          )}
+        </div>
       );
     },
   };
@@ -195,15 +195,7 @@ function drawCalm(ctx: CanvasRenderingContext2D, f: Frame, pitches: number[], sh
   ctx.restore();
 }
 
-const link: CSSProperties = {
-  display: "inline-block",
-  padding: "8px 24px",
-  fontSize: 16,
-  borderRadius: 8,
-  background: "#ddd",
-  color: "#000",
-  textDecoration: "none",
-};
+const link = kitButton("secondary");
 
 const headlineStyle: CSSProperties = {
   margin: 0,

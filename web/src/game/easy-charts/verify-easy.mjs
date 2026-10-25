@@ -96,7 +96,7 @@ try {
 
   // 3 and 4. The select: E, a reload, E again; the toggle at both sizes in both states.
   await page.evaluate(() => localStorage.removeItem("pianoArcade.level"));
-  const toggle = page.getByTestId("level-toggle");
+  const toggle = page.getByTestId("level-easy"); // the Easy chip (mouse-first): pressed when the level is Easy
   const href = () => page.getByTestId("song-twinkle").getAttribute("href");
   for (const [w, h] of [
     [1280, 720],
@@ -118,6 +118,10 @@ try {
     check((await toggle.getAttribute("aria-pressed")) === "true", `${w}×${h}: still Easy after a reload`);
     await page.keyboard.press("e");
     check((await toggle.getAttribute("aria-pressed")) === "false" && !(await href()).includes("level="), `${w}×${h}: E again goes back to Normal (${await href()})`);
+    await toggle.click(); // the chips, by mouse (mouse-first): Easy, then Normal
+    check((await toggle.getAttribute("aria-pressed")) === "true" && (await href()).endsWith("&level=easy"), `${w}×${h}: clicking EASY reads Easy (${await href()})`);
+    await page.getByTestId("level-normal").click();
+    check((await toggle.getAttribute("aria-pressed")) === "false" && !(await href()).includes("level="), `${w}×${h}: clicking NORMAL goes back (${await href()})`);
   }
   check(errors.length === 0, `no page errors${errors.length ? `: ${errors.join(" | ")}` : ""}`);
   await context.close();

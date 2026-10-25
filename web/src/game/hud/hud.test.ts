@@ -51,7 +51,7 @@ describe("reduceHud", () => {
     const judge = new Judge(chart, (e) => events.push(e));
     const mpb = msPerBeat(bpm);
     chart.notes.forEach((n, i) => {
-      if (i !== 10) judge.press(n.pitch, n.beat * mpb + (i < 10 ? 0 : 40), i); // 0 ms is PERFECT, 40 ms GREAT; 10 is the MISS
+      if (i !== 10) judge.press(n.pitch, n.beat * mpb + (i < 10 ? 0 : 60), i); // 0 ms is PERFECT, 60 ms GREAT; 10 is the MISS
       judge.advance(n.beat * mpb + GOOD_MS + 10); // past the judge's window, so each MISS lands before the next hit
     });
     judge.finish(36 * mpb);

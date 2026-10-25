@@ -81,39 +81,51 @@ export function skipReason(params: URLSearchParams): string | null {
   return null;
 }
 
-// "Recording volume", 0–1, saved per browser; its own level, apart from the effects mute and the piano volume. The
-// options panel's row reads and sets it the way it does laptop-sound's piano volume; each take reads it at its start.
-const VOLUME_KEY = "pianoArcade.recordingVolume";
+// A number saved per browser, for the options panel's rows: read once, clamped when set, out-of-range or unreadable
+// saved values read as the default, and listeners told of each change (useSyncExternalStore's subscribe).
+function savedNumber(key: string, fallback: number, min: number, max: number) {
+  let value: number | null = null;
+  const listeners = new Set<() => void>();
+  const load = (): number => {
+    try {
+      const raw = localStorage.getItem(key);
+      const v = Number(raw);
+      return raw !== null && v >= min && v <= max ? v : fallback;
+    } catch {
+      return fallback;
+    }
+  };
+  return {
+    get: (): number => (value ??= load()),
+    set(v: number): void {
+      value = Math.min(max, Math.max(min, v));
+      try {
+        localStorage.setItem(key, String(value));
+      } catch {
+        // private mode: it holds for this page only
+      }
+      listeners.forEach((f) => f());
+    },
+    subscribe(f: () => void): () => void {
+      listeners.add(f);
+      return () => listeners.delete(f);
+    },
+  };
+}
+
+// "Recording volume", 0–1: the recording's own level, apart from the effects mute and the piano volume. Each take
+// reads it at its start.
 export const DEFAULT_RECORDING_VOLUME = 0.7;
-export function loadRecordingVolume(): number {
-  try {
-    const raw = localStorage.getItem(VOLUME_KEY);
-    const v = Number(raw);
-    return raw !== null && v >= 0 && v <= 1 ? v : DEFAULT_RECORDING_VOLUME;
-  } catch {
-    return DEFAULT_RECORDING_VOLUME;
-  }
-}
+const volume = savedNumber("pianoArcade.recordingVolume", DEFAULT_RECORDING_VOLUME, 0, 1);
+export const { get: getRecordingVolume, set: setRecordingVolume, subscribe: subscribeRecordingVolume } = volume;
 
-let recordingVolume: number | null = null;
-const volumeListeners = new Set<() => void>();
-
-export const getRecordingVolume = (): number => (recordingVolume ??= loadRecordingVolume());
-
-export function setRecordingVolume(v: number): void {
-  recordingVolume = Math.min(1, Math.max(0, v));
-  try {
-    localStorage.setItem(VOLUME_KEY, String(recordingVolume));
-  } catch {
-    // private mode: the level holds for this page only
-  }
-  volumeListeners.forEach((f) => f());
-}
-
-export function subscribeRecordingVolume(f: () => void): () => void {
-  volumeListeners.add(f);
-  return () => volumeListeners.delete(f);
-}
+// "Recording offset", ± ms (golden-demo, part 6): moves the recording against the chart, for a sidecar's offsetMs that
+// is a little off on this machine. File time = offsetMs + recording offset + chart time; positive plays it earlier.
+// Read at each start and resume.
+export const RECORDING_OFFSET_MIN = -300;
+export const RECORDING_OFFSET_MAX = 300;
+const offset = savedNumber("pianoArcade.recordingOffsetMs", 0, RECORDING_OFFSET_MIN, RECORDING_OFFSET_MAX);
+export const { get: getRecordingOffset, set: setRecordingOffset, subscribe: subscribeRecordingOffset } = offset;
 
 interface Scheduled {
   node: AudioBufferSourceNode;
@@ -162,6 +174,8 @@ export function audioTrack(): GamePlugin {
   };
 
   // Play from chart time atMs, which sounds now: songStart, a resume, or the buffer arriving mid-take.
+  // The file time of chart time 0: the sidecar's, moved by the player's Recording offset.
+  const fileOffset = () => (sidecar?.offsetMs ?? 0) + getRecordingOffset();
   const play = (atMs: number) => {
     anchor = { perf: performance.now(), atMs };
     if (!audio || !buffer || !sidecar) return;
@@ -171,7 +185,7 @@ export function audioTrack(): GamePlugin {
     bus.connect(audio.destination);
     scheduled = [];
     const nowS = audio.currentTime;
-    for (const seg of segmentsFrom(atMs, sidecar.offsetMs, loop)) {
+    for (const seg of segmentsFrom(atMs, fileOffset(), loop)) {
       // Heard at the segment's chart time: started one output latency early.
       let whenS = ctxAt(anchor.perf + seg.atMs - atMs) - latencyS();
       let offsetS = seg.fileMs / 1000;
@@ -190,6 +204,18 @@ export function audioTrack(): GamePlugin {
     watch = window.setInterval(() => {
       if (window.location.pathname !== "/play") silence(); // left /play without a quit (back button, a link)
     }, audioTrackSettings.watchMs);
+  };
+
+  // A demo (bot=…&demo=1) never clicks Start, so Chrome keeps a new context suspended: the first press or click
+  // anywhere resumes it. Anything play() scheduled while it was suspended was mapped on a stopped clock, so once it
+  // runs the recording restarts at the chart's time now.
+  const wakeable = (ctx: AudioContext) => {
+    const wake = () => void ctx.resume().catch(() => {});
+    for (const type of ["pointerdown", "keydown"]) window.addEventListener(type, wake, { once: true, capture: true });
+    ctx.onstatechange = () => {
+      if (ctx.state === "running" && anchor) play(anchor.atMs + performance.now() - anchor.perf);
+    };
+    return ctx;
   };
 
   const sounding = () => {
@@ -216,7 +242,7 @@ export function audioTrack(): GamePlugin {
       const token = ++load;
       const dir = `/songs/${song}/`;
       try {
-        audio ??= new AudioContext();
+        audio ??= wakeable(new AudioContext());
       } catch {
         return c; // no Web Audio: the take plays without the recording
       }
@@ -246,7 +272,7 @@ export function audioTrack(): GamePlugin {
         },
         // The chart time now, from the clock this plugin follows; null while paused or before the take.
         chartMs: () => (anchor ? anchor.atMs + performance.now() - anchor.perf : null),
-        fileTimeAt: (chartMs) => fileTimeAt(chartMs, sidecar?.offsetMs ?? 0, loop),
+        fileTimeAt: (chartMs) => fileTimeAt(chartMs, fileOffset(), loop),
         // The file time being heard now, or null when nothing sounds.
         positionMs: () => {
           const s = sounding();

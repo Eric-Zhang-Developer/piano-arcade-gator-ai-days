@@ -57,6 +57,13 @@ const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
 const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
+// A prior Für Elise best no take can beat (a fixture, not a real score), so the planted take isn't a NEW RECORD. A
+// record take features record-moment alone and moves BY BAR to Details (results-layout), which isn't what this checks.
+await page.addInitScript(() => {
+  if (localStorage.getItem("pianoArcade.records")) return;
+  const fixture = { initials: "FIX", score: 1_000_000, accuracy: 1, rank: "S", maxCombo: 294, date: "2026-01-01T00:00:00.000Z" };
+  localStorage.setItem("pianoArcade.records", JSON.stringify({ "fur-elise": { best: { rank: "S", accuracy: 1, score: 1_000_000, date: fixture.date }, top: [fixture] } }));
+});
 for (let i = 0; ; i++) {
   try {
     await page.goto(`${base}/play?song=fur-elise&input=test&stage=off&idle=3600`); // idle: demo-reset waits an hour
@@ -79,6 +86,7 @@ await page.evaluate(() => {
 });
 await page.getByTestId("results").waitFor({ timeout: 400_000 });
 await page.waitForTimeout(2500); // the tally and the rank stamp
+check((await page.getByTestId("record-moment").count()) === 0, "the take isn't a NEW RECORD (the fixture best holds)");
 const { r, bars } = await page.evaluate(() => {
   const { results: r, chart } = window.__pianoArcade;
   return { r, bars: Math.ceil(Math.max(...chart.notes.map((n) => n.beat + n.duration)) / chart.beatsPerBar) };

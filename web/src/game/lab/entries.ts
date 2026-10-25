@@ -168,7 +168,7 @@ export const labGroups: LabGroup[] = [
       {
         slug: "learning-ui",
         name: "Learning",
-        description: "guided mastery map, three-state parent/leaf examples, one prepared Start/real Resume, four existing activities",
+        description: "a map of music skills, from pitch and rhythm to phrase endings, with the next lesson ready to start.",
         href: "/learn",
         open: "/learn",
       },

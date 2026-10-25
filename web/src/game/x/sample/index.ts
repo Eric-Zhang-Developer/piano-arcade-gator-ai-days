@@ -22,14 +22,26 @@ export const sample: Experiment = {
       ctx.fillStyle = primary;
       ctx.fillText("X · SAMPLE", f.width - size, f.judgmentLineY - size);
     },
-    // The kit's data label in a hairline frame, in the slot under Start, which takes its height from Start, not the modes.
+    // The kit's data label in a lit hairline frame, in the slot under Start, which takes its height from Start, not the modes.
     startPanel: () =>
       createElement(
         "p",
         { "data-testid": "x-sample-panel" },
         createElement(
           MonoLabel,
-          { dim: false, style: { display: "inline-block", border: "1px solid var(--pa-line)", padding: "0.4em 0.8em", fontSize: "clamp(16px, 1.25vw, 24px)" } },
+          {
+            dim: false,
+            // lit like the select's chip that's in force, so it reads as a state, not as one more button
+            style: {
+              display: "inline-block",
+              border: "1px solid var(--pa-primary)",
+              background:
+                "color-mix(in srgb, var(--pa-primary) 14%, transparent)",
+              color: "var(--pa-primary)",
+              padding: "0.4em 0.8em",
+              fontSize: "clamp(16px, 1.25vw, 24px)",
+            },
+          },
           "Experiment on · x=sample",
         ),
       ),

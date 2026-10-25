@@ -26,6 +26,22 @@ describe("stage-view's state", () => {
     expect(s.hits).toEqual([]);
   });
 
+  it("opened mid-take, a catchUp brings the chart and the notes fall; a live take isn't reset by one (#1405)", () => {
+    // what main's /stage had: the clock and combo streaming, no take, so nothing on the lane
+    const late = run([{ type: "clock", nowMs: 100 }, { type: "combo", count: 6 }]);
+    expect(onLane(late, 2000)).toEqual([]);
+    const caught = run([{ type: "catchUp", chart }, { type: "clock", nowMs: 100 }], late);
+    expect(caught.chart).toBe(chart);
+    expect(caught.combo).toBe(6);
+    expect(onLane(caught, 2000).map((n) => n.id)).toEqual(["n2", "n3", "n4"]);
+    // another viewer's hello: the catchUp leaves this page's judgments alone
+    const live = run([{ type: "take", chart }, { type: "judgment", noteId: "n1", judgment: "GOOD" }]);
+    expect(reduceStage(live, { type: "catchUp", chart }, 2000)).toBe(live);
+    // after the end, a catchUp is a new take
+    const ended = run([{ type: "end" }], live);
+    expect(reduceStage(ended, { type: "catchUp", chart }, 2000).judged.size).toBe(0);
+  });
+
   it("follows the clock: notes on the lane, combo, milestones, full combo and the end", () => {
     const s0 = run([{ type: "take", chart }, { type: "clock", nowMs: -400 }]);
     expect(onLane(s0, 1000).map((n) => [n.id, Math.round(n.t * 1000) / 1000])).toEqual([["n1", 0.6], ["n2", 0.1]]);

@@ -11,12 +11,15 @@ export const settings = {
   lookaheadMs: 2000,
   perspective: 0, // 0 flat … 0.3: top of the highway is (1 - p) × the bottom's width
   countInBeats: 8, // two bars: time to get hands on the keys after Start (playtest, findings.md)
-  noteColor: "#5ef2c4",
+  noteColor: "#2b9bff",
   noteHeadColor: "#ffffff", // the leading edge: the moment to press
   noteHeadPx: 6,
   noteGapPx: 8, // space at the end of each note, so repeated notes read as separate
   missColor: "#6b5560",
   keyLitColor: "#ffffff", // a pressed key that hit no note (key-skin: plain white, never red)
+  // The 2D canvases' devicePixelRatio at most, as fever-stage caps its WebGL canvas: a Retina screen's 2 made every
+  // full-window layer 4× the pixels to clear and composite each frame, and /play lagged on Eric's MacBook (2026-10-25).
+  pixelRatioCap: 1.5,
   stageBackdropAlpha: 0.55, // the highway's backdrop while a background layer (fever-stage) shows through
 };
 

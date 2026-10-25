@@ -6,6 +6,7 @@ import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import type { Chart } from "../../contracts";
 import { validateChart } from "../../contracts";
 import { hudSettings } from "../hud";
+import { loadReview, reviewLine, type SheetReview } from "../sheet-review/review";
 import { chartToMusicXml } from "../sheet-xml";
 import { cyan, ink } from "../ui-tokens";
 import { follow, type Follower } from "./follow";
@@ -23,6 +24,7 @@ const COLORS = hudSettings.judgmentColors; // the HUD's, so a notehead means wha
 
 // For headless checks: where the cursor is, and how many noteheads are painted per judgment (not judgments heard).
 interface SheetHook {
+  review: boolean; // showing a stored take (sheet-review), not following /play
   cursorMs: number | null;
   colored: Record<Judgment, number>;
   beams: { should: number; beamed: number }; // sheet-beams: notes a score would beam, and how many OSMD did
@@ -89,11 +91,19 @@ export function SheetView() {
   const judgedRef = useRef(new Map<string, Judgment>()); // this take's judgments, kept to repaint after a re-render
   const paintedRef = useRef(new Map<string, Judgment>()); // the ones with a notehead painted
   const clockRef = useRef<number | null>(null);
+  // ?review=1 (sheet-review): the stored take, all its judgments at once and no cursor, until /play starts a take.
+  // undefined: not a review; null: a review was asked for and none is stored (or it's corrupt). Read at first render:
+  // what shows it waits for the chart, after hydration, so the server's undefined never mismatches.
+  const [review, setReview] = useState<SheetReview | null | undefined>(() =>
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).get("review") === "1" ? loadReview() : undefined,
+  );
+  const reviewRef = useRef(false);
 
   const publish = () => {
     const colored = { PERFECT: 0, GREAT: 0, GOOD: 0, MISS: 0 };
     for (const j of paintedRef.current.values()) colored[j]++;
     window.__pianoArcadeSheet = {
+      review: reviewRef.current,
       cursorMs: clockRef.current,
       colored,
       beams: followerRef.current?.beams ?? { should: 0, beamed: 0 },
@@ -120,14 +130,27 @@ export function SheetView() {
     followerRef.current = follow(osmd, chart);
     paintedRef.current.clear();
     for (const [id, j] of judgedRef.current) paint(id, j);
+    if (reviewRef.current) osmd.cursor.hide(); // a finished take: nothing to follow
     if (clockRef.current !== null) moveCursor(clockRef.current);
     publish();
   };
 
-  // Load the chart once, as /play does.
+  // Load the chart once, as /play does; a stored review brings its own (the chart as played).
   useEffect(() => {
     const song = new URLSearchParams(window.location.search).get("song") || "twinkle";
     let live = true;
+    if (review) {
+      reviewRef.current = true;
+      for (const [id, j] of Object.entries(review.judgments)) judgedRef.current.set(id, j);
+      void songFor(review.chart).then((whole) => {
+        if (!live) return;
+        setZoom(loadZoom());
+        setState((s) => (s.phase === "loading" ? { phase: "ready", chart: review.chart, song: whole } : s));
+      });
+      return () => {
+        live = false;
+      };
+    }
     (SONG_ID.test(song) ? fetch(`/songs/${song}/chart.json`) : Promise.reject(new Error(`No song called "${song}".`)))
       .then((r) => {
         if (!r.ok) throw new Error(`No song called "${song}".`);
@@ -145,6 +168,7 @@ export function SheetView() {
     return () => {
       live = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once: review only changes when a live take brings its chart
   }, []);
 
   // Render the score once the chart is in. OSMD touches the DOM, so it's imported in the browser only.
@@ -202,6 +226,8 @@ export function SheetView() {
     const ch = new BroadcastChannel(SHEET_CHANNEL);
     ch.onmessage = ({ data: m }: MessageEvent<SheetMessage>) => {
       if (m.type === "take") {
+        reviewRef.current = false; // the latest take wins over a review too
+        setReview(undefined);
         judgedRef.current.clear();
         clockRef.current = null;
         const osmd = osmdRef.current;
@@ -241,6 +267,9 @@ export function SheetView() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  const tally = { PERFECT: 0, GREAT: 0, GOOD: 0, MISS: 0 };
+  for (const j of Object.values(review?.judgments ?? {})) tally[j]++;
+
   if (state.phase === "error") {
     return (
       <main className={`${styles.sheet} ${styles.message}`} data-sheet="error">
@@ -256,13 +285,18 @@ export function SheetView() {
         <div>
           <h1 className={styles.title}>{chart?.title ?? "Loading the score…"}</h1>
           {chart?.composer && <p className={styles.composer}>{chart.composer}</p>}
-          {chart && <p className={styles.note}>Generated from the chart</p>}
+          {chart && (
+            <p className={styles.note}>
+              {review ? reviewLine(review) : review === null ? "No take to review" : "Generated from the chart"}
+            </p>
+          )}
         </div>
         <ul className={styles.legend} aria-label="Note colors">
           {JUDGMENTS.map((j) => (
             <li key={j}>
               <span className={styles.swatch} style={{ background: COLORS[j] }} aria-hidden />
               {j}
+              {chart && review && <span className={styles.count}>{tally[j]}</span>}
             </li>
           ))}
         </ul>

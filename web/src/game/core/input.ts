@@ -1,5 +1,6 @@
 import type { InputDevice, InputEvent } from "../../contracts";
 import { KEYS_VELOCITY } from "./settings";
+import { laptopSoundActive } from "../laptop-sound";
 
 const isBlack = (pitch: number) => [1, 3, 6, 8, 10].includes(pitch % 12);
 
@@ -14,8 +15,8 @@ export function midiDevice(onStatus: (status: string) => void): InputDevice {
         const access = await navigator.requestMIDIAccess();
         const inputs = [...access.inputs.values()];
         input = inputs.find((i) => i.name?.includes("Portable Grand")) ?? inputs[0] ?? null;
-        if (!input) return onStatus("MIDI: no device, laptop keys only");
-        onStatus(`MIDI: ${input.name}`);
+        if (!input) return onStatus(laptopSoundActive() ? "Piano: laptop sound" : "MIDI: no device, laptop keys only");
+        onStatus(`MIDI: ${input.name}${laptopSoundActive() ? " · Piano: laptop sound" : ""}`);
         input.onmidimessage = (m) => {
           const d = m.data;
           if (!d || d[0] === 0xfe || d[0] === 0xf8) return;

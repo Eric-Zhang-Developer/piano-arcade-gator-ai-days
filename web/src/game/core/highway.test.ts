@@ -129,7 +129,7 @@ describe("drawHighway backdrop", () => {
 });
 
 describe("drawHighway black-key lanes (black-key-lanes)", () => {
-  it("fills a lane per black key in view at the tint, after the backdrop and before the first note", () => {
+  it("draws no lane shading at the default tint 0: the backdrop, then the first note", () => {
     const fills: string[] = [];
     const state: Record<string | symbol, unknown> = {};
     const ctx = new Proxy(state, {
@@ -139,11 +139,8 @@ describe("drawHighway black-key lanes (black-key-lanes)", () => {
     const c = chart([60, 72]); // C4–C5
     const L = makeLayout(c, 800, 600, 0.2);
     drawHighway(ctx, L, c, { nowMs: 0, noteState: new Map(), pressed: new Set(), latest: null, countInBeat: null });
-    const n = Array.from({ length: L.highPitch - L.lowPitch + 1 }, (_, i) => L.lowPitch + i).filter(isBlack).length;
-    expect(n).toBeGreaterThanOrEqual(5); // C♯4 to A♯4 at least, whatever range core pads to
-    const tint = `rgba(255,255,255,${blackKeyLaneSettings.tint})`;
-    expect(fills.slice(0, n + 2)).toEqual(["#000", ...Array(n).fill(tint), settings.noteColor]);
-    expect(fills.filter((f) => f === tint)).toHaveLength(n);
+    expect(blackKeyLaneSettings.tint).toBe(0);
+    expect(fills.slice(0, 2)).toEqual(["#000", settings.noteColor]); // nothing between the backdrop and the first note
   });
 });
 

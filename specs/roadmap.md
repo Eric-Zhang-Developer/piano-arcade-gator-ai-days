@@ -66,6 +66,18 @@ was away, in his order: `help-overlay`, `watch-demo`, `phone-guard`, `sheet-beam
 `song-options`, `sheet-review`, `rewind`, `score-card`. `song-options` waits on `easy-charts`.
 Ahead of them, on his word: `level-forge` phase 1 (a local agent session makes a level from a public-domain source,
 no API spend), then `veritas` (`/veritas`: the judge catching planted mistakes, live) and `veritas-polish`.
+Last, on his word (#601): `adaptive-chunks`, chunk practice that shrinks onto the bars you miss and grows back as
+you prove them. Cut if it isn't done by Sunday noon.
+First in the queue, on his word (#612): `laptop-sound`, the laptop plays the game's piano part and your key presses
+when no piano is connected. Cut if it isn't done by Sunday noon.
+Then, on his word: `flow-mode` (#618), the song waits for you and follows your tempo, judging what a listener
+hears (Eric: strict mode is "completely undemoable"); then `lab` (#619), one page that opens every hidden feature.
+Both are cut if they aren't done by Sunday noon.
+Then the Duo restyle, which Eric and Andres chose on 2026-10-25 (`visual-direction.md`, #636), video first:
+`duo-tokens` (#645), `duo-hud` (#647, the cold open's screen), `duo-select` (#646), `duo-results` (#648, where the
+tutor visibly decides) and `sheet-paper` (#649). Each is cut if it isn't done by Sunday noon.
+`audio-track` (#675): a local song's own recording plays in sync under /play, for the local Golden spike. Eric lifted
+decision 003's recording safeguard for local play only. Cut at Sunday noon.
 
 ## Spikes
 Milestone **spikes**, after `extras`: `simon-says-spike`, then `restyle-spike`. About 3 hours each, findings whatever

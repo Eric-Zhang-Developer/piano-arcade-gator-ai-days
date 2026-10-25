@@ -15,7 +15,8 @@ run locally, and a take that can't be saved waits in the browser's outbox. Owner
 | `take_history` | view | one row per take, for the progress chart | that player |
 | `session_history` | view | every take with its song title, when and how long it was played: the profile page | that player |
 | `hand_stats` | view | per song and hand: notes by judgment, mean timing, spread, velocity: the profile's hands panel | that player |
-| `save_take(take, notes)` | function | saves a take and its notes in one transaction; answers `saved`, `duplicate` or `conflict` | server only |
+| `save_take(take, notes)` | function | saves a take and its notes in one transaction; answers `saved`, `duplicate`, `conflict`, or `limited` (over 20 new takes in 5 minutes for that player: the browser keeps it and resends) | server only |
+| `cleanup_stale_guests(days = 30)` | function | deletes guest accounts with no sign-in and no take in `days` (at least 7); Google accounts are never touched. Nightly at 04:17 UTC via `pg_cron` where available | server only |
 | `merge_player(from, to)` | function | moves an anonymous device's takes and coach notes into a Google account (`/auth/merge`) | server only |
 | `rls_auto_enable` | Supabase's own | turns RLS on for new tables automatically; not ours, leave it | nobody |
 
@@ -29,6 +30,22 @@ own session, so it can read that player's rows and nothing else. Auth: anonymous
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | browser + server | Project Settings > API Keys: `sb_publishable_...` |
 | `SUPABASE_SECRET_KEY` | server only | Project Settings > API Keys: `sb_secret_...`. Never in a `NEXT_PUBLIC_` variable. |
 | `SUPABASE_DB_URL` | `supabase/push.sh` only | Connect > Direct > Session pooler URI, with the database password filled in: `postgresql://postgres.umswmcehegvggcfcjdfy:<password>@aws-0-us-east-1.pooler.supabase.com:5432/postgres`. Not the direct `db.<ref>.supabase.co` one: it's IPv6-only and refused on most networks. |
+
+## Test everything (5 minutes)
+With the app running locally (`pnpm -C web dev`), from the repo root:
+1. `node supabase/tests/migrations.mjs`: every migration on a throwaway database, and the safety rules.
+2. `node supabase/tests/live-smoke.mjs`: the live project's grants, row-level security and guest sign-in.
+3. `node supabase/tests/every-song.mjs`: every committed song saves and reads back through the app.
+4. `node supabase/tests/login-e2e.mjs`: the whole journey in a real browser: sign-in screen, Play as guest, the
+   menu, a song on laptop keys ("Saved"), Easy ("Not saved"), the profile, the row in Supabase, both Google buttons
+   reaching Google's page, and a failed Google return. Each script deletes what it made.
+
+Google sign-in itself needs a person (no script logs into a Google account). Once per release:
+- On `/auth/login`, **Sign in with Google** lands on the menu with your name bottom-right.
+- As a guest, play a song, then **Keep my progress with Google** on `/progress`: the take stays, now under Google.
+- In a private window, play as a guest, then **Sign in with Google** with the same account: that take joins your
+  history.
+- **Sign out** on the menu: the chip goes back to "Sign in"; signing in again brings the history back.
 
 ## Adding a song
 Nothing to do in the database: a song's row in `songs` is written (or updated, with the chart's new SHA-256) the first

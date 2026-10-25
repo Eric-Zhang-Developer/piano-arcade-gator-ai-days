@@ -31,7 +31,7 @@
 
 .pips li.here {
   width: 34px;
-  background: var(--pa-magenta);
+  background: var(--pa-primary);
   box-shadow: 0 0 10px rgb(255 47 208 / 0.7);
 }
 
@@ -129,7 +129,7 @@
 
 .next:focus-visible,
 .ghost:focus-visible {
-  outline: 2px solid var(--pa-magenta);
+  outline: 2px solid var(--pa-primary);
   outline-offset: 3px;
 }
 

@@ -1,0 +1,9 @@
+Screen: the results after one take, where the tutor speaks. This screen must say "this machine understood how I played and knows what I should do next".
+
+Layout, top band: left, a big rank stamp "A" in a condensed heavy numeral style, framed by corner brackets, with the title "Für Elise" and "BEETHOVEN" in small monospace beneath. Center and right: a row of data cells, each hairline-framed: "PERFECT 214", "GREAT 131", "GOOD 41", "MISS 26", "ACC 91.2%", "MAX COMBO 128". Each label in small monospace caps, each number large.
+
+Middle band, full width: a per-bar strip labeled "BY BAR" with 32 small cells in a row, each tinted by accuracy from the PERFECT color (best) through to the MISS color (worst); cells 9 to 12 are clearly the weakest and are outlined with the accent color and a small label above them "BARS 9–12". Beside it on the right, a small, clean timing histogram labeled "TIMING · AVG +18 MS LATE".
+
+Bottom band, the tutor: a panel with a small, minimal, friendly line-art alligator head icon in the accent color, and two lines of text: "Your left hand drags in bars 9–12, about 42 ms late." and "Let's loop just those bars at 70%, then play it through." To the right, three buttons: "PRACTICE BARS 9–12" (primary, accent fill), "RETRY" and "SONGS" (outlined).
+
+Mood: a pit-wall telemetry screen after a lap, with a coach who's on your side.

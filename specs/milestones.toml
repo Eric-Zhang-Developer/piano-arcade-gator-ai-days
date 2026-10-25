@@ -158,6 +158,7 @@ features = [
   "first-run",
   "landing",
   "account",
+  "menu-test",
 ]
 cut = []
 
@@ -167,6 +168,15 @@ cut = []
 name = "extras"
 ship = ""
 features = [
+  "laptop-sound",
+  "flow-mode",
+  "duo-tokens",
+  "duo-hud",
+  "audio-track",
+  "duo-select",
+  "duo-results",
+  "sheet-paper",
+  "lab",
   "level-forge",
   "veritas",
   "veritas-polish",
@@ -180,6 +190,7 @@ features = [
   "sheet-review",
   "rewind",
   "score-card",
+  "adaptive-chunks",
 ]
 cut = []
 

@@ -180,7 +180,7 @@ export function beatTrack(): GamePlugin {
     id: "beat-track",
     transformChart(c, params) {
       chart = c;
-      off = params.get("beat") === "off" || params.get("mode") === "wait"; // wait mode stops the clock at every note
+      off = params.get("beat") === "off" || params.get("mode") === "wait" || params.get("mode") === "flow"; // both stop the clock at notes
       style = params.get("beat") && params.get("beat") !== "off" ? params.get("beat") : null;
       if (!off && typeof navigator !== "undefined" && navigator.requestMIDIAccess) {
         navigator

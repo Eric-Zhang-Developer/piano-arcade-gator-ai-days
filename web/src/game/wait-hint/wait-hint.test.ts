@@ -22,6 +22,10 @@ describe("waitingNotes", () => {
     expect(waitingNotes(chart, new Map([["a", "PERFECT"]]), 2000).map((n) => n.pitch)).toEqual([48, 64]); // lowest first
     expect(waitingNotes(chart, new Map(), 500)).toEqual([]); // nothing due yet
   });
+
+  it("after a rewind's →, a skipped note before the floor isn't waited on (rewind)", () => {
+    expect(waitingNotes(chart, new Map(), 2000, 1500).map((n) => n.pitch)).toEqual([48, 64]); // not a, skipped at 1000
+  });
 });
 
 describe("hintTimer", () => {

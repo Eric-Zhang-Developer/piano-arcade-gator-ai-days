@@ -170,7 +170,7 @@
 .retry:focus-visible,
 .songs:focus-visible,
 .cue:focus-visible {
-  outline: 2px solid var(--pa-magenta);
+  outline: 2px solid var(--pa-primary);
   outline-offset: 3px;
 }
 
@@ -217,7 +217,7 @@
   padding: 14px 20px 18px;
   background: var(--pa-panel);
   border: 1px solid rgb(242 242 245 / 0.1);
-  border-top: 2px solid var(--pa-magenta);
+  border-top: 2px solid var(--pa-primary);
   border-radius: 6px;
 }
 

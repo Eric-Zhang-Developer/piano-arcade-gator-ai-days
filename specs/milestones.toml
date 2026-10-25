@@ -188,6 +188,7 @@ features = [
   "hand-palette", # Eric, 2026-10-25 (#1127): the hand and judgment colors solved for CVD, compared in the Lab first
   "build-sonata", # Eric, 2026-10-25 (#1162): wow feeder; the night of merged PRs as music on the DGX, an experiment
   "ui-sound-family", # Eric, 2026-10-25 (#1167): one deep polish pass on the menu sounds, one celesta family in key
+  "pinned", # Eric, 2026-10-25 (#1171): wow feeder; your take as a brass music-box cylinder and an STL, an experiment
   "laptop-sound",
   "flow-mode",
   "duo-tokens",

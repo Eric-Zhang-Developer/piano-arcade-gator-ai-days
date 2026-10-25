@@ -2,6 +2,7 @@
 // laptop, so the ~12 features that look for the piano by that name sound without a change. A real DGX always wins.
 import { createSynth, type Audio, type Synth } from "./synth";
 import { getPianoVolume, subscribePianoVolume } from "./volume";
+import { loadBank } from "../sampled-piano";
 
 export { getPianoVolume, setPianoVolume, subscribePianoVolume, DEFAULT_PIANO_VOLUME } from "./volume";
 
@@ -122,6 +123,8 @@ function startAudio() {
       out.gain.value = getPianoVolume();
       out.connect(ctx.destination);
       audio = { ctx, out };
+      const a = audio;
+      void loadBank(ctx).then((bank) => bank && (a.bank = bank)); // the synth voice plays until then
       subscribePianoVolume(() => audio && (audio.out.gain.value = getPianoVolume()));
     } catch {
       return; // no Web Audio: laptop sound stays silent
@@ -177,6 +180,9 @@ export function installLaptopSound(): void {
       },
       get voices() {
         return synth.voices();
+      },
+      get sampled() {
+        return !!audio?.bank;
       },
     },
   });

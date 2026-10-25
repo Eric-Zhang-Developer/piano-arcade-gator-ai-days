@@ -29,8 +29,19 @@ describe("loopChart (pure)", () => {
     expect(r.chart.bpm).toBe(twinkle.bpm);
   });
 
-  it("changes nothing without from and to", () => {
-    expect(loopChart(twinkle, q("tempo=70"))).toBeNull();
+  it("changes nothing without from, to or tempo", () => {
+    expect(loopChart(twinkle, q("song=twinkle"))).toBeNull();
+  });
+
+  it("tempo alone plays every note once at that tempo, the whole song (song-options' Speed)", () => {
+    const r = loopChart(twinkle, q("tempo=70"))!;
+    expect(r.chart.notes.map((n) => [n.pitch, n.beat, n.duration])).toEqual(twinkle.notes.map((n) => [n.pitch, n.beat, n.duration]));
+    expect(r.chart.bpm).toBeCloseTo(twinkle.bpm * 0.7);
+    expect(r.plan).toMatchObject({ from: 1, to: 12, passes: 1, whole: true });
+  });
+
+  it("tempo with from and to is unchanged: the bar range, four passes", () => {
+    expect(loopChart(twinkle, q("tempo=70&from=1&to=2"))!.plan).toMatchObject({ from: 1, to: 2, passes: 4, whole: false });
   });
 
   it.each([

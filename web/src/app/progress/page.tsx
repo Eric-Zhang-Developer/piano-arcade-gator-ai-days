@@ -7,29 +7,43 @@ import { validateChart, type Chart } from "../../contracts";
 import { judgeTake } from "../../game/core/judge";
 import { getSession, linkGoogle, signInWithGoogle, signOut, type Session } from "../../data/auth";
 import { isConfigured } from "../../data/config";
-import { takeRows } from "../../data/mapping";
+import { takeRows, type NoteRow } from "../../data/mapping";
 import { readOutbox } from "../../data/outbox";
 import {
   barTrends,
   formatDuration,
+  handSummary,
+  judgmentMix,
+  practiceDays,
   sessionsFrom,
   sessionSummary,
+  songStats,
+  streak,
   weakestBars,
   type BarTrendRow,
+  type HandStatRow,
   type SessionRow,
 } from "../../data/progress";
 import { flushOutbox } from "../../data/save-plugin";
+import { AccuracyChart, HandsPanel, JudgmentBar, panel, panelTitle, PracticeCalendar, SongsTable, StatTile, tableStyle, td, th } from "./panels";
 
-// The player's profile: every session they've played (when, how long, how it went), totals, and for one song
-// (?song=<id>) the bars to practice. From the account when signed in; from this device's takes otherwise.
+// The player's profile: headline numbers, accuracy over time, a practice calendar, every note's judgment, both
+// hands, each song, and every session (when, how long, how it went). ?song=<id> narrows it all to one song and adds
+// the bars to practice. From the account when signed in; from this browser's takes otherwise.
 
 type Source = "account" | "device";
+interface ProfileData {
+  sessions: SessionRow[];
+  hands: HandStatRow[];
+  bars: BarTrendRow[];
+}
 
-/** Fallback with no Supabase or no network: the same rows, from the takes queued on this device. */
-async function localData(songId: string | null): Promise<{ sessions: SessionRow[]; bars: BarTrendRow[] }> {
+/** Fallback with no Supabase or no network: the same rows, from the takes saved in this browser. */
+async function localData(songId: string | null): Promise<ProfileData> {
   const items = readOutbox(localStorage).filter((i) => !songId || i.take.chartId === songId);
   const charts = new Map<string, Chart | null>();
   const rows = [];
+  const notes: NoteRow[] = [];
   for (const i of items) {
     if (!charts.has(i.take.chartId)) {
       const c = await fetch(`/songs/${i.take.chartId}/chart.json`).then((r) => (r.ok ? (r.json() as Promise<Chart>) : null), () => null);
@@ -39,8 +53,31 @@ async function localData(songId: string | null): Promise<{ sessions: SessionRow[
     if (!chart) continue;
     const r = takeRows({ takeId: i.id, playerId: "local", chartSha256: "" }, chart, i.take, judgeTake(chart, i.take));
     rows.push({ take: { ...r.take, created_at: i.queuedAt }, notes: r.notes, title: chart.title, composer: chart.composer });
+    notes.push(...r.notes);
   }
-  return { sessions: sessionsFrom(rows), bars: songId ? barTrends(rows) : [] };
+  const hands: HandStatRow[] = (["L", "R"] as const).flatMap((hand) => {
+    const mine = notes.filter((n) => n.hand === hand);
+    if (!mine.length) return [];
+    const offs = mine.flatMap((n) => (n.offset_ms === null ? [] : [n.offset_ms]));
+    const mean = offs.length ? offs.reduce((a, b) => a + b, 0) / offs.length : null;
+    const spread = offs.length > 1 && mean !== null ? Math.sqrt(offs.reduce((a, x) => a + (x - mean) ** 2, 0) / (offs.length - 1)) : null;
+    const count = (j: string) => mine.filter((n) => n.judgment === j).length;
+    return [
+      {
+        song_id: "*",
+        hand,
+        notes: mine.length,
+        perfect: count("PERFECT"),
+        great: count("GREAT"),
+        good: count("GOOD"),
+        miss: count("MISS"),
+        mean_offset_ms: mean === null ? null : Math.round(mean * 10) / 10,
+        spread_ms: spread === null ? null : Math.round(spread * 10) / 10,
+        mean_velocity: null,
+      },
+    ];
+  });
+  return { sessions: sessionsFrom(rows), hands, bars: songId ? barTrends(rows) : [] };
 }
 
 const when = (iso: string) =>
@@ -57,9 +94,7 @@ export default function ProgressPageWithParams() {
 
 function ProgressPage() {
   const song = useSearchParams().get("song");
-  const [songId, setSongId] = useState<string | null>(null);
-  const [sessions, setSessions] = useState<SessionRow[] | null>(null);
-  const [bars, setBars] = useState<BarTrendRow[]>([]);
+  const [data, setData] = useState<ProfileData | null>(null);
   const [source, setSource] = useState<Source>("device");
   const [session, setSession] = useState<Session | null>(null);
   const [note, setNote] = useState("");
@@ -68,7 +103,6 @@ function ProgressPage() {
     let live = true;
     (async () => {
       await flushOutbox().catch(() => 0);
-      if (live) setSongId(song);
       const s = await getSession();
       if (!live) return;
       setSession(s);
@@ -76,31 +110,28 @@ function ProgressPage() {
         try {
           const auth = { headers: { Authorization: `Bearer ${s.access_token}` } };
           const q = song ? `&song=${encodeURIComponent(song)}` : "";
-          const [list, prog] = await Promise.all([
-            fetch(`/api/progress?view=sessions${q}`, auth),
+          const [prof, prog] = await Promise.all([
+            fetch(`/api/progress?view=profile${q}`, auth),
             song ? fetch(`/api/progress?song=${encodeURIComponent(song)}`, auth) : Promise.resolve(null),
           ]);
-          if (list.ok && (!prog || prog.ok)) {
-            const rows = ((await list.json()) as { sessions: SessionRow[] }).sessions;
-            const trend = prog ? ((await prog.json()) as { bars: BarTrendRow[] }).bars : [];
+          if (prof.ok && (!prog || prog.ok)) {
+            const p = (await prof.json()) as { sessions: SessionRow[]; hands: HandStatRow[] };
+            const bars = prog ? ((await prog.json()) as { bars: BarTrendRow[] }).bars : [];
             if (live) {
-              setSessions(rows);
-              setBars(trend);
+              setData({ sessions: p.sessions, hands: p.hands, bars });
               setSource("account");
+              setNote("");
             }
             return;
           }
         } catch {
-          // offline: fall through to this device's takes
+          // offline: fall through to this browser's takes
         }
         // Saving isn't affected (takes wait in the outbox); only reading the account's history failed.
         if (live) setNote("Your account's history didn't load just now, so this shows the takes saved in this browser. Refresh to try again.");
       }
       const local = await localData(song);
-      if (live) {
-        setSessions(local.sessions);
-        setBars(local.bars);
-      }
+      if (live) setData(local);
     })();
     return () => {
       live = false;
@@ -108,16 +139,29 @@ function ProgressPage() {
   }, [song]); // ?song= changes in place when a song or "all songs" is clicked
 
   const google = Boolean(session && !session.is_anonymous);
+  const sessions = data?.sessions ?? null;
   const total = sessions ? sessionSummary(sessions) : null;
-  const weak = weakestBars(bars);
-  const songTitle = songId && sessions?.find((r) => r.song_id === songId)?.title;
+  const mix = data ? judgmentMix(data.hands) : null;
+  const hands = data ? handSummary(data.hands) : [];
+  const songs = sessions ? songStats(sessions) : [];
+  const today = new Date();
+  const days = sessions ? practiceDays(sessions, today) : [];
+  const run = sessions ? streak(sessions, today) : 0;
+  const bestCombo = sessions?.length ? Math.max(...sessions.map((r) => r.max_combo)) : 0;
+  const bestAccuracy = sessions?.length ? Math.max(...sessions.map((r) => Number(r.accuracy))) : 0;
+  const songTitle = song && sessions?.find((r) => r.song_id === song)?.title;
+  const weak = weakestBars(data?.bars ?? []);
+  const last = sessions?.[0];
 
   return (
     <main style={page}>
-      <Link href="/" style={back}>
-        ← Menu
+      <Link href={song ? "/progress" : "/"} style={back}>
+        {song ? "← All songs" : "← Menu"}
       </Link>
-      <h1 style={title}>{google ? "Your profile" : "Your practice"}</h1>
+      <header style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "4px 16px", margin: "10px 0 2px" }}>
+        <h1 style={title}>{song ? (songTitle ?? song) : google ? "Your profile" : "Your practice"}</h1>
+        {last && !song && <span style={{ color: "var(--pa-ink-dim)" }}>last played {when(last.created_at)}</span>}
+      </header>
       <p style={{ color: "var(--pa-ink-dim)", margin: "0 0 4px" }}>
         {google ? (
           <>
@@ -150,16 +194,7 @@ function ProgressPage() {
         </p>
       )}
 
-      {!sessions && <p>Loading…</p>}
-
-      {total && total.sessions > 0 && (
-        <div style={tiles} data-testid="profile-totals">
-          <Tile label="Sessions" value={String(total.sessions)} />
-          <Tile label="Time played" value={formatDuration(total.totalMs)} />
-          <Tile label={songId ? "Song" : "Songs"} value={songId ? songTitle ?? songId : String(total.songs)} />
-          <Tile label="Best rank" value={total.bestRank ?? "—"} />
-        </div>
-      )}
+      {!data && <p>Loading…</p>}
 
       {sessions && sessions.length === 0 && (
         <p data-testid="no-takes">
@@ -171,63 +206,36 @@ function ProgressPage() {
         </p>
       )}
 
-      {sessions && sessions.length > 0 && (
+      {sessions && total && total.sessions > 0 && mix && (
         <>
-          <h2 style={h2}>
-            {songId ? `Sessions: ${songTitle ?? songId}` : "Every session"}
-            {songId && (
-              <Link href="/progress" style={{ ...plainLink, marginLeft: 12 }}>
-                all songs
-              </Link>
-            )}
-          </h2>
-          <div style={{ overflowX: "auto" }}>
-            <table data-testid="take-history" style={table}>
-              <thead>
-                <tr>
-                  <th style={th}>When</th>
-                  {!songId && <th style={th}>Song</th>}
-                  <th style={th}>Played for</th>
-                  <th style={th}>Rank</th>
-                  <th style={th}>Accuracy</th>
-                  <th style={th}>Perfect</th>
-                  <th style={th}>Great</th>
-                  <th style={th}>Good</th>
-                  <th style={th}>Miss</th>
-                  <th style={th}>Best combo</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sessions.map((r) => (
-                  <tr key={r.take_id}>
-                    <td style={td}>{when(r.created_at)}</td>
-                    {!songId && (
-                      <td style={td}>
-                        <Link href={`/progress?song=${encodeURIComponent(r.song_id)}`} style={plainLink}>
-                          {r.title}
-                        </Link>
-                      </td>
-                    )}
-                    <td style={td}>{formatDuration(r.duration_ms)}</td>
-                    <td style={{ ...td, fontWeight: 800, color: "var(--pa-gold)" }}>{r.rank}</td>
-                    <td style={td}>{(Number(r.accuracy) * 100).toFixed(1)}%</td>
-                    <td style={td}>{r.perfect}</td>
-                    <td style={td}>{r.great}</td>
-                    <td style={td}>{r.good}</td>
-                    <td style={td}>{r.miss}</td>
-                    <td style={td}>{r.max_combo}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div style={tiles} data-testid="profile-totals">
+            <StatTile label="Sessions" value={String(total.sessions)} />
+            <StatTile label="Time played" value={formatDuration(total.totalMs)} />
+            <StatTile label="Notes played" value={String(mix.notes)} sub={mix.hitRate === null ? undefined : `${(mix.hitRate * 100).toFixed(1)}% hit`} />
+            {song ? <StatTile label="Best accuracy" value={`${(bestAccuracy * 100).toFixed(1)}%`} /> : <StatTile label="Songs" value={String(total.songs)} />}
+            <StatTile label="Best rank" value={total.bestRank ?? "—"} />
+            <StatTile label="Best combo" value={String(bestCombo)} />
+            <StatTile label="Day streak" value={String(run)} sub={run === 1 ? "day" : "days in a row"} />
           </div>
-          {songId && (
-            <>
-              <h2 style={h2}>Bars to practice (last 5 takes)</h2>
+
+          <div style={twoUp}>
+            <AccuracyChart sessions={sessions} />
+            <PracticeCalendar days={days} />
+          </div>
+          <div style={twoUp}>
+            <JudgmentBar mix={mix} />
+            <HandsPanel hands={hands} />
+          </div>
+
+          {song ? (
+            <section style={{ ...panel, marginTop: 16 }}>
+              <h2 style={panelTitle}>Bars to practice (last 5 takes)</h2>
               {weak.length === 0 ? (
-                <p data-testid="weak-bars">No misses and steady timing in every bar. Nice.</p>
+                <p data-testid="weak-bars" style={{ margin: 0 }}>
+                  No misses and steady timing in every bar. Nice.
+                </p>
               ) : (
-                <ul data-testid="weak-bars">
+                <ul data-testid="weak-bars" style={{ margin: 0, paddingLeft: 18 }}>
                   {weak.map((b) => (
                     <li key={b.bar}>
                       Bar {b.bar}: {b.misses} of {b.notes} notes missed
@@ -237,41 +245,88 @@ function ProgressPage() {
                   ))}
                 </ul>
               )}
-              <Link href={`/play?song=${encodeURIComponent(songId)}`} style={playButton}>
+              <Link href={`/play?song=${encodeURIComponent(song)}`} style={playButton}>
                 Play {songTitle ?? "it"} again
               </Link>
-            </>
+            </section>
+          ) : (
+            <div style={{ marginTop: 16 }}>
+              <SongsTable songs={songs} />
+            </div>
           )}
+
+          <section style={{ ...panel, marginTop: 16 }}>
+            <h2 style={panelTitle}>Every session</h2>
+            <div style={{ overflowX: "auto" }}>
+              <table data-testid="take-history" style={tableStyle}>
+                <thead>
+                  <tr>
+                    {["When", ...(song ? [] : ["Song"]), "Played for", "Rank", "Accuracy", "Perfect", "Great", "Good", "Miss", "Best combo", "Played on"].map((c) => (
+                      <th key={c} style={th}>
+                        {c}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sessions.map((r) => (
+                    <tr key={r.take_id}>
+                      <td style={td}>{when(r.created_at)}</td>
+                      {!song && (
+                        <td style={td}>
+                          <Link href={`/progress?song=${encodeURIComponent(r.song_id)}`} style={{ color: "var(--pa-cyan)", textDecoration: "none" }}>
+                            {r.title}
+                          </Link>
+                        </td>
+                      )}
+                      <td style={td}>{formatDuration(r.duration_ms)}</td>
+                      <td style={{ ...td, fontWeight: 800, color: "var(--pa-gold)" }}>{r.rank}</td>
+                      <td style={td}>{(Number(r.accuracy) * 100).toFixed(1)}%</td>
+                      <td style={td}>{r.perfect}</td>
+                      <td style={td}>{r.great}</td>
+                      <td style={td}>{r.good}</td>
+                      <td style={td}>{r.miss}</td>
+                      <td style={td}>{r.max_combo}</td>
+                      <td style={{ ...td, color: "var(--pa-ink-dim)" }}>{r.input_device === "midi" ? "piano" : "laptop keys"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
         </>
       )}
     </main>
   );
 }
 
-function Tile({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={tile}>
-      <div style={tileLabel}>{label}</div>
-      <div style={{ ...tileValue, fontSize: value.length > 10 ? 18 : 28 }} title={value}>
-        {value}
-      </div>
-    </div>
-  );
-}
-
 const display = "var(--pa-font-display), system-ui, sans-serif";
-const page: React.CSSProperties = { padding: "28px 32px 64px", minHeight: "100vh", background: "var(--pa-bg)", color: "var(--pa-ink)", fontFamily: "system-ui, sans-serif" };
+const page: React.CSSProperties = {
+  padding: "28px clamp(16px, 4vw, 32px) 64px",
+  minHeight: "100vh",
+  background: "var(--pa-bg)",
+  color: "var(--pa-ink)",
+  fontFamily: "system-ui, sans-serif",
+  maxWidth: 1280,
+  margin: "0 auto",
+};
 const back: React.CSSProperties = { color: "var(--pa-ink-dim)", textDecoration: "none", fontSize: 14 };
-const title: React.CSSProperties = { margin: "10px 0 4px", fontFamily: display, fontStyle: "italic", fontWeight: 900, fontSize: 40, textTransform: "uppercase", letterSpacing: 1 };
-const h2: React.CSSProperties = { fontFamily: display, fontStyle: "italic", fontWeight: 800, fontSize: 20, textTransform: "uppercase", letterSpacing: 1, margin: "32px 0 10px" };
-const tiles: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginTop: 20, maxWidth: 820 };
-const tile: React.CSSProperties = { padding: "12px 16px", background: "var(--pa-panel)", border: "1px solid rgba(242,242,245,0.18)", borderRadius: 8 };
-const tileLabel: React.CSSProperties = { fontSize: 12, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--pa-ink-dim)" };
-const tileValue: React.CSSProperties = { fontFamily: display, fontStyle: "italic", fontWeight: 900, fontSize: 28, marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" };
-const table: React.CSSProperties = { borderCollapse: "collapse", fontVariantNumeric: "tabular-nums", minWidth: 640 };
-const th: React.CSSProperties = { textAlign: "left", padding: "6px 18px 6px 0", color: "var(--pa-ink-dim)", fontWeight: 500, fontSize: 13, whiteSpace: "nowrap" };
-const td: React.CSSProperties = { padding: "7px 18px 7px 0", borderTop: "1px solid rgba(242,242,245,0.08)", whiteSpace: "nowrap" };
-const plainLink: React.CSSProperties = { color: "var(--pa-cyan)", textDecoration: "none", fontFamily: "system-ui, sans-serif", fontStyle: "normal", fontWeight: 500, fontSize: 14, textTransform: "none", letterSpacing: 0 };
+const title: React.CSSProperties = { margin: 0, fontFamily: display, fontStyle: "italic", fontWeight: 900, fontSize: 40, textTransform: "uppercase", letterSpacing: 1 };
+const tiles: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(140px, 100%), 1fr))", gap: 12, marginTop: 20 };
+const twoUp: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(340px, 100%), 1fr))", gap: 16, marginTop: 16 };
 const plain: React.CSSProperties = { marginLeft: 12, padding: 0, border: 0, background: "transparent", color: "var(--pa-ink-dim)", textDecoration: "underline", cursor: "pointer" };
 const linkButton: React.CSSProperties = { marginLeft: 16, padding: "4px 12px", borderRadius: 6, border: "1px solid var(--pa-cyan)", background: "transparent", color: "var(--pa-cyan)", cursor: "pointer" };
-const playButton: React.CSSProperties = { display: "inline-block", marginTop: 20, padding: "10px 18px", borderRadius: 8, background: "var(--pa-cyan)", color: "#000", fontFamily: display, fontStyle: "italic", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, textDecoration: "none" };
+const playButton: React.CSSProperties = {
+  display: "inline-block",
+  marginTop: 16,
+  padding: "10px 18px",
+  borderRadius: 8,
+  background: "var(--pa-cyan)",
+  color: "#000",
+  fontFamily: display,
+  fontStyle: "italic",
+  fontWeight: 800,
+  textTransform: "uppercase",
+  letterSpacing: 1,
+  textDecoration: "none",
+};

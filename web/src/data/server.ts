@@ -55,7 +55,8 @@ export async function ensurePlayer(id: string): Promise<void> {
 }
 
 /** One transaction. A retry of the same take id changes nothing; an id owned by another player is refused. */
-export async function saveTake(take: TakeRow, notes: NoteRow[]): Promise<"saved" | "duplicate" | "conflict"> {
+/** "limited": over 20 new takes in 5 minutes for this player (0008); the browser keeps the take and resends later. */
+export async function saveTake(take: TakeRow, notes: NoteRow[]): Promise<"saved" | "duplicate" | "conflict" | "limited"> {
   const res = await rest("/rest/v1/rpc/save_take", { method: "POST", body: JSON.stringify({ p_take: take, p_notes: notes }) });
   return res.json();
 }
@@ -85,4 +86,10 @@ export async function deleteAuthUser(id: string): Promise<void> {
 export async function readSessions(userToken: string, songId?: string) {
   const song = songId ? `&song_id=eq.${encodeURIComponent(songId)}` : "";
   return rest(`/rest/v1/session_history?select=*&order=created_at.desc&limit=500${song}`, { userToken }).then((r) => r.json());
+}
+
+/** The signed-in player's per-hand judgments and timing, per song (RLS: their rows only). */
+export async function readHandStats(userToken: string, songId?: string) {
+  const song = songId ? `&song_id=eq.${encodeURIComponent(songId)}` : "";
+  return rest(`/rest/v1/hand_stats?select=*${song}`, { userToken }).then((r) => r.json());
 }

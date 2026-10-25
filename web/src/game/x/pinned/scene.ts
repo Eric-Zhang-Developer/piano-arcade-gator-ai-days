@@ -21,8 +21,10 @@ export const sceneSettings = {
   wobbleHz: 9, // the ring, slowed to be seen
   wobbleS: 0.35,
   pixelRatioCap: 1.5,
-  wide: { position: [38, 12, 48], target: [0, -8, 0] },
-  macro: { offset: [4, -2, 10], aperture: 0.0035, maxblur: 0.009 },
+  rim: { color: "#9fb4ff", intensity: 0.9 }, // a cool light from behind, so the dark end cap has an edge
+  filmOffset: -6, // the model sits right of the rail, in both views
+  wide: { dir: [0.3, 0.28, 0.91], fill: 0.9 }, // framed on the model's bounding sphere, from the comb's side
+  macro: { offset: [5, -3, 15], aperture: 0.0035, maxblur: 0.009 },
   moveS: 0.7, // a camera move between wide and macro; reduced motion jumps
 };
 
@@ -48,10 +50,12 @@ export function makeMusicBox(canvas: HTMLCanvasElement, p: Pinned): MusicBox | n
   const pmrem = new THREE.PMREMGenerator(renderer);
   const env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   scene.environment = env;
-  scene.environmentIntensity = 0.55;
+  scene.environmentIntensity = 0.8;
   const key = new THREE.DirectionalLight(S.key.color, S.key.intensity);
   key.position.set(30, 40, 30);
-  scene.add(key);
+  const rim = new THREE.DirectionalLight(S.rim.color, S.rim.intensity);
+  rim.position.set(-30, 10, -30);
+  scene.add(key, rim);
 
   const brass = new THREE.MeshStandardMaterial(S.brass);
   const steel = new THREE.MeshStandardMaterial(S.steel);
@@ -110,8 +114,14 @@ export function makeMusicBox(canvas: HTMLCanvasElement, p: Pinned): MusicBox | n
   const lengthS = p.lengthMs / 1000;
 
   const camera = new THREE.PerspectiveCamera(32, 1, 0.5, 600);
-  const target = new THREE.Vector3(...(S.wide.target as [number, number, number]));
-  camera.position.set(...(S.wide.position as [number, number, number]));
+  // Wide: the whole model in frame, whatever the take's comb width, from a fixed direction.
+  const sphere = new THREE.Box3().setFromObject(scene).getBoundingSphere(new THREE.Sphere());
+  const target = sphere.center.clone();
+  const widePos = target.clone().add(
+    new THREE.Vector3(...(S.wide.dir as [number, number, number])).normalize().multiplyScalar((sphere.radius * S.wide.fill) / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2))),
+  );
+  camera.position.copy(widePos);
+  camera.filmOffset = S.filmOffset;
   camera.lookAt(target);
   const controls = new OrbitControls(camera, canvas);
   controls.target.copy(target);
@@ -163,7 +173,7 @@ export function makeMusicBox(canvas: HTMLCanvasElement, p: Pinned): MusicBox | n
     },
     setMacro(on, instant) {
       macro = on;
-      const to = on ? macroAt : new THREE.Vector3(...(S.wide.position as [number, number, number]));
+      const to = on ? macroAt : widePos;
       const look1 = on ? pluck : target;
       if (instant) {
         camera.position.copy(to);

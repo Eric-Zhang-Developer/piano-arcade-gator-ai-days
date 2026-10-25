@@ -145,7 +145,7 @@ export function Pinned() {
             <dd>{pinned?.teeth.length ?? "…"}</dd>
           </div>
         </dl>
-        {saved?.scripted && <MonoLabel>A scripted take: a perfect run, not yours. Play one with ?x=pinned to pin it.</MonoLabel>}
+        {saved?.scripted && <MonoLabel>A scripted take, a perfect run. Pin your own from the results with Pinned on in the Lab.</MonoLabel>}
         <div className={styles.actions}>
           <Button onClick={crank} disabled={!pinned} data-testid="pinned-crank" aria-pressed={playing}>
             {playing ? "Stop" : "Turn the crank"}

@@ -17,7 +17,7 @@ export const modelSettings = {
   combGap: 0.4, // between a tooth tip and the pins' reach
   toothWidth: 1.2,
   toothThick: 0.6,
-  longestTooth: 22,
+  longestTooth: 14,
   baseDepth: 6,
   triangleCap: 200_000,
 };

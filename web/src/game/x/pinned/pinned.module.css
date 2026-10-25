@@ -19,6 +19,9 @@
   display: block;
   cursor: grab;
   touch-action: none;
+  /* The scene fades out under the rail and the notes, so their words stay on black when Macro fills the frame. */
+  mask-image: linear-gradient(90deg, transparent 18%, #000 50%), linear-gradient(0deg, transparent 6%, #000 28%);
+  mask-composite: intersect;
 }
 
 .canvas:active {
@@ -40,7 +43,7 @@
   display: grid;
   gap: 1.1rem;
   justify-items: start;
-  max-width: min(34rem, 44vw);
+  max-width: 44vw; /* the data and the three buttons stay one row each, 1280 to 1920 */
   pointer-events: none; /* the scene shows through and still orbits; only the buttons take clicks */
 }
 
@@ -117,4 +120,10 @@
 .hint {
   font-family: var(--pa-font-data), ui-monospace, monospace;
   letter-spacing: 0.04em;
+}
+
+/* The kit's mono label, scaled with the rail. */
+.rail [data-kit="mono"] {
+  font-size: clamp(11px, 0.72vw, 14px) !important;
+  max-width: 36em;
 }

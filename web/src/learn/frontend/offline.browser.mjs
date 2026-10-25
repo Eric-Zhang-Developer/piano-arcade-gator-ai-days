@@ -1,6 +1,25 @@
 const { page } = globalThis;
 const origin = await page.eval(() => location.origin);
 
+// An offline interruption must cancel prepared-entry navigation and restore its action.
+await page.open(`${origin}/learn`);
+await page.wait('aside[aria-label="Your next activity"] button');
+await page.eval(async () => {
+  const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+  document.querySelector('aside[aria-label="Your next activity"] button').click();
+  await delay(100);
+  Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => false });
+  window.dispatchEvent(new Event('offline'));
+  await delay(100);
+  delete navigator.onLine;
+  window.dispatchEvent(new Event('online'));
+  await delay(1600);
+  const guide = document.querySelector('aside[aria-label="Your next activity"]');
+  if (location.pathname !== '/learn' || document.querySelector('[data-entering]')?.dataset.entering !== 'false' || !guide || guide.querySelector('button').disabled || getComputedStyle(guide).opacity !== '1') {
+    throw new Error('Interrupted entry navigated late or failed to restore the prepared action');
+  }
+});
+
 async function open(path) {
   await page.open(`${origin}/learn/${path}`);
   await page.wait('main h2');
@@ -11,7 +30,7 @@ async function open(path) {
       constructor(...args) { super(...args); contexts.push(this); }
     };
     const flush = () => new Promise(resolve => setTimeout(resolve, 50));
-    const text = () => document.querySelector('main').innerText;
+    const text = () => document.querySelector('main').textContent;
     function assert(value, message) { if (!value) throw new Error(message); }
     async function until(predicate, message) {
       const end = Date.now() + 10000;
@@ -84,7 +103,7 @@ await page.eval(async () => {
   assert(text().includes('That’s the idea.'), 'Completed Understand reset');
 });
 
-await open('review');
+await open('review/theory');
 await page.eval(async () => {
   const { assert, text, click, choose, recover } = window.learningOfflineTest;
   const reference = () => [...document.querySelectorAll('button')].find(b => b.textContent.startsWith('Reference'));
@@ -141,9 +160,9 @@ await page.eval(async () => {
   await click('I played it');
   await click('I played it');
   await click('Preview at');
-  await until(() => text().includes('Go to Play-through'), 'Practice support fading did not finish');
+  await until(() => !!document.querySelector('main a[href="/learn"]'), 'Practice support fading did not finish');
   await recover();
-  assert(text().includes('Go to Play-through') && document.querySelector('main').textContent.includes('2 example takes'), 'Completed practice reset');
+  assert(!!document.querySelector('main a[href="/learn"]') && document.querySelector('main').textContent.includes('2 example takes'), 'Completed practice reset');
 });
 
 await open('play-through');

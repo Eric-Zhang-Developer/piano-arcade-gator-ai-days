@@ -16,7 +16,7 @@ const db = new PGlite();
 await db.exec(`
   create role anon; create role authenticated; create role service_role bypassrls;
   create schema auth;
-  create table auth.users (id uuid primary key, is_anonymous boolean not null default true, created_at timestamptz default now());
+  create table auth.users (id uuid primary key, is_anonymous boolean not null default true, created_at timestamptz default now(), last_sign_in_at timestamptz);
   create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
   grant usage on schema auth to anon, authenticated, service_role;
   grant usage on schema public to anon, authenticated, service_role;
@@ -127,6 +127,44 @@ say("ok  session_history lists each take with its song title and how long it was
 const hs = await rows(`select hand, notes, perfect, great, good, miss, mean_offset_ms from hand_stats where player_id = '${player}' and song_id = 'twinkle' order by hand`);
 assert.ok(hs.length >= 1 && hs.every((h) => Number(h.notes) === Number(h.perfect) + Number(h.great) + Number(h.good) + Number(h.miss)), "every note is one judgment");
 say("ok  hand_stats counts each hand's notes by judgment, with timing");
+
+// Save limit: 20 new takes per player in 5 minutes; a retry still answers 'duplicate'; other players are unaffected.
+const busy = randomUUID();
+await db.exec(`insert into auth.users(id) values ('${busy}'); insert into players(id) values ('${busy}');`);
+const burst = [];
+for (let i = 0; i < 20; i++) {
+  const t = { ...take(), player_id: busy };
+  burst.push(t);
+  assert.equal(await save(t, [note(t, "PERFECT", 1)]), "saved");
+}
+const t21 = { ...take(), player_id: busy };
+assert.equal(await save(t21, [note(t21, "PERFECT", 1)]), "limited");
+assert.equal((await rows(`select count(*)::int as n from takes where id = '${t21.id}'`))[0].n, 0);
+assert.equal(await save(burst[0], [note(burst[0], "PERFECT", 1)]), "duplicate");
+const calm = { ...take({ song_id: "fur-elise" }), player_id: player };
+assert.equal(await save(calm, [note(calm, "PERFECT", 1)]), "saved");
+await db.exec(`update takes set created_at = now() - interval '6 minutes' where player_id = '${busy}'`);
+assert.equal(await save(t21, [note(t21, "PERFECT", 1)]), "saved");
+say("ok  20 saves per player per 5 minutes; a retry is still a duplicate; others and later saves go through");
+
+// Guest cleanup: only anonymous users idle for 30 days (no sign-in, no take). Google users and active guests stay.
+const [idleGuest, activeGuest, oldGoogle, recentPlayer] = [randomUUID(), randomUUID(), randomUUID(), randomUUID()];
+await db.exec(`insert into auth.users(id, is_anonymous, created_at, last_sign_in_at) values
+  ('${idleGuest}', true, now() - interval '40 days', now() - interval '40 days'),
+  ('${activeGuest}', true, now() - interval '40 days', now() - interval '2 days'),
+  ('${oldGoogle}', false, now() - interval '400 days', now() - interval '400 days'),
+  ('${recentPlayer}', true, now() - interval '40 days', now() - interval '40 days');
+  insert into players(id) values ('${idleGuest}'), ('${activeGuest}'), ('${oldGoogle}'), ('${recentPlayer}');`);
+const oldTake = { ...take({ created_at: new Date(Date.now() - 35 * 86400000).toISOString() }), player_id: idleGuest };
+assert.equal(await save(oldTake, [note(oldTake, "PERFECT", 1)]), "saved");
+const freshTake = { ...take(), player_id: recentPlayer };
+assert.equal(await save(freshTake, [note(freshTake, "PERFECT", 1)]), "saved");
+await assert.rejects(() => db.query("select cleanup_stale_guests(1)"), /at least 7 days/);
+assert.equal((await rows("select cleanup_stale_guests() as n"))[0].n, 1);
+const left = (await rows(`select id from auth.users where id in ('${idleGuest}', '${activeGuest}', '${oldGoogle}', '${recentPlayer}')`)).map((r) => r.id).sort();
+assert.deepEqual(left, [activeGuest, oldGoogle, recentPlayer].sort());
+assert.equal((await rows(`select count(*)::int as n from takes where player_id = '${idleGuest}'`))[0].n, 0, "the idle guest's takes cascade");
+say("ok  cleanup removes only guests idle 30 days; Google users, recent sign-ins and recent players stay");
 
 const [trend] = await rows(`select notes, misses from bar_trends where player_id = '${player}' and song_id = 'twinkle'`);
 assert.deepEqual([Number(trend.notes), Number(trend.misses)], [6, 1]);

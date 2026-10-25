@@ -199,3 +199,20 @@ describe("scored: false (wait mode): no score moments", () => {
     expect(types({ scored: false }, 20)).not.toContain("feverEnd");
   });
 });
+
+describe("Judge.rewind (rewind)", () => {
+  it("makes bar 2's notes pressable again and leaves bar 1's judged", () => {
+    const events: GameEvent[] = [];
+    const judge = new Judge(chart, (e) => events.push(e), { scored: false });
+    const bar = 2400; // 100 bpm, 4 beats
+    const inBar = (b: number) => chart.notes.filter((n) => noteTimeMs(chart, n) >= (b - 1) * bar && noteTimeMs(chart, n) < b * bar);
+    [...inBar(1), ...inBar(2)].forEach((n, i) => judge.press(n.pitch, noteTimeMs(chart, n), i));
+    judge.rewind(bar);
+    expect(inBar(1).every((n) => judge.noteState.has(n.id))).toBe(true);
+    expect(inBar(2).some((n) => judge.noteState.has(n.id))).toBe(false);
+    expect(events.at(-1)).toEqual({ type: "combo", count: 0, atMs: bar });
+    const first = inBar(2)[0];
+    judge.press(first.pitch, noteTimeMs(chart, first), 99);
+    expect(judge.noteState.get(first.id)).toBe("PERFECT");
+  });
+});

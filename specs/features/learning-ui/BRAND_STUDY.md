@@ -16,8 +16,10 @@ foreground assignment rail beside the actual read-only mastery graph. The real
 song, key, phrase count and three questions make Start concrete. The selected
 capable guide travels to the actual phrase-endings target, then settles into a
 reserved 112px full-body slot beside the real TheoryWorkspace. One image and size
-persist throughout. The map fades during a 550ms settle before a 200ms lesson
-reveal; the guide never crosses visible teaching content or changes crops.
+persist throughout. The map fades while the guide settles before the lesson
+appears; the guide never crosses visible teaching content or changes crops.
+[Accompaniment in motion](../../../PRODUCT_AND_DESIGN.md#accompaniment-in-motion)
+links the authoritative journey timers and CSS transitions.
 Stop during travel/docking and Back to map
 preserve deliberate control; actual local Resume retains answer, history and
 reference state. Replay explicitly resets only this isolated study session.
@@ -26,8 +28,9 @@ No new model, progress inference or task-planning behavior is implied.
 Bricolage Grotesque supplies compact brand/headings, Source Sans 3 operational
 text, both as actual Next font assets. Warm-white working surfaces, deep ink,
 restrained cobalt actions and the new forest-green/cream character form one
-system. Secure, developing and unknown graph states retain distinct fill/ring/
-dashed forms on leaves and broad parents. The small wordmark symbol and action/
+system. Mastery presentation on leaves and broad parents follows the
+[feature requirements](spec.md#requirements), not the legacy internal state names.
+The small wordmark symbol and action/
 answer feet share a restrained piano-key shape. No marketing hero, decorative
 keyboard wall, palette collage or stock card grid is used.
 

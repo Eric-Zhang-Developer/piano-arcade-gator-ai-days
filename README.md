@@ -52,7 +52,11 @@ map. [Product philosophy](PRODUCT_PHILOSOPHY.md) is the canonical purpose.
 The four existing activity routes remain `/learn/understand`, `/learn/practice`,
 `/learn/review/theory` and `/learn/play-through`; the current prepared assignment
 leads directly into theory without asking the learner to manage those categories.
-The current frontend uses isolated in-memory demo state; refreshing clears it.
+The proposed preview has its own in-memory session: Back to your map and Resume
+preserve it; Replay from home, leaving `/learn/brand-preview`, or refreshing
+clears it. Prior UI sessions survive navigation among learning routes, but
+refreshing or leaving the learning layout clears them. The two previews do not
+share session progress.
 
 ## How it works
 

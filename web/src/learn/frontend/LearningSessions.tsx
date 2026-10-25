@@ -24,7 +24,8 @@ type Sessions = {
 };
 const SessionContext = createContext<Sessions | null>(null);
 
-// The learning layout owns real session state across hub navigation. Nothing is saved to an account or disk.
+// The layout preserves sessions across learning routes; the brand preview mounts
+// an isolated provider. Neither provider saves to an account or disk.
 export function LearningSessionsProvider({ children }: { children: React.ReactNode }) {
   const [theory, setTheory] = useState(emptyTheory);
   const [review, setReview] = useState(emptyTheory);

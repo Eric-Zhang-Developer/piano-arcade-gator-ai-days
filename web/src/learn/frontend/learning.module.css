@@ -99,7 +99,6 @@
 .phrase[data-playing=true] { background:rgb(39 225 255 / .06); outline:1px solid rgb(39 225 255 / .4); outline-offset:8px; }
 .phrase[data-playing=true] figcaption { color:var(--pa-cyan); }
 
-/* Top navigation always opens a hub; session entry is an explicit landing action. */
 .topbar { height:var(--learn-header-height); flex:none; display:flex; align-items:center; gap:48px; padding:0 32px; border-bottom:1px solid var(--learn-border); background:var(--pa-bg); }
 .brand { font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-weight:900; font-size:24px; line-height:1; letter-spacing:-.02em; text-transform:uppercase; }
 .topbar nav { display:flex; align-self:stretch; gap:12px; }

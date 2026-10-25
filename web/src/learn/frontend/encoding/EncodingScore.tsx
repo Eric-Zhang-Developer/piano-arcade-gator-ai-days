@@ -52,7 +52,8 @@ export function EncodingScore({ focus }: { focus?: Phrase }) {
     window.clearTimeout(timer.current);
     setPlaying(null);
   };
-  useEffect(() => () => { stop.current?.(); window.clearTimeout(timer.current); }, []);
+  // An offline gate hides the tab through Activity, which runs this cleanup but keeps state, so it resets `playing` too.
+  useEffect(() => () => { stop.current?.(); stop.current = null; window.clearTimeout(timer.current); setPlaying(null); }, []);
 
   const listen = (phrase: Phrase) => {
     const again = playing === phrase;

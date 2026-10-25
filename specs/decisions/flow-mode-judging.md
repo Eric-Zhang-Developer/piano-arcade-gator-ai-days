@@ -1,6 +1,6 @@
 # flow-mode: judging cases the spec doesn't spell out
 
-**Context.** The spec defines a right note, WRONG, a skipped note, a chord's inner note and a lost stop. Four presses
+**Context.** The spec defines a right note, WRONG, a skipped note, a chord's inner note and a lost stop. Four cases
 fall between those rules.
 
 **Choices.**
@@ -9,7 +9,9 @@ fall between those rules.
 - **Outside the song** (more than a beat before the first note, i.e. the count-in, or after every note is judged) a
   press is a harmless extra, as core's Judge ignores presses outside the song.
 - **A lost stop** breaks the combo with a `combo` event of count 0, not a `noteMiss` or `wrongNote`: nothing was
-  missed or played wrong, and the note still waits. It doesn't step the fever gauge.
+  missed or played wrong, and the note still waits. It doesn't step the fever gauge. Waiting at the first note is
+  never lost: nothing has been played to fall out of (the count-in ends, you look at your hands). "Take your time"
+  still shows there after the 2 free beats.
 - **A chord's inner note credited GOOD** counts as a hit for the combo, so the combo holds and grows through it.
 
 **How to undo.** Each is one branch in `FlowJudge.press`, `advance` or `passOver` in `web/src/game/flow-mode/judge.ts`.

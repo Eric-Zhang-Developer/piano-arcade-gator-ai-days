@@ -43,7 +43,9 @@
 .choice:has(:checked) { border-color:var(--learn-accent); box-shadow:inset 2px 0 0 var(--learn-accent); }
 .choice:has(:disabled) { cursor:default; }
 .choice:has(:disabled):not(:has(:checked)) { color:var(--learn-muted); }
-.choice input { accent-color:var(--pa-primary); margin:0; width:16px; height:16px; }
+.choice input { appearance:none; flex:none; width:20px; height:20px; margin:0; padding:3px; border:2px solid var(--learn-muted); background:transparent; background-clip:content-box; cursor:pointer; }
+.choice input:checked { border-color:var(--learn-accent); background-color:var(--learn-accent); }
+.choice input:disabled { cursor:default; }
 .actions { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
 .feedback { max-width:560px; margin:0 0 24px; padding:16px; border:1px solid var(--learn-border); display:grid; gap:8px; }
 .feedback p { margin:0; }

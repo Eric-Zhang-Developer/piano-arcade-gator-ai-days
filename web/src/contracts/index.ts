@@ -36,7 +36,7 @@ export interface TakeEvent {
 }
 
 export interface Take {
-  // Missing/1 is the original onset-only policy. Only explicit 2 earns sustain
+  // Missing/1 is the original onset-only policy. Only explicit 2 or 3 earns sustain
   // credit; old files/outbox entries must never be silently reinterpreted.
   scoringVersion?: 1 | 2 | 3;
   chartId: string;

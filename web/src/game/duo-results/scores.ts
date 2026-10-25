@@ -20,6 +20,7 @@ export interface BarCell {
   to: number;
   notes: number;
   accuracy: number | null; // 0–1 by the judge's formula; null for a cell with no notes
+  misses: number; // MISS judgments and WRONG presses in the cell
 }
 
 export const barCount = (chart: Chart) =>
@@ -36,7 +37,7 @@ export function rangeScore(chart: Chart, take: Take, results: Results, from: num
     const t = take.events[w.eventIndex]?.timeMs;
     if (t !== undefined && t >= (from - 1) * barMs && t < to * barMs) count.wrong++;
   }
-  return { from, to, notes: ids.size, accuracy: ids.size ? passAccuracy(count, ids.size) : null };
+  return { from, to, notes: ids.size, accuracy: ids.size ? passAccuracy(count, ids.size) : null, misses: count.MISS + count.wrong };
 }
 
 // One cell per `per` bars from bar 1 (the strip pairs bars when one per cell gets too narrow).
@@ -97,6 +98,7 @@ export interface TutorInput {
   run: { from: number; to: number } | null;
   accuracy: number | null; // the run's
   drift: Record<Hand, number | null>; // the run's
+  misses?: number; // the run's MISS and WRONG; 0 means every note was hit, only off the beat
 }
 
 const bars = (r: { from: number; to: number }) => (r.from === r.to ? `bar ${r.from}` : `bars ${r.from}–${r.to}`);
@@ -108,14 +110,16 @@ export const driftingHand = (drift: Record<Hand, number | null>): [Hand, number]
     .filter(([, d]) => d !== null && Math.abs(d) > duoResultsSettings.driftMs)
     .sort((a, b) => Math.abs(b[1]!) - Math.abs(a[1]!))[0] as [Hand, number] | undefined) ?? [null, null];
 
-// The template line: a drifting hand if one is past driftMs, else the run's accuracy.
-export function tutorLine({ run, accuracy, drift }: TutorInput): string[] {
+// The template line: a drifting hand if one is past driftMs, else the run's accuracy. "Accuracy", not "notes right":
+// it's the judge's weighted score, so a run with no misses can still be the weakest (Eric's full combo read "54% of
+// notes right" with every note hit).
+export function tutorLine({ run, accuracy, drift, misses }: TutorInput): string[] {
   if (!run) return ["Clean take. Try it faster, or pick the next song."];
   const [hand, ms] = driftingHand(drift);
   const first =
     hand && ms !== null
       ? `Your ${hand === "L" ? "left" : "right"} hand ${ms > 0 ? "drags" : "rushes"} in ${bars(run)}, about ${Math.round(Math.abs(ms))} ms ${ms > 0 ? "late" : "early"}.`
-      : `${bars(run).replace(/^b/, "B")} ${run.from === run.to ? "was" : "were"} your weakest: ${Math.round((accuracy ?? 0) * 100)}% of notes right.`;
+      : `${bars(run).replace(/^b/, "B")} ${run.from === run.to ? "was" : "were"} your weakest: ${Math.round((accuracy ?? 0) * 100)}% accuracy${misses === 0 ? ", every note hit but off the beat" : ""}.`;
   return [first, `Let's loop just those bars at ${duoResultsSettings.practiceTempo}%, then play it through.`];
 }
 

@@ -1,0 +1,161 @@
+<!doctype html>
+<!-- The mascot spike's pick page (spec: mascot-spike). Open from disk; it reads out/manifest.js (pack.mjs) and
+     out/check.js (check.mjs) and saves nothing. Eric's pick goes in chat or in PICK.md. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pick a gator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Saira:wdth,wght@75..100,500..800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pa-bg: #030607; --pa-panel: #0a0d15; --pa-line: #1b2130; --pa-primary: #2b9bff;
+    --pa-ink: #e2e6f0; --pa-ink-dim: #7d8496; --pa-gold: #ffe27a; --pa-wrong: #ff4d5e;
+    --display: "Saira", sans-serif; --data: "JetBrains Mono", monospace;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--pa-bg); color: var(--pa-ink); font: 14px/1.5 var(--data); padding: 32px 40px 64px; }
+  h1, h2, .big { font-family: var(--display); font-stretch: 75%; text-transform: uppercase; letter-spacing: .01em; }
+  h1 { font-size: 56px; font-weight: 800; line-height: .95; }
+  h1 i { color: var(--pa-primary); font-style: normal; }
+  h2 { font-size: 26px; font-weight: 700; display: flex; gap: 14px; align-items: baseline; margin: 48px 0 16px; }
+  h2 small, .label { font: 600 11px/1.4 var(--data); letter-spacing: .14em; text-transform: uppercase; color: var(--pa-ink-dim); }
+  code { color: var(--pa-gold); }
+  .lede { display: flex; justify-content: space-between; align-items: end; gap: 32px; border-bottom: 1px solid var(--pa-line); padding-bottom: 20px; }
+  .lede p { max-width: 520px; color: var(--pa-ink-dim); }
+  .lede p b { color: var(--pa-ink); font-weight: 600; }
+
+  /* Sheets: a contact strip of all six. */
+  .sheets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .sheet { background: var(--pa-panel); border: 1px solid var(--pa-line); padding: 10px 12px 12px; position: relative; }
+  .sheet img { width: 100%; aspect-ratio: 2 / 1; object-fit: contain; display: block; }
+  .sheet .label { display: flex; justify-content: space-between; }
+  .sheet[data-top] { border-color: var(--pa-primary); }
+  .sheet[data-top] .label b { color: var(--pa-primary); font-weight: 600; }
+
+  /* Pose sets: one column per top sheet, a row per pose, a cell per candidate. */
+  .switch { display: flex; gap: 8px; margin-bottom: 16px; }
+  .switch button { font: 600 12px var(--data); letter-spacing: .12em; text-transform: uppercase; color: var(--pa-ink-dim);
+    background: var(--pa-panel); border: 1px solid var(--pa-line); padding: 8px 14px; cursor: pointer; }
+  .switch button[aria-pressed="true"] { color: var(--pa-ink); border-color: var(--pa-primary); }
+  .switch button:focus-visible { outline: 2px solid var(--pa-primary); outline-offset: 2px; }
+  .poses { display: grid; grid-template-columns: 150px repeat(3, 1fr); border-top: 1px solid var(--pa-line); }
+  .poses > * { border-bottom: 1px solid var(--pa-line); padding: 12px 0; }
+  .pose-name { font: 800 34px/1 var(--display); font-stretch: 75%; text-transform: uppercase; display: flex; align-items: center; }
+  .cand { display: grid; grid-template-columns: 168px 1fr; gap: 12px; align-items: center; padding-right: 12px; }
+  .sprite { width: 168px; height: 168px; background-size: 300% 100%; background-repeat: no-repeat;
+    animation: play 600ms steps(3, jump-none) infinite; }
+  .sprite[data-pose="idle"] { animation: blink 4s step-end infinite; }
+  .sprite.none { display: grid; place-items: center; border: 1px dashed var(--pa-line); color: var(--pa-ink-dim); font-size: 11px; }
+  @keyframes play { from { background-position: 0% 0; } to { background-position: 100% 0; } }
+  /* Idle: calm, a breath at 1.8 s, the blink for the last 200 ms of each 4 s. */
+  @keyframes blink { 0% { background-position: 0% 0; } 45% { background-position: 50% 0; } 55% { background-position: 0% 0; } 95%, 100% { background-position: 100% 0; } }
+  .verdict { font-size: 12px; }
+  .verdict .n { font: 700 24px/1 var(--display); font-stretch: 75%; display: block; }
+  .verdict[data-ok="all"] .n { color: var(--pa-gold); }
+  .verdict[data-ok="none"] .n { color: var(--pa-wrong); }
+  .verdict summary { color: var(--pa-ink-dim); cursor: pointer; font-size: 11px; }
+  .verdict pre { font: 10px/1.4 var(--data); white-space: pre-wrap; color: var(--pa-ink-dim); margin-top: 4px; max-width: 220px; }
+
+  /* Context: the gator over two real screens, at the size it would have there. */
+  .context { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .mock { position: relative; border: 1px solid var(--pa-line); overflow: hidden; container-type: inline-size; }
+  .shot > img { display: block; width: 100%; }
+  .mock .sprite { position: absolute; height: auto; }
+  .mock figcaption { padding: 10px 12px; background: var(--pa-panel); }
+  .shot { position: relative; }
+  /* Sizes as a share of the 1280-wide screen: 77 px in the footer gap after "Lab", 150 px left of the pause card. */
+  .on-select { left: 39.2%; bottom: 0.4%; width: 6cqw; aspect-ratio: 1; }
+  .on-pause { left: 21%; top: 40%; width: 11.7cqw; aspect-ratio: 1; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sprite, .sprite[data-pose="idle"] { animation: none; background-position: 0% 0; }
+  }
+</style>
+<script src="out/manifest.js"></script>
+<script src="out/check.js"></script>
+</head>
+<body>
+<header class="lede">
+  <h1>Pick <i>one</i> gator</h1>
+  <p>Six character sheets from codex, then pose sets for the worker's top two. <b>Say a sheet in chat</b>, or set
+    <code>sheet: sheet-NN.png</code> in <code>spikes/mascot/PICK.md</code>. This page saves nothing.</p>
+</header>
+
+<h2>Sheets <small id="sheet-count"></small></h2>
+<div class="sheets" id="sheets"></div>
+
+<h2>Poses <small>3 frames each, 200 ms a frame · idle blinks every 4 s · check.mjs beside each</small></h2>
+<div class="switch" id="switch" role="group" aria-label="Sheet"></div>
+<div class="poses" id="poses"></div>
+
+<h2>In context <small>over screenshots of duo-select and the pause card, at in-game size</small></h2>
+<div class="context">
+  <figure class="mock"><div class="shot"><img src="../../specs/features/duo-select/shots/select-1280.jpg" alt="Duo select screen">
+    <div class="sprite on-select" data-pose="idle" data-ctx="idle"></div></div>
+    <figcaption class="label">duo-select · idle in the footer, after "First time?"</figcaption></figure>
+  <figure class="mock"><div class="shot"><img src="../../specs/features/pause-skin/duo-after-1280.jpg" alt="Pause card">
+    <div class="sprite on-pause" data-ctx="thinking"></div></div>
+    <figcaption class="label">pause card · thinking</figcaption></figure>
+</div>
+
+<script>
+  const M = window.MASCOT ?? { sheets: [], sets: [] };
+  const C = window.MASCOT_CHECK ?? {};
+  const POSES = ["idle", "pointing", "happy", "oops", "thinking", "celebrating"];
+  const tops = [...new Set(M.sets.map((s) => s.sheet))].sort();
+  const el = (tag, props = {}, ...kids) => {
+    const n = Object.assign(document.createElement(tag), props);
+    n.append(...kids);
+    return n;
+  };
+
+  document.getElementById("sheet-count").textContent = `${M.sheets.length} candidates · top two in blue`;
+  for (const f of M.sheets) {
+    const name = f.replace(/\.png$/, "");
+    const card = el("figure", { className: "sheet" },
+      el("img", { src: `out/${f}`, alt: name, loading: "lazy" }),
+      el("figcaption", { className: "label" }, el("span", {}, f), el("b", {}, tops.includes(name) ? "top two" : "")));
+    if (tops.includes(name)) card.dataset.top = "";
+    document.getElementById("sheets").append(card);
+  }
+
+  const sprite = (set, pose) => {
+    const d = el("div", { className: "sprite" });
+    d.dataset.pose = pose;
+    if (set?.frames) d.style.backgroundImage = `url("out/sets/${set.sheet}/${set.name}/sprite.png")`;
+    else { d.classList.add("none"); d.textContent = set ? "not split" : "not made"; }
+    return d;
+  };
+  const verdict = (key) => {
+    const r = C[key];
+    if (!r) return el("div", { className: "verdict" }, el("span", { className: "n" }, "—"), "not checked");
+    const v = el("div", { className: "verdict" }, el("span", { className: "n" }, `${r.pass}/${r.of}`), "frames pass",
+      el("details", {}, el("summary", {}, "check lines"), el("pre", {}, r.lines.join("\n"))));
+    v.dataset.ok = r.pass === r.of ? "all" : r.pass ? "some" : "none";
+    return v;
+  };
+
+  function show(sheet) {
+    for (const b of document.querySelectorAll("#switch button")) b.setAttribute("aria-pressed", b.value === sheet);
+    const grid = document.getElementById("poses");
+    grid.replaceChildren();
+    for (const pose of POSES) {
+      grid.append(el("div", { className: "pose-name" }, pose));
+      for (const n of [1, 2, 3]) {
+        const set = M.sets.find((s) => s.sheet === sheet && s.name === `${pose}-${n}`);
+        grid.append(el("div", { className: "cand" }, sprite(set, pose),
+          el("div", {}, el("span", { className: "label" }, `${pose}-${n}`), verdict(`${sheet}/${pose}-${n}`))));
+      }
+    }
+    for (const d of document.querySelectorAll("[data-ctx]")) {
+      const set = M.sets.find((s) => s.sheet === sheet && s.pose === d.dataset.ctx && s.frames);
+      d.style.backgroundImage = set ? `url("out/sets/${set.sheet}/${set.name}/sprite.png")` : "";
+    }
+  }
+  for (const s of tops) document.getElementById("switch").append(el("button", { value: s, onclick: () => show(s) }, s));
+  if (tops.length) show(tops[0]);
+</script>
+</body>
+</html>

@@ -9,35 +9,62 @@ import { blank, readPng, writePng } from "./png.mjs";
 
 export const CANVAS = 384; // square; the gator stands 90% of it at the tallest frame of its set
 export const FRAMES = { idle: 3, pointing: 3, happy: 3, oops: 3, thinking: 3, celebrating: 3 };
-const SOLID = 128; // alpha that counts as the figure when looking for gaps and boxes
-const GAP = 6; // a gap narrower than this (px) is inside one figure, not between frames
+const SOLID = 128; // alpha that counts as the figure; fainter pixels join the figure they touch, or are dropped
 
-// Column runs that hold figure pixels, merged across narrow gaps; the n heaviest, back in left-to-right order.
+// Each frame is a connected figure. Frames may share columns (a pointing finger reaches over the next frame's tail),
+// so the split is by components, not by gaps. The n largest are the frames; a small piece (motion lines) joins the
+// frame whose box holds its centre, and the rest are dropped as specks. Edge pixels under SOLID join the figure they
+// touch within 2 px, which also leaves behind the faint glow some images have.
 export function splitStrip(img, n) {
   const { width, height, px } = img;
-  const mass = new Array(width).fill(0);
-  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) if (px[(y * width + x) * 4 + 3] >= SOLID) mass[x]++;
-  const runs = [];
-  for (let x = 0; x < width; x++) {
-    if (!mass[x]) continue;
-    const last = runs.at(-1);
-    if (last && x - last.x1 <= GAP) [last.x1, last.mass] = [x, last.mass + mass[x]];
-    else runs.push({ x0: x, x1: x, mass: mass[x] });
+  const label = new Int32Array(width * height);
+  const comps = [];
+  for (let i = 0; i < width * height; i++) {
+    if (label[i] || px[i * 4 + 3] < SOLID) continue;
+    const c = { id: comps.length + 1, area: 0, x0: width, x1: 0, y0: height, y1: 0 };
+    comps.push(c);
+    const stack = [i];
+    label[i] = c.id;
+    while (stack.length) {
+      const j = stack.pop(), x = j % width, y = (j - x) / width;
+      c.area++;
+      [c.x0, c.x1, c.y0, c.y1] = [Math.min(c.x0, x), Math.max(c.x1, x), Math.min(c.y0, y), Math.max(c.y1, y)];
+      for (const k of [x > 0 ? j - 1 : -1, x < width - 1 ? j + 1 : -1, y > 0 ? j - width : -1, y < height - 1 ? j + width : -1])
+        if (k >= 0 && !label[k] && px[k * 4 + 3] >= SOLID) {
+          label[k] = c.id;
+          stack.push(k);
+        }
+    }
   }
-  if (runs.length < n) return { frames: null, why: `${runs.length} figures, wanted ${n}` };
-  const kept = [...runs].sort((a, b) => b.mass - a.mass).slice(0, n).sort((a, b) => a.x0 - b.x0);
-  return { frames: kept.map((r) => crop(img, r.x0, r.x1 + 1)), why: runs.length > n ? `dropped ${runs.length - n} specks` : "" };
-}
-
-// The figure's box within columns [x0, x1); stray pixels outside the columns are left behind.
-function crop(img, x0, x1) {
-  const { width, height, px } = img;
-  let top = height, bottom = -1;
+  if (comps.length < n) return { frames: null, why: `${comps.length} figures, wanted ${n}` };
+  const big = [...comps].sort((a, b) => b.area - a.area).slice(0, n).sort((a, b) => a.x0 - b.x0);
+  const owner = new Int32Array(comps.length + 1); // component id -> frame index + 1
+  big.forEach((c, f) => (owner[c.id] = f + 1));
+  let specks = 0;
+  for (const c of comps) {
+    if (owner[c.id]) continue;
+    const [cx, cy] = [(c.x0 + c.x1) / 2, (c.y0 + c.y1) / 2];
+    const f = big.findIndex((b) => cx >= b.x0 && cx <= b.x1 && cy >= b.y0 && cy <= b.y1);
+    if (f >= 0) owner[c.id] = f + 1;
+    else specks++;
+  }
+  const frames = big.map((b) => blank(b.x1 - b.x0 + 5, b.y1 - b.y0 + 5)); // 2 px margin for the edge pixels
   for (let y = 0; y < height; y++)
-    for (let x = x0; x < x1; x++) if (px[(y * width + x) * 4 + 3] >= SOLID) [top, bottom] = [Math.min(top, y), Math.max(bottom, y)];
-  const out = blank(x1 - x0, bottom - top + 1);
-  for (let y = top; y <= bottom; y++) out.px.set(px.subarray((y * width + x0) * 4, (y * width + x1) * 4), (y - top) * out.width * 4);
-  return out;
+    for (let x = 0; x < width; x++) {
+      const i = y * width + x;
+      if (!px[i * 4 + 3]) continue;
+      let f = owner[label[i]];
+      for (let dy = -2; !f && dy <= 2; dy++)
+        for (let dx = -2; !f && dx <= 2; dx++) {
+          const [nx, ny] = [x + dx, y + dy];
+          if (nx >= 0 && ny >= 0 && nx < width && ny < height) f = owner[label[ny * width + nx]];
+        }
+      if (!f) continue;
+      const b = big[f - 1], out = frames[f - 1];
+      const [ox, oy] = [x - b.x0 + 2, y - b.y0 + 2];
+      if (ox >= 0 && oy >= 0 && ox < out.width && oy < out.height) out.px.set(px.subarray(i * 4, i * 4 + 4), (oy * out.width + ox) * 4);
+    }
+  return { frames, why: specks ? `dropped ${specks} specks` : "" };
 }
 
 // Box-filter scale by s < 1 into a CANVAS square, bottom-centre anchored. Averages premultiplied colour, so the

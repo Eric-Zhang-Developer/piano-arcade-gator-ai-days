@@ -21,6 +21,7 @@ import { wetPaint } from "./wet-paint";
 import { uiSoundsAb } from "./ui-sounds-ab";
 import { recordFollowsX } from "./record-follows";
 import { harmonyMap } from "./harmony-map";
+import { crowd } from "./crowd";
 
 export interface Experiment {
   name: string; // its folder and its flag: ?x=<name>, comma-separated for several
@@ -50,6 +51,7 @@ export const experiments: Experiment[] = [
   uiSoundsAb, // #1167: the menu sounds, old against new
   recordFollowsX, // #1261: a recording stretches to follow you in Learn and Flow, and holds when you stop
   harmonyMap, // #1299: its own pages, /harmony and /harmony/all; chords as triangles on the Tonnetz
+  crowd, // #1345: the room claps along, and the mic scores the room's timing apart from yours
 ];
 
 // The names a take's ?x= turns on.

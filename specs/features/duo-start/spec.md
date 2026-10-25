@@ -8,7 +8,7 @@ assignee: "eric"
 # Duo start
 
 Issue #733. Eric, 2026-10-25, with a screenshot of `/play`'s start screen: "To redesign this page entirely should just
-be one pull request." Then: "Yes, duo-start before Monday." It's the screen right after the select in the video.
+be one pull request." It's the screen right after the select in the video.
 
 Today the start screen is the pre-Duo stage card (`web/src/game/stage-card/`: the "ARE YOU READY?" band, the old
 jacket, title and level) above browser-default buttons and controls. Those come from several features' start panels:
@@ -48,5 +48,5 @@ real seam (a component other screens share), and say why.
 4. Eric looks at it once. Mark that in the done note.
 
 ## Defaults
-- **Before Monday,** in `extras` after nav-bar. Cut it if it isn't merged by the freeze.
+- **In `extras`, after nav-bar.**
 - Log any choice this spec doesn't make in `specs/decisions/duo-start-*.md`.

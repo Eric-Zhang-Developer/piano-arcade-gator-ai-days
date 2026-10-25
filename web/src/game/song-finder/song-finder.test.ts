@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { fileURLToPath } from "node:url";
 import { loadSongs, type Song } from "../song-select/load";
-import { announcement, filterSongs, LAST_PLAYED_KEY, markPlayed, readLastPlayed, readSort, sortSongs, surname, writeSort } from ".";
+import { announcement, filterSongs, LAST_PLAYED_KEY, markPlayed, readLastPlayed, readSort, sortSongs, surname, takesFocus, writeSort } from ".";
 
 const song = (id: string, title: string, composer: string, level: number, catalog?: string): Song => ({ id, title, composer, level, catalog, noteCount: 1, roll: [] as unknown as Song["roll"] });
 const ids = (songs: Song[]) => songs.map((s) => s.id);
@@ -122,5 +122,20 @@ describe("the live region's line", () => {
     expect(announcement(true, "chopin", 3, 31)).toBe("3 of 31 songs");
     expect(announcement(true, "  zzqx ", 0, 31)).toBe("No song matches zzqx");
     expect(announcement(true, "", 31, 31)).toBe("31 songs");
+  });
+});
+
+describe("takesFocus (#1272)", () => {
+  const body = { closest: () => null } as unknown as Element;
+  const inList = { closest: (s: string) => (s === "ol" ? {} : null) } as unknown as Element;
+  const chip = { closest: () => null } as unknown as Element;
+  const column = { contains: (n: Element) => n === inList } as unknown as Element;
+  it("a re-sort that dropped focus to <body> (a remounted row) moves it to the panel's row", () => {
+    expect(takesFocus(body, body, column)).toBe(true);
+    expect(takesFocus(null, body, column)).toBe(true);
+  });
+  it("focus in the list follows; a sort chip or the search box keeps it", () => {
+    expect(takesFocus(inList, body, column)).toBe(true);
+    expect(takesFocus(chip, body, column)).toBe(false);
   });
 });

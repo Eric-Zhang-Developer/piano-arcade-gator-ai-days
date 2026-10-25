@@ -78,6 +78,11 @@ export function writeSort(mode: SortMode, storage: Store = browserStorage()): vo
   }
 }
 
+// Whether a new order or filter moves focus to the panel's row: focus is in the column's list, or nowhere (<body>,
+// after a re-sort remounted the focused row). A sort chip or the search box keeps it.
+export const takesFocus = (active: Element | null, body: Element, column: Element | null) =>
+  !active || active === body || (!!active.closest("ol") && !!column?.contains(active));
+
 // What the finder's live region says (#1035): nothing until the player types or sorts, then the count shown, or the
 // no-match line.
 export function announcement(touched: boolean, query: string, shown: number, total: number): string {

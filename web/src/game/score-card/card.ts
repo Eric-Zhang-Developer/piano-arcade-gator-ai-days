@@ -93,8 +93,9 @@ type Ctx = Pick<
 
 /**
  * The card, on a 1920×1080 context. `display` is the display face's CSS family (Saira), with fallbacks: numbers and
- * titles use it, upright as on the results screen (no italic in the Duo look). `data` is the kit's mono data face, for
- * the labels, as the results screen sets them. Nothing is under 24 px. Hype pink stays off: a saved card is a record of the take, not one of its moments.
+ * titles use it, upright as on the results screen (no italic in the Duo look; the jacket keeps SongJacket's). `data`
+ * is the kit's mono data face, for the labels, as the results screen sets them. Nothing is under 24 px. Hype pink
+ * stays off: a saved card is a record of the take, not one of its moments.
  */
 export function drawCard(ctx: Ctx, m: CardModel, display = "system-ui, sans-serif", data = "ui-monospace, monospace"): void {
   const face = (weight: number, px: number) => `${weight} ${px}px ${display}`;
@@ -133,7 +134,8 @@ export function drawCard(ctx: Ctx, m: CardModel, display = "system-ui, sans-seri
   ctx.fillStyle = grad;
   ctx.fillRect(J.x, J.y, J.s, J.s);
   // The CSS line box ends 10% below the square; its baseline sits about a fifth of the font size above that.
-  text(m.jacket.word, J.x - J.s * 0.04, J.y + J.s * (1.1 - 0.56 * 0.2), face(900, Math.round(J.s * 0.56)), m.jacket.text);
+  // Italic only here: the jacket is SongJacket's artwork (its .word is italic), so the card shows the same sleeve.
+  text(m.jacket.word, J.x - J.s * 0.04, J.y + J.s * (1.1 - 0.56 * 0.2), `italic ${face(900, Math.round(J.s * 0.56))}`, m.jacket.text);
   ctx.restore();
 
   // The right column, on the jacket's top and bottom edges: the song, then the rank with its numbers beside it, then

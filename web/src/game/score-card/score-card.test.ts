@@ -67,6 +67,7 @@ describe("drawCard", () => {
     const texts: string[] = [];
     const fonts: string[] = [];
     const fills: unknown[] = [];
+    const italics: string[] = [];
     let font = "";
     let fill: unknown = "";
     const ctx = {
@@ -89,6 +90,7 @@ describe("drawCard", () => {
       fillRect() {},
       fillText(s: string) {
         texts.push(s);
+        if (/italic/.test(font)) italics.push(s);
       },
       measureText: (s: string) => ({ width: s.length * 30 }),
       save() {},
@@ -98,7 +100,7 @@ describe("drawCard", () => {
       clip() {},
       createLinearGradient: () => ({ addColorStop() {} }),
     };
-    return { ctx: ctx as unknown as CanvasRenderingContext2D, texts, fonts, fills };
+    return { ctx: ctx as unknown as CanvasRenderingContext2D, texts, fonts, fills, italics };
   }
   const strings = (m: CardModel) =>
     [m.title, m.composer, m.practice, m.rank, m.score, m.accuracy, m.maxCombo, m.date, m.jacket.word]
@@ -121,11 +123,12 @@ describe("drawCard", () => {
   });
 
   it("reads Étude, upright, with no hype pink (Duo look, #1139)", () => {
-    const { ctx, texts, fonts, fills } = recorder();
-    drawCard(ctx, cardModel(twinkle, results, 12345, day));
+    const { ctx, texts, italics, fills } = recorder();
+    const m = cardModel(twinkle, results, 12345, day);
+    drawCard(ctx, m);
     expect(texts).toContain(APP_NAME);
     expect(texts).not.toContain("PIANO ARCADE");
-    expect(fonts.filter((f) => /italic/.test(f))).toEqual([]);
+    expect(italics).toEqual([m.jacket.word]); // the sleeve is SongJacket's artwork, italic there too
     expect(fills.filter((f) => typeof f === "string" && f.toLowerCase() === hype)).toEqual([]);
   });
 });

@@ -1,5 +1,6 @@
 // sheet-view's half on /play: it posts the take to /sheet on a BroadcastChannel and puts "Sheet music ↗" on the start
-// screen. It draws nothing (decision 001 row 13: the score is never on the arcade screen).
+// screen. It draws nothing (decision 001 row 13: the score is never on the arcade screen). /stage (stage-view) listens
+// on the same channel, and reads the judge's combo moments too; /sheet ignores them.
 import type { Chart, GamePlugin } from "../../contracts";
 import { kitButton } from "../duo-tokens";
 
@@ -10,6 +11,9 @@ export type SheetMessage =
   | { type: "take"; chart: Chart } // the chart as played, after every transformChart
   | { type: "clock"; nowMs: number } // the chart clock, once per drawn frame
   | { type: "judgment"; noteId: string; judgment: Judgment }
+  | { type: "combo"; count: number } // the judge's own combo, so WRONG presses and Flow's lost stops break it too
+  | { type: "milestone"; count: number } // the judge's comboMilestone: its rule, and none in Learn
+  | { type: "fullCombo" }
   | { type: "end" };
 export type Judgment = "PERFECT" | "GREAT" | "GOOD" | "MISS";
 
@@ -39,6 +43,9 @@ export function sheetView(): GamePlugin {
       if (!live) return;
       if (e.type === "noteHit") post({ type: "judgment", noteId: e.noteId, judgment: e.judgment });
       if (e.type === "noteMiss") post({ type: "judgment", noteId: e.noteId, judgment: "MISS" });
+      if (e.type === "combo") post({ type: "combo", count: e.count });
+      if (e.type === "comboMilestone") post({ type: "milestone", count: e.count });
+      if (e.type === "fullCombo") post({ type: "fullCombo" });
       if (e.type === "songEnd" || e.type === "quit") {
         live = false;
         post({ type: "end" });

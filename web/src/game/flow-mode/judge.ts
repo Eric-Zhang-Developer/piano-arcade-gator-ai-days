@@ -9,7 +9,9 @@ import type { HandsSetting } from "../hand-mode/hands";
 import { flowRank, heldTempo } from "../play-modes/modes";
 import { flowClock, flowSettings, onsetsOf, type FlowClock, type Onset } from "./clock";
 
-const LOOKAHEAD = 4; // onsets after the front that a press may skip ahead to
+// onsets after the front that a press may skip ahead to. 1 (was 4): Eric, 2026-10-25, "it's skipping a bunch of notes";
+// a stray or re-struck key could throw away up to four onsets
+const LOOKAHEAD = 1;
 
 const isMilestone = (n: number) => n === 25 || n === 50 || (n >= 100 && n % 100 === 0);
 
@@ -83,16 +85,14 @@ export class FlowJudge {
       for (let s = f; s < k; s++) this.passOver(s, timeMs);
       return this.hit(i, k, timeMs, outerMs, eventIndex);
     }
-    // WRONG: it breaks the combo, and the note keeps waiting.
-    this.extras.push({ eventIndex });
-    this.onEvent({ type: "extra", pitch, atMs: timeMs });
-    this.wrong.push({ eventIndex });
-    this.slips++;
-    this.breakCombo({ type: "wrongNote", pitch, atMs: timeMs });
+    // A press that matches nothing is harmless in flow: no WRONG, no slip, no combo break, and the note keeps waiting.
+    // Eric, 2026-10-25: "make it really sloppy so it follows me".
+    this.harmless(eventIndex, pitch, timeMs);
   }
 
-  // Timing never makes a MISS. A stop past the free beats breaks the combo once and counts as a slip; the song keeps
-  // waiting, so the player can always rejoin.
+  // Timing never makes a MISS. A stop past the free beats counts once as a slip for the results, and keeps the combo
+  // (Eric, 2026-10-25: flow follows the player); the song keeps waiting, so the player can always rejoin.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- callers pass the clock; no combo event is sent at it now
   advance(nowMs: number): void {
     if (this.results) return;
     const at = this.clock.front;
@@ -102,8 +102,6 @@ export class FlowJudge {
     this.lostAt = at;
     this.lost++;
     this.slips++;
-    this.combo = 0;
-    this.onEvent({ type: "combo", count: 0, atMs: nowMs });
   }
 
   // Every note at or after fromMs is unplayed again, and the combo starts over.

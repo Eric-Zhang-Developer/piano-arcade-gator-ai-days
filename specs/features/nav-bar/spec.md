@@ -11,7 +11,7 @@ Issue #706. Eric, 2026-10-25: "We don't have a proper nav bar? There's the whole
 Built' page. There's a lot of random crap that's not here on our core main route. which is /"
 
 Then, on the plan in #706: "lab Into navbar for now, we can remove it later cause yeah rn our nav is really fucked",
-and "Raise this. Send it to the planner." He wants it **before Monday**.
+and "Raise this. Send it to the planner."
 
 Today `/` links to songs, options and `/calibrate`, first run, `/progress`, login and a quiet Lab link (#631). `/learn`,
 and soon `/how`, have no way in from `/`. The bar carries the few top-level pages. Everything else (`/simon`,
@@ -80,5 +80,5 @@ Follow `specs/context/visual-direction.md`, build it with the `frontend-design` 
 step 8, "Look", at 1280×720 and 1920×1080. Before and after screenshots of `/` go in the PR.
 
 ## Defaults
-- **After sheet-paper in `extras`, and before Monday.** Cut it if it isn't merged by the final milestone's freeze.
+- **In `extras`, after lab.**
 - Log any choice this spec doesn't make in `specs/decisions/nav-bar-*.md`.

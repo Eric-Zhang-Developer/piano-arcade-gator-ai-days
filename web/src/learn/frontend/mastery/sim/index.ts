@@ -6,7 +6,8 @@ import { mix } from './random';
 // 200 seeded synthetic learners, not real students: the same seed always gives the same cohort, nothing is stored.
 export { COHORT_SEED, COHORT_SIZE, SIM_STEPS } from './params';
 export { type SimStep, type SyntheticLearner } from './learner';
-export { type LearningAttemptRow, toLearningAttemptRows } from './rows';
+export { type LearningAttemptRow, toLearnerGoalsRow, toLearningAttemptRows } from './rows';
+export { songSkill, syntheticTakes } from './songs';
 
 const ID = /^synthetic-(\d{3})$/;
 

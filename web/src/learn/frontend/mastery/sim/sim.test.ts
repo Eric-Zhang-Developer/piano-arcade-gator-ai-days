@@ -1,14 +1,20 @@
+import { readFileSync } from 'node:fs';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { type Chart, validateTake } from '../../../../contracts';
+import { judgeTake } from '../../../../game/core/judge';
 import { curriculum } from '../curriculum';
 import { colourOf, replay } from '../engine';
 import {
   buildCohort,
   COHORT_SIZE,
   isSyntheticId,
+  songSkill,
   pathOf,
   SIM_STEPS,
   syntheticLearner,
   type SyntheticLearner,
+  syntheticTakes,
+  toLearnerGoalsRow,
   toLearningAttemptRows,
 } from '.';
 
@@ -95,29 +101,71 @@ describe('isSyntheticId', () => {
 });
 
 describe('toLearningAttemptRows', () => {
-  it('maps every attempt to a learning_attempts row under one stable player uuid', () => {
+  it('maps every attempt to a learning_attempts row, oldest first, marked synthetic, ids left to the loader', () => {
     const learner = cohort[7];
     const rows = toLearningAttemptRows(learner, learner.attempts);
-    const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
     expect(rows).toHaveLength(learner.attempts.length);
-    expect(new Set(rows.map(r => r.player_id))).toEqual(new Set([learner.playerId]));
-    expect(learner.playerId).toMatch(uuid);
-    expect(new Set(cohort.map(l => l.playerId)).size).toBe(COHORT_SIZE);
-    const [first] = rows, a = learner.attempts[0];
-    expect(Object.keys(first).sort()).toEqual(
-      ['cold', 'correct', 'created_at', 'details', 'help_share', 'id', 'item_id', 'kind', 'mode', 'node_id', 'player_id', 'revealed'],
+    expect(Object.keys(rows[0]).sort()).toEqual(
+      ['cold', 'correct', 'created_at', 'details', 'help_share', 'item_id', 'kind', 'mode', 'node_id', 'revealed'],
     );
-    expect(first).toMatchObject({ id: a.id, created_at: a.at, item_id: a.itemId, node_id: a.nodeId, help_share: a.helpShare });
-    for (const r of rows) {
-      expect(r.id).toMatch(uuid);
+    const a = learner.attempts[0];
+    expect(rows[0]).toMatchObject({ created_at: a.at, item_id: a.itemId, node_id: a.nodeId, help_share: a.helpShare, mode: 'diagnostic' });
+    for (const [i, r] of rows.entries()) {
+      expect(r.details.synthetic).toBe(true);
+      expect(r.item_id.length).toBeGreaterThanOrEqual(1);
+      expect(r.item_id.length).toBeLessThanOrEqual(128);
+      expect(r.node_id.length).toBeLessThanOrEqual(128);
       expect(r.help_share).toBeGreaterThanOrEqual(0);
       expect(r.help_share).toBeLessThanOrEqual(1);
-      expect(JSON.stringify(r.details).length).toBeLessThanOrEqual(8192);
+      expect(JSON.stringify(r.details).length).toBeLessThan(8192);
+      expect(new Date(r.created_at).toISOString()).toBe(r.created_at);
+      if (i) expect(Date.parse(r.created_at)).toBeGreaterThanOrEqual(Date.parse(rows[i - 1].created_at));
+    }
+  });
+
+  it('spreads a learner\'s rows over sittings, closer together for learners who come more often', () => {
+    const span = (l: SyntheticLearner) => Date.parse(l.attempts.at(-1)!.at) - Date.parse(l.attempts[0].at);
+    const rare = cohort.filter(l => l.sessionsPerWeek <= 2 && l.steps.length === SIM_STEPS).map(span);
+    const often = cohort.filter(l => l.sessionsPerWeek >= 5 && l.steps.length === SIM_STEPS).map(span);
+    expect(mean(rare)).toBeGreaterThan(mean(often));
+  });
+});
+
+describe('toLearnerGoalsRow', () => {
+  it('is the learner\'s goal songs, at most three real song ids', () => {
+    const songs = new Set(curriculum.songs.map(s => s.songId));
+    for (const l of cohort) {
+      const row = toLearnerGoalsRow(l);
+      expect(Object.keys(row)).toEqual(['song_ids']);
+      expect(row.song_ids).toEqual([...l.goals.songIds]);
+      expect(row.song_ids.length).toBeLessThanOrEqual(3);
+      expect(row.song_ids.every(id => songs.has(id))).toBe(true);
     }
   });
 });
 
-it('keeps every attempt in the past, before the cohort shipped', () => {
-  const last = Math.max(...cohort.flatMap(l => l.attempts.map(a => Date.parse(a.at))));
-  expect(last).toBeLessThan(Date.parse('2026-10-25T00:00:00Z'));
+describe('syntheticTakes', () => {
+  const chart = (id: string): Chart => JSON.parse(readFileSync(new URL(`../../../../../public/songs/${id}/chart.json`, import.meta.url), 'utf8'));
+
+  it('plays a song through the game\'s own judge, the same way every time, before today', () => {
+    const learner = cohort.find(l => l.goals.songIds.length > 0)!;
+    const song = chart(learner.goals.songIds[0]);
+    const takes = syntheticTakes(learner, song);
+    expect(takes.length).toBeGreaterThanOrEqual(1);
+    expect(syntheticTakes(learner, song)).toEqual(takes);
+    for (const { take, results } of takes) {
+      expect(validateTake(take)).toEqual([]);
+      expect(take.inputDevice).toBe(learner.input === 'keyboard' ? 'keys' : 'midi');
+      expect(results).toEqual(judgeTake(song, take));
+      expect(Date.parse(take.startedAt)).toBeLessThan(Date.parse('2026-10-25T00:00:00Z'));
+    }
+    expect(takes.map(t => t.take.startedAt)).toEqual(takes.map(t => t.take.startedAt).sort());
+  });
+
+  it('scores higher for learners who know more of what the song needs', () => {
+    const song = chart('twinkle');
+    const sorted = [...cohort].sort((a, b) => songSkill(a, 'twinkle') - songSkill(b, 'twinkle'));
+    const accuracy = (ls: readonly SyntheticLearner[]) => mean(ls.flatMap(l => syntheticTakes(l, song).map(t => t.results.accuracy)));
+    expect(accuracy(sorted.slice(-40))).toBeGreaterThan(accuracy(sorted.slice(0, 40)));
+  });
 });

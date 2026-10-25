@@ -39,10 +39,13 @@ export type SyntheticLearner = {
   startingLevel: string;
   /** The simulated history, diagnostic first, every attempt's `learnerId` this learner's id. */
   attempts: readonly Attempt[];
-  /** A stable uuid for this learner's rows, so a later seed can insert them as one player. */
-  playerId: string;
+  /** The learner's own seed, from the cohort seed and its index: anything else drawn for it (takes) starts here. */
+  seed: number;
   sessionsPerWeek: number;
   accuracy: number;
+  /** Onset spread around the beat and velocity spread on a fully known node; both grow as mastery falls. */
+  timingNoiseMs: number;
+  velocityNoise: number;
   /** The mean hidden mastery over every node before the diagnostic: what the learner really knows, never shown to the engine. */
   hiddenMastery: number;
   diagnosticAnswers: number;
@@ -52,6 +55,8 @@ export type SyntheticLearner = {
   /** Node colours after the last step. */
   mastered: number;
   inProgress: number;
+  /** Hidden mastery per node after the last step: what the learner now really knows. */
+  knows: Readonly<Record<string, number>>;
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -87,7 +92,6 @@ export function simulateLearner(curriculum: Curriculum, seed: number, index: num
   const random = mulberry32(seed);
   const ids = mulberry32(mix(seed, 0x1d));
   const id = syntheticId(index);
-  const playerId = uuid(ids);
 
   const level = LEVELS[weighted(random, LEVELS.map(l => l.weight))];
   const input = chance(random, MIDI_SHARE) ? 'midi' : 'keyboard';
@@ -184,15 +188,18 @@ export function simulateLearner(curriculum: Curriculum, seed: number, index: num
     input,
     startingLevel: level.name,
     attempts,
-    playerId,
+    seed,
     sessionsPerWeek,
-    accuracy: Math.round(accuracy * 100) / 100,
+    accuracy,
+    timingNoiseMs,
+    velocityNoise,
     hiddenMastery,
     diagnosticAnswers,
     leftDiagnosticEarly,
     steps,
     mastered: colours.filter(c => c === 'mastered').length,
     inProgress: colours.filter(c => c === 'in-progress').length,
+    knows: Object.fromEntries(hidden),
   };
 }
 

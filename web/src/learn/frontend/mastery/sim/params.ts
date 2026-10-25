@@ -74,3 +74,17 @@ export const DIAGNOSTIC_QUIT_SHARE = 0.25;
 export const DIAGNOSTIC_QUIT_AFTER: Range = [4, 14];
 /** A theory answer from a node the learner doesn't know is a guess; one they know can still slip. */
 export const THEORY_SLIP_RATE = 0.06;
+
+/** Game takes of a song: how many a learner plays, the share stopped partway, and minutes into a sitting they start. */
+export const TAKES_PER_SONG: Range = [1, 6];
+export const TAKE_QUIT_SHARE = 0.3;
+export const TAKE_START_MIN: Range = [5, 40];
+/** A take's skill climbs this share of what is left with each earlier take of the song. */
+export const TAKE_PRACTICE_GAIN = 0.06;
+/**
+ * In a game take, the per-note chance of a slip at skill 0 and from imperfect accuracy, and how much of the learner's
+ * timing noise reaches a whole song, which they rehearse more than a diagnostic passage.
+ */
+export const TAKE_SLIP = 0.3;
+export const TAKE_ACCURACY_SLIP = 0.04;
+export const TAKE_TIMING_SHARE = 0.7;

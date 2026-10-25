@@ -33,7 +33,14 @@ function hash(s: string) {
 
 // 10 palettes x 8 angles is 80 looks, so a growing library collides. A song whose id lands on another's angle and
 // first color re-rolls its hash here (song-jacket.test.ts finds the clash); a new entry moves no existing jacket.
-const reroll: Record<string, number> = { "chopin-prelude-7": 1, "invention-1": 5, "mozart-331-theme": 2 };
+const reroll: Record<string, number> = {
+  "chopin-prelude-7": 1,
+  "invention-1": 5,
+  "mozart-331-theme": 2,
+  "debussy-arabesque-1": 3,
+  "moment-musical-3": 2,
+  "pathetique-2": 1,
+};
 
 export function jacketFor(id: string, title: string, composer: string): Jacket {
   const h = hash(reroll[id] ? `${id}#${reroll[id]}` : id);

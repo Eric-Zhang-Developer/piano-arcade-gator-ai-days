@@ -7,7 +7,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 CLI="npx -y supabase@2.122.0"
 # The CLI never reads the keyboard here (its spinner and npx can swallow typed input); only the y/N question does.
-cli() { $CLI "$@" </dev/null; }
+cli() { $CLI "$@" --workdir . </dev/null; }
 
 DB_URL="$(grep -E '^SUPABASE_DB_URL=' web/.env.local 2>/dev/null | head -1 | cut -d= -f2- | sed -E "s/^[\"']|[\"']$//g" || true)"
 if [[ -z "$DB_URL" ]]; then

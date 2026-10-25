@@ -1,6 +1,10 @@
+import type { ErrorInfo } from "next/error";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Chart } from "../../contracts";
 import { coreGuard, crashGuard, createGuard } from ".";
+import { Card } from "./boundary";
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -84,5 +88,18 @@ describe("crashGuard", () => {
     p.transformChart!(chart, new URLSearchParams("crash=event"));
     p.onEvent!(start);
     expect(() => p.onEvent!(hit)).toThrow("test crash (?crash=event)");
+  });
+});
+
+// kit-leftovers-screens (c): the fallback is the kit's Panel and Buttons, with the same copy and both actions.
+describe("the crash card", () => {
+  it("renders on the kit, upright, with its copy and both actions", () => {
+    const html = renderToStaticMarkup(createElement(() => Card({}, { error: new Error("boom"), retry: () => {} } as unknown as ErrorInfo)));
+    expect(html).toContain('data-kit="panel"');
+    expect(html).toMatch(/data-kit="button-primary"[^>]*>Back to the song list</);
+    expect(html).toMatch(/data-kit="button-secondary"[^>]*>Try again</);
+    expect(html).toContain("Something broke.");
+    expect(html).toContain("boom");
+    expect(html).toContain('role="alert"');
   });
 });

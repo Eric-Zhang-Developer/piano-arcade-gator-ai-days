@@ -1,4 +1,4 @@
-/* Chunk practice's panels, in visual-direction.md's tokens and results-layout's button shapes. */
+/* Chunk practice's panels on the Duo kit: square, upright, and its buttons are the kit's (kitButton, index.tsx). */
 
 .step {
   display: flex;
@@ -8,7 +8,8 @@
   margin-top: 4px;
 }
 
-/* One pip per chunk: cleared ones cyan, this one magenta and wider, the rest dim. */
+/* One pip per chunk: cleared ones in the dim ink, this one primary and wider, the rest faint. Cyan is primary's alias
+   now (globals.css), so cleared pips can't be cyan and still differ from this one. */
 .pips {
   display: flex;
   gap: 6px;
@@ -20,25 +21,23 @@
 .pips li {
   width: 18px;
   height: 6px;
-  border-radius: 3px;
   background: rgb(242 242 245 / 0.18);
   transform: skewX(-18deg);
 }
 
 .pips li.done {
-  background: var(--pa-cyan);
+  background: var(--pa-ink-dim);
 }
 
 .pips li.here {
   width: 34px;
-  background: var(--pa-magenta);
-  box-shadow: 0 0 10px rgb(255 47 208 / 0.7);
+  background: var(--pa-primary);
 }
 
 .line {
   margin: 0;
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
+  font-stretch: 75%;
   font-weight: 800;
   font-size: 20px;
   letter-spacing: 0.06em;
@@ -56,16 +55,15 @@
 .verdict {
   margin: 0;
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
   font-weight: 800;
-  font-size: 18px;
+  font-size: calc(var(--read, 13px) * 1.4); /* --read: results-layout's reading size, 13 px at 1280 to 24 at 1920 */
   letter-spacing: 0.04em;
   font-variant-numeric: tabular-nums;
   color: var(--pa-ink);
 }
 
 .clear {
-  font-size: 28px;
+  font-size: calc(var(--read, 13px) * 2.15);
   font-weight: 900;
   color: var(--pa-gold);
   text-transform: uppercase;
@@ -75,9 +73,8 @@
 /* How far a take fell short: the fill is its accuracy, the gold tick the gate. */
 .meter {
   position: relative;
-  width: 280px;
+  width: calc(var(--read, 13px) * 22);
   height: 8px;
-  border-radius: 4px;
   background: rgb(242 242 245 / 0.14);
 }
 
@@ -85,7 +82,6 @@
   position: absolute;
   inset: 0 auto 0 0;
   width: calc(var(--acc) * 100%);
-  border-radius: 4px;
   background: var(--pa-miss);
 }
 
@@ -95,7 +91,6 @@
   bottom: -5px;
   left: calc(var(--gate) * 100%);
   width: 3px;
-  border-radius: 1px;
   background: var(--pa-gold);
 }
 
@@ -103,36 +98,16 @@
   color: var(--pa-ink-dim);
 }
 
-.next,
-.ghost {
-  display: inline-block;
-  padding: 12px 36px;
-  border-radius: 6px;
-  font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 800;
-  font-size: 20px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  text-decoration: none;
+/* The kit's buttons at the results' reading size, like the action row below (results-layout); !important beats
+   kitButton's inline 14 px. */
+.after a {
+  font-size: var(--read, 14px) !important;
+  padding: 0.85em 1.7em !important;
 }
 
-.next {
-  background: var(--pa-gold);
-  color: var(--pa-bg);
-}
-
-.ghost {
-  border: 1px solid var(--pa-ink-dim);
-  color: var(--pa-ink);
-}
-
-.next:focus-visible,
-.ghost:focus-visible {
-  outline: 2px solid var(--pa-magenta);
-  outline-offset: 3px;
-}
-
-.next:focus {
-  box-shadow: 0 0 0 2px var(--pa-bg), 0 0 18px rgb(255 226 122 / 0.6);
+/* The way on takes focus after a take (index.tsx) and Enter follows it: show that even when the focus came from code,
+   which :focus-visible alone doesn't (the kit's ring, kit.module.css). */
+.after a:focus {
+  outline: 2px solid var(--pa-ink);
+  outline-offset: 2px;
 }

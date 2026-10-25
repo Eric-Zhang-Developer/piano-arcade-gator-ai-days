@@ -5,233 +5,349 @@
   color: var(--pa-ink);
   text-align: center;
   /* Over the page's dimmed overlay: the frozen highway (combo, keys) stays a hint, not a second layer of text. */
-  background: radial-gradient(ellipse at 50% 35%, rgb(11 2 32 / 0.6), rgb(0 0 0 / 0.7) 70%);
+  background: rgb(3 6 7 / 0.96); /* the frozen HUD showed through behind the data cells at 0.88 */
+  /* Lines a viewer reads: 13 px at 1280 wide, rising to 24 px at 1920, the video rule (visual-direction.md, #1030). */
+  --read: clamp(12px, calc(1.72vw - 9px), 24px);
 }
 
-.song {
-  margin: 0 0 -0.6vh;
-  font-size: clamp(12px, 0.9vw, 17px);
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--pa-ink-dim);
-}
-
-/* The ceremony: exactly one window tall, so the rank, counts, featured panel and buttons need no scroll. */
+/* The ceremony: exactly one window tall, so the rank, cells, middle band and buttons need no scroll. */
 .ceremony {
   box-sizing: border-box;
+  width: min(1760px, 94vw);
   min-height: 100dvh;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
-  gap: clamp(10px, 2.4vh, 32px);
-  padding: 3vh 4vw 1.5vh;
+  gap: clamp(12px, 2.6vh, 40px);
+  padding: 3vh 0 1.5vh;
 }
 
-.head {
+/* Top band: the rank in brackets, the title, then the six data cells. */
+.top {
   display: flex;
   align-items: center;
-  gap: clamp(24px, 4vw, 80px);
+  gap: clamp(16px, 2.2vw, 48px);
+  text-align: left;
 }
 
 .rank {
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 900;
-  font-size: clamp(120px, 27vh, 320px);
+  font-stretch: 75%;
+  font-weight: 800;
+  font-size: clamp(110px, 25vh, 300px);
   line-height: 0.8;
-  padding-right: 0.08em; /* the italic's overhang */
   color: var(--pa-gold);
-  text-shadow: 0 0 0.25em rgb(255 226 122 / 0.35);
 }
 
-.tally {
+.name {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: clamp(10px, 2vh, 24px);
-  text-align: left;
+  gap: 8px;
 }
 
-.counts {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(6.5em, auto));
-  gap: clamp(8px, 1.6vh, 18px) clamp(16px, 2.2vw, 40px);
-  margin: 0;
-}
-
-.count {
-  padding-left: 0.7em;
-  border-left: 3px solid var(--tone);
-}
-
-.count dt,
-.stats dt {
-  font-size: clamp(11px, 0.8vw, 15px);
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.count dt {
-  color: var(--tone);
-}
-
-.count dd,
-.stats dd {
+.song {
   margin: 0;
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.05;
+  font-stretch: 75%;
+  font-weight: 700;
+  font-size: clamp(28px, 3.2vw, 64px);
+  line-height: 1;
+  color: var(--pa-ink);
+  overflow-wrap: anywhere;
 }
 
-.count dd {
-  font-size: clamp(28px, 2.6vw, 52px);
+.extra {
+  margin: 6px 0 0;
 }
 
-.stats {
+.wrong {
+  color: var(--pa-wrong);
+}
+
+.cells {
   display: flex;
-  gap: clamp(20px, 3vw, 56px);
-  margin: 0;
-  padding-top: clamp(8px, 1.6vh, 18px);
-  border-top: 1px solid rgb(242 242 245 / 0.15);
+  gap: clamp(6px, 0.6vw, 14px);
 }
 
-.stats dt {
-  color: var(--pa-ink-dim);
+/* The kit's cells take a fixed px size; at 1920 wide they'd read small on video, so they scale with the window. */
+.cells [data-kit="numeral"] {
+  font-size: clamp(40px, 3.4vw, 76px) !important;
 }
 
-.stats dd {
-  font-size: clamp(22px, 1.9vw, 38px);
+.cells [data-kit="mono"],
+.extra [data-kit="mono"] {
+  font-size: var(--read) !important;
 }
 
 .unscored {
   margin: 0;
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
+  font-stretch: 75%;
   font-weight: 800;
   font-size: clamp(28px, 3vw, 56px);
 }
 
-.timing {
-  color: var(--pa-ink-dim);
-}
-
-/* The page's timing panel and the slots carry their own top margins; the gap spaces the ceremony instead. */
-.timing > *,
+/* The slots carry their own top margins; the gap spaces the ceremony instead. */
 .featured > *,
+.ladder > *,
+.tutor > *,
 .actions > * {
   margin-top: 0 !important;
 }
 
 .featured {
-  width: min(1100px, 92vw);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 2vh, 24px);
 }
 
 .featured:empty {
   display: none;
 }
 
+/* The play-modes ladder: one slim row, as wide as the six cells' band at most, so the first view keeps Retry. */
+.ladder {
+  width: min(100%, max(720px, 48vw)); /* 48vw: 920 px at 1920, so the rungs keep their room at 24 px */
+  align-self: center;
+}
+
+/* play-modes' ladder in this slot: its rungs are read on video like the lines above (#1030). */
+.ladder ol {
+  font-size: var(--read) !important;
+}
+
+.ladder:empty {
+  display: none;
+}
+
+/* Bottom band: the tutor, then the buttons, in one hairline panel. */
+.bottom {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: clamp(12px, 2vh, 24px) clamp(16px, 1.6vw, 32px);
+}
+
+.tutor {
+  flex: 1;
+  min-width: 0;
+}
+
+.tutor:empty {
+  display: none;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   gap: 12px;
+  margin: 0 auto;
 }
 
-.retry,
-.songs {
-  padding: 12px 36px;
-  border-radius: 6px;
-  font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 800;
-  font-size: 20px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+/* Beside the tutor: the buttons in two equal columns on the right, as in F-duo-3, so the line keeps its width. */
+.tutor:not(:empty) + .actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: clamp(360px, 32vw, 640px); /* 32vw: at 1920, REVIEW ON SHEET ↗ fits a column at 24 px */
+  flex-shrink: 0;
+  margin-right: 0;
+}
+
+/* Every action is drawn as the kit's secondary button, whichever plugin renders it (score-card, sheet-review,
+   piano-out's inline-styled Replay): one button style in the row, not each panel's own. !important beats those
+   panels' inline styles; the layout owns this row's look. */
+.actions button,
+.actions a {
+  box-sizing: border-box !important;
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: clamp(12px, 1.6vh, 18px) 10px !important;
+  border: 1px solid var(--pa-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  font-family: var(--pa-font-data), ui-monospace, monospace !important;
+  font-size: var(--read) !important; /* scales with the screen's type, 24 px at 1920 */
+  font-style: normal !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  text-align: center;
   text-decoration: none;
+  white-space: nowrap;
+  color: var(--pa-ink) !important;
   cursor: pointer;
 }
 
-.retry {
-  border: none;
-  background: var(--pa-cyan);
-  color: var(--pa-bg);
+/* An odd action out (five of them: Retry, three panels, Songs) takes the whole last row, not half of it beside an
+   empty cell (#883). */
+.tutor:not(:empty) + .actions > :last-child:nth-child(odd) {
+  grid-column: 1 / -1;
 }
 
-.songs {
-  border: 1px solid var(--pa-ink-dim);
+/* The tutor's primary (NEXT SONG or PRACTICE BARS X–Y) at least as big as an action cell, in the same type: it's the
+   screen's one primary, so it can't be the smallest button on it (#883). */
+.tutor [data-testid="duo-practice"] {
+  box-sizing: border-box;
+  min-width: calc((clamp(360px, 32vw, 640px) - 12px) / 2); /* one column of .actions' grid */
+  padding: clamp(12px, 1.6vh, 18px) 1.2em !important;
+  font-size: var(--read) !important;
+}
+
+/* A panel that wraps its button (score-card's span) still fills the cell. */
+.actions > div > span {
+  display: block;
+}
+
+.actions button:hover,
+.actions a:hover {
+  background: rgba(125, 132, 150, 0.12) !important;
+}
+
+.actions button:focus-visible,
+.actions a:focus-visible {
+  outline: 2px solid var(--pa-ink);
+  outline-offset: 2px;
+}
+
+.cue:focus-visible {
+  outline: 2px solid var(--pa-ink);
+  outline-offset: 2px;
+}
+
+/* A control, not a caption: 32 px tall on a hairline at 720, so the way to Details is a real target (#949). */
+.cue {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 14px;
+  border: 1px solid var(--pa-line);
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: clamp(12px, 0.75vw, 16px);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
   color: var(--pa-ink);
 }
 
-.retry:focus-visible,
-.songs:focus-visible,
-.cue:focus-visible {
-  outline: 2px solid var(--pa-magenta);
-  outline-offset: 3px;
+.cue:hover {
+  border-color: var(--pa-ink-dim);
 }
 
-.cue {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  text-decoration: none;
-  color: var(--pa-ink-dim);
+/* The song's h1 carries the rank for a screen reader; the letter on screen is the bracketed one (#950). */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
-/* Details: every other panel, a card each, in layers.ts order. */
+/* Details (duo-details): the take's readout under the ceremony. Two numbered groups, How I played as bracketed cards
+   in two columns, Do something as one row of the kit's buttons. */
 .details {
-  width: min(1200px, 94vw);
+  width: min(1760px, 94vw); /* the ceremony's width: one left edge from the rank down to the last card */
   margin: 0 auto;
-  padding: 4vh 0 8vh;
-  border-top: 1px solid rgb(242 242 245 / 0.12);
+  padding: 5vh 0 10vh;
+  border-top: 1px solid var(--pa-line);
+  text-align: left;
 }
 
-.detailsName {
-  margin: 0 0 16px;
-  font-size: 13px;
-  letter-spacing: 0.16em;
+.groupHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 20px;
+}
+
+.groupName {
+  margin: 0;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-stretch: 75%;
+  font-weight: 800;
+  font-size: clamp(28px, 2.2vw, 44px);
+  line-height: 1;
   text-transform: uppercase;
-  color: var(--pa-ink-dim);
+  color: var(--pa-ink);
 }
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 0 16px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-flow: row dense; /* a half card after the full-width graph fills the hole a hidden panel leaves */
+  gap: 16px;
 }
 
-@media (min-width: 1280px) {
+/* play-slots gives each slot a 16 px top margin; the grid's gap spaces the cards instead */
+.grid > *,
+.doingRow > * {
+  margin-top: 0 !important;
+}
+
+@media (min-width: 1100px) {
   .grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); /* a wide panel can't push the page sideways */
+  }
+
+  .grid > :has([data-wide]) {
+    grid-column: 1 / -1;
   }
 }
 
 .card {
   height: 100%;
   box-sizing: border-box;
-  padding: 14px 20px 18px;
-  background: var(--pa-panel);
-  border: 1px solid rgb(242 242 245 / 0.1);
-  border-top: 2px solid var(--pa-magenta);
-  border-radius: 6px;
-}
-
-.cardName {
-  margin: 0 0 10px;
-  font-size: 12px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--pa-cyan);
-}
-
-.settings {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-top: 24px;
+  padding: 16px 22px 22px;
+  font-size: clamp(17px, 1vw, 21px); /* the readouts: a size up from body, and up again at 1920 for the video */
+}
+
+/* the panel's name: condensed caps on a hairline, the way the kit labels a band */
+.cardName {
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--pa-line);
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-stretch: 75%;
+  font-weight: 700;
+  font-size: clamp(20px, 1.3vw, 26px);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pa-ink);
+}
+
+.doing {
+  margin-top: 44px;
+}
+
+.doing .groupName {
+  margin-bottom: 20px;
+}
+
+.doingRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.doingRow:empty,
+.doing:has(.doingRow:empty) {
+  display: none;
+}
+
+/* A Flow take's held tempo in the stats line: in ink, since below 90% it caps the rank (play-modes). */
+.tempo {
+  color: var(--pa-ink);
 }

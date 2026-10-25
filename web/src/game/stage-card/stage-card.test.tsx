@@ -15,7 +15,7 @@ test("the card shows ARE YOU READY, the chart's title and composer, and — with
 
 test("a given level shows instead of the dash", () => {
   const t = text(renderToStaticMarkup(<StageCard {...song} level={7} />));
-  expect(t).toContain("|7|");
+  expect(t).toContain("|07|");
   expect(t).not.toContain("|—|");
 });
 
@@ -30,4 +30,12 @@ test("the title is the start screen's one h1 (verify waits for a heading named a
   const html = renderToStaticMarkup(<StageCard {...song} />);
   expect(html.match(/<h1[^>]*>Für Elise<\/h1>/)).not.toBeNull();
   expect(html.match(/<h[1-6]/g)).toHaveLength(1);
+});
+
+test("the composer line drops the trailing attribution note, and keeps a name with none (#884)", async () => {
+  const { shortComposer } = await import("../duo-select/Select");
+  expect(shortComposer('Traditional (French melody "Ah! vous dirai-je, maman")')).toBe("Traditional");
+  expect(shortComposer("Christian Petzold (attributed; formerly J. S. Bach)")).toBe("Christian Petzold");
+  expect(shortComposer("Erik Satie")).toBe("Erik Satie");
+  expect(renderToStaticMarkup(<StageCard id="t" title="T" composer="Traditional (a note)" catalog="first verse" />)).toContain("Traditional · first verse");
 });

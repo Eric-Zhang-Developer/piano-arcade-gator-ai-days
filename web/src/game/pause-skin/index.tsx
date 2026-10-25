@@ -88,9 +88,6 @@ export function PauseMenu({
           </button>
         ))}
       </div>
-      <p className={styles.hint}>
-        <b>↑ ↓</b> choose · <b>Enter</b> select · <b>Esc</b> resume
-      </p>
     </div>
   );
 }

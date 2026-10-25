@@ -1,5 +1,6 @@
 "use client";
-// The records results panel: the initials entry and the top 5 (spec: records). NEW RECORD is record-moment's.
+// The records results panel: the initials entry and the top 5 (spec: records). NEW RECORD is record-moment's. Practice
+// and blocked takes get no panel at all (duo-details), so this draws a recorded take only.
 import { useInitials } from "./initials";
 import { NO_INITIALS, type Entry } from "./store";
 
@@ -8,9 +9,7 @@ export type Outcome =
   | { kind: "blocked" }
   | { kind: "recorded"; chartId: string; date: string; newRecord: boolean; inTop: boolean; top: Entry[] };
 
-export function RecordsPanel({ outcome }: { outcome: Outcome }) {
-  if (outcome.kind === "practice") return <Line>Practice takes aren&apos;t recorded</Line>;
-  if (outcome.kind === "blocked") return <Line>Records can&apos;t be saved in this browser</Line>;
+export function RecordsPanel({ outcome }: { outcome: Extract<Outcome, { kind: "recorded" }> }) {
   return <Recorded {...outcome} />;
 }
 
@@ -26,22 +25,23 @@ function Recorded({ chartId, date, newRecord, inTop, top }: Extract<Outcome, { k
       {entering && !newRecord && (
         <div data-testid="initials-entry">
           Your initials:{" "}
-          <span style={{ fontFamily: "monospace", fontSize: 24, letterSpacing: 6 }}>
+          <span style={{ fontFamily: "var(--pa-font-data), ui-monospace, monospace", fontSize: 24, letterSpacing: 6 }}>
             {[0, 1, 2].map((i) => (
               <span key={i} style={{ borderBottom: i === letters.length ? "2px solid #fff" : "2px solid transparent" }}>
                 {letters[i] ?? "_"}
               </span>
             ))}
           </span>
-          <div style={{ fontSize: 13, opacity: 0.6 }}>Type A–Z or ↑ ↓, Backspace to fix, Enter to save</div>
+          <div style={{ fontSize: 13, color: "var(--pa-ink-dim)" }}>Type A–Z or ↑ ↓, Backspace to fix, Enter to save</div>
         </div>
       )}
-      <table data-testid="top5" style={{ margin: "4px auto 0", fontSize: 14, borderSpacing: "16px 0", fontVariantNumeric: "tabular-nums" }}>
+      {/* -16px: the border spacing's own leading gap, so the rows start on the card's left edge */}
+      <table data-testid="top5" style={{ margin: "4px 0 0 -16px", fontFamily: "var(--pa-font-data), ui-monospace, monospace", fontSize: 14, borderSpacing: "16px 0", fontVariantNumeric: "tabular-nums" }}>
         <tbody>
           {top.map((t, i) => (
-            <tr key={t.date} data-testid={t.date === date ? "top5-this-take" : undefined} style={{ fontWeight: t.date === date ? 700 : 400, opacity: t.date === date ? 1 : 0.7 }}>
+            <tr key={t.date} data-testid={t.date === date ? "top5-this-take" : undefined} style={{ fontWeight: t.date === date ? 700 : 400, color: t.date === date ? "var(--pa-ink)" : "var(--pa-ink-dim)" }}>
               <td>{i + 1}.</td>
-              <td style={{ fontFamily: "monospace" }}>{initials(t) || NO_INITIALS}</td>
+              <td>{initials(t) || NO_INITIALS}</td>
               <td style={{ textAlign: "right" }}>{t.score.toLocaleString("en-US")}</td>
               <td>{t.rank}</td>
               <td style={{ textAlign: "right" }}>{(t.accuracy * 100).toFixed(1)}%</td>
@@ -53,9 +53,3 @@ function Recorded({ chartId, date, newRecord, inTop, top }: Extract<Outcome, { k
     </div>
   );
 }
-
-const Line = ({ children }: { children: React.ReactNode }) => (
-  <div data-testid="records" style={{ fontSize: 14, opacity: 0.6 }}>
-    {children}
-  </div>
-);

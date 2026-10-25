@@ -7,7 +7,9 @@
 # final   the last milestone: from `report_before`, only fixes, reverts, docs and `allow`; at ship, nothing merges.
 # The bootstrap feature always merges before any other feature.
 #
-# No deadlines on purpose (decision 001, row 15): start is empty, so ship, freeze and report times are off.
+# No deadlines on purpose (decision 001, row 15): start is empty, so "+H:MM" times are off and the milestones with
+# ship = "" have no deadline. The one exception is Eric's (2026-10-25): submission ships at the Devpost deadline,
+# an absolute time that needs no start. From 4:00 PM ET only fixes, reverts and docs merge; from 5:00 PM, nothing.
 start = ""
 
 [[milestone]]
@@ -158,6 +160,7 @@ features = [
   "first-run",
   "landing",
   "account",
+  "menu-test",
 ]
 cut = []
 
@@ -167,14 +170,42 @@ cut = []
 name = "extras"
 ship = ""
 features = [
+  "golden-demo", # Eric, 2026-10-25 (#807): Golden's DGX autoplay sounds like a performance; his priority now
+  "key-polish", # Eric, 2026-10-25 (#848): the keyboard and falling notes polished to hit-particles' level; a priority
+  "stage-view", # Eric, 2026-10-25 (#875): a NOSTALGIA-style audience highway on a second display, mirroring the live take
+  "milestone-sfx", # Eric, 2026-10-25 (#877): Chunithm-level sound on milestones only, never per hit
+  "experiments", # Eric, 2026-10-25 (#878): many variations on main, off by default, reviewed from a Lab gallery, pruned later
+  "duo-details", # Eric, 2026-10-25 (#833): the results screen's Details grid in the Duo look, settings in Options
+  "play-modes", # Eric, 2026-10-25 (#835): Learn, Flow and Perform as a ladder; practice keeps your mode (#832)
+  "demo-performance", # Eric, 2026-10-25 (#814): sustain, dynamics and legato for every demo, five songs a batch
+  "results-landing", # Eric, 2026-10-25 (#959): one deep polish pass on the 3 s from the last note to the rank
+  "count-in", # Eric, 2026-10-25 (#1006): one deep polish pass on the 8 beats before the first note, a #856 hero moment
+  "miss-moment", # Eric, 2026-10-25 (#1038): one deep polish pass on a miss, quiet and readable, a #856 hero moment
+  "take-graph-pass", # Eric, 2026-10-25 (#1083): one deep polish pass on the take graph, read in 5 s, a #856 hero item
+  "highway-field", # Eric, 2026-10-25 (#1114): one deep polish pass on the highway's dark field, a #856 hero item
+  "round", # Eric, 2026-10-25 (#1123): wow feeder; play a round once and the DGX echoes it as voices 2-4, an experiment
+  "fever-arc", # Eric, 2026-10-25 (#1150): fever as one designed arc, build-up, drop, sustain, release, a #856 hero item
+  "hand-palette", # Eric, 2026-10-25 (#1127): the hand and judgment colors solved for CVD, compared in the Lab first
+  "build-sonata", # Eric, 2026-10-25 (#1162): wow feeder; the night of merged PRs as music on the DGX, an experiment
+  "ui-sound-family", # Eric, 2026-10-25 (#1167): one deep polish pass on the menu sounds, one celesta family in key
+  "pinned", # Eric, 2026-10-25 (#1171): wow feeder; your take as a brass music-box cylinder and an STL, an experiment
+  "note-material", # Eric, 2026-10-25 (#1174): one deep polish pass on the falling notes' material, a #856 hero item
   "laptop-sound",
   "flow-mode",
   "duo-tokens",
   "duo-hud",
+  "audio-track",
   "duo-select",
   "duo-results",
   "sheet-paper",
+  "sheet-engraving", # Eric, 2026-10-25 (#827): clef changes, 8va, beamed eighths and a readable zoom on /sheet; after sheet-paper, same worker
   "lab",
+  "nav-bar",
+  "hit-particles", # Eric, 2026-10-25 (#750): a priority, so ahead of duo-start
+  "mouse-first", # Eric, 2026-10-25 (#772): key hints off the screens, onto the ? card
+  "foreman-duo", # Eric, 2026-10-25 (#774): the foreman's pages fully in the Duo look
+  "sampled-piano", # Eric, 2026-10-25 (#798): the laptop voice plays real piano samples
+  "duo-start",
   "level-forge",
   "veritas",
   "veritas-polish",
@@ -189,20 +220,63 @@ features = [
   "rewind",
   "score-card",
   "adaptive-chunks",
+  "song-pack-3",
+  "song-pack-4",
+  "song-pack-5", # Eric, 2026-10-25 (#849): about 20 more songs, easiest first; five Easy pieces
+  "song-pack-6", # Eric, 2026-10-25 (#849): five Easy-medium to Medium pieces
+  "song-pack-7", # Eric, 2026-10-25 (#849): five famous Medium to Medium-hard pieces
+  "song-pack-8", # Eric, 2026-10-25 (#849): five Medium-hard to Expert showpieces
+  "song-finder", # Eric, 2026-10-25 (#850): sort by level, composer or recently played, and filter, at about 40 songs
+  "main-page", # Eric, 2026-10-25 (#851): "we would have to redo our main page"; the select laid out for 40 songs
+  "video-shots", # Eric, 2026-10-25 (#852): visuals for the hackathon video; a shot list, two cards, capture clean
+  "screen-shake", # catalog G13 (#990): a small shake on each combo milestone, a Lab experiment, off by default
+  "lab-pages-a11y", # polish refill (#1128, #1129, #1143, #1130): the Lab's pages get titles, announcements, focus, Lab lit
+  "kit-leftovers-overlays", # polish refill (#1132, #1135, #1137): wait hint upright, L / R legend and toasts square
+  "kit-leftovers-screens", # polish refill (#1133, #1134, #1136): chunk panel, phone guard, crash screen on the kit
+  "select-lab-charts", # polish refill (#1165): charts under songs/x/ stay off the select
+  "learn-titles", # polish refill (#1141): each /learn page names its own tab
+  "docs-refresh", # polish refill (#1140, #1142): README routes and devpost.md experiments; docs only
+  "name-theme", # Eric, 2026-10-25 (#1190): wow feeder; a judge's name as a musical cryptogram the DGX plays, an experiment
+  "wet-paint-polish", # polish sweep 2 (#1195, #1196, #1197): /paint names its tab, clears the strip, focuses the frame
+  "musicbox-polish", # polish sweep 2 (#1198, #1199, #1200): /musicbox names its tab, closes its audio, plain toggles
+  "speak-polish", # polish sweep 2 (#1201, #1202, #1203): /speak lets go of the mic, 12 px floor, announced notes
+  "roll-pages-polish", # polish sweep 2 (#1204, #1205, #1206, #1207): /sonata upright and quiet, /composers-hands stops clean
+  "kit-leftovers-small", # polish sweep 2 (#1208, #1209, #1210): data-face labels, square key chips, /real-keys upright
+  "select-motion", # Eric, 2026-10-25 (#1212): one deep polish pass on the select's motion, springs and no queue, a #856 hero item
+  "inside", # Eric, 2026-10-25 (#1226): wow feeder; a live cutaway of a grand's action driven by the DGX, an experiment
+  "lab-gallery", # Eric, 2026-10-25 (#1249): the Lab's On trial as an exhibition with posters, and Eric's verdict sheet
+  "select-a11y", # polish sweep 3 (#1236, #1237, #1238): an arrow step reads the song, Song N of M heard, GitHub tab
+  "play-polish", # polish sweep 3 (#1239, #1240): the start screen reads on video, the toast ring off the old cyan
+  "take-seams", # polish sweep 3 (#1241, #1242, #1243): Back says quit, WARNING upright, the broken combo as the HUD
+  "results-polish", # polish sweep 3 (#1244-#1247): PRACTICE BARS a link, Watch replay a kit dialog, initials heard
+  "record-follows", # Eric, 2026-10-25 (#1261): wow feeder; the real recording stretches to follow the player, an experiment
 ]
 cut = []
 
 # spikes: after extras (Eric, 2026-10-24). About 3 hours of agent time each, findings whatever the state, never on the
 # demo path by themselves, and no new spike work after Sun Oct 25 12:00 PM ET.
+# The last three added 2026-10-25 (about 05:40 ET) on Eric's "We have a lot of agent hours ... Treat it as
+# near-infinite. But the problem is the humans": each answer is measured by code, and Eric's part is minutes.
 [[milestone]]
 name = "spikes"
 ship = ""
-features = ["simon-says-spike", "restyle-spike"]
+features = ["simon-says-spike", "restyle-spike", "score-follow-spike", "wrong-note-spike", "snap-score-spike",
+  "mascot-spike", # Eric, 2026-10-25 (#903): "I like those 4 alright lets do a spike"
+  "highlight-reel", # Eric, 2026-10-25 (#913): wow feeder; a take becomes a 15 s broadcast replay WebM, an experiment
+  "conductor", # Eric, 2026-10-25 (#985): wow feeder; wave a hand at the camera and the DGX follows your tempo
+  "hum-level-spike", # Eric's spike idea (#522): a tune hummed to a click becomes a local level, scored by forge diff
+  "jam-mode-spike", # Eric's spike idea (#520): the DGX's drums and bass follow the chords a player holds
+  "real-keys", # Eric, 2026-10-25 (#1017): wow feeder; the notes fall onto live video of the real DGX keys
+  "composers-hands", # Eric, 2026-10-25 (#1069): wow feeder; the composer's own piano roll on the DGX, then a duet
+  "wet-paint", # Eric, 2026-10-25 (#1106): wow feeder; free play where every note blooms as paint, wet under the pedal
+  "speaking-piano", # Eric, 2026-10-25 (#1153): wow feeder; can the DGX say a short phrase a listener understands
+]
 cut = []
 
 [[milestone]]
 name = "submission"
-ship = ""
+ship = "2026-10-25T17:00:00-04:00"
+report_before = "1:00"
 final = true
 features = ["bar-loop", "piano-out", "operator-replay", "take-store"]
 cut = []

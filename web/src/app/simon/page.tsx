@@ -5,9 +5,12 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Chart, ChartNote, InputEvent } from "../../contracts";
 import { keyMap, keysDevice, midiDevice } from "../../game/core/input";
+import { laptopKey } from "../../game/laptop-sound";
 import { allNotesOff } from "../../game/piano-out";
 import { laptopReach, melody, newRun, phrase, phraseMessages, simonSettings, step, type Run, type SimonEvent } from "../../game/simon";
 import styles from "../../game/simon/simon.module.css";
+import { HelpLink } from "../../game/help-overlay";
+import { Button, kitChip } from "../../game/duo-tokens";
 import { tone } from "../../game/sound";
 
 const SONGS = [
@@ -135,13 +138,17 @@ function Simon() {
         tone(audioRef.current, audioRef.current.destination, "triangle", hz(e.pitch), audioRef.current.currentTime, 0.4, 0.25);
       dispatch(e.type === "on" ? { type: "on", pitch: e.pitch } : { type: "off" });
     };
-    const devices = [midiDevice(setMidiStatus), keysDevice(lowest)];
-    devices.forEach((d) => void d.start(onEvent));
+    const [midi, keys] = [midiDevice(setMidiStatus), keysDevice(lowest)];
+    void midi.start(onEvent);
+    void keys.start((e) => {
+      laptopKey(e.type, e.pitch, e.velocity); // sounds only while laptop sound is the piano
+      onEvent(e);
+    });
     navigator.requestMIDIAccess?.().then(
       (a) => (outRef.current = [...a.outputs.values()].find((o) => o.name?.includes("Portable Grand")) ?? null),
       () => {},
     );
-    return () => devices.forEach((d) => d.stop());
+    return () => [midi, keys].forEach((d) => d.stop());
   }, [tune, dispatch]);
 
   // Space or Enter starts a run when none is going; All Notes Off when the page goes away.
@@ -171,7 +178,7 @@ function Simon() {
         <h1 className={styles.mark}>SIMON SAYS</h1>
         <nav className={styles.songs}>
           {SONGS.map(([id, name]) => (
-            <a key={id} href={`/simon?song=${id}`} aria-current={id === song ? "page" : undefined}>
+            <a key={id} href={`/simon?song=${id}`} aria-current={id === song ? "page" : undefined} {...kitChip(id === song)}>
               {name}
             </a>
           ))}
@@ -183,13 +190,14 @@ function Simon() {
         {run?.phase === "turn" && <Dots done={run.pos} of={phrase(tune, run.round).length} />}
         {chart && <Keys tune={tune} lit={lit} held={held} wrong={run?.phase === "over" ? run.wrong : null} />}
         {(!run || run.phase === "over" || run.phase === "won") && chart && (
-          <button className={styles.again} onClick={start}>
-            {run ? "Again" : "Start"} <kbd>Space</kbd>
-          </button>
+          <Button kind="primary" className={styles.again} onClick={start} title={`${run ? "Again" : "Start"} (Space)`} aria-keyshortcuts="Space Enter">
+            {run ? "Again" : "Start"}
+          </Button>
         )}
       </section>
 
       <footer className={styles.foot}>
+        <HelpLink />
         {reach !== null && <p>Laptop keys reach round {reach} on this song</p>}
         <p>{midiStatus}</p>
         {runs.length > 0 && (

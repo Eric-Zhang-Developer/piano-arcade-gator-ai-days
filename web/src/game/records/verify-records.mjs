@@ -93,11 +93,24 @@ try {
   await page.getByTestId("records").screenshot({ path: join(out, "records-second.png") });
   await page.goto(`${base}/`);
   const s2 = await stored(page);
-  // Song select: Twinkle's card shows the best grade (take 1's S at 100%), and no other card shows one.
-  const bestText = (await page.getByTestId("song-twinkle").locator('[data-testid="best"]').innerText()).replace(/\s+/g, " ");
-  const bestCards = await page.locator('[data-testid="best"]').count();
-  say(`verify-records: song select -> Twinkle "${bestText}", ${bestCards} card(s) with a grade`);
-  if (!/BEST 100\.0% S/i.test(bestText) || bestCards !== 1) fail.push(`song select: "${bestText}" on ${bestCards} cards`);
+  // Song select: Twinkle's best grade (take 1's S at 100%) shows, and no other song's. On the card select each card
+  // shows its own; on duo-select's panel the focused song's BEST cell does (Twinkle is first, so focused).
+  await page.locator("ol a").first().waitFor({ timeout: 60_000 });
+  if (await page.locator('[data-testid="best"]').count()) {
+    const bestText = (await page.getByTestId("song-twinkle").locator('[data-testid="best"]').innerText()).replace(/\s+/g, " ");
+    const bestCards = await page.locator('[data-testid="best"]').count();
+    say(`verify-records: song select -> Twinkle "${bestText}", ${bestCards} card(s) with a grade`);
+    if (!/BEST 100\.0% S/i.test(bestText) || bestCards !== 1) fail.push(`song select: "${bestText}" on ${bestCards} cards`);
+  } else {
+    const cell = page.getByTestId("cell-best");
+    await cell.waitFor({ timeout: 10_000 }).catch(() => {});
+    const first = (await cell.count()) ? (await cell.innerText()).trim() : "(no BEST cell)";
+    await page.getByTestId("song-ode-to-joy").focus();
+    await page.waitForTimeout(300);
+    const other = (await cell.count()) ? (await cell.innerText()).trim() : "(no BEST cell)";
+    say(`verify-records: song select -> Twinkle's BEST "${first}", Ode to Joy's "${other}"`);
+    if (first !== "100.0%" || other !== "—") fail.push(`song select: Twinkle's BEST "${first}", Ode to Joy's "${other}"`);
+  }
   await page.screenshot({ path: join(out, "song-select.png") });
   const top = s2.twinkle?.top ?? [];
   say(`verify-records: take 2 -> NEW RECORD shown ${newRecord2 > 0}, top 5 ${top.map((t) => `${t.initials} ${t.score}`).join(", ")}`);
@@ -106,14 +119,14 @@ try {
   if (top.length !== 2 || top[1].initials !== "---" || top[0].initials !== "ERI") fail.push(`2: top 5 ${JSON.stringify(top)}`);
   if (s2.twinkle?.best?.score !== s1.twinkle?.best?.score) fail.push("2: the best grade changed on a worse take");
 
-  // 3. A bot take isn't recorded.
+  // 3. A bot take isn't recorded, and its results show no records panel (duo-details hides a panel with nothing to say).
   await page.goto(`${base}/play?song=twinkle&bot=perfect&beat=off&stage=off`);
   await page.getByRole("button", { name: "Start" }).click({ timeout: 60_000 }).catch(() => {}); // bots may start themselves
-  await page.getByTestId("records").waitFor({ timeout: 120_000 });
-  const text3 = await page.getByTestId("records").innerText();
+  await page.getByTestId("results").waitFor({ timeout: 120_000 });
+  const panels3 = await page.getByTestId("records").count();
   const s3 = await stored(page);
-  say(`verify-records: take 3 (?bot=perfect) -> "${text3}", entries ${s3.twinkle?.top?.length}`);
-  if (!/Practice takes aren.t recorded/.test(text3)) fail.push(`3: panel says "${text3}"`);
+  say(`verify-records: take 3 (?bot=perfect) -> records panels ${panels3}, entries ${s3.twinkle?.top?.length}`);
+  if (panels3 !== 0) fail.push(`3: a records panel on a bot take`);
   if (s3.twinkle?.top?.length !== 2) fail.push("3: the bot take was recorded");
 
   fail.push(...errors);

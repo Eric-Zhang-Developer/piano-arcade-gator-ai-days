@@ -1,7 +1,9 @@
 // Headless proof of song preview (spec: song-preview, the Chrome steps). On /?midi=off: nothing sounds before a key press; ↓
-// shows the panel and plays the opening as tones; ↓ again stops it and starts the next; PRACTICE 70% opens bar-loop.
-// Then with a stand-in "Portable Grand" MIDI output: the opening goes to the piano on channel 1, and moving on sends
-// All Notes Off, and L (learn-from-select) does the same on its way to wait mode.
+// plays the opening as tones; ↓ again stops it and starts the next. (Level, notes, best and PRACTICE live in duo-select's
+// panel, and its own check covers them.)
+// Then with a stand-in "Portable Grand" MIDI output: the opening goes to the piano on channel 1 a few notes at a time
+// (never queued whole: a real piano plays a timestamped note even after All Notes Off), moving on lifts the keys and
+// sends All Notes Off and nothing more, and L (learn-from-select) does the same on its way to wait mode.
 // Usage: node web/src/game/song-preview/verify-preview.mjs --out <dir>
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -100,7 +102,9 @@ async function open(page, path = "/") {
 const opening = (page, id) =>
   page.evaluate(async (id) => {
     const c = await (await fetch(`/songs/${id}/chart.json`)).json();
-    return c.notes.filter((n) => n.beat < 2 * c.beatsPerBar).length;
+    const first = Math.min(...c.notes.map((n) => n.beat));
+    return c.notes.filter((n) => ((n.beat - first) * 60000) / c.bpm < 5000).length; // the first 5 s, from the first note
+
   }, id);
 
 const browser = await chromium.launch({ headless: true });
@@ -114,15 +118,14 @@ await page.addInitScript(instrument, false);
 // through it instead of tones (spec: laptop-sound).
 await open(page, "/?midi=off");
 await page.waitForTimeout(1500);
-check((await page.getByTestId("preview-status").textContent()) === "Press any key for previews", "before a key press the panel says 'Press any key for previews'");
+check((await page.getByTestId("preview-status").textContent()).trim() === "", "before a key press the status line is blank (mouse-first: no 'Press any key' line)");
 check((await page.evaluate(() => window.__tones + window.__uiTones + window.__midiAsked)) === 0, "nothing plays and no MIDI is asked for on page load");
 const list = (await page.locator("ol a").evaluateAll((as) => as.map((a) => a.getAttribute("href").replace("/play?song=", ""))));
 await page.keyboard.press("ArrowDown");
 await page.getByTestId("preview-status").filter({ hasText: "laptop tones" }).waitFor({ timeout: 10_000 });
 const second = list[1];
-check(/\d/.test(await page.getByTestId("preview-nps").textContent()), `↓ shows ${second}'s notes per second (${await page.getByTestId("preview-nps").textContent()})`);
 const want = await opening(page, second);
-check((await page.evaluate(() => window.__tones)) === want, `its opening plays as tones: ${await page.evaluate(() => window.__tones)} of ${want} notes in bars 1–2`);
+check((await page.evaluate(() => window.__tones)) === want, `its opening plays as tones: ${await page.evaluate(() => window.__tones)} of ${want} notes in its first 5 s`);
 check((await page.evaluate(() => window.__uiTones)) === 1, `… apart from ui-sounds' one ↓ blip (${await page.evaluate(() => window.__uiTones)} UI tones)`);
 await page.screenshot({ path: join(out, "preview-tones.png") });
 const before = await page.evaluate(() => [window.__tones, window.__disconnects]);
@@ -131,12 +134,6 @@ await page.waitForTimeout(100);
 check((await page.evaluate(() => window.__disconnects)) > before[1], "↓ again mid-preview stops the first (its bus is disconnected)");
 await page.waitForFunction((n) => window.__tones > n, before[0], { timeout: 10_000 });
 check(true, `… and ${list[2]}'s opening starts`);
-await page.getByTestId("preview-practice").click();
-await page.waitForURL(/tempo=70/);
-const url = new URL(page.url());
-check(url.searchParams.get("song") === list[2] && url.searchParams.get("from") === "1" && url.searchParams.get("passes") === "1", `PRACTICE 70% opens ${url.pathname}${url.search}`);
-await page.getByText("at 70%").first().waitFor({ timeout: 30_000 });
-check(true, "… bar-loop at 70%");
 await page.close();
 
 // The piano.
@@ -148,12 +145,14 @@ await page.keyboard.press("ArrowDown");
 await page.getByTestId("preview-status").filter({ hasText: "on the piano" }).waitFor({ timeout: 10_000 });
 await page.waitForTimeout(300);
 const ons = await page.evaluate(() => window.__sent.filter((m) => m[0] === 0x90).length);
-check(ons === want, `on the piano: ${ons} note-ons on channel 1 for ${want} notes`);
+check(ons > 0 && ons < want, `on the piano: ${ons} of ${want} note-ons sent so far, on channel 1, not the whole opening at once`);
 check((await page.evaluate(() => window.__tones)) === 0, "… and no laptop tones");
 await page.keyboard.press("ArrowDown");
 await page.waitForTimeout(100);
+// A stop: clear, a note-off per pressed key, All Notes Off, and no note-on after it.
+const stops = (sent) => sent[0]?.[0] === "clear" && sent.slice(1).every((m) => m[0] !== 0x90) && sent.some((m) => JSON.stringify(m) === JSON.stringify([0xb0, 123, 0]));
 const tail = await page.evaluate(() => window.__sent.slice(window.__sent.findIndex((m) => m[0] === "clear")));
-check(tail[0]?.[0] === "clear" && JSON.stringify(tail[1]) === JSON.stringify([0xb0, 123, 0]), "moving on clears the queue and sends All Notes Off");
+check(stops(tail), "moving on lifts the keys and sends All Notes Off, and no note-on follows");
 // L (learn-from-select) leaves for wait mode and stops the opening at once, as Enter does.
 await page.getByTestId("preview-status").filter({ hasText: "on the piano" }).waitFor({ timeout: 10_000 });
 await page.waitForFunction(() => window.__sent.at(-1)?.[0] === 0x80 || window.__sent.at(-1)?.[0] === 0x90, null, { timeout: 10_000 });
@@ -161,7 +160,7 @@ const mark = await page.evaluate(() => window.__sent.length);
 await page.keyboard.press("l");
 await page.waitForURL(/mode=wait/, { timeout: 15_000 });
 const afterL = await page.evaluate((n) => window.__sent.slice(n), mark);
-check(afterL[0]?.[0] === "clear" && JSON.stringify(afterL[1]) === JSON.stringify([0xb0, 123, 0]), `L clears the queue and sends All Notes Off, then opens ${new URL(page.url()).search}`);
+check(stops(afterL.slice(afterL.findIndex((m) => m[0] === "clear"))), `L clears the queue and sends All Notes Off, then opens ${new URL(page.url()).search}`);
 
 check(errors.length === 0, `no page errors${errors.length ? `: ${errors.join("; ")}` : ""}`);
 writeFileSync(join(out, "verify-preview.json"), JSON.stringify({ failures, errors }, null, 2));

@@ -1,0 +1,118 @@
+/* The experiments gallery on /lab: the Lab's own type and colours (it inherits the Lab's width-scaled font size), with
+   each experiment a filled button, a tone step above the ground. Primary for the target and focus; no hype pink. */
+.gallery {
+  margin-top: 1.4em;
+  scroll-margin-top: 3em; /* "On trial ↓" lands below the fixed nav bar */
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2em;
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid var(--pa-line);
+}
+
+.title {
+  margin: 0;
+  font: 800 1.6em/1 var(--pa-font-display), system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.sub {
+  margin: 0;
+  color: var(--pa-ink-dim);
+}
+
+/* The Lab's own columns: the groups' unequal lengths balance on their own, and a group may run on into the next
+   column, so one big group doesn't leave two columns half empty. A card never splits. */
+.groups {
+  margin-top: 0.9em;
+  columns: 3;
+  column-gap: 2.2em;
+}
+
+.group {
+  margin-bottom: 0.9em;
+}
+
+.groupTitle {
+  margin: 0 0 0.4em;
+  break-after: avoid;
+  font: 500 0.75em/1.2 var(--pa-font-data), ui-monospace, monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pa-ink-dim);
+}
+
+.grid {
+  display: grid;
+  gap: 0.45em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grid > li {
+  display: flex;
+  break-inside: avoid;
+}
+
+/* The Lab entry's shape, filled: name and target on the first row, the line under them. */
+.button {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-content: start;
+  align-items: baseline;
+  column-gap: 1em;
+  row-gap: 0.15em;
+  flex: 1;
+  padding: 0.55em 0.75em 0.6em;
+  background: var(--pa-panel);
+  color: inherit;
+  text-decoration: none;
+  outline: 2px solid transparent;
+  transition:
+    background-color 150ms ease-out,
+    outline-color 150ms ease-out,
+    transform 150ms ease-out;
+}
+
+.button:hover {
+  background: color-mix(in srgb, var(--pa-panel), var(--pa-primary) 14%);
+}
+
+.button:focus-visible {
+  outline-color: var(--pa-primary);
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.name {
+  font: 800 1.05em/1.2 var(--pa-font-display), system-ui, sans-serif;
+}
+
+.line {
+  grid-column: 1 / -1;
+  color: var(--pa-ink);
+}
+
+.meta {
+  grid-column: 2;
+  grid-row: 1;
+  color: var(--pa-primary);
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+  .button:active {
+    transform: none;
+  }
+}

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Chart, Take } from "../../contracts";
 import { judgeTake, noteTimeMs } from "../core/judge";
-import { gradeDynamics, NO_DYNAMICS, NO_VELOCITY, summary, type DynamicsReport } from ".";
+import { dynamics, gradeDynamics, NO_DYNAMICS, NO_VELOCITY, summary, type DynamicsReport } from ".";
 
 // 8 bars of 4/4, one note a beat: phrases are bars 1–2, 3–4, 5–6, 7–8. Bars 3–4 are forte (96), the rest piano (48).
 const forte = (beat: number) => beat >= 8 && beat < 16;
@@ -59,5 +59,16 @@ describe("gradeDynamics", () => {
     expect(play(flat, (_, v) => v)).toEqual({ kind: "message", text: NO_DYNAMICS });
     const none = { ...chart, notes: chart.notes.map((n) => ({ ...n, velocity: undefined })) };
     expect(play(none, () => 80)).toEqual({ kind: "message", text: NO_DYNAMICS });
+  });
+
+  it("a message is no card on the results screen; a graded take is (duo-details)", () => {
+    const panel = (c: Chart, inputDevice: Take["inputDevice"]) => {
+      const events = c.notes.map((n) => ({ pitch: n.pitch, velocity: n.velocity ?? 64, timeMs: noteTimeMs(c, n), offTimeMs: null }));
+      const take: Take = { chartId: c.id, startedAt: "2026-10-24T00:00:00Z", latencyOffsetMs: 0, inputDevice, events };
+      return dynamics().resultsPanel!({ chart: c, take, results: judgeTake(c, take), params: new URLSearchParams(), retry() {} });
+    };
+    expect(panel(chart, "keys")).toBeNull(); // NO_VELOCITY
+    expect(panel({ ...chart, notes: chart.notes.map((n) => ({ ...n, velocity: 62 })) }, "test")).toBeNull(); // NO_DYNAMICS
+    expect(panel(chart, "test")).not.toBeNull();
   });
 });

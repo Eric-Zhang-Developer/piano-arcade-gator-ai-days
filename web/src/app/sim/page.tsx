@@ -8,6 +8,7 @@ import { KEYS_VELOCITY } from "../../game/core/settings";
 import { keyOff, keyOn, PROFILE_SOURCES, type SimLog, type TimelineEntry } from "../../game/sim/fake";
 import fixture from "../../game/sim/fixtures/python-piano.json";
 import { SIM_CHANNEL, type SimCommand, type SimMessage } from "../../game/sim/plugin";
+import { kitChip } from "../../game/duo-tokens";
 
 const CHART_URL = "/songs/twinkle/chart.json";
 const MAX_GAP_MS = 2000; // replay only: longer silences in the capture are shortened, and say so in the log
@@ -150,9 +151,13 @@ function SimPage() {
   const keys = Array.from({ length: Math.max(0, high - low + 1) }, (_, i) => low + i);
 
   return (
-    <main style={{ display: "grid", gridTemplateColumns: "minmax(0, 2fr) minmax(320px, 1fr)", gap: 16, padding: 16, height: "100vh", boxSizing: "border-box" }}>
+    <main style={{ display: "grid", gridTemplateColumns: "minmax(0, 2fr) minmax(320px, 1fr)", gap: 16, padding: "calc(4vh + 8px) 16px 16px", height: "100vh", boxSizing: "border-box" }}>
       <section style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0 }}>
-        <iframe key={gameKey} title="game" src={`/play?midi=sim&simId=${simId}`} style={{ flex: 1, border: "1px solid #333", borderRadius: 8, minHeight: 0 }} />
+        <iframe
+          key={gameKey}
+          data-testid="sim-game"
+          title={`${chart?.title ?? "The game"}, played from the virtual piano`}
+          src={`/play?midi=sim&simId=${simId}`} style={{ flex: 1, border: "1px solid var(--pa-line)", minHeight: 0 }} />
         <div aria-label="virtual keyboard" style={{ display: "flex", gap: 2, height: 96 }}>
           {keys.map((p) => (
             <button
@@ -169,7 +174,7 @@ function SimPage() {
                 cursor: "pointer",
                 alignSelf: isBlack(p) ? "flex-start" : "stretch",
                 height: isBlack(p) ? "60%" : undefined,
-                background: down.has(p) ? "#5ef0c4" : isBlack(p) ? "#222" : "#ddd",
+                background: down.has(p) ? "var(--pa-primary)" : isBlack(p) ? "#222" : "#ddd",
                 color: isBlack(p) ? "#eee" : "#111",
                 fontSize: 12,
               }}
@@ -185,9 +190,10 @@ function SimPage() {
       </section>
 
       <aside style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0 }}>
+        <h1 style={h1}>Piano sim</h1>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           <button
-            style={btn}
+            {...btn}
             disabled={!ready}
             onClick={() => {
               // A fresh game from any state (ready, mid-song, results): the bot starts once it says ready.
@@ -198,20 +204,20 @@ function SimPage() {
           >
             Watch the bot
           </button>
-          <button style={btn} disabled={!ready} onClick={() => post({ type: "play", timeline: replayTimeline() })}>
+          <button {...btn} disabled={!ready} onClick={() => post({ type: "play", timeline: replayTimeline() })}>
             Replay a real take
           </button>
-          <button style={btn} disabled={!ready} onClick={() => post({ type: "stall", ms: 5000 })}>
+          <button {...btn} disabled={!ready} onClick={() => post({ type: "stall", ms: 5000 })}>
             Stall 5 s
           </button>
-          <button style={btn} disabled={!ready} onClick={() => post({ type: "unplug" })}>
+          <button {...btn} disabled={!ready} onClick={() => post({ type: "unplug" })}>
             Unplug
           </button>
-          <button style={btn} disabled={!ready} onClick={() => post({ type: "replug" })}>
+          <button {...btn} disabled={!ready} onClick={() => post({ type: "replug" })}>
             Replug
           </button>
           <button
-            style={btn}
+            {...btn}
             disabled={!ready}
             aria-pressed={jitter}
             onClick={() => {
@@ -221,14 +227,14 @@ function SimPage() {
           >
             Jitter ±10 ms: {jitter ? "on" : "off"}
           </button>
-          <button style={btn} disabled={!ready} onClick={() => post({ type: "dropRelease", pitch: stuckPitch })}>
+          <button {...btn} disabled={!ready} onClick={() => post({ type: "dropRelease", pitch: stuckPitch })}>
             Stuck note ({stuckPitch})
           </button>
         </div>
         {!ready && <p style={{ margin: 0, opacity: 0.6 }}>Waiting for the game…</p>}
 
         <h2 style={h2}>MIDI log</h2>
-        <div data-testid="midi-log" style={{ flex: 1, overflowY: "auto", minHeight: 120, fontFamily: "ui-monospace, monospace", fontSize: 12, background: "#111", borderRadius: 8, padding: 8 }}>
+        <div data-testid="midi-log" style={{ flex: 1, overflowY: "auto", minHeight: 120, fontFamily: "ui-monospace, monospace", fontSize: 12, background: "var(--pa-panel)", border: "1px solid var(--pa-line)", padding: 8 }}>
           <LogTable rows={rows} />
         </div>
 
@@ -332,10 +338,10 @@ function Record() {
         filtered.
       </p>
       <div style={{ display: "flex", gap: 8 }}>
-        <button style={btn} onClick={connect}>
+        <button {...btn} onClick={connect}>
           Connect piano
         </button>
-        <button style={btn} disabled={!msgs.length} onClick={download}>
+        <button {...btn} disabled={!msgs.length} onClick={download}>
           Download fixture ({msgs.length} messages)
         </button>
       </div>
@@ -344,12 +350,14 @@ function Record() {
         Active Sensing (0xFE): {fe.length} received
         {feGaps.length > 0 && `, median interval ${feGaps[Math.floor(feGaps.length / 2)].toFixed(1)} ms`}
       </p>
-      <div style={{ flex: 1, overflowY: "auto", fontFamily: "ui-monospace, monospace", fontSize: 12, background: "#111", borderRadius: 8, padding: 8 }}>
+      <div style={{ flex: 1, overflowY: "auto", fontFamily: "ui-monospace, monospace", fontSize: 12, background: "var(--pa-panel)", border: "1px solid var(--pa-line)", padding: 8 }}>
         <LogTable rows={rows} />
       </div>
     </main>
   );
 }
 
-const btn: React.CSSProperties = { padding: "8px 14px", borderRadius: 6, border: "none", background: "#5ef0c4", color: "#000", cursor: "pointer" };
+const btn = kitChip(false); // the Duo kit's small hairline control, spread as className and style
 const h2: React.CSSProperties = { margin: 0, fontSize: 16 };
+// The page's name, in the kit's display face like /lab's and /simon's titles (#1045).
+const h1: React.CSSProperties = { margin: 0, font: "800 clamp(28px, 2.4vw, 44px)/1 var(--pa-font-display), system-ui, sans-serif", letterSpacing: "0.02em", textTransform: "uppercase" };

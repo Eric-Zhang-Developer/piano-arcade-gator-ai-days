@@ -14,7 +14,7 @@ One prepared next action makes that relationship concrete. Show the task and a s
 
 The user selected the **center upright, inviting alligator**. That selects the character, not every palette, layout or motion decision. The current frontend is the editable baseline shared with Eric under the frozen purpose. It uses a quiet graph behind a foreground assignment, then a question pane beside the actual score/reference workspace. The character stays beside the work.
 
-`/learn/brand-preview` is the current desktop frontend entry for editing. Its in-app Proposed preview label distinguishes it from the previous interface. `/learn` and its activity routes retain the explicitly labelled **Prior UI**. Review disclosure, Replay and references sit outside the student task. This publication shares the complete current implementation; it does not connect the authored demo to a live tutor or deploy a production service.
+`/learn/brand-preview` is the current desktop frontend entry for editing. Its in-app Proposed preview label distinguishes it from the previous interface. `/learn` and its activity routes retain the explicitly labelled **Prior UI**. Review disclosure, Replay and references sit outside the student task. This publication shares the complete current implementation; it does not connect the authored demo to a live tutor or deploy a production service. The one live model connection is the theory sandbox chat (below).
 
 ### Current assets
 
@@ -29,7 +29,7 @@ Provenance: an authorized Nano Banana 2 still concept sheet generated the origin
 
 ### Current typography and colors
 
-The proposed route loads actual `next/font/google` assets: **Bricolage Grotesque**, weights 600/700, for brand/headings; **Source Sans 3**, weights 400/500/600/700, for reading and controls. Both use Latin subsets and `display: swap`. Their CSS variables are `--mentor-heading` and `--mentor-reading`. Prior UI retains Saira italic display roles and system-ui reading; avoid changing the shared game font system to style the proposed route.
+The proposed route loads actual `next/font/google` assets: **Bricolage Grotesque**, weights 600/700, for brand/headings; **Source Sans 3**, weights 400/500/600/700, for reading and controls. Both use Latin subsets and `display: swap`. Their CSS variables are `--mentor-heading` and `--mentor-reading`. Prior UI and the theory screens follow Duo (below); avoid changing the shared game font system to style the proposed route.
 
 Current source: `web/src/learn/frontend/brand-preview/brand-preview.module.css`.
 
@@ -49,6 +49,10 @@ Current source: `web/src/learn/frontend/brand-preview/brand-preview.module.css`.
 
 These are current implementation tokens, not frozen brand law. The green/cream character colors are embedded in the PNG, not separate palette tokens.
 
+### Theory screens follow Duo
+
+`/learn`, including the theory screens `/learn/understand` and `/learn/review/theory`, follows the Duo look in [`specs/context/visual-direction.md`](specs/context/visual-direction.md): black and panel greys, blue primary, purple secondary, red only beside a ✕, zero radius, Saira upright condensed headings (no italic), a calm reading face, monospace data, notation on a paper panel. The kit (panels, brackets, buttons, labels, data cells) comes from Eric's `web/src/game/duo-tokens/`; `/learn` adds only `DuoScope`, `Mark` and the `--learn-*` aliases, in `web/src/learn/frontend/duo/`. The sandbox counts as complete only when every gate passes, keeps gate progress on the device, and pairs the workspace with a real model chat that coaches without giving answers. Why and how to undo: [`specs/decisions/learning-ui-theory-screens.md`](specs/decisions/learning-ui-theory-screens.md).
+
 ### Accompaniment in motion
 
 Start follows the prepared target using one spatial path for guide and camera. The proposed journey and handoff timers live in [`directions.ts`](web/src/learn/frontend/brand-preview/directions.ts) and [`BrandPreview.tsx`](web/src/learn/frontend/brand-preview/BrandPreview.tsx); the visible docking and lesson-fade durations live in [`brand-preview.module.css`](web/src/learn/frontend/brand-preview/brand-preview.module.css). The CSS lesson fade is independent of the handoff timer. One 112px full-body image settles into reserved space **before** the lesson appears. Keep title, score and destination caption unobstructed; never morph into the portrait crop or leave the tutor behind. Stop and map return preserve control; reduced motion uses direct entry.
@@ -61,7 +65,7 @@ The intended mastery model is a universal hierarchical skill graph: broad concep
 
 Every node, including broad parents, retains a normalized distribution over low/partial/secure mastery. Current values are fictional examples or disclosed uniform priors. Three colors and shapes are a presentation projection; cutoffs are demo choices, not validated assessment thresholds. Parent values are independently authored, not inferred child averages. Preserve distributions, provenance, presentation and eligibility as distinct concerns. No extra review-due color or student-facing legend is required.
 
-The prepared recommendation is authored, not a live model decision. Session answers, history, reference selection and practice settings/results are in-memory. [Learning preview](README.md#learning-preview) owns the reset boundaries for the separate proposed and Prior UI sessions. No account continuity, persistent progress, AI explanation grading, piano capture or mastery-update service is connected to this UI. Closed answers have computed feedback; explanations compare against reference copy. Procedural takes/results remain illustrative; the score is permitted during procedural retrieval. Preserve the distinction between melodic closure and evidence of harmonic cadence. Offline recovery must describe connection/sync limits honestly, preserve available local work and stop active playback/takes safely.
+The prepared recommendation is authored, not a live model decision. Session answers, history, reference selection and practice settings/results are in-memory; only theory gate progress is saved, per device, in `localStorage`. [Learning preview](README.md#learning-preview) owns the reset boundaries for the separate proposed and Prior UI sessions. No account continuity, AI explanation grading, piano capture or mastery-update service is connected to this UI. Closed answers have computed feedback; explanations compare against reference copy. Procedural takes/results remain illustrative; the score is permitted during procedural retrieval. Preserve the distinction between melodic closure and evidence of harmonic cadence. Offline recovery must describe connection/sync limits honestly, preserve available local work and stop active playback/takes safely.
 
 ## Cross-industry lessons
 

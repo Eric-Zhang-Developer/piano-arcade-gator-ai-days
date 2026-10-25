@@ -1,4 +1,5 @@
-/* The pause menu over the playfield: a dim, PAUSED in the display face, then Resume, Retry and Quit stacked. */
+/* The pause menu over the playfield: a dim, PAUSED in the display face, then Resume, Retry and Quit stacked. Duo look:
+   upright type, square hairline panel, the focused row tinted primary (hype pink is for the five moments, #783). */
 .overlay {
   position: absolute;
   inset: 0;
@@ -16,8 +17,7 @@
 .title {
   margin: 0;
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 900;
+  font-weight: 800;
   font-size: clamp(72px, 9vw, 176px);
   line-height: 0.9;
   letter-spacing: -0.02em;
@@ -31,7 +31,8 @@
   gap: 1.4vh;
   min-width: clamp(240px, 22vw, 420px);
   padding: 1.4vh;
-  border-radius: 8px;
+  border: 1px solid var(--pa-line);
+  border-radius: 0;
   background: var(--pa-panel);
   animation: enter 220ms ease-out;
 }
@@ -39,15 +40,14 @@
 .item {
   appearance: none;
   border: 0;
-  border-radius: 4px;
+  border-radius: 0;
   padding: 0.55em 1em;
   background: transparent;
   color: var(--pa-ink-dim);
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 800;
+  font-weight: 700;
   font-size: clamp(20px, 1.6vw, 32px);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-align: left;
   text-transform: uppercase;
   cursor: pointer;
@@ -55,27 +55,16 @@
 
 /* The focus is the menu's cursor: always shown, keyboard or mouse. */
 .item:focus {
-  outline: 3px solid var(--pa-magenta);
+  outline: 3px solid var(--pa-primary);
   outline-offset: 0;
   color: var(--pa-ink);
-  background: rgba(255, 47, 208, 0.12);
-}
-
-.hint {
-  margin: 0;
-  font-size: clamp(16px, 1.25vw, 24px);
-  color: var(--pa-ink-dim);
-}
-
-.hint b {
-  font-weight: 600;
-  color: var(--pa-ink);
+  background: color-mix(in srgb, var(--pa-primary) 14%, transparent); /* the kit's lit chip */
 }
 
 .count {
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 900;
+  font-weight: 800;
+  font-stretch: 75%; /* the kit's condensed numeral */
   font-size: clamp(120px, 16vw, 300px);
   line-height: 1;
   font-variant-numeric: tabular-nums;

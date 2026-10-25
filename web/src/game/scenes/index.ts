@@ -1,26 +1,29 @@
 import type { Chart, GamePlugin, InputDevice, InputEvent, TakeEvent } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
-import { KEYS_VELOCITY, loadLatencyOffset } from "../core/settings";
+import { KEYS_VELOCITY, loadLatencyOffset, msPerBeat } from "../core/settings";
 import { gaugeSize } from "../fever-gauge/gauge";
 import { seededRandom } from "../sim/fake";
 import { toast } from "../notice-toast";
+import { loadPedal, pedalEvents, type Pedal } from "../pedal";
 import { pianoOutSettings } from "../piano-out";
 import { readTakeMidi } from "../take-midi";
 
 export const scenesSettings = {
   seed: 118,
-  holdMs: 100, // how long a bot holds each key (shorter for notes closer together)
-  lateMs: 40, // `late`: every note GREAT, late
-  offsets: { PERFECT: 0, GREAT: 40, GOOD: 75 }, // a bot's offset for each judgment, sign seeded
+  restrikeGapMs: 20, // a held key lets go this long before its own pitch strikes again, so the piano re-articulates
+  lateMs: 60, // `late`: every note GREAT, late
+  offsets: { PERFECT: 0, GREAT: 60, GOOD: 100 }, // a bot's offset for each judgment, sign seeded
   sloppy: { GREAT: 0.2, GOOD: 0.15, MISS: 0.1, wrong: 3 }, // fractions of notes; `wrong` is a count
-  // Each rank bot's mix lands mid-band on Twinkle: accuracy = (PERFECT + 0.5 GREAT + 0.25 GOOD) / (notes + WRONG).
+  // Each rank bot's mix lands mid-band on Twinkle: accuracy = (PERFECT + 0.8 GREAT + 0.5 GOOD) / (notes + WRONG).
+  // A, a full combo, needs no MISS; B and below need one, or the full-combo floor would lift them to B.
   ranks: {
-    "rank-a": { GREAT: 0.16 }, // 1 - 0.5 × 0.16 ≈ 0.92
-    "rank-b": { GREAT: 0.1, MISS: 0.1 }, // ≈ 0.85
-    "rank-c": { GREAT: 0.1, MISS: 0.2 }, // ≈ 0.75
+    "rank-a": { GREAT: 0.375 }, // 1 - 0.2 × 0.375 ≈ 0.92
+    "rank-b": { GREAT: 0.25, MISS: 0.1 }, // ≈ 0.85
+    "rank-c": { GREAT: 0.25, MISS: 0.2 }, // ≈ 0.75
     "rank-d": { GREAT: 0.1, MISS: 0.4 }, // ≈ 0.55
   } as Record<string, Partial<Record<"GREAT" | "GOOD" | "MISS", number>>>,
   feverExtra: 10, // `fever` repeats the chart until it holds the fever gauge's size plus this many notes
+  lookaheadMs: 150, // MIDI out is handed to Web MIDI this far ahead, stamped with its chart time
 };
 
 export const BOTS = ["perfect", "late", "sloppy", "rank-a", "rank-b", "rank-c", "rank-d", "fever"] as const;
@@ -30,7 +33,7 @@ export interface Press {
   pitch: number;
   timeMs: number; // chart clock
   holdMs: number;
-  velocity?: number; // a take's own; the scripted bots press at KEYS_VELOCITY
+  velocity?: number; // a take's own, or the chart note's; none presses at KEYS_VELOCITY
 }
 
 // ?bot=take&take=<file>: a take file under /takes/ (hero-replay). Only a plain name: nothing outside /takes/.
@@ -73,14 +76,21 @@ export function botPresses(chart: Chart, name: BotName): Press[] {
     for (const i of shuffled.slice(at, at + count)) judgments[i] = j;
     at += count;
   }
+  // Each key is held for its note's written length, as a player would, so a legato chart sounds legato (a fixed 100 ms
+  // hold made every demo staccato). It lets go early only where the same pitch strikes again.
+  const holds = chart.notes.map((note, i) => {
+    const written = note.duration * msPerBeat(chart.bpm);
+    const again = times.filter((t, k) => k !== i && chart.notes[k].pitch === note.pitch && t > times[i]);
+    const restrike = again.length ? Math.min(...again) - times[i] - s.restrikeGapMs : Infinity;
+    return Math.max(10, Math.min(written, restrike));
+  });
   const presses: Press[] = [];
-  order.forEach((i, k) => {
+  order.forEach((i) => {
     const j = judgments[i];
     if (j === "MISS") return;
     const sign = name === "late" ? 1 : r() < 0.5 ? -1 : 1;
     const offset = name === "late" ? s.lateMs : sign * s.offsets[j];
-    const next = order[k + 1] === undefined ? Infinity : times[order[k + 1]] - times[i];
-    presses.push({ pitch: chart.notes[i].pitch, timeMs: times[i] + offset, holdMs: Math.min(s.holdMs, next * 0.6) });
+    presses.push({ pitch: chart.notes[i].pitch, timeMs: times[i] + offset, holdMs: holds[i], velocity: chart.notes[i].velocity });
   });
   if (name === "sloppy") {
     // WRONG notes: a pitch the chart never uses, between notes, so they break the combo without stealing a hit.
@@ -113,24 +123,55 @@ export function scenes(): GamePlugin {
   let pumpPerf: number | null = null; // when this frame's pump ran: just before /play read its clock
   let fromMs = -Infinity; // after a resume, only what is still ahead
   let latency = 0;
-  // The presses and releases still to send, in time order, each at its chart time. A timer sends each on time, so a
-  // piano hears it on time; the pump sends whatever a starved timer hasn't yet (#586).
-  let queue: { atMs: number; type: InputEvent["type"]; pitch: number; velocity?: number; sent: boolean }[] = [];
-  let next = 0;
+  let pedal: Pedal | null = null; // a local song's pedal.json, once read
+  let load = 0; // which transformChart the pedal read belongs to
+  // The presses and releases still to send, in time order, each at its chart time, on two clocks (golden-demo, part 6).
+  // The judge gets each at perfOf, calibrated, from a timer or, on a starved page, the pump (#586). The piano gets it
+  // at chart time, zeroPerf + atMs, the clock the recording follows: handed to Web MIDI up to lookaheadMs early with
+  // that timestamp, so a calibration offset never moves the sound. A pedal event goes only to the piano, as CC64 with
+  // its value in `velocity`.
+  let queue: { atMs: number; type: InputEvent["type"] | "pedal"; pitch: number; velocity?: number; sent: boolean; out?: boolean }[] = [];
+  let next = 0; // the judge's cursor
+  let nextOut = 0; // the piano's
+  const sounding = new Set<number>(); // keys the piano has been sent down and not yet up
+  let lastStamp = 0; // the latest timestamp handed to the piano
+  let ticker: ReturnType<typeof setInterval> | undefined;
   const timers: ReturnType<typeof setTimeout>[] = [];
   const cancel = () => {
     timers.forEach(clearTimeout);
     timers.length = 0;
-    [queue, next] = [[], 0];
+    clearInterval(ticker);
+    [queue, next, nextOut] = [[], 0, 0];
+    // Pause, quit and songEnd leave no key down and the pedal up, even mid-pair. Stamped after the last thing already
+    // handed over, so a press queued a few ms ahead can't land after its own release.
+    const at = Math.max(lastStamp, performance.now());
+    sounding.forEach((p) => out?.send([0x90, p, 0], at));
+    sounding.clear();
+    out?.send([0xb0, 64, 0], at);
   };
   // /play judges arrival - zero - latency, so an event's time is read from the best zero so far, when it's sent.
   const perfOf = (chartMs: number) => zeroPerf! + latency + chartMs;
   const fire = (e: (typeof queue)[number]) => {
     if (e.sent || !emit) return;
     e.sent = true;
-    const velocity = e.type === "on" ? (e.velocity ?? KEYS_VELOCITY) : 0;
-    emit({ type: e.type, pitch: e.pitch, velocity, timeMs: perfOf(e.atMs) });
-    out?.send([0x90, e.pitch, velocity]);
+    if (e.type === "pedal") return;
+    emit({ type: e.type, pitch: e.pitch, velocity: e.type === "on" ? (e.velocity ?? KEYS_VELOCITY) : 0, timeMs: perfOf(e.atMs) });
+  };
+  const sendOut = () => {
+    if (!out || zeroPerf === null) return;
+    const until = performance.now() + scenesSettings.lookaheadMs;
+    while (nextOut < queue.length && zeroPerf + queue[nextOut].atMs <= until) {
+      const e = queue[nextOut++];
+      if (e.out) continue;
+      e.out = true;
+      lastStamp = Math.max(lastStamp, zeroPerf + e.atMs);
+      if (e.type === "pedal") out.send([0xb0, 64, e.velocity!], lastStamp);
+      else {
+        out.send([0x90, e.pitch, e.type === "on" ? (e.velocity ?? KEYS_VELOCITY) : 0], lastStamp);
+        if (e.type === "on") sounding.add(e.pitch);
+        else sounding.delete(e.pitch);
+      }
+    }
   };
   // Run from a frame callback queued during /play's frame, so it runs before /play's next one: every event due by now
   // reaches the judge before that frame sweeps late notes to MISS. On a starved page each frame is a long task and
@@ -139,18 +180,33 @@ export function scenes(): GamePlugin {
     pumpPerf = performance.now();
     if (zeroPerf === null) return;
     while (next < queue.length && perfOf(queue[next].atMs) <= pumpPerf) fire(queue[next++]);
+    sendOut();
   };
   const play = () => {
     cancel();
     if (!bot || !chart || !emit || zeroPerf === null) return;
     if (bot === "take" && !take) return; // still reading: start() plays once it has
     latency = loadLatencyOffset();
+    const keys: typeof queue = [];
     for (const p of bot === "take" ? take! : botPresses(chart, bot)) {
-      if (p.timeMs >= fromMs) queue.push({ atMs: p.timeMs, type: "on", pitch: p.pitch, velocity: p.velocity, sent: false });
-      if (p.timeMs + p.holdMs >= fromMs) queue.push({ atMs: p.timeMs + p.holdMs, type: "off", pitch: p.pitch, sent: false });
+      if (p.timeMs >= fromMs) keys.push({ atMs: p.timeMs, type: "on", pitch: p.pitch, velocity: p.velocity, sent: false });
+      if (p.timeMs + p.holdMs >= fromMs) keys.push({ atMs: p.timeMs + p.holdMs, type: "off", pitch: p.pitch, sent: false });
     }
-    queue.sort((a, b) => a.atMs - b.atMs); // stable: a press before its own release at the same time, as the timers were
-    for (const e of queue) timers.push(setTimeout(() => fire(e), perfOf(e.atMs) - performance.now()));
+    enqueue(keys);
+    if (pedal) enqueue(pedalQueue(fromMs));
+    if (out) ticker = setInterval(sendOut, scenesSettings.lookaheadMs / 4);
+    sendOut();
+  };
+  const pedalQueue = (from: number): typeof queue =>
+    pedalEvents(pedal!, msPerBeat(chart!.bpm), from).map((e) => ({ atMs: e.atMs, type: "pedal", pitch: 64, velocity: e.value, sent: false }));
+  // Merge events into the queue, each with its judge timer, and point both cursors at their first unsent event. A new
+  // event already behind the piano's cursor is past: it isn't sent late. Stable: a press before its own release at the
+  // same time, as the timers were, and a key before a pedal change at the same time, so a re-pedal catches the chord.
+  const enqueue = (events: typeof queue) => {
+    for (const e of events) e.out = zeroPerf !== null && zeroPerf + e.atMs < lastStamp;
+    queue = [...queue, ...events].sort((a, b) => a.atMs - b.atMs);
+    [next, nextOut] = [queue.findIndex((e) => !e.sent), queue.findIndex((e) => !e.out)].map((i) => (i < 0 ? queue.length : i));
+    for (const e of events) timers.push(setTimeout(() => fire(e), perfOf(e.atMs) - performance.now()));
   };
 
   // bot=take: read the file once, for both devices. Refused -> a toast, and the take plays normally.
@@ -184,6 +240,17 @@ export function scenes(): GamePlugin {
         else toast(`Take "${takeFile}" isn't a file name in /takes/ (like fur-elise-20261024-1900.mid). Playing normally.`);
       } else if (name !== null && !bot) toast(`Unknown bot "${name}". Bots: ${BOTS.join(", ")}, take. Playing normally.`);
       chart = bot === "fever" ? feverChart(c) : c;
+      pedal = null;
+      const song = params.get("song") ?? "";
+      const token = ++load;
+      if (bot && song)
+        void loadPedal(song).then((p) => {
+          if (token !== load || !p) return;
+          pedal = p;
+          // Read after the bot started: only what is still ahead of the piano, which runs up to lookaheadMs ahead.
+          if (zeroPerf !== null && emit)
+            enqueue(pedalQueue(Math.max(fromMs, performance.now() - perfOf(0), lastStamp - zeroPerf)));
+        });
       return chart;
     },
     onEvent(e) {

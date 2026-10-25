@@ -93,16 +93,26 @@ const start = (page) => page.getByRole("button", { name: "Start" }).click({ time
 const results = (page) => page.getByTestId("results").waitFor({ timeout: 120_000 });
 const atHome = (page) => new URL(page.url()).pathname === "/";
 const twinkle = "/play?song=twinkle&bot=perfect&beat=off";
+// /play's latency is in the start screen's Options drawer (duo-start): open it (again until hydrated), return its value.
+const playLatency = async (page) => {
+  const drawer = page.getByTestId("options");
+  for (let i = 0; i < 20 && !(await drawer.evaluate((d) => d.open).catch(() => false)); i++) {
+    await page.getByTestId("options-open").click({ timeout: 30_000 });
+    await page.waitForTimeout(500);
+  }
+  return page.getByTestId("opt-latency-value");
+};
 
 try {
   // 1. Shift+Esc mid-take.
   let page = await fresh();
   await goto(page, "/play?song=twinkle");
-  const output = page.locator("label output").first();
+  const output = await playLatency(page);
   for (let i = 0; i < 20 && (await output.innerText({ timeout: 30_000 })) !== "37 ms"; i++) {
-    await page.locator('input[type="range"]').first().fill("37"); // again until hydrated: before, React resets it to 0
+    await page.locator("#opt-latency").fill("37"); // again until hydrated: before, React resets it to 0
     await page.waitForTimeout(500);
   }
+  await page.keyboard.press("Escape");
   check((await output.innerText()) === "37 ms", `the latency offset is set to ${await output.innerText()} on /play`);
   await goto(page, twinkle);
   await start(page);
@@ -115,7 +125,7 @@ try {
   check(offs.size === 16, `All Notes Off on ${offs.size} of 16 channels`);
   await page.screenshot({ path: join(out, "1-reset-home.png") });
   await goto(page, "/play?song=twinkle");
-  const latency = await page.locator("label output").first().innerText({ timeout: 30_000 });
+  const latency = await (await playLatency(page)).innerText({ timeout: 30_000 });
   check(latency === "37 ms", `the latency offset survives: ${latency}`);
   await page.close();
 

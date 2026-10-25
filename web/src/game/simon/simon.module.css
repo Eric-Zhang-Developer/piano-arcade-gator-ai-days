@@ -1,12 +1,13 @@
-/* Simon Says (spec: simon-says-spike): visual-direction.md's tokens, one quiet page over the sky. */
+/* Simon Says (spec: simon-says-spike) in the Duo kit (visual-direction.md): upright condensed type, the kit's chips
+   and primary button, small mono caps for status. */
 .page {
   box-sizing: border-box;
   height: 100vh;
   display: grid;
   grid-template-rows: auto 1fr auto;
   gap: 2vh;
-  padding: 4vh 4vw;
-  background: radial-gradient(ellipse at 50% 120%, rgba(255, 63, 164, 0.18), transparent 60%), var(--pa-sky);
+  padding: calc(4vh + 16px) 4vw 4vh; /* the top 4vh is the nav bar's band (nav-bar) */
+  background: var(--pa-bg);
   color: var(--pa-ink);
   overflow: hidden;
 }
@@ -19,25 +20,36 @@
   gap: 1em 2em;
 }
 
+/* The select's wordmark (select-layout): wide-tracked caps after a slanted bar in the primary. */
 .mark {
   margin: 0;
-  font: italic 900 clamp(32px, 4.4vw, 64px) / 1 var(--pa-font-display);
-  letter-spacing: 0.02em;
+  font: 700 clamp(32px, 4.4vw, 64px) / 1 var(--pa-font-display);
+  letter-spacing: 0.08em;
 }
 
+.mark::before {
+  content: "";
+  display: inline-block;
+  width: 0.22em;
+  height: 0.78em;
+  margin-right: 0.5em;
+  background: var(--pa-primary);
+  transform: skewX(-18deg);
+}
+
+/* The song picker: the kit's chips (kitChip), the song in force lit. */
 .songs {
   display: flex;
-  gap: 1.4em;
+  flex-wrap: wrap;
+  gap: 0.4em;
 }
 
 .songs a {
-  color: var(--pa-ink-dim);
   text-decoration: none;
-  font-weight: 600;
 }
 
-.songs a[aria-current] {
-  color: var(--pa-cyan);
+.songs a:not([aria-current]):hover {
+  border-color: var(--pa-ink-dim) !important; /* over kitChip's inline hairline */
 }
 
 .stage {
@@ -50,7 +62,8 @@
 
 .call {
   margin: 0;
-  font: italic 800 clamp(24px, 3.2vw, 48px) / 1.15 var(--pa-font-display);
+  font: 700 clamp(24px, 3.2vw, 48px) / 1.15 var(--pa-font-display);
+  font-stretch: 75%;
   text-align: center;
   max-width: 28ch;
 }
@@ -77,10 +90,9 @@
 }
 
 .dots span {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2px solid var(--pa-ink-dim);
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--pa-ink-dim);
 }
 
 .dots span[data-done] {
@@ -88,9 +100,10 @@
   border-color: var(--pa-hand-r);
 }
 
+/* The game's only play surface, so it grows with the screen (#1040): six whites span half the stage at 1920. */
 .keys {
   display: flex;
-  height: clamp(140px, 30vh, 280px);
+  height: clamp(140px, 38vh, 440px);
   max-width: 92vw;
 }
 
@@ -100,13 +113,13 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding-bottom: 12px;
-  font: 700 18px/1 var(--pa-font-display);
+  padding-bottom: 0.7em;
+  font: 700 clamp(18px, 1.6vw, 32px) / 1 var(--pa-font-display);
   transition: background 60ms linear;
 }
 
 .white {
-  width: clamp(36px, 5vw, 72px);
+  width: clamp(36px, 7.6vw, 160px);
   margin-right: 3px;
   border-radius: 0 0 8px 8px;
   background: var(--pa-tier-x1);
@@ -123,12 +136,12 @@
   border-radius: 0 0 6px 6px;
   background: #16161c;
   color: var(--pa-ink-dim);
-  font-size: 14px;
+  font-size: clamp(14px, 1.25vw, 24px);
 }
 
 .white[data-held],
 .black[data-held] {
-  background: var(--pa-cyan);
+  background: var(--pa-primary);
   color: #000;
 }
 
@@ -144,29 +157,25 @@
   background: var(--pa-wrong);
 }
 
+/* The kit's primary button (Button), a size up: it's the page's one action. */
 .again {
-  font: italic 800 22px/1 var(--pa-font-display);
-  padding: 14px 36px;
-  border: 2px solid var(--pa-magenta);
-  border-radius: 8px;
-  background: transparent;
-  color: var(--pa-ink);
-  cursor: pointer;
+  min-width: 12em;
+  font-size: clamp(14px, 1.1vw, 20px) !important; /* over the kit's inline 14 px */
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
-.again kbd {
-  margin-left: 0.6em;
-  font: 600 13px/1 system-ui;
-  color: var(--pa-ink-dim);
-}
-
+/* Status in the kit's small mono caps. */
 .foot {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   gap: 2em;
   color: var(--pa-ink-dim);
-  font-size: 14px;
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: clamp(12px, 0.85vw, 16px);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .foot p {

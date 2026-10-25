@@ -1,32 +1,24 @@
 // CI's browser job (specs/features/ci-browser/spec.md): pick the headless checks a change needs, split them across
-// shards, run them one at a time, and rerun each failure once. A pass on the rerun is `flaky`; two failures fail the
-// shard. Node stdlib only, so `--list` runs before `pnpm install` and an empty shard skips the Chromium install.
+// shards, run them one at a time. On main a failure reruns once (a pass on the rerun is `flaky`; two failures fail
+// the shard); on a pull request the first failure fails it. Node stdlib only, so `--list` runs before
+// `pnpm install` and an empty shard skips the Chromium install.
 // Usage (from anywhere in the repo):
 //   node web/e2e/run-checks.mjs --list [--base <ref> | --all] [--shard i/n]   print the selected checks, one per line
 //   node web/e2e/run-checks.mjs --out <dir> [--base <ref> | --all] [--shard i/n]   run them
-// --base <ref>: verify.mjs plus the checks nearest each file changed since <ref>, or every check when shared code
-// changed. --all (or no --base): every check.
+// --base <ref>: the smoke check (verify.mjs) alone, or every check when the runner or workflow changed since <ref>.
+// --all (or no --base): every check. A PR and a push to main use --base; the full run (schedule, by hand) uses --all.
 import { execFileSync, spawn } from "node:child_process";
-import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const MAIN_CHECK = "web/e2e/verify.mjs";
 const say = (s) => process.stdout.write(`${s}\n`);
 
-// Code every screen runs through: a change here can break any check, so every check runs.
-export const SHARED = [
-  "web/src/game/core/",
-  "web/src/contracts/",
-  "web/src/app/",
-  "web/src/game/layers.ts",
-  "web/e2e/",
-  "web/package.json",
-  "web/pnpm-lock.yaml",
-  "web/next.config.ts",
-  "web/public/songs/twinkle/",
-  ".github/workflows/ci.yml",
-];
+// The paths whose change runs every check on a pull request or a push: the runner and the workflow themselves.
+// Everything else gets the smoke check only; the full suite runs every 30 min and by hand (Eric, 2026-10-25;
+// decision ci-browser-pr-scope.md).
+export const FULL_RUN = ["web/e2e/", ".github/workflows/ci.yml"];
 // The runner's own ceiling, so a hung check still fails its shard (and uploads evidence) inside the job's 20 min.
 // Not a check's timeout: decision ci-browser-check-timeout.md.
 const CHECK_TIMEOUT_MS = 8 * 60_000;
@@ -34,38 +26,63 @@ const CHECK_TIMEOUT_MS = 8 * 60_000;
 // the shard. Check -> its issue. The list only shrinks: an entry leaves after its check passes 2 browser runs in a
 // row that include the fix (one green run can be luck).
 // Decision ci-browser-known-red.md.
-export const KNOWN_RED = {};
+// 2026-10-25: nine checks that went red unseen while main's full run didn't fire (#1021), each red on main's own run
+// 40187861996 and not yet fixed on main, pointing at its fix PR (or #754, the ci-red issue, where none exists yet).
+export const KNOWN_RED = {
+  "web/src/game/duo-results/verify-results.mjs": 754, // a localStorage page error, under repro
+  "web/src/game/first-run/verify-first-run.mjs": 1148, // reads Start by its tag; #1100 gave it an id (main's run 40192807028)
+  "web/src/game/ghost/verify-ghost.mjs": 1032, // stale after judging-tiers' +60 ms late bot (#859)
+  "web/src/game/hand-mode/verify-hands.mjs": 754, // chart zero -2.1 ms from the first kick (PR run 40194634606)
+  "web/src/game/learn-from-select/verify-learn.mjs": 1025, // the ? card repeats the Learn line (#796)
+  "web/src/game/records/verify-records.mjs": 754, // failed its first attempt on main too: red on any one-attempt PR
+  "web/src/game/results-landing/verify-landing.mjs": 754, // `results` of undefined: drift since #978 (PR run 40194634606)
+  "web/src/game/sheet-beams/verify-beams.mjs": 1053, // the paper's darker hues (#730)
+  "web/src/game/song-finder/verify-finder.mjs": 754, // focus on BODY after the reload (#1074 and #1124 runs)
+  "web/src/game/song-options/verify-options.mjs": 1066, // a focus before hydration is lost (the check races song-finder)
+  "web/src/game/take-graph/verify-take-graph.mjs": 1032, // the +60 ms late bot (#859), the graph across its card (#839)
+  "web/src/game/wait-mode/verify-wait.mjs": 1034, // the Flow rung read mid-take (#841)
+  "web/src/game/watch-demo/verify-watch.mjs": 1100, // AutoStart clicks the first button, not Start, since #763
+  "web/src/game/x/highlight-reel/verify-highlight.mjs": 754, // a 14.854 s fallback reel, want 15.0 ± 0.1 (PR run 40194634606)
+};
 
-/** Every check: verify.mjs first, then each verify*.mjs under web/src/, sorted. `files` are repo-relative paths. */
+// Checks CI skips because other checks cover them in smaller pieces. Each stays a whole run for people and specs.
+// verify-sheet.mjs: verify-sheet-a/-b/-c.mjs run its follow run split by song (#682), so no shard waits 7 min on it.
+export const NOT_IN_CI = ["web/src/game/sheet-view/verify-sheet.mjs"];
+
+/** Every check: verify.mjs first, then each verify*.mjs under web/src/ not in NOT_IN_CI, sorted. Repo-relative paths. */
 export function allChecks(files) {
-  const feature = files.filter((f) => f.startsWith("web/src/") && /\/verify[^/]*\.mjs$/.test(f)).sort();
+  const feature = files.filter((f) => f.startsWith("web/src/") && /\/verify[^/]*\.mjs$/.test(f) && !NOT_IN_CI.includes(f)).sort();
   return [MAIN_CHECK, ...feature];
 }
 
-/**
- * The checks a change needs: verify.mjs, plus for each changed file under web/src/ the checks of the nearest folder
- * (its own, then each parent) that has any. Every check when a SHARED path changed.
- */
+/** The checks a change needs: the smoke check alone, or every check when a FULL_RUN path changed. */
 export function selectChecks(checks, changed) {
-  if (changed.some((f) => SHARED.some((s) => f === s || (s.endsWith("/") && f.startsWith(s))))) return checks;
-  const byFolder = Map.groupBy(checks.filter((c) => c !== MAIN_CHECK), (c) => dirname(c));
-  const picked = new Set([MAIN_CHECK]);
-  for (const f of changed.filter((f) => f.startsWith("web/src/"))) {
-    for (let dir = dirname(f); dir.startsWith("web/src"); dir = dirname(dir)) {
-      const here = byFolder.get(dir);
-      if (here) {
-        here.forEach((c) => picked.add(c));
-        break;
-      }
-    }
-  }
-  return checks.filter((c) => picked.has(c));
+  const full = changed.some((f) => FULL_RUN.some((s) => f === s || (s.endsWith("/") && f.startsWith(s))));
+  return full ? checks : checks.filter((c) => c === MAIN_CHECK);
 }
 
-/** Shard i of n (1-based): the entries whose index mod n is i - 1. */
-export function shard(checks, i, n) {
+// Each check's seconds on CI (its passing attempt in main's full run 40187861996, 2026-10-25; a check that failed there
+// keeps its last passing time, since a failure's seconds are a timeout), to balance the shards; a check not in the
+// table counts DEFAULT_SECONDS, about the median. Refresh it from a full run's logs when a shard nears the job's 20 min.
+export const SECONDS = JSON.parse(readFileSync(new URL("./run-checks.seconds.json", import.meta.url), "utf8"));
+export const DEFAULT_SECONDS = 90;
+
+/**
+ * Shard i of n (1-based), balanced by time: longest check first, each onto the shard with the fewest seconds so far
+ * (the lower shard on a tie). Round-robin by index put 17 of the 84 minutes in one shard, past the 20 min job (#673).
+ * Every runner computes the same split from the same list. A shard keeps the list's order.
+ */
+export function shard(checks, i, n, seconds = SECONDS) {
   if (!(Number.isInteger(i) && Number.isInteger(n) && n >= 1 && i >= 1 && i <= n)) throw new Error(`bad shard ${i}/${n}`);
-  return checks.filter((_, k) => k % n === i - 1);
+  const cost = (c) => seconds[c] ?? DEFAULT_SECONDS;
+  const load = new Array(n).fill(0);
+  const owner = new Map();
+  for (const c of [...checks].sort((a, b) => cost(b) - cost(a) || (a < b ? -1 : 1))) {
+    const k = load.indexOf(Math.min(...load));
+    load[k] += cost(c);
+    owner.set(c, k);
+  }
+  return checks.filter((c) => owner.get(c) === i - 1);
 }
 
 // One check in its own process group, so a server it leaves behind (on a timeout, say) is stopped too. Its output
@@ -106,16 +123,20 @@ function runOnce(root, check, out) {
 }
 
 /**
- * Run each check once, rerun a failure once into a fresh folder. Returns [{ check, result, seconds, knownRed? }], and
- * keeps them with the shard in <out>/results.json, rewritten after each check so a job cut short keeps what ran.
+ * Run each check once; with `attempts` 2, rerun a failure once into a fresh folder. A known-red check gets one
+ * attempt whatever `attempts` says: it doesn't gate, so its rerun only spends the shard's time. Returns
+ * [{ check, result, seconds, knownRed? }], and keeps them with the shard in <out>/results.json, rewritten after each
+ * check so a job cut short keeps what ran.
  */
-export async function runChecks(root, checks, out, shardLabel = "1/1") {
+export async function runChecks(root, checks, out, shardLabel = "1/1", attempts = 2, knownRed = KNOWN_RED) {
   const rows = [];
   for (const check of checks) {
     const name = check.replace(/\.mjs$/, "").replaceAll("/", "_");
     const start = Date.now();
     let result = "FAIL";
-    for (const attempt of [1, 2]) {
+    const issue = knownRed[check];
+    const tries = issue ? 1 : attempts;
+    for (let attempt = 1; attempt <= tries; attempt++) {
       const dir = join(out, attempt === 1 ? name : `${name}-retry`);
       mkdirSync(dir, { recursive: true });
       say(`::group::${check}${attempt === 2 ? " (retry)" : ""}`);
@@ -126,15 +147,18 @@ export async function runChecks(root, checks, out, shardLabel = "1/1") {
         break;
       }
     }
-    const issue = KNOWN_RED[check];
     if (issue) say(`::warning title=known red #${issue}::${check}: ${result === "FAIL" ? "fail" : "pass"}`);
     else if (result === "flaky") say(`::warning title=flaky::flaky: ${check}`);
-    else if (result === "FAIL") say(`::error title=FAIL::${check} failed twice`);
+    else if (result === "FAIL") say(`::error title=FAIL::${check} failed${tries > 1 ? " twice" : ""}`);
     rows.push({ check, result, seconds: Math.round((Date.now() - start) / 1000), ...(issue && { knownRed: issue }) });
     writeFileSync(join(out, "results.json"), `${JSON.stringify({ shard: shardLabel, rows }, null, 2)}\n`);
   }
   return rows;
 }
+
+// One attempt on a pull request (GitHub sets GITHUB_EVENT_NAME), two on main: a PR's failure is its author's to read
+// at once, and only 1 of ~520 sampled check runs passed on a rerun; main keeps the rerun so a flake can't redden it.
+export const retriesFor = (env) => (env.GITHUB_EVENT_NAME === "pull_request" ? 1 : 2);
 
 /** The shard's exit code: 0 when every check passed (flaky counts as passed) or is known red, 1 otherwise. */
 export const exitCode = (rows) => (rows.some((r) => r.result === "FAIL" && !r.knownRed) ? 1 : 0);
@@ -162,7 +186,7 @@ async function main() {
     return 2;
   }
   const start = Date.now();
-  const rows = await runChecks(root, picked, resolve(outArg), `${i}/${n}`);
+  const rows = await runChecks(root, picked, resolve(outArg), `${i}/${n}`, retriesFor(process.env));
   const lines = [
     ...rows.map((r) => `${r.check} ${r.knownRed ? `known red #${r.knownRed}: ${r.result === "FAIL" ? "fail" : "pass"}` : r.result} ${r.seconds} s`),
     `shard ${i}/${n}: ${rows.length} check(s) in ${Math.round((Date.now() - start) / 1000)} s`,

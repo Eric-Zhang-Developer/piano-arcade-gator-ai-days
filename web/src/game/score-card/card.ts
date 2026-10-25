@@ -1,9 +1,10 @@
 // The score card (spec: score-card): a take as one 1920×1080 image. cardModel is pure (every string and color the
 // card shows); drawCard paints a model on a 2D canvas and draws each string once.
 import type { Chart, Rank, Results } from "../../contracts";
+import { APP_NAME } from "../app-name";
 import { countRows } from "../results-layout";
 import { jacketFor, type Jacket } from "../song-jacket";
-import { bg, cyan, gold, good, ink, inkDim, magenta, miss, wrong } from "../ui-tokens";
+import { bg, cyan, gold, good, ink, inkDim, miss, primary, wrong } from "../ui-tokens";
 
 export const CARD_W = 1920;
 export const CARD_H = 1080;
@@ -71,7 +72,7 @@ export function cardModel(chart: Chart, results: Results, score: number, date: D
 }
 
 // The labels the card draws besides the model's strings.
-export const CARD_LABELS = ["SCORE", "ACCURACY", "MAX COMBO", "PIANO ARCADE"];
+export const CARD_LABELS = ["SCORE", "ACCURACY", "MAX COMBO", APP_NAME];
 
 type Ctx = Pick<
   CanvasRenderingContext2D,
@@ -92,11 +93,13 @@ type Ctx = Pick<
 
 /**
  * The card, on a 1920×1080 context. `display` is the display face's CSS family (Saira), with fallbacks: numbers and
- * titles use it, labels use system-ui. Nothing is under 24 px.
+ * titles use it, upright as on the results screen (no italic in the Duo look; the jacket keeps SongJacket's). `data`
+ * is the kit's mono data face, for the labels, as the results screen sets them. Nothing is under 24 px. Hype pink
+ * stays off: a saved card is a record of the take, not one of its moments.
  */
-export function drawCard(ctx: Ctx, m: CardModel, display = "system-ui, sans-serif"): void {
-  const face = (weight: number, px: number, italic = true) => `${italic ? "italic " : ""}${weight} ${px}px ${display}`;
-  const label = (px: number) => `600 ${px}px system-ui, sans-serif`;
+export function drawCard(ctx: Ctx, m: CardModel, display = "system-ui, sans-serif", data = "ui-monospace, monospace"): void {
+  const face = (weight: number, px: number) => `${weight} ${px}px ${display}`;
+  const label = (px: number) => `500 ${px}px ${data}`;
   const text = (s: string, x: number, y: number, font: string, color: string, align: CanvasTextAlign = "left") => {
     ctx.font = font;
     ctx.fillStyle = color;
@@ -131,7 +134,8 @@ export function drawCard(ctx: Ctx, m: CardModel, display = "system-ui, sans-seri
   ctx.fillStyle = grad;
   ctx.fillRect(J.x, J.y, J.s, J.s);
   // The CSS line box ends 10% below the square; its baseline sits about a fifth of the font size above that.
-  text(m.jacket.word, J.x - J.s * 0.04, J.y + J.s * (1.1 - 0.56 * 0.2), face(900, Math.round(J.s * 0.56)), m.jacket.text);
+  // Italic only here: the jacket is SongJacket's artwork (its .word is italic), so the card shows the same sleeve.
+  text(m.jacket.word, J.x - J.s * 0.04, J.y + J.s * (1.1 - 0.56 * 0.2), `italic ${face(900, Math.round(J.s * 0.56))}`, m.jacket.text);
   ctx.restore();
 
   // The right column, on the jacket's top and bottom edges: the song, then the rank with its numbers beside it, then
@@ -139,12 +143,12 @@ export function drawCard(ctx: Ctx, m: CardModel, display = "system-ui, sans-seri
   const R = { x: 1000, w: 800 };
   text(m.title, R.x, J.y + 55, fit(m.title, 800, 76, R.w), ink); // cap height ~0.72 em: its top on the jacket's
   text(m.composer, R.x, J.y + 108, `400 32px system-ui, sans-serif`, inkDim);
-  ctx.fillStyle = magenta;
+  ctx.fillStyle = primary;
   ctx.fillRect(R.x, J.y + 138, 120, 6);
   if (m.practice) text(m.practice, R.x, J.y + 196, face(800, 34), cyan);
 
   const RANK_BASE = 720;
-  text(m.rank, R.x - 16, RANK_BASE, face(900, 420), gold); // italic: pulled left so its foot sits on the column edge
+  text(m.rank, R.x, RANK_BASE, face(900, 420), gold);
   const stats: [string, string][] = [
     ["SCORE", m.score],
     ["ACCURACY", m.accuracy],
@@ -164,6 +168,6 @@ export function drawCard(ctx: Ctx, m: CardModel, display = "system-ui, sans-seri
   });
 
   // The bottom line: the date under the jacket, the name in the far corner.
-  text(m.date, J.x, J.y + J.s + 70, face(700, 32, false), inkDim);
-  text("PIANO ARCADE", R.x + R.w, J.y + J.s + 70, face(900, 28), magenta, "right");
+  text(m.date, J.x, J.y + J.s + 70, face(700, 32), inkDim);
+  text(APP_NAME, R.x + R.w, J.y + J.s + 70, face(800, 32), ink, "right");
 }

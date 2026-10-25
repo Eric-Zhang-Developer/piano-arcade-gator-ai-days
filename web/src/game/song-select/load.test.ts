@@ -1,7 +1,8 @@
-import { cpSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "vitest";
+import { validateChart } from "../../contracts";
 import { loadSongs } from "./load";
 
 const songs = new URL("../../../public/songs", import.meta.url).pathname;
@@ -27,7 +28,9 @@ test("finds charts at any depth, sorted by level then title, and skips and repor
 
   const { songs: found, invalid } = loadSongs(dir);
   expect(found.map((s) => s.id)).toEqual(["library/bach", "twinkle"]);
-  expect(found[0]).toEqual({ id: "library/bach", title: "A Minuet", composer: "Bach", catalog: undefined, noteCount: 1, level: 1 });
+  expect(found[0]).toEqual({ id: "library/bach", title: "A Minuet", composer: "Bach", catalog: undefined, noteCount: 1, level: 1, roll: expect.objectContaining({ rows: 1 }), key: expect.objectContaining({ tonic: expect.any(Number) }) });
+  expect(found[1].key).toEqual({ tonic: 0, mode: "major" }); // Twinkle, in C
+  expect(found[0].roll.bars).toHaveLength(1);
   expect(invalid.map((i) => i.path).sort()).toEqual([join("broken", "chart.json"), join("garbled", "chart.json")]);
   expect(invalid.every((i) => i.problems.length > 0)).toBe(true);
 });
@@ -39,4 +42,14 @@ test("the real library is sorted easiest first, Twinkle at the top", () => {
     const [a, b] = [found[i - 1], found[i]];
     expect(a.level < b.level || (a.level === b.level && a.title.localeCompare(b.title) <= 0), `${a.id} before ${b.id}`).toBe(true);
   }
+});
+
+test("experiment-only charts under songs/x/ and songs/rounds/ stay off the select, and stay where /play fetches them (#1165)", () => {
+  const dir = mkdtempSync(join(tmpdir(), "songs-"));
+  cpSync(join(songs, "twinkle"), join(dir, "twinkle"), { recursive: true });
+  cpSync(join(songs, "twinkle"), join(dir, "x", "demo"), { recursive: true });
+  cpSync(join(songs, "twinkle"), join(dir, "rounds", "demo"), { recursive: true });
+  expect(loadSongs(dir).songs.map((s) => s.id)).toEqual(["twinkle"]);
+  // /play?song=x/demo fetches /songs/x/demo/chart.json: the chart is still there and still valid.
+  expect(validateChart(JSON.parse(readFileSync(join(dir, "x", "demo", "chart.json"), "utf8")))).toEqual([]);
 });

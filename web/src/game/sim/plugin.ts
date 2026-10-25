@@ -40,7 +40,9 @@ function connect(simId: string) {
     if (m.type === "bot") {
       // Start (or Retry) the game; the bot plays from its songStart. Mid-song, it waits for the next start.
       botArmed = true;
-      document.querySelector<HTMLButtonElement>("main button")?.click();
+      // Start by its id, or Retry by its name: since duo-start (#763) neither is the first button on its screen.
+      const start = document.querySelector<HTMLButtonElement>("[data-testid=start]");
+      (start ?? [...document.querySelectorAll<HTMLButtonElement>("main button")].find((b) => b.textContent?.trim() === "Retry"))?.click();
     }
   };
   post({ simId, type: "ready" });

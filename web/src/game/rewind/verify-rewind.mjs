@@ -146,22 +146,15 @@ try {
   await holdsAt(page, 0, "chunk step, ← in its second bar");
   await page.close();
 
-  // The start-screen hint, at both sizes; plain mode has none.
+  // No start-screen hint in either mode: ← → is on the ? card instead (duo-start, #772). Shots at both sizes.
   for (const [w, h] of [[1280, 720], [1920, 1080]]) {
     page = await newPage(w, h);
     await goto(page, "/play?song=twinkle&mode=wait");
-    const hint = page.getByTestId("rewind-hint");
-    const shown = await hint.waitFor({ timeout: 60_000 }).then(() => true, () => false);
-    check(shown && (await hint.innerText()).includes("back or ahead a bar"), `${w}×${h} wait-mode start screen: the ← → hint`);
+    await page.getByRole("button", { name: "Start", exact: true }).waitFor({ timeout: 60_000 });
+    check((await page.getByTestId("rewind-hint").count()) === 0, `${w}×${h} wait-mode start screen: no ← → hint`);
     await page.screenshot({ path: join(out, `start-${w}.png`) });
     await page.close();
   }
-  page = await newPage();
-  await goto(page, "/play?song=twinkle");
-  await page.waitForLoadState("networkidle");
-  await page.waitForTimeout(1000); // the start panel's slots have rendered
-  check((await page.getByTestId("rewind-hint").count()) === 0, "plain start screen: no hint");
-  await page.close();
 } catch (e) {
   check(false, `error: ${e.message}`);
 } finally {

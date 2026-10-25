@@ -63,7 +63,7 @@ screen where the tutor visibly decides", and this screen is that moment. Every n
 - **The template line,** from the take only:
   - `Your {left|right} hand {drags|rushes} in bars X–Y, about N ms {late|early}.` when one hand's mean offset in that
     run is past ±20 ms;
-  - else `Bars X–Y were your weakest: N% of notes right.`;
+  - else `Bars X–Y were your weakest: N% accuracy.`, adding `, every note hit but off the beat` when the run has no MISS or WRONG (accuracy is the judge's weighted score, not a count of notes right);
   - then `Let's loop just those bars at 70%, then play it through.`;
   - with no weak run (every bar at least 95%), `Clean take. Try it faster, or pick the next song.`, and the primary
     button becomes `NEXT SONG`.
@@ -83,8 +83,9 @@ screen where the tutor visibly decides", and this screen is that moment. Every n
 2. Headless, once, under `verify.lock`:
    `python3 .agents/scripts/verify.py --slug duo-results --worktree . --cmd "node {worktree}/web/src/game/duo-results/verify-results.mjs --out {out}"`.
    It prints `verify-results: pass` or names each failed step:
-   1. `/play?song=fur-elise&bot=rank-c&input=test` to the end: the six cells read the same numbers as
-      `__pianoArcade.results`, and the strip has one cell per bar.
+   1. `/play?song=fur-elise&input=test` to the end, every note pressed through the test hook except two in three of
+      bars 9–12: the six cells read the same numbers as `__pianoArcade.results`, the strip has one cell per bar, and
+      the bracket is on bars 9–12. (Was the rank-c bot: a bot's take has no known weak run to check the bracket against.)
    2. `PRACTICE BARS X–Y` opens a `/play` URL with `from=X&to=Y&tempo=70`, matching the bracket.
    3. Screenshots `results.png` at 1280×720 and 1920×1080, plus reduced motion, with no page scroll.
 3. Eric plays one take on the DGX: does the tutor line name bars he'd agree were his weakest? Mark it in the done

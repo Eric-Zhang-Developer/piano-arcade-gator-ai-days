@@ -6,7 +6,9 @@ import { createElement, useEffect, useRef, type CSSProperties } from "react";
 import type { Chart, GamePlugin, Results, Take } from "../../contracts";
 import { adaptSettings, adaptState, adaptUrl, next, songPhrases, start, takeResult, type AdaptState, type Step as AdaptStep } from "../adaptive-chunks/next";
 import { Strip } from "../adaptive-chunks/Strip";
+import { kitButton } from "../duo-tokens";
 import { isWaitMode } from "../wait-mode";
+import { playMode } from "../play-modes/modes";
 import { scorePhrases, type Phrase } from "../weak-bars";
 import { barsLabel, chunkSettings, chunksOf, isPlainTake, nextAfter, practiceStep, stepUrl, wholeSongUrl, type Chunk, type Step } from "./chunks";
 import styles from "./chunk-practice.module.css";
@@ -64,10 +66,10 @@ export function chunkPractice(): GamePlugin {
     },
     startPanel: ({ params }) => {
       if (adapt) return createElement(AdaptLine, { list: phraseList, state: adapt, learn: isWaitMode(params) });
-      if (at) return createElement(StepLine, { index: at.index, of: list.length, step: at.step });
+      if (at) return createElement(StepLine, { index: at.index, of: list.length, step: at.step, flow: playMode(params) === "flow" });
       if (!isPlainTake(params) || !phraseList.length) return null;
       return (
-        <a data-testid="chunk-start" className={styles.ghost} href={adaptUrl(params, phraseList, start(phraseList))}>
+        <a data-testid="chunk-start" {...kitButton("secondary")} href={adaptUrl(params, phraseList, start(phraseList))}>
           Practice in chunks
         </a>
       );
@@ -130,11 +132,11 @@ function AdaptAfter(props: { chart: Chart; params: URLSearchParams; take: Take; 
         <span className={styles.dim}>{pass ? pct : `· ${Math.round(adaptSettings.passAccuracy * 100)}% to pass`}</span>
       </p>
       <Strip list={list} from={state.from} to={state.to} scores={new Map(r.phrases.map((p) => [p.from, p.accuracy]))} />
-      <a ref={ref} data-testid="adapt-next" className={styles.next} href={href}>
+      <a ref={ref} data-testid="adapt-next" {...kitButton("primary")} href={href}>
         {text}
       </a>
-      {step === "floor" && tempo > adaptSettings.slowTempo && (
-        <a data-testid="adapt-slower" className={styles.ghost} href={url(to, adaptSettings.slowTempo)}>
+      {step === "floor" && tempo > adaptSettings.slowTempo && playMode(params) !== "flow" && (
+        <a data-testid="adapt-slower" {...kitButton("secondary")} href={url(to, adaptSettings.slowTempo)}>
           Slower: {adaptSettings.slowTempo}%
         </a>
       )}
@@ -142,7 +144,7 @@ function AdaptAfter(props: { chart: Chart; params: URLSearchParams; take: Take; 
   );
 }
 
-function StepLine({ index, of, step }: { index: number; of: number; step: Step }) {
+function StepLine({ index, of, step, flow }: { index: number; of: number; step: Step; flow: boolean }) {
   return (
     <div className={styles.step} data-testid="chunk-step">
       <ol className={styles.pips} aria-hidden>
@@ -151,13 +153,14 @@ function StepLine({ index, of, step }: { index: number; of: number; step: Step }
         ))}
       </ol>
       <p className={styles.line} data-testid="chunk-line">
-        Chunk {index + 1} of {of} · {step === "learn" ? "learn" : `play at ${chunkSettings.tempo}%`}
+        Chunk {index + 1} of {of} · {step === "learn" ? "learn" : flow ? "play in Flow" : `play at ${chunkSettings.tempo}%`}
       </p>
     </div>
   );
 }
 
-function AfterPlay({ params, results, list, index }: { params: URLSearchParams; results: Results; list: Chunk[]; index: number }) {
+// Exported for its kit test.
+export function AfterPlay({ params, results, list, index }: { params: URLSearchParams; results: Results; list: Chunk[]; index: number }) {
   const go = nextAfter(list, index, results.accuracy);
   const ref = useRef<HTMLAnchorElement>(null);
   // An effect runs after Retry's autoFocus, so the way on takes focus and Enter moves on. The panel is featured in the
@@ -174,7 +177,7 @@ function AfterPlay({ params, results, list, index }: { params: URLSearchParams; 
         <p className={styles.verdict}>
           <span className={styles.clear}>Chunk {index + 1} clear</span> <span className={styles.dim}>{pct}</span>
         </p>
-        <a ref={ref} data-testid="chunk-next" className={styles.next} href={"next" in go ? stepUrl(params, go.next, "learn") : wholeSongUrl(params)}>
+        <a ref={ref} data-testid="chunk-next" {...kitButton("primary")} href={"next" in go ? stepUrl(params, go.next, "learn") : wholeSongUrl(params)}>
           {"next" in go ? `Next: ${barsLabel(go.next)}` : "Play the whole song"}
         </a>
       </div>
@@ -188,7 +191,7 @@ function AfterPlay({ params, results, list, index }: { params: URLSearchParams; 
         <span className={styles.fill} />
         <span className={styles.gate} />
       </div>
-      <a data-testid="chunk-again" className={styles.ghost} href={stepUrl(params, list[index], "learn")}>
+      <a data-testid="chunk-again" {...kitButton("secondary")} href={stepUrl(params, list[index], "learn")}>
         Learn {barsLabel(list[index])} again
       </a>
     </div>

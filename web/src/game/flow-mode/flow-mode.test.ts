@@ -202,9 +202,9 @@ describe("steadiness", () => {
 
   it("the headline: right notes, the word, the slips", () => {
     const { judge, results } = run(twinkle, steadyPlayer(twinkle, 1));
-    expect(headline(results, judge.slips, judge.deviations)).toBe("100% right notes · steady · 0 slips");
+    expect(headline(results, judge.slips, judge.deviations, judge.heldTempo)).toBe("Steady at 100% of tempo · 100% right notes · 0 slips");
     const k = 10;
     const skip = run(twinkle, player(twinkle, (_, beat) => beat * msPerBeat(twinkle.bpm), (i) => i === k));
-    expect(headline(skip.results, skip.judge.slips, skip.judge.deviations)).toBe(`${Math.round((100 * 41) / 42)}% right notes · steady · 1 slip`);
+    expect(headline(skip.results, skip.judge.slips, skip.judge.deviations)).toBe(`Steady · ${Math.round((100 * 41) / 42)}% right notes · 1 slip`);
   });
 });

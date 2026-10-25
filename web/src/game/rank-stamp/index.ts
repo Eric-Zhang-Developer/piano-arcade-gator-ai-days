@@ -22,9 +22,18 @@ export function stampScale(t: number): number {
 // Where the letter first reaches 1×, as a fraction of the stamp: back(t) = 1 at t = 1 - c1 / c3.
 export const impactT = 1 - c1 / c3;
 
+// results-landing's own stamp (behind ?x=results-landing) sets its times here, so juice-sound's rank hit and drumroll
+// and record-moment's NEW RECORD follow it without edits of their own. null: today's stamp.
+let landing: { stampStartMs: number; stampImpactMs: number; afterMs: number } | null = null;
+export function setStampTiming(times: typeof landing): void {
+  landing = times;
+}
+
 // When the stamp starts and when it hits, in ms after the results show (songEnd).
-export const stampStartMs = () => stampSettings.afterTallyMs;
-export const stampImpactMs = () => stampStartMs() + Math.round(impactT * stampSettings.durationMs);
+export const stampStartMs = () => landing?.stampStartMs ?? stampSettings.afterTallyMs;
+export const stampImpactMs = () => landing?.stampImpactMs ?? stampStartMs() + Math.round(impactT * stampSettings.durationMs);
+// When what follows the stamp arrives (record-moment's NEW RECORD): today, as the stamp ends.
+export const stampAfterMs = () => landing?.afterMs ?? stampStartMs() + stampSettings.durationMs;
 
 // The stamp as CSS keyframes, sampled from stampScale, so the page and the tests share one curve.
 export function stampKeyframes(name: string, steps = 12): string {

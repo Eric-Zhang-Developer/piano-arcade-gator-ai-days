@@ -1,0 +1,84 @@
+<!doctype html>
+<!-- Real Keys spike (spec: real-keys, Eric's morning-page asks 2 and 3): records a short camera clip of the DGX's keys
+     and logs every note-on and note-off on the recorder's own clock, for /real-keys?clip=1 and score.mjs.
+     Open this file on purpose (it's linked from nowhere). Frame the keys, not your face. The clip and its log download to
+     your Downloads folder: move them into spikes/real-keys/local/, which git ignores. Keep clips about 10 s. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Real Keys clip</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; padding: 24px; background: #030607; color: #e2e6f0; font: 16px/1.4 system-ui, sans-serif; }
+  video { width: 640px; max-width: 100%; background: #0a0d15; display: block; margin: 16px 0; }
+  select, input, button { font: 700 14px ui-monospace, monospace; padding: 10px 16px; margin-right: 8px; }
+  button { border: 1px solid #2b9bff; background: #2b9bff; color: #030607; cursor: pointer; }
+  button:disabled { opacity: 0.4; cursor: default; }
+  #cue { font: 800 32px/1.1 system-ui, sans-serif; margin: 16px 0; min-height: 1.2em; }
+  #plan { color: #7d8496; max-width: 60ch; }
+</style>
+</head>
+<body>
+<p id="plan">Latency clip: press one key 8 times, about once a second. Play clip: play anything. Name each one, e.g.
+latency-1, latency-2, latency-3, play.</p>
+<select id="cam"></select>
+<input id="name" value="latency-1" size="12" aria-label="Clip name">
+<input id="secs" type="number" value="10" min="4" max="20" aria-label="Seconds">
+<button id="go">Record</button>
+<video id="v" muted playsinline></video>
+<p id="cue">Pick the camera, then Record</p>
+<script>
+const $ = (id) => document.getElementById(id);
+const v = $("v"), cue = $("cue"), go = $("go"), cam = $("cam");
+const save = (blob, name) => { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click(); };
+let stream = null, t0 = null, notes = [];
+
+async function open(deviceId) {
+  stream?.getTracks().forEach((t) => t.stop());
+  stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: deviceId ? { exact: deviceId } : undefined, width: 1920, height: 1080, frameRate: { ideal: 60 } }, audio: false });
+  v.srcObject = stream;
+  await v.play();
+  const s = stream.getVideoTracks()[0].getSettings();
+  cue.textContent = `Camera gave ${s.width}×${s.height} at ${s.frameRate} fps`;
+}
+(async () => {
+  await open();
+  const devs = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "videoinput");
+  cam.replaceChildren(...devs.map((d) => new Option(d.label || "camera", d.deviceId)));
+  cam.onchange = () => open(cam.value);
+  // Every DGX note-on and note-off, on performance.now() counted from the recorder's start (≈ the clip's 0).
+  const midi = await navigator.requestMIDIAccess();
+  const listen = () => midi.inputs.forEach((i) => (i.onmidimessage = (e) => {
+    if (t0 === null) return;
+    const [st, pitch, vel] = e.data, kind = st & 0xf0;
+    if (kind !== 0x90 && kind !== 0x80) return;
+    notes.push({ t: Math.round((e.timeStamp - t0) * 10) / 10, type: kind === 0x90 && vel > 0 ? "on" : "off", pitch, velocity: vel });
+  }));
+  listen();
+  midi.onstatechange = listen;
+})().catch((e) => (cue.textContent = String(e)));
+
+go.onclick = () => {
+  go.disabled = true;
+  notes = [];
+  const name = $("name").value.trim() || "clip", secs = Math.max(4, Math.min(20, Number($("secs").value) || 10));
+  const rec = new MediaRecorder(stream, { mimeType: "video/webm" });
+  const chunks = [];
+  rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+  rec.onstart = () => (t0 = performance.now());
+  rec.onstop = () => {
+    t0 = null;
+    const s = stream.getVideoTracks()[0].getSettings();
+    save(new Blob(chunks, { type: "video/webm" }), `${name}.webm`);
+    save(new Blob([JSON.stringify({ note: "t in ms from MediaRecorder's start (≈ clip 0)", camera: { width: s.width, height: s.height, frameRate: s.frameRate }, notes }, null, 1)], { type: "application/json" }), `${name}.notes.json`);
+    cue.textContent = `Saved ${name}.webm and ${name}.notes.json (${notes.filter((n) => n.type === "on").length} presses): move both into spikes/real-keys/local/`;
+    go.disabled = false;
+  };
+  rec.start();
+  cue.textContent = `Recording ${secs} s…`;
+  setTimeout(() => rec.stop(), secs * 1000);
+};
+</script>
+</body>
+</html>

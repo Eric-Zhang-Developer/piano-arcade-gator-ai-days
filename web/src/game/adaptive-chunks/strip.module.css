@@ -1,8 +1,8 @@
-/* The adaptive strip, in visual-direction.md's tokens: chrome cyan and magenta for the window, MISS to PERFECT for a
-   take's phrases, never red. The cells are chunk-practice's skewed pips stretched to the whole song. */
+/* The adaptive strip, in the Duo look (visual-direction.md): square, upright, flat. The window lit in primary with ink
+   edges, a take's phrases MISS to PERFECT, never red. */
 
 .strip {
-  width: min(64vw, 1000px);
+  width: min(100%, 64vw, 1000px); /* never wider than its slot: on /play's start screen that's half the panel */
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -21,28 +21,25 @@
   flex: 1 1 0;
   min-width: 3px;
   height: clamp(12px, 1.8vh, 20px);
-  border-radius: 3px;
   background: rgb(242 242 245 / 0.14);
-  transform: skewX(-18deg);
   transition: background-color 200ms ease-out, box-shadow 200ms ease-out;
 }
 
 .lit {
-  background: var(--pa-cyan);
-  box-shadow: 0 0 10px rgb(39 225 255 / 0.55);
+  background: var(--pa-primary);
 }
 
-/* The window's edges: a magenta bracket, so a narrow window still reads from across the room. */
+/* The window's edges: an ink bar each side, so a narrow window still reads from across the room. */
 .first {
-  box-shadow: -3px 0 0 var(--pa-magenta), 0 0 10px rgb(39 225 255 / 0.55);
+  box-shadow: -3px 0 0 var(--pa-ink);
 }
 
 .last {
-  box-shadow: 3px 0 0 var(--pa-magenta), 0 0 10px rgb(39 225 255 / 0.55);
+  box-shadow: 3px 0 0 var(--pa-ink);
 }
 
 .first.last {
-  box-shadow: -3px 0 0 var(--pa-magenta), 3px 0 0 var(--pa-magenta), 0 0 10px rgb(39 225 255 / 0.55);
+  box-shadow: -3px 0 0 var(--pa-ink), 3px 0 0 var(--pa-ink);
 }
 
 /* After a take: the phrase's accuracy, MISS (0%) to PERFECT (100%). */
@@ -56,7 +53,7 @@
   justify-content: space-between;
   height: 1.3em;
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
+  font-stretch: 75%;
   font-weight: 800;
   font-size: clamp(16px, 2.2223vh, 24px);
   font-variant-numeric: tabular-nums;
@@ -68,7 +65,7 @@
   left: clamp(5em, calc(var(--at) * 100%), calc(100% - 5em)); /* clear of the end numbers */
   transform: translateX(-50%);
   white-space: nowrap;
-  color: var(--pa-cyan);
+  color: var(--pa-primary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }

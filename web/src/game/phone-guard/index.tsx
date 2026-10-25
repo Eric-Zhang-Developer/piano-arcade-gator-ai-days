@@ -5,6 +5,8 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import styles from "./phone-guard.module.css";
+import { APP_NAME } from "../app-name";
+import { kitButton } from "../duo-tokens";
 
 export const phoneGuardSettings = {
   repoUrl: "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days",
@@ -54,9 +56,9 @@ export function PhoneGuard() {
     <div ref={card} className={styles.guard} role="dialog" aria-modal="true" aria-labelledby="phone-guard-title" data-testid="phone-guard">
       <div className={styles.card}>
         <h1 id="phone-guard-title" className={styles.wordmark}>
-          Piano Arcade
+          {APP_NAME}
         </h1>
-        <p className={styles.lead}>Piano Arcade is made for a laptop keyboard or a real piano.</p>
+        <p className={styles.lead}>{APP_NAME} is made for a laptop keyboard or a real piano.</p>
         <p className={styles.hint}>Open it in Chrome on a laptop.</p>
         <div className={styles.links}>
           <a ref={first} href={phoneGuardSettings.repoUrl} className={styles.link}>
@@ -68,7 +70,7 @@ export function PhoneGuard() {
             </a>
           )}
         </div>
-        <button type="button" className={styles.anyway} onClick={playAnyway}>
+        <button type="button" className={[kitButton("secondary").className, styles.anyway].join(" ")} style={kitButton("secondary").style} onClick={playAnyway}>
           Play anyway
         </button>
       </div>

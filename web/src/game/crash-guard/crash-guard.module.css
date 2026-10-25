@@ -1,4 +1,5 @@
-/* GameBoundary's card: centred on black, the display face for the headline, the body face for the rest.
+/* GameBoundary's card: the kit's Panel and Buttons (Kit.tsx) centred on black, the display face upright for the
+   headline, the body face for the rest.
    Text scales with the screen's height: 16 px at 720, 24 px at 1080. */
 
 .screen {
@@ -8,23 +9,14 @@
   display: grid;
   place-items: center;
   padding: var(--size);
-  background: radial-gradient(ellipse at 50% 120%, rgb(255 47 208 / 0.14), transparent 60%), var(--pa-bg);
+  background: var(--pa-bg);
   color: var(--pa-ink);
   font: var(--size) / 1.35 system-ui, sans-serif;
 }
 
-.card {
-  width: fit-content;
-  max-width: min(32em, 100%);
-  padding: calc(var(--size) * 1.6) calc(var(--size) * 1.8);
-  border-left: 3px solid var(--pa-wrong);
-  border-radius: 6px;
-  background: var(--pa-panel);
-}
-
 .title {
   margin: 0 0 calc(var(--size) * 0.5);
-  font: italic 900 calc(var(--size) * 2.4) / 1 var(--pa-font-display), system-ui, sans-serif;
+  font: 900 calc(var(--size) * 2.4) / 1 var(--pa-font-display), system-ui, sans-serif;
   letter-spacing: -0.01em;
   text-transform: uppercase;
 }
@@ -39,32 +31,4 @@
   display: flex;
   flex-wrap: wrap;
   gap: calc(var(--size) * 0.6);
-}
-
-.primary,
-.secondary {
-  padding: calc(var(--size) * 0.45) calc(var(--size) * 1);
-  border-radius: 6px;
-  font: italic 800 var(--size) var(--pa-font-display), system-ui, sans-serif;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.primary {
-  border: none;
-  background: var(--pa-cyan);
-  color: var(--pa-bg);
-}
-
-.secondary {
-  border: 1px solid rgb(242 242 245 / 0.3);
-  background: none;
-  color: var(--pa-ink);
-}
-
-.primary:focus-visible,
-.secondary:focus-visible {
-  outline: 2px solid var(--pa-magenta);
-  outline-offset: 3px;
 }

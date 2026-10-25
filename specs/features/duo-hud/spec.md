@@ -45,8 +45,7 @@ it lands, not alongside it. The black-key lane shading and the non-fever stage a
    - **Note pills:** about 2 px radius.
    - **The judgment word:** the condensed display face and the monospace ms readout, near the right end of the hit
      line, as in the frame. If moving it collides with judgmentPlace's fever rule, keep its place and only restyle it.
-3. **`fix(juice-visual)`:** the sparks burst upward from the hit line on every hit, not only held notes, short and
-   crisp, in the hand's color with a white core. The combo pulse stays the HUD's swell.
+3. ~~`fix(juice-visual)` sparks~~: dropped for hit-particles (#750, Eric 2026-10-25).
 4. **One `fix(<slug>)` per overlay** with rounded canvas badges (wait-hud, flow-mode, watch-demo, laptop-octaves,
    first-run): radius 0, hairline frames.
 5. **`feat(duo-hud)`:** `verify-hud.mjs`, the screenshots, the done note.
@@ -65,7 +64,7 @@ it lands, not alongside it. The black-key lane shading and the non-fever stage a
   chrome. GREAT's mint (`hud/index.ts:19`) stops matching a hand color: the worker picks GREAT within
   visual-direction.md (white or ink is the frame's choice) and logs it.
 - **Readable on video:** the combo numeral is at least 64 px at 1920×1080, and labels at least 16 px.
-- **Reduced motion:** sparks become a static flare. The swell is off.
+- **Reduced motion:** the swell is off. Hit effects' reduced motion is hit-particles' (#750).
 - **Fever:** the stage's short moment is fever-stage's (duo-tokens). The HUD adds nothing for it.
 
 ## Validation
@@ -74,7 +73,8 @@ it lands, not alongside it. The black-key lane shading and the non-fever stage a
    `drawBrackets`, with no local bracket code.
 2. Headless, once, under `verify.lock`:
    `python3 .agents/scripts/verify.py --slug duo-hud --worktree . --cmd "node {worktree}/web/src/game/duo-hud/verify-hud.mjs --out {out}"`.
-   It plays `/play?song=fur-elise&bot=perfect&input=test` and prints `verify-hud: pass` or names each failed step:
+   It plays `/play?song=fur-elise&bot=perfect` (Start pressed; not `&input=test`, whose test device replaces the
+   laptop keys the bot plays) and prints `verify-hud: pass` or names each failed step:
    1. The HUD test hook (`window.__pianoArcadeHud`, add it if missing) reports `bar` rising from 1 to N, and `combo`
       rising.
    2. Screenshots `hud-mid.png`, about 20 s in, at 1280×720 and 1920×1080, plus `hud-reduced.png`.

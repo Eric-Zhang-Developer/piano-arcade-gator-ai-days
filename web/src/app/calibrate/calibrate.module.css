@@ -1,0 +1,115 @@
+/* /calibrate in the Duo look: one bracketed panel on the playfield's black. Type scales with the screen's height,
+   16 px at 720 and 24 px at 1080 (the video rule), so the page reads the same on the laptop and on the recording. */
+
+.page {
+  --size: clamp(16px, 2.2223vh, 24px);
+  box-sizing: border-box; /* 100vh includes the padding, so the page never scrolls (#787) */
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: calc(var(--size) * 3) var(--size) var(--size);
+  background: var(--pa-bg);
+  color: var(--pa-ink);
+  font: var(--size) / 1.45 system-ui, sans-serif;
+}
+
+.panel {
+  box-sizing: border-box;
+  width: min(30em, 92vw);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--size) * 1.1);
+  padding: calc(var(--size) * 1.6) calc(var(--size) * 1.8);
+}
+
+.title {
+  margin: 0;
+  font: 800 calc(var(--size) * 2) / 1.05 var(--pa-font-display), system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.text {
+  margin: 0;
+}
+
+.text b {
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-weight: 600;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--size) * 1.2);
+}
+
+/* The saved offset as a kit data cell: a hairline at its left, a mono caps label over a condensed numeral. */
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+  padding-left: calc(var(--size) * 0.9);
+  border-left: 1px solid var(--pa-line);
+}
+
+.numeral {
+  font: 800 calc(var(--size) * 1.6) / 1 var(--pa-font-display), system-ui, sans-serif;
+  font-stretch: 75%;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The twelve clicks: square cells, settling ones grey, the counted ones primary once heard. */
+.clicks {
+  display: flex;
+  gap: calc(var(--size) * 0.4);
+}
+
+.click {
+  width: calc(var(--size) * 0.9);
+  height: calc(var(--size) * 0.9);
+  border: 1px solid color-mix(in srgb, var(--pa-ink-dim) 70%, transparent); /* the line token vanishes on the panel */
+}
+
+.click[data-settle-end] {
+  margin-right: calc(var(--size) * 0.6); /* the settling clicks, then the ones that count */
+}
+
+.click[data-heard="settle"] {
+  background: var(--pa-ink-dim);
+  border-color: var(--pa-ink-dim);
+}
+
+.click[data-heard="count"] {
+  background: var(--pa-primary);
+  border-color: var(--pa-primary);
+}
+
+.status {
+  margin: 0;
+  color: var(--pa-ink-dim);
+  font-size: 0.75em;
+}
+
+/* A 24 px target at least: the page's only way out besides the nav. */
+.back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  color: var(--pa-ink-dim);
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: 0.75em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.back:hover,
+.back:focus-visible {
+  color: var(--pa-ink);
+}
+
+.back:focus-visible {
+  outline: 2px solid var(--pa-primary);
+  outline-offset: 4px;
+}

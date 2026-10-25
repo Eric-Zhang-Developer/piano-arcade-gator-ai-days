@@ -3,9 +3,8 @@
 // 2. /sheet beside /play?input=test: a Perfect Ode to Joy turns every beam gold; a sloppy one (every third note 60 ms
 //    late) colors a beam only when all its notes share a judgment, and leaves every other beam ink.
 // 3. Readability: after the Perfect take, a full-page shot at 1920×1080; pixels within ΔE76 10 of PERFECT's gold, per
-//    note, must beat main's (--baseline, measured with this script's --measure-only against main).
+//    note, must beat the same page with only its beams repainted ink, as it drew before sheet-beams.
 // Usage: node web/src/game/sheet-beams/verify-beams.mjs --out <dir> [--url <running server>] [--measure-only]
-//        [--baseline <gold px per note on main>]
 import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { createServer } from "node:net";
@@ -16,19 +15,17 @@ import { chromium } from "playwright";
 const webDir = fileURLToPath(new URL("../../../", import.meta.url));
 const arg = (name) => (process.argv.includes(name) ? process.argv[process.argv.indexOf(name) + 1] : undefined);
 if (!arg("--out")) {
-  console.error("usage: verify-beams.mjs --out <dir> [--url <server>] [--measure-only] [--baseline <px per note>]");
+  console.error("usage: verify-beams.mjs --out <dir> [--url <server>] [--measure-only]");
   process.exit(2);
 }
 const out = resolve(arg("--out"));
 mkdirSync(out, { recursive: true });
 const measureOnly = process.argv.includes("--measure-only");
-// Gold pixels per note in the full-page shot after a Perfect Ode to Joy on origin/main before sheet-beams (8f79e11),
-// from this script's --measure-only run in a worktree of that commit: 33,334 pixels over 122 notes.
-const BASELINE = Number(arg("--baseline") ?? 273.2);
 const say = (s) => process.stdout.write(`${s}\n`);
-const INK = "#f2f2f5"; // ui-tokens' ink, unjudged music
-const BG = "#000000"; // ui-tokens' bg, the page
-const GOLD = "#ffe27a"; // PERFECT, hudSettings.judgmentColors
+// The score is ink on paper since #730 (sheet-paper). sheet-beams.test.ts pins these to their sources.
+const INK = "#16130f"; // ui-tokens' paperInk, unjudged music
+const BG = "#f2ede3"; // ui-tokens' paper, behind the score
+const GOLD = "#9b7900"; // paperJudgmentColors.PERFECT: the HUD's gold, darkened for the paper
 
 let base = arg("--url");
 let server;
@@ -153,9 +150,17 @@ async function goldPixels(page, path) {
     say(`${notGold.length || !audit.length ? "FAIL" : "ok  "} 2. Perfect: ${audit.length - notGold.length} of ${audit.length} beams gold`);
     if (!audit.length) fail.push("2. Perfect: no beams drawn");
     if (notGold.length) fail.push(`2. Perfect: ${notGold.length} beams not gold: ${JSON.stringify(notGold)}`);
-    const better = px / notes > BASELINE;
-    say(`${better ? "ok  " : "FAIL"} 3. ${(px / notes).toFixed(1)} gold pixels a note, main ${BASELINE}`);
-    if (!better) fail.push(`3. ${(px / notes).toFixed(1)} gold pixels a note isn't above main's ${BASELINE}`);
+    // The baseline: every beam line back to ink, as VexFlow names them in follow.ts (vf-<first note>-beam…).
+    const inked = await sheet.evaluate((ink) => {
+      const els = [...document.querySelectorAll('[id^="vf-"][id*="-beam"]')].flatMap((g) => [g, ...g.querySelectorAll("*")]);
+      for (const el of els) for (const a of ["fill", "stroke"]) el.setAttribute(a, ink);
+      return els.length;
+    }, INK);
+    const base = (await goldPixels(sheet, join(out, "ode-to-joy-perfect-ink-beams-1920.png"))) / notes;
+    results.perfect.inkBeamsPerNote = base;
+    const better = inked > 0 && px / notes > base;
+    say(`${better ? "ok  " : "FAIL"} 3. ${(px / notes).toFixed(1)} gold pixels a note, ${base.toFixed(1)} with ink beams`);
+    if (!better) fail.push(`3. ${(px / notes).toFixed(1)} gold pixels a note isn't above ${base.toFixed(1)} with ink beams (${inked} beam elements)`);
   }
   await context.close();
 }

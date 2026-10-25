@@ -1,15 +1,20 @@
 import type { Chart, Frame, GamePlugin, Hand, InputDevice } from "../../contracts";
 import { noteColorFor } from "../hand-colors";
 import { noteTimeMs } from "../core/judge";
+import { isolated } from "../core/isolated";
 import { msPerBeat, settings } from "../core/settings";
 import { seededRandom } from "../sim/fake";
 import { alphaOf, spawn, step, type Particle } from "./particles";
+import { hitParticles, type HitParticles } from "../hit-particles/gl";
 import { impactT, stampKeyframes, stampSettings, stampStartMs } from "../rank-stamp";
 
 export const juiceSettings = {
   clearMs: 500, // spec: effects never cover a note less than 500 ms from the line
   flareMs: 320,
   pillarPx: 140, // a light pillar above the hit key (Nostalgia)
+  bloomColor: "#cdbdff", // hit-particles: the white-violet glow where a held note meets the line
+  bloomScale: 2.2, // its radius, in key widths: wider than the key
+  bloomAlpha: 0.55,
   missFlashMs: 220,
   wisps: { PERFECT: 32, GREAT: 18, GOOD: 8 },
   bright: { PERFECT: 1, GREAT: 0.7, GOOD: 0.45 },
@@ -24,7 +29,9 @@ export const juiceSettings = {
 type Judgment = keyof typeof juiceSettings.wisps;
 
 // One plugin for every visual effect. Effects rise above the line into empty space and are clipped out of the
-// rectangle of any note due within 500 ms, so they never hide the next thing to play.
+// rectangle of any note due within 500 ms, so they never hide the next thing to play. With WebGL, hit-particles' dust
+// and wisps replace the 2D wisps and sparks; they aren't clipped, staying dim near the line instead
+// (decision hit-particles-clear-zone).
 export function juiceVisual(): GamePlugin {
   const s = juiceSettings;
   const random = seededRandom(1);
@@ -41,7 +48,8 @@ export function juiceVisual(): GamePlugin {
   const hitIds = new Set<string>(); // played notes no longer need to be read, so effects may cover them
   let fever = false;
   let sparkClock = 0;
-  let lastCtx: CanvasRenderingContext2D | null = null; // /play stops drawing at the results: clear what's left
+  let ended = false; // songEnd: nothing more to draw, including /play's last frame behind the results
+  let gpu: HitParticles | null | undefined; // undefined until the first frame tries WebGL; null: none, 2D particles
 
   // Rectangles of the unplayed notes due within clearMs: nothing juice draws may cover them.
   function clearZone(ctx: CanvasRenderingContext2D, f: Frame) {
@@ -87,12 +95,14 @@ export function juiceVisual(): GamePlugin {
     onEvent(e) {
       if (e.type === "songStart") {
         particles = [];
+        gpu?.reset();
         pending = [];
         flares.length = misses.length = 0;
         heldHits.clear();
         hitIds.clear();
         fever = false;
         lastNow = null;
+        ended = false;
         rankReveal();
       }
       if (e.type === "noteHit") {
@@ -107,39 +117,41 @@ export function juiceVisual(): GamePlugin {
       if (e.type === "feverEnd") fever = false;
       if (e.type === "songEnd") {
         rankReveal();
-        lastCtx?.clearRect(0, 0, lastCtx.canvas.width, lastCtx.canvas.height);
+        ended = true;
       }
     },
     draw(ctx, f) {
-      lastCtx = ctx;
+      if (ended) return;
       const dt = lastNow === null ? 0 : Math.max(0, Math.min(100, f.nowMs - lastNow));
       lastNow = f.nowMs;
       const line = f.judgmentLineY;
+      if (gpu === undefined) gpu = hitParticles();
 
       // Fever: the one whole-screen state. Edges only, so notes keep their color. The edges stop where notes become due
       // within clearMs, fading out above that, since the edge lanes hold the chart's lowest and highest notes (#280).
       if (fever) {
         const cut = line * (1 - s.clearMs / settings.lookaheadMs);
-        ctx.save();
-        for (const [x0, x1] of [
-          [0, s.feverEdgePx],
-          [f.width, f.width - s.feverEdgePx],
-        ]) {
-          const g = ctx.createLinearGradient(x0, 0, x1, 0);
-          g.addColorStop(0, `rgba(${s.feverColor}, 0.38)`);
-          g.addColorStop(1, `rgba(${s.feverColor}, 0)`);
-          ctx.fillStyle = g;
-          ctx.fillRect(Math.min(x0, x1), 0, s.feverEdgePx, cut);
-        }
-        // Erase the strips' lowest quarter along a vertical ramp, so they fade instead of ending at a hard line.
-        const fade = ctx.createLinearGradient(0, cut * 0.75, 0, cut);
-        fade.addColorStop(0, "rgba(0, 0, 0, 0)");
-        fade.addColorStop(1, "rgba(0, 0, 0, 1)");
-        ctx.globalCompositeOperation = "destination-out";
-        ctx.fillStyle = fade;
-        ctx.fillRect(0, cut * 0.75, s.feverEdgePx, cut * 0.25);
-        ctx.fillRect(f.width - s.feverEdgePx, cut * 0.75, s.feverEdgePx, cut * 0.25);
-        ctx.restore();
+        // Isolated: the strips' fade erases, which on /play's shared overlay would reach other plugins' pixels.
+        isolated(ctx, (ctx) => {
+          for (const [x0, x1] of [
+            [0, s.feverEdgePx],
+            [f.width, f.width - s.feverEdgePx],
+          ]) {
+            const g = ctx.createLinearGradient(x0, 0, x1, 0);
+            g.addColorStop(0, `rgba(${s.feverColor}, 0.38)`);
+            g.addColorStop(1, `rgba(${s.feverColor}, 0)`);
+            ctx.fillStyle = g;
+            ctx.fillRect(Math.min(x0, x1), 0, s.feverEdgePx, cut);
+          }
+          // Erase the strips' lowest quarter along a vertical ramp, so they fade instead of ending at a hard line.
+          const fade = ctx.createLinearGradient(0, cut * 0.75, 0, cut);
+          fade.addColorStop(0, "rgba(0, 0, 0, 0)");
+          fade.addColorStop(1, "rgba(0, 0, 0, 1)");
+          ctx.globalCompositeOperation = "destination-out";
+          ctx.fillStyle = fade;
+          ctx.fillRect(0, cut * 0.75, s.feverEdgePx, cut * 0.25);
+          ctx.fillRect(f.width - s.feverEdgePx, cut * 0.75, s.feverEdgePx, cut * 0.25);
+        });
         const top = ctx.createLinearGradient(0, 0, 0, line * 0.25);
         top.addColorStop(0, `rgba(${s.feverColor}, 0.22)`);
         top.addColorStop(1, `rgba(${s.feverColor}, 0)`);
@@ -150,10 +162,16 @@ export function juiceVisual(): GamePlugin {
       // New hits become wisps; held hit notes stream sparks.
       for (const h of pending) {
         const { x, width } = f.keyX(h.pitch);
-        particles = spawn(particles, "wisp", s.wisps[h.judgment], x, width, line, s.bright[h.judgment], random, h.color);
+        if (gpu) gpu.hit(x, width, line, h.judgment, h.color);
+        else particles = spawn(particles, "wisp", s.wisps[h.judgment], x, width, line, s.bright[h.judgment], random, h.color);
       }
       pending = [];
-      sparkClock += dt;
+      if (gpu)
+        for (const [p, c] of heldHits) {
+          const { x, width } = f.keyX(p);
+          gpu.hold(x + width * 0.15, width * 0.7, line, c, dt);
+        }
+      sparkClock += gpu ? 0 : dt;
       for (; sparkClock >= s.sparkEveryMs; sparkClock -= s.sparkEveryMs) {
         for (const [p, c] of heldHits) {
           const { x, width } = f.keyX(p);
@@ -214,6 +232,20 @@ export function juiceVisual(): GamePlugin {
         ctx.fillRect(x + width * 0.15, line - s.pillarPx, width * 0.7, s.pillarPx);
       }
 
+      // Bloom: a held hit note's contact point glows white-violet, wider than the key, for as long as it's held.
+      for (const [p, c] of heldHits) {
+        const { x, width } = f.keyX(p);
+        const cx = x + width / 2;
+        const r = width * s.bloomScale;
+        const g = ctx.createRadialGradient(cx, line, 0, cx, line, r);
+        g.addColorStop(0, `rgba(255, 255, 255, ${s.bloomAlpha})`);
+        g.addColorStop(0.3, hexAlpha(s.bloomColor, s.bloomAlpha * 0.7));
+        g.addColorStop(0.65, hexAlpha(c, s.bloomAlpha * 0.25));
+        g.addColorStop(1, hexAlpha(c, 0));
+        ctx.fillStyle = g;
+        ctx.fillRect(cx - r, line - r, r * 2, r * 2);
+      }
+
       for (const p of particles) {
         const a = alphaOf(p);
         if (a <= 0.01) continue;
@@ -221,6 +253,7 @@ export function juiceVisual(): GamePlugin {
         ctx.fillRect(p.x, p.y, p.size, p.size);
       }
       ctx.restore();
+      gpu?.draw(ctx, f, dt); // over the notes, outside the clear zone
     },
   };
 }

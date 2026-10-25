@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { GameEvent } from "../../contracts";
+import { cyan } from "../ui-tokens";
 import { noteOn, reduceWaitHud, waitHud } from ".";
 
 const hit = (i: number): GameEvent => ({ type: "noteHit", noteId: `n${i}`, pitch: 60, judgment: "PERFECT", offsetMs: 0, atMs: i * 600 });
@@ -52,7 +53,7 @@ describe("the plugin", () => {
     const out = texts("mode=wait");
     expect(out.map((o) => o.text)).toEqual(["6 / 42", "NOTE", "LEARN"]);
     const learn = out.find((o) => o.text === "LEARN")!;
-    expect(learn.fill).toBe("#27e1ff");
+    expect(learn.fill).toBe(cyan); // the token, which Duo repaints (duo-tokens)
     expect(learn.font).toMatch(/^italic 900 /);
     for (const o of [learn, out[0]]) expect(Number(/(\d+)px/.exec(o.font)![1])).toBeGreaterThanOrEqual(24);
   });

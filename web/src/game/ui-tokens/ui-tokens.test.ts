@@ -7,7 +7,7 @@ const declared = [...css.matchAll(/--pa-([\w-]+):\s*([^;]+);/g)];
 const camel = (name: string) => name.replace(/-(\w)/g, (_, c: string) => c.toUpperCase());
 
 test("globals.css declares the color tokens", () => {
-  expect(declared.length).toBe(21);
+  expect(declared.length).toBe(27);
 });
 
 test.each(declared.map(([, name, value]) => [name, value]))("--pa-%s equals the TypeScript token", (name, value) => {

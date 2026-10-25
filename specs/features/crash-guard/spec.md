@@ -28,7 +28,7 @@ Three small PRs, in this order (the page and layout are core-loop's, a done feat
 ## Requirements
 - **Guard, per take:** `createGuard(onFail)` returns `{ run(id, hook, fn), off(id) }`. A throw from `fn` logs one
   `console.error("crash-guard: <id>'s <hook> threw: <message>")`, marks the plugin off and calls `onFail(id)`. An off
-  plugin's draw, onEvent and background frame are skipped for the rest of the take; its layer canvas is cleared once.
+  plugin's draw, onEvent and background frame are skipped for the rest of the take; its drawing is gone from the next frame (/play redraws its one shared overlay canvas every frame).
   Every other plugin keeps running. Retry builds a new guard: the plugin is back.
 - **Core's own frame work** (`drawHighway`, the judge): a throw is logged once per distinct message, and the next
   frame is still requested. The clock runs on, so the take reaches its results.

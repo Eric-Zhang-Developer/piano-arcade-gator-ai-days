@@ -1,0 +1,62 @@
+/* The top edge's empty band: the select's 4vh top padding, centered so it clears the wordmark's accent on the left and
+   the build stamp on the right (decision nav-bar-layout). Over the page, never in its flow, so / keeps its layout. */
+.bar {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  /* The smaller of the height's and the width's band: at 16:9 and wider it's 4vh as before, but a tall window (768×1024)
+     no longer grows a 41 px band over the page's wordmark and build stamp (#942). */
+  height: max(min(4vh, 2.25vw), 24px);
+  /* Its own band: on a page that scrolls, content passes under the links instead of through them (#892). A modal
+     (Options) still covers it, from the top layer. */
+  background: var(--pa-bg);
+  display: flex;
+  align-items: stretch;
+  gap: 0.4em;
+  font-size: clamp(16px, min(2.5vh, 1.40625vw), 27px); /* 18px at 720, 27px at 1080: the condensed face reads on video, in
+     the 4vh band. 1.40625vw is 2.5vh at 16:9, so a portrait window sizes by its width and gets 16px. */
+}
+
+/* Saira condensed, sentence case: the song titles' face, so the bar reads as pages and not as the select's mono key
+   hints right below it. Color lives here, not inline, so hover and current can change it. */
+.label {
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-stretch: 75%;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--pa-ink-dim);
+}
+
+.slot {
+  display: flex;
+  align-items: center;
+  padding: 0 0.7em;
+  margin-bottom: 3px; /* the current underline stops short of the wordmark row */
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.slot:hover .label {
+  color: var(--pa-ink);
+}
+
+.slot[aria-current="page"] {
+  border-bottom-color: var(--pa-primary);
+}
+
+.slot[aria-current="page"] .label {
+  color: var(--pa-primary);
+}
+
+.repo {
+  margin-left: 1.2em; /* the repo is off-site: set apart from the pages */
+}
+
+.slot:focus-visible {
+  outline: 2px solid var(--pa-primary);
+  outline-offset: -2px;
+}

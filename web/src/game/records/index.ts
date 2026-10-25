@@ -3,6 +3,7 @@
 import { createElement } from "react";
 import type { GamePlugin } from "../../contracts";
 import { emptyHud, reduceHud } from "../hud";
+import { markPlayed } from "../song-finder";
 import { RecordsPanel, type Outcome } from "./panel";
 import { addTake, browserStorage, loadRecords, practiceReason, recordKey, saveRecords } from "./store";
 
@@ -30,6 +31,8 @@ export function records(): GamePlugin {
       hud = reduceHud(hud, e);
       if (e.type === "songStart") outcome = current = null;
       if (e.type !== "songEnd") return;
+      // song-finder's Recent: every finished take, practice included, by the song's id (Easy shares it); not bots or demos.
+      if (!params.has("bot") && !params.has("demo")) markPlayed(params.get("song") ?? chartId.replace(/@easy$/, ""));
       if (practiceReason(params)) {
         outcome = current = { kind: "practice" };
         return;
@@ -45,6 +48,7 @@ export function records(): GamePlugin {
           : { kind: "blocked" };
       current = outcome;
     },
-    resultsPanel: () => (outcome ? createElement(RecordsPanel, { outcome }) : null),
+    // Practice, bot and blocked takes aren't stored, and say nothing worth a card (duo-details).
+    resultsPanel: () => (outcome?.kind === "recorded" ? createElement(RecordsPanel, { outcome }) : null),
   };
 }

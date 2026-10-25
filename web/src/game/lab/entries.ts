@@ -21,10 +21,18 @@ export const labGroups: LabGroup[] = [
     entries: [
       {
         slug: "wait-mode",
-        name: "Wait mode",
+        name: "Learn mode",
         description: "the highway stops on each note (a chord waits for all its keys), never calls a MISS, plays no beat",
         href: "/play?song=twinkle&mode=wait",
-        open: "Twinkle, wait mode",
+        open: "Twinkle, Learn",
+      },
+      {
+        slug: "flow-mode",
+        name: "Flow mode",
+        description:
+          "the song waits at each note and follows your tempo (0.5–1.3×), scored on wrong notes, skipped notes and stops past 2 beats, not timing",
+        href: "/play?song=twinkle&mode=flow",
+        open: "Twinkle, Flow",
       },
       {
         slug: "adaptive-chunks",
@@ -51,9 +59,9 @@ export const labGroups: LabGroup[] = [
       {
         slug: "rewind",
         name: "Rewind",
-        description: "In wait mode, and so in chunk-practice's learn steps, ← moves back a bar and → skips ahead one",
+        description: "In Learn mode, ◀ (or ←) moves back a bar and ▶ (or →) skips ahead one, from the HUD's buttons.",
         href: "/play?song=twinkle&mode=wait",
-        open: "Twinkle, wait mode",
+        open: "Twinkle, Learn",
       },
     ],
   },
@@ -63,7 +71,7 @@ export const labGroups: LabGroup[] = [
       {
         slug: "watch-demo",
         name: "Watch demo",
-        description: "W on the music select plays the focused song with the perfect bot, audible and hands-off.",
+        description: "WATCH on the music select plays the focused song with the perfect bot, audible and hands-off.",
         href: "/play?song=twinkle&bot=perfect&audible=1&demo=1",
         open: "Twinkle, the perfect bot",
       },
@@ -77,9 +85,16 @@ export const labGroups: LabGroup[] = [
       {
         slug: "operator-replay",
         name: "Attract",
-        description: "a three.js synthwave stage (neon grid, low sun, slow orbit) with one pillar per feature spec",
+        description: "one merged PR per note of Twinkle on the chart's own rhythm, while each step's note plays",
         href: "/attract",
         open: "/attract",
+      },
+      {
+        slug: "stage-view",
+        name: "Stage view",
+        description: "notes rise dim on a back slope, tip over a lit crest and speed down to the bar, over 1033 ms.",
+        href: "/stage",
+        open: "/stage",
       },
     ],
   },
@@ -106,6 +121,13 @@ export const labGroups: LabGroup[] = [
         open: "/simon",
       },
       {
+        slug: "wrong-note-spike",
+        name: "Spot the Wrong Note",
+        description: "the DGX plays 8 notes of Twinkle (or Ode to Joy, Minuet in G, Für Elise) with one moved 2 semitones",
+        href: "/wrong-note",
+        open: "/wrong-note",
+      },
+      {
         slug: "veritas",
         name: "Veritas",
         description: "five test players (Golden, Rusher, Jitter, Fumbler, Chord Roller) plant mistakes in real library songs",
@@ -115,7 +137,7 @@ export const labGroups: LabGroup[] = [
       {
         slug: "piano-sim",
         name: "Piano sim",
-        description: '/sim shows the game, a virtual keyboard, a raw MIDI log, fault buttons, "Watch the bot"',
+        description: 'the game, a virtual keyboard, a raw MIDI log, fault buttons, "Watch the bot"',
         href: "/sim",
         open: "/sim",
       },
@@ -127,7 +149,7 @@ export const labGroups: LabGroup[] = [
       {
         slug: "operator-board",
         name: "Operator board",
-        description: "the arcade's operator menu in synthwave bookkeeping",
+        description: "a coin-counter strip, then Needs a person (non-draft plan/contract PRs, needs-human and blocked issues, drafts stale at 45 min, red main CI, STOP)",
         href: "/operator",
         open: "/operator",
       },
@@ -146,7 +168,7 @@ export const labGroups: LabGroup[] = [
       {
         slug: "learning-ui",
         name: "Learning",
-        description: "guided mastery map, three-state parent/leaf examples, one prepared Start/real Resume, four existing activities",
+        description: "a map of music skills, from pitch and rhythm to phrase endings, with the next lesson ready to start.",
         href: "/learn",
         open: "/learn",
       },

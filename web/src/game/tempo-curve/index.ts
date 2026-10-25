@@ -138,7 +138,7 @@ export function tempoCurve(): GamePlugin {
       const [main, detail] = describeRubato(rubato(chart, take, results));
       return createElement(
         "div",
-        { "data-testid": "tempo-curve", style: { textAlign: "center", lineHeight: 1.5 } },
+        { "data-testid": "tempo-curve", style: { lineHeight: 1.5 } },
         createElement("div", { style: { fontSize: "1.15em", color: "var(--pa-ink)" } }, main),
         detail && createElement("div", { style: { fontSize: "0.9em", color: "var(--pa-ink-dim)" } }, detail),
       );

@@ -1,6 +1,8 @@
 // Headless proof of the take graph, the spec's Chrome steps: /play?bot=sloppy shows dots above and below zero and
-// ×s for the misses, a dot names its bar, beat, offset and judgment, and /play?bot=late puts every dot about 40 ms
+// ×s for the misses, a dot names its bar, beat, offset and judgment, and /play?bot=late puts every dot about 60 ms
 // late. Also: the table lists one row per note. Screenshots of each. ?beat=off keeps the laptop click out of it.
+// take-graph-pass: the readout card replaced the native <title> tooltips, so a mark's words are its data-label, and
+// the card is checked through the keyboard (arrow keys, Home, End).
 // Usage: node web/src/game/take-graph/verify-take-graph.mjs --out <dir>
 import { spawn } from "node:child_process";
 import { mkdirSync } from "node:fs";
@@ -42,7 +44,7 @@ process.on("exit", () => {
 });
 for (const sig of ["SIGINT", "SIGTERM"]) process.on(sig, () => process.exit(1));
 
-// "Bar 5, beat 2 · +32 ms · GREAT · velocity 74" -> its signed offset, or null for a MISS.
+// "Bar 5 · beat 2 · +32 ms · GREAT · vel 74" -> its signed offset, or null for a MISS.
 const offsetOf = (label) => {
   const m = /· ([+−±])(\d+) ms/.exec(label);
   return m ? (m[1] === "−" ? -1 : 1) * Number(m[2]) : null;
@@ -57,7 +59,7 @@ async function takeWith(browser, bot) {
   await page.waitForSelector('[data-testid="take-graph"]', { timeout: 90_000 });
   const graph = page.getByTestId("take-graph");
   await graph.scrollIntoViewIfNeeded();
-  const labels = await graph.locator('svg g[role="img"]').evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")));
+  const labels = await graph.locator("svg [data-note]").evaluateAll((els) => els.map((e) => e.getAttribute("data-label")));
   return { page, graph, labels, errors };
 }
 
@@ -86,7 +88,16 @@ try {
   const width = await sloppy.graph.evaluate((el) => el.getBoundingClientRect().width);
   const height = await sloppy.graph.evaluate((el) => el.getBoundingClientRect().height);
   if (width < 880) fail.push(`graph is ${width} px wide at 1280×720, want 900`);
-  if (height > 240) fail.push(`graph is ${height} px tall, over results-layout's 240 px`);
+  // duo-details (#839) spans the graph across its Details card, so its height follows the card's width: results-layout's
+  // 240 px cap was the old first screen's. Now the plot keeps its own proportions exactly (scaled, never stretched)
+  // and the whole graph fits on one 720 px screen.
+  const plot = await sloppy.graph.locator("svg").first().evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    const v = el.viewBox.baseVal;
+    return { w: r.width, h: r.height, want: (r.width * v.height) / v.width };
+  });
+  if (Math.abs(plot.h - plot.want) > 1) fail.push(`the plot is ${plot.h} px tall at ${plot.w} px wide, want ${plot.want.toFixed(1)}: stretched`);
+  if (height > 720) fail.push(`graph is ${height} px tall, more than the 720 px screen`);
   // With the graph added the results screen is taller than 720 px: scrolled to the top, the rank must be on screen.
   const top = await sloppy.page.getByTestId("results").evaluate((el) => {
     for (let a = el.parentElement; a; a = a.parentElement) a.scrollTop = 0;
@@ -95,10 +106,21 @@ try {
   if (top < 0) fail.push(`results screen's top is at ${top} px after scrolling up: the rank is cut off`);
   say(`verify-take-graph: panel ${Math.round(width)}×${Math.round(height)} px; results top at ${top} px when scrolled up`);
   await sloppy.graph.scrollIntoViewIfNeeded();
-  const dot = sloppy.graph.locator('svg g[role="img"]').first();
-  await dot.hover();
-  const title = await dot.locator("title").textContent();
-  if (!/^Bar \d+, beat [\d.]+ · /.test(title)) fail.push(`hover title: ${title}`);
+  // The readout: focus the plot, step with the keys; the card and the plot's name follow the note.
+  const plotBox = sloppy.page.getByTestId("take-graph-plot");
+  await plotBox.focus();
+  await sloppy.page.keyboard.press("Home");
+  const card = sloppy.page.getByTestId("take-graph-readout");
+  const title = (await card.textContent())?.trim() ?? "";
+  if (!/^Bar 1 · beat [\d.]+ · /.test(title)) fail.push(`readout after Home: ${title}`);
+  await sloppy.page.keyboard.press("ArrowRight");
+  const next = (await card.textContent())?.trim() ?? "";
+  if (next === title || !/^Bar \d+ · beat [\d.]+ · /.test(next)) fail.push(`readout after ArrowRight: ${next}`);
+  if ((await plotBox.getAttribute("aria-label")) !== next) fail.push("the plot's accessible name doesn't follow the focused note");
+  await sloppy.page.keyboard.press("End");
+  const last = (await card.textContent())?.trim() ?? "";
+  const lastBar = Math.max(...sloppy.labels.map((l) => Number(/^Bar (\d+)/.exec(l)[1])));
+  if (!last.startsWith(`Bar ${lastBar} · `)) fail.push(`readout after End: ${last}, want bar ${lastBar}`);
   await sloppy.page.getByRole("button", { name: "Show as table" }).click();
   const rows = await sloppy.page.getByTestId("take-graph-table").locator("tbody tr").count();
   if (rows !== 42) fail.push(`table: ${rows} rows, want 42`);
@@ -107,13 +129,14 @@ try {
 
   const late = await takeWith(browser, "late");
   const lateOffs = late.labels.map(offsetOf);
-  const off = lateOffs.filter((o) => o === null || o < 30 || o > 55);
-  if (off.length) fail.push(`late: ${off.length} dots outside +30..+55 ms: ${JSON.stringify(off.slice(0, 5))}`);
+  // The late bot plays +60 ms since judging-tiers (#859), GREAT under its 40/80/120 windows: the same band around it.
+  const off = lateOffs.filter((o) => o === null || o < 50 || o > 75);
+  if (off.length) fail.push(`late: ${off.length} dots outside +50..+75 ms: ${JSON.stringify(off.slice(0, 5))}`);
   await late.graph.screenshot({ path: join(out, "late.png") });
   fail.push(...late.errors);
 
   if (fail.length) throw new Error(fail.join("; "));
-  say(`verify-take-graph: pass, sloppy ${misses} MISS and dots both sides of zero, hover "${title}", table 42 rows, late all +${Math.min(...lateOffs)}..+${Math.max(...lateOffs)} ms (evidence: ${out})`);
+  say(`verify-take-graph: pass, sloppy ${misses} MISS and dots both sides of zero, readout "${title}", table 42 rows, late all +${Math.min(...lateOffs)}..+${Math.max(...lateOffs)} ms (evidence: ${out})`);
 } catch (e) {
   failed = true;
   console.error(`verify-take-graph: FAIL: ${e.message}`);

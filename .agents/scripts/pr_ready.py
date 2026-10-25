@@ -52,7 +52,11 @@ def newest_runs(checks: list[dict]) -> list[dict]:
         key = c.get("context") or (c.get("workflowName"), c.get("name"))
         if key not in newest or when(c) >= when(newest[key]):
             newest[key] = c
-    return list(newest.values())
+    runs = list(newest.values())
+    # A run cancelled before its matrix expanded leaves a job named "browser (${{ matrix.shard }})" that never
+    # reruns (#726, #811). Drop it once an expanded sibling ("browser (1)") exists: that one is the real result.
+    expanded = {n.split(" (")[0] for c in runs if " (" in (n := c.get("name") or "") and "${{" not in n}
+    return [c for c in runs if not ("${{" in (c.get("name") or "") and (c.get("name") or "").split(" (")[0] in expanded)]
 
 
 def unresolved_threads(root, pr: dict) -> int | None:
@@ -86,6 +90,8 @@ def verdict(root, pr: dict) -> tuple[int, str]:
     for code, kind in ((7, "fail"), (8, "pending")):
         if hit := [c.get("name") or c.get("context") or "?" for c in checks if check_state(c) == kind]:
             return code, f"{'failing' if kind == 'fail' else 'pending'} checks: {', '.join(hit)}"
+    if not any(c.get("name") == "ci" for c in checks):  # GitHub attaches checks a few seconds after ready (#745)
+        return 8, "no `ci` check yet: GitHub hasn't attached the PR's checks, run again in a few seconds"
     if pr.get("mergeable") == "UNKNOWN":  # GitHub recomputes this for a few seconds after the base branch moves
         return 8, "GitHub is still checking for conflicts (mergeable: UNKNOWN): run again in a few seconds"
     return 0, "ready"

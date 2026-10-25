@@ -37,13 +37,15 @@ function SaveCard({ model }: { model: CardModel }) {
     setFailed(false);
     try {
       await whenDisplayFontReady();
-      const family = getComputedStyle(document.documentElement).getPropertyValue("--pa-font-display").trim();
+      const root = getComputedStyle(document.documentElement);
+      const family = root.getPropertyValue("--pa-font-display").trim();
+      const data = root.getPropertyValue("--pa-font-data").trim();
       const canvas = document.createElement("canvas");
       canvas.width = CARD_W;
       canvas.height = CARD_H;
       const ctx = canvas.getContext("2d");
       if (!ctx) throw new Error("no 2D canvas");
-      drawCard(ctx, model, family ? `${family}, system-ui, sans-serif` : undefined);
+      drawCard(ctx, model, family ? `${family}, system-ui, sans-serif` : undefined, data ? `${data}, ui-monospace, monospace` : undefined);
       const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
       if (!blob) throw new Error("no PNG");
       const url = URL.createObjectURL(blob);

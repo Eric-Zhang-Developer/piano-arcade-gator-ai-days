@@ -1,0 +1,8 @@
+## What shipped
+Fever is one arc on the beat. In the gauge's last 20% a light band crosses the meter once a beat. The flash, banner, star streak and lit meter fire together on the beat after the judge's `feverStart`, not on the 12th hit. In the sustain the sparks' wisps and the stars warm to amber while the dust keeps the hand's color, and the streak swells on each beat. A combo break drains the edges and meter over 400 ms; a song ending in fever drains on results-landing's out. Reduced motion cuts. Judging is untouched.
+## Where it lives
+`web/src/game/fever-arc/` (timeline, hook, tests), readers in `fever-gauge/`, `fever-moment/`, `stage/`, `hit-particles/gl.ts`, mount in `layers.ts`; shots and WebMs in `specs/features/fever-arc/shots/`; decisions `specs/decisions/fever-arc-*.md`.
+## How to check it
+Unit tests: `pnpm -C web exec vitest run src/game/fever-arc src/game/fever-gauge src/game/fever-moment src/game/stage src/game/sound src/game/hit-particles`. Live (in-app browser, `window.__pianoArcadeFever`): ignition on the first frame after its beat (7811.6 ms for 7800); flash, banner, stars and meter all first lit on that same frame. Perf probe: not run locally; main's scheduled run covers it.
+## Gaps
+The sweep sound still starts on `feverStart` (#600 holds `sound/`), juice's steady edges still light on `feverStart` (#761), and the near-line glow keeps its color (#747): `specs/decisions/fever-arc-switch-offs.md`. WebMs are silent. The LED seam waits on #720. Not seen or heard by Eric.

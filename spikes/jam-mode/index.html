@@ -1,0 +1,143 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Jam mode spike</title>
+<!-- The jam mode spike's page (specs/features/jam-mode-spike/spec.md). Serve the repo root over localhost, e.g.
+     python3 -m http.server 8000, then open /spikes/jam-mode/. Play chords on the DGX; its drums and bass follow.
+     ?loopback=1 runs the scripted IAC progression instead (loopback.mjs drives it). -->
+<style>
+  body { font: 15px system-ui, sans-serif; margin: 16px; background: #030607; color: #e2e6f0 }
+  button, select, input { font: inherit; margin: 2px }
+  #chord { font-size: 96px; font-weight: 800; margin: 12px 0; min-height: 1.1em }
+  #log { white-space: pre; font: 12px ui-monospace, monospace; height: 40vh; overflow: auto; background: #0b1013; padding: 8px }
+</style>
+<p>
+  <button id="connect">Connect MIDI</button>
+  in <select id="in"></select> out <select id="out"></select>
+  BPM <input id="bpm" type="number" value="100" min="40" max="200" style="width:4em">
+  <button id="start">Start</button> <button id="stop">Stop</button> <button id="save">Save log</button>
+</p>
+<div id="chord" aria-live="polite">–</div>
+<div id="log"></div>
+<script type="module">
+import { createBand, createHeld, nameChord } from "./jam.mjs";
+
+const $ = (id) => document.getElementById(id);
+const say = (s) => { $("log").textContent += s + "\n"; $("log").scrollTop = 1e9; };
+// Everything, for the saved JSON: input messages with their timestamps, chord changes, and each 8th the band sent.
+const log = { inputs: [], changes: [], sent: [], meta: {} };
+let midi, input, output, band = null, timer = 0;
+const held = createHeld();
+let shown = null;
+
+function onMessage(e) {
+  const d = [...e.data];
+  if (d[0] === 0xfe || d[0] === 0xf8) return; // Active Sensing, clock
+  log.inputs.push([e.timeStamp, d]);
+  if (held.message(d) !== "on") return; // only a struck key renames: a release keeps the chord
+  const c = nameChord(held.pitches());
+  if (!c || c.name === shown) return; // one note or none: the band keeps the last chord
+  shown = c.name;
+  $("chord").textContent = c.name;
+  log.changes.push({ at: e.timeStamp, name: c.name, root: c.root, quality: c.quality });
+  say(`${e.timeStamp.toFixed(1).padStart(10)} chord ${c.name}`);
+  band?.setChord(c);
+}
+
+function pick() {
+  if (input) input.onmidimessage = null;
+  input = midi.inputs.get($("in").value);
+  output = midi.outputs.get($("out").value);
+  if (input) input.onmidimessage = onMessage;
+  log.meta.ports = { in: input?.name, out: output?.name };
+}
+
+async function connect() {
+  midi = await navigator.requestMIDIAccess();
+  for (const [sel, ports] of [[$("in"), midi.inputs], [$("out"), midi.outputs]]) {
+    sel.innerHTML = "";
+    for (const p of ports.values()) sel.add(new Option(p.name, p.id));
+  }
+  // The DGX by default; the loopback picks IAC.
+  for (const sel of [$("in"), $("out")])
+    for (const o of sel.options) if (/Portable Grand/.test(o.text)) sel.value = o.value;
+  pick();
+  say(`# in ${input?.name ?? "none"}, out ${output?.name ?? "none"}`);
+}
+
+function start(at) {
+  if (band || !output) return;
+  const bpm = Number($("bpm").value) || 100;
+  log.meta.bpm = bpm;
+  log.meta.lookaheadMs = 50;
+  band = createBand({ bpm, lookaheadMs: 50, send: (d, t) => output.send(d, t), now: () => performance.now() });
+  band.start(at);
+  if (shown) band.setChord(nameChord(held.pitches()) ?? undefined);
+  // ponytail: a 10 ms timer feeding a 50 ms lookahead; the notes' times come from send timestamps, not the timer
+  timer = setInterval(() => band.tick((s) => log.sent.push(s)), 10);
+  say(`# band started at ${bpm} BPM`);
+}
+
+function stop() {
+  if (!band) return;
+  clearInterval(timer);
+  try { output.clear(); } catch {} // drops queued notes where Chrome supports it
+  band.stop();
+  log.stopAt = performance.now();
+  band = null;
+  say("# band stopped: CC 123 on channels 2 and 10, twice");
+}
+
+function save() {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(log)], { type: "application/json" }));
+  a.download = `jam-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
+  a.click();
+}
+
+$("connect").onclick = () => connect().catch((e) => say(`# requestMIDIAccess failed: ${e}`));
+$("in").onchange = $("out").onchange = pick;
+$("start").onclick = () => start();
+$("stop").onclick = stop;
+$("save").onclick = save;
+
+// The scripted IAC run: the page plays the progression into IAC on channel 1, hears it back as the player, and the
+// band plays into IAC too, so its bass comes back on channel 2 with Chrome's real arrival times.
+// C–Am–F–G then Dm7–G7–Cmaj7, 2 bars each at 100 BPM, three times over. Each change is struck in the beat before its
+// two bars, at an offset that steps across the beat (step = beat / changes), so some land inside the lookahead.
+const PROGRESSION = [
+  ["C", [60, 64, 67]], ["Am", [57, 60, 64]], ["F", [53, 57, 60]], ["G", [55, 59, 62]],
+  ["Dm7", [50, 53, 57, 60]], ["G7", [55, 59, 62, 65]], ["Cmaj7", [48, 52, 55, 59]],
+];
+async function loopback({ passes = 3 } = {}) {
+  midi = await navigator.requestMIDIAccess();
+  const iac = (ports) => [...ports.values()].find((p) => /IAC/.test(p.name));
+  input = iac(midi.inputs);
+  output = iac(midi.outputs);
+  if (!input || !output) throw new Error("no IAC port: tick 'Device is online' in Audio MIDI Setup");
+  input.onmidimessage = onMessage;
+  log.meta.ports = { in: input.name, out: output.name };
+  const beat = 600, region = 8 * beat, n = PROGRESSION.length * passes, step = beat / n;
+  const t0 = performance.now() + 1500; // the band's first beat
+  log.meta.t0 = t0;
+  log.meta.strikes = [];
+  for (let i = 0; i < n; i++) {
+    const [name, notes] = PROGRESSION[i % PROGRESSION.length];
+    const at = t0 + i * region - beat + i * step; // in the beat before the chord's two bars
+    const off = t0 + (i + 1) * region - beat + (i + 1) * step - 5; // just before the next strike
+    for (const p of notes) {
+      output.send([0x90, p, 80], at);
+      output.send([0x90, p, 0], i === n - 1 ? at + 400 : off);
+    }
+    log.meta.strikes.push({ at, offsetMs: +(i * step).toFixed(1), name });
+  }
+  start(t0);
+  const end = t0 + n * region;
+  await new Promise((r) => setTimeout(r, end - performance.now()));
+  stop();
+  await new Promise((r) => setTimeout(r, 800)); // the second CC 123, and anything still queued
+  log.meta.end = performance.now();
+  return log;
+}
+if (new URLSearchParams(location.search).get("loopback") === "1")
+  window.__jam = loopback().then((l) => (window.__jamLog = l), (e) => (window.__jamError = String(e)));
+</script>

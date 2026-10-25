@@ -43,19 +43,19 @@ Issue: #407
   `node <check> --out <dir>`, and each check keeps spawning its own server: GitHub's CPU, not Eric's. A shard runs
   its checks one at a time.
 - **Selection** (`run-checks.mjs --base <ref> --shard <i>/<n> --out <dir>`, or `--all` in place of `--base`):
-  - Always `web/e2e/verify.mjs`.
-  - For each file the PR changes (`git diff --name-only <base>...HEAD`) under `web/src/`, walk up from its folder and
-    take the `verify*.mjs` files of the first folder that has any. `web/src/game/notice-toast/index.ts` gives
-    `verify-toast.mjs`; `web/src/operator/x.tsx` gives `verify-operator.mjs`; `web/src/game/fever-stage/x.ts` gives
-    none.
-  - Every check when the PR touches shared code: `web/src/game/core/`, `web/src/contracts/`, `web/src/app/`,
-    `web/src/game/layers.ts`, `web/e2e/`, `web/package.json`, `web/pnpm-lock.yaml`, `web/next.config.ts`,
-    `web/public/songs/twinkle/`, `.github/workflows/ci.yml`. A push to main runs every check (`--all`).
+  - **A pull request and a push to main: the smoke check only,** `web/e2e/verify.mjs` on one shard. The exception is a
+    change to the runner or the workflow (`web/e2e/` or `.github/workflows/ci.yml`), which runs every check.
+  - **The full suite** (`--all`) runs on a `schedule` every 30 min and by hand (`workflow_dispatch`), over at most
+    8 shards. A red full run files or updates one issue labeled `bug` and `ci-red`. It names the failing checks and
+    the commits since the last green full run, and it doesn't freeze merges. The decision is
+    `ci-browser-pr-scope.md` (Eric, 2026-10-25).
   - "Every check" is `web/e2e/verify.mjs` plus `web/src/**/verify*.mjs`, found at run time, so a new check joins
     without editing the runner.
-  - Shard `i` of `n` takes the sorted list's entries whose index mod `n` is `i - 1`. Every check lands in exactly one
-    shard.
-- **Retry:** a failing check reruns once, into a fresh `--out` folder. Passes on retry: the shard passes and prints
+  - Shards balance by each check's measured seconds (`run-checks.seconds.json`): longest first, onto the lightest
+    shard. Every check lands in exactly one shard (decision `ci-browser-shard-balance.md`). `NOT_IN_CI` lists checks
+    that smaller checks cover (the whole `verify-sheet.mjs`).
+- **Retry, on main only:** on a pull request the first failure fails the shard. On main a failing check reruns once,
+  into a fresh `--out` folder. Passes on retry: the shard passes and prints
   `::warning title=flaky::flaky: <check>` (an annotation on the PR). Fails twice: the shard fails. Exit 0 when every
   check passed, 1 otherwise. No check's tolerance, timeout or arguments change; the runner passes only `--out`.
 - **Known red** (decision `ci-browser-known-red.md`): a check that is already red on `origin/main` when the job

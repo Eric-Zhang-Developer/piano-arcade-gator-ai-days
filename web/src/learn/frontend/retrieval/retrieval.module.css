@@ -1,0 +1,78 @@
+/* The retrieval test: one bracketed panel on the page's own black, nothing beside it. Tokens only, square, upright. */
+.screen {
+  min-height: calc(100dvh - var(--learn-header-height));
+  background: var(--learn-bg);
+  color: var(--learn-text);
+  padding: 40px 48px;
+  font-size: 16px;
+}
+.screen .column { width: min(880px, 100%); margin: 0 auto; }
+
+.screen .prompt {
+  margin: 0 0 28px;
+  font-size: 36px;
+  line-height: 1.15;
+  font-style: normal;
+  color: var(--learn-text);
+}
+.screen .subhead { margin: 0 0 12px; font-size: 24px; font-style: normal; color: var(--learn-secondary); }
+
+.screen .options { margin: 0; padding: 0; border: 0; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.screen .hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+.screen .option {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  border: 1px solid var(--learn-border);
+  border-radius: 0;
+  background: var(--learn-bg);
+}
+.screen .option[data-picked] { border-color: var(--learn-secondary); }
+.screen .option[data-verdict='correct'] { border-color: var(--learn-accent); }
+.screen .option:has(input:focus-visible) { outline: 2px solid var(--learn-text); outline-offset: 2px; }
+
+.screen .choice { display: flex; align-items: center; gap: 16px; padding: 14px 20px; font-size: 18px; cursor: pointer; }
+.screen .choice input {
+  appearance: none;
+  flex: none;
+  width: 20px; height: 20px; margin: 0; padding: 3px;
+  border: 2px solid var(--learn-muted);
+  border-radius: 0;
+  background: transparent;
+  background-clip: content-box;
+  cursor: pointer;
+}
+.screen .choice input:checked { border-color: var(--learn-secondary); background-color: var(--learn-secondary); }
+.screen .option[data-verdict='correct'] .choice input { border-color: var(--learn-accent); background-color: var(--learn-accent); }
+.screen .choice input:focus-visible { outline: none; }
+.screen .choice input:disabled { opacity: 1; cursor: default; }
+.screen .choice:has(input:disabled) { cursor: default; }
+
+.screen .feedback:not(:empty) {
+  width: 360px;
+  padding: 14px 20px;
+  border-left: 1px solid var(--learn-border);
+  display: flex; flex-direction: column; gap: 6px; align-items: flex-start;
+}
+.screen .feedback p { margin: 0; color: var(--learn-text); }
+
+.screen .actions { display: flex; gap: 16px; align-items: center; margin-top: 28px; }
+.screen :is(input, button, a):focus-visible { outline: 2px solid var(--learn-text); outline-offset: 2px; }
+
+.screen .revisit { margin: 0 0 20px; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+.screen .note { margin: 0; color: var(--learn-muted); }
+.screen .primaryLink {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 0;
+  background: var(--learn-accent);
+  color: var(--learn-bg);
+  font-family: var(--learn-font-data);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}

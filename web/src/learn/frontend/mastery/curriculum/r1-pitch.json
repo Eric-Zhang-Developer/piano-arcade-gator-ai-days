@@ -1,0 +1,5024 @@
+{
+  "nodes": [
+    {
+      "id": "pitch.staff-lines-spaces",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "The five-line staff: lines and spaces",
+      "whyImportant": "Every written note sits on a line or in a space, so counting them is how a reader finds a note's place.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Notation of Notes, Clefs, and Ledger Lines",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notation-of-notes-clefs-and-ledger-lines/"
+        },
+        {
+          "title": "Wikipedia: Staff (music)",
+          "url": "https://en.wikipedia.org/wiki/Staff_(music)"
+        }
+      ]
+    },
+    {
+      "id": "pitch.letter-names",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "The seven letter names A to G",
+      "whyImportant": "Notes are named with only seven letters that repeat, so knowing the cycle lets a reader step up or down from any note.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        },
+        {
+          "title": "Open Music Theory, v2: Pitch and Pitch Class",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/pitch-and-pitch-class/"
+        }
+      ]
+    },
+    {
+      "id": "pitch.treble-clef",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "The treble (G) clef",
+      "whyImportant": "The right hand usually reads the treble staff, and the clef's curl tells the reader which line is G.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Reading Clefs",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/clefs/"
+        },
+        {
+          "title": "Wikipedia: Clef",
+          "url": "https://en.wikipedia.org/wiki/Clef"
+        }
+      ]
+    },
+    {
+      "id": "pitch.bass-clef",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "The bass (F) clef",
+      "whyImportant": "The left hand usually reads the bass staff, and its two dots surround the F line.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Reading Clefs",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/clefs/"
+        },
+        {
+          "title": "Wikipedia: Clef",
+          "url": "https://en.wikipedia.org/wiki/Clef"
+        }
+      ]
+    },
+    {
+      "id": "pitch.middle-c",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Middle C (C4)",
+      "whyImportant": "Middle C joins the two staves and is the landmark both hands read outward from.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: American Standard Pitch Notation (ASPN)",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/aspn/"
+        },
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        },
+        {
+          "title": "Wikipedia: Scientific pitch notation",
+          "url": "https://en.wikipedia.org/wiki/Scientific_pitch_notation"
+        }
+      ]
+    },
+    {
+      "id": "pitch.ledger-lines",
+      "region": "pitch",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Ledger lines",
+      "whyImportant": "Notes above or below the staff use short extra lines, and reading them by counting is what keeps high and low notes readable.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Notation of Notes, Clefs, and Ledger Lines",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notation-of-notes-clefs-and-ledger-lines/"
+        },
+        {
+          "title": "Open Music Theory, v2: Reading Clefs",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/clefs/"
+        },
+        {
+          "title": "Wikipedia: Ledger line",
+          "url": "https://en.wikipedia.org/wiki/Ledger_line"
+        }
+      ]
+    },
+    {
+      "id": "pitch.accidentals",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Sharps, flats and naturals",
+      "whyImportant": "Accidentals reach the black keys and change a note by a semitone, so missing one plays a wrong key.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Half Steps, Whole Steps, and Accidentals",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/half-and-whole-steps/"
+        },
+        {
+          "title": "Wikipedia: Accidental (music)",
+          "url": "https://en.wikipedia.org/wiki/Accidental_(music)"
+        }
+      ]
+    },
+    {
+      "id": "pitch.accidental-duration",
+      "region": "pitch",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "How long an accidental lasts",
+      "whyImportant": "An accidental holds for the rest of the bar on that line or space, so a reader must carry it forward without a new sign.",
+      "sources": [
+        {
+          "title": "Wikipedia: Accidental (music)",
+          "url": "https://en.wikipedia.org/wiki/Accidental_(music)"
+        }
+      ]
+    },
+    {
+      "id": "pitch.double-accidentals",
+      "region": "pitch",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Double sharps and double flats",
+      "whyImportant": "Some keys and chords need a note raised or lowered by two semitones, and the reader must still find the right key.",
+      "sources": [
+        {
+          "title": "Wikipedia: Accidental (music)",
+          "url": "https://en.wikipedia.org/wiki/Accidental_(music)"
+        },
+        {
+          "title": "Open Music Theory, v2: Half Steps, Whole Steps, and Accidentals",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/half-and-whole-steps/"
+        }
+      ]
+    },
+    {
+      "id": "pitch.tones-semitones",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Semitones and whole tones",
+      "whyImportant": "Semitones and tones are the distances between keys, and they explain why some white keys have no black key between them.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Half Steps, Whole Steps, and Accidentals",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/half-and-whole-steps/"
+        },
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        }
+      ]
+    },
+    {
+      "id": "pitch.enharmonics",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Enharmonic spellings",
+      "whyImportant": "One key can have more than one name, so a reader must map C sharp, D flat or E sharp to the right key without hesitating.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Half Steps, Whole Steps, and Accidentals",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/half-and-whole-steps/"
+        },
+        {
+          "title": "Wikipedia: Enharmonic equivalence",
+          "url": "https://en.wikipedia.org/wiki/Enharmonic_equivalence"
+        }
+      ]
+    },
+    {
+      "id": "pitch.octave-signs",
+      "region": "pitch",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Octave signs: 8va, 8vb and 15ma",
+      "whyImportant": "Very high and low passages are written with octave signs, and missing one puts the hand in the wrong register.",
+      "sources": [
+        {
+          "title": "Wikipedia: Ottava",
+          "url": "https://en.wikipedia.org/wiki/Ottava"
+        }
+      ]
+    },
+    {
+      "id": "pitch.keyboard-layout",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "White and black keys in groups of two and three",
+      "whyImportant": "The black-key groups are the map of the keyboard: every white key is found from them without counting from the end.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        },
+        {
+          "title": "Wikipedia: Musical keyboard",
+          "url": "https://en.wikipedia.org/wiki/Musical_keyboard"
+        }
+      ]
+    },
+    {
+      "id": "pitch.keyboard-registers",
+      "region": "pitch",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "The 88 keys and their octave numbers",
+      "whyImportant": "Octave numbers name each register from A0 to C8, so a reader can place any written note on the full keyboard.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: American Standard Pitch Notation (ASPN)",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/aspn/"
+        },
+        {
+          "title": "Wikipedia: Piano key frequencies",
+          "url": "https://en.wikipedia.org/wiki/Piano_key_frequencies"
+        },
+        {
+          "title": "Wikipedia: Scientific pitch notation",
+          "url": "https://en.wikipedia.org/wiki/Scientific_pitch_notation"
+        }
+      ]
+    },
+    {
+      "id": "pitch.octave-equivalence",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Octaves share a letter name",
+      "whyImportant": "Notes an octave apart share a name and a role, which lets one tune be read and played in any register.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        },
+        {
+          "title": "Open Music Theory, v2: Pitch and Pitch Class",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/pitch-and-pitch-class/"
+        }
+      ]
+    },
+    {
+      "id": "pitch.alto-clef",
+      "region": "pitch",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "The alto (C) clef",
+      "whyImportant": "Viola music and Grade 5 theory use the alto clef, where the middle line is middle C.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Reading Clefs",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/clefs/"
+        },
+        {
+          "title": "Wikipedia: Clef",
+          "url": "https://en.wikipedia.org/wiki/Clef"
+        }
+      ]
+    },
+    {
+      "id": "pitch.tenor-clef",
+      "region": "pitch",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "The tenor (C) clef",
+      "whyImportant": "Cello, bassoon and trombone parts use the tenor clef, where the fourth line is middle C.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Reading Clefs",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/clefs/"
+        },
+        {
+          "title": "Wikipedia: Clef",
+          "url": "https://en.wikipedia.org/wiki/Clef"
+        }
+      ]
+    },
+    {
+      "id": "pitch.clef-transcription",
+      "region": "pitch",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Rewriting a note in another clef at the same pitch",
+      "whyImportant": "Grade 5 asks a reader to move a melody between clefs without changing its sound, which tests knowing each clef cold.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Reading Clefs",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/clefs/"
+        },
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        }
+      ]
+    },
+    {
+      "id": "pitch.steps-and-skips",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Steps and skips on the staff",
+      "whyImportant": "Reading the distance between notes, not every name, is how fluent readers keep up with a line.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        },
+        {
+          "title": "Open Music Theory, v2: Notation of Notes, Clefs, and Ledger Lines",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notation-of-notes-clefs-and-ledger-lines/"
+        }
+      ]
+    },
+    {
+      "id": "pitch.landmark-notes",
+      "region": "pitch",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Landmark notes on the grand staff",
+      "whyImportant": "A few fixed anchors (treble G, bass F, the Cs) let a reader name any note by a short step from the nearest one.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Reading Clefs",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/clefs/"
+        },
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        }
+      ]
+    },
+    {
+      "id": "pitch.stem-direction",
+      "region": "pitch",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Which way stems point",
+      "whyImportant": "Stems point by the note's place on the staff, so their direction is a quick check of whether a note is high or low.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Notation of Notes, Clefs, and Ledger Lines",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notation-of-notes-clefs-and-ledger-lines/"
+        },
+        {
+          "title": "Wikipedia: Stem (music)",
+          "url": "https://en.wikipedia.org/wiki/Stem_(music)"
+        }
+      ]
+    },
+    {
+      "id": "pitch.find-keys",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Finding a named key from the black-key groups",
+      "whyImportant": "Before reading can turn into playing, the hand must land on the named key straight away.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        },
+        {
+          "title": "Wikipedia: Musical keyboard",
+          "url": "https://en.wikipedia.org/wiki/Musical_keyboard"
+        }
+      ]
+    },
+    {
+      "id": "pitch.play-registers",
+      "region": "pitch",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Playing the same tune in different registers",
+      "whyImportant": "Moving a tune by octaves proves the reader hears the octave number, not just the letter.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: American Standard Pitch Notation (ASPN)",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/aspn/"
+        },
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        }
+      ]
+    },
+    {
+      "id": "pitch.read-treble-notes",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Reading treble-staff notes at the keyboard",
+      "whyImportant": "Most melodies in the song list sit in the treble staff, so naming and playing them without hesitation is the core reading skill.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Reading Clefs",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/clefs/"
+        },
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        }
+      ]
+    },
+    {
+      "id": "pitch.read-bass-notes",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Reading bass-staff notes at the keyboard",
+      "whyImportant": "Left-hand parts in the song list are written in the bass staff, and slow bass reading holds back the whole piece.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Reading Clefs",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/clefs/"
+        },
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        }
+      ]
+    },
+    {
+      "id": "pitch.read-ledger-notes",
+      "region": "pitch",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Playing notes written on ledger lines",
+      "whyImportant": "Pieces like Fur Elise and the Clementi sonatina climb above the staff, and ledger notes must be read as fast as staff notes.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Notation of Notes, Clefs, and Ledger Lines",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notation-of-notes-clefs-and-ledger-lines/"
+        },
+        {
+          "title": "Wikipedia: Ledger line",
+          "url": "https://en.wikipedia.org/wiki/Ledger_line"
+        }
+      ]
+    },
+    {
+      "id": "pitch.play-accidentals",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Playing sharps and flats as written",
+      "whyImportant": "Black-key notes appear in almost every song on the list, and a missed accidental is the commonest wrong note.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Half Steps, Whole Steps, and Accidentals",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/half-and-whole-steps/"
+        },
+        {
+          "title": "Wikipedia: Accidental (music)",
+          "url": "https://en.wikipedia.org/wiki/Accidental_(music)"
+        }
+      ]
+    },
+    {
+      "id": "pitch.play-unusual-spellings",
+      "region": "pitch",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Playing E sharp, B sharp, C flat and F flat",
+      "whyImportant": "Keys with many sharps or flats spell white keys with accidentals, and the hand must land on the white key the name means.",
+      "sources": [
+        {
+          "title": "Wikipedia: Enharmonic equivalence",
+          "url": "https://en.wikipedia.org/wiki/Enharmonic_equivalence"
+        },
+        {
+          "title": "Open Music Theory, v2: Half Steps, Whole Steps, and Accidentals",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/half-and-whole-steps/"
+        }
+      ]
+    },
+    {
+      "id": "pitch.play-octave-signs",
+      "region": "pitch",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Playing under an octave sign",
+      "whyImportant": "An 8va or 8vb line moves the whole passage, and the hand must shift a full octave while reading the same shapes.",
+      "sources": [
+        {
+          "title": "Wikipedia: Ottava",
+          "url": "https://en.wikipedia.org/wiki/Ottava"
+        }
+      ]
+    },
+    {
+      "id": "pitch.five-finger-position",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Playing in a five-finger position",
+      "whyImportant": "Most beginner tunes fit under five fingers, so reading inside one position lets the eyes stay on the page.",
+      "sources": [
+        {
+          "title": "Wikipedia: Fingering (music)",
+          "url": "https://en.wikipedia.org/wiki/Fingering_(music)"
+        }
+      ]
+    },
+    {
+      "id": "pitch.position-shift",
+      "region": "pitch",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Moving the hand to a new position",
+      "whyImportant": "Songs like the Minuet in G run past five notes, and a clean shift keeps the line in time.",
+      "sources": [
+        {
+          "title": "Wikipedia: Fingering (music)",
+          "url": "https://en.wikipedia.org/wiki/Fingering_(music)"
+        }
+      ]
+    },
+    {
+      "id": "pitch.read-by-intervals",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Reading by steps and skips",
+      "whyImportant": "Reading the shape from note to note, instead of naming each one, is what lets sight-reading keep the tempo.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        },
+        {
+          "title": "Wikipedia: Sight-reading",
+          "url": "https://en.wikipedia.org/wiki/Sight-reading"
+        }
+      ]
+    },
+    {
+      "id": "pitch.sight-read-single-line",
+      "region": "pitch",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Sight-reading a single line",
+      "whyImportant": "Learning new songs fast depends on playing an unseen line at a steady tempo, wrong notes and all.",
+      "sources": [
+        {
+          "title": "Wikipedia: Sight-reading",
+          "url": "https://en.wikipedia.org/wiki/Sight-reading"
+        }
+      ]
+    },
+    {
+      "id": "pitch.cross-staff-line",
+      "region": "pitch",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Reading a line that crosses between the staves",
+      "whyImportant": "Scales and broken chords pass across middle C from one staff and hand to the other, and the hand-over must not break the line.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        },
+        {
+          "title": "Open Music Theory, v2: Reading Clefs",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/clefs/"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "pitch-grand-staff",
+      "to": "pitch.staff-lines-spaces",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Naming a note on the grand staff starts with counting which line or space it sits on."
+    },
+    {
+      "from": "pitch-grand-staff",
+      "to": "pitch.letter-names",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Every note on the grand staff is named with one of the seven letters."
+    },
+    {
+      "from": "pitch-grand-staff",
+      "to": "pitch.treble-clef",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "The grand staff's upper staff is read in the treble clef."
+    },
+    {
+      "from": "pitch-grand-staff",
+      "to": "pitch.bass-clef",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "The grand staff's lower staff is read in the bass clef."
+    },
+    {
+      "from": "pitch-grand-staff",
+      "to": "pitch.middle-c",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Middle C is the note that joins the grand staff's two staves."
+    },
+    {
+      "from": "pitch-grand-staff",
+      "to": "pitch.ledger-lines",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Notes beyond either staff of the grand staff are written on ledger lines."
+    },
+    {
+      "from": "pitch-grand-staff",
+      "to": "pitch.accidentals",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A note name on the grand staff is incomplete until any sharp, flat or natural is read with it."
+    },
+    {
+      "from": "pitch-grand-staff",
+      "to": "pitch.landmark-notes",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Landmark notes are the grand-staff positions readers memorise first and count from."
+    },
+    {
+      "from": "pitch-grand-staff",
+      "to": "pitch.keyboard-layout",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "The grand staff maps to the keyboard, and each named note becomes a key found from the black-key groups."
+    },
+    {
+      "from": "pitch-grand-staff",
+      "to": "pitch.octave-signs",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Octave signs change which octave a grand-staff note sounds in without changing where it is written."
+    },
+    {
+      "from": "pitch-grand-staff",
+      "to": "pitch.stem-direction",
+      "relation": "in-context",
+      "weight": 2,
+      "rationale": "Stems are drawn by a note's place on the staff, a side detail of grand-staff notation."
+    },
+    {
+      "from": "pitch-grand-staff",
+      "to": "pitch.clef-transcription",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Rewriting between clefs tests that each clef's note names are known at the same pitch."
+    },
+    {
+      "from": "pitch-grand-staff",
+      "to": "pitch.read-treble-notes",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Reading the treble staff at the keyboard is grand-staff naming turned into keys."
+    },
+    {
+      "from": "pitch-grand-staff",
+      "to": "pitch.read-bass-notes",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Reading the bass staff at the keyboard is grand-staff naming turned into keys."
+    },
+    {
+      "from": "pitch-grand-staff",
+      "to": "pitch.cross-staff-line",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Lines that cross middle C use both staves of the grand staff at once."
+    },
+    {
+      "from": "pitch.staff-lines-spaces",
+      "to": "pitch.treble-clef",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The treble clef gives the five lines and four spaces their names."
+    },
+    {
+      "from": "pitch.staff-lines-spaces",
+      "to": "pitch.bass-clef",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The bass clef gives the five lines and four spaces their names."
+    },
+    {
+      "from": "pitch.staff-lines-spaces",
+      "to": "pitch.steps-and-skips",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A step is a line to the next space; a skip is a line to the next line."
+    },
+    {
+      "from": "pitch.staff-lines-spaces",
+      "to": "pitch.stem-direction",
+      "relation": "in-context",
+      "weight": 2,
+      "rationale": "Stem direction is decided by a note's position relative to the middle line."
+    },
+    {
+      "from": "pitch.letter-names",
+      "to": "pitch.steps-and-skips",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Interval sizes are counted in letter names, both ends included."
+    },
+    {
+      "from": "pitch.letter-names",
+      "to": "pitch.octave-equivalence",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The seven letters repeat at every octave."
+    },
+    {
+      "from": "pitch.treble-clef",
+      "to": "pitch.bass-clef",
+      "relation": "contradicts",
+      "weight": 4,
+      "rationale": "The same staff position has different names in the two clefs, so a reader used to one misreads the other by two letters."
+    },
+    {
+      "from": "pitch.treble-clef",
+      "to": "pitch.alto-clef",
+      "relation": "contradicts",
+      "weight": 3,
+      "rationale": "The alto clef's lines sit one letter above the treble clef's, a frequent source of misreadings."
+    },
+    {
+      "from": "pitch.alto-clef",
+      "to": "pitch.tenor-clef",
+      "relation": "analogous",
+      "weight": 4,
+      "rationale": "Both are C clefs: the clef marks middle C on a line, the third for alto and the fourth for tenor."
+    },
+    {
+      "from": "pitch.alto-clef",
+      "to": "pitch.tenor-clef",
+      "relation": "contradicts",
+      "weight": 3,
+      "rationale": "The two C clefs sit one line apart, so their notes are easily confused."
+    },
+    {
+      "from": "pitch.treble-clef",
+      "to": "pitch.bass-clef",
+      "relation": "analogous",
+      "weight": 3,
+      "rationale": "Both clefs name one landmark line, G for treble and F for bass, and every other note is counted from it."
+    },
+    {
+      "from": "pitch.alto-clef",
+      "to": "pitch.clef-transcription",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Transcription exercises at Grade 5 move melodies into and out of the alto clef."
+    },
+    {
+      "from": "pitch.tenor-clef",
+      "to": "pitch.clef-transcription",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Transcription exercises at Grade 5 move melodies into and out of the tenor clef."
+    },
+    {
+      "from": "pitch.middle-c",
+      "to": "pitch.alto-clef",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The alto clef is defined by where it puts middle C."
+    },
+    {
+      "from": "pitch.middle-c",
+      "to": "pitch.tenor-clef",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The tenor clef is defined by where it puts middle C."
+    },
+    {
+      "from": "pitch.middle-c",
+      "to": "pitch.ledger-lines",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Middle C is the first ledger-line note most readers meet."
+    },
+    {
+      "from": "pitch.middle-c",
+      "to": "pitch.keyboard-registers",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Middle C, C4, is where the octave numbering is anchored for most readers."
+    },
+    {
+      "from": "pitch.middle-c",
+      "to": "pitch.landmark-notes",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Middle C is the central landmark of the grand staff."
+    },
+    {
+      "from": "pitch.landmark-notes",
+      "to": "pitch.treble-clef",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Treble G is the landmark the treble clef is drawn around."
+    },
+    {
+      "from": "pitch.landmark-notes",
+      "to": "pitch.bass-clef",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Bass F is the landmark the bass clef is drawn around."
+    },
+    {
+      "from": "pitch.landmark-notes",
+      "to": "pitch.steps-and-skips",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Readers name an unknown note by stepping or skipping from the nearest landmark."
+    },
+    {
+      "from": "pitch.ledger-lines",
+      "to": "pitch.octave-signs",
+      "relation": "analogous",
+      "weight": 3,
+      "rationale": "Both handle notes beyond the staff; octave signs replace long stacks of ledger lines."
+    },
+    {
+      "from": "pitch.ledger-lines",
+      "to": "pitch.clef-transcription",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Moving a note into another clef often lands it on ledger lines."
+    },
+    {
+      "from": "pitch.accidentals",
+      "to": "pitch.accidental-duration",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Knowing what an accidental does is not enough without knowing how long it lasts."
+    },
+    {
+      "from": "pitch.accidentals",
+      "to": "pitch.tones-semitones",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Sharps and flats each move a note by one semitone."
+    },
+    {
+      "from": "pitch.accidentals",
+      "to": "pitch.double-accidentals",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Double sharps and double flats move a note by two semitones instead of one."
+    },
+    {
+      "from": "pitch.accidentals",
+      "to": "pitch.enharmonics",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Sharps and flats give each black key two names."
+    },
+    {
+      "from": "pitch.tones-semitones",
+      "to": "pitch.keyboard-layout",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The missing black keys between E-F and B-C are where white keys sit a semitone apart."
+    },
+    {
+      "from": "pitch.tones-semitones",
+      "to": "pitch.enharmonics",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "E sharp is F because E to F is already a semitone."
+    },
+    {
+      "from": "pitch.enharmonics",
+      "to": "pitch.double-accidentals",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "F double sharp is the key G: double accidentals are read through enharmonic spelling."
+    },
+    {
+      "from": "pitch.enharmonics",
+      "to": "pitch.letter-names",
+      "relation": "contradicts",
+      "weight": 3,
+      "rationale": "One key, many names: the habit of one letter per key breaks on E sharp, C flat and double accidentals."
+    },
+    {
+      "from": "pitch.keyboard-layout",
+      "to": "pitch.keyboard-registers",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The black-key groups repeat across the 88 keys, one set per octave."
+    },
+    {
+      "from": "pitch.keyboard-registers",
+      "to": "pitch.octave-equivalence",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Octave numbers name which copy of a letter is meant."
+    },
+    {
+      "from": "pitch.octave-equivalence",
+      "to": "pitch.octave-signs",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "An octave sign moves notes to the same letters an octave away."
+    },
+    {
+      "from": "pitch.accidental-duration",
+      "to": "pitch.octave-equivalence",
+      "relation": "contradicts",
+      "weight": 2,
+      "rationale": "An accidental applies only to its own staff position, not to the same letter in other octaves."
+    },
+    {
+      "from": "pitch.find-keys",
+      "to": "pitch.keyboard-layout",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Finding a named key is done from the black-key groups."
+    },
+    {
+      "from": "pitch.find-keys",
+      "to": "pitch.letter-names",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A key is found by its letter name."
+    },
+    {
+      "from": "pitch.play-registers",
+      "to": "pitch.keyboard-registers",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Playing in a register means finding the octave number on the keyboard."
+    },
+    {
+      "from": "pitch.play-registers",
+      "to": "pitch.octave-equivalence",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The same tune in another octave keeps its letters."
+    },
+    {
+      "from": "pitch.read-treble-notes",
+      "to": "pitch.treble-clef",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Reading treble notes at the keyboard uses the treble clef's names."
+    },
+    {
+      "from": "pitch.read-treble-notes",
+      "to": "pitch.find-keys",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Each name read must land on its key."
+    },
+    {
+      "from": "pitch.read-bass-notes",
+      "to": "pitch.bass-clef",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Reading bass notes at the keyboard uses the bass clef's names."
+    },
+    {
+      "from": "pitch.read-bass-notes",
+      "to": "pitch.find-keys",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Each name read must land on its key."
+    },
+    {
+      "from": "pitch.read-bass-notes",
+      "to": "pitch.read-treble-notes",
+      "relation": "analogous",
+      "weight": 4,
+      "rationale": "The same skill on the other staff: name, find, play."
+    },
+    {
+      "from": "pitch.read-ledger-notes",
+      "to": "pitch.ledger-lines",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Playing ledger notes means counting ledger lines in time."
+    },
+    {
+      "from": "pitch.read-ledger-notes",
+      "to": "pitch.read-treble-notes",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Ledger notes extend treble reading above and below the staff."
+    },
+    {
+      "from": "pitch.play-accidentals",
+      "to": "pitch.accidentals",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Playing sharps and flats puts the accidental rules on the keys."
+    },
+    {
+      "from": "pitch.play-accidentals",
+      "to": "pitch.accidental-duration",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "An accidental early in a bar must be played again on later notes without a sign."
+    },
+    {
+      "from": "pitch.play-unusual-spellings",
+      "to": "pitch.enharmonics",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "E sharp, B sharp, C flat and F flat are played through their enharmonic white keys."
+    },
+    {
+      "from": "pitch.play-unusual-spellings",
+      "to": "pitch.double-accidentals",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Double accidentals are played the same way, by finding the key the spelling means."
+    },
+    {
+      "from": "pitch.play-unusual-spellings",
+      "to": "pitch.play-accidentals",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Unusual spellings are the hardest case of playing accidentals."
+    },
+    {
+      "from": "pitch.play-octave-signs",
+      "to": "pitch.octave-signs",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Playing under 8va or 8vb is the octave sign read in real time."
+    },
+    {
+      "from": "pitch.play-octave-signs",
+      "to": "pitch.play-registers",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "An octave sign is a forced change of register."
+    },
+    {
+      "from": "pitch.five-finger-position",
+      "to": "pitch.find-keys",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A position starts from finding its first key."
+    },
+    {
+      "from": "pitch.five-finger-position",
+      "to": "pitch.steps-and-skips",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Inside a position, a step is the next finger and a skip skips one."
+    },
+    {
+      "from": "pitch.position-shift",
+      "to": "pitch.five-finger-position",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "A shift moves the hand from one five-finger position to another."
+    },
+    {
+      "from": "pitch.position-shift",
+      "to": "pitch.read-by-intervals",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Seeing a leap on the page warns the hand that a shift is coming."
+    },
+    {
+      "from": "pitch.read-by-intervals",
+      "to": "pitch.steps-and-skips",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Reading by intervals is seeing steps and skips and playing them."
+    },
+    {
+      "from": "pitch.read-by-intervals",
+      "to": "pitch.read-treble-notes",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Interval reading works on top of knowing a few notes by name."
+    },
+    {
+      "from": "pitch.sight-read-single-line",
+      "to": "pitch.read-by-intervals",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Sight-reading keeps tempo by reading shapes rather than naming every note."
+    },
+    {
+      "from": "pitch.sight-read-single-line",
+      "to": "pitch.read-treble-notes",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A single line at sight needs quick note reading in its clef."
+    },
+    {
+      "from": "pitch.sight-read-single-line",
+      "to": "pitch.read-bass-notes",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A single line at sight needs quick note reading in its clef."
+    },
+    {
+      "from": "pitch.cross-staff-line",
+      "to": "pitch.middle-c",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "A line crosses between the staves at middle C."
+    },
+    {
+      "from": "pitch.cross-staff-line",
+      "to": "pitch.read-treble-notes",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The right hand's part of a crossing line is read in the treble staff."
+    },
+    {
+      "from": "pitch.cross-staff-line",
+      "to": "pitch.read-bass-notes",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The left hand's part of a crossing line is read in the bass staff."
+    }
+  ],
+  "items": [
+    {
+      "type": "theory",
+      "id": "pitch.staff-lines-spaces-1",
+      "nodeId": "pitch.staff-lines-spaces",
+      "prompt": "How many lines and spaces does one staff have?",
+      "answer": {
+        "id": "a",
+        "text": "Five lines and four spaces",
+        "explanation": "A staff is five lines; the gaps between them make four spaces."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Five lines and five spaces",
+          "explanation": "That counts the area above or below the staff as a space; only the four gaps between the lines are the staff's spaces."
+        },
+        {
+          "id": "c",
+          "text": "Four lines and five spaces",
+          "explanation": "Lines and spaces are swapped: there are five lines, and the four spaces sit between them."
+        },
+        {
+          "id": "d",
+          "text": "Six lines and five spaces",
+          "explanation": "A sixth line would be a ledger line added for one note, not part of the staff."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.staff-lines-spaces-2",
+      "nodeId": "pitch.staff-lines-spaces",
+      "prompt": "Which line of the staff is the first line?",
+      "answer": {
+        "id": "a",
+        "text": "The bottom line",
+        "explanation": "Lines and spaces are counted from the bottom up, so the first line is the lowest."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "The top line",
+          "explanation": "Counting runs upward, the same way pitch rises, so the top line is the fifth."
+        },
+        {
+          "id": "c",
+          "text": "The middle line",
+          "explanation": "The middle line is the third line, two lines up from the bottom."
+        },
+        {
+          "id": "d",
+          "text": "Whichever line the clef marks",
+          "explanation": "The clef names a line's pitch but does not change how lines are numbered: always bottom to top."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.letter-names-1",
+      "nodeId": "pitch.letter-names",
+      "prompt": "Going up from G, which letter name comes next?",
+      "answer": {
+        "id": "a",
+        "text": "A",
+        "explanation": "The musical alphabet runs A B C D E F G and then starts again at A."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "H",
+          "explanation": "English note names stop at G; there is no H in English usage."
+        },
+        {
+          "id": "c",
+          "text": "F",
+          "explanation": "F is below G; going up from G wraps around to A."
+        },
+        {
+          "id": "d",
+          "text": "G again, an octave higher",
+          "explanation": "The next G is seven letters up; the very next step is A."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.letter-names-2",
+      "nodeId": "pitch.letter-names",
+      "prompt": "How many different letter names do notes use?",
+      "answer": {
+        "id": "a",
+        "text": "Seven",
+        "explanation": "A, B, C, D, E, F and G: after G the names repeat."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Eight",
+          "explanation": "Eight counts the starting letter twice, as in C up to the next C; there are only seven names."
+        },
+        {
+          "id": "c",
+          "text": "Twelve",
+          "explanation": "Twelve is the number of different keys in an octave, white and black; the black keys reuse the seven letters with sharps or flats."
+        },
+        {
+          "id": "d",
+          "text": "Five",
+          "explanation": "Five is the number of black keys in an octave, not the number of letter names."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.treble-clef-1",
+      "nodeId": "pitch.treble-clef",
+      "prompt": "In the treble clef, which note is on the top line?",
+      "answer": {
+        "id": "a",
+        "text": "F (F5)",
+        "explanation": "Treble lines from the bottom are E G B D F, so the top line is F5."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "E (E5)",
+          "explanation": "E is the bottom line (E4) and the fourth space (E5); the top line is F."
+        },
+        {
+          "id": "c",
+          "text": "G (G5)",
+          "explanation": "G5 sits in the space just above the staff; the top line is one step lower, F5."
+        },
+        {
+          "id": "d",
+          "text": "A (A4)",
+          "explanation": "A4 is the second space (F A C E); it is not a line note."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.treble-clef-2",
+      "nodeId": "pitch.treble-clef",
+      "prompt": "In the treble clef, which note is in the third space?",
+      "answer": {
+        "id": "a",
+        "text": "C (C5)",
+        "explanation": "Treble spaces from the bottom spell F A C E, so the third space is C5."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "A (A4)",
+          "explanation": "A is the second space; counting starts at the bottom space, F."
+        },
+        {
+          "id": "c",
+          "text": "B (B4)",
+          "explanation": "B4 is the middle line, just below the third space."
+        },
+        {
+          "id": "d",
+          "text": "E (E5)",
+          "explanation": "E5 is the fourth (top) space."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.bass-clef-1",
+      "nodeId": "pitch.bass-clef",
+      "prompt": "In the bass clef, which note is on the bottom line?",
+      "answer": {
+        "id": "a",
+        "text": "G (G2)",
+        "explanation": "Bass lines from the bottom are G B D F A, so the bottom line is G2."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "E (E2)",
+          "explanation": "E is the treble clef's bottom line; read in bass clef the same line is G, two letters higher."
+        },
+        {
+          "id": "c",
+          "text": "F (F3)",
+          "explanation": "F3 is the fourth line, the one between the clef's two dots."
+        },
+        {
+          "id": "d",
+          "text": "A (A2)",
+          "explanation": "A2 is the bottom space; the bottom line is a step lower, G2."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.bass-clef-2",
+      "nodeId": "pitch.bass-clef",
+      "prompt": "Which line do the two dots of the bass clef surround?",
+      "answer": {
+        "id": "a",
+        "text": "The fourth line, F3",
+        "explanation": "The bass clef is an F clef: its dots sit either side of the fourth line, F3."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "The second line, B2",
+          "explanation": "The dots surround the fourth line from the bottom, not the second."
+        },
+        {
+          "id": "c",
+          "text": "The third line, D3",
+          "explanation": "D3 is the middle line; the dots sit one line higher, around F."
+        },
+        {
+          "id": "d",
+          "text": "The fourth line, F4",
+          "explanation": "The line is F3, below middle C; F4 is in the treble staff's bottom space."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.middle-c-1",
+      "nodeId": "pitch.middle-c",
+      "prompt": "Where is middle C written on the grand staff?",
+      "answer": {
+        "id": "a",
+        "text": "On one ledger line, below the treble staff or above the bass staff",
+        "explanation": "C4 is one ledger line below the treble staff; the same pitch is one ledger line above the bass staff."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "In the third space of the treble staff",
+          "explanation": "The third treble space is C5, the C an octave above middle C."
+        },
+        {
+          "id": "c",
+          "text": "In the second space of the bass staff",
+          "explanation": "The second bass space is C3, the C an octave below middle C."
+        },
+        {
+          "id": "d",
+          "text": "On the middle line of the treble staff",
+          "explanation": "The treble middle line is B4, seven white keys above middle C."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.middle-c-2",
+      "nodeId": "pitch.middle-c",
+      "prompt": "In American Standard Pitch Notation, what is middle C called?",
+      "answer": {
+        "id": "a",
+        "text": "C4",
+        "explanation": "ASPN numbers octaves from C; the C near the middle of the piano begins octave 4."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "C3",
+          "explanation": "C3 is an octave lower, written in the bass staff's second space. (Some music software calls middle C 'C3', but standard notation uses C4.)"
+        },
+        {
+          "id": "c",
+          "text": "C1",
+          "explanation": "C1 is near the bottom of the piano, three octaves below middle C."
+        },
+        {
+          "id": "d",
+          "text": "C5",
+          "explanation": "C5 is the C an octave above, in the treble staff's third space."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.ledger-lines-1",
+      "nodeId": "pitch.ledger-lines",
+      "prompt": "In the treble clef, which note sits on the first ledger line above the staff?",
+      "answer": {
+        "id": "a",
+        "text": "A5",
+        "explanation": "The top line is F5, the space above is G5, and the first ledger line above is A5."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "G5",
+          "explanation": "G5 sits just above the top line, with no ledger line; the ledger line is one step higher."
+        },
+        {
+          "id": "c",
+          "text": "C6",
+          "explanation": "C6 is on the second ledger line above (A5 line, B5 space, C6 line)."
+        },
+        {
+          "id": "d",
+          "text": "E5",
+          "explanation": "E5 is inside the staff, in the top space."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.ledger-lines-2",
+      "nodeId": "pitch.ledger-lines",
+      "prompt": "In the bass clef, which note sits on the first ledger line below the staff?",
+      "answer": {
+        "id": "a",
+        "text": "E2",
+        "explanation": "The bottom line is G2, the space below is F2, and the first ledger line below is E2."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "F2",
+          "explanation": "F2 hangs just below the bottom line with no ledger line; one step lower is the ledger line, E2."
+        },
+        {
+          "id": "c",
+          "text": "C2",
+          "explanation": "C2 is on the second ledger line below (E2 line, D2 space, C2 line)."
+        },
+        {
+          "id": "d",
+          "text": "C4",
+          "explanation": "C4 is the first ledger line above the bass staff, not below it."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.accidentals-1",
+      "nodeId": "pitch.accidentals",
+      "prompt": "What does a sharp sign do to a note?",
+      "answer": {
+        "id": "a",
+        "text": "Raises it by one semitone",
+        "explanation": "A sharp moves the note to the very next key to the right, one semitone higher."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Raises it by one whole tone",
+          "explanation": "A whole tone is two semitones; a sharp raises by only one (a double sharp raises by two)."
+        },
+        {
+          "id": "c",
+          "text": "Lowers it by one semitone",
+          "explanation": "That is a flat; a sharp raises."
+        },
+        {
+          "id": "d",
+          "text": "Cancels an earlier flat",
+          "explanation": "Cancelling is the natural sign's job; a sharp raises the note a semitone from its natural form."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.accidentals-2",
+      "nodeId": "pitch.accidentals",
+      "prompt": "Which key plays F sharp?",
+      "answer": {
+        "id": "a",
+        "text": "The black key just to the right of F",
+        "explanation": "F sharp is one semitone above F, the next key to the right, which is black."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "The black key just to the left of F",
+          "explanation": "There is no black key between E and F; the key just left of F is E, a semitone below, and sharps raise."
+        },
+        {
+          "id": "c",
+          "text": "G, the white key",
+          "explanation": "G is a whole tone above F; F sharp is only a semitone up."
+        },
+        {
+          "id": "d",
+          "text": "E, the white key",
+          "explanation": "E is a semitone below F; sharps move up, not down."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.accidental-duration-1",
+      "nodeId": "pitch.accidental-duration",
+      "prompt": "With no key signature, a bar has F sharp on the first beat and later another F on the same line with no sign. What is the second note?",
+      "answer": {
+        "id": "a",
+        "text": "F sharp",
+        "explanation": "An accidental applies to later notes on the same staff position until the bar line."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "F natural",
+          "explanation": "Without a new natural sign, the sharp still holds until the bar line."
+        },
+        {
+          "id": "c",
+          "text": "F double sharp",
+          "explanation": "Accidentals do not add up; the second F is simply F sharp again."
+        },
+        {
+          "id": "d",
+          "text": "It depends on the hand playing it",
+          "explanation": "The rule is about the staff position and the bar, not which hand plays."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.accidental-duration-2",
+      "nodeId": "pitch.accidental-duration",
+      "prompt": "With no key signature, F sharp appears in bar 1. In bar 2, an F on the same line has no sign and is not tied. What is it?",
+      "answer": {
+        "id": "a",
+        "text": "F natural",
+        "explanation": "The bar line cancels the accidental; only a tie carries it into the next bar."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "F sharp",
+          "explanation": "The sharp held only until the bar line; a new bar starts clean unless the note is tied over."
+        },
+        {
+          "id": "c",
+          "text": "F flat",
+          "explanation": "Nothing lowers the note; once the sharp ends, it is plain F."
+        },
+        {
+          "id": "d",
+          "text": "F sharp, but only an octave higher",
+          "explanation": "Accidentals do not jump octaves; this F is natural, and the sharp never applied to other octaves."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.double-accidentals-1",
+      "nodeId": "pitch.double-accidentals",
+      "prompt": "Which key plays F double sharp?",
+      "answer": {
+        "id": "a",
+        "text": "G, the white key",
+        "explanation": "A double sharp raises a note two semitones: F to F sharp to G."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "F sharp, the black key",
+          "explanation": "That is one semitone up; a double sharp raises by two."
+        },
+        {
+          "id": "c",
+          "text": "G sharp, the black key",
+          "explanation": "That is three semitones above F; a double sharp moves only two."
+        },
+        {
+          "id": "d",
+          "text": "E, the white key",
+          "explanation": "Sharps raise; E is below F."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.double-accidentals-2",
+      "nodeId": "pitch.double-accidentals",
+      "prompt": "Which key plays B double flat?",
+      "answer": {
+        "id": "a",
+        "text": "A, the white key",
+        "explanation": "A double flat lowers a note two semitones: B to B flat to A."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "B flat, the black key",
+          "explanation": "That is one semitone down; a double flat lowers by two."
+        },
+        {
+          "id": "c",
+          "text": "A flat, the black key",
+          "explanation": "That is three semitones below B; a double flat moves only two."
+        },
+        {
+          "id": "d",
+          "text": "C, the white key",
+          "explanation": "Flats lower; C is above B."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.tones-semitones-1",
+      "nodeId": "pitch.tones-semitones",
+      "prompt": "Which pair of white keys is a semitone apart, with no black key between them?",
+      "answer": {
+        "id": "a",
+        "text": "E and F",
+        "explanation": "E to F (and B to C) are the two white-key pairs with no black key between, so each is a semitone."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "C and D",
+          "explanation": "A black key (C sharp) lies between C and D, so they are a whole tone apart."
+        },
+        {
+          "id": "c",
+          "text": "F and G",
+          "explanation": "F sharp lies between them, so F to G is a whole tone."
+        },
+        {
+          "id": "d",
+          "text": "A and B",
+          "explanation": "B flat lies between them, so A to B is a whole tone."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.tones-semitones-2",
+      "nodeId": "pitch.tones-semitones",
+      "prompt": "How many semitones make one whole tone?",
+      "answer": {
+        "id": "a",
+        "text": "Two",
+        "explanation": "A whole tone is two semitones, as from C to D past C sharp."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "One",
+          "explanation": "One semitone is a half step, half of a whole tone."
+        },
+        {
+          "id": "c",
+          "text": "Three",
+          "explanation": "Three semitones make a minor third, a bigger gap than a tone."
+        },
+        {
+          "id": "d",
+          "text": "Twelve",
+          "explanation": "Twelve semitones make an octave."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.enharmonics-1",
+      "nodeId": "pitch.enharmonics",
+      "prompt": "Which note sounds the same as C sharp on the piano?",
+      "answer": {
+        "id": "a",
+        "text": "D flat",
+        "explanation": "C sharp and D flat are the same black key, two names for one sound."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "C flat",
+          "explanation": "C flat is below C (it is the key B), not above it."
+        },
+        {
+          "id": "c",
+          "text": "D sharp",
+          "explanation": "D sharp is the next black key up, a whole tone above C sharp."
+        },
+        {
+          "id": "d",
+          "text": "B sharp",
+          "explanation": "B sharp is the key C, a semitone below C sharp."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.enharmonics-2",
+      "nodeId": "pitch.enharmonics",
+      "prompt": "Which key plays E sharp?",
+      "answer": {
+        "id": "a",
+        "text": "F, the white key",
+        "explanation": "E to F is a semitone with no black key between, so E raised a semitone is the key F."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "The black key above E",
+          "explanation": "There is no black key between E and F; one semitone up from E is F."
+        },
+        {
+          "id": "c",
+          "text": "E, the white key",
+          "explanation": "A sharp always moves the note up a semitone, even when that lands on a white key."
+        },
+        {
+          "id": "d",
+          "text": "F sharp, the black key",
+          "explanation": "F sharp is two semitones above E; E sharp is only one."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.octave-signs-1",
+      "nodeId": "pitch.octave-signs",
+      "prompt": "A treble-staff C5 has '8va' written above it. Which C do you play?",
+      "answer": {
+        "id": "a",
+        "text": "C6",
+        "explanation": "8va above the notes means play them an octave higher than written: C5 becomes C6."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "C5",
+          "explanation": "The sign changes the sounding octave; playing as written ignores it."
+        },
+        {
+          "id": "c",
+          "text": "C4",
+          "explanation": "An octave lower is 8vb, written below the notes; 8va above means higher."
+        },
+        {
+          "id": "d",
+          "text": "C7",
+          "explanation": "Two octaves higher is 15ma; 8va is one octave."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.octave-signs-2",
+      "nodeId": "pitch.octave-signs",
+      "prompt": "A bass-staff C3 has '8vb' written below it. Which C do you play?",
+      "answer": {
+        "id": "a",
+        "text": "C2",
+        "explanation": "8vb below the notes means play them an octave lower than written: C3 becomes C2."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "C4",
+          "explanation": "8vb means lower; the higher octave is 8va."
+        },
+        {
+          "id": "c",
+          "text": "C3",
+          "explanation": "The sign changes the octave you play; playing as written ignores it."
+        },
+        {
+          "id": "d",
+          "text": "C1",
+          "explanation": "That is two octaves down (15mb); 8vb is one octave."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.keyboard-layout-1",
+      "nodeId": "pitch.keyboard-layout",
+      "prompt": "Which white key is just to the left of a group of two black keys?",
+      "answer": {
+        "id": "a",
+        "text": "C",
+        "explanation": "C sits just below the group of two black keys; D is between them and E just above."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "D",
+          "explanation": "D is between the two black keys, not to their left."
+        },
+        {
+          "id": "c",
+          "text": "F",
+          "explanation": "F is just left of the group of three black keys."
+        },
+        {
+          "id": "d",
+          "text": "B",
+          "explanation": "B is just left of C, at the right end of the group of three."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.keyboard-layout-2",
+      "nodeId": "pitch.keyboard-layout",
+      "prompt": "Which white key is just to the left of a group of three black keys?",
+      "answer": {
+        "id": "a",
+        "text": "F",
+        "explanation": "F sits just below the group of three; G and A are between them and B just above."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "C",
+          "explanation": "C is left of the group of two black keys."
+        },
+        {
+          "id": "c",
+          "text": "G",
+          "explanation": "G is between the first two black keys of the group of three."
+        },
+        {
+          "id": "d",
+          "text": "E",
+          "explanation": "E is just right of the group of two, one key before F."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.keyboard-registers-1",
+      "nodeId": "pitch.keyboard-registers",
+      "prompt": "What is the lowest key on a standard 88-key piano?",
+      "answer": {
+        "id": "a",
+        "text": "A0",
+        "explanation": "The piano runs from A0 at the bottom to C8 at the top."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "C0",
+          "explanation": "Octave 0 starts at C below the piano's range; the lowest key the piano actually has is A0."
+        },
+        {
+          "id": "c",
+          "text": "C1",
+          "explanation": "C1 is the lowest C, but A0 and B0 lie below it."
+        },
+        {
+          "id": "d",
+          "text": "A1",
+          "explanation": "A1 is an octave above the lowest key."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.keyboard-registers-2",
+      "nodeId": "pitch.keyboard-registers",
+      "prompt": "Which note is one white key below middle C (C4)?",
+      "answer": {
+        "id": "a",
+        "text": "B3",
+        "explanation": "Octave numbers change at C, so the B just below C4 belongs to octave 3."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "B4",
+          "explanation": "B4 is the B just below C5; octave numbers go up at each C, so the B below C4 is B3."
+        },
+        {
+          "id": "c",
+          "text": "C3",
+          "explanation": "C3 is seven white keys down, a whole octave."
+        },
+        {
+          "id": "d",
+          "text": "A3",
+          "explanation": "A3 is two white keys below middle C."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.octave-equivalence-1",
+      "nodeId": "pitch.octave-equivalence",
+      "prompt": "Which note is one octave above A3?",
+      "answer": {
+        "id": "a",
+        "text": "A4",
+        "explanation": "An octave up keeps the letter and adds one to the octave number."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "B3",
+          "explanation": "B3 is one white key up, a step, not an octave."
+        },
+        {
+          "id": "c",
+          "text": "A3",
+          "explanation": "That is the same note; an octave above is a different pitch with the same name."
+        },
+        {
+          "id": "d",
+          "text": "E4",
+          "explanation": "E4 is a fifth above A3, not an octave."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.octave-equivalence-2",
+      "nodeId": "pitch.octave-equivalence",
+      "prompt": "How many semitones above C4 is the next C?",
+      "answer": {
+        "id": "a",
+        "text": "Twelve",
+        "explanation": "An octave spans twelve keys, seven white and five black."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Seven",
+          "explanation": "Seven is the number of white keys (and letter names) in an octave; with the black keys there are twelve."
+        },
+        {
+          "id": "c",
+          "text": "Eight",
+          "explanation": "Eight counts the white keys from C to C including both ends; in semitones the distance is twelve."
+        },
+        {
+          "id": "d",
+          "text": "Five",
+          "explanation": "Five is only the black keys in an octave."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.alto-clef-1",
+      "nodeId": "pitch.alto-clef",
+      "prompt": "In the alto clef, which note is on the middle line?",
+      "answer": {
+        "id": "a",
+        "text": "C4 (middle C)",
+        "explanation": "The alto clef is a C clef centred on the third line, which makes that line middle C."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "B4",
+          "explanation": "B4 is the treble clef's middle line; the alto clef puts middle C there."
+        },
+        {
+          "id": "c",
+          "text": "D3",
+          "explanation": "D3 is the bass clef's middle line."
+        },
+        {
+          "id": "d",
+          "text": "A3",
+          "explanation": "A3 is the tenor clef's third line; in alto, the middle line is C4."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.alto-clef-2",
+      "nodeId": "pitch.alto-clef",
+      "prompt": "In the alto clef, which note is on the top line?",
+      "answer": {
+        "id": "a",
+        "text": "G4",
+        "explanation": "Alto lines from the bottom are F3 A3 C4 E4 G4."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "F5",
+          "explanation": "F5 is the treble clef's top line; alto sits lower, with middle C in the centre."
+        },
+        {
+          "id": "c",
+          "text": "A3",
+          "explanation": "A3 is the bass clef's top line, and the alto clef's second line."
+        },
+        {
+          "id": "d",
+          "text": "E4",
+          "explanation": "E4 is the alto clef's fourth line, just below the top line."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.tenor-clef-1",
+      "nodeId": "pitch.tenor-clef",
+      "prompt": "In the tenor clef, which line is middle C?",
+      "answer": {
+        "id": "a",
+        "text": "The fourth line",
+        "explanation": "The tenor clef is a C clef centred on the fourth line from the bottom."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "The third line",
+          "explanation": "The third line is middle C in the alto clef; tenor moves the C clef up one line."
+        },
+        {
+          "id": "c",
+          "text": "A ledger line below the staff",
+          "explanation": "That is middle C's place in the treble clef."
+        },
+        {
+          "id": "d",
+          "text": "The second line",
+          "explanation": "No common clef puts middle C on the second line; tenor uses the fourth."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.tenor-clef-2",
+      "nodeId": "pitch.tenor-clef",
+      "prompt": "In the tenor clef, which note is on the top line?",
+      "answer": {
+        "id": "a",
+        "text": "E4",
+        "explanation": "Tenor lines from the bottom are D3 F3 A3 C4 E4."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "G4",
+          "explanation": "G4 is the alto clef's top line; the tenor clef sits a third lower."
+        },
+        {
+          "id": "c",
+          "text": "F5",
+          "explanation": "F5 is the treble clef's top line."
+        },
+        {
+          "id": "d",
+          "text": "A3",
+          "explanation": "A3 is the tenor clef's middle line, two lines below the top."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.clef-transcription-1",
+      "nodeId": "pitch.clef-transcription",
+      "prompt": "Middle C, written in the alto clef, goes where?",
+      "answer": {
+        "id": "a",
+        "text": "On the middle line",
+        "explanation": "Alto is a C clef on the third line, so middle C is the middle line."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "On one ledger line below the staff",
+          "explanation": "That is middle C's place in the treble clef, not the alto."
+        },
+        {
+          "id": "c",
+          "text": "In the third space",
+          "explanation": "The alto clef's third space is D4, a step above middle C."
+        },
+        {
+          "id": "d",
+          "text": "On one ledger line above the staff",
+          "explanation": "That is middle C's place in the bass clef."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.clef-transcription-2",
+      "nodeId": "pitch.clef-transcription",
+      "prompt": "The bass clef's top-line note, A3, is rewritten in the treble clef at the same pitch. Where does it go?",
+      "answer": {
+        "id": "a",
+        "text": "On the second ledger line below the staff",
+        "explanation": "Below the treble staff: D4 hangs under the bottom line, C4 is the first ledger line, B3 the space under it, and A3 the second ledger line."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "On the top line",
+          "explanation": "The top treble line is F5; copying the line's position changes the pitch."
+        },
+        {
+          "id": "c",
+          "text": "In the second space",
+          "explanation": "That is A4, an octave higher: the letter matches but the octave does not."
+        },
+        {
+          "id": "d",
+          "text": "On the first ledger line below the staff",
+          "explanation": "That ledger line is middle C, two white keys above A3."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.steps-and-skips-1",
+      "nodeId": "pitch.steps-and-skips",
+      "prompt": "A note moves from a line to the next line up. What is that interval?",
+      "answer": {
+        "id": "a",
+        "text": "A third (a skip)",
+        "explanation": "Line to next line passes one space, so it spans three letter names: a third."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "A second (a step)",
+          "explanation": "A step is line to the next space, or space to the next line."
+        },
+        {
+          "id": "c",
+          "text": "A fourth",
+          "explanation": "A fourth goes from a line to the second space above it."
+        },
+        {
+          "id": "d",
+          "text": "A fifth",
+          "explanation": "A fifth is line to the second line above it."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.steps-and-skips-2",
+      "nodeId": "pitch.steps-and-skips",
+      "prompt": "Counting the way music theory does, what size of interval is C up to E?",
+      "answer": {
+        "id": "a",
+        "text": "A third",
+        "explanation": "Count both ends: C, D, E is three letter names, so a third."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "A second",
+          "explanation": "That counts only the gaps between the notes; theory counts every letter name, both ends included."
+        },
+        {
+          "id": "c",
+          "text": "A fourth",
+          "explanation": "C to F is a fourth; E is one letter lower."
+        },
+        {
+          "id": "d",
+          "text": "Two semitones",
+          "explanation": "C to E is four semitones; the size 'third' counts letter names, not keys."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.landmark-notes-1",
+      "nodeId": "pitch.landmark-notes",
+      "prompt": "Which C sits in the second space of the bass staff?",
+      "answer": {
+        "id": "a",
+        "text": "C3",
+        "explanation": "Bass spaces from the bottom are A2 C3 E3 G3, so the second space is C3, an octave below middle C."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "C4",
+          "explanation": "C4 is middle C, on a ledger line above the bass staff."
+        },
+        {
+          "id": "c",
+          "text": "C2",
+          "explanation": "C2 is on the second ledger line below the bass staff."
+        },
+        {
+          "id": "d",
+          "text": "E3",
+          "explanation": "E3 is the third space; the second space is C."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.landmark-notes-2",
+      "nodeId": "pitch.landmark-notes",
+      "prompt": "Which landmark note does the treble clef's curl circle?",
+      "answer": {
+        "id": "a",
+        "text": "G4, on the second line",
+        "explanation": "The treble clef is a G clef; its curl wraps the second line, G4."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "F3, on the fourth line",
+          "explanation": "That is the bass clef's landmark, marked by its two dots."
+        },
+        {
+          "id": "c",
+          "text": "C4, on a ledger line",
+          "explanation": "Middle C is a landmark, but the treble clef's curl marks G."
+        },
+        {
+          "id": "d",
+          "text": "E4, on the bottom line",
+          "explanation": "E4 is the bottom line; the curl is one line higher, on G."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.stem-direction-1",
+      "nodeId": "pitch.stem-direction",
+      "prompt": "A note sits above the middle line. Which way does its stem usually go?",
+      "answer": {
+        "id": "a",
+        "text": "Down, on the left side of the note",
+        "explanation": "Notes above the middle line take stems down, drawn from the left side."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Up, on the right side of the note",
+          "explanation": "That is for notes below the middle line."
+        },
+        {
+          "id": "c",
+          "text": "Down, on the right side of the note",
+          "explanation": "A down stem hangs from the left side; up stems go on the right."
+        },
+        {
+          "id": "d",
+          "text": "Up, on the left side of the note",
+          "explanation": "Up stems are drawn on the right side, and high notes take down stems anyway."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch.stem-direction-2",
+      "nodeId": "pitch.stem-direction",
+      "prompt": "Which way does the stem of a note on the middle line go?",
+      "answer": {
+        "id": "a",
+        "text": "Either way, depending on the notes around it",
+        "explanation": "Middle-line notes may point either way; the surrounding notes decide."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Always up",
+          "explanation": "Up is for notes below the middle line; the middle line itself can go either way."
+        },
+        {
+          "id": "c",
+          "text": "Always down",
+          "explanation": "Down is common, but the rule leaves middle-line notes free to match their neighbours."
+        },
+        {
+          "id": "d",
+          "text": "It has no stem",
+          "explanation": "Every note shorter than a whole note has a stem, wherever it sits."
+        }
+      ]
+    },
+    {
+      "type": "playing",
+      "id": "pitch.find-keys-1",
+      "nodeId": "pitch.find-keys",
+      "prompt": "Find B4 from the group of three black keys, then play Hot Cross Buns starting there with the right hand: B A G.",
+      "notes": [
+        {
+          "pitch": 71,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 6,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 8,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 9,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 9.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 10,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 10.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 11,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 11.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 12,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 13,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "right"
+        }
+      ],
+      "bpm": 84,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.find-keys-2",
+      "nodeId": "pitch.find-keys",
+      "prompt": "Find E4 from the group of two black keys, then play Hot Cross Buns starting there with the right hand: E D C.",
+      "notes": [
+        {
+          "pitch": 64,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 2,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 6,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 8,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 9,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 9.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 10,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 10.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 11,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 11.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 12,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 13,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "right"
+        }
+      ],
+      "bpm": 84,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.play-registers-1",
+      "nodeId": "pitch.play-registers",
+      "prompt": "Play the first bar of Twinkle, Twinkle (C C G G) three times: starting on C3, then C4, then C5.",
+      "notes": [
+        {
+          "pitch": 48,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "right"
+        }
+      ],
+      "bpm": 84,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.play-registers-2",
+      "nodeId": "pitch.play-registers",
+      "prompt": "Play the first two bars of Frere Jacques (C D E C, C D E C) with the left hand from C3, then with the right hand from C5.",
+      "notes": [
+        {
+          "pitch": 48,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 12,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 13,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 14,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 15,
+          "beats": 1,
+          "hand": "right"
+        }
+      ],
+      "bpm": 88,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.read-treble-notes-1",
+      "nodeId": "pitch.read-treble-notes",
+      "prompt": "Play Ode to Joy, bars 1-4, from the treble staff with the right hand, starting on E4.",
+      "notes": [
+        {
+          "pitch": 64,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 12,
+          "beats": 1.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 13.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "right"
+        }
+      ],
+      "bpm": 80,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.read-treble-notes-2",
+      "nodeId": "pitch.read-treble-notes",
+      "prompt": "Play Twinkle, Twinkle, Little Star, bars 1-4, from the treble staff with the right hand, starting on C4.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 6,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 12,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 13,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "right"
+        }
+      ],
+      "bpm": 80,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.read-bass-notes-1",
+      "nodeId": "pitch.read-bass-notes",
+      "prompt": "Play Ode to Joy, bars 1-4, from the bass staff with the left hand, starting on E3.",
+      "notes": [
+        {
+          "pitch": 52,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 12,
+          "beats": 1.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 13.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "left"
+        }
+      ],
+      "bpm": 76,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.read-bass-notes-2",
+      "nodeId": "pitch.read-bass-notes",
+      "prompt": "Play Twinkle, Twinkle, Little Star, bars 1-4, from the bass staff with the left hand, starting on C3.",
+      "notes": [
+        {
+          "pitch": 48,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 6,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 12,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 13,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "left"
+        }
+      ],
+      "bpm": 76,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.read-ledger-notes-1",
+      "nodeId": "pitch.read-ledger-notes",
+      "prompt": "Play Ode to Joy, bars 1-4, written high in the bass clef on ledger lines (starting on E4, the second ledger line above), with the left hand.",
+      "notes": [
+        {
+          "pitch": 64,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 12,
+          "beats": 1.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 13.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "left"
+        }
+      ],
+      "bpm": 72,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.read-ledger-notes-2",
+      "nodeId": "pitch.read-ledger-notes",
+      "prompt": "Play Twinkle, Twinkle in G, high above the treble staff (starting on G5, climbing to E6 on the third ledger line), with the right hand.",
+      "notes": [
+        {
+          "pitch": 79,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 86,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 86,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 88,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 88,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 86,
+          "startBeat": 6,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 84,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 84,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 83,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 83,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 81,
+          "startBeat": 12,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 81,
+          "startBeat": 13,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "right"
+        }
+      ],
+      "bpm": 72,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.play-accidentals-1",
+      "nodeId": "pitch.play-accidentals",
+      "prompt": "Play the opening of Fur Elise with the right hand (an eighth note is one beat): E D sharp E D sharp E B D C A, then C E A B, E G sharp B C.",
+      "notes": [
+        {
+          "pitch": 76,
+          "startBeat": 0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 1,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 2,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 3,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 6,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 9,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 9.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "right"
+        }
+      ],
+      "bpm": 66,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.play-accidentals-2",
+      "nodeId": "pitch.play-accidentals",
+      "prompt": "Play Hot Cross Buns on three black keys with the right hand: B flat, A flat, G flat.",
+      "notes": [
+        {
+          "pitch": 70,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 2,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 6,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 8,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 9,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 9.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 10,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 10.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 11,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 11.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 12,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 13,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "right"
+        }
+      ],
+      "bpm": 84,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.play-unusual-spellings-1",
+      "nodeId": "pitch.play-unusual-spellings",
+      "prompt": "Play the C sharp major scale up one octave with the right hand: C# D# E# F# G# A# B# C#. E sharp is the key F and B sharp is the key C.",
+      "notes": [
+        {
+          "pitch": 61,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 73,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "right"
+        }
+      ],
+      "bpm": 72,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.play-unusual-spellings-2",
+      "nodeId": "pitch.play-unusual-spellings",
+      "prompt": "Play the C flat major scale down one octave with the right hand: Cb Bb Ab Gb Fb Eb Db Cb. C flat is the key B and F flat is the key E.",
+      "notes": [
+        {
+          "pitch": 71,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "right"
+        }
+      ],
+      "bpm": 72,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.play-octave-signs-1",
+      "nodeId": "pitch.play-octave-signs",
+      "prompt": "Twinkle, Twinkle is written from C5 with '8va' above it. Play it where it sounds, an octave higher, with the right hand.",
+      "notes": [
+        {
+          "pitch": 84,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 84,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 91,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 91,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 93,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 93,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 91,
+          "startBeat": 6,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 89,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 89,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 88,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 88,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 86,
+          "startBeat": 12,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 86,
+          "startBeat": 13,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 84,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "right"
+        }
+      ],
+      "bpm": 80,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.play-octave-signs-2",
+      "nodeId": "pitch.play-octave-signs",
+      "prompt": "Ode to Joy, bars 1-4, is written in the bass staff from E3 with '8vb' below it. Play it where it sounds, an octave lower, with the left hand.",
+      "notes": [
+        {
+          "pitch": 40,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 40,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 41,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 43,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 43,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 41,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 40,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 38,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 36,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 36,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 38,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 40,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 40,
+          "startBeat": 12,
+          "beats": 1.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 38,
+          "startBeat": 13.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 38,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "left"
+        }
+      ],
+      "bpm": 76,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.five-finger-position-1",
+      "nodeId": "pitch.five-finger-position",
+      "prompt": "With the right hand in C position (C4 to G4), play Mary Had a Little Lamb, bars 1-4.",
+      "notes": [
+        {
+          "pitch": 64,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 6,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 10,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 12,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 13,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "right"
+        }
+      ],
+      "bpm": 84,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.five-finger-position-2",
+      "nodeId": "pitch.five-finger-position",
+      "prompt": "With the left hand in C position (C3 to G3), play Lightly Row (Hanschen klein), bars 1-4.",
+      "notes": [
+        {
+          "pitch": 55,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 2,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 6,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 12,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 13,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "left"
+        }
+      ],
+      "bpm": 84,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.position-shift-1",
+      "nodeId": "pitch.position-shift",
+      "prompt": "Play the Minuet in G (from the Notebook for Anna Magdalena Bach), bars 1-4, with the right hand, in 3/4.",
+      "notes": [
+        {
+          "pitch": 74,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 1,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 2,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 7,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 8,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 78,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "right"
+        }
+      ],
+      "bpm": 88,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.position-shift-2",
+      "nodeId": "pitch.position-shift",
+      "prompt": "Play Ode to Joy, bars 9-12, with the right hand: the last bar drops below C position to G3.",
+      "notes": [
+        {
+          "pitch": 62,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 9,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 9.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 12,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 13,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "right"
+        }
+      ],
+      "bpm": 80,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.read-by-intervals-1",
+      "nodeId": "pitch.read-by-intervals",
+      "prompt": "Play Frere Jacques, bars 1-4, with the right hand from C4, reading each note as a step or skip from the last.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 10,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 12,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 13,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "right"
+        }
+      ],
+      "bpm": 88,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.read-by-intervals-2",
+      "nodeId": "pitch.read-by-intervals",
+      "prompt": "Play London Bridge, bars 1-4, with the right hand from G4, reading the steps and the skip down to D.",
+      "notes": [
+        {
+          "pitch": 67,
+          "startBeat": 0,
+          "beats": 1.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 6,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 10,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 12,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 13,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "right"
+        }
+      ],
+      "bpm": 88,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.sight-read-single-line-1",
+      "nodeId": "pitch.sight-read-single-line",
+      "prompt": "Sight-read Au Clair de la Lune, bars 1-4, with the right hand from C4: one try, keep going through mistakes.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 4,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 6,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 12,
+          "beats": 4,
+          "hand": "right"
+        }
+      ],
+      "bpm": 72,
+      "pass": {
+        "notesInOrder": 0.85,
+        "timingSpreadMs": 100,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.sight-read-single-line-2",
+      "nodeId": "pitch.sight-read-single-line",
+      "prompt": "Sight-read Twinkle, Twinkle in G from the bass staff with the left hand, from G2: one try, keep going through mistakes.",
+      "notes": [
+        {
+          "pitch": 43,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 43,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 6,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 47,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 47,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 45,
+          "startBeat": 12,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 45,
+          "startBeat": 13,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 43,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "left"
+        }
+      ],
+      "bpm": 72,
+      "pass": {
+        "notesInOrder": 0.85,
+        "timingSpreadMs": 100,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.cross-staff-line-1",
+      "nodeId": "pitch.cross-staff-line",
+      "prompt": "Play the C major scale up two octaves in eighth notes: the left hand reads C3 to B3 in the bass staff, the right hand takes over at middle C in the treble staff.",
+      "notes": [
+        {
+          "pitch": 48,
+          "startBeat": 0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 1,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 2,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 3,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 4,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 6,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 7,
+          "beats": 1.5,
+          "hand": "right"
+        }
+      ],
+      "bpm": 72,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    },
+    {
+      "type": "playing",
+      "id": "pitch.cross-staff-line-2",
+      "nodeId": "pitch.cross-staff-line",
+      "prompt": "Play Bach's Prelude in C (BWV 846), bars 1-2: the left hand holds C4 and E4 (then C4 and D4) from the bass staff while the right hand finishes each broken chord in the treble.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 0.25,
+          "beats": 1.75,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 0.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 0.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 1,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 1.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 1.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 1.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 2,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2.25,
+          "beats": 1.75,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 2.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 3,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 3.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 3.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 4,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 4.25,
+          "beats": 1.75,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 4.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 4.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 5.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 5.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 5.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 6,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 6.25,
+          "beats": 1.75,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 6.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 6.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 7,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 7.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 7.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 7.75,
+          "beats": 0.25,
+          "hand": "right"
+        }
+      ],
+      "bpm": 60,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 25
+      }
+    }
+  ]
+}

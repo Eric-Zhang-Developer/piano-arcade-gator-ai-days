@@ -51,8 +51,9 @@ editing `/play`), then `scenes` (fever, full combo and every rank on demand, for
 `fever-gauge` (fever on every song). Then the results panels that grade what competitors don't: `dynamics` and
 `evenness` (with `timing-feedback`: timing direction, evenness and dynamics, `mission.md`), `take-graph`,
 `weak-bars` and `records` (best grades and a local top 5; no online leaderboard). After those: `difficulty`,
-`hand-colors`, `note-labels`, `calibration` and `hand-mode`. `main` freezes Sun Oct 25 5:00 PM ET; whatever hasn't
-landed by then lands after the awards.
+`hand-colors`, `note-labels`, `calibration` and `hand-mode`. From Sun Oct 25 4:00 PM ET only fixes, reverts and
+docs merge, and from 5:00 PM ET (the Devpost submission) nothing merges (`specs/milestones.toml`, #744); whatever
+hasn't landed by then lands after the awards.
 
 ## Encore
 Milestone **encore**, after `showcase`: the rest of the overnight batch, by dependency and by what the stage demo
@@ -76,6 +77,8 @@ Both are cut if they aren't done by Sunday noon.
 Then the Duo restyle, which Eric and Andres chose on 2026-10-25 (`visual-direction.md`, #636), video first:
 `duo-tokens` (#645), `duo-hud` (#647, the cold open's screen), `duo-select` (#646), `duo-results` (#648, where the
 tutor visibly decides) and `sheet-paper` (#649). Each is cut if it isn't done by Sunday noon.
+`audio-track` (#675): a local song's own recording plays in sync under /play, for the local Golden spike. Eric lifted
+decision 003's recording safeguard for local play only. Cut at Sunday noon.
 
 ## Spikes
 Milestone **spikes**, after `extras`: `simon-says-spike`, then `restyle-spike`. About 3 hours each, findings whatever

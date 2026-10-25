@@ -11,6 +11,10 @@ run locally, and a take that can't be saved waits in the browser's outbox. Owner
 | `takes` | table | one finished take: counts, accuracy, rank, drill bars, versions, the raw `Take` and `Results` JSON | that player |
 | `note_judgments` | table | one row per chart note per take: pitch, hand, bar, beat, judgment, signed offset, velocity | that player |
 | `coach_feedback` | table | what the coach said and the exact numbers it was checked against | that player |
+| `learning_attempts` | table | the learning lane's evidence (#753): one row per theory answer or playing attempt (item, node, kind, mode, correct, cold, help share, hint shown, details ≤ 8 KB), append-only | that player |
+| `learner_goals` | table | up to 3 goal song ids per player | that player |
+| `save_learning_attempt(p)` | function | saves one attempt; answers `saved`, `duplicate`, `conflict`, or `limited` (over 300 in 5 minutes) | server only |
+| `set_learner_goals(player, song_ids)` | function | replaces a player's goals (at most 3) | server only |
 | `bar_trends` | view | per bar over a player's last 5 takes of a song: notes, misses, mean offset, spread | that player |
 | `take_history` | view | one row per take, for the progress chart | that player |
 | `session_history` | view | every take with its song title, when and how long it was played: the profile page | that player |
@@ -30,6 +34,34 @@ own session, so it can read that player's rows and nothing else. Auth: anonymous
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | browser + server | Project Settings > API Keys: `sb_publishable_...` |
 | `SUPABASE_SECRET_KEY` | server only | Project Settings > API Keys: `sb_secret_...`. Never in a `NEXT_PUBLIC_` variable. |
 | `SUPABASE_DB_URL` | `supabase/push.sh` only | Connect > Direct > Session pooler URI, with the database password filled in: `postgresql://postgres.umswmcehegvggcfcjdfy:<password>@aws-0-us-east-1.pooler.supabase.com:5432/postgres`. Not the direct `db.<ref>.supabase.co` one: it's IPv6-only and refused on most networks. |
+
+## Deploying (Vercel)
+The Vercel project is Eric's (#792). It needs, once:
+1. **Environment variables** (Production and Preview): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
+   `SUPABASE_SECRET_KEY` (Sensitive). Never `SUPABASE_DB_URL`. Values are shared privately, never in GitHub.
+2. **The repo connected**, Root Directory `web`, so every merge to `main` deploys itself.
+3. **A redeploy without the build cache** after changing the `NEXT_PUBLIC_` values: they're baked in at build time.
+4. **Sign-in on the new address:** Supabase → Authentication → URL Configuration → Redirect URLs gets
+   `https://<site>/auth/callback`; the Google OAuth client gets `https://<site>` as a JavaScript origin.
+
+Check it: `/api/health` shows `main`'s commit; `POST /api/takes` with no login answers **401** (503 means the keys are
+missing); then `node supabase/tests/every-song.mjs https://<site>` and `node supabase/tests/login-e2e.mjs https://<site>`.
+
+## Test everything (5 minutes)
+With the app running locally (`pnpm -C web dev`), from the repo root:
+1. `node supabase/tests/migrations.mjs`: every migration on a throwaway database, and the safety rules.
+2. `node supabase/tests/live-smoke.mjs`: the live project's grants, row-level security and guest sign-in.
+3. `node supabase/tests/every-song.mjs`: every committed song saves and reads back through the app.
+4. `node supabase/tests/login-e2e.mjs`: the whole journey in a real browser: sign-in screen, Play as guest, the
+   menu, a song on laptop keys ("Saved"), Easy ("Not saved"), the profile, the row in Supabase, both Google buttons
+   reaching Google's page, and a failed Google return. Each script deletes what it made.
+
+Google sign-in itself needs a person (no script logs into a Google account). Once per release:
+- On `/auth/login`, **Sign in with Google** lands on the menu with your name bottom-right.
+- As a guest, play a song, then **Keep my progress with Google** on `/progress`: the take stays, now under Google.
+- In a private window, play as a guest, then **Sign in with Google** with the same account: that take joins your
+  history.
+- **Sign out** on the menu: the chip goes back to "Sign in"; signing in again brings the history back.
 
 ## Adding a song
 Nothing to do in the database: a song's row in `songs` is written (or updated, with the chart's new SHA-256) the first

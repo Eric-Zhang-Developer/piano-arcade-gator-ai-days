@@ -1,7 +1,11 @@
 import { readFileSync } from "node:fs";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import type { Chart } from "../../contracts";
+import type { Chart, Results } from "../../contracts";
 import { loopChart } from "../bar-loop";
+import { kitButton } from "../duo-tokens";
+import { AfterPlay } from ".";
 import { chunksOf, nextAfter, practiceStep, stepUrl, wholeSongUrl } from "./chunks";
 
 const song = (id: string): Chart => JSON.parse(readFileSync(new URL(`../../../public/songs/${id}/chart.json`, import.meta.url), "utf8"));
@@ -89,5 +93,26 @@ describe("nextAfter", () => {
   });
   it("after the last chunk, the whole song", () => {
     expect(nextAfter(list, 2, 1)).toEqual({ whole: true });
+  });
+});
+
+// kit-leftovers-screens (b): the way on is the kit's primary button, the way back its secondary.
+describe("the panel's buttons are the kit's", () => {
+  const params = new URLSearchParams("song=twinkle&from=1&to=4&tempo=70&passes=1&practice=1");
+  const list = [
+    { from: 1, to: 4 },
+    { from: 5, to: 8 },
+  ];
+  const panel = (accuracy: number) => renderToStaticMarkup(createElement(AfterPlay, { params, results: { accuracy } as Results, list, index: 0 }));
+  const classOf = (html: string, id: string) => html.match(new RegExp(`data-testid="${id}" class="([^"]*)"`))?.[1];
+
+  it("a pass: Next carries kitButton(\"primary\")'s class", () => {
+    expect(classOf(panel(1), "chunk-next")).toBe(kitButton("primary").className);
+  });
+
+  it("a fail: Learn again carries kitButton(\"secondary\")'s class, and there's no Next", () => {
+    const html = panel(0.4);
+    expect(classOf(html, "chunk-again")).toBe(kitButton("secondary").className);
+    expect(html).not.toContain("chunk-next");
   });
 });

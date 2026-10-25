@@ -1,15 +1,26 @@
-// Event sounds: short laptop sounds at game events, mixed under the piano (spec: juice-sound). All synthesized here,
-// so web/public/sounds/ holds no files and needs no licenses yet.
+// Event sounds: short laptop sounds at game events, mixed under the piano (spec: juice-sound). All synthesized, so
+// web/public/sounds/ holds no files and needs no licenses yet. The milestone voices, the clear card's and NEW RECORD's
+// moments and the loudness rule are milestone-sfx's; this is still the one place that schedules them.
 import type { GameEvent, GamePlugin } from "../../contracts";
+import { recordingLevelAt } from "../audio-track";
+import { CLEAR_VOICE, clearWatch, loudnessGain, newRecordImpactMs } from "../milestone-sfx";
+import { playVoice, type Voice } from "../milestone-sfx/voices";
 import { stampImpactMs } from "../rank-stamp";
+import { showsMoment } from "../record-moment/timing";
+import { takeOutcome } from "../records";
 import { isWaitMode } from "../wait-mode";
 
 export type Sound = "stinger" | "sweep" | "fanfare" | "drumroll" | "rankHit" | "miss";
 
 export const soundSettings = {
   fanfareAfterHitMs: 150, // a full combo's fanfare follows the rank hit
-  levels: { stinger: 0.25, sweep: 0.2, fanfare: 0.25, drumroll: 0.2, rankHit: 0.4, miss: 0.15 } satisfies Record<Sound, number>,
+  missLevel: 0.05, // the miss cue's: 21.1 dB under the laptop piano's C4 (0.15 was 12.6; miss-moment wants 18 or more). The milestone voices' levels are milestone-sfx's
+  missGapMs: 120, // miss-moment: in a run of misses, at most one cue per this
 };
+
+// The last miss cue's chart time, so a run of misses makes at most one cue per missGapMs (miss-moment). One per take.
+export type MissGate = { lastMissMs: number };
+export const missGate = (): MissGate => ({ lastMissMs: -Infinity });
 
 export interface Prefs {
   volume: number; // 0–1, master for effects
@@ -60,7 +71,7 @@ export function savePrefs(p: Prefs): void {
 
 // Pure: which sounds a list of events makes, and when on the audio clock. audioAtZero is the audio time (s) of
 // chart time 0. The rank hit lands when rank-stamp's stamp hits.
-export function soundsFor(events: GameEvent[], audioAtZero: number, missCue = true): { sound: Sound; startTime: number }[] {
+export function soundsFor(events: GameEvent[], audioAtZero: number, missCue = true, gate = missGate()): { sound: Sound; startTime: number }[] {
   const at = (ms: number) => audioAtZero + ms / 1000;
   const { fanfareAfterHitMs } = soundSettings;
   return events.flatMap((e): { sound: Sound; startTime: number }[] => {
@@ -69,8 +80,12 @@ export function soundsFor(events: GameEvent[], audioAtZero: number, missCue = tr
         return [{ sound: "stinger", startTime: at(e.atMs) }];
       case "feverStart":
         return [{ sound: "sweep", startTime: at(e.atMs) }];
-      case "noteMiss":
-        return missCue ? [{ sound: "miss", startTime: at(e.atMs) }] : [];
+      case "noteMiss": {
+        const since = e.atMs - gate.lastMissMs;
+        if (!missCue || (since >= 0 && since < soundSettings.missGapMs)) return []; // a rewind moves time back: a new run
+        gate.lastMissMs = e.atMs;
+        return [{ sound: "miss", startTime: at(e.atMs) }];
+      }
       case "fullCombo":
         return [{ sound: "fanfare", startTime: at(e.atMs + stampImpactMs() + fanfareAfterHitMs) }];
       case "songEnd":
@@ -110,50 +125,70 @@ export function noise(ctx: AudioContext, out: AudioNode, t: number, len: number,
   src.start(t);
 }
 
-const C5 = 523.25;
-const semis = (n: number) => C5 * 2 ** (n / 12);
+export interface Scheduled {
+  sound: Voice | "miss";
+  startTime: number; // on the audio clock
+  gain: number; // the loudness rule's, 1 off a recording's loud stretches
+  count?: number; // a combo step's count
+}
 
-function play(ctx: AudioContext, out: AudioNode, sound: Sound, t: number) {
-  const L = soundSettings.levels[sound];
-  switch (sound) {
-    case "stinger": // a quick rising major arpeggio
-      [0, 4, 7, 12].forEach((s, i) => tone(ctx, out, "triangle", semis(s), t + i * 0.05, 0.18, L));
-      return;
-    case "sweep": {
-      const osc = tone(ctx, out, "sawtooth", 200, t, 0.7, L);
-      osc.frequency.setValueAtTime(200, t);
-      osc.frequency.exponentialRampToValueAtTime(1600, t + 0.6);
-      return;
-    }
-    case "fanfare": // arpeggio, then the chord held
-      [0, 4, 7].forEach((s, i) => tone(ctx, out, "square", semis(s), t + i * 0.1, 0.12, L * 0.5));
-      [0, 4, 7, 12].forEach((s) => tone(ctx, out, "triangle", semis(s), t + 0.3, 0.9, L));
-      return;
-    case "drumroll": // noise taps, crescendo, filling the gap before the rank hit (the stamp's)
-      for (let i = 0, n = Math.floor(stampImpactMs() / 40); i < n; i++) noise(ctx, out, t + i * 0.04, 0.03, L * (0.3 + (0.7 * i) / n));
-      return;
-    case "rankHit": {
-      const osc = tone(ctx, out, "sine", 150, t, 0.5, L);
-      osc.frequency.setValueAtTime(150, t);
-      osc.frequency.exponentialRampToValueAtTime(45, t + 0.4);
-      noise(ctx, out, t, 0.6, L * 0.5);
-      return;
-    }
-    case "miss": // low and short, so it's heard but never mistaken for the piano
-      tone(ctx, out, "sine", 98, t, 0.12, L);
-      return;
-  }
+export interface SchedulerOptions {
+  notes: number; // the chart's, for the clear card's moment
+  wait: boolean; // wait mode isn't scored: no clear card and nothing at songEnd
+  missCue: () => boolean;
+  newRecord: () => boolean; // read at songEnd, after records has set the take's outcome
+  levelAt: (chartMs: number) => number | null; // the recording's level, null when none plays
+}
+
+// One event's sounds (spec: milestone-sfx): soundsFor's, the clear card's when the last note is judged, and NEW
+// RECORD's at its stamp. Every milestone sound passes the loudness rule; the miss cue stays as juice-sound has it.
+export function scheduler(o: SchedulerOptions): (e: GameEvent, audioAtZero: number) => Scheduled[] {
+  const clear = clearWatch(o.notes);
+  const gate = missGate();
+  let clearMs: number | null = null; // the clear card's moment: a combo step on the same note gives way to it
+  return (e, audioAtZero) => {
+    if (o.wait && (e.type === "songEnd" || e.type === "fullCombo")) return []; // the judge sends no fullCombo in wait mode today
+    const kind = clear(e);
+    if (kind) clearMs = e.atMs;
+    if (e.type === "comboMilestone" && e.atMs === clearMs) return [];
+    const atMs: { sound: Voice | "miss"; ms: number }[] = soundsFor([e], 0, o.missCue(), gate).map((s) => ({ sound: s.sound, ms: s.startTime * 1000 }));
+    if (kind && !o.wait) atMs.push({ sound: CLEAR_VOICE[kind], ms: e.atMs });
+    if (e.type === "songEnd" && o.newRecord()) atMs.push({ sound: "newRecord", ms: e.atMs + newRecordImpactMs() });
+    return atMs.map(({ sound, ms }) => ({
+      sound,
+      startTime: audioAtZero + ms / 1000,
+      gain: sound === "miss" ? 1 : loudnessGain(ms, o.levelAt),
+      ...(e.type === "comboMilestone" && { count: e.count }),
+    }));
+  };
+}
+
+// The miss cue: low and short, so it's heard but never mistaken for the piano. miss-moment measures it against the piano.
+export const playMissCue = (ctx: BaseAudioContext, out: AudioNode, t: number, level = soundSettings.missLevel) =>
+  tone(ctx as AudioContext, out, "sine", 98, t, 0.12, level);
+
+function play(ctx: AudioContext, out: AudioNode, s: Scheduled, t: number) {
+  if (s.sound === "miss") playMissCue(ctx, out, t);
+  else playVoice(ctx, out, s.sound, t, s.gain, s.count);
 }
 
 export function eventSounds(): GamePlugin {
   let audio: AudioContext | null = null;
   let zeroPerf = 0; // performance.now() at chart time 0
   let wait = false; // wait mode isn't scored: no drumroll or rank hit at the end (the judge sends no other moments)
+  let next: ReturnType<typeof scheduler> = () => [];
 
   return {
     id: "juice-sound",
     transformChart(chart, params) {
       wait = isWaitMode(params);
+      next = scheduler({
+        notes: chart.notes?.length ?? Infinity,
+        wait,
+        missCue: () => getPrefs().missCue,
+        newRecord: () => showsMoment(takeOutcome()),
+        levelAt: recordingLevelAt,
+      });
       return chart;
     },
     onEvent(e) {
@@ -171,12 +206,15 @@ export function eventSounds(): GamePlugin {
         }
         return;
       }
-      if (!audio || !master) return;
+      if (!audio || !master) {
+        next(e, 0); // keeps the clear card's count
+        return;
+      }
       // Map the chart clock to the audio clock with a matched pair of readings, as beat-track does.
       const stamp = audio.getOutputTimestamp?.();
       const [ctxT, perfT] = stamp?.performanceTime ? [stamp.contextTime ?? 0, stamp.performanceTime] : [audio.currentTime, performance.now()];
       const audioAtZero = ctxT + (zeroPerf - perfT) / 1000;
-      for (const s of soundsFor([e], audioAtZero, getPrefs().missCue)) play(audio, master, s.sound, Math.max(s.startTime, audio.currentTime));
+      for (const s of next(e, audioAtZero)) play(audio, master, s, Math.max(s.startTime, audio.currentTime));
     },
   };
 }

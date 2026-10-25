@@ -2,6 +2,8 @@ const { page } = globalThis;
 const origin = await page.eval(() => location.origin);
 
 // An offline interruption must cancel prepared-entry navigation and restore its action.
+// A fresh profile has no answers, so /learn would send it to the diagnostic first; mark this tab as already offered.
+await page.eval(() => sessionStorage.setItem('learn:diagnostic-offered', '1'));
 await page.open(`${origin}/learn`);
 await page.wait('aside[aria-label="Your next activity"] button');
 await page.eval(async () => {
@@ -129,62 +131,59 @@ await page.eval(async () => {
 
 await open('practice');
 await page.eval(async () => {
-  const { assert, flush, text, until, click, connect, recover, playingAudio, stoppedAudio } = window.learningOfflineTest;
-  const tempo = () => document.querySelector('input[type="range"]');
-  Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(tempo(), '80');
-  tempo().dispatchEvent(new Event('input', { bubbles: true }));
-  await flush();
-  document.querySelector('input[name="note-names"]').closest('details').open = true;
-  document.querySelector('input[name="note-names"]').click();
-  await flush();
+  const { assert, text, until, click, connect, recover, playingAudio, stoppedAudio } = window.learningOfflineTest;
+  const heading = () => document.querySelector('main h2')?.textContent;
+  const ready = label => [...document.querySelectorAll('main button')].some(b => b.textContent.trim().startsWith(label) && !b.disabled);
   await click('Hear the opening');
   await playingAudio();
   assert(text().includes('Stop demo'), 'Demo ended before cancellation');
   await connect(false);
   await stoppedAudio();
   await connect(true);
-  assert(tempo().value === '80' && !document.querySelector('input[name="note-names"]').checked && !tempo().disabled, 'Practice settings reset or remained locked');
+  assert(heading() === 'Give the ending room' && ready('See an example take') && ready('Hear the opening') && !text().includes('Stop demo'), 'Practice moved on or remained locked after the demo was cancelled');
   await click('Hear the opening');
   await playingAudio();
   await click('Stop demo');
-  await click('Start preview take');
+  await click('See an example take');
   await recover();
-  assert(text().includes('Start preview take') && !document.querySelector('main').textContent.includes('example take'), 'Interrupted practice take completed or stayed active');
-  await click('Start preview take');
+  assert(heading() === 'Give the ending room' && ready('See an example take') && !text().includes('Stop example') && !text().includes('Practise the held note'), 'Interrupted practice take completed or stayed active');
+  await click('See an example take');
   await until(() => text().includes('Practise the held note'), 'Practice could not finish after recovery');
   await click('Practise the held note');
   await click('I played it');
   await click('I played it');
   await recover();
-  assert(text().includes('2 of 4 repetitions') && document.querySelector('main').textContent.includes('1 example take') && tempo().value === '80', 'Practice repetitions, take count or settings reset');
+  assert(heading() === 'Give G two full beats' && text().includes('2 of 4 repetitions'), 'Practice repetitions reset or the drill was lost');
   await click('I played it');
   await click('I played it');
-  await click('Preview at');
+  assert(heading() === 'Read from the staff', 'Practice support fading did not start with note names');
+  await click('Example without note names');
+  await until(() => ready('Example at 100 bpm'), 'Practice support fading did not move on to tempo');
+  assert(heading() === 'Bring it up to tempo', 'Note names were not faded first');
+  await click('Example at 100 bpm');
   await until(() => !!document.querySelector('main a[href="/learn"]'), 'Practice support fading did not finish');
   await recover();
-  assert(!!document.querySelector('main a[href="/learn"]') && document.querySelector('main').textContent.includes('2 example takes'), 'Completed practice reset');
+  assert(!!document.querySelector('main a[href="/learn"]') && heading() === 'Connect the whole melody' && !ready('Hear the opening'), 'Completed practice reset');
 });
 
 await open('play-through');
 await page.eval(async () => {
   const { assert, text, until, click, recover } = window.learningOfflineTest;
-  await click('Start preview take');
+  await click('See an example take');
   assert(text().includes('Get ready'), 'Count-in did not start');
   await recover();
-  assert(text().includes('Start preview take'), 'Count-in was not cancelled');
-  await click('Start preview take');
+  assert(text().includes('See an example take'), 'Count-in was not cancelled');
+  await click('See an example take');
   await until(() => text().includes('Playing through'), 'Play-through did not start');
   await recover();
-  assert(text().includes('Start preview take'), 'Active play-through was not cancelled');
-  await click('Start preview take');
+  assert(text().includes('See an example take'), 'Active play-through was not cancelled');
+  await click('See an example take');
 });
 await page.wait(32000);
 await page.eval(async () => {
-  const { assert, text, until, click, recover } = window.learningOfflineTest;
+  const { assert, text, until, recover } = window.learningOfflineTest;
   await until(() => text().includes('Play-through complete'), 'Play-through could not finish after recovery');
   await recover();
-  assert(text().includes('Play-through complete'), 'Completed play-through result reset');
-  await click('Play again');
-  assert(text().includes('Start preview take'), 'Play again no longer resets completed result');
+  assert(text().includes('Play-through complete') && !!document.querySelector('main a[href="/learn"]') && !text().includes('See an example take'), 'Completed play-through result reset');
   delete navigator.onLine;
 });

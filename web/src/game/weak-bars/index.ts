@@ -1,7 +1,10 @@
 import { createElement } from "react";
+import { kitButton } from "../duo-tokens";
 import type { Chart, GamePlugin, Results, Take } from "../../contracts";
 import { passAccuracy } from "../bar-loop";
 import { msPerBeat } from "../core/settings";
+import { inMode, playMode } from "../play-modes/modes";
+import { isWaitMode } from "../wait-mode";
 
 export const weakBarsSettings = {
   phraseBars: 2, // bars per phrase, from bar 1
@@ -49,26 +52,30 @@ export function scorePhrases(chart: Chart, take: Take, results: Results): Phrase
 export const weakest = (scores: PhraseScore[]) =>
   scores.reduce<PhraseScore | null>((w, s) => (s.accuracy < 1 && (!w || s.accuracy < w.accuracy) ? s : w), null);
 
-// bar-loop on the phrase at practiceTempo, keeping only the params that pick the song.
+// bar-loop on the phrase at practiceTempo, keeping only the params that pick the song, in the take's mode (play-modes:
+// under Flow, no tempo).
 export function practiceUrl(chart: Chart, params: URLSearchParams, p: Phrase): string {
   const q = new URLSearchParams({ song: params.get("song") ?? chart.id });
   if (params.has("hands")) q.set("hands", params.get("hands")!);
   q.set("from", String(p.from));
   q.set("to", String(p.to));
   q.set("tempo", String(weakBarsSettings.practiceTempo));
-  return `/play?${q}`;
+  return `/play?${inMode(q, playMode(params))}`;
 }
 
 const label = (p: Phrase) => (p.from === p.to ? `Bar ${p.from}` : `Bars ${p.from}–${p.to}`);
 
-// A results panel (play-slots): accuracy per phrase, and one click to loop the weakest at a slower tempo.
+// A results panel (play-slots): accuracy per phrase. On a scored take duo-results' tutor owns the one practice
+// prescription (#1026, decision duo-results-one-prescription), so the panel shows only the numbers; on a wait take,
+// which has no tutor, it marks the weakest phrase and offers to loop it at a slower tempo.
 export function weakBars(): GamePlugin {
   return {
     id: "weak-bars",
     resultsPanel({ chart, take, results, params }) {
       if (params.has("from") || params.has("to")) return null; // bar-loop's own passes panel covers a loop take
       const scores = scorePhrases(chart, take, results);
-      const worst = weakest(scores);
+      const prescribes = isWaitMode(params);
+      const worst = prescribes ? weakest(scores) : null;
       const cell = (s: PhraseScore) =>
         createElement(
           "div",
@@ -77,40 +84,36 @@ export function weakBars(): GamePlugin {
             "data-testid": "weak-bars-cell",
             "data-weakest": s === worst || undefined,
             style: {
-              padding: "4px 8px",
-              borderRadius: 6,
-              minWidth: 64,
-              background: s === worst ? "rgba(255, 77, 94, 0.18)" : "var(--pa-panel)",
-              border: `1px solid ${s === worst ? "var(--pa-wrong)" : "rgba(242, 242, 245, 0.15)"}`,
+              padding: "6px 10px",
+              borderRadius: 0,
+              minWidth: 72,
+              background: s === worst ? "color-mix(in srgb, var(--pa-primary) 14%, transparent)" : "var(--pa-panel)",
+              border: `1px solid ${s === worst ? "var(--pa-primary)" : "var(--pa-line)"}`,
+              fontFamily: "var(--pa-font-data), ui-monospace, monospace",
+              fontVariantNumeric: "tabular-nums",
               fontSize: "0.8em",
               lineHeight: 1.3,
             },
           },
-          createElement("div", { style: { color: "var(--pa-ink-dim)" } }, label(s)),
+          createElement("div", { style: { color: "var(--pa-ink-dim)", whiteSpace: "nowrap" } }, label(s)),
           createElement("div", { style: { color: "var(--pa-ink)", fontSize: "1.25em" } }, `${Math.round(s.accuracy * 100)}%`),
         );
       return createElement(
         "div",
-        { "data-testid": "weak-bars", style: { textAlign: "center" } },
-        createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" } }, ...scores.map(cell)),
-        worst
+        { "data-testid": "weak-bars" },
+        createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(112px, 1fr))", gap: 6 } }, ...scores.map(cell)),
+        !prescribes
+          ? null
+          : worst
           ? createElement(
               "a",
               {
                 href: practiceUrl(chart, params, worst),
                 "data-testid": "weak-bars-practice",
-                style: {
-                  display: "inline-block",
-                  marginTop: 10,
-                  padding: "6px 14px",
-                  borderRadius: 8,
-                  background: "var(--pa-hand-r)",
-                  color: "#000",
-                  textDecoration: "none",
-                  fontWeight: 600,
-                },
+                className: kitButton("primary").className,
+                style: { ...kitButton("primary").style, marginTop: 14 },
               },
-              `Practice ${label(worst).toLowerCase()} at ${weakBarsSettings.practiceTempo}%`,
+              `Practice ${label(worst).toLowerCase()} ${playMode(params) === "flow" ? "in Flow" : `at ${weakBarsSettings.practiceTempo}%`}`,
             )
           : createElement("div", { style: { marginTop: 8, color: "var(--pa-ink-dim)" } }, "No weak bars"),
       );

@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Chart, GameEvent, InputDevice, InputEvent, Results, Take } from "../../contracts";
+import type { Chart, Frame, GameEvent, InputDevice, InputEvent, Results, Take } from "../../contracts";
 import { validateChart } from "../../contracts";
+import { APP_NAME } from "../../game/app-name";
 import { plugins } from "../../game/layers";
 import { barLines } from "../../game/bar-lines";
 import { coreGuard, createGuard } from "../../game/crash-guard";
@@ -15,19 +16,18 @@ import { Judge, noteTimeMs } from "../../game/core/judge";
 import { keysDevice, midiDevice, testDevice } from "../../game/core/input";
 import { laptopKey } from "../../game/laptop-sound";
 import { describeTiming, timingSummary, type TimingSummary } from "../../game/timing";
-import { SfxControls } from "../../game/sound/SfxControls";
 import { nextPause, pauseClock, type PauseAction, type PauseMode } from "../../game/play-slots";
-import { Slots } from "../../game/play-slots/ui";
+import { StartScreen } from "../../game/duo-start/StartScreen";
 import { PauseMenu } from "../../game/pause-skin";
+import { Button, MonoLabel, Panel, kitButton } from "../../game/duo-tokens";
 import { ResultsLayout } from "../../game/results-layout";
-import { emptyHud, reduceHud } from "../../game/hud";
+import { emptyHud, hudLayout, hudSettings, reduceHud, tierFor } from "../../game/hud";
+import { landingAt, landingCounts, landingMounted, landingPlan, landingRuns, landingSettings, landingT, startLanding, stopLanding } from "../../game/results-landing";
 import { barStep, holdClock, isWaitMode } from "../../game/wait-mode";
 import { isFlowMode } from "../../game/flow-mode/clock";
 import { FlowJudge } from "../../game/flow-mode/judge";
 import {
   GOOD_MS,
-  LATENCY_MAX,
-  LATENCY_MIN,
   loadLatencyOffset,
   msPerBeat,
   saveLatencyOffset,
@@ -77,9 +77,10 @@ export default function Play() {
   const latencyRef = useRef(0);
   const backgroundRef = useRef<HTMLDivElement>(null);
   const highwayRef = useRef<HTMLCanvasElement>(null);
-  const layerRefs = useRef<(HTMLCanvasElement | null)[]>([]);
+  const overlayRef = useRef<HTMLCanvasElement>(null); // every plugin's draw, in layers.ts order
   const stopRef = useRef<() => void>(() => {});
   const pauseRef = useRef<(a: PauseAction) => void>(() => {});
+  const rewindRef = useRef<(dir: -1 | 1) => void>(() => {}); // the ◀ ▶ buttons, the same as ← → (mouse-first)
   const startRef = useRef<() => void>(() => {}); // Retry from the pause menu, inside start itself
 
   // Load settings and the chart once.
@@ -101,6 +102,7 @@ export default function Play() {
         keysRef.current = staticRange(raw as Chart); // hands=, loops and practice keep the whole song's keyboard
         chartRef.current = plugins.reduce((c, p) => p.transformChart?.(c, params) ?? c, raw as Chart);
         setLoaded({ chart: chartRef.current, params });
+        document.title = `${(raw as Chart).title} · ${APP_NAME}`; // the tab names the song (#953)
         setLatency(latencyRef.current);
         setIsTest(params.get("input") === "test");
         setPhase("ready");
@@ -153,17 +155,18 @@ export default function Play() {
     };
     // crash-guard: one plugin's throw turns that plugin off for this take (its layer cleared once, a toast says so) and
     // the game goes on; Retry's new guard brings it back. Core's own throws are logged once and the frame goes on.
-    const guard = createGuard((id) => {
-      toast(`${id} stopped after an error. The game goes on.`);
-      const c = layerRefs.current[plugins.findIndex((p) => p.id === id)];
-      c?.getContext("2d")?.clearRect(0, 0, c.width, c.height);
-    });
+    // The overlay is cleared and redrawn every frame, so a plugin that's off simply isn't drawn from the next one on.
+    const guard = createGuard((id) => toast(`${id} stopped after an error. The game goes on.`));
     const core = coreGuard();
     const bgId = plugins.find((p) => p.background)?.id ?? "";
     const handOf = new Map(chart.notes.map((n) => [n.id, n.hand]));
     let hud = emptyHud(); // rebuilt with the HUD's own reducer, as records does
+    let judged = 0; // results-landing's T0: every note judged …
+    let maxCombo = 0;
     const emit = (e: GameEvent) => {
       hud = reduceHud(hud, e);
+      if (e.type === "noteHit" || e.type === "noteMiss") judged++;
+      if (e.type === "combo") maxCombo = Math.max(maxCombo, e.count);
       if (e.type === "noteHit") hw.pressedHand!.set(e.pitch, handOf.get(e.noteId)!); // the key lights in its note's hand
       if (e.type === "noteHit") hw.latest = { judgment: e.judgment, offsetMs: e.offsetMs, atMs: e.atMs };
       if (e.type === "noteMiss") hw.latest = { judgment: "MISS", offsetMs: null, atMs: e.atMs };
@@ -172,7 +175,7 @@ export default function Play() {
     };
     // ?mode=flow: the flow judge, which owns a clock that waits at each note and follows your tempo (flow-mode). With
     // ?tempo= the chart is already slowed by bar-loop, so rate 1 is the asked tempo and the steadiness reference.
-    const flowJudge = isFlowMode(params) ? new FlowJudge(chart, emit, { startRate: params.has("tempo") ? 1 : undefined }) : null;
+    const flowJudge = isFlowMode(params) ? new FlowJudge(chart, emit, { startRate: params.has("tempo") ? 1 : undefined, tempo: params.has("tempo") ? Number(params.get("tempo")) / 100 : 1 }) : null;
     const judge = flowJudge ?? new Judge(chart, emit, { scored: !isWaitMode(params) }); // wait mode: no score moments
     hw.noteState = judge.noteState;
     // Zero is fixed here, after the stage and judge are built, so songStart's atMs is the chart time now and a plugin's
@@ -219,7 +222,22 @@ export default function Play() {
 
     // Canvases sized to the window, in CSS pixels.
     const ctx = canvas.getContext("2d")!;
-    const layerCtxs = layerRefs.current.map((c) => c?.getContext("2d") ?? null);
+    const overlay = overlayRef.current;
+    const octx = overlay?.getContext("2d") ?? null;
+    const drawers = plugins.filter((p) => p.draw);
+    // One canvas for every plugin's layer: cleared once, then each plugin draws in layers.ts order, its canvas state
+    // (transform, alpha, composite mode) saved and restored around it so nothing leaks into the next. One full-window
+    // canvas per plugin was 53 layers for the compositor to blend each frame (#678).
+    const drawLayers = (f: Frame) => {
+      if (!octx) return;
+      octx.clearRect(0, 0, f.width, f.height);
+      for (const p of drawers) {
+        if (guard.off(p.id)) continue;
+        octx.save();
+        guard.run(p.id, "draw", () => p.draw!(octx, f));
+        octx.restore();
+      }
+    };
     let layout: Layout | null = null;
     const keys = keysRef.current ?? staticRange(chart);
     // highway-zoom: on wide charts (or ?zoom=on) the layout follows the music, rebuilt each frame from its range.
@@ -229,8 +247,8 @@ export default function Play() {
     const resize = () => {
       w = window.innerWidth;
       h = window.innerHeight;
-      const dpr = window.devicePixelRatio || 1;
-      for (const c of [canvas, ...layerRefs.current]) {
+      const dpr = Math.min(window.devicePixelRatio || 1, settings.pixelRatioCap);
+      for (const c of [canvas, overlay]) {
         if (!c) continue;
         c.width = w * dpr;
         c.height = h * dpr;
@@ -305,6 +323,7 @@ export default function Play() {
       wait.seek(target, pauses.now(perf));
       emit({ type: "resume", atMs: target });
     };
+    rewindRef.current = rewind;
     const onArrow = (e: KeyboardEvent) => {
       if ((e.key !== "ArrowLeft" && e.key !== "ArrowRight") || e.repeat || e.shiftKey || e.ctrlKey || e.metaKey || e.altKey || !wait) return;
       e.preventDefault();
@@ -316,15 +335,54 @@ export default function Play() {
       if (background) guard.run(bgId, "background", () => background.frame({ ...layout!, nowMs: clock.now(performance.now()) }));
       idleRaf = requestAnimationFrame(idle);
     };
-    const finish = (now: number) => {
+    // ?x=results-landing (spec: results-landing): from T0 the drawn clock eases to a stop and the keyboard dims while
+    // the judge runs on the real clock, so the take is judged as before; the results mount when the out ends.
+    const landing = landingRuns(params);
+    let t0Chart: number | null = null;
+    const drawDim = (f: Frame, dim: number) => {
+      if (!octx || dim <= 0) return;
+      octx.fillStyle = `rgba(0,0,0,${dim.toFixed(3)})`;
+      octx.fillRect(0, layout!.judgmentLineY, f.width, layout!.keyboardHeight);
+    };
+    const beginLanding = (now: number) => {
+      t0Chart = now;
+      const r = canvas.getBoundingClientRect();
+      const hl = hudLayout(layout!.width, layout!.judgmentLineY);
+      // Where the HUD drew its score: right-aligned left of the multiplier badge, as its draw code places it.
+      // ponytail: mirrors hud/index.ts's score placement (that file is another PR's); move it to a hud export once free.
+      const h = hl.panel.h;
+      const pad = Math.max(10, h * 0.25);
+      const fam = `${getComputedStyle(document.documentElement).getPropertyValue("--pa-font-display").trim() || "system-ui"}, system-ui, sans-serif`;
+      ctx.save();
+      ctx.font = `italic 900 ${Math.round(h * 0.5)}px ${fam}`;
+      const badgeW = ctx.measureText(`x${tierFor(hud.combo).mult}`).width;
+      ctx.font = `italic 800 ${Math.round(h * 0.42)}px ${fam}`;
+      const scoreW = ctx.measureText(hud.score.toLocaleString("en-US")).width;
+      ctx.restore();
+      const scoreRight = layout!.width - pad - hudSettings.statusGutterPx - badgeW - pad;
+      startLanding(
+        { bpm: chart.bpm, mountChartMs: now + landingSettings.outMs, counts: landingCounts(hud), combo: hud.combo, maxCombo },
+        {
+          score: { x: r.left + scoreRight - scoreW / 2, y: r.top + h * 0.42, size: h * 0.42 },
+          combo: { x: r.left + hl.combo.cx, y: r.top + hl.combo.cy, size: hl.combo.size },
+        },
+        hud.score,
+      );
+    };
+    const finish = (now: number, drawn = now) => {
       done = true;
       const r = judge.finish(now);
+      // The last frame behind the results: songEnd has gone out, so a plugin that ends with the song draws nothing now
+      // and every other one leaves its final state, as their own canvases did.
+      drawLayers({ ...layout!, nowMs: drawn });
+      if (t0Chart !== null) drawDim({ ...layout!, nowMs: drawn }, landingAt(landingT(), landingPlan()!).keyboardDim);
       stop();
       if (background) idleRaf = requestAnimationFrame(idle);
       if (window.__pianoArcade) window.__pianoArcade.results = r;
       setTake(take);
       setResults(r);
       setScore(hud.score);
+      if (t0Chart !== null) landingMounted(landingCounts(r.counts), r.maxCombo, hud.score);
       setTiming(timingSummary(chart, take, r, latencyRef.current));
       setPhase("results");
     };
@@ -344,26 +402,30 @@ export default function Play() {
       const perf = performance.now();
       held?.update(pauses.now(perf));
       const now = clock.now(perf);
-      hw.nowMs = now;
+      const out = t0Chart === null ? null : landingAt(landingT(), landingPlan()!);
+      const drawn = out ? t0Chart! + out.clockMs : now;
+      hw.nowMs = drawn;
       const beat = now < 0 ? Math.floor(now / mpb) + settings.countInBeats + 1 : 0;
-      hw.countInBeat = beat > 0 ? beat : null;
+      hw.countInBeat = null; // count-in draws the 8 beats; highway.ts's old digit comes out after #747 (count-in spec)
       if (beat > lastBeat) emit({ type: "countInBeat", beat, atMs: (beat - 1 - settings.countInBeats) * mpb });
       lastBeat = beat;
       // Flow's advance never MISSes: it only notices a stop past the free beats.
       if (!wait) core("the judge", () => judge.advance(now - Math.max(0, latencyRef.current) - INPUT_GRACE_MS));
 
-      if (zoom) layout = makeLayout(chart, w, h, perspective, zoom(now));
+      if (zoom) layout = makeLayout(chart, w, h, perspective, zoom(drawn));
       core("drawHighway", () => drawHighway(ctx, layout!, chart, hw));
-      const f = { ...layout!, nowMs: now };
-      plugins.forEach((p, i) => {
-        const lc = layerCtxs[i];
-        if (!lc || !p.draw || guard.off(p.id)) return;
-        lc.clearRect(0, 0, f.width, f.height);
-        guard.run(p.id, "draw", () => p.draw!(lc, f));
-      });
+      const f = { ...layout!, nowMs: drawn };
+      drawLayers(f);
+      if (out) drawDim(f, out.keyboardDim);
       if (background) guard.run(bgId, "background", () => background.frame(f));
 
-      if (now > lastNoteMs + GOOD_MS + Math.max(0, latencyRef.current) + INPUT_GRACE_MS + END_TAIL_MS) finish(now);
+      const tail = now > lastNoteMs + GOOD_MS + Math.max(0, latencyRef.current) + INPUT_GRACE_MS + END_TAIL_MS;
+      if (!landing) {
+        if (tail) finish(now);
+      } else if (!out) {
+        // … and no key held, or today's finish time: a key held past it doesn't hold the cut back
+        if (tail || (judged >= chart.notes.length && hw.pressed.size === 0)) beginLanding(now);
+      } else if (out.mounted) finish(now, drawn);
     };
     raf = requestAnimationFrame(frame);
 
@@ -378,6 +440,7 @@ export default function Play() {
       stop();
       cancelAnimationFrame(idleRaf);
       background?.dispose();
+      stopLanding();
     };
 
     if (window.__pianoArcade) {
@@ -408,34 +471,38 @@ export default function Play() {
     saveLatencyOffset(v);
   };
 
-  // Latency, sound and MIDI status: under the start screen, and under the details on the results screen. Setup, not the
-  // game: ?capture=1 hides each of them (capture-mode); the SfxControls wrapper has no box, so nothing moves without it.
-  const controls = (
-    <>
-      <label data-capture-hide style={{ marginTop: 24, display: "flex", gap: 8, alignItems: "center" }}>
-        Latency offset
-        <input type="range" min={LATENCY_MIN} max={LATENCY_MAX} step={1} value={latency} onChange={(e) => onLatency(Number(e.target.value))} />
-        <output style={{ width: 64 }}>{latency} ms</output>
-      </label>
-      <div data-capture-hide style={{ display: "contents" }}>
-        <SfxControls />
-      </div>
-      {!isTest && (
-        <p data-capture-hide style={{ opacity: 0.6, fontSize: 14 }}>
-          {midiStatus}
-        </p>
-      )}
-    </>
-  );
-
   return (
     <main style={{ position: "fixed", inset: 0, overflow: "hidden" }}>
-      <div ref={backgroundRef} style={canvasStyle} />
-      <canvas ref={highwayRef} style={canvasStyle} />
-      {plugins.map((p, i) => (
-        <canvas key={p.id} ref={(c) => void (layerRefs.current[i] = c)} style={canvasStyle} />
-      ))}
+      {/* The take is drawn, so the drawing is hidden from screen readers; the status line says what it shows. */}
+      <div ref={backgroundRef} style={canvasStyle} aria-hidden />
+      <canvas ref={highwayRef} style={canvasStyle} aria-hidden />
+      <canvas ref={overlayRef} style={canvasStyle} aria-hidden />
+      <p role="status" style={srOnly}>
+        {phase === "playing" ? `${loaded?.chart.title ?? "The song"}: playing` : ""}
+        {phase === "results" && results ? `${loaded?.chart.title ?? "The song"}: rank ${results.rank}, ${(results.accuracy * 100).toFixed(1)}%` : ""}
+      </p>
 
+      {/* mouse-first: Esc and ← → as buttons in the corner, while playing only; ?capture=1 hides them. Pressing one
+          keeps focus where it was, so a later Space or Enter doesn't press it again. ?input=test never pauses. */}
+      {phase === "playing" && pauseMode === "playing" && (
+        <div data-capture-hide style={corner} onMouseDown={(e) => e.preventDefault()}>
+          {loaded && isWaitMode(loaded.params) && (
+            <>
+              <Button kind="secondary" tabIndex={-1} aria-label="Back a bar" title="Back a bar (←)" aria-keyshortcuts="ArrowLeft" style={cornerButton} onClick={() => rewindRef.current(-1)} data-testid="bar-back">
+                ◀
+              </Button>
+              <Button kind="secondary" tabIndex={-1} aria-label="Ahead a bar" title="Ahead a bar (→)" aria-keyshortcuts="ArrowRight" style={cornerButton} onClick={() => rewindRef.current(1)} data-testid="bar-ahead">
+                ▶
+              </Button>
+            </>
+          )}
+          {!isTest && (
+            <Button kind="secondary" tabIndex={-1} aria-label="Pause" title="Pause (Esc)" aria-keyshortcuts="Escape" style={cornerButton} onClick={() => pauseRef.current("esc")} data-testid="pause-button">
+              ❚❚
+            </Button>
+          )}
+        </div>
+      )}
       {phase === "playing" && (
         <PauseMenu
           mode={pauseMode}
@@ -448,41 +515,42 @@ export default function Play() {
       )}
       {phase !== "playing" && (
         <div style={overlay}>
-          {phase === "loading" && <p>Loading chart…</p>}
+          {/* Loading and a bad song link in the Duo kit; settings live in the Options drawers, not here (#889, #890). */}
+          {phase === "loading" && <MonoLabel style={{ margin: "auto", fontSize: "clamp(13px, 1vw, 18px)" }}>Loading chart…</MonoLabel>}
           {phase === "error" && (
-            <>
-              <p role="alert">{error}</p>
-              <Link href="/" style={{ color: settings.noteColor }}>
-                Back to the song list
-              </Link>
-            </>
-          )}
-          {phase === "ready" && (
-            <>
-              <p data-capture-hide style={{ opacity: 0.7 }}>
-                Laptop keys: A S D F G H J K L ; (white) · W E T Y U O P (black)
+            <Panel style={{ margin: "auto", padding: "clamp(20px, 2.4vw, 44px)", display: "flex", flexDirection: "column", gap: "2.4vh", alignItems: "flex-start", maxWidth: "min(640px, 90vw)" }}>
+              <p role="alert" style={stateTitle}>
+                {error}
               </p>
-              <button style={button} onClick={start} autoFocus>
-                Start
-              </button>
-              {loaded && <Slots plugins={plugins} panel={(p) => p.startPanel?.(loaded)} />}
-            </>
+              <Link href="/" {...kitButton("primary")}>
+                Songs
+              </Link>
+            </Panel>
+          )}
+          {phase === "ready" && loaded && (
+            <StartScreen
+              plugins={plugins}
+              panel={(p) => p.startPanel?.(loaded)}
+              onStart={start}
+              onLatency={onLatency}
+              status={!isTest && <p data-capture-hide>{midiStatus}</p>}
+            />
           )}
           {phase === "results" && results && (
             <ResultsLayout
               results={results}
               title={loaded?.chart.title}
+              composer={loaded?.chart.composer}
               scored={!(loaded && isWaitMode(loaded.params))}
               score={score}
               timing={timing && <TimingPanel timing={timing} latency={latency} onLatency={onLatency} />}
               plugins={take && loaded ? plugins : []}
               panel={(p) => take && loaded && p.resultsPanel?.({ ...loaded, take, results, retry: start })}
               onRetry={start}
-              settings={controls}
+              onLatency={onLatency}
+              status={!isTest && <p data-capture-hide>{midiStatus}</p>}
             />
           )}
-          {/* not while loading: the slider would show useState's 0 before the stored offset is read (#447, #478) */}
-          {phase !== "results" && phase !== "loading" && controls}
         </div>
       )}
     </main>
@@ -493,22 +561,22 @@ export default function Play() {
 function TimingPanel({ timing, latency, onLatency }: { timing: TimingSummary; latency: number; onLatency: (ms: number) => void }) {
   const suggested = timing.suggestedLatencyMs;
   return (
-    <div data-testid="timing" style={{ marginTop: 16, fontSize: 16, lineHeight: 1.6 }}>
+    <div data-testid="timing" style={{ lineHeight: 1.6 }}>
       {describeTiming(timing).map((line) => (
         <div key={line}>{line}</div>
       ))}
       {suggested !== null && suggested !== latency && (
-        <div data-capture-hide style={{ marginTop: 8 }}>
-          <button style={{ ...button, fontSize: 15, padding: "6px 16px", background: "#ddd" }} onClick={() => onLatency(suggested)}>
+        <div data-capture-hide style={{ marginTop: 12 }}>
+          <Button kind="secondary" onClick={() => onLatency(suggested)}>
             Set latency offset to {suggested} ms
-          </button>
-          <div style={{ fontSize: 13, opacity: 0.6, marginTop: 4 }}>
+          </Button>
+          <div style={{ fontSize: 13, color: "var(--pa-ink-dim)", marginTop: 6 }}>
             Shifts every press, so it also hides a habit of rushing or dragging.
           </div>
         </div>
       )}
       {suggested !== null && suggested === latency && (
-        <div data-capture-hide style={{ fontSize: 13, opacity: 0.6, marginTop: 8 }}>
+        <div data-capture-hide style={{ fontSize: 13, color: "var(--pa-ink-dim)", marginTop: 8 }}>
           Latency offset set to {latency} ms. Press Retry to use it.
         </div>
       )}
@@ -517,6 +585,19 @@ function TimingPanel({ timing, latency, onLatency }: { timing: TimingSummary; la
 }
 
 const canvasStyle: React.CSSProperties = { position: "absolute", inset: 0, width: "100%", height: "100%" };
+// Read by screen readers, not drawn: the usual visually hidden box.
+const srOnly: React.CSSProperties = { position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap", margin: -1 };
+// The error screen's line, in the kit's display type (upright, condensed).
+const stateTitle: React.CSSProperties = {
+  margin: 0,
+  fontFamily: "var(--pa-font-display), system-ui, sans-serif",
+  fontStretch: "75%",
+  fontWeight: 700,
+  fontSize: "clamp(24px, 2.4vw, 44px)",
+  lineHeight: 1.1,
+  color: "var(--pa-ink)",
+};
+
 const overlay: React.CSSProperties = {
   position: "absolute",
   inset: 0,
@@ -527,12 +608,16 @@ const overlay: React.CSSProperties = {
   overflowY: "auto", // … and scrolls, so the rank and counts are never cut off above the window
   background: "rgba(0,0,0,0.75)",
 };
-const button: React.CSSProperties = {
-  padding: "12px 32px",
-  fontSize: 20,
-  borderRadius: 8,
-  border: "none",
-  background: settings.noteColor,
-  color: "#000",
-  cursor: "pointer",
+
+// The play corner (mouse-first): square kit buttons, the only way to pause or rewind with a mouse. Sized with the
+// window (about 45 px at 1080p) and under the HUD band (hudLayout's clamp(44, 11% of the judgment line, 84) px, about
+// 8.4vh), clear of its badge and the beat track's status line (#888).
+const corner: React.CSSProperties = { position: "fixed", top: "calc(clamp(44px, 8.4vh, 84px) + 8px)", right: 12, display: "flex", gap: 6, zIndex: 5 };
+const cornerButton: React.CSSProperties = {
+  width: "clamp(36px, 4.2vh, 56px)",
+  height: "clamp(36px, 4.2vh, 56px)",
+  padding: 0,
+  fontSize: "clamp(14px, 1.8vh, 22px)",
+  background: "color-mix(in srgb, var(--pa-panel) 80%, transparent)",
+  color: "var(--pa-ink)", // full ink: read from playing distance
 };

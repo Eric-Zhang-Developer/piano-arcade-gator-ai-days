@@ -78,11 +78,18 @@ try {
   const page = await context.newPage();
   const pressed = async (id) => (await page.getByTestId(id).getAttribute("aria-pressed")) === "true";
   // Focus a song on / and wait for its preview's chart (Hands shows once the chart says it has both hands).
+  // A focus that lands before hydration is lost: React never sees the event, and song-finder's mount effect then
+  // moves focus to the row the panel shows (the first song). So focus until the row itself says it's the focused one.
   const focus = async (id, twoHands) => {
-    await page.getByTestId(`song-${id}`).focus();
+    const row = page.locator(`[data-testid="song-${id}"] [data-focused]`);
+    for (let i = 0; i < 40 && !(await row.count()); i++) {
+      await page.getByTestId(`song-${id}`).focus();
+      await page.waitForTimeout(250);
+    }
     await page.getByTestId("song-options").waitFor({ timeout: 60_000 });
     if (twoHands) await page.getByTestId("hands-R").waitFor({ timeout: 10_000 });
-    else await page.getByTestId("preview-practice").waitFor({ timeout: 10_000 }); // the chart has loaded
+    // The chart has loaded: song-preview's PRACTICE 70% shows, or duo-select's PRACTICE turns on.
+    else await page.locator('[data-testid="preview-practice"], [data-testid="select-practice"]:not([disabled])').first().waitFor({ timeout: 10_000 });
   };
   const home = async () => {
     await page.goto(`${base}/`);
@@ -116,7 +123,9 @@ try {
   const lastBeat = Math.max(...chart.notes.map((n) => n.beat + n.duration));
   await page.waitForSelector('[data-testid="results"]', { timeout: lastBeat * mpb + 30_000 });
   const results = await page.evaluate(() => window.__pianoArcade.results);
-  const recordShown = await page.getByText("NEW RECORD").count();
+  // Visible only: the help card (a closed <dialog> on every page) reads "initials for a new record", and getByText is
+  // case-insensitive and counts hidden text.
+  const recordShown = await page.getByText("NEW RECORD").filter({ visible: true }).count();
   const records = await page.evaluate(() => Object.keys(JSON.parse(localStorage.getItem("pianoArcade.records") ?? "{}")));
   check(results?.accuracy === 1 && recordShown === 0 && !records.length, `a perfect take: ${results ? `${(results.accuracy * 100).toFixed(1)}%` : "no results"}, no NEW RECORD, records [${records.join(", ")}]`);
   await page.screenshot({ path: join(out, "fur-elise-right-70-results.png") });
@@ -129,15 +138,16 @@ try {
   const twinkleHref = await page.getByTestId("song-twinkle").getAttribute("href");
   check((await page.locator('[data-testid^="hands-"]').count()) === 0 && (await pressed("speed-100")) && twinkleHref === "/play?song=twinkle", `Twinkle: no Hands, 100%, href ${twinkleHref}`);
 
-  // 4. L on Für Elise learns with the options; LEARN's href is the same URL.
+  // 4. L on Für Elise learns with the options; LEARN's href, where there is one, is the same URL.
   await focus("fur-elise", true);
-  const learnHref = await page.getByTestId("preview-learn").getAttribute("href");
+  // duo-select's panel has no LEARN link (L is the way in), so the href check runs only where it's drawn.
+  const learnHref = (await page.getByTestId("preview-learn").count()) ? await page.getByTestId("preview-learn").getAttribute("href") : null;
   await page.keyboard.press("l");
   await page.waitForURL(/\/play\?/, { timeout: 30_000 });
   const learn = new URL(page.url());
   const lp = learn.searchParams;
   check(lp.get("mode") === "wait" && lp.get("hands") === "R" && lp.get("tempo") === "70", `L opens /play?${lp}`);
-  check(learnHref === `${learn.pathname}${learn.search}`, `LEARN's href matches (${learnHref})`);
+  if (learnHref !== null) check(learnHref === `${learn.pathname}${learn.search}`, `LEARN's href matches (${learnHref})`);
 
   // 5. The panel at both sizes.
   for (const [w, h] of [

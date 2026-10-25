@@ -1,5 +1,6 @@
 // Beat track: a drum beat on the piano from the count-in to the end, so players hear the time (spec: beat-track).
 import type { Chart, GameEvent, GamePlugin } from "../../contracts";
+import { parseSidecar } from "../audio-track";
 import { captureOn } from "../capture-mode";
 import { msPerBeat, settings as core } from "../core/settings";
 
@@ -50,6 +51,15 @@ export const beatPatterns: Record<string, Pattern> = {
   },
   lullaby: { beatsPerBar: null, hits: [{ at: 0, note: SIDE_STICK, velocity: 40 }] },
 };
+
+// Whether the beat plays. ?beat=off, wait mode and flow mode stop it (both hold the clock at notes). A song with its own
+// recording (audio-track's sidecar) already has its drums, so the beat is off by default there (#789); ?beat=<style>
+// still turns it on.
+export function beatOn(params: URLSearchParams, recording: boolean): boolean {
+  const beat = params.get("beat");
+  if (beat === "off" || params.get("mode") === "wait" || params.get("mode") === "flow") return false;
+  return beat ? true : !recording;
+}
 
 // The pattern a chart plays for ?beat=<style>, or null for the default (no style, an unknown one, or another meter).
 export function patternFor(chart: Chart, style: string | null): Pattern | null {
@@ -112,9 +122,12 @@ export function beatTrack(): GamePlugin {
   let active = false;
   let where = "Beat: off";
   let style: string | null = null; // ?beat=<style>, on the piano only: the laptop clicks the beats
+  let load = 0; // only the latest take's sidecar check may turn the beat off
 
   const play = (h: Hit) => {
     const perf = zero + h.atMs;
+    // For verify-count-in: each count-in click's chart time and the performance time it's scheduled for (read-only).
+    if (h.atMs < 0 && typeof window !== "undefined") (window.__pianoArcadeBeat ??= { countIn: [] }).countIn.push({ atMs: h.atMs, perfMs: perf });
     if (output) {
       output.send([0x99, h.note, h.velocity], perf);
       output.send([0x89, h.note, 0], perf + beatSettings.noteLengthMs);
@@ -180,8 +193,21 @@ export function beatTrack(): GamePlugin {
     id: "beat-track",
     transformChart(c, params) {
       chart = c;
-      off = params.get("beat") === "off" || params.get("mode") === "wait" || params.get("mode") === "flow"; // both stop the clock at notes
+      off = !beatOn(params, false);
       style = params.get("beat") && params.get("beat") !== "off" ? params.get("beat") : null;
+      const song = params.get("song") ?? "";
+      const token = ++load;
+      if (!off && song.startsWith("local/") && typeof fetch !== "undefined") {
+        // The same sidecar audio-track reads. It may arrive after Start: then the beat stops where it is.
+        void fetch(`/songs/${song}/audio.json`)
+          .then((r) => (r.ok ? r.json() : null))
+          .then((raw) => {
+            if (token !== load || !parseSidecar(raw) || beatOn(params, true)) return;
+            off = true;
+            silence();
+          })
+          .catch(() => {});
+      }
       if (!off && typeof navigator !== "undefined" && navigator.requestMIDIAccess) {
         navigator
           .requestMIDIAccess()
@@ -201,6 +227,7 @@ export function beatTrack(): GamePlugin {
       if (e.type === "resume") return begin(e.atMs);
       if (e.type !== "songStart") return;
       silence();
+      if (typeof window !== "undefined") window.__pianoArcadeBeat = { countIn: [] }; // this take's clicks only
       if (!output) {
         try {
           audio ??= new AudioContext();
@@ -225,4 +252,10 @@ export function beatTrack(): GamePlugin {
       ctx.fillText(off ? "Beat: off" : where, frame.width - 12, 20);
     },
   };
+}
+
+declare global {
+  interface Window {
+    __pianoArcadeBeat?: { countIn: { atMs: number; perfMs: number }[] }; // read by verify-count-in.mjs
+  }
 }

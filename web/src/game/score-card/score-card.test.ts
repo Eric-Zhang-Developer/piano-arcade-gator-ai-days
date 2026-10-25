@@ -1,7 +1,9 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { Chart, Results } from "../../contracts";
+import { APP_NAME } from "../app-name";
 import { loopChart } from "../bar-loop";
+import { hype } from "../ui-tokens";
 import { CARD_LABELS, cardModel, drawCard, practiceLine, type CardModel } from "./card";
 
 const twinkle: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
@@ -64,9 +66,18 @@ describe("drawCard", () => {
   function recorder() {
     const texts: string[] = [];
     const fonts: string[] = [];
+    const fills: unknown[] = [];
+    const italics: string[] = [];
     let font = "";
+    let fill: unknown = "";
     const ctx = {
-      fillStyle: "" as unknown,
+      get fillStyle() {
+        return fill;
+      },
+      set fillStyle(f: unknown) {
+        fill = f;
+        fills.push(f);
+      },
       textAlign: "left",
       textBaseline: "alphabetic",
       get font() {
@@ -79,6 +90,7 @@ describe("drawCard", () => {
       fillRect() {},
       fillText(s: string) {
         texts.push(s);
+        if (/italic/.test(font)) italics.push(s);
       },
       measureText: (s: string) => ({ width: s.length * 30 }),
       save() {},
@@ -88,7 +100,7 @@ describe("drawCard", () => {
       clip() {},
       createLinearGradient: () => ({ addColorStop() {} }),
     };
-    return { ctx: ctx as unknown as CanvasRenderingContext2D, texts, fonts };
+    return { ctx: ctx as unknown as CanvasRenderingContext2D, texts, fonts, fills, italics };
   }
   const strings = (m: CardModel) =>
     [m.title, m.composer, m.practice, m.rank, m.score, m.accuracy, m.maxCombo, m.date, m.jacket.word]
@@ -108,5 +120,15 @@ describe("drawCard", () => {
     drawCard(ctx, cardModel({ ...twinkle, title: "A very long title that has to shrink to fit the right column" }, results, 0, day));
     const sizes = fonts.map((f) => Number(/(\d+)px/.exec(f)?.[1]));
     expect(Math.min(...sizes)).toBeGreaterThanOrEqual(24);
+  });
+
+  it("reads Étude, upright, with no hype pink (Duo look, #1139)", () => {
+    const { ctx, texts, italics, fills } = recorder();
+    const m = cardModel(twinkle, results, 12345, day);
+    drawCard(ctx, m);
+    expect(texts).toContain(APP_NAME);
+    expect(texts).not.toContain("PIANO ARCADE");
+    expect(italics).toEqual([m.jacket.word]); // the sleeve is SongJacket's artwork, italic there too
+    expect(fills.filter((f) => typeof f === "string" && f.toLowerCase() === hype)).toEqual([]);
   });
 });

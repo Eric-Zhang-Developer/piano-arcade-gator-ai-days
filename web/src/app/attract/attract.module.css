@@ -1,13 +1,13 @@
-/* Attract mode on top of operator-board's synthwave look: the stage, its HTML overlays, and the crew timeline. */
+/* Attract mode on operator-board's Duo look (foreman-duo): the stage, its HTML overlays, and the crew timeline.
+   Overlays are panel-dark hairline boxes; blue and purple are the only accents, and state always carries a glyph. */
 .cabinet {
   position: relative;
   height: 62vh;
   min-height: 420px;
-  margin: 0 0 12px;
-  border: 1px solid rgba(78, 246, 255, 0.35);
-  box-shadow: 0 0 30px rgba(255, 90, 217, 0.18);
+  margin: 0 0 14px;
+  border: 1px solid var(--pa-line);
   overflow: hidden;
-  background: #05000c;
+  background: var(--pa-bg);
 }
 
 .stage {
@@ -15,65 +15,73 @@
   inset: 0;
 }
 
+/* FEATURES DONE, PRS MERGED, AGENTS AT WORK: the kit's data cells, drawn on the dl verify-replay reads */
 .counters {
   position: absolute;
-  top: 12px;
+  top: 14px;
   left: 14px;
   display: flex;
-  gap: 12px;
   margin: 0;
+  background: color-mix(in srgb, var(--pa-panel) 88%, transparent);
+  border: 1px solid var(--pa-line);
   pointer-events: none;
 }
 
 .counters div {
-  padding: 6px 12px 4px;
-  background: rgba(13, 0, 28, 0.82);
-  border: 1px solid rgba(255, 90, 217, 0.5);
+  padding: 8px 16px 8px;
+}
+
+.counters div + div {
+  border-left: 1px solid var(--pa-line);
 }
 
 .counters dt {
-  color: var(--dim);
-  font-size: 11px;
-  letter-spacing: 2px;
+  color: var(--pa-ink-dim);
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: 0.75em;
+  font-weight: 500;
+  letter-spacing: 0.14em;
 }
 
 .counters dd {
-  margin: 0;
-  font-family: var(--op-display), monospace;
-  font-size: 48px;
+  margin: 6px 0 0;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-stretch: 75%;
+  font-weight: 800;
+  font-size: clamp(36px, 2.8vw, 54px);
   line-height: 1;
-  color: var(--amber);
-  text-shadow: 0 0 10px rgba(255, 211, 107, 0.5);
   font-variant-numeric: tabular-nums;
 }
 
 .chapter {
   position: absolute;
-  top: 18px;
-  right: 18px;
+  top: 14px;
+  right: 14px;
   max-width: 40%;
   margin: 0;
-  padding: 6px 14px;
-  font-family: var(--op-display), monospace;
-  font-size: 30px;
-  letter-spacing: 2px;
-  color: var(--cyan);
-  background: rgba(13, 0, 28, 0.82);
-  border: 1px solid var(--cyan);
-  text-shadow: 0 0 10px rgba(78, 246, 255, 0.6);
+  padding: 8px 16px;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-stretch: 75%;
+  font-weight: 700;
+  font-size: clamp(22px, 1.7vw, 32px);
+  line-height: 1.1;
+  text-transform: uppercase;
+  background: color-mix(in srgb, var(--pa-panel) 88%, transparent);
+  border: 1px solid var(--pa-line);
+  border-left: 3px solid var(--pa-primary);
   animation: slide 0.4s ease-out;
 }
 
 .ticker {
   position: absolute;
   left: 14px;
-  bottom: 12px;
+  bottom: 14px;
   max-width: 70%;
   margin: 0;
-  padding: 6px 12px;
+  padding: 8px 14px;
   list-style: none;
-  background: rgba(13, 0, 28, 0.82);
-  border-left: 3px solid var(--magenta);
+  background: color-mix(in srgb, var(--pa-panel) 88%, transparent);
+  border-left: 3px solid var(--pa-secondary);
   pointer-events: none;
 }
 
@@ -84,12 +92,12 @@
 }
 
 .ticker li:first-child {
-  color: var(--ink);
+  color: var(--pa-ink);
   animation: slide 0.3s ease-out;
 }
 
 .ticker li + li {
-  color: var(--dim);
+  color: var(--pa-ink-dim);
 }
 
 @keyframes slide {
@@ -102,11 +110,12 @@
 .picked {
   position: absolute;
   right: 14px;
-  bottom: 12px;
+  bottom: 14px;
   min-width: 260px;
-  padding: 10px 14px;
-  background: rgba(13, 0, 28, 0.94);
-  border: 1px solid var(--magenta);
+  padding: 12px 16px;
+  background: var(--pa-panel);
+  border: 1px solid var(--pa-line);
+  border-top: 2px solid var(--pa-primary);
 }
 
 .picked p {
@@ -117,28 +126,97 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px 16px;
+  gap: 10px 18px;
   margin: 0 0 28px;
 }
 
+/* The step scrubber: a hairline track and a sharp primary thumb, not the browser's slider. */
 .scrub {
   flex: 1;
   min-width: 240px;
-  accent-color: var(--magenta);
+  height: 20px;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.scrub::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--pa-line);
+}
+
+.scrub::-webkit-slider-thumb {
+  appearance: none;
+  width: 10px;
+  height: 20px;
+  margin-top: -9px;
+  border-radius: 0;
+  background: var(--pa-primary);
+}
+
+.scrub::-moz-range-track {
+  height: 2px;
+  background: var(--pa-line);
+}
+
+.scrub::-moz-range-thumb {
+  width: 10px;
+  height: 20px;
+  border: 0;
+  border-radius: 0;
+  background: var(--pa-primary);
+}
+
+.scrub:focus-visible {
+  outline: 2px solid var(--pa-ink);
+  outline-offset: 3px;
+}
+
+.stepNo,
+.toggle {
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: 0.87em;
+  letter-spacing: 0.06em;
+  color: var(--pa-ink-dim);
 }
 
 .stepNo {
   font-variant-numeric: tabular-nums;
-  color: var(--dim);
 }
 
 .toggle {
-  color: var(--dim);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* wall clock: a square checkbox, filled primary when on */
+.toggle input {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  border: 1px solid var(--pa-ink-dim);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.toggle input:checked {
+  border-color: var(--pa-primary);
+  background: var(--pa-primary);
+  box-shadow: inset 0 0 0 2px var(--pa-bg);
+}
+
+.toggle input:focus-visible {
+  outline: 2px solid var(--pa-ink);
+  outline-offset: 2px;
 }
 
 .flat {
   position: absolute;
-  inset: 90px 14px 90px;
+  inset: 100px 14px 90px;
   overflow: auto;
 }
 
@@ -148,27 +226,36 @@
   align-items: center;
   gap: 6px;
   margin: 0 0 8px;
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: 0.8em;
 }
 
 .flatItem {
-  padding: 2px 8px;
-  color: var(--dim);
+  padding: 3px 8px;
+  font: inherit;
+  color: var(--pa-ink-dim);
   background: transparent;
   border: 1px solid currentColor;
+  border-radius: 0;
   cursor: pointer;
 }
 
+.flatItem:hover {
+  background: color-mix(in srgb, var(--pa-ink-dim) 12%, transparent);
+}
+
 .up {
-  color: var(--green);
+  color: var(--pa-primary);
 }
 
 .legend {
   display: flex;
   flex-wrap: wrap;
   gap: 4px 18px;
-  margin: 0 0 8px;
-  color: var(--dim);
-  font-size: 13px;
+  margin: 0 0 10px;
+  color: var(--pa-ink-dim);
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: 0.8em;
 }
 
 .legend i {
@@ -190,43 +277,44 @@
 
 .axis,
 .worker {
-  fill: var(--dim);
+  fill: var(--pa-ink-dim);
   font-size: 11px;
-  font-family: var(--op-body), monospace;
+  font-family: var(--pa-font-data), ui-monospace, monospace;
 }
 
 .worker {
-  fill: var(--magenta);
+  fill: var(--pa-ink);
 }
 
 .strip {
-  fill: rgba(78, 246, 255, 0.25);
-  stroke: var(--cyan);
+  fill: color-mix(in srgb, var(--pa-primary) 22%, transparent);
+  stroke: var(--pa-primary);
   stroke-width: 1;
 }
 
+/* PR kinds: feat blue, fixes purple, plans ink, the rest dim */
 .k_feat {
-  fill: var(--magenta);
-  stroke: var(--magenta);
-  background: var(--magenta);
+  fill: var(--pa-primary);
+  stroke: var(--pa-primary);
+  background: var(--pa-primary);
 }
 
 .k_fix {
-  fill: var(--cyan);
-  stroke: var(--cyan);
-  background: var(--cyan);
+  fill: var(--pa-secondary);
+  stroke: var(--pa-secondary);
+  background: var(--pa-secondary);
 }
 
 .k_plan {
-  fill: var(--amber);
-  stroke: var(--amber);
-  background: var(--amber);
+  fill: var(--pa-ink);
+  stroke: var(--pa-ink);
+  background: var(--pa-ink);
 }
 
 .k_other {
-  fill: var(--dim);
-  stroke: var(--dim);
-  background: var(--dim);
+  fill: var(--pa-ink-dim);
+  stroke: var(--pa-ink-dim);
+  background: var(--pa-ink-dim);
 }
 
 .how_merged {
@@ -246,12 +334,12 @@
 
 .timeline a:focus-visible rect,
 .timeline rect:hover {
-  stroke: #fff;
+  stroke: var(--pa-flare);
   stroke-width: 1.5;
 }
 
 .marker {
-  stroke: var(--amber);
+  stroke: var(--pa-ink);
   stroke-width: 1.5;
 }
 
@@ -259,18 +347,22 @@
   position: absolute;
   transform: translate(-50%, calc(-100% - 6px));
   max-width: 420px;
-  padding: 4px 8px;
-  font-size: 12px;
-  color: var(--ink);
-  background: rgba(13, 0, 28, 0.96);
-  border: 1px solid var(--cyan);
+  padding: 6px 10px;
+  font-size: 0.8em;
+  color: var(--pa-ink);
+  background: var(--pa-panel);
+  border: 1px solid var(--pa-line);
   pointer-events: none;
 }
 
 .details summary {
   cursor: pointer;
-  color: var(--cyan);
-  margin: 10px 0;
+  color: var(--pa-primary);
+  margin: 12px 0;
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: 0.8em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 @media (prefers-reduced-motion: reduce) {

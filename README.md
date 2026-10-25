@@ -1,9 +1,11 @@
-# Piano Arcade
+# Étude
 
 An arcade rhythm game played on a real 88-key piano (a Yamaha DGX-660) in Chrome. Notes fall toward the keys,
 every note you play is judged against the chart's clock to the millisecond, and the results screen shows how you
-played it: PERFECT, GREAT, MISS and extras, how early or late, combo and rank. A learning lane will read your takes
-and tell you what to practice next.
+played it: PERFECT, GREAT, GOOD, MISS and WRONG, how early or late, combo and rank. A learning side will read your takes
+and tell you what to practice next; today it runs on a sample learner.
+
+**Judging this project?** Start with [`docs/judges.md`](docs/judges.md), then [Run it for judging](#run-it-for-judging).
 
 Built at Gator Hack V (UF AI Days, Oct 23 to 25, 2026). Why we're building it and what's out of scope:
 [`specs/mission.md`](specs/mission.md). Product, UI and code decisions start with the frozen
@@ -11,52 +13,68 @@ Built at Gator Hack V (UF AI Days, Oct 23 to 25, 2026). Why we're building it an
 
 ## Run it
 
-Needs Node.js, pnpm (pinned in `web/package.json`; run `corepack enable` once) and Chrome for the piano.
+Needs Node.js 24 (what CI runs), pnpm 10.32.1 (pinned in `web/package.json`; run `corepack enable` once) and Chrome
+for the piano.
 
 ```bash
 cd web
 pnpm install
-pnpm dev            # http://localhost:3000 redirects to /play
+pnpm dev            # http://localhost:3000: the song select
 ```
 
 | Route | What it is |
 |---|---|
-| `/play` | The game. Plug a MIDI piano in over USB and Chrome asks for MIDI access. With no piano, the home row plays the white keys (`A` through `;`) and the row above plays the black keys between them. |
+| `/` | Song select: every chart under `web/public/songs/`, easiest first, or sorted by composer or recently played. Find filters by title, composer or catalog. Click a song, or ↑/↓ and Enter, then PLAY, PRACTICE, LEARN or WATCH. |
+| `/play?song=<id>` | The game. Plug a MIDI piano in over USB and Chrome asks for MIDI access. With no piano, the home row plays the white keys (`A` through `;`), the row above plays the black keys between them, and Z / X move them an octave. |
 | `/play?midi=sim` | The game on a virtual DGX-660 instead of real MIDI. |
 | `/sim` | The piano simulator: the game, a virtual keyboard, a raw MIDI log, fault buttons (stall, unplug, jitter, stuck note) and a bot that plays the song perfectly. `/sim?record` records a real piano into a test fixture. |
+| `/learn` | The learning side (the nav's **Learn**) and its activities. It runs on an authored sample learner and isn't connected to your takes or an account yet ([#874](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/874)). Its activities: `/learn/understand` (explore a musical idea), `/learn/practice` (a short passage with guidance), `/learn/review/theory` (recall the idea) and `/learn/play-through` (the whole melody, feedback after the last bar); `/learn/brand-preview` is a brand direction review, and `/learn/review` redirects to `/learn`. A student with no answers yet lands in the diagnostic (`/learn/diagnostic`) first. |
+| `/sheet?song=<id>` | The chart's score as sheet music, following the take while `/play` runs. |
+| `/stage` | The live take on NOSTALGIA's hill, for people watching on a second display. `/play`'s start screen opens it. |
+| `/calibrate` | Tap along to 12 clicks to measure your latency offset. |
+| `/progress` | Your saved takes over time. |
+| `/lab` | Experimental and hidden features, each with one link. The experiment and spike pages, and the video cards, follow. |
+| `/real-keys` | Spike: calibrate a camera on the key bed, then play with the highway's notes falling onto the live picture of the real keys. |
+| `/highlight` | Spike: renders a take into a 15 s broadcast replay WebM. |
+| `/composers-hands` | Spike: plays a composer's own piano roll, or his left hand while you play the right, and draws his tempo against yours. |
+| `/paint` | Spike: free play where each note blooms as paint in Scriabin's colors, wet while the pedal is down. |
+| `/speak` | Spike: plays a preset phrase or your voice on the DGX, the voice's spectrum struck on 88 keys. |
+| `/musicbox` | Your take as a brass music-box cylinder over a steel comb, with an STL export (Lab: Pinned). |
+| `/sonata` | The Build Sonata: the night the agents built Étude as 90 s of music, one note per merged PR. |
+| `/shots?card=title\|end` | The video's title and end cards. |
+| `/veritas` | The judge on trial: test players plant known mistakes in real songs, and the game's judge has to find exactly those. |
 
-Web MIDI works in Chrome only. Laptop keys always work, so the game is playable with the piano unplugged.
+The nav bar links `/`, `/learn`, `/lab` and `/progress` (and `/operator` on the dev server). The other pages in
+`web/src/app/` are spikes (`/simon`, `/wrong-note`, `/conduct`), the kiosk loop (`/cabinet`, `/attract`), sign-in
+(`/auth/login`, and `/auth/callback` it returns to) and `/operator`, the agents' status board.
 
-## Learning preview
+Web MIDI works in Chrome only. Laptop keys always work, so the game is playable with the piano unplugged. Contributors
+editing the learning frontend: [`PRODUCT_AND_DESIGN.md`](PRODUCT_AND_DESIGN.md) has the run-and-edit map.
 
-The current editable learning frontend is at
-[http://localhost:3000/learn/brand-preview](http://localhost:3000/learn/brand-preview)
-after starting the development server above. Open that path explicitly: `/`
-starts the arcade. The authored local demo supports a guided map, a real
-question/score workspace and Start/Resume; it is not connected to an adaptive
-agent, account sync or persistent learning progress.
+## Run it for judging
 
-Start with the [product and design handoff](PRODUCT_AND_DESIGN.md) for the frozen
-purpose, selected assets, current typography/colors, motion boundaries and edit
-map. [Product philosophy](PRODUCT_PHILOSOPHY.md) is the canonical purpose.
+A production build, which also runs with the wifi off ([`changes/offline-ready.md`](changes/offline-ready.md)):
 
-| Edit | Location |
-|---|---|
-| Current frontend composition, styling and motion | `web/src/learn/frontend/brand-preview/` |
-| Route and font loading | `web/src/app/learn/brand-preview/page.tsx` |
-| Shared question/score/reference workspace and local state | `web/src/learn/frontend/TheoryWorkspace.tsx`, `LearningSessions.tsx` |
-| Selected mascot and previous character | `web/public/learning/` |
-| Graph nodes, mastery fixtures, layout and preparation | `web/src/learn/frontend/graph/` |
+```bash
+corepack enable
+cd web
+pnpm install
+pnpm build          # needs the network once: it downloads the Saira font
+pnpm start          # http://localhost:3000, works offline from here on
+```
 
-`/learn` is explicitly labelled Prior UI and remains available for comparison.
-The four existing activity routes remain `/learn/understand`, `/learn/practice`,
-`/learn/review/theory` and `/learn/play-through`; the current prepared assignment
-leads directly into theory without asking the learner to manage those categories.
-The proposed preview has its own in-memory session: Back to your map and Resume
-preserve it; Replay from home, leaving `/learn/brand-preview`, or refreshing
-clears it. Prior UI sessions survive navigation among learning routes, but
-refreshing or leaving the learning layout clears them. The two previews do not
-share session progress.
+`pnpm dev` with no network falls back to system fonts, so build before going offline.
+
+No keys are needed to play. With no `web/.env.local`, every song, the results screen, `/sheet`, `/sim` and `/veritas`
+work, and takes save in the browser's localStorage. These features read keys from `web/.env.local`:
+
+| Variable | Used by | Without it |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Sign-in, the account chip, server-saved takes, `/progress` from the server (`web/src/data/config.ts`) | No sign-in; takes stay in localStorage |
+| `SUPABASE_SECRET_KEY` | The server routes that save and read takes (`web/src/data/server.ts`) | Takes aren't saved on the server |
+| `ANTHROPIC_API_KEY` | The learning side's theory chat (`web/src/app/learn/api/chat/route.ts`) | The chat shows it isn't configured, never a reply |
+
+Never commit `web/.env.local`, and never put a secret in a `NEXT_PUBLIC_` name.
 
 ## How it works
 
@@ -69,11 +87,12 @@ share session progress.
                canvas highway (one lane per key)   drum beat out to the piano (MIDI out)
 ```
 
-- **Charts** are JSON files in `web/public/songs/<id>/chart.json`, each citing its source score. Twinkle is the
-  first one.
+- **Charts** are JSON files in `web/public/songs/<id>/chart.json`, each citing its source score: 40 songs (`git ls-files 'web/public/songs/*/chart.json' | wc -l`).
 - **Judging** (`web/src/game/core/judge.ts`) is a pure function of the chart and the key presses, after the
-  latency offset: PERFECT within 25 ms, GREAT within 50 ms, MISS when no key of the same pitch arrives in time. A
-  key press that matches no note is an extra, never a MISS. The same judge runs in tests with synthetic players.
+  latency offset: PERFECT within 40 ms, GREAT within 80 ms, GOOD within 120 ms (`web/src/game/core/settings.ts`),
+  MISS when no key of the same pitch arrives in time. A key press that matches no note is an extra, never a MISS;
+  an extra is a WRONG note unless it's part of a nearby note's timing. A MISS or a WRONG note breaks the combo. The
+  full rules are in [`specs/mission.md`](specs/mission.md). The same judge runs in tests with synthetic players.
 - **Rendering** is one 2D canvas per layer on `requestAnimationFrame`. Per-frame game state lives in refs, not React
   state. React draws menus and the results screen only.
 - **Sound** is scheduled ahead on the chart clock. The beat track (`web/src/game/beat/`) sends a drum beat to the
@@ -91,18 +110,22 @@ Stack: Next.js (App Router) and TypeScript, pnpm, Vitest, Playwright. Details: [
 |---|---|
 | `web/src/game/` | Game lane: clock, input, judging, highway (`core/`), beat track, timing feedback, piano simulator |
 | `web/src/contracts/` | Frozen shared formats |
-| `web/src/app/` | Next.js routes (`/play`, `/sim`) |
+| `web/src/app/` | Next.js routes, listed under [Run it](#run-it) |
 | `web/public/songs/` | One folder per chart |
 | `web/e2e/verify.mjs` | Starts the app, plays Twinkle headless as the perfect player, fails unless every note is PERFECT |
 | `specs/` | The source of truth: mission, tech stack, roadmap, milestones, one folder per feature, decisions, playtest findings |
 | `changes/<feature>.md` | What each finished feature shipped and how to check it |
 | `spikes/` | Feasibility evidence (the piano MIDI test, an agent-written Mozart variation). Never imported. |
+| `docs/judges.md` | The project against the judging criteria, each claim linked to its evidence |
+| `docs/devpost.md` | The Devpost submission draft, with its open items marked |
 | `docs/story.md` | How it got built, one chapter per milestone |
+| [`CREDITS.md`](CREDITS.md) | Every committed third-party file whose license asks for credit: its source, license and what we changed |
 
 ## Checks
 
 ```bash
 pnpm -C web lint && pnpm -C web typecheck && pnpm -C web test && pnpm -C web build
+pnpm -C web exec playwright install chromium            # once per clone: verify drives Playwright's Chromium
 pnpm -C web verify --out /tmp/piano-arcade-evidence     # headless end-to-end run, saves a results screenshot
 ```
 

@@ -1,6 +1,7 @@
 // Browser proof of ui-sounds (spec: ui-sounds, Validation): a production build in headless Chromium, with a page-side
-// spy logging every OscillatorNode.start. song-preview's tones start 400 ms after a row settles, so the steps count
-// only starts within 100 ms of a press (step 3 sorts by pitch instead).
+// spy logging every AudioBufferSourceNode.start. Since ui-sound-family each UI sound is one rendered buffer, and
+// song-preview's tones are oscillators, so the spy sees only UI sounds. The steps count starts within 100 ms of a press
+// (step 3 tells confirm from sting by length instead).
 // 1. Load / and press nothing -> no starts.  2. ↓ three times, 150 ms apart -> three moves; ↓ on the last song -> none.
 // 3. Enter -> a confirm, then one sting when the stage card shows.  4. Mute on the start screen, back to /, ↓ -> none.
 // Also: a direct load of /play gets no sting (no gesture yet).
@@ -56,9 +57,9 @@ const check = (ok, line) => {
 
 const spy = () => {
   window.__oscStarts = [];
-  const start = OscillatorNode.prototype.start;
-  OscillatorNode.prototype.start = function (...a) {
-    window.__oscStarts.push({ at: performance.now(), hz: this.frequency.value });
+  const start = AudioBufferSourceNode.prototype.start;
+  AudioBufferSourceNode.prototype.start = function (...a) {
+    window.__oscStarts.push({ at: performance.now(), s: this.buffer?.duration ?? 0 });
     return start.apply(this, a);
   };
 };
@@ -83,7 +84,7 @@ for (let i = 0; ; i++) {
 await page.locator("ol a").first().waitFor({ timeout: 30_000 });
 const now = () => page.evaluate(() => performance.now());
 const startsIn = (from, to) => page.evaluate(([a, b]) => window.__oscStarts.filter((s) => s.at >= a && s.at < b).length, [from, to]);
-// Presses a key; returns the oscillator starts within 100 ms of it.
+// Presses a key; returns the UI sound starts within 100 ms of it.
 const press = async (key) => {
   const t = await now();
   await page.keyboard.press(key);
@@ -93,7 +94,7 @@ const press = async (key) => {
 
 // 1
 await page.waitForTimeout(2000);
-check((await page.evaluate(() => window.__oscStarts.length)) === 0, "1: loading / and pressing nothing starts no oscillator");
+check((await page.evaluate(() => window.__oscStarts.length)) === 0, "1: loading / and pressing nothing starts no UI sound");
 
 // 2
 const moves = [];
@@ -113,16 +114,18 @@ const enterAt = await now();
 await page.keyboard.press("Enter");
 await page.locator('section[aria-label="Stage"]').waitFor({ timeout: 30_000 });
 await page.waitForTimeout(800);
-// The stage card often shows within 100 ms of Enter, so the two are told apart by pitch: confirm is G5 and C6
-// (784, 1047 Hz), the sting C4 to C5 (262–523 Hz).
-const after = await page.evaluate((t) => window.__oscStarts.filter((s) => s.at >= t).map((s) => s.hz), enterAt);
-const confirm = after.filter((hz) => hz > 700).length;
-const sting = after.filter((hz) => hz < 600).length;
-check(confirm === 2, `3: Enter -> a confirm (2 notes, got ${confirm})`);
-check(sting === 4 && after.length === 6, `3: the stage card -> one sting (4 notes, got ${sting}; ${after.length} starts in all)`);
+// The stage card often shows within 100 ms of Enter, so the two are told apart by length: confirm is 0.15 s, the
+// sting 0.55 s (ui-sounds/timbre.ts, LENGTH_S).
+const after = await page.evaluate((t) => window.__oscStarts.filter((s) => s.at >= t).map((s) => s.s), enterAt);
+const confirm = after.filter((s) => s < 0.3).length;
+const sting = after.filter((s) => s > 0.4).length;
+check(confirm === 1, `3: Enter -> one confirm (got ${confirm})`);
+check(sting === 1 && after.length === 2, `3: the stage card -> one sting (got ${sting}; ${after.length} starts in all)`);
 
 // 4
+await page.getByTestId("options-open").click(); // the start screen's settings are in its Options drawer (duo-start)
 await page.getByLabel("Mute").check();
+await page.keyboard.press("Escape");
 await page.goBack();
 await page.locator("ol a").first().waitFor({ timeout: 30_000 });
 await page.locator("ol a").first().focus();

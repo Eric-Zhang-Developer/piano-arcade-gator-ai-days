@@ -29,15 +29,15 @@ test("Late40: late by 40, suggests a latency offset of 40", () => {
   expect(describeTiming(s)[0]).toBe("Late by 40 ms on average, spread ±0 ms");
 });
 
-test("a press 120 ms late is a near miss and counts toward the mean", () => {
-  const s = play((i) => (i === 4 ? 120 : 0));
+test("a press 130 ms late is a near miss and counts toward the mean", () => {
+  const s = play((i) => (i === 4 ? 130 : 0));
   expect(s).toMatchObject({ timed: N, misses: 1, nearMisses: 1, late: 1 });
-  expect(s.meanMs).toBe(Math.round(120 / N));
+  expect(s.meanMs).toBe(Math.round(130 / N));
   expect(describeTiming(s)[2]).toBe("1 of 1 miss was within 150 ms");
 });
 
-test("a press 80 ms late is a GOOD hit, not a near miss", () => {
-  const s = play((i) => (i === 4 ? 80 : 0));
+test("a press 100 ms late is a GOOD hit, not a near miss", () => {
+  const s = play((i) => (i === 4 ? 100 : 0));
   expect(s).toMatchObject({ timed: N, misses: 0, nearMisses: 0, late: 1 });
 });
 
@@ -59,7 +59,7 @@ test("two presses near one missed note: only the nearest counts", () => {
     () => 0,
     [
       { pitch: n.pitch, velocity: 80, timeMs: t + 140, offTimeMs: null },
-      { pitch: n.pitch, velocity: 80, timeMs: t - 120, offTimeMs: null },
+      { pitch: n.pitch, velocity: 80, timeMs: t - 130, offTimeMs: null },
     ],
   );
   expect(s).toMatchObject({ timed: N, misses: 1, nearMisses: 1, early: 1 });

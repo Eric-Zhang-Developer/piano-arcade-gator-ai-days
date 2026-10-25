@@ -7,6 +7,9 @@ assignee: "eric-agent-1"
 
 # Song card
 
+**Retired 2026-10-25.** Since #714 the select draws duo-select's `SongRow`, and nothing imported `SongCard`, so the
+component and its test were removed. The spec below is history; `git show d219bea:web/src/game/song-card/` has the code.
+
 One component, `SongCard`, in `web/src/game/song-card/`: a song as a card for the music select. Only the card;
 `select-layout` places the cards.
 

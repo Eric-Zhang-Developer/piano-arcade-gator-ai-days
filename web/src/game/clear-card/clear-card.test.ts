@@ -57,7 +57,7 @@ describe("against the real judge", () => {
   it("FULL COMBO or ALL PERFECT exactly when the judge sends fullCombo", () => {
     const cases: [(number | null)[], string][] = [
       [Array(8).fill(0), "ALL PERFECT"],
-      [[0, 0, 0, 40, 0, 0, 0, 0], "FULL COMBO"],
+      [[0, 0, 0, 60, 0, 0, 0, 0], "FULL COMBO"],
       [[0, 0, null, 0, 0, 0, 0, 0], "CLEAR"],
     ];
     for (const [offsets, kind] of cases) {
@@ -84,13 +84,15 @@ describe("against the real judge", () => {
 function recorder() {
   const texts: { text: string; style: string; alpha: number; x: number; y: number; align: string }[] = [];
   const moves: [number, number][] = [];
+  const fonts: string[] = [];
+  const blurs: number[] = [];
   const o: Record<string | symbol, unknown> = { globalAlpha: 1, canvas: { width: 1280, height: 720 } };
   const ctx = new Proxy(o, {
     get: (t, k) =>
       k in t
         ? t[k]
         : k === "fillText"
-          ? (s: string, x: number, y: number) => texts.push({ text: s, style: String(t.fillStyle), alpha: t.globalAlpha as number, x, y, align: String(t.textAlign) })
+          ? (s: string, x: number, y: number) => (fonts.push(String(t.font)), blurs.push(Number(t.shadowBlur ?? 0)), texts.push({ text: s, style: String(t.fillStyle), alpha: t.globalAlpha as number, x, y, align: String(t.textAlign) }))
           : k === "translate"
             ? (x: number, y: number) => moves.push([x, y])
             : k === "measureText"
@@ -98,7 +100,7 @@ function recorder() {
               : () => {},
     set: (t, k, v) => ((t[k] = v), true),
   }) as unknown as CanvasRenderingContext2D;
-  return { ctx, texts, moves };
+  return { ctx, texts, moves, fonts, blurs };
 }
 
 describe("the draw", () => {
@@ -122,6 +124,16 @@ describe("the draw", () => {
       shown([...offsets]).draw!(r.ctx, frame(t0 + 300));
       expect(r.texts).toEqual([{ text: kind, style: color, alpha: 1, x: 0, y: 0, align: "center" }]);
       expect(r.moves[0][0]).toBe(640); // the canvas's middle
+    }
+  });
+
+  it("sets every card upright in the display face's 900, never italic, and flat with no glow (Duo look, #1131)", () => {
+    for (const offsets of [Array(8).fill(0), [0, 0, null, 0, 0, 0, 0, 0]]) {
+      const r = recorder();
+      shown([...offsets]).draw!(r.ctx, frame(t0 + 300));
+      expect(r.fonts).toHaveLength(1);
+      expect(r.fonts[0]).toMatch(/^900 [\d.]+px /);
+      expect(r.blurs).toEqual([0]);
     }
   });
 

@@ -51,10 +51,12 @@ Measure first, then the smallest fix the numbers allow.
   1. For each of the ten charts, `/sheet?song=<id>`: `beams.beamed === beams.should`. It prints both per chart. If main
      already passes this step, the beaming half is done and the PR says so. Steps 2 and 3 still fail on main.
   2. `/sheet?song=ode-to-joy` with `/play?song=ode-to-joy&bot=perfect` in the same browser context -> every beam in
-     the SVG carries `#ffe27a`. With `bot=sloppy` -> no beam carries a judgment color unless all its notes share it.
-  3. Readability, from screenshots at 1920×1080 after the Perfect take: pixels within ΔE76 10 of `#ffe27a`, divided
-     by the 122 notes. It must be higher than the same count on main. Both numbers, and each judgment color's
-     luminance ratio against `--pa-ink` and against `--pa-bg`, go in the done note.
+     the SVG carries PERFECT's paper gold (`paperJudgmentColors.PERFECT`, `#9b7900` since #730; it was `#ffe27a`). With `bot=sloppy` -> no beam carries a judgment color unless all its notes share it.
+  3. Readability, from screenshots at 1920×1080 after the Perfect take: pixels within ΔE76 10 of that gold, divided
+     by the 122 notes. It must be higher than the same page with only its beams repainted ink, as it drew before this
+     feature. (Until #730 the bar was main's count before the feature; no commit has the paper without beam colors.)
+     Both numbers, and each judgment color's luminance ratio against `--pa-paper-ink` and against `--pa-paper`, go in
+     the done note.
 - `verify-sheet.mjs --out <dir>` and `verify.py --slug sheet-beams` pass. Eric (mark it in the done note): /sheet on the second monitor, from the bench, during an Ode to Joy take. Can he
   tell the gold notes from the unjudged ones?
 

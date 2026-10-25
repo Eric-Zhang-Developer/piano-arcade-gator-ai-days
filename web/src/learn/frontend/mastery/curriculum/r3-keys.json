@@ -1,0 +1,6136 @@
+{
+  "nodes": [
+    {
+      "id": "keys.scale-degrees",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Scale degrees and their names",
+      "whyImportant": "Naming each note by its place in the key (tonic, dominant, leading note) lets you hear and talk about what a note does, not just what it is called.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Major Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/major-scales/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 4: technical names of degrees",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.tones-semitones-major",
+      "region": "keys",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Tones and semitones in the major scale",
+      "whyImportant": "The tone-tone-semitone-tone-tone-tone-semitone pattern lets you build any major scale from any note without memorising each one.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Half and Whole Steps",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/half-and-whole-steps/"
+        },
+        {
+          "title": "Open Music Theory, v2: Major Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/major-scales/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 1: tones and semitones",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.sharp-key-signatures",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Sharp key signatures",
+      "whyImportant": "Knowing the order of sharps (F C G D A E B) lets you name a sharp key at a glance and write its signature without counting scales.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Major Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/major-scales/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 3: keys up to four sharps",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 5: keys up to six sharps",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.flat-key-signatures",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Flat key signatures",
+      "whyImportant": "Knowing the order of flats (B E A D G C F) lets you name a flat key at a glance and write its signature without counting scales.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Major Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/major-scales/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 3: keys up to four flats",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 5: keys up to six flats",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.seven-accidental-keys",
+      "region": "keys",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Keys with six and seven sharps or flats",
+      "whyImportant": "The far keys share sounds with nearer ones (F sharp major is G flat major on the piano), so you can read them by their enharmonic twin.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Major Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/major-scales/"
+        },
+        {
+          "title": "Open Music Theory, v2: Minor Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/minor-scales/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 5: keys up to six sharps and flats",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.circle-of-fifths",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "The circle of fifths",
+      "whyImportant": "The circle puts every key in order of sharps and flats, so neighbouring keys (one accidental apart) are the ones a piece most often moves to.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Major Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/major-scales/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 5: keys up to six sharps and flats",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.natural-minor",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "The natural minor scale",
+      "whyImportant": "Natural minor uses exactly the notes of its key signature, so it is the base the harmonic and melodic minors change.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Minor Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/minor-scales/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 2: minor keys",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.harmonic-minor",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "The harmonic minor scale",
+      "whyImportant": "Harmonic minor raises the seventh to make a leading note, which gives minor keys their strong dominant chord.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Minor Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/minor-scales/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 2: harmonic minor",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.melodic-minor",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "The melodic minor scale",
+      "whyImportant": "Melodic minor raises the sixth and seventh going up for a smooth line and drops them coming down, so you read the same accidentals differently by direction.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Minor Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/minor-scales/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 3: melodic minor",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.minor-key-signatures",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Minor key signatures",
+      "whyImportant": "A minor key shares its signature with a major key, so knowing which minor goes with which signature tells you which tonic to expect.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Minor Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/minor-scales/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 3: minor keys up to four sharps and flats",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 5: minor keys up to six sharps and flats",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.relative-keys",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Relative major and minor",
+      "whyImportant": "Relative keys share a key signature, so you must look at the music itself to tell C major from A minor.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Minor Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/minor-scales/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 2: relative major and minor keys",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.tonic-keys",
+      "region": "keys",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Tonic (parallel) major and minor",
+      "whyImportant": "Tonic major and minor share a starting note but not a key signature, so switching between them changes the third, sixth and seventh.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Minor Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/minor-scales/"
+        }
+      ]
+    },
+    {
+      "id": "keys.chromatic-scale",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "The chromatic scale",
+      "whyImportant": "The chromatic scale is every semitone in order, so it trains even fingers and shows how sharps and flats sit between the letter names.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Introduction to Diatonic Modes and the Chromatic Scale",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/intro-to-diatonic-modes-and-the-chromatic-scale/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 4: chromatic scales",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.double-accidentals",
+      "region": "keys",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Double sharps, double flats and enharmonics",
+      "whyImportant": "Some minor scales need a note raised twice (F double sharp in G sharp minor), and naming it right keeps each letter name in the scale.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Half and Whole Steps",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/half-and-whole-steps/"
+        },
+        {
+          "title": "Open Music Theory, v2: Minor Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/minor-scales/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 4: double sharps and flats, enharmonic equivalents",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.interval-number",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Interval number",
+      "whyImportant": "Counting the letter names from one note to another names the interval's number, which tells you roughly how far a melody leaps.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Intervals",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/intervals/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 1: intervals by number",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.interval-quality",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Interval quality: major, minor and perfect",
+      "whyImportant": "Quality tells two intervals with the same number apart (C to E is a major third, C to E flat a minor third), which is the difference you hear.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Intervals",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/intervals/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 3: interval number and type above the tonic",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 4: all intervals up to an octave",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.augmented-diminished",
+      "region": "keys",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Augmented and diminished intervals",
+      "whyImportant": "Augmented and diminished intervals show up between the raised and lowered notes of minor keys, so they explain why harmonic minor has its gap.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Intervals",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/intervals/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 4: augmented and diminished intervals",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.compound-intervals",
+      "region": "keys",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Compound intervals",
+      "whyImportant": "Intervals wider than an octave are a simple interval plus an octave, so the left hand and right hand can be named against each other.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Intervals",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/intervals/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 5: simple and compound intervals",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.transposition-octave",
+      "region": "keys",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Transposing by an octave between clefs",
+      "whyImportant": "Moving a melody an octave between the treble and bass clefs keeps every letter name, so the left hand can play what the right hand read.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 3: transposition by an octave between clefs",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.transposition-interval",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Transposing to a new key",
+      "whyImportant": "Moving a tune to a new key keeps its shape and changes its sharps and flats, so you can play a song where it suits a singer or an instrument.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Major Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/major-scales/"
+        },
+        {
+          "title": "Open Music Theory, v2: Intervals",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/intervals/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 5: transposition",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.transposing-instruments",
+      "region": "keys",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Transposing instruments",
+      "whyImportant": "A clarinet or horn part is written in a different key from the sound, so reading one at the piano means moving every note by the same interval.",
+      "sources": [
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 5: transposition for instruments in B flat, A and F",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.key-of-a-melody",
+      "region": "keys",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Finding the key of a melody",
+      "whyImportant": "The signature gives two possible keys, and the accidentals and the last note tell you which one the music is really in.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Minor Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/minor-scales/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 2: key of a melody",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.minor-scales-playing",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Playing minor scales",
+      "whyImportant": "A minor scale under the hand makes the raised sixth and seventh automatic, so you stop tripping over the accidentals in minor pieces.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Minor Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/minor-scales/"
+        },
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Level 1 Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        },
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Level 2 Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.two-octave-scales",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Two-octave scales",
+      "whyImportant": "Crossing the thumb into a second octave without a bump is what lets runs in real pieces cover the keyboard.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        },
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Level 1 Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        },
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Level 2 Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.scales-hands-together",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Scales hands together",
+      "whyImportant": "Two hands in step on different fingerings is the first real coordination test, and the piano hears at once when they drift apart.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        },
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Level 3 Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        },
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Level 4 Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.contrary-motion",
+      "region": "keys",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Contrary-motion scales",
+      "whyImportant": "Hands moving away from each other use mirror fingering, which is the easiest way to play hands together evenly.",
+      "sources": [
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Level 1 Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        },
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Preparatory B Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.chromatic-playing",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Playing the chromatic scale",
+      "whyImportant": "Twelve semitones in a row expose every uneven finger, so a clean chromatic scale is a quick check of evenness.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Introduction to Diatonic Modes and the Chromatic Scale",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/intro-to-diatonic-modes-and-the-chromatic-scale/"
+        },
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Level 1 Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        },
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Level 4 Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.tonic-arpeggios",
+      "region": "keys",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Tonic arpeggios",
+      "whyImportant": "Arpeggios stretch the hand across the tonic chord, the shape behind accompaniments and broken-chord passages.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Major Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/major-scales/"
+        },
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Level 4 Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        },
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Level 5 Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.broken-tonic-triads",
+      "region": "keys",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Broken tonic triads",
+      "whyImportant": "A broken triad and its inversions put the key's home chord under the hand in every position, the pattern of countless left-hand parts.",
+      "sources": [
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Level 1 Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        },
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Level 2 Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.even-scales-at-tempo",
+      "region": "keys",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Even scales at tempo",
+      "whyImportant": "Notes evenly spaced and evenly loud at speed are what make a scale sound like music rather than a finger exercise.",
+      "sources": [
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Level 4 Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        },
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Level 5 Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.intervals-at-keyboard",
+      "region": "keys",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Finding intervals at the keyboard",
+      "whyImportant": "Finding a named interval without counting keys is what lets you sight-read leaps and chords by their shape.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Intervals",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/intervals/"
+        },
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        }
+      ]
+    },
+    {
+      "id": "keys.transposing-at-keyboard",
+      "region": "keys",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Transposing at the keyboard",
+      "whyImportant": "Playing a known tune in a new key tests whether you know its intervals or only its keys, and it is how accompanists follow a singer.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Major Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/major-scales/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus from 2020, Grade 5: transposition",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "keys.black-key-scales",
+      "region": "keys",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Scales on the black keys",
+      "whyImportant": "Keys with many sharps or flats sit mostly on the black keys, and their fingering feels nothing like C major until the hand has learned it.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Major Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/major-scales/"
+        },
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Level 4 Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        },
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition: Level 5 Technical Tests",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "keys-major-key-signatures",
+      "to": "keys.scale-degrees",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The key signature is read as degrees of the scale: the last sharp is the leading note, the second-to-last flat the tonic."
+    },
+    {
+      "from": "keys-major-key-signatures",
+      "to": "keys.tones-semitones-major",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "A major key signature is the set of sharps or flats that keeps the tone-semitone pattern on a new tonic."
+    },
+    {
+      "from": "keys-major-key-signatures",
+      "to": "keys.sharp-key-signatures",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Sharp key signatures are the major key signatures on the sharp side."
+    },
+    {
+      "from": "keys-major-key-signatures",
+      "to": "keys.flat-key-signatures",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Flat key signatures are the major key signatures on the flat side."
+    },
+    {
+      "from": "keys-major-key-signatures",
+      "to": "keys.circle-of-fifths",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The circle of fifths is the major key signatures set in order of sharps and flats."
+    },
+    {
+      "from": "keys-major-key-signatures",
+      "to": "keys.relative-keys",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A relative minor borrows its major key's signature unchanged."
+    },
+    {
+      "from": "keys-major-key-signatures",
+      "to": "keys.transposition-interval",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Transposing to a new key means writing that key's signature."
+    },
+    {
+      "from": "keys.sharp-key-signatures",
+      "to": "keys.flat-key-signatures",
+      "relation": "analogous",
+      "weight": 3,
+      "rationale": "Both follow one fixed order, read from the last accidental; only the rule for finding the tonic differs."
+    },
+    {
+      "from": "keys.sharp-key-signatures",
+      "to": "keys.circle-of-fifths",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Each step clockwise on the circle adds the next sharp in order."
+    },
+    {
+      "from": "keys.flat-key-signatures",
+      "to": "keys.circle-of-fifths",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Each step anticlockwise on the circle adds the next flat in order."
+    },
+    {
+      "from": "keys.sharp-key-signatures",
+      "to": "keys.scale-degrees",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "The last sharp is always the leading note, which is how the key is found."
+    },
+    {
+      "from": "keys.sharp-key-signatures",
+      "to": "keys.seven-accidental-keys",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Six and seven sharps continue the same order to E sharp and B sharp."
+    },
+    {
+      "from": "keys.flat-key-signatures",
+      "to": "keys.seven-accidental-keys",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Six and seven flats continue the same order to C flat and F flat."
+    },
+    {
+      "from": "keys.seven-accidental-keys",
+      "to": "keys.double-accidentals",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Enharmonic keys like F sharp and G flat major are the same keys spelled two ways."
+    },
+    {
+      "from": "keys.seven-accidental-keys",
+      "to": "keys.circle-of-fifths",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "The far keys meet where the circle closes, where sharp and flat keys sound the same."
+    },
+    {
+      "from": "keys.tones-semitones-major",
+      "to": "keys.natural-minor",
+      "relation": "analogous",
+      "weight": 3,
+      "rationale": "Both scales are a fixed pattern of tones and semitones; minor only moves where the semitones fall."
+    },
+    {
+      "from": "keys.tones-semitones-major",
+      "to": "keys.interval-quality",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Interval quality is counted in the same tones and semitones the scale is built from."
+    },
+    {
+      "from": "keys.tones-semitones-major",
+      "to": "keys.chromatic-scale",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "The chromatic scale fills in every semitone the major scale steps over."
+    },
+    {
+      "from": "keys.scale-degrees",
+      "to": "keys.harmonic-minor",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Harmonic minor exists to turn the subtonic into a leading note."
+    },
+    {
+      "from": "keys.natural-minor",
+      "to": "keys.harmonic-minor",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Harmonic minor is natural minor with one note raised."
+    },
+    {
+      "from": "keys.natural-minor",
+      "to": "keys.melodic-minor",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Melodic minor is natural minor with two notes raised going up, and natural minor coming down."
+    },
+    {
+      "from": "keys.harmonic-minor",
+      "to": "keys.melodic-minor",
+      "relation": "contradicts",
+      "weight": 4,
+      "rationale": "Both raise the seventh, but harmonic minor keeps the flat sixth both ways while melodic minor raises it going up and drops both coming down."
+    },
+    {
+      "from": "keys.natural-minor",
+      "to": "keys.minor-key-signatures",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Natural minor uses exactly the notes of its key signature."
+    },
+    {
+      "from": "keys.minor-key-signatures",
+      "to": "keys.relative-keys",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "A minor key's signature is the signature of its relative major."
+    },
+    {
+      "from": "keys.relative-keys",
+      "to": "keys.tonic-keys",
+      "relation": "contradicts",
+      "weight": 5,
+      "rationale": "Relative keys share a signature and differ in tonic; tonic keys share a tonic and differ in signature, an easy pair to mix up."
+    },
+    {
+      "from": "keys.tonic-keys",
+      "to": "keys.minor-key-signatures",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "The tonic minor's signature is three steps flatter than its major's on the circle."
+    },
+    {
+      "from": "keys.relative-keys",
+      "to": "keys.interval-quality",
+      "relation": "in-context",
+      "weight": 2,
+      "rationale": "The relative minor sits a minor third below its major."
+    },
+    {
+      "from": "keys.harmonic-minor",
+      "to": "keys.augmented-diminished",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The gap between the sixth and raised seventh of harmonic minor is an augmented second."
+    },
+    {
+      "from": "keys.harmonic-minor",
+      "to": "keys.double-accidentals",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "In keys like G sharp minor the raised seventh needs a double sharp."
+    },
+    {
+      "from": "keys.harmonic-minor",
+      "to": "keys.key-of-a-melody",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A raised seventh written in the music is what shows a melody is in the minor key."
+    },
+    {
+      "from": "keys.minor-key-signatures",
+      "to": "keys.key-of-a-melody",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "One key signature fits a major and a minor key, so the melody has to decide between them."
+    },
+    {
+      "from": "keys.chromatic-scale",
+      "to": "keys.double-accidentals",
+      "relation": "in-context",
+      "weight": 2,
+      "rationale": "The chromatic scale is where one key gets two names, a sharp and a flat."
+    },
+    {
+      "from": "keys.interval-number",
+      "to": "keys.interval-quality",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "An interval's name pairs its quality with its number."
+    },
+    {
+      "from": "keys.interval-quality",
+      "to": "keys.augmented-diminished",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Augmented and diminished are a semitone wider or narrower than major, minor or perfect."
+    },
+    {
+      "from": "keys.interval-quality",
+      "to": "keys.compound-intervals",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "A compound interval keeps the quality of the simple interval inside it."
+    },
+    {
+      "from": "keys.interval-number",
+      "to": "keys.compound-intervals",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Compound intervals are numbered by adding seven to the simple interval."
+    },
+    {
+      "from": "keys.interval-number",
+      "to": "keys.scale-degrees",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Interval numbers above the tonic are the scale degrees counted from 1."
+    },
+    {
+      "from": "keys.transposition-octave",
+      "to": "keys.transposition-interval",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "An octave is the one transposition that changes no letter names or accidentals."
+    },
+    {
+      "from": "keys.interval-quality",
+      "to": "keys.transposition-interval",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Every note moves by the same interval, quality and all, to keep the tune's shape."
+    },
+    {
+      "from": "keys.transposition-interval",
+      "to": "keys.transposing-instruments",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "A transposing instrument's part is a transposition by a fixed interval."
+    },
+    {
+      "from": "keys.circle-of-fifths",
+      "to": "keys.transposition-interval",
+      "relation": "in-context",
+      "weight": 2,
+      "rationale": "Transposing up a fifth moves the key one step clockwise on the circle."
+    },
+    {
+      "from": "keys-major-scales-playing",
+      "to": "keys.minor-scales-playing",
+      "relation": "analogous",
+      "weight": 4,
+      "rationale": "Minor scales use the same fingering habits as major ones, with the raised notes in new places."
+    },
+    {
+      "from": "keys.natural-minor",
+      "to": "keys.minor-scales-playing",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Playing a minor scale puts its key signature under the hand."
+    },
+    {
+      "from": "keys.harmonic-minor",
+      "to": "keys.minor-scales-playing",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "The harmonic minor scale is played with the raised seventh and its wide step."
+    },
+    {
+      "from": "keys.melodic-minor",
+      "to": "keys.minor-scales-playing",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Melodic minor has to be played up and down to feel its two shapes."
+    },
+    {
+      "from": "keys-major-scales-playing",
+      "to": "keys.two-octave-scales",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "A two-octave scale is the one-octave scale with one more thumb crossing."
+    },
+    {
+      "from": "keys-major-scales-playing",
+      "to": "keys.scales-hands-together",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Hands together is the same scale in both hands at once."
+    },
+    {
+      "from": "keys.two-octave-scales",
+      "to": "keys.scales-hands-together",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Exams join the two: two octaves, hands together."
+    },
+    {
+      "from": "keys.scales-hands-together",
+      "to": "keys.contrary-motion",
+      "relation": "analogous",
+      "weight": 4,
+      "rationale": "Both put the hands together; contrary motion mirrors the fingering, which is easier to line up."
+    },
+    {
+      "from": "keys-major-scales-playing",
+      "to": "keys.contrary-motion",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Contrary motion plays the major scale with each hand going its own way."
+    },
+    {
+      "from": "keys.chromatic-scale",
+      "to": "keys.chromatic-playing",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Playing the chromatic scale puts all twelve semitones under the hand in order."
+    },
+    {
+      "from": "keys.tones-semitones-major",
+      "to": "keys-major-scales-playing",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Hearing tone and semitone steps is how you catch a wrong note in a scale."
+    },
+    {
+      "from": "keys-major-scales-playing",
+      "to": "keys.chromatic-playing",
+      "relation": "analogous",
+      "weight": 2,
+      "rationale": "Both are judged on even timing, but the chromatic fingering is its own."
+    },
+    {
+      "from": "keys.scale-degrees",
+      "to": "keys.tonic-arpeggios",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "An arpeggio plays the tonic, mediant and dominant of the key."
+    },
+    {
+      "from": "keys.tonic-arpeggios",
+      "to": "keys.broken-tonic-triads",
+      "relation": "analogous",
+      "weight": 4,
+      "rationale": "Both spread the tonic chord; the arpeggio crosses the thumb while the broken triad moves the whole hand."
+    },
+    {
+      "from": "keys-major-key-signatures",
+      "to": "keys.broken-tonic-triads",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "The key's tonic triad uses its first, third and fifth degrees."
+    },
+    {
+      "from": "keys-major-scales-playing",
+      "to": "keys.even-scales-at-tempo",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Even scales at tempo is the same scale played faster with steady timing and touch."
+    },
+    {
+      "from": "keys.scales-hands-together",
+      "to": "keys.even-scales-at-tempo",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Two hands at speed are where unevenness shows first."
+    },
+    {
+      "from": "keys.chromatic-playing",
+      "to": "keys.even-scales-at-tempo",
+      "relation": "analogous",
+      "weight": 3,
+      "rationale": "Both test evenness of timing and loudness at speed."
+    },
+    {
+      "from": "keys.interval-quality",
+      "to": "keys.intervals-at-keyboard",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Finding the interval on the keys turns its name into a hand shape."
+    },
+    {
+      "from": "keys.compound-intervals",
+      "to": "keys.intervals-at-keyboard",
+      "relation": "in-context",
+      "weight": 2,
+      "rationale": "Compound intervals are found at the keyboard as a simple interval plus an octave."
+    },
+    {
+      "from": "keys.transposition-interval",
+      "to": "keys.transposing-at-keyboard",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Transposing at the keyboard is the same move played instead of written."
+    },
+    {
+      "from": "keys.intervals-at-keyboard",
+      "to": "keys.transposing-at-keyboard",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Keeping each interval of the tune is what makes the new key sound like the same tune."
+    },
+    {
+      "from": "keys.sharp-key-signatures",
+      "to": "keys.black-key-scales",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Keys with many sharps put most of the scale on black keys."
+    },
+    {
+      "from": "keys.flat-key-signatures",
+      "to": "keys.black-key-scales",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Keys with many flats put most of the scale on black keys."
+    },
+    {
+      "from": "keys.seven-accidental-keys",
+      "to": "keys.black-key-scales",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "F sharp major and its enharmonic twin, G flat major, use five black keys."
+    },
+    {
+      "from": "keys-major-scales-playing",
+      "to": "keys.black-key-scales",
+      "relation": "analogous",
+      "weight": 3,
+      "rationale": "The same scale pattern with fingering that starts on a black key."
+    }
+  ],
+  "items": [
+    {
+      "type": "theory",
+      "id": "keys.scale-degrees-1",
+      "nodeId": "keys.scale-degrees",
+      "prompt": "In any major key, what is the technical name of the fifth degree?",
+      "answer": {
+        "id": "dominant",
+        "text": "Dominant",
+        "explanation": "The fifth degree is the dominant, the strongest pull back to the tonic after the leading note."
+      },
+      "wrong": [
+        {
+          "id": "subdominant",
+          "text": "Subdominant",
+          "explanation": "The subdominant is the fourth degree, one step below the dominant."
+        },
+        {
+          "id": "mediant",
+          "text": "Mediant",
+          "explanation": "The mediant is the third degree, halfway between tonic and dominant."
+        },
+        {
+          "id": "submediant",
+          "text": "Submediant",
+          "explanation": "The submediant is the sixth degree, a third below the tonic."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.scale-degrees-2",
+      "nodeId": "keys.scale-degrees",
+      "prompt": "In D major, which note is the leading note?",
+      "answer": {
+        "id": "c-sharp",
+        "text": "C sharp",
+        "explanation": "The leading note is the seventh degree, a semitone below the tonic: C sharp leads up to D."
+      },
+      "wrong": [
+        {
+          "id": "c-natural",
+          "text": "C natural",
+          "explanation": "C natural is a tone below D; D major's key signature makes the seventh degree C sharp."
+        },
+        {
+          "id": "a",
+          "text": "A",
+          "explanation": "A is the fifth degree of D major, the dominant."
+        },
+        {
+          "id": "e",
+          "text": "E",
+          "explanation": "E is the second degree, the supertonic, a step above the tonic rather than below it."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.scale-degrees-3",
+      "nodeId": "keys.scale-degrees",
+      "prompt": "In natural minor, the seventh degree is a tone below the tonic. What is it called?",
+      "answer": {
+        "id": "subtonic",
+        "text": "Subtonic",
+        "explanation": "A seventh degree a whole tone below the tonic is the subtonic; only a semitone below is it a leading note."
+      },
+      "wrong": [
+        {
+          "id": "leading-note",
+          "text": "Leading note",
+          "explanation": "The leading note is a semitone below the tonic; natural minor's seventh is a whole tone below."
+        },
+        {
+          "id": "submediant",
+          "text": "Submediant",
+          "explanation": "The submediant is the sixth degree, not the seventh."
+        },
+        {
+          "id": "supertonic",
+          "text": "Supertonic",
+          "explanation": "The supertonic is the second degree, just above the tonic."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.tones-semitones-major-1",
+      "nodeId": "keys.tones-semitones-major",
+      "prompt": "Between which degrees of a major scale do the two semitones fall?",
+      "answer": {
+        "id": "3-to-4-and-7-to-8",
+        "text": "3 to 4 and 7 to 8",
+        "explanation": "The major pattern is tone, tone, semitone, tone, tone, tone, semitone, so the semitones are 3-4 and 7-8."
+      },
+      "wrong": [
+        {
+          "id": "2-to-3-and-5-to-6",
+          "text": "2 to 3 and 5 to 6",
+          "explanation": "Semitones at 2-3 and 5-6 belong to natural minor, not major."
+        },
+        {
+          "id": "3-to-4-and-6-to-7",
+          "text": "3 to 4 and 6 to 7",
+          "explanation": "6 to 7 is a tone in major; the second semitone is between the leading note and the tonic."
+        },
+        {
+          "id": "4-to-5-and-7-to-8",
+          "text": "4 to 5 and 7 to 8",
+          "explanation": "4 to 5 is a tone in major; the first semitone is between the mediant and the subdominant."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.tones-semitones-major-2",
+      "nodeId": "keys.tones-semitones-major",
+      "prompt": "On the white keys, where are the two places with no black key between neighbours?",
+      "answer": {
+        "id": "e-to-f-and-b-to-c",
+        "text": "E to F and B to C",
+        "explanation": "E-F and B-C are the white-key semitones, which is why C to C on the white keys is a major scale."
+      },
+      "wrong": [
+        {
+          "id": "c-to-d-and-f-to-g",
+          "text": "C to D and F to G",
+          "explanation": "There is a black key between C and D and between F and G, so those are tones."
+        },
+        {
+          "id": "d-to-e-and-a-to-b",
+          "text": "D to E and A to B",
+          "explanation": "D-E and A-B each have a black key between them, so they are tones."
+        },
+        {
+          "id": "e-to-f-and-a-to-b",
+          "text": "E to F and A to B",
+          "explanation": "E to F is right, but A to B has B flat between them."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.sharp-key-signatures-1",
+      "nodeId": "keys.sharp-key-signatures",
+      "prompt": "A key signature has four sharps. Which major key is it?",
+      "answer": {
+        "id": "e-major",
+        "text": "E major",
+        "explanation": "The sharps are F, C, G and D; the last sharp, D sharp, is the leading note, so the tonic is a semitone up: E."
+      },
+      "wrong": [
+        {
+          "id": "a-major",
+          "text": "A major",
+          "explanation": "A major has three sharps, F, C and G; four sharps adds D sharp."
+        },
+        {
+          "id": "d-major",
+          "text": "D major",
+          "explanation": "The last sharp is D sharp, but it is the leading note, not the tonic: go up a semitone."
+        },
+        {
+          "id": "b-major",
+          "text": "B major",
+          "explanation": "B major has five sharps, adding A sharp to the four."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.sharp-key-signatures-2",
+      "nodeId": "keys.sharp-key-signatures",
+      "prompt": "Which sharps are in B major, in key-signature order?",
+      "answer": {
+        "id": "f-c-g-d-a",
+        "text": "F, C, G, D, A",
+        "explanation": "B major has five sharps, written F, C, G, D, A; the last, A sharp, is its leading note."
+      },
+      "wrong": [
+        {
+          "id": "f-c-g-d",
+          "text": "F, C, G, D",
+          "explanation": "Those four sharps make E major; B major needs a fifth, A sharp."
+        },
+        {
+          "id": "c-f-g-d-a",
+          "text": "C, F, G, D, A",
+          "explanation": "The same five sharps, but key signatures always start with F sharp, then C sharp."
+        },
+        {
+          "id": "f-c-g-d-a-e",
+          "text": "F, C, G, D, A, E",
+          "explanation": "Six sharps, adding E sharp, make F sharp major."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.sharp-key-signatures-3",
+      "nodeId": "keys.sharp-key-signatures",
+      "prompt": "In a sharp key signature, how does the last sharp give you the major key?",
+      "answer": {
+        "id": "it-is-the-leading-note-so-the-key-is-a-semitone-higher",
+        "text": "It is the leading note, so the key is a semitone higher",
+        "explanation": "The last sharp added is always the seventh degree, so the tonic sits a semitone above it."
+      },
+      "wrong": [
+        {
+          "id": "it-is-the-tonic",
+          "text": "It is the tonic",
+          "explanation": "The last sharp is a semitone below the tonic: three sharps end on G sharp, and the key is A major."
+        },
+        {
+          "id": "it-is-the-dominant-so-the-key-is-a-fifth-lower",
+          "text": "It is the dominant, so the key is a fifth lower",
+          "explanation": "Each new sharp key is a fifth up, but the last sharp itself is the leading note, not the dominant."
+        },
+        {
+          "id": "the-key-is-a-fifth-above-it",
+          "text": "The key is a fifth above it",
+          "explanation": "A fifth above G sharp (three sharps) would be D sharp, but three sharps is A major."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.flat-key-signatures-1",
+      "nodeId": "keys.flat-key-signatures",
+      "prompt": "A key signature has three flats. Which major key is it?",
+      "answer": {
+        "id": "e-flat-major",
+        "text": "E flat major",
+        "explanation": "The flats are B, E and A; the second-to-last flat, E flat, names the major key."
+      },
+      "wrong": [
+        {
+          "id": "a-flat-major",
+          "text": "A flat major",
+          "explanation": "A flat is the last flat; the key is named by the one before it. A flat major has four flats."
+        },
+        {
+          "id": "b-flat-major",
+          "text": "B flat major",
+          "explanation": "B flat major has two flats, B and E."
+        },
+        {
+          "id": "c-minor",
+          "text": "C minor",
+          "explanation": "C minor does share three flats, but it is the relative minor; the major key is E flat."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.flat-key-signatures-2",
+      "nodeId": "keys.flat-key-signatures",
+      "prompt": "Which major key has one flat?",
+      "answer": {
+        "id": "f-major",
+        "text": "F major",
+        "explanation": "F major has B flat only; it is the one flat key the 'second-to-last flat' rule cannot name."
+      },
+      "wrong": [
+        {
+          "id": "b-flat-major",
+          "text": "B flat major",
+          "explanation": "B flat major has two flats, B flat and E flat."
+        },
+        {
+          "id": "d-minor",
+          "text": "D minor",
+          "explanation": "D minor shares the one flat, but it is a minor key; the major key with one flat is F."
+        },
+        {
+          "id": "c-major",
+          "text": "C major",
+          "explanation": "C major has no sharps or flats."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.flat-key-signatures-3",
+      "nodeId": "keys.flat-key-signatures",
+      "prompt": "Which flats are in D flat major, in key-signature order?",
+      "answer": {
+        "id": "b-e-a-d-g",
+        "text": "B, E, A, D, G",
+        "explanation": "D flat major has five flats; the second-to-last, D flat, is the tonic."
+      },
+      "wrong": [
+        {
+          "id": "b-e-a-d",
+          "text": "B, E, A, D",
+          "explanation": "Four flats make A flat major; D flat major adds G flat."
+        },
+        {
+          "id": "d-g-c-f-b",
+          "text": "D, G, C, F, B",
+          "explanation": "The order of flats is B, E, A, D, G, C, F, always starting from B flat."
+        },
+        {
+          "id": "b-e-a-d-g-c",
+          "text": "B, E, A, D, G, C",
+          "explanation": "Six flats, adding C flat, make G flat major."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.seven-accidental-keys-1",
+      "nodeId": "keys.seven-accidental-keys",
+      "prompt": "Which major key has seven sharps?",
+      "answer": {
+        "id": "c-sharp-major",
+        "text": "C sharp major",
+        "explanation": "Seven sharps raise every note: C sharp, D sharp, E sharp, F sharp, G sharp, A sharp, B sharp."
+      },
+      "wrong": [
+        {
+          "id": "f-sharp-major",
+          "text": "F sharp major",
+          "explanation": "F sharp major has six sharps; E sharp is the last."
+        },
+        {
+          "id": "b-major",
+          "text": "B major",
+          "explanation": "B major has five sharps."
+        },
+        {
+          "id": "d-flat-major",
+          "text": "D flat major",
+          "explanation": "D flat major sounds the same on the piano but is written with five flats."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.seven-accidental-keys-2",
+      "nodeId": "keys.seven-accidental-keys",
+      "prompt": "On the piano, F sharp major sounds the same as which other major key?",
+      "answer": {
+        "id": "g-flat-major",
+        "text": "G flat major",
+        "explanation": "F sharp and G flat are one black key, so the six-sharp and six-flat keys are enharmonic."
+      },
+      "wrong": [
+        {
+          "id": "g-major",
+          "text": "G major",
+          "explanation": "G major has one sharp and starts on a white key, a semitone higher than F sharp."
+        },
+        {
+          "id": "f-major",
+          "text": "F major",
+          "explanation": "F major starts a semitone lower than F sharp and has one flat."
+        },
+        {
+          "id": "c-flat-major",
+          "text": "C flat major",
+          "explanation": "C flat major is enharmonic with B major, not F sharp major."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.seven-accidental-keys-3",
+      "nodeId": "keys.seven-accidental-keys",
+      "prompt": "Which major key has seven flats?",
+      "answer": {
+        "id": "c-flat-major",
+        "text": "C flat major",
+        "explanation": "Seven flats lower every note; the second-to-last flat, C flat, names the key."
+      },
+      "wrong": [
+        {
+          "id": "g-flat-major",
+          "text": "G flat major",
+          "explanation": "G flat major has six flats; C flat is its last."
+        },
+        {
+          "id": "f-flat-major",
+          "text": "F flat major",
+          "explanation": "F flat is the seventh flat added, so it is the last flat, not the key name."
+        },
+        {
+          "id": "b-major",
+          "text": "B major",
+          "explanation": "B major sounds the same as C flat major but is written with five sharps."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.circle-of-fifths-1",
+      "nodeId": "keys.circle-of-fifths",
+      "prompt": "Going clockwise round the circle of fifths from C, each key adds one sharp. What comes after D major?",
+      "answer": {
+        "id": "a-major",
+        "text": "A major",
+        "explanation": "Each step is a perfect fifth up: D to A, and A major has three sharps."
+      },
+      "wrong": [
+        {
+          "id": "g-major",
+          "text": "G major",
+          "explanation": "G major comes before D: one sharp, then D with two."
+        },
+        {
+          "id": "e-major",
+          "text": "E major",
+          "explanation": "E is two steps on from D; E major has four sharps."
+        },
+        {
+          "id": "b-flat-major",
+          "text": "B flat major",
+          "explanation": "B flat major is on the flat side of the circle, a fifth below F."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.circle-of-fifths-2",
+      "nodeId": "keys.circle-of-fifths",
+      "prompt": "Going anticlockwise from C, each key adds one flat. Which key comes after B flat major?",
+      "answer": {
+        "id": "e-flat-major",
+        "text": "E flat major",
+        "explanation": "Each step anticlockwise is a perfect fifth down (a fourth up): B flat to E flat, three flats."
+      },
+      "wrong": [
+        {
+          "id": "f-major",
+          "text": "F major",
+          "explanation": "F major comes before B flat: one flat, then two."
+        },
+        {
+          "id": "a-flat-major",
+          "text": "A flat major",
+          "explanation": "A flat major is two steps on, with four flats."
+        },
+        {
+          "id": "d-major",
+          "text": "D major",
+          "explanation": "D major is on the sharp side of the circle."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.natural-minor-1",
+      "nodeId": "keys.natural-minor",
+      "prompt": "What is the pattern of tones and semitones in the natural minor scale?",
+      "answer": {
+        "id": "tone-semitone-tone-tone-semitone-tone-tone",
+        "text": "Tone, semitone, tone, tone, semitone, tone, tone",
+        "explanation": "Natural minor has its semitones between degrees 2-3 and 5-6."
+      },
+      "wrong": [
+        {
+          "id": "tone-tone-semitone-tone-tone-tone-semitone",
+          "text": "Tone, tone, semitone, tone, tone, tone, semitone",
+          "explanation": "That is the major scale pattern."
+        },
+        {
+          "id": "tone-semitone-tone-tone-semitone-tone-and-a-half-semitone",
+          "text": "Tone, semitone, tone, tone, semitone, tone and a half, semitone",
+          "explanation": "That is harmonic minor, with its raised seventh."
+        },
+        {
+          "id": "tone-semitone-tone-tone-tone-tone-semitone",
+          "text": "Tone, semitone, tone, tone, tone, tone, semitone",
+          "explanation": "That is melodic minor going up."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.natural-minor-2",
+      "nodeId": "keys.natural-minor",
+      "prompt": "Which notes make up A natural minor?",
+      "answer": {
+        "id": "a-b-c-d-e-f-g",
+        "text": "A B C D E F G",
+        "explanation": "A natural minor uses only white keys, the same notes as its relative, C major."
+      },
+      "wrong": [
+        {
+          "id": "a-b-c-d-e-f-g-sharp",
+          "text": "A B C D E F G sharp",
+          "explanation": "G sharp makes it A harmonic minor."
+        },
+        {
+          "id": "a-b-c-sharp-d-e-f-sharp-g-sharp",
+          "text": "A B C sharp D E F sharp G sharp",
+          "explanation": "Those are the notes of A major."
+        },
+        {
+          "id": "a-b-c-d-e-f-sharp-g-sharp",
+          "text": "A B C D E F sharp G sharp",
+          "explanation": "Raising both sixth and seventh gives A melodic minor going up."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.harmonic-minor-1",
+      "nodeId": "keys.harmonic-minor",
+      "prompt": "Which note of E harmonic minor is raised from the key signature?",
+      "answer": {
+        "id": "d-becomes-d-sharp",
+        "text": "D becomes D sharp",
+        "explanation": "Harmonic minor raises the seventh degree; in E minor that is D, which becomes D sharp."
+      },
+      "wrong": [
+        {
+          "id": "c-becomes-c-sharp",
+          "text": "C becomes C sharp",
+          "explanation": "C is the sixth degree; only melodic minor raises it, and only going up."
+        },
+        {
+          "id": "f-sharp-becomes-f-double-sharp",
+          "text": "F sharp becomes F double sharp",
+          "explanation": "F sharp is the second degree and stays as it is."
+        },
+        {
+          "id": "g-becomes-g-sharp",
+          "text": "G becomes G sharp",
+          "explanation": "G is the third degree; raising it would make E major's third."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.harmonic-minor-2",
+      "nodeId": "keys.harmonic-minor",
+      "prompt": "What interval lies between the sixth and seventh degrees of a harmonic minor scale?",
+      "answer": {
+        "id": "augmented-second",
+        "text": "Augmented second",
+        "explanation": "The flat sixth and raised seventh are three semitones apart, written as a second: an augmented second."
+      },
+      "wrong": [
+        {
+          "id": "minor-third",
+          "text": "Minor third",
+          "explanation": "Three semitones, yes, but between neighbouring letter names it is a second, so it is augmented."
+        },
+        {
+          "id": "major-second",
+          "text": "Major second",
+          "explanation": "A major second is two semitones; harmonic minor's gap is three."
+        },
+        {
+          "id": "minor-second",
+          "text": "Minor second",
+          "explanation": "The semitone in harmonic minor is between degrees 7 and 8, not 6 and 7."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.harmonic-minor-3",
+      "nodeId": "keys.harmonic-minor",
+      "prompt": "Which notes make up D harmonic minor?",
+      "answer": {
+        "id": "d-e-f-g-a-b-flat-c-sharp",
+        "text": "D E F G A B flat C sharp",
+        "explanation": "D minor has one flat, B flat; harmonic minor raises C to C sharp."
+      },
+      "wrong": [
+        {
+          "id": "d-e-f-g-a-b-flat-c",
+          "text": "D E F G A B flat C",
+          "explanation": "That is D natural minor; harmonic minor raises the seventh."
+        },
+        {
+          "id": "d-e-f-sharp-g-a-b-c-sharp",
+          "text": "D E F sharp G A B C sharp",
+          "explanation": "Those are the notes of D major."
+        },
+        {
+          "id": "d-e-f-g-a-b-c-sharp",
+          "text": "D E F G A B C sharp",
+          "explanation": "B natural with C sharp is D melodic minor going up."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.melodic-minor-1",
+      "nodeId": "keys.melodic-minor",
+      "prompt": "How is a melodic minor scale played going up and coming down?",
+      "answer": {
+        "id": "sixth-and-seventh-raised-going-up-natural-minor-coming-down",
+        "text": "Sixth and seventh raised going up, natural minor coming down",
+        "explanation": "The raised sixth smooths the climb to the leading note; descending it returns to the key signature."
+      },
+      "wrong": [
+        {
+          "id": "seventh-raised-both-ways",
+          "text": "Seventh raised both ways",
+          "explanation": "Raising only the seventh, both ways, is harmonic minor."
+        },
+        {
+          "id": "sixth-and-seventh-raised-both-ways",
+          "text": "Sixth and seventh raised both ways",
+          "explanation": "Coming down, melodic minor drops both back to natural minor."
+        },
+        {
+          "id": "the-same-as-natural-minor-both-ways",
+          "text": "The same as natural minor both ways",
+          "explanation": "Going up, melodic minor raises the sixth and seventh."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.melodic-minor-2",
+      "nodeId": "keys.melodic-minor",
+      "prompt": "Which notes does A melodic minor use going up?",
+      "answer": {
+        "id": "a-b-c-d-e-f-sharp-g-sharp",
+        "text": "A B C D E F sharp G sharp",
+        "explanation": "From A natural minor, raise the sixth (F to F sharp) and seventh (G to G sharp)."
+      },
+      "wrong": [
+        {
+          "id": "a-b-c-d-e-f-g-sharp",
+          "text": "A B C D E F G sharp",
+          "explanation": "Only the seventh raised is A harmonic minor."
+        },
+        {
+          "id": "a-b-c-sharp-d-e-f-sharp-g-sharp",
+          "text": "A B C sharp D E F sharp G sharp",
+          "explanation": "C sharp makes the third major, so this is A major."
+        },
+        {
+          "id": "a-b-c-d-e-f-g",
+          "text": "A B C D E F G",
+          "explanation": "This is A natural minor, which melodic minor uses coming down."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.minor-key-signatures-1",
+      "nodeId": "keys.minor-key-signatures",
+      "prompt": "Which minor key has two sharps?",
+      "answer": {
+        "id": "b-minor",
+        "text": "B minor",
+        "explanation": "Two sharps is D major; its relative minor is three semitones lower, B minor."
+      },
+      "wrong": [
+        {
+          "id": "e-minor",
+          "text": "E minor",
+          "explanation": "E minor has one sharp, F sharp."
+        },
+        {
+          "id": "d-minor",
+          "text": "D minor",
+          "explanation": "D minor has one flat; D major is the key with two sharps."
+        },
+        {
+          "id": "f-sharp-minor",
+          "text": "F sharp minor",
+          "explanation": "F sharp minor has three sharps."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.minor-key-signatures-2",
+      "nodeId": "keys.minor-key-signatures",
+      "prompt": "Which minor key has four flats?",
+      "answer": {
+        "id": "f-minor",
+        "text": "F minor",
+        "explanation": "Four flats is A flat major; a minor third below A flat is F."
+      },
+      "wrong": [
+        {
+          "id": "c-minor",
+          "text": "C minor",
+          "explanation": "C minor has three flats."
+        },
+        {
+          "id": "a-flat-minor",
+          "text": "A flat minor",
+          "explanation": "A flat minor has seven flats; A flat major is the key with four."
+        },
+        {
+          "id": "b-flat-minor",
+          "text": "B flat minor",
+          "explanation": "B flat minor has five flats."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.minor-key-signatures-3",
+      "nodeId": "keys.minor-key-signatures",
+      "prompt": "How many sharps or flats does G minor have?",
+      "answer": {
+        "id": "two-flats",
+        "text": "Two flats",
+        "explanation": "G minor is the relative minor of B flat major: B flat and E flat."
+      },
+      "wrong": [
+        {
+          "id": "one-sharp",
+          "text": "One sharp",
+          "explanation": "One sharp belongs to G major and E minor."
+        },
+        {
+          "id": "one-flat",
+          "text": "One flat",
+          "explanation": "One flat is D minor and F major."
+        },
+        {
+          "id": "three-flats",
+          "text": "Three flats",
+          "explanation": "Three flats is C minor and E flat major."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.relative-keys-1",
+      "nodeId": "keys.relative-keys",
+      "prompt": "What is the relative minor of F major?",
+      "answer": {
+        "id": "d-minor",
+        "text": "D minor",
+        "explanation": "The relative minor starts on the sixth degree of the major, a minor third below: F, E, D."
+      },
+      "wrong": [
+        {
+          "id": "f-minor",
+          "text": "F minor",
+          "explanation": "F minor shares the tonic, so it is the tonic (parallel) minor, with four flats."
+        },
+        {
+          "id": "a-minor",
+          "text": "A minor",
+          "explanation": "A minor is the relative of C major, with no flats."
+        },
+        {
+          "id": "c-minor",
+          "text": "C minor",
+          "explanation": "C minor has three flats; F major has one."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.relative-keys-2",
+      "nodeId": "keys.relative-keys",
+      "prompt": "What is the relative major of C sharp minor?",
+      "answer": {
+        "id": "e-major",
+        "text": "E major",
+        "explanation": "Go up a minor third from the minor tonic: C sharp to E. Both have four sharps."
+      },
+      "wrong": [
+        {
+          "id": "c-sharp-major",
+          "text": "C sharp major",
+          "explanation": "C sharp major shares the tonic, not the signature; it has seven sharps."
+        },
+        {
+          "id": "a-major",
+          "text": "A major",
+          "explanation": "A major's relative minor is F sharp minor."
+        },
+        {
+          "id": "b-major",
+          "text": "B major",
+          "explanation": "B major's relative minor is G sharp minor."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.tonic-keys-1",
+      "nodeId": "keys.tonic-keys",
+      "prompt": "D major has two sharps. How many does its tonic minor, D minor, have?",
+      "answer": {
+        "id": "one-flat",
+        "text": "One flat",
+        "explanation": "The tonic minor has three fewer sharps or three more flats: two sharps minus three is one flat."
+      },
+      "wrong": [
+        {
+          "id": "two-sharps",
+          "text": "Two sharps",
+          "explanation": "Two sharps belongs to B minor, the relative minor of D major, not to D minor."
+        },
+        {
+          "id": "five-sharps",
+          "text": "Five sharps",
+          "explanation": "Minor keys have fewer sharps than their tonic majors, not more."
+        },
+        {
+          "id": "one-sharp",
+          "text": "One sharp",
+          "explanation": "That is only one step flatter on the circle; the tonic minor is three steps flatter."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.tonic-keys-2",
+      "nodeId": "keys.tonic-keys",
+      "prompt": "Which pair are tonic (parallel) keys?",
+      "answer": {
+        "id": "g-major-and-g-minor",
+        "text": "G major and G minor",
+        "explanation": "Tonic keys share the same tonic, G, but have different key signatures."
+      },
+      "wrong": [
+        {
+          "id": "g-major-and-e-minor",
+          "text": "G major and E minor",
+          "explanation": "G major and E minor share one sharp, so they are relative, not tonic, keys."
+        },
+        {
+          "id": "g-minor-and-b-flat-major",
+          "text": "G minor and B flat major",
+          "explanation": "These share two flats, which makes them relative keys."
+        },
+        {
+          "id": "g-major-and-d-major",
+          "text": "G major and D major",
+          "explanation": "These are neighbours on the circle of fifths, a fifth apart."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.chromatic-scale-1",
+      "nodeId": "keys.chromatic-scale",
+      "prompt": "How many different notes are in one octave of the chromatic scale?",
+      "answer": {
+        "id": "twelve",
+        "text": "Twelve",
+        "explanation": "The chromatic scale is twelve semitones in a row, every white and black key in the octave."
+      },
+      "wrong": [
+        {
+          "id": "seven",
+          "text": "Seven",
+          "explanation": "Seven is the number of notes in a major or minor scale."
+        },
+        {
+          "id": "eight",
+          "text": "Eight",
+          "explanation": "Eight counts the top note again; there are twelve different notes."
+        },
+        {
+          "id": "thirteen",
+          "text": "Thirteen",
+          "explanation": "Thirteen counts the starting note twice, at the bottom and the top."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.chromatic-scale-2",
+      "nodeId": "keys.chromatic-scale",
+      "prompt": "How is a chromatic scale usually spelled going up?",
+      "answer": {
+        "id": "with-sharps",
+        "text": "With sharps",
+        "explanation": "Ascending chromatic lines usually raise notes with sharps; descending ones use flats and naturals."
+      },
+      "wrong": [
+        {
+          "id": "with-flats",
+          "text": "With flats",
+          "explanation": "Flats are the usual spelling coming down, not going up."
+        },
+        {
+          "id": "with-double-sharps",
+          "text": "With double sharps",
+          "explanation": "Double sharps are not needed for a plain chromatic scale."
+        },
+        {
+          "id": "each-letter-name-once-only",
+          "text": "Each letter name once only",
+          "explanation": "Each letter name once gives seven notes, a diatonic scale."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.double-accidentals-1",
+      "nodeId": "keys.double-accidentals",
+      "prompt": "What is the leading note of G sharp harmonic minor?",
+      "answer": {
+        "id": "f-double-sharp",
+        "text": "F double sharp",
+        "explanation": "G sharp minor has F sharp in its signature; raising it a semitone gives F double sharp, which is G on the piano."
+      },
+      "wrong": [
+        {
+          "id": "g-natural",
+          "text": "G natural",
+          "explanation": "It sounds the same as G, but the seventh degree must use the letter F."
+        },
+        {
+          "id": "f-sharp",
+          "text": "F sharp",
+          "explanation": "F sharp is the subtonic from the key signature; harmonic minor raises it."
+        },
+        {
+          "id": "f-natural",
+          "text": "F natural",
+          "explanation": "F natural is a tone and a half below G sharp, too far to lead to it."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.double-accidentals-2",
+      "nodeId": "keys.double-accidentals",
+      "prompt": "Which note is enharmonic with E sharp?",
+      "answer": {
+        "id": "f",
+        "text": "F",
+        "explanation": "E sharp is a semitone above E, which is the white key F."
+      },
+      "wrong": [
+        {
+          "id": "e-flat",
+          "text": "E flat",
+          "explanation": "E flat is a semitone below E, not above."
+        },
+        {
+          "id": "f-sharp",
+          "text": "F sharp",
+          "explanation": "F sharp is a semitone above E sharp."
+        },
+        {
+          "id": "d-double-sharp",
+          "text": "D double sharp",
+          "explanation": "D double sharp is E, a semitone below E sharp."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.interval-number-1",
+      "nodeId": "keys.interval-number",
+      "prompt": "What is the interval number from C up to G?",
+      "answer": {
+        "id": "fifth",
+        "text": "Fifth",
+        "explanation": "Count every letter name, both ends included: C, D, E, F, G is five."
+      },
+      "wrong": [
+        {
+          "id": "fourth",
+          "text": "Fourth",
+          "explanation": "Leaving out the first note gives four; interval numbers count both ends."
+        },
+        {
+          "id": "seventh",
+          "text": "Seventh",
+          "explanation": "Seven is the number of semitones between C and G, not the letter count."
+        },
+        {
+          "id": "sixth",
+          "text": "Sixth",
+          "explanation": "C up to A is a sixth; G is one letter lower."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.interval-number-2",
+      "nodeId": "keys.interval-number",
+      "prompt": "What is the interval number from E up to C?",
+      "answer": {
+        "id": "sixth",
+        "text": "Sixth",
+        "explanation": "E, F, G, A, B, C: six letter names."
+      },
+      "wrong": [
+        {
+          "id": "fifth",
+          "text": "Fifth",
+          "explanation": "E up to B is a fifth; C is one letter higher."
+        },
+        {
+          "id": "third",
+          "text": "Third",
+          "explanation": "C up to E is a third; going from E up to C counts the other way round the octave."
+        },
+        {
+          "id": "seventh",
+          "text": "Seventh",
+          "explanation": "E up to D is a seventh."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.interval-quality-1",
+      "nodeId": "keys.interval-quality",
+      "prompt": "What is the interval from C up to E flat?",
+      "answer": {
+        "id": "minor-third",
+        "text": "Minor third",
+        "explanation": "Three semitones across three letter names is a minor third."
+      },
+      "wrong": [
+        {
+          "id": "major-third",
+          "text": "Major third",
+          "explanation": "C up to E is a major third, four semitones; E flat is a semitone smaller."
+        },
+        {
+          "id": "augmented-second",
+          "text": "Augmented second",
+          "explanation": "C to D sharp is three semitones too, but E flat is a third by letter name."
+        },
+        {
+          "id": "perfect-fourth",
+          "text": "Perfect fourth",
+          "explanation": "A perfect fourth from C is F, five semitones."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.interval-quality-2",
+      "nodeId": "keys.interval-quality",
+      "prompt": "Which intervals are called perfect rather than major or minor?",
+      "answer": {
+        "id": "unisons-fourths-fifths-and-octaves",
+        "text": "Unisons, fourths, fifths and octaves",
+        "explanation": "These stay the same whether the scale is major or minor, so they are perfect."
+      },
+      "wrong": [
+        {
+          "id": "thirds-and-sixths",
+          "text": "Thirds and sixths",
+          "explanation": "Thirds and sixths are major or minor."
+        },
+        {
+          "id": "seconds-and-sevenths",
+          "text": "Seconds and sevenths",
+          "explanation": "Seconds and sevenths are major or minor."
+        },
+        {
+          "id": "only-fifths",
+          "text": "Only fifths",
+          "explanation": "Fifths are perfect, but so are unisons, fourths and octaves."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.interval-quality-3",
+      "nodeId": "keys.interval-quality",
+      "prompt": "What is the interval from D up to B?",
+      "answer": {
+        "id": "major-sixth",
+        "text": "Major sixth",
+        "explanation": "D to B is six letter names and nine semitones; in D major, B is the sixth degree."
+      },
+      "wrong": [
+        {
+          "id": "minor-sixth",
+          "text": "Minor sixth",
+          "explanation": "A minor sixth from D is B flat, eight semitones."
+        },
+        {
+          "id": "perfect-fifth",
+          "text": "Perfect fifth",
+          "explanation": "D up to A is a perfect fifth; B is a letter higher."
+        },
+        {
+          "id": "major-seventh",
+          "text": "Major seventh",
+          "explanation": "A major seventh from D is C sharp."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.augmented-diminished-1",
+      "nodeId": "keys.augmented-diminished",
+      "prompt": "What is the interval from F up to B?",
+      "answer": {
+        "id": "augmented-fourth",
+        "text": "Augmented fourth",
+        "explanation": "F to B spans four letter names and six semitones, one more than a perfect fourth."
+      },
+      "wrong": [
+        {
+          "id": "perfect-fourth",
+          "text": "Perfect fourth",
+          "explanation": "A perfect fourth from F is B flat, five semitones."
+        },
+        {
+          "id": "diminished-fifth",
+          "text": "Diminished fifth",
+          "explanation": "A diminished fifth also has six semitones, but F to B is a fourth by letter name."
+        },
+        {
+          "id": "perfect-fifth",
+          "text": "Perfect fifth",
+          "explanation": "F up to C is the perfect fifth."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.augmented-diminished-2",
+      "nodeId": "keys.augmented-diminished",
+      "prompt": "What happens to a minor interval when it is made one semitone smaller, keeping the letter names?",
+      "answer": {
+        "id": "it-becomes-diminished",
+        "text": "It becomes diminished",
+        "explanation": "Smaller than minor is diminished; a minor third C to E flat becomes C to E double flat."
+      },
+      "wrong": [
+        {
+          "id": "it-becomes-perfect",
+          "text": "It becomes perfect",
+          "explanation": "Perfect belongs only to unisons, fourths, fifths and octaves."
+        },
+        {
+          "id": "it-becomes-major",
+          "text": "It becomes major",
+          "explanation": "Major is a semitone larger than minor, not smaller."
+        },
+        {
+          "id": "it-becomes-augmented",
+          "text": "It becomes augmented",
+          "explanation": "Augmented is larger than major, not smaller than minor."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.compound-intervals-1",
+      "nodeId": "keys.compound-intervals",
+      "prompt": "What is the interval from middle C up to the E in the octave above?",
+      "answer": {
+        "id": "major-tenth",
+        "text": "Major tenth",
+        "explanation": "An octave plus a major third is a compound major third, called a major tenth."
+      },
+      "wrong": [
+        {
+          "id": "major-third",
+          "text": "Major third",
+          "explanation": "Middle C to the E just above is a major third; this E is an octave higher still."
+        },
+        {
+          "id": "major-ninth",
+          "text": "Major ninth",
+          "explanation": "A ninth is an octave plus a second; E is a third above C."
+        },
+        {
+          "id": "minor-tenth",
+          "text": "Minor tenth",
+          "explanation": "A minor tenth would end on E flat."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.compound-intervals-2",
+      "nodeId": "keys.compound-intervals",
+      "prompt": "Which simple interval plus an octave makes a perfect twelfth?",
+      "answer": {
+        "id": "perfect-fifth",
+        "text": "Perfect fifth",
+        "explanation": "Add seven to the simple interval: a fifth plus an octave is a twelfth."
+      },
+      "wrong": [
+        {
+          "id": "perfect-fourth",
+          "text": "Perfect fourth",
+          "explanation": "A fourth plus an octave is an eleventh."
+        },
+        {
+          "id": "major-sixth",
+          "text": "Major sixth",
+          "explanation": "A sixth plus an octave is a thirteenth."
+        },
+        {
+          "id": "perfect-octave",
+          "text": "Perfect octave",
+          "explanation": "Two octaves is a fifteenth, not a twelfth."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.transposition-octave-1",
+      "nodeId": "keys.transposition-octave",
+      "prompt": "A melody starts on the G above middle C in the treble clef. Written an octave lower in the bass clef, which note does it start on?",
+      "answer": {
+        "id": "the-g-below-middle-c",
+        "text": "The G below middle C",
+        "explanation": "An octave keeps the letter name: the G above middle C drops twelve semitones to the G below."
+      },
+      "wrong": [
+        {
+          "id": "the-c-below-middle-c",
+          "text": "The C below middle C",
+          "explanation": "The letter name stays G; only the octave changes."
+        },
+        {
+          "id": "middle-c",
+          "text": "Middle C",
+          "explanation": "Middle C is a fifth below that G, not an octave."
+        },
+        {
+          "id": "the-g-two-octaves-lower",
+          "text": "The G two octaves lower",
+          "explanation": "That would be two octaves; the transposition is one octave."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.transposition-octave-2",
+      "nodeId": "keys.transposition-octave",
+      "prompt": "When a melody is transposed down an octave, what happens to its key signature?",
+      "answer": {
+        "id": "it-stays-the-same",
+        "text": "It stays the same",
+        "explanation": "An octave changes no letter names, so the key is the same."
+      },
+      "wrong": [
+        {
+          "id": "it-gains-one-flat",
+          "text": "It gains one flat",
+          "explanation": "Moving down a fifth adds a flat; an octave changes nothing."
+        },
+        {
+          "id": "it-changes-to-the-relative-minor",
+          "text": "It changes to the relative minor",
+          "explanation": "The relative minor is a different tonic; an octave keeps the tonic."
+        },
+        {
+          "id": "it-loses-all-sharps-and-flats",
+          "text": "It loses all sharps and flats",
+          "explanation": "Every note keeps its sharp or flat when moved by an octave."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.transposition-interval-1",
+      "nodeId": "keys.transposition-interval",
+      "prompt": "A melody in C major is transposed up a major second. What is the new key?",
+      "answer": {
+        "id": "d-major",
+        "text": "D major",
+        "explanation": "A major second above C is D, so C major becomes D major, with two sharps."
+      },
+      "wrong": [
+        {
+          "id": "d-minor",
+          "text": "D minor",
+          "explanation": "Transposing keeps the key's quality: major stays major."
+        },
+        {
+          "id": "c-sharp-major",
+          "text": "C sharp major",
+          "explanation": "C sharp is a minor second (semitone) above C."
+        },
+        {
+          "id": "e-major",
+          "text": "E major",
+          "explanation": "E is a major third above C."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.transposition-interval-2",
+      "nodeId": "keys.transposition-interval",
+      "prompt": "The melody C D E is transposed up a perfect fourth. What are the new notes?",
+      "answer": {
+        "id": "f-g-a",
+        "text": "F G A",
+        "explanation": "Each note moves up a perfect fourth: C to F, D to G, E to A."
+      },
+      "wrong": [
+        {
+          "id": "g-a-b",
+          "text": "G A B",
+          "explanation": "G A B is up a perfect fifth."
+        },
+        {
+          "id": "f-g-a-flat",
+          "text": "F G A flat",
+          "explanation": "E up a perfect fourth is A natural; A flat would change the major third C-E into a minor one."
+        },
+        {
+          "id": "e-f-sharp-g-sharp",
+          "text": "E F sharp G sharp",
+          "explanation": "That is up a major third."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.transposing-instruments-1",
+      "nodeId": "keys.transposing-instruments",
+      "prompt": "A clarinet in B flat sounds a major second lower than written. A concert-pitch melody is in F major. What key is the clarinet part written in?",
+      "answer": {
+        "id": "g-major",
+        "text": "G major",
+        "explanation": "The part is written a major second higher than it sounds: F up a major second is G."
+      },
+      "wrong": [
+        {
+          "id": "e-flat-major",
+          "text": "E flat major",
+          "explanation": "That transposes down a major second; the written part has to go up."
+        },
+        {
+          "id": "f-major",
+          "text": "F major",
+          "explanation": "F major is the sounding key; the part must be written a tone higher."
+        },
+        {
+          "id": "a-major",
+          "text": "A major",
+          "explanation": "A is a major third above F."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.transposing-instruments-2",
+      "nodeId": "keys.transposing-instruments",
+      "prompt": "A horn in F sounds a perfect fifth lower than written. For concert C major, what key is the horn part written in?",
+      "answer": {
+        "id": "g-major",
+        "text": "G major",
+        "explanation": "Write it a perfect fifth higher than it sounds: C up a perfect fifth is G."
+      },
+      "wrong": [
+        {
+          "id": "f-major",
+          "text": "F major",
+          "explanation": "F major is down a perfect fifth; the written part goes the other way."
+        },
+        {
+          "id": "c-major",
+          "text": "C major",
+          "explanation": "C is the sounding key; a horn part is never written at concert pitch."
+        },
+        {
+          "id": "d-major",
+          "text": "D major",
+          "explanation": "D is a major second above C, the shift for a B flat instrument."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.transposing-instruments-3",
+      "nodeId": "keys.transposing-instruments",
+      "prompt": "A clarinet in A sounds a minor third lower than written. For concert C major, what key is the part written in?",
+      "answer": {
+        "id": "e-flat-major",
+        "text": "E flat major",
+        "explanation": "A minor third above C is E flat, so the part is written in E flat major."
+      },
+      "wrong": [
+        {
+          "id": "a-major",
+          "text": "A major",
+          "explanation": "A is a minor third below C; the written part goes up."
+        },
+        {
+          "id": "e-major",
+          "text": "E major",
+          "explanation": "E is a major third above C, one semitone too far."
+        },
+        {
+          "id": "d-major",
+          "text": "D major",
+          "explanation": "D is the shift for a B flat clarinet, a major second."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.key-of-a-melody-1",
+      "nodeId": "keys.key-of-a-melody",
+      "prompt": "A melody has one sharp in the key signature and a D sharp written in. What key is it most likely in?",
+      "answer": {
+        "id": "e-minor",
+        "text": "E minor",
+        "explanation": "One sharp is G major or E minor; D sharp is the raised seventh of E minor."
+      },
+      "wrong": [
+        {
+          "id": "g-major",
+          "text": "G major",
+          "explanation": "G major has D natural as its fifth; the raised D sharp points to E minor."
+        },
+        {
+          "id": "e-major",
+          "text": "E major",
+          "explanation": "E major has four sharps in its signature."
+        },
+        {
+          "id": "b-minor",
+          "text": "B minor",
+          "explanation": "B minor has two sharps and its leading note is A sharp."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys.key-of-a-melody-2",
+      "nodeId": "keys.key-of-a-melody",
+      "prompt": "A melody has two flats in the key signature and F sharp written in. What key is it most likely in?",
+      "answer": {
+        "id": "g-minor",
+        "text": "G minor",
+        "explanation": "Two flats is B flat major or G minor; F sharp is G minor's leading note."
+      },
+      "wrong": [
+        {
+          "id": "b-flat-major",
+          "text": "B flat major",
+          "explanation": "F is B flat major's dominant; it would not be sharpened."
+        },
+        {
+          "id": "d-minor",
+          "text": "D minor",
+          "explanation": "D minor has one flat and its leading note is C sharp."
+        },
+        {
+          "id": "g-major",
+          "text": "G major",
+          "explanation": "G major has F sharp but one sharp in its signature, not two flats."
+        }
+      ]
+    },
+    {
+      "type": "playing",
+      "id": "keys.minor-scales-playing-1",
+      "nodeId": "keys.minor-scales-playing",
+      "prompt": "Play A harmonic minor up and down one octave from the A below middle C, right hand, one note per beat.",
+      "notes": [
+        {
+          "pitch": 57,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 10.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 12.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 13.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 14.0,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 69,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.minor-scales-playing-2",
+      "nodeId": "keys.minor-scales-playing",
+      "prompt": "Play E melodic minor up and down one octave from the E above middle C, right hand, one note per beat: C sharp and D sharp going up, C and D natural coming down.",
+      "notes": [
+        {
+          "pitch": 64,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 73,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 10.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 12.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 13.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 14.0,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 69,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.minor-scales-playing-3",
+      "nodeId": "keys.minor-scales-playing",
+      "prompt": "Play D harmonic minor up and down one octave from the D below middle C, left hand, one note per beat.",
+      "notes": [
+        {
+          "pitch": 50,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 58,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 58,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 10.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 12.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 13.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 14.0,
+          "beats": 1.0,
+          "hand": "left"
+        }
+      ],
+      "bpm": 69,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.two-octave-scales-1",
+      "nodeId": "keys.two-octave-scales",
+      "prompt": "Play G major up and down two octaves from the G below middle C, right hand, two notes per beat.",
+      "notes": [
+        {
+          "pitch": 55,
+          "startBeat": 0.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 2.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 4.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 6.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 78,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 7.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 78,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 8.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 9.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 9.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 10.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 10.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 11.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 11.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 12.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 12.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 13.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 13.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 14.0,
+          "beats": 0.5,
+          "hand": "right"
+        }
+      ],
+      "bpm": 69,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.two-octave-scales-2",
+      "nodeId": "keys.two-octave-scales",
+      "prompt": "Play F major up and down two octaves from the F an octave and a fifth below middle C, left hand, two notes per beat.",
+      "notes": [
+        {
+          "pitch": 41,
+          "startBeat": 0.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 43,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 45,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 46,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 2.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 4.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 58,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 6.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 7.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 8.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 58,
+          "startBeat": 9.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 9.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 10.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 10.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 11.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 11.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 12.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 46,
+          "startBeat": 12.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 45,
+          "startBeat": 13.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 43,
+          "startBeat": 13.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 41,
+          "startBeat": 14.0,
+          "beats": 0.5,
+          "hand": "left"
+        }
+      ],
+      "bpm": 69,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.scales-hands-together-1",
+      "nodeId": "keys.scales-hands-together",
+      "prompt": "Play C major hands together up and down one octave, right hand from middle C and left hand an octave lower, one note per beat.",
+      "notes": [
+        {
+          "pitch": 48,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 10.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 10.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 12.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 12.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 13.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 13.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 14.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 14.0,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 72,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.scales-hands-together-2",
+      "nodeId": "keys.scales-hands-together",
+      "prompt": "Play D major hands together up and down one octave, right hand from the D above middle C and left hand an octave lower, two notes per beat.",
+      "notes": [
+        {
+          "pitch": 50,
+          "startBeat": 0.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 0.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 2.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 2.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 73,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 4.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 73,
+          "startBeat": 4.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 6.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 6.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 7.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 7.0,
+          "beats": 0.5,
+          "hand": "right"
+        }
+      ],
+      "bpm": 80,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.scales-hands-together-3",
+      "nodeId": "keys.scales-hands-together",
+      "prompt": "Play B minor (harmonic) hands together up and down one octave, right hand from the B below middle C and left hand an octave lower, one note per beat.",
+      "notes": [
+        {
+          "pitch": 47,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 49,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 58,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 58,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 10.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 10.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 12.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 12.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 49,
+          "startBeat": 13.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 13.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 47,
+          "startBeat": 14.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 14.0,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 72,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.contrary-motion-1",
+      "nodeId": "keys.contrary-motion",
+      "prompt": "Play C major in contrary motion one octave, both thumbs on middle C, right hand up and left hand down and back, one note per beat.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 10.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 10.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 12.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 12.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 13.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 13.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 14.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 14.0,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 60,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.contrary-motion-2",
+      "nodeId": "keys.contrary-motion",
+      "prompt": "Play G major in contrary motion one octave, right hand from the G above middle C going up, left hand from the G below middle C going down, and back, one note per beat.",
+      "notes": [
+        {
+          "pitch": 55,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 47,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 45,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 78,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 43,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 45,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 78,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 47,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 10.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 10.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 12.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 12.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 13.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 13.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 14.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 14.0,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 60,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.chromatic-playing-1",
+      "nodeId": "keys.chromatic-playing",
+      "prompt": "Play the chromatic scale up and down one octave from middle C, right hand, two notes per beat.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 4.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 6.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 7.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 8.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 9.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 9.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 10.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 10.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 11.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 11.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 12.0,
+          "beats": 0.5,
+          "hand": "right"
+        }
+      ],
+      "bpm": 69,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.chromatic-playing-2",
+      "nodeId": "keys.chromatic-playing",
+      "prompt": "Play the chromatic scale up and down one octave from the G below middle C, left hand, two notes per beat.",
+      "notes": [
+        {
+          "pitch": 55,
+          "startBeat": 0.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 58,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 2.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 4.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 6.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 7.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 8.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 9.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 9.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 10.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 58,
+          "startBeat": 10.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 11.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 11.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 12.0,
+          "beats": 0.5,
+          "hand": "left"
+        }
+      ],
+      "bpm": 80,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.tonic-arpeggios-1",
+      "nodeId": "keys.tonic-arpeggios",
+      "prompt": "Play the C major arpeggio up and down two octaves from middle C, right hand, two notes per beat.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 2.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 84,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 4.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 6.0,
+          "beats": 0.5,
+          "hand": "right"
+        }
+      ],
+      "bpm": 72,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.tonic-arpeggios-2",
+      "nodeId": "keys.tonic-arpeggios",
+      "prompt": "Play the A minor arpeggio up and down two octaves from the A an octave and a third below middle C, left hand, two notes per beat.",
+      "notes": [
+        {
+          "pitch": 45,
+          "startBeat": 0.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 2.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 4.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 45,
+          "startBeat": 6.0,
+          "beats": 0.5,
+          "hand": "left"
+        }
+      ],
+      "bpm": 72,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.broken-tonic-triads-1",
+      "nodeId": "keys.broken-tonic-triads",
+      "prompt": "Play the G major tonic triad broken in root position, first inversion, second inversion and root position again, from the G below middle C, right hand, one note per beat.",
+      "notes": [
+        {
+          "pitch": 55,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 10.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 50,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.broken-tonic-triads-2",
+      "nodeId": "keys.broken-tonic-triads",
+      "prompt": "Play the D minor tonic triad broken in root position, first inversion, second inversion and root position again, from the D below middle C, left hand, one note per beat.",
+      "notes": [
+        {
+          "pitch": 50,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 10.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "left"
+        }
+      ],
+      "bpm": 50,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.even-scales-at-tempo-1",
+      "nodeId": "keys.even-scales-at-tempo",
+      "prompt": "Play E flat major up and down two octaves from the E flat above middle C, right hand, two notes per beat, every note the same loudness.",
+      "notes": [
+        {
+          "pitch": 63,
+          "startBeat": 0.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 2.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 4.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 80,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 82,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 84,
+          "startBeat": 6.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 86,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 87,
+          "startBeat": 7.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 86,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 84,
+          "startBeat": 8.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 82,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 80,
+          "startBeat": 9.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 9.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 10.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 10.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 11.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 11.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 12.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 12.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 13.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 13.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 14.0,
+          "beats": 0.5,
+          "hand": "right"
+        }
+      ],
+      "bpm": 92,
+      "pass": {
+        "notesInOrder": 0.95,
+        "timingSpreadMs": 45,
+        "velocitySpread": 15,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.even-scales-at-tempo-2",
+      "nodeId": "keys.even-scales-at-tempo",
+      "prompt": "Play A major hands together up and down two octaves, right hand from the A below middle C and left hand an octave lower, two notes per beat, every note the same loudness.",
+      "notes": [
+        {
+          "pitch": 45,
+          "startBeat": 0.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 0.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 47,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 49,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 2.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 4.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 4.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 73,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 6.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 78,
+          "startBeat": 6.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 80,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 7.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 81,
+          "startBeat": 7.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 80,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 8.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 78,
+          "startBeat": 8.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 9.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 9.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 9.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 73,
+          "startBeat": 9.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 10.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 10.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 10.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 10.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 11.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 11.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 11.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 11.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 12.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 12.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 12.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 12.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 49,
+          "startBeat": 13.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 13.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 47,
+          "startBeat": 13.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 13.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 45,
+          "startBeat": 14.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 14.0,
+          "beats": 0.5,
+          "hand": "right"
+        }
+      ],
+      "bpm": 104,
+      "pass": {
+        "notesInOrder": 0.95,
+        "timingSpreadMs": 45,
+        "velocitySpread": 15,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.intervals-at-keyboard-1",
+      "nodeId": "keys.intervals-at-keyboard",
+      "prompt": "Play these intervals up from middle C, each as two notes one after the other, right hand: major third, perfect fourth, perfect fifth, major sixth, octave.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 60,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.intervals-at-keyboard-2",
+      "nodeId": "keys.intervals-at-keyboard",
+      "prompt": "Play these intervals up from the D above middle C, each as two notes together, right hand: minor third, perfect fifth, minor sixth, octave.",
+      "notes": [
+        {
+          "pitch": 62,
+          "startBeat": 0.0,
+          "beats": 2.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 0.0,
+          "beats": 2.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 2.0,
+          "beats": 2.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 2.0,
+          "beats": 2.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 4.0,
+          "beats": 2.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 4.0,
+          "beats": 2.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 6.0,
+          "beats": 2.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 6.0,
+          "beats": 2.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 60,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.transposing-at-keyboard-1",
+      "nodeId": "keys.transposing-at-keyboard",
+      "prompt": "Play the opening of Frere Jacques in G major, starting on the G above middle C, right hand (in C it begins C D E C).",
+      "notes": [
+        {
+          "pitch": 67,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 10.0,
+          "beats": 2.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 12.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 13.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 14.0,
+          "beats": 2.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 80,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.transposing-at-keyboard-2",
+      "nodeId": "keys.transposing-at-keyboard",
+      "prompt": "Play the opening of Frere Jacques in F major, starting on the F below middle C, left hand (in C it begins C D E C).",
+      "notes": [
+        {
+          "pitch": 53,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 58,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 10.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 12.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 58,
+          "startBeat": 13.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 14.0,
+          "beats": 2.0,
+          "hand": "left"
+        }
+      ],
+      "bpm": 80,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.black-key-scales-1",
+      "nodeId": "keys.black-key-scales",
+      "prompt": "Play B flat major up and down one octave from the B flat below middle C, right hand, one note per beat.",
+      "notes": [
+        {
+          "pitch": 58,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 10.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 12.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 13.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 58,
+          "startBeat": 14.0,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 80,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.black-key-scales-2",
+      "nodeId": "keys.black-key-scales",
+      "prompt": "Play A flat major up and down one octave from the A flat below middle C, left hand, one note per beat.",
+      "notes": [
+        {
+          "pitch": 56,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 58,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 10.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 12.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 58,
+          "startBeat": 13.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 14.0,
+          "beats": 1.0,
+          "hand": "left"
+        }
+      ],
+      "bpm": 80,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "keys.black-key-scales-3",
+      "nodeId": "keys.black-key-scales",
+      "prompt": "Play F sharp major up and down one octave from the F sharp above middle C, right hand, one note per beat.",
+      "notes": [
+        {
+          "pitch": 66,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 73,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 78,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 8.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 73,
+          "startBeat": 10.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 12.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 13.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 14.0,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 72,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    }
+  ]
+}

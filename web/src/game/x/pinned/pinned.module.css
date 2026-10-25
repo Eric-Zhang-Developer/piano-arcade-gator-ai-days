@@ -1,0 +1,142 @@
+/* Pinned (spec: pinned): a jeweller's bench at night. The brass cylinder is the one lit thing on the black; the Duo
+   kit's rail sits quietly at the left, as wet-paint's does, and the two honest lines sit low on the right. */
+
+.page {
+  position: fixed;
+  inset: 0;
+  background: var(--pa-bg);
+  color: var(--pa-ink);
+  overflow: hidden;
+}
+
+/* Under the nav bar's band (4vh), to the bottom. */
+.canvas {
+  position: absolute;
+  top: 4vh;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 4vh);
+  display: block;
+  cursor: grab;
+  touch-action: none;
+  /* The scene fades out under the rail and the notes, so their words stay on black when Macro fills the frame. */
+  mask-image: linear-gradient(90deg, transparent 18%, #000 50%), linear-gradient(0deg, transparent 6%, #000 28%);
+  mask-composite: intersect;
+}
+
+.canvas:active {
+  cursor: grabbing;
+}
+
+.noGl {
+  position: absolute;
+  inset: 40% 10% auto;
+  margin: 0;
+  text-align: center;
+  font: 600 clamp(18px, 1.6vw, 30px) / 1.3 var(--pa-font-display), system-ui, sans-serif;
+}
+
+.rail {
+  position: absolute;
+  top: calc(4vh + 1.4rem);
+  left: 2vw;
+  display: grid;
+  gap: 1.1rem;
+  justify-items: start;
+  max-width: 44vw; /* the data and the three buttons stay one row each, 1280 to 1920 */
+  pointer-events: none; /* the scene shows through and still orbits; only the buttons take clicks */
+}
+
+.rail button {
+  pointer-events: auto;
+}
+
+/* The select's wordmark: wide-tracked caps after a slanted primary bar. */
+.mark {
+  margin: 0;
+  font: 700 clamp(28px, 2.6vw, 50px) / 1 var(--pa-font-display), system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mark::before {
+  content: "";
+  display: inline-block;
+  width: 0.22em;
+  height: 0.78em;
+  margin-right: 0.5em;
+  background: var(--pa-primary);
+  transform: skewX(-18deg);
+}
+
+.data {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(18px, 2vw, 40px);
+  margin: 0;
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+}
+
+.data dt {
+  color: var(--pa-ink-dim);
+  font-size: clamp(12px, 0.8vw, 16px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.data dd {
+  margin: 0.3em 0 0;
+  font-size: clamp(18px, 1.4vw, 28px);
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.actions button {
+  font-size: clamp(14px, 1vw, 20px) !important; /* over the kit's inline 14 px */
+  padding: 0.8em 1.6em !important;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.notes {
+  position: absolute;
+  right: 2vw;
+  bottom: 1.6rem;
+  margin: 0;
+  display: grid;
+  gap: 0.4em;
+  justify-items: end;
+  color: var(--pa-ink-dim);
+  font-size: clamp(12px, 0.85vw, 16px);
+  text-align: right;
+  pointer-events: none;
+}
+
+.hint {
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  letter-spacing: 0.04em;
+}
+
+/* The kit's mono label, scaled with the rail. */
+.rail [data-kit="mono"] {
+  font-size: clamp(12px, 0.72vw, 14px) !important; /* the kit's 12 px floor (#1200) */
+  max-width: 36em;
+}
+
+/* A toggle's two labels in one cell: it keeps its longer label's width, and the idle one is hidden (#1200). */
+.swap {
+  display: inline-grid;
+}
+
+.swap > span {
+  grid-area: 1 / 1;
+}
+
+.swap > [data-idle] {
+  visibility: hidden;
+}

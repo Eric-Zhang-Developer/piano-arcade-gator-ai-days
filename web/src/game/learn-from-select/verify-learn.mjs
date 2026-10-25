@@ -70,21 +70,34 @@ async function home() {
 }
 await home();
 const ids = await page.locator("ol a").evaluateAll((as) => as.map((a) => new URL(a.href).searchParams.get("song")));
-const hint = await page.getByText("choose ·").textContent();
-check(hint === "↑ ↓ choose · Enter play · L learn · W watch · E easy", `the hint reads "${hint}"`);
+// L, W and E are listed on the ? card, behind the select's "Controls" link (mouse-first): one line each, its key alone
+// in the chip and the word in the line, so the check reads the keys, not one exact string.
+await page.getByTestId("help-link").click();
+await page.getByTestId("help").waitFor({ timeout: 10_000 });
+const lines = await page
+  .getByTestId("help")
+  .locator("dl > div")
+  .evaluateAll((ds) => ds.map((d) => [[...d.querySelectorAll("kbd")].map((k) => k.textContent).join(" "), d.querySelector("dd")?.textContent ?? ""]));
+const listed = (k, w) => lines.some(([keys, what]) => keys === k && w.test(what));
+check(listed("L", /learn/i) && listed("W", /watch/i) && listed("E", /easy/i), `the ? card names L learn, W watch and E easy`);
+await page.keyboard.press("Escape");
+await page.waitForFunction(() => !document.querySelector("dialog[open]"), null, { timeout: 10_000 });
+await page.locator("ol a").first().focus();
 
 // 1. ↓ then L: the second song in wait mode.
 await page.keyboard.press("ArrowDown");
 await page.keyboard.press("l");
 await page.waitForURL(/\/play\?/, { timeout: 30_000 });
 check(search(page) === `?song=${ids[1]}&mode=wait`, `↓ then L opens ${search(page)} (want ?song=${ids[1]}&mode=wait)`);
-const line = page.getByText("Wait mode: the song waits for each note");
+// wait-mode's whole start line: the ? card (help-overlay) lists L as "Learn: the song waits for each note" too, and
+// a bare match finds both (strict mode).
+const line = page.getByText("Learn: the song waits for each note. Not scored.");
 await line.waitFor({ timeout: 30_000 }).catch(() => {});
 check(await line.isVisible(), "… and wait mode's start line shows");
 
-// 2. LEARN on the focused song.
+// 2. The LEARN button on the focused song's panel (mouse-first): the same wait-mode take as L.
 await home();
-await page.getByTestId("preview-learn").click();
+await page.getByTestId("select-learn").click();
 await page.waitForURL(/\/play\?/, { timeout: 30_000 });
 check(search(page) === `?song=${ids[0]}&mode=wait`, `LEARN opens ${search(page)} (want ?song=${ids[0]}&mode=wait)`);
 
@@ -100,14 +113,14 @@ await page.keyboard.press(process.platform === "darwin" ? "Meta+L" : "Control+L"
 await page.waitForTimeout(1500);
 check(new URL(page.url()).pathname === "/" && search(page) === "", `${process.platform === "darwin" ? "Meta" : "Ctrl"}+L leaves the page on ${page.url()}`);
 
-// 5. Screenshots of / with the hint and LEARN.
+// 5. Screenshots of / with the hint.
 for (const [w, h] of [
   [1280, 720],
   [1920, 1080],
 ]) {
   await page.setViewportSize({ width: w, height: h });
   await home();
-  await page.getByTestId("preview-learn").waitFor();
+  await page.getByTestId("song-preview").waitFor();
   await page.screenshot({ path: join(out, `select-${w}x${h}.png`) });
 }
 say(`verify-learn: screenshots in ${out}`);

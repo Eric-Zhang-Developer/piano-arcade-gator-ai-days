@@ -66,6 +66,10 @@ describe("each rule fires on a chart that breaks only it", () => {
   test("duplicate id (validateChart, by index)", () => {
     expect(broken((c) => (c.notes[4].id = "r2"))).toEqual(["validateChart: note 4: id missing or duplicate"]);
   });
+  test("folder matches id, at any depth under songs/", () => {
+    expect(chartProblems("songs/x/lint/chart.json", clean())).toEqual([]);
+    expect(chartProblems("songs/x/other/chart.json", clean())).toEqual(['id: "lint" but its folder is "other"']);
+  });
   test("time order", () => {
     expect(broken((c) => c.notes.reverse())).toContain("time order: r2 (beat 1) comes before r3");
   });

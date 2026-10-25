@@ -158,6 +158,32 @@ function bar(ctx: CanvasRenderingContext2D, L: Layout, x0: number, x1: number, y
   if (fill) ctx.fill();
 }
 
+// key-polish: the notes' body and glow, and the keys' release.
+export const notePolish = {
+  glowMs: 400, // a note starts to glow this long before it lands
+  glowPx: 18, // its glow at the line
+  heldGlow: 0.35, // of glowPx, on a held note: a long one is a column, and a full glow down it reads as neon
+  lift: 0.18, // white over a note's leading end, fading to none at its tail
+  rim: "rgba(255,255,255,0.3)", // the fine light around a note's edge
+  releaseMs: 140, // a released key's light fades over this; none under reduced motion
+};
+
+// Which keys were lit last frame, so a released key's light can fade instead of cut. Per canvas.
+type Release = { light: string; atMs: number };
+const lastLit = new WeakMap<CanvasRenderingContext2D, { lit: Map<number, string>; fading: Map<number, Release> }>();
+function releases(ctx: CanvasRenderingContext2D, s: HighwayState, lit: (p: number) => string): Map<number, Release> {
+  let r = lastLit.get(ctx);
+  if (!r) lastLit.set(ctx, (r = { lit: new Map(), fading: new Map() }));
+  if (!reducedMotion()) for (const [p, light] of r.lit) if (!s.pressed.has(p)) r.fading.set(p, { light, atMs: s.nowMs });
+  r.lit.clear();
+  for (const p of s.pressed) {
+    r.lit.set(p, lit(p));
+    r.fading.delete(p);
+  }
+  for (const [p, f] of r.fading) if (s.nowMs < f.atMs || s.nowMs - f.atMs >= notePolish.releaseMs) r.fading.delete(p);
+  return r.fading;
+}
+
 export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Chart, s: HighwayState): void {
   const line = L.judgmentLineY;
   const beatMs = msPerBeat(chart.bpm);
@@ -190,31 +216,57 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
   const color = noteColorFor(chart);
   for (const n of chart.notes) {
     const state = s.noteState.get(n.id);
-    if (state && state !== "MISS") continue; // consumed on hit
     const startMs = n.beat * beatMs;
-    const yBottom = line - (startMs - s.nowMs) * pxPerMs;
-    const yTop = line - (startMs + n.duration * beatMs - s.nowMs) * pxPerMs;
+    const endMs = startMs + n.duration * beatMs;
+    // A hit note is consumed, unless its key is still held: then what's left of it feeds into the key (key-polish).
+    const held = state !== undefined && state !== "MISS" && s.pressed.has(n.pitch) && endMs > s.nowMs;
+    if (state && state !== "MISS" && !held) continue;
+    const yBottom = held ? line : line - (startMs - s.nowMs) * pxPerMs;
+    const yTop = line - (endMs - s.nowMs) * pxPerMs;
     if (yBottom < 0 || yTop > line) continue;
     // A pill sized to its key (note-pills), dim far from the line and full brightness at it. Dimmed by alpha over a
     // black underlay, so the hand's color stays exact and a background layer never shows through a far note.
     const pill = pillRect(L.keyX(n.pitch), L.isBlack(n.pitch));
     const x1 = pill.x;
     const x2 = pill.x + pill.width;
-    const top = Math.min(yTop + settings.noteGapPx, yBottom - settings.noteHeadPx * 2);
-    const b = state === "MISS" ? 1 : brightness(startMs - s.nowMs, settings.lookaheadMs);
+    const top = held ? yTop + settings.noteGapPx : Math.min(yTop + settings.noteGapPx, yBottom - settings.noteHeadPx * 2);
+    if (top >= yBottom - 2) continue; // a held note's last sliver
+    const toHit = startMs - s.nowMs;
+    const b = state === "MISS" || held ? 1 : brightness(toHit, settings.lookaheadMs);
     if (b < 1) {
       ctx.fillStyle = "#000";
       bar(ctx, L, x1, x2, top, yBottom - 1, pill.radius);
       ctx.globalAlpha = b;
     }
-    ctx.fillStyle = state === "MISS" ? settings.missColor : color(n.hand);
+    const hue = state === "MISS" ? settings.missColor : color(n.hand);
+    ctx.fillStyle = hue;
+    // The next notes to land glow in their hand's color, more as they near the line (key-polish).
+    const near = state === "MISS" ? 0 : held ? notePolish.heldGlow : 1 - Math.min(1, Math.max(0, toHit) / notePolish.glowMs);
+    if (near > 0) {
+      ctx.shadowColor = hue;
+      ctx.shadowBlur = notePolish.glowPx * near;
+    }
     bar(ctx, L, x1, x2, top, yBottom - 1, pill.radius);
+    ctx.shadowBlur = 0;
     if (state !== "MISS") {
-      // The head is the pill's leading edge, clipped to its rounded end.
+      // Inside the pill: a body that lifts toward its leading end (a long note reads as one sustained stroke), a fine
+      // light rim, and the white-hot head, soft rather than a hard line.
       ctx.save();
       ctx.clip();
-      ctx.fillStyle = settings.noteHeadColor;
-      ctx.fillRect(0, yBottom - 1 - settings.noteHeadPx, L.width, settings.noteHeadPx);
+      const lift = ctx.createLinearGradient(0, top, 0, yBottom);
+      lift.addColorStop(0, "rgba(255,255,255,0)");
+      lift.addColorStop(1, `rgba(255,255,255,${notePolish.lift})`);
+      ctx.fillStyle = lift;
+      ctx.fillRect(0, top, L.width, yBottom - top);
+      ctx.strokeStyle = notePolish.rim; // the clip keeps the inner half: a fine light rim, as on glass
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      const headPx = settings.noteHeadPx * 1.6;
+      const head = ctx.createLinearGradient(0, yBottom - 1 - headPx, 0, yBottom - 1);
+      head.addColorStop(0, "rgba(255,255,255,0)");
+      head.addColorStop(1, settings.noteHeadColor);
+      ctx.fillStyle = head;
+      ctx.fillRect(0, yBottom - 1 - headPx, L.width, headPx);
       ctx.restore();
     }
     ctx.globalAlpha = 1;
@@ -228,16 +280,22 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
     return hand ? color(hand) : settings.keyLitColor;
   };
   const kbH = L.keyboardHeight;
+  const fading = releases(ctx, s, lit);
+  const light = (p: number): [string | null, number] => {
+    if (s.pressed.has(p)) return [lit(p), 1];
+    const f = fading.get(p);
+    return f ? [f.light, 1 - (s.nowMs - f.atMs) / notePolish.releaseMs] : [null, 1];
+  };
   for (const down of [false, true])
     for (let p = L.lowPitch; p <= L.highPitch; p++) {
       if (L.isBlack(p) || s.pressed.has(p) !== down) continue;
       const k = L.keyX(p);
-      drawWhiteKey(ctx, { x: k.x + 0.5, y: line, w: k.width - 1, h: kbH }, down ? lit(p) : null);
+      drawWhiteKey(ctx, { x: k.x + 0.5, y: line, w: k.width - 1, h: kbH }, ...light(p));
     }
   for (let p = L.lowPitch; p <= L.highPitch; p++) {
     if (!L.isBlack(p)) continue;
     const k = L.keyX(p);
-    drawBlackKey(ctx, { x: k.x, y: line, w: k.width, h: kbH * 0.62 }, s.pressed.has(p) ? lit(p) : null);
+    drawBlackKey(ctx, { x: k.x, y: line, w: k.width, h: kbH * 0.62 }, ...light(p));
   }
   // The hit line (hit-line): a gently moving white stroke with a soft glow, brighter over each pressed key in that
   // key's light. Flat under reduced motion.
@@ -247,12 +305,12 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
     path.forEach((p, i) => (i ? ctx.lineTo(p.x, line + p.dy) : ctx.moveTo(p.x, line + p.dy)));
   };
   ctx.save();
-  // A soft shadow on the key tops, so the white line reads against white keys.
-  const shade = ctx.createLinearGradient(0, line, 0, line + 8);
+  // The keybed's soft shadow on the key tops, so the white line reads against white keys.
+  const shade = ctx.createLinearGradient(0, line, 0, line + 10);
   shade.addColorStop(0, "rgba(0,0,0,0.6)");
   shade.addColorStop(1, "rgba(0,0,0,0)");
   ctx.fillStyle = shade;
-  ctx.fillRect(0, line, L.width, 8);
+  ctx.fillRect(0, line, L.width, 10);
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
   trace();

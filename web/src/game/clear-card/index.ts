@@ -38,7 +38,6 @@ export function clearCard(): GamePlugin {
   let wait = false;
   let counts: Record<Judgment | "wrong", number> = { PERFECT: 0, GREAT: 0, GOOD: 0, MISS: 0, wrong: 0 };
   let card: { kind: ClearKind; shownAtMs: number } | null = null;
-  let lastCtx: CanvasRenderingContext2D | null = null;
   // Body face until the display face has loaded (or 1 s has passed), as the HUD does.
   let display = clearSettings.font;
   if (typeof document !== "undefined")
@@ -52,7 +51,6 @@ export function clearCard(): GamePlugin {
   const gone = () => {
     card = null;
     publish();
-    lastCtx?.clearRect(0, 0, lastCtx.canvas.width, lastCtx.canvas.height); // the draw loop stops with the results
   };
   return {
     id: "clear-card",
@@ -77,7 +75,6 @@ export function clearCard(): GamePlugin {
       publish();
     },
     draw(ctx, f) {
-      lastCtx = ctx;
       if (!card || wait) return;
       const t = f.nowMs - card.shownAtMs; // the chart clock, so Esc freezes the card with everything else
       if (t < 0) return;
@@ -90,19 +87,17 @@ export function clearCard(): GamePlugin {
       ctx.fillRect(0, band, f.width, f.height - band);
 
       let size = Math.max(24, (f.judgmentLineY - band) * s.sizeOfPlayfield);
-      ctx.font = `italic 900 ${size}px ${display}`;
+      ctx.font = `900 ${size}px ${display}`; // upright, the kit's display type (no italic in the Duo look)
       const w = ctx.measureText(card.kind).width;
       if (w > f.width * s.maxWidth) size *= (f.width * s.maxWidth) / w;
       const color = card.kind === "CLEAR" ? ink : gold;
       const scale = s.fromScale + (1 - s.fromScale) * e;
       ctx.translate(f.width / 2, (band + f.judgmentLineY) / 2);
       ctx.scale(scale, scale);
-      ctx.font = `italic 900 ${size}px ${display}`;
+      ctx.font = `900 ${size}px ${display}`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.globalAlpha = e;
-      ctx.shadowColor = color;
-      ctx.shadowBlur = size * 0.35;
       ctx.fillStyle = color;
       ctx.fillText(card.kind, 0, 0);
       ctx.restore();

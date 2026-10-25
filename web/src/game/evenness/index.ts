@@ -127,11 +127,11 @@ export function evenness(): GamePlugin {
     id: "evenness",
     resultsPanel({ chart, take, results }) {
       const d = describeEvenness(scoreEvenness(chart, take, results), chart);
+      if (d.empty) return null; // no runs, or too little played: no card (duo-details)
       const line = (text: string, style: Record<string, string> = {}) => createElement("div", { key: text, style }, text);
       return createElement(
         "div",
-        { "data-testid": "evenness", style: { textAlign: "center", lineHeight: 1.5 } },
-        d.empty && line(d.empty, { color: "var(--pa-ink-dim)" }),
+        { "data-testid": "evenness", style: { lineHeight: 1.5 } },
         ...d.hands.map((h) => line(h, { fontSize: "1.15em", color: "var(--pa-ink)" })),
         d.worst && line(d.worst, { color: "var(--pa-ink-dim)", fontSize: "0.9em" }),
       );

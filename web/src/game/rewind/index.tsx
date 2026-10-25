@@ -16,13 +16,17 @@ export function rewind(): GamePlugin {
   };
 }
 
+// The help overlay's key chip (help-overlay.module.css .kbd): square, a cyan hairline on a faint cyan field.
 const key: CSSProperties = {
   display: "inline-block",
   minWidth: "1.6em",
   padding: "0 0.35em",
-  border: "1px solid currentColor",
-  borderRadius: 4,
+  border: "1px solid rgb(39 225 255 / 0.55)",
+  borderRadius: 0,
+  background: "rgb(39 225 255 / 0.08)",
+  color: "var(--pa-ink)",
   font: "inherit",
+  fontWeight: 700,
   lineHeight: 1.4,
   textAlign: "center",
 };

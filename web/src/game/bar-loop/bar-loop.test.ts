@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { Chart, GameEvent } from "../../contracts";
 import { Judge, noteTimeMs } from "../core/judge";
@@ -63,15 +64,15 @@ describe("per-pass results", () => {
     const chart = plugin.transformChart!(twinkle, q("from=1&to=2&tempo=70&passes=3"));
     const judge = new Judge(chart, (e: GameEvent) => plugin.onEvent!(e));
     plugin.onEvent!({ type: "songStart", atMs: 0 });
-    // Pass 1 perfect, pass 2 skips one note, pass 3 every note 40 ms late (GREAT).
+    // Pass 1 perfect, pass 2 skips one note, pass 3 every note 60 ms late (GREAT).
     chart.notes.forEach((n, i) => {
       const pass = Number(n.id[1]);
       if (n.id === `p2-${twinkle.notes[0].id}`) return;
-      judge.press(n.pitch, noteTimeMs(chart, n) + (pass === 3 ? 40 : 0), i);
+      judge.press(n.pitch, noteTimeMs(chart, n) + (pass === 3 ? 60 : 0), i);
     });
     judge.finish(1e9);
     const per = chart.notes.length / 3;
-    expect(plugin.passes()).toEqual([1, (per - 1) / per, 0.5]);
+    expect(plugin.passes()).toEqual([1, (per - 1) / per, 0.8]);
   });
 
   it("counts a wrong note against the pass it fell in", () => {
@@ -85,5 +86,32 @@ describe("per-pass results", () => {
     judge.finish(1e9);
     const per = chart.notes.length / 2;
     expect(plugin.passes()).toEqual([1, per / (per + 1)]);
+  });
+});
+
+describe("the Passes panel (duo-details: a card in the results, not a fixed box)", () => {
+  // Plays every note of the loop on time, then returns the plugin's results panel as markup ("" for none).
+  function panel(query: string) {
+    const plugin = barLoop();
+    const chart = plugin.transformChart!(twinkle, q(query));
+    const judge = new Judge(chart, (e: GameEvent) => plugin.onEvent!(e));
+    plugin.onEvent!({ type: "songStart", atMs: 0 });
+    chart.notes.forEach((n, i) => judge.press(n.pitch, noteTimeMs(chart, n), i));
+    judge.finish(1e9); // sends songEnd
+    const node = plugin.resultsPanel!({ params: q(query) } as never);
+    return node ? renderToStaticMarkup(node as never) : "";
+  }
+
+  it("lists one accuracy per pass, under the testid the checks read", () => {
+    const html = panel("from=1&to=2&passes=3");
+    expect(html).toContain('data-testid="bar-loop-passes"');
+    expect(html.match(/<li/g)).toHaveLength(3);
+    expect(html).toContain("100.0%");
+  });
+
+  it("none in wait mode, none for one whole-song pass, none without a loop", () => {
+    expect(panel("from=1&to=2&passes=2&mode=wait")).toBe("");
+    expect(panel("tempo=80")).toBe("");
+    expect(panel("")).toBe("");
   });
 });

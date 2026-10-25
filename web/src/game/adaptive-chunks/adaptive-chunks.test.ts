@@ -95,13 +95,20 @@ describe("adaptive chunks' window rule", () => {
   });
 
   it("round-trips a state through its URL, keeping song and hands", () => {
-    const params = new URLSearchParams("song=fur-elise&hands=R&mode=wait");
+    const params = new URLSearchParams("song=fur-elise&hands=R");
     for (const s of [start(list), { from: 11, to: 13, ok: 3, ko: 6, clean: 1 }, { from: 22, to: 22, ok: 0, ko: 1, clean: 0 }]) {
       const url = adaptUrl(params, list, s);
       const q = new URLSearchParams(url.split("?")[1]);
       expect(adaptState(q, list)).toEqual(s);
       expect(Object.fromEntries(q)).toMatchObject({ song: "fur-elise", hands: "R", tempo: "70", passes: "1", practice: "adapt" });
       expect(q.has("mode")).toBe(false);
+    }
+    // play-modes: a Flow walk stays in Flow with no tempo; after a Learn step, the walk goes on in Flow.
+    for (const mode of ["flow", "wait"]) {
+      const q = new URLSearchParams(adaptUrl(new URLSearchParams(`song=fur-elise&hands=R&mode=${mode}&tempo=70`), list, start(list)).split("?")[1]);
+      expect(q.get("mode")).toBe("flow");
+      expect(q.has("tempo")).toBe(false);
+      expect(adaptState(q, list)).toEqual(start(list));
     }
     expect(adaptUrl(params, list, start(list))).toContain("from=1&to=45");
     expect(adaptUrl(params, list, start(list), adaptSettings.slowTempo)).toContain("tempo=50");

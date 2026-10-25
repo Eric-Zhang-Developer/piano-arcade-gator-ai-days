@@ -1,5 +1,5 @@
 // Headless proof of chunk practice on Twinkle, the spec's Validation steps: chunk 1's learn step, by its URL (the start
-// screen's "Practice in chunks" opens adaptive-chunks' start since #601; verify-adaptive checks that link); a learned chunk's "Play it judged" opens the play step at 70%; a perfect play step
+// screen's "Practice in chunks" opens adaptive-chunks' start since #601; verify-adaptive checks that link); a learned chunk's ladder Flow step (play-judged) opens the play step in Flow; a perfect play step
 // focuses "Next: bars 5–8", a rank-D one shows "Learn bars 1–4 again" and leaves Retry focused; the last chunk leads
 // to the whole song. Screenshots of the start line and both results panels at 1280×720 and 1920×1080.
 // Usage: node web/src/game/chunk-practice/verify-chunks.mjs --out <dir>
@@ -91,7 +91,8 @@ for (const [w, h] of [
   await page.screenshot({ path: join(out, `start-learn-${size}.png`) });
 
   if (first) {
-    // 2. Learn it: every note pressed once the clock holds on it; "Play it judged" opens the play step.
+    // 2. Learn it: every note pressed once the clock holds on it; the ladder's Flow step (play-judged, play-modes) opens
+    // the play step in Flow, which follows the player's tempo, so it carries no tempo.
     await goto(page, `/play?song=twinkle&from=1&to=4&tempo=70&passes=1&mode=wait&practice=1&input=test&${off}`);
     await page.waitForFunction(() => window.__pianoArcade?.ready === true, null, { timeout: 60_000 });
     const chart = await page.evaluate(() => window.__pianoArcade.chart);
@@ -108,9 +109,9 @@ for (const [w, h] of [
     await page.waitForFunction(() => window.__pianoArcade?.ready === true, null, { timeout: 60_000 });
     const hook = await page.evaluate(() => window.__pianoArcadeChunk);
     const bpm = await page.evaluate(() => window.__pianoArcade.chart.bpm);
-    check(params(page) === "song=twinkle&from=1&to=4&tempo=70&passes=1&practice=1", `"Play it judged" opens ${params(page)}`);
+    check(params(page) === "song=twinkle&from=1&to=4&passes=1&mode=flow&practice=1", `the ladder's Flow step opens ${params(page)}`);
     check(hook?.step === "play" && hook.chunk === 1 && hook.of === 3, `__pianoArcadeChunk is ${JSON.stringify(hook)}`);
-    check(bpm === 70, `the play step's bpm is ${bpm}`);
+    check(bpm === 100, `the play step's bpm is ${bpm} (Twinkle's own: Flow takes no tempo)`);
   }
 
   // The play step's start line.

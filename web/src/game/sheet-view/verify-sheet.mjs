@@ -3,6 +3,7 @@
 // Without it: /sheet and /play?input=test share one browser context, a take is played Perfect as e2e/verify.mjs plays
 // it, and the sheet's cursor must rise while every note's notehead ends up painted PERFECT.
 // Usage: node web/src/game/sheet-view/verify-sheet.mjs --out <dir> [--static] [--songs id,id]
+// CI runs verify-sheet-a/-b/-c.mjs, this file's follow run split by song (#673); run this one by hand for all seven.
 import { spawn } from "node:child_process";
 import { mkdirSync, readdirSync, existsSync, writeFileSync } from "node:fs";
 import { createServer } from "node:net";
@@ -32,7 +33,7 @@ const SHOTS = ["twinkle", "ode-to-joy", "minuet-g"];
 const EXACT = ["twinkle", "ode-to-joy", "minuet-g", "fur-elise"];
 const DENSE = ["chopin-prelude-4", "nocturne-op9-2", "maple-leaf-rag"];
 const follows = songsArg > 0 ? process.argv[songsArg + 1].split(",") : [...EXACT, ...DENSE];
-const PERFECT_FILL = "#ffe27a"; // hudSettings.judgmentColors.PERFECT (--pa-gold)
+const PERFECT_FILL = "#9b7900"; // paperJudgmentColors.PERFECT: the HUD's gold, darkened for the paper (#730, sheet-paper)
 
 const port = await new Promise((res, rej) => {
   const s = createServer().once("error", rej);

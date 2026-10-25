@@ -1,13 +1,17 @@
-import { skills, type Domain, type Skill } from './data';
+import type { Curriculum, Node, Region } from '../mastery/schema';
+import { skills, type Domain } from './data';
+import { shortTitle } from './student';
 
 /** Subject geography, independent of the learner overlay and any rendering technology. */
 export type WorldPosition = { x: number; y: number; z: number };
-export type Point = WorldPosition & { node: Skill; depth: number; fanAngle: number };
+/** What the layout needs of a node: its place in a tree and its caption. */
+export type GraphNode = { id: string; short: string; title: string; parentId?: string };
+export type Point = WorldPosition & { node: GraphNode; depth: number; fanAngle: number };
 export type RootRelationship = { from: string; to: string; kind: 'supports' | 'applies' | 'explains'; label: string };
 const precise = (value: number) => Number(value.toFixed(3));
 
 /** Spark course-graph.ts: broad-idea relaxation and complete-branch footprint reservation. */
-function anchorPositions(roots: readonly Skill[], relationships: readonly RootRelationship[], radii: number[]) {
+function anchorPositions(roots: readonly GraphNode[], relationships: readonly RootRelationship[], radii: number[]) {
   const spacing = Math.max(...radii) * 2 + 240;
   const indices = new Map(roots.map((node, index) => [node.id, index]));
   const neighbors = roots.map(() => new Set<number>());
@@ -66,11 +70,15 @@ function anchorPositions(roots: readonly Skill[], relationships: readonly RootRe
 }
 
 export function layoutGraph(domain: Domain, relationships: readonly RootRelationship[] = []): Point[] {
-  const nodes = skills.filter(node => node.domain === domain), roots = nodes.filter(node => !node.parentId);
+  return layoutNodes(skills.filter(node => node.domain === domain), relationships);
+}
+
+export function layoutNodes(nodes: readonly GraphNode[], relationships: readonly RootRelationship[] = []): Point[] {
+  const roots = nodes.filter(node => !node.parentId);
   if (!roots.length) return [];
   const children = (id: string) => nodes.filter(node => node.parentId === id);
   const weight = (id: string): number => Math.max(1, children(id).reduce((sum, node) => sum + weight(node.id), 0));
-  const rootOf = (node: Skill): Skill => node.parentId ? rootOf(nodes.find(parent => parent.id === node.parentId) ?? { ...node, parentId: undefined }) : node;
+  const rootOf = (node: GraphNode): GraphNode => node.parentId ? rootOf(nodes.find(parent => parent.id === node.parentId) ?? { ...node, parentId: undefined }) : node;
   const groups = roots.map(root => nodes.filter(node => rootOf(node).id === root.id));
   const radii = roots.map((root, index) => {
     const neighbors = new Set(relationships.flatMap(edge => edge.from === root.id ? [edge.to] : edge.to === root.id ? [edge.from] : []));
@@ -80,9 +88,9 @@ export function layoutGraph(domain: Domain, relationships: readonly RootRelation
   const centers = anchorPositions(roots, relationships, radii), result: Point[] = [];
   roots.forEach((root, index) => {
     const center = centers[index];
-    const depthOf = (node: Skill): number => node.parentId ? 1 + depthOf(nodes.find(parent => parent.id === node.parentId)!) : 0;
+    const depthOf = (node: GraphNode): number => node.parentId ? 1 + depthOf(nodes.find(parent => parent.id === node.parentId)!) : 0;
     const levels = Math.max(1, ...groups[index].map(depthOf));
-    function place(node: Skill, start: number, end: number, depth: number, reach = 1) {
+    function place(node: GraphNode, start: number, end: number, depth: number, reach = 1) {
       const angle = (start + end) / 2, radius = depth ? radii[index] * (.65 + .35 * (depth - 1) / Math.max(1, levels - 1)) * reach : 0;
       result.push({ x: precise(center.x + Math.cos(angle) * radius), y: precise(center.y + Math.sin(angle) * radius), z: 0, node, depth, fanAngle: precise(angle) });
       const descendants = children(node.id), total = descendants.reduce((sum, child) => sum + weight(child.id), 0);
@@ -96,4 +104,48 @@ export function layoutGraph(domain: Domain, relationships: readonly RootRelation
     place(root, center.start, center.start + center.sweep, 0);
   });
   return result;
+}
+
+export const regions: readonly Region[] = ['pitch', 'rhythm', 'keys', 'chords', 'expression', 'pieces'];
+const regionTitles: Record<Region, string> = { pitch: 'Pitch', rhythm: 'Rhythm', keys: 'Keys', chords: 'Chords', expression: 'Expression', pieces: 'Pieces' };
+export const regionId = (region: Region) => `region:${region}`;
+/** Two regions get a drawn link when at least this many curriculum edges join them; fewer would tangle the overview. */
+const regionLinkFloor = 5;
+
+/**
+ * The built curriculum as a tree for the map: one root per region, its backbone nodes under it, each concept under
+ * its most strongly linked backbone node and each detail under its most strongly linked concept (else the next layer
+ * up). Edges are not prerequisites, so the tree is only geography.
+ */
+export function layoutCurriculum(curriculum: Curriculum): { points: Point[]; relationships: RootRelationship[] } {
+  const byId = new Map(curriculum.nodes.map(node => [node.id, node]));
+  const links = new Map<string, { id: string; weight: number }[]>();
+  for (const edge of curriculum.edges) {
+    links.set(edge.from, [...links.get(edge.from) ?? [], { id: edge.to, weight: edge.weight }]);
+    links.set(edge.to, [...links.get(edge.to) ?? [], { id: edge.from, weight: edge.weight }]);
+  }
+  const strongest = (node: Node, layer: Node['layer']) => (links.get(node.id) ?? [])
+    .filter(link => byId.get(link.id)?.region === node.region && byId.get(link.id)?.layer === layer)
+    .reduce<{ id: string; weight: number } | undefined>((best, link) => !best || link.weight > best.weight ? link : best, undefined)?.id;
+  const parentOf = (node: Node) => node.layer === 'backbone' ? regionId(node.region)
+    : node.layer === 'concept' ? strongest(node, 'backbone') ?? regionId(node.region)
+    : strongest(node, 'concept') ?? strongest(node, 'backbone') ?? regionId(node.region);
+  const nodes: GraphNode[] = [
+    ...regions.map(region => ({ id: regionId(region), short: regionTitles[region], title: regionTitles[region] })),
+    ...curriculum.nodes.map(node => ({ id: node.id, short: shortTitle(node.title), title: node.title, parentId: parentOf(node) })),
+  ];
+  const pairs = new Map<string, { from: Region; to: Region; forward: number; back: number }>();
+  for (const edge of curriculum.edges) {
+    const a = byId.get(edge.from)?.region, b = byId.get(edge.to)?.region;
+    if (!a || !b || a === b) continue;
+    const [from, to] = regions.indexOf(a) < regions.indexOf(b) ? [a, b] : [b, a], key = `${from}>${to}`;
+    const pair = pairs.get(key) ?? { from, to, forward: 0, back: 0 };
+    if (a === from) pair.forward++; else pair.back++;
+    pairs.set(key, pair);
+  }
+  const relationships = [...pairs.values()].filter(pair => pair.forward + pair.back >= regionLinkFloor).map(pair => {
+    const [from, to] = pair.forward >= pair.back ? [pair.from, pair.to] : [pair.to, pair.from];
+    return { from: regionId(from), to: regionId(to), kind: 'supports' as const, label: '' };
+  });
+  return { points: layoutNodes(nodes, relationships), relationships };
 }

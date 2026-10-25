@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import type { Chart, Take } from "../../contracts";
 import { judgeTake, noteTimeMs } from "../core/judge";
+import { GOOD_MS } from "../core/settings";
 import { pianoOutSettings } from "../piano-out";
-import { highwayAt, replayChartTime, replaySpan, replayView } from ".";
+import { highwayAt, latePresses, replayChartTime, replaySpan, replayView } from ".";
 
 // 4/4 at 120 bpm (500 ms a beat, 2 s a bar): C D E F on beats 0–3.
 const chart: Chart = {
@@ -14,7 +15,7 @@ const take: Take = {
   chartId: "t", startedAt: "2026-10-24T00:00:00Z", latencyOffsetMs: 0, inputDevice: "test",
   events: [
     { pitch: 60, velocity: 80, timeMs: 0, offTimeMs: 300 },
-    { pitch: 62, velocity: 80, timeMs: 530, offTimeMs: 930 },
+    { pitch: 62, velocity: 80, timeMs: 560, offTimeMs: 930 },
     { pitch: 65, velocity: 80, timeMs: 1500, offTimeMs: null },
   ],
 };
@@ -37,9 +38,9 @@ describe("the highway at a chart time", () => {
   it("shows hits from their press and a miss once its window closes", () => {
     expect([...highwayAt(chart, take, results, -1).noteState]).toEqual([]);
     expect([...highwayAt(chart, take, results, 0).noteState]).toEqual([["n0", "PERFECT"]]);
-    expect(highwayAt(chart, take, results, 529).noteState.has("n1")).toBe(false);
-    expect(highwayAt(chart, take, results, 530).noteState.get("n1")).toBe("GREAT");
-    const missAt = noteTimeMs(chart, chart.notes[2]) + 100;
+    expect(highwayAt(chart, take, results, 559).noteState.has("n1")).toBe(false);
+    expect(highwayAt(chart, take, results, 560).noteState.get("n1")).toBe("GREAT");
+    const missAt = noteTimeMs(chart, chart.notes[2]) + GOOD_MS;
     expect(highwayAt(chart, take, results, missAt - 1).noteState.has("n2")).toBe(false);
     expect(highwayAt(chart, take, results, missAt).noteState.get("n2")).toBe("MISS");
   });
@@ -52,7 +53,15 @@ describe("the highway at a chart time", () => {
   });
 
   it("shows the latest judgment, with its offset", () => {
-    expect(highwayAt(chart, take, results, 600).latest).toMatchObject({ judgment: "GREAT", atMs: 530 });
+    expect(highwayAt(chart, take, results, 600).latest).toMatchObject({ judgment: "GREAT", atMs: 560 });
+  });
+});
+
+describe("the slip", () => {
+  it("marks only the presses the game called LATE: past PERFECT and after the note", () => {
+    expect([...latePresses(results)]).toEqual([1]); // D, 60 ms late (GREAT); C and F on time, E missed
+    const early = judgeTake(chart, { ...take, events: [{ ...take.events[0], timeMs: -60 }] });
+    expect(latePresses(early).size).toBe(0); // EARLY isn't a slip here
   });
 });
 

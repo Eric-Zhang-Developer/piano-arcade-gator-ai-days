@@ -27,7 +27,7 @@ Sources whose licenses ask for credit. Each chart's `source` field names its sou
 - **Piano Sonata No. 14, Op. 27 No. 2, 3rd movement** (Ludwig van Beethoven), `web/public/songs/moonlight-3/`: charted
   from Mutopia Project piece 276 (<https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=276>), after the Berners
   edition (1908, ed. A. Winterberger), licensed [CC BY-SA 2.5](https://creativecommons.org/licenses/by-sa/2.5/).
-  Changes: an excerpt (bars 1–8) converted to a chart; the chart is shared under the same license.
+  Changes: an excerpt (the exposition, bars 1–65 with the first ending) converted to a chart; the chart is shared under the same license.
 - **Piano Sonata No. 14, Op. 27 No. 2, 1st movement** (Ludwig van Beethoven), `web/public/songs/moonlight-1/`: charted
   from Mutopia Project piece 276 (<https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=276>), after the Berners
   edition (1908, ed. A. Winterberger), licensed [CC BY-SA 2.5](https://creativecommons.org/licenses/by-sa/2.5/).

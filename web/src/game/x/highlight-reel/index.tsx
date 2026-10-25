@@ -3,6 +3,7 @@
 // links there. The page is web/src/app/highlight/; FINDINGS.md has the spike's answer.
 import Link from "next/link";
 import type { Experiment } from "..";
+import { kitButton } from "../../duo-tokens";
 import { saveLast } from "./take";
 
 export const highlightReel: Experiment = {
@@ -16,8 +17,10 @@ export const highlightReel: Experiment = {
     id: "x-highlight-reel",
     resultsPanel: ({ chart, take, results }) => {
       saveLast({ chart, take, results }); // the chart as played: after every transformChart
+      const button = kitButton("secondary");
+      // Its own width, like Details' other buttons: the card is a stretching column.
       return (
-        <Link href="/highlight?take=last" data-testid="highlight-reel-link" style={{ color: "var(--pa-primary)" }}>
+        <Link href="/highlight?take=last" data-testid="highlight-reel-link" className={button.className} style={{ ...button.style, alignSelf: "flex-start" }}>
           Highlight reel →
         </Link>
       );

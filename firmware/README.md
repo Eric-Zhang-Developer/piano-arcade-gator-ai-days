@@ -83,7 +83,7 @@ The kit's jumper wires are pin-to-pin, so each goes into a free hole in the same
 
 After the first connect, there's nothing to click. Chrome remembers the board and the piano, so opening
 `tester.html` connects both by itself, and unplugging and replugging the board reconnects it. Free play is the default:
-every key lights over itself and sends a **ripple** of its color out along the strip, brighter for harder hits.
+every key lights over itself, brighter for harder hits. A **ripple** of its color out along the strip is there but off by default.
 **Colors** switches between the two-hands palette and a rainbow by pitch. **Ripple ms** sets how long a ripple lasts
 (default 700; 0 turns it off), and **Save to board** keeps it.
 
@@ -100,8 +100,32 @@ The game opens the port at 115200, waits for the line that starts `PAL1 leds=`, 
 - `[0x90, note, r, g, b]` when a note is played (colors 0-127), `[0x80, note]` on release;
 - `[0xA0, note, r, g, b]` to show a hint ("this key is next"), with `0, 0, 0` to clear it. This is the guide-lights
   layer: light the next key before the note arrives;
-- nothing extra for ripples: every `0x90` key on starts one in its color. `[0xB0, 6, lo, hi]` sets their length
-  in ms (0 = off), in case the game wants them off during a song;
+- nothing extra for ripples: with setting 6 on, every `0x90` key on starts one in its color. `[0xB0, 6, lo, hi]` sets
+  their length in ms (0 = off, the default);
+- nothing extra for the hint ramp either: a hint that turns on starts nearly dark and brightens evenly as the eye
+  sees it (LED duty follows a 2.2 gamma) to twice the hint color, the full hand color for the game's half-strength
+  hints, over `hintRampMs` (setting 7, default 600, the game's `leadMs`). Then it breathes until it's cleared. A hit on
+  a key that still has a hint restarts its ramp (it's for that key's next note); a recolor doesn't;
+- nothing extra for wrong keys: the game sends `0x80` for every released key but `0x90` only for judged notes, so a
+  release of a key that never lit flashes it red (setting 8, on by default; only while a song is live, so not in the
+  count-in). It shows on release, since the board never hears the press;
+- nothing extra for the shows (setting 9): `0xF0` with no song live starts the count-in: a charge bar, cyan from the
+  bass end and pink from the treble end, filling in 8 steps (one per count-in beat) to meet in the middle at the first
+  hint, which launches a burst from that key. The bar's length is learned: each launch remembers how long its
+  count-in took, so a replayed song lands exactly on the go. `0xF0` while a song is live (a hint came since the last
+  clear) plays fireworks for 3.5 s. A key on or a raw LED stops a count-in show;
+- nothing extra for idle lights (setting 4): 8 s with no play (heartbeats, hello and pings don't count) and no song
+  live, an aurora of cyan, violet and pink flows along the strip with a shooting star every few seconds. A key
+  released then sparkles from that key without ending it; any other message ends it at once;
+- nothing extra for fever (drawn with setting 9, shows): the board reads each `0x90`'s color as a judgment (PERFECT
+  `127 113 61`, GREAT `47 121 98`, GOOD `62 91 127`, miss `127 38 47`: the HUD colors through `rgb7`) and runs the
+  game's fever gauge on them (PERFECT 1, GREAT 0.5, GOOD 0; a miss or wrong key halves it, or breaks fever). Gold
+  embers build as it fills, FEVER flashes the strip gold and a pink-to-gold glow flows under the keys until a break
+  shatters it red. The gauge size comes from the last play of the song (a quarter of its notes, 12 to 50). If the HUD
+  colors change, these four values must follow, or fever never starts on the strip;
+- nothing extra for pause (also setting 9): during a song, 2 s of nothing but heartbeats means the game is paused,
+  and rainbow comets sweep the strip with the paused hint still on top. Any other message ends it. Wait mode holding
+  on a note looks the same, and a song with a rest over 2 s would trigger it too
 - `[0xF2, id]` to measure: the board answers `PONG id showMicros ledsDriven` at once;
 - `[0xFE]` every second as a heartbeat. After 2.5 s of silence the board releases every held key, so a stalled
   Chrome tab can't leave lights stuck on. After 15 s it plays a dim idle rainbow.

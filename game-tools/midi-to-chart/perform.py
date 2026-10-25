@@ -91,10 +91,10 @@ def midi_pedal(path):
 
 
 # A note, chord repeat, rest or skip, not inside a word (Staff.SustainPedal holds no note): name, octave marks, duration.
-NOTE = re.compile(r"(?<![A-Za-z0-9._-])([a-g](?:isis|eses|is|es|ss|ff|s|f)?|[rRsq])(?![a-zA-Z])[',]*[!?]?")
+NOTE = re.compile(r"(?<![A-Za-z0-9._-])([a-h](?:isis|eses|is|es|ss|ff|s|f)?|[rRsq])(?![a-zA-Z])[',]*[!?]?")
 DURATION = re.compile(r"(\d+)(\.*)(?:\*(\d+)(?:/(\d+))?)?")
-DYNAMICS = {"ppp", "pp", "p", "mp", "mf", "f", "ff", "fff", "sf", "sfz", "fp", "<", ">", "!", "cresc", "dim", "decresc",
-            "accent"}
+DYNAMICS = {"ppp", "pp", "p", "mp", "mf", "f", "ff", "fff", "sf", "sfz", "fz", "fp", "<", ">", "!", "cresc", "dim",
+            "decresc", "accent"}
 PEDAL = {"sustainOn": "down", "sustainOff": "up", "sustainDown": "down", "sustainUp": "up"}
 
 
@@ -107,11 +107,20 @@ def ly_voice(text, name, unfold=False, marks=(), trace=None):
     names in `marks` (a score's own pedal macros). Pitches, markup, scheme and strings are skipped. `trace`, if given, gets
     (text index, onset) for every note, chord, rest and skip read."""
     text = re.sub(r"%\{.*?%\}|%[^\n]*", "", text, flags=re.S)
-    start = (re.search(r'\\new\s+\w+\s*=\s*"' + re.escape(name) + r'"\s*(?=\{)', text)  # a context with its music here
+    start = (re.search(r'\\new\s+\w+\s*=\s*"' + re.escape(name) + r'"\s*(?:\\relative\s+[a-h]\w*[\',]*\s*)?(?=\{|<<)',
+                       text)  # a context with its music here, Liszt's `\new Staff = "up" \relative c'' << ... >>` too
              or re.search(r"^\s*" + re.escape(name) + r"\s*=", text, re.M))  # or a variable
     if not start:
         raise SystemExit(f"no voice {name!r}")
-    i = text.index("{", start.end())
+    i = start.end() if text.startswith("<<", start.end()) else text.index("{", start.end())
+    alias, called = {}, {}  # the score's variables: `pd = \sustainDown` stands for its command; music is read where called
+    music_value = re.compile(r"(?:\\(?:relative|fixed)\s+[a-g](?:is|es|s)*[',]*\s*|\\transpose\s+\S+\s+\S+\s*)?\{")
+    for m in re.finditer(r"^\s*([a-zA-Z]+)\s*=\s*", text, re.M):
+        a = re.compile(r"\\([a-zA-Z]+)[ \t]*$", re.M).match(text, m.end())
+        if a:
+            alias[m.group(1)] = a.group(1)
+        elif v := music_value.match(text, m.end()):  # not a header's string or a \markup or \override value
+            called[m.group(1)] = v.end() - 1
     notes, out = [], []
     state = {"t": Fraction(0), "onset": Fraction(0), "dur": Fraction(1), "scale": Fraction(1), "tied": False}
 
@@ -199,6 +208,7 @@ def ly_voice(text, name, unfold=False, marks=(), trace=None):
             if c == "\\":
                 m = re.compile(r"\\([a-zA-Z]+|.)").match(text, j)
                 w, j = m.group(1), m.end()
+                w = alias.get(w, w)
                 if w in ("<", ">", "!") or w in DYNAMICS or w in PEDAL or w in marks:
                     out.append((state["onset"], PEDAL.get(w, w)))
                 elif w == "repeat":
@@ -232,14 +242,15 @@ def ly_voice(text, name, unfold=False, marks=(), trace=None):
                             music(a + 1)
                     j = after
                 elif w in ("times", "tuplet"):
-                    a2, b2 = re.compile(r"\s*(\d+)/(\d+)").match(text, j).groups()
-                    j = re.compile(r"\s*(\d+)/(\d+)").match(text, j).end()
+                    tup = re.compile(r"\s*(\d+)/(\d+)(?:\s+\d+\.*)?").match(text, j)  # Liszt's `\tuplet 3/2 4`: a span
+                    a2, b2 = tup.groups()
+                    j = tup.end()
                     f = Fraction(int(a2), int(b2)) if w == "times" else Fraction(int(b2), int(a2))
                     state["scale"] *= f
                     j = len(text[j:]) - len(text[j:].lstrip()) + j
                     j = music(j + 1)
                     state["scale"] /= f
-                elif w in ("grace", "acciaccatura", "appoggiatura", "afterGrace"):
+                elif w in ("grace", "acciaccatura", "appoggiatura", "afterGrace", "slashedGrace"):
                     t, scale = state["t"], state["scale"]
                     state["scale"] = Fraction(0)  # graces take no time
                     j = len(text[j:]) - len(text[j:].lstrip()) + j
@@ -249,11 +260,17 @@ def ly_voice(text, name, unfold=False, marks=(), trace=None):
                         m = NOTE.match(text, j)
                         j = length(m.end())[1] if m else j
                     state["scale"], state["t"] = scale, t
+                elif w in called and w != name:  # a variable's music, as if written here
+                    music(called[w] + 1)
                 elif w in ("markup", "mark", "bar", "clef", "set", "override", "once", "tempo", "key", "time", "partial",
-                           "relative", "transpose", "change", "context", "new", "unset", "revert", "tweak"):
-                    if w == "markup":
-                        j = skip_markup(j)
-                    elif w in ("bar", "clef", "change"):
+                           "relative", "transpose", "change", "context", "new", "unset", "revert", "tweak",
+                           "octaveCheck"):
+                    if w == "markup":  # a \dynamic inside it is that mark (Liszt's opening ppp)
+                        k, j = j, skip_markup(j)
+                        d = re.search(r"\\dynamic\s+([a-z]+)", text[k:j])
+                        if d and d.group(1) in DYNAMICS:
+                            out.append((state["onset"], d.group(1)))
+                    elif w in ("bar", "clef", "change", "octaveCheck"):  # one word; \octaveCheck's pitch takes no time
                         j = skip_arg(j)
                         if w == "change":
                             j = skip_arg(skip_arg(j))  # Staff = "name"
@@ -277,7 +294,7 @@ def ly_voice(text, name, unfold=False, marks=(), trace=None):
                 d, j = length(m.end())
                 event(d, m.group(1) not in ("r", "R", "s"), at)
                 continue
-            if c in "-^_" and text.startswith(">", j + 1):  # an accent, ->
+            if c in "-^_" and text[j + 1:j + 2] in (">", "^"):  # an accent, ->, or a marcato, -^ (Liszt's ^^): one step
                 out.append((state["onset"], "accent"))
                 j += 2
                 continue
@@ -290,7 +307,7 @@ def ly_voice(text, name, unfold=False, marks=(), trace=None):
             while True:
                 j = music(j, "\\\\") if branch_has(j, "\\\\") else music(j, ">>")
                 ends.append(state["t"])
-                if text.startswith(">>", j - 2):
+                if text.startswith(">>", j - 2) or j >= len(text):
                     break
                 state["t"] = t0
         else:  # each braced block or nested << >> (\context Voice = "1" { ... } too) starts at t0
@@ -328,7 +345,7 @@ def ly_voice(text, name, unfold=False, marks=(), trace=None):
             k += 1
         return False
 
-    music(i + 1)
+    simultaneous(i + 2) if text.startswith("<<", i) else music(i + 1)
     return notes, out
 
 
@@ -450,7 +467,7 @@ def ly_marks(voices, segs, end):
     """{hand: [(source time, mark)]} as ly_voice reads them -> --marks items in chart beats, on decision
     demo-performance-dynamics's rules. A level or hairpin sets its own staff, and the other staff too unless that staff
     has its own at that beat; a hairpin (or cresc./dim.) runs to the next mark or \\! in its staff, or the excerpt's end;
-    sf, sfz and accents are their own staff's only; fp is an accent, then p. A level before the excerpt (or between its
+    sf, sfz, fz and accents are their own staff's only; fp is an accent, then p. A level before the excerpt (or between its
     spans) holds from where the excerpt picks up."""
     def beats(t, level):  # a source time in every span that plays it; a level outside them, the next span's start
         got = [t - lo + shift for lo, hi, shift in segs if lo <= t < hi]
@@ -468,7 +485,7 @@ def ly_marks(voices, segs, end):
                 opened = None
             if m in LADDER or m == "fp":
                 sets[h][b] = "p" if m == "fp" else m  # the last at a beat wins
-            if m in ("sf", "sfz", "fp", "accent"):
+            if m in ("sf", "sfz", "fz", "fp", "accent"):
                 accents[h].append(b)
             if m in HAIRPIN:
                 opened = (b, HAIRPIN[m])
@@ -529,6 +546,18 @@ def self_test():
     # Happy Farmer: a << >> with no \\ holds simultaneous voices, a \context header's words included; a \\ still splits.
     ly = r'v = { c4 << { d4-> e-> } \context Voice = "1" { \voiceOne f2\sf } >> g4-> << { a4 } \\ { b8-> c } >> d4-> }'
     assert ly_voice(ly, "v")[1] == [(1, "accent"), (2, "accent"), (1, "sf"), (3, "accent"), (4, "accent"), (5, "accent")]
+    # The Fantaisie-Impromptu: a staff calls its parts by name, and `pd` stands for \sustainDown.
+    ly = "pd = \\sustainDown\npart = \\relative c'' { c4\\p\\pd d-> }\nup = { r1 \\part e4\\f }"
+    assert ly_voice(ly, "up")[1] == [(4, "p"), (4, "down"), (5, "accent"), (6, "f")], ly_voice(ly, "up")[1]
+    assert ly_voice(r"v = { c4 \slashedGrace d8 e4-> \slashedGrace{f16[ g]} a4\f }", "v")[1] == [(1, "accent"), (2, "f")]
+    ly = r"""\new PianoStaff << \new Staff = "up" \relative c'' << { c2\p d-> } \\ { e1 } >> \new Staff = "down" { f1\f } >>"""
+    assert ly_voice(ly, "up")[1] == [(0, "p"), (2, "accent")], ly_voice(ly, "up")[1]  # Liszt's inline staves
+    assert ly_voice(r"v = { R1 _\markup { \small \dynamic ppp \italic legato } c4^^ d-^ }", "v")[1] == \
+        [(0, "ppp"), (4, "accent"), (5, "accent")]  # Liszt's: a markup's \dynamic, marcatos
+    assert ly_voice(r"v = { \tuplet 3/2 4 { c8 d e f g a } b4-> }", "v")[1] == [(2, "accent")]  # with its span duration
+    assert ly_voice(r"v = { c1 \octaveCheck c e4-> }", "v")[1] == [(4, "accent")]  # Rachmaninoff's: a check, not a note
+    assert ly_voice(r"v = { h16 his as g c4\fz }", "v")[1] == [(1, "fz")]  # the Revolutionary's German names: h is B
+    assert ly_marks({"R": [(0, "f"), (1, "fz")]}, [(0, 2, 0)], 2) == ["R@0=f", "R@1!", "L@0=f"]  # fz: as sf
     assert ly_voice(r"v = { \partial 8 c\( d4-> }", "v")[1] == [(Fraction(1, 2), "accent")]  # its lower's pickup: an eighth
     # Wild Horseman: the dynamics line is written once beside a volta (pickup, 2 bars, 2 alternatives of a bar); unfolded,
     # the body's marks land in both passes and the alternatives' and the coda's after them.

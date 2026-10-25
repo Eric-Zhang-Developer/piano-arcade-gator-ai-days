@@ -85,13 +85,14 @@ function recorder() {
   const texts: { text: string; style: string; alpha: number; x: number; y: number; align: string }[] = [];
   const moves: [number, number][] = [];
   const fonts: string[] = [];
+  const blurs: number[] = [];
   const o: Record<string | symbol, unknown> = { globalAlpha: 1, canvas: { width: 1280, height: 720 } };
   const ctx = new Proxy(o, {
     get: (t, k) =>
       k in t
         ? t[k]
         : k === "fillText"
-          ? (s: string, x: number, y: number) => (fonts.push(String(t.font)), texts.push({ text: s, style: String(t.fillStyle), alpha: t.globalAlpha as number, x, y, align: String(t.textAlign) }))
+          ? (s: string, x: number, y: number) => (fonts.push(String(t.font)), blurs.push(Number(t.shadowBlur ?? 0)), texts.push({ text: s, style: String(t.fillStyle), alpha: t.globalAlpha as number, x, y, align: String(t.textAlign) }))
           : k === "translate"
             ? (x: number, y: number) => moves.push([x, y])
             : k === "measureText"
@@ -99,7 +100,7 @@ function recorder() {
               : () => {},
     set: (t, k, v) => ((t[k] = v), true),
   }) as unknown as CanvasRenderingContext2D;
-  return { ctx, texts, moves, fonts };
+  return { ctx, texts, moves, fonts, blurs };
 }
 
 describe("the draw", () => {
@@ -126,12 +127,13 @@ describe("the draw", () => {
     }
   });
 
-  it("sets every card upright in the display face's 900, never italic (Duo look, #1131)", () => {
+  it("sets every card upright in the display face's 900, never italic, and flat with no glow (Duo look, #1131)", () => {
     for (const offsets of [Array(8).fill(0), [0, 0, null, 0, 0, 0, 0, 0]]) {
       const r = recorder();
       shown([...offsets]).draw!(r.ctx, frame(t0 + 300));
       expect(r.fonts).toHaveLength(1);
       expect(r.fonts[0]).toMatch(/^900 [\d.]+px /);
+      expect(r.blurs).toEqual([0]);
     }
   });
 

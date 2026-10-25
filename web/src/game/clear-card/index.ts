@@ -98,8 +98,6 @@ export function clearCard(): GamePlugin {
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.globalAlpha = e;
-      ctx.shadowColor = color;
-      ctx.shadowBlur = size * 0.35;
       ctx.fillStyle = color;
       ctx.fillText(card.kind, 0, 0);
       ctx.restore();

@@ -1,17 +1,19 @@
 'use client';
-import { useEffect, useReducer, useState } from 'react';
-import { music, takeTransition, totalBeats, type TakePhase } from './model';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { music, totalBeats } from './model';
 import { Score, ScoreSource } from './Score';
+import { useLearningSessions } from '../LearningSessions';
 import { usePlayback } from './usePlayback';
 import styles from './playing.module.css';
 
 export function PlayThroughWorkspace() {
-  const [phase, send] = useReducer(takeTransition, 'ready' as TakePhase);
+  const { playThrough: phase, dispatchPlayThrough: send } = useLearningSessions();
   const [count, setCount] = useState(4);
   const [error, setError] = useState<string | null>(null);
   const playback = usePlayback();
   const { start, stop } = playback;
-  useEffect(() => () => send('stop'), []);
+  useEffect(() => () => send('stop'), [send]);
   useEffect(() => {
     if (phase !== 'countin') return;
     let remaining = 4;
@@ -21,14 +23,14 @@ export function PlayThroughWorkspace() {
       else { clearInterval(timer); send('counted'); }
     }, 60000 / music.bpm);
     return () => clearInterval(timer);
-  }, [phase]);
+  }, [phase, send]);
   useEffect(() => {
     if (phase !== 'playing') return;
     void start({ tempo: music.bpm, beats: totalBeats, sound: false, onEnd: () => send('finish') }).catch(() => {
       setError('The preview could not start. Try again.'); send('stop');
     });
     return stop;
-  }, [phase, start, stop]);
+  }, [phase, start, stop, send]);
   function begin() { setCount(4); setError(null); send('start'); }
   const running = phase === 'countin' || phase === 'playing';
   return <section className={styles.workspace} aria-label="Independent play-through">
@@ -48,7 +50,7 @@ export function PlayThroughWorkspace() {
       <div className={styles.actions}>
         {phase === 'ready' && <button type="button" className={styles.primary} onClick={begin}>Start preview take</button>}
         {running && <button type="button" className={styles.secondary} onClick={() => { stop(); send('stop'); }}>Stop preview</button>}
-        {phase === 'result' && <><a className={styles.primary} href="/learn/practice">Practise the phrase ending</a><button type="button" className={styles.secondary} onClick={() => send('again')}>Play again</button></>}
+        {phase === 'result' && <><Link className={styles.primary} href="/learn">Back to map</Link><button type="button" className={styles.secondary} onClick={() => send('again')}>Play again</button></>}
       </div>
     </aside>
   </section>;

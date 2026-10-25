@@ -15,7 +15,7 @@ export const resultsLayoutSettings = {
   newRecordFeatured: ["record-moment"], // a NEW RECORD take: the moment alone; at 1280×720 the graph pushed Retry off
   // the first view, so it moves to the details for that take (spec: record-moment, First view)
   demoFeatured: ["watch-demo"], // a demo=1 take: its way back to the songs, so its focused button scrolls nothing
-  actions: ["piano-out", "wait-mode", "score-card"], // panels that are buttons: they join Retry and Songs
+  actions: ["piano-out", "wait-mode", "sheet-review", "score-card"], // panels that are buttons: they join Retry and Songs
   names: { "take-midi": "MIDI", "replay-view": "Replay", "weak-bars": "Phrases", "tempo-curve": "Tempo" } as Record<string, string>,
 };
 

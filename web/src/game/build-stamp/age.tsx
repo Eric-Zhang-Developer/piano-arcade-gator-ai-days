@@ -8,6 +8,7 @@ import styles from "./build-stamp.module.css";
 export function StampAge({ sha, committedAt }: { sha: string; committedAt: string }) {
   const [now, setNow] = useState<number | null>(null);
   useEffect(() => {
+    if (new URLSearchParams(location.search).get("debug") === "1") document.documentElement.dataset.debug = ""; // the stamp shows
     const tick = () => setNow(Date.now());
     tick();
     const id = setInterval(tick, 60_000);

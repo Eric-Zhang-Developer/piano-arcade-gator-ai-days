@@ -15,6 +15,13 @@ export interface HitParticles {
 }
 
 const LIFE_MS = 3000; // the longest any particle lives (the shader's dust)
+// The wisps' look (#1373, decision hit-particles-wisps-reference): life in ms, the head's lead over the tail in ms,
+// and how high the head stops, as a share of the hit line's height (the space above it), and each segment's alpha.
+const WISP_LIFE = [2200, 2600];
+const WISP_LAG = [180, 260];
+const WISP_RISE = [0.5, 0.85];
+const WISP_ALPHA = 0.9;
+const f = (n: number) => n.toFixed(4); // a GLSL float literal
 
 const vertex = /* glsl */ `
 uniform float uTime;
@@ -22,50 +29,104 @@ uniform vec2 uView;
 uniform float uLine;
 uniform float uRise;
 uniform float uWarm; // fever's heat (fever-arc): the wisps' white core turns amber, the dust keeps the hand's color
-attribute vec3 aParams; // seed, kind, bright
+attribute vec3 aParams; // seed, kind (a wisp's is 1 + its segment's place along the ribbon), bright
 attribute vec3 aColor;
 varying vec4 vColor;
 varying float vWisp;
 varying float vAngle;
+varying float vThin;
+varying float vLen;
 float h(float n) { return fract(sin(aParams.x * 91.7 + n * 17.13) * 43758.5453); }
-void main() {
+void hide() { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); gl_PointSize = 0.0; }
+
+// A wisp's path at age a (#1373, decision hit-particles-wisps-reference): slow out of the dust, a fast climb, then a
+// stop where it hangs, drifting up a little. Sideways it makes one C or S bend, so its heading turns 90–180°.
+vec2 path(float a, float life, float rise, float px) {
+  float t = a / life;
+  float stop = mix(0.65, 0.85, h(14.0));
+  float k = pow(smoothstep(0.0, stop, t), 1.3);
+  float bend = mix(0.6, 1.2, h(4.0)) * 3.1416;
+  float side = mix(20.0, 45.0, h(15.0)) * px * sign(h(16.0) - 0.5);
+  float x = (h(3.0) - 0.5) * 70.0 * px * k + side * (sin(bend * k + h(5.0) * 6.2832) - sin(h(5.0) * 6.2832));
+  // A quicker wobble, about two body lengths long, bends the body itself into a crescent, a comma or an S.
+  x += mix(10.0, 22.0, h(18.0)) * px * smoothstep(0.0, 0.3, t) * sin(a * mix(0.009, 0.014, h(19.0)) + h(20.0) * 6.2832);
+  return vec2(x, -rise * k - 40.0 * px * max(0.0, t - stop));
+}
+
+// A wisp is a ribbon: each segment sits on the head's past path, s * lag ms behind it, so the body bends along where
+// the head went, and when the head stops the tail catches up into a comma.
+void ribbon() {
   float age = uTime - position.z;
-  float wisp = step(0.5, aParams.y);
-  float life = mix(mix(2000.0, 3000.0, h(1.0)), mix(1600.0, 2600.0, h(1.0)), wisp);
-  if (age < 0.0 || age > life) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); gl_PointSize = 0.0; return; }
+  float life = mix(${f(WISP_LIFE[0])}, ${f(WISP_LIFE[1])}, h(1.0));
+  float s = fract(aParams.y + 0.0001); // 0 the head, near 1 the tail
+  float lag = mix(${f(WISP_LAG[0])}, ${f(WISP_LAG[1])}, h(17.0));
+  float a = max(0.0, age - s * lag);
+  if (age < 0.0 || age > life) { hide(); return; }
+  float px = uView.y / 1080.0; // the reference's sizes are at 1080p
+  float rise = max(uLine, 1.0) * mix(${f(WISP_RISE[0])}, ${f(WISP_RISE[1])}, h(2.0));
+  vec2 p = path(a, life, rise, px);
+  vec2 d = p - path(max(0.0, a - 16.0), life, rise, px);
+  float x = position.x + p.x;
+  float y = position.y + p.y;
+  float gap = length(p - path(max(0.0, a - lag / ${f(S.wispSegments)}), life, rise, px)); // px to the next segment back
+  // A blunt head and a needle tail, 5–9 px at the widest.
+  float width = mix(8.0, 12.0, h(12.0)) * px * mix(0.8, 1.0, smoothstep(0.0, 0.1, s)) * pow(1.0 - s, 1.6);
+  float size = clamp(max(width + 4.0, gap * 2.5), 3.0, 64.0);
+  float lift = clamp((uLine - y) / 40.0, 0.0, 1.0);
+  float fade = smoothstep(250.0, 600.0, age) * smoothstep(life, life - 450.0, age) * lift; // out of the dust, then gone
+  vec3 hue = aColor / max(max(aColor.r, aColor.g), max(aColor.b, 0.01)); // the note's hue pushed to clipping
+  vec3 core = mix(mix(hue, vec3(1.0), 0.3), vec3(1.0, 0.8, 0.38), uWarm); // #ffb02e lifted a little, in fever
+  float head = mix(1.4, 1.0, smoothstep(0.0, 0.25, s)); // the blunt head burns brightest
+  vColor = vec4(min(core * head, 1.0), aParams.z * fade * ${f(WISP_ALPHA)});
+  vWisp = 1.0;
+  vAngle = length(d) > 0.01 ? atan(d.y, d.x) : 1.5708;
+  vThin = width / size;
+  vLen = max(gap, 1.0) * 1.4 / size;
+  gl_PointSize = size;
+  gl_Position = vec4(x / uView.x * 2.0 - 1.0, 1.0 - y / uView.y * 2.0, 0.0, 1.0);
+}
+
+void main() {
+  if (aParams.y > 0.5) { ribbon(); return; }
+  float age = uTime - position.z;
+  float life = mix(2000.0, 3000.0, h(1.0));
+  if (age < 0.0 || age > life) { hide(); return; }
   float t = age / life;
   float ease = 1.0 - pow(1.0 - t, 2.2); // quick off the key, slowing as it rises
-  float y = position.y - uRise * ease * mix(mix(0.06, 1.0, pow(h(2.0), 3.0)), mix(0.3, 0.8, h(2.0)), wisp); // most dust stays low, a cloud on the key
-  float sway = sin(age * mix(0.0012, 0.0035, h(4.0)) + h(5.0) * 6.2832) * mix(12.0, 26.0, wisp);
-  float x = position.x + ((h(3.0) - 0.5) * mix(120.0, 90.0, wisp) + sway) * ease;
+  float y = position.y - uRise * ease * mix(0.06, 1.0, pow(h(2.0), 3.0)); // most dust stays low, a cloud on the key
+  float sway = sin(age * mix(0.0012, 0.0035, h(4.0)) + h(5.0) * 6.2832) * 12.0;
+  float x = position.x + ((h(3.0) - 0.5) * 120.0 + sway) * ease;
   float lift = clamp((uLine - y) / 40.0, 0.0, 1.0); // dim on the line, full 40 px above it
-  float fade = min(1.0, age / mix(70.0, 140.0, wisp)) * pow(1.0 - t, mix(1.6, 1.3, wisp));
-  float twinkle = mix(0.5 + 0.5 * sin(age * mix(0.008, 0.03, h(6.0)) + h(7.0) * 40.0), 1.0, wisp);
-  float puff = (1.0 - wisp) * step(0.75, h(13.0)); // one speck in four is a faint soft puff: the clouds' haze
-  float white = mix(h(8.0) > 0.7 ? 0.8 : 0.3, 0.85, wisp); // a white core among the note's hue
-  vec3 core = mix(vec3(1.0), vec3(1.0, 0.69, 0.18), uWarm * wisp); // #ffb02e
-  vColor = vec4(mix(aColor, core, white), aParams.z * fade * twinkle * mix(0.35, 1.0, lift) * mix(1.0, 0.95, wisp) * mix(1.0, 0.3, puff));
-  vWisp = wisp;
-  vAngle = h(9.0) * 6.2832 + age * mix(-0.003, 0.003, h(10.0));
-  gl_PointSize = mix(mix(h(11.0) > 0.97 ? 3.0 : mix(1.2, 2.6, h(12.0)), mix(5.0, 9.0, h(12.0)), puff), mix(30.0, 60.0, h(11.0)), wisp);
+  float fade = min(1.0, age / 70.0) * pow(1.0 - t, 1.6);
+  float twinkle = 0.5 + 0.5 * sin(age * mix(0.008, 0.03, h(6.0)) + h(7.0) * 40.0);
+  float puff = step(0.75, h(13.0)); // one speck in four is a faint soft puff: the clouds' haze
+  float white = h(8.0) > 0.7 ? 0.8 : 0.3; // a white core among the note's hue
+  vColor = vec4(mix(aColor, vec3(1.0), white), aParams.z * fade * twinkle * mix(0.35, 1.0, lift) * mix(1.0, 0.3, puff));
+  vWisp = 0.0;
+  vAngle = 0.0;
+  vThin = 1.0;
+  vLen = 1.0;
+  gl_PointSize = mix(h(11.0) > 0.97 ? 3.0 : mix(1.2, 2.6, h(12.0)), mix(5.0, 9.0, h(12.0)), puff);
   gl_Position = vec4(x / uView.x * 2.0 - 1.0, 1.0 - y / uView.y * 2.0, 0.0, 1.0);
 }`;
 
-// Dust is a soft dot. A wisp is a sickle: a shallow arc of one disc minus a larger disc set below it, thickest in the
-// middle (12% of the sprite) and tapering to tips at the sprite's sides, turning.
+// Dust is a soft dot. A wisp segment is a short sharp-edged stroke turned along its path, vThin of the sprite across
+// and vLen along; a run of them overlapping reads as one blade with at most a pixel or two of soft edge.
 const fragment = /* glsl */ `
 varying vec4 vColor;
 varying float vWisp;
 varying float vAngle;
+varying float vThin;
+varying float vLen;
 void main() {
   vec2 p = gl_PointCoord - 0.5;
-  float a;
   if (vWisp > 0.5) {
     float c = cos(vAngle), s = sin(vAngle);
-    p = mat2(c, s, -s, c) * p;
-    a = smoothstep(0.61, 0.59, length(p - vec2(0.0, 0.4))) * smoothstep(1.251, 1.271, length(p - vec2(0.0, 1.181)));
-  } else a = exp(-dot(p, p) * 10.0);
-  gl_FragColor = vec4(vColor.rgb, vColor.a * a);
+    p = mat2(c, -s, s, c) * p; // along, across
+    float across = abs(p.y) / max(vThin * 0.5, 0.001);
+    float along = abs(p.x) / max(vLen * 0.5, 0.001);
+    gl_FragColor = vec4(vColor.rgb, vColor.a * smoothstep(1.25, 0.8, across) * smoothstep(1.0, 0.4, along));
+  } else gl_FragColor = vec4(vColor.rgb, vColor.a * exp(-dot(p, p) * 10.0));
 }`;
 
 export function hitParticles(): HitParticles | null {
@@ -129,7 +190,8 @@ export function hitParticles(): HitParticles | null {
     return Math.floor(v) + (random() < v - Math.floor(v) ? 1 : 0);
   };
   const spawn = (kind: number, n: number, x: number, width: number, y: number, color: string, bright: number) => {
-    if (pool.spawn(kind, scaled(n), x, width, y, rgbOf(color), bright, clock, random) > 0) aliveUntil = clock + LIFE_MS;
+    const segments = kind === WISP ? S.wispSegments : 1;
+    if (pool.spawn(kind, scaled(n), x, width, y, rgbOf(color), bright, clock, random, segments) > 0) aliveUntil = clock + LIFE_MS;
   };
   const upload = (start: number, count: number) => {
     buffer.addUpdateRange(start * FLOATS, count * FLOATS);
@@ -143,6 +205,7 @@ export function hitParticles(): HitParticles | null {
     },
     hold(x, width, y, color, dtMs) {
       spawn(DUST, (S.streamPerSec * dtMs) / 1000, x, width, y, color, 0.8);
+      spawn(WISP, (S.wispsPerSecHeld * dtMs) / 1000, x, width, y, color, 0.8);
     },
     draw(ctx, f, dtMs) {
       const wall = performance.now();

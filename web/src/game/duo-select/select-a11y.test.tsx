@@ -35,7 +35,7 @@ describe("select a11y (#1236-#1238)", () => {
   it("the place is heard as Song N of M, and the visible N / M is hidden from readers", () => {
     const html = renderToStaticMarkup(<SectionChips sections={[]} place={7} count={40} onJump={() => {}} />);
     expect(html).toContain(">Song 7 of 40<");
-    expect(html).toMatch(/<span[^>]*data-testid="list-place"[^>]*aria-hidden="true"|<span[^>]*aria-hidden="true"[^>]*data-testid="list-place"/);
+    expect(html).not.toContain("> / 40<"); // select-calm (#1411): the visible N / M is gone, so nothing is left to hide
     expect(html).not.toContain("aria-label=\"Song");
   });
 

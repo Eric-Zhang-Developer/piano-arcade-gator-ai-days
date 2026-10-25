@@ -79,11 +79,11 @@ try {
   await page.reload();
   await search.waitFor({ timeout: 60_000 });
   const level = await rows();
-  check(level.length >= 20 && (await page.getByTestId("finder-sort-level").getAttribute("aria-pressed")) === "true", `Level is the default, ${level.length} songs`);
+  check(level.length >= 20 && (await page.getByTestId("finder-sort").inputValue()) === "level", `Level is the default, ${level.length} songs`);
   await page.screenshot({ path: join(out, "level-1280.png") });
 
   // 2. Composer.
-  await page.getByTestId("finder-sort-composer").click();
+  await page.getByTestId("finder-sort").selectOption("composer");
   const byComposer = await meta(await rows());
   const names = byComposer.map((s) => surname(s.composer));
   check(names.every((n, i) => i === 0 || names[i - 1].localeCompare(n) <= 0), `Composer runs by surname (${[...new Set(names)].join(", ")})`);
@@ -97,7 +97,8 @@ try {
   check(shown.length === chopin.length && shown.every((s) => surname(s.composer) === "Chopin"), `"chopin" leaves only Chopin's ${shown.length} songs`);
   const panelTitle = await page.locator("main h2").first().textContent().catch(() => "");
   check(shown.some((s) => panelTitle?.includes(s.title)), `the focused song is one of them (${panelTitle})`);
-  check((await page.getByTestId("finder-count").textContent())?.trim() === `${shown.length} of ${level.length}`, "the count reads N of total");
+  // select-calm (#1411): the visible count is gone; the live line still says N of total.
+  check((await page.getByTestId("finder-said").textContent())?.trim() === `${shown.length} of ${level.length} songs`, "the live line reads N of total");
 
   // 7. A typed p never starts practice.
   const before = page.url();
@@ -125,7 +126,7 @@ try {
   await page.waitForSelector('[data-testid="results"]', { timeout: end + 30_000 });
   await page.goto(`${base}/`);
   await search.waitFor({ timeout: 60_000 });
-  await page.getByTestId("finder-sort-recent").click();
+  await page.getByTestId("finder-sort").selectOption("recent");
   const recent = await rows();
   check(recent[0] === last, `Recent puts ${last} first after its take (${recent[0]})`);
 
@@ -133,8 +134,8 @@ try {
   await search.fill("bach");
   await page.reload();
   await search.waitFor({ timeout: 60_000 });
-  await page.waitForFunction(() => document.querySelector('[data-testid="finder-sort-recent"]')?.getAttribute("aria-pressed") === "true", null, { timeout: 10_000 }).catch(() => {});
-  check((await page.getByTestId("finder-sort-recent").getAttribute("aria-pressed")) === "true", "a reload keeps Recent");
+  await page.waitForFunction(() => document.querySelector('[data-testid="finder-sort"]')?.value === "recent", null, { timeout: 10_000 }).catch(() => {});
+  check((await page.getByTestId("finder-sort").inputValue()) === "recent", "a reload keeps Recent");
   check((await search.inputValue()) === "" && (await rows())[0] === last, "a reload empties the search box and keeps the order");
   // The browser autofocused the server's first row (Level order); focus must follow to the row the panel shows.
   const active = await page.evaluate(() => document.activeElement?.dataset?.testid ?? document.activeElement?.tagName);

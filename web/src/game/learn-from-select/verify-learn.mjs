@@ -9,6 +9,13 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 
+// select-calm (#1411): Learn, Flow, the level, Hands, Speed and the source sit in the Practice panel; open it first.
+const openPractice = async (p) => {
+  const b = p.getByTestId("practice-open");
+  await b.waitFor({ timeout: 60_000 });
+  if ((await b.getAttribute("aria-expanded")) !== "true") await b.click();
+};
+
 const webDir = fileURLToPath(new URL("../../../", import.meta.url));
 const outArg = process.argv.indexOf("--out");
 if (outArg < 0 || !process.argv[outArg + 1]) {
@@ -97,6 +104,7 @@ check(await line.isVisible(), "… and wait mode's start line shows");
 
 // 2. The LEARN button on the focused song's panel (mouse-first): the same wait-mode take as L.
 await home();
+await openPractice(page);
 await page.getByTestId("select-learn").click();
 await page.waitForURL(/\/play\?/, { timeout: 30_000 });
 check(search(page) === `?song=${ids[0]}&mode=wait`, `LEARN opens ${search(page)} (want ?song=${ids[0]}&mode=wait)`);

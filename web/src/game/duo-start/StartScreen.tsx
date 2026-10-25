@@ -5,11 +5,13 @@
 // panel in no group (first-run, versus, the demo's auto-start, any new one) goes under Start. Key hints never show
 // (#772): their shortcuts stay bound and are on the ? card.
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 import type { GamePlugin } from "../../contracts";
 import { Brackets, Button, Panel } from "../duo-tokens";
 import { OptionsDrawer } from "../options-panel";
 import { Slots } from "../play-slots/ui";
+import { watchUrl } from "../watch-demo/demo";
 import styles from "./start.module.css";
 
 export const groups = {
@@ -38,6 +40,9 @@ export function StartScreen({
   onLatency: (ms: number) => void; // /play's own: the next take uses it
   status: ReactNode; // the MIDI status line, in the drawer
 }) {
+  const params = useSearchParams();
+  const song = params.get("song");
+  const watch = song && params.get("demo") !== "1" ? watchUrl(song) : null; // not on the demo itself
   const slots = (ids: string[]) => <Slots plugins={plugins.filter((p) => ids.includes(p.id))} panel={panel} />;
   return (
     <Brackets style={{ width: "min(94vw, 1800px)" }}>
@@ -62,6 +67,12 @@ export function StartScreen({
               <Link href="/" className={styles.songs} data-testid="start-songs">
                 Songs
               </Link>
+              {/* select-calm (#1411): Watch left the select for here, where the song is already chosen. */}
+              {watch && (
+                <Link href={watch} className={styles.songs} data-testid="start-watch">
+                  Watch first
+                </Link>
+              )}
               <OptionsDrawer keys={false} onLatency={onLatency}>
                 <div data-group="drawer">{slots(groups.drawer)}</div>
                 {status}

@@ -14,6 +14,13 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 
+// select-calm (#1411): Learn, Flow, the level, Hands, Speed and the source sit in the Practice panel; open it first.
+const openPractice = async (p) => {
+  const b = p.getByTestId("practice-open");
+  await b.waitFor({ timeout: 60_000 });
+  if ((await b.getAttribute("aria-expanded")) !== "true") await b.click();
+};
+
 const webDir = fileURLToPath(new URL("../../../", import.meta.url));
 const outArg = process.argv.indexOf("--out");
 if (outArg < 0 || !process.argv[outArg + 1]) {
@@ -86,6 +93,7 @@ try {
       await page.getByTestId(`song-${id}`).focus();
       await page.waitForTimeout(250);
     }
+    await openPractice(page);
     await page.getByTestId("song-options").waitFor({ timeout: 60_000 });
     if (twoHands) await page.getByTestId("hands-R").waitFor({ timeout: 10_000 });
     // The chart has loaded: song-preview's PRACTICE 70% shows, or duo-select's PRACTICE turns on.

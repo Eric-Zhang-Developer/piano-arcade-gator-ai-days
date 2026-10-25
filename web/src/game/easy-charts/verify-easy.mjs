@@ -13,6 +13,13 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 
+// select-calm (#1411): Learn, Flow, the level, Hands, Speed and the source sit in the Practice panel; open it first.
+const openPractice = async (p) => {
+  const b = p.getByTestId("practice-open");
+  await b.waitFor({ timeout: 60_000 });
+  if ((await b.getAttribute("aria-expanded")) !== "true") await b.click();
+};
+
 const webDir = fileURLToPath(new URL("../../../", import.meta.url));
 const outArg = process.argv.indexOf("--out");
 if (outArg < 0 || !process.argv[outArg + 1]) {
@@ -104,6 +111,7 @@ try {
   ]) {
     await page.setViewportSize({ width: w, height: h });
     await page.goto(`${base}/`);
+    await openPractice(page);
     await toggle.waitFor({ timeout: 60_000 });
     await page.getByText(/EASY Lv \d/).waitFor({ timeout: 10_000 }); // the focused chart's Easy level has loaded
     await page.screenshot({ path: join(out, `toggle-normal-${w}.png`) });
@@ -111,6 +119,7 @@ try {
     check((await toggle.getAttribute("aria-pressed")) === "true" && (await href()).endsWith("&level=easy"), `${w}×${h}: E reads Easy and the focused card's href ends in &level=easy (${await href()})`);
     await page.screenshot({ path: join(out, `toggle-easy-${w}.png`) });
     await page.reload();
+    await openPractice(page);
     await toggle.waitFor({ timeout: 60_000 });
     // The server renders Normal; the stored level arrives at hydration. The Easy level is filled in by a client fetch
     // after hydration, so once it shows, the toggle reads the stored level (reading at once raced it: #532).

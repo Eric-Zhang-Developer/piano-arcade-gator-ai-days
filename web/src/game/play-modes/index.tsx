@@ -81,7 +81,11 @@ const title: Record<PlayMode, string> = {
 };
 
 // The select's mark: the furthest step reached on this song, read-only. An empty key lights nothing.
-export function LadderMark({ song }: { song: string }) {
+// With `on`, each rung with an action is a button (select-calm, #1411): the select's Practice panel, where the ladder
+// is the way into Learn and Flow. Learn and Flow keep the select's old button ids, so checks find them there.
+const rungId: Record<PlayMode, string> = { learn: "select-learn", flow: "select-practice", perform: "ladder-perform" };
+const rungKey: Record<PlayMode, string> = { learn: "L", flow: "P", perform: "Enter" };
+export function LadderMark({ song, on }: { song: string; on?: Partial<Record<PlayMode, () => void>> }) {
   const raw = useSyncExternalStore(
     noop,
     () => readLadder(storage(), song),
@@ -96,9 +100,24 @@ export function LadderMark({ song }: { song: string }) {
             →
           </li>
         ),
-        <li key={m} className={`${styles.rung} ${i === reached ? styles.current : i < reached ? styles.reached : ""}`}>
-          {modeName[m]}
-        </li>,
+        on ? (
+          <li key={m} className={styles.cell}>
+            <button
+              type="button"
+              className={`${styles.rung} ${i === reached ? styles.current : i < reached ? styles.reached : ""}`}
+              onClick={on[m]}
+              disabled={!on[m]}
+              aria-keyshortcuts={rungKey[m]}
+              data-testid={rungId[m]}
+            >
+              {modeName[m]}
+            </button>
+          </li>
+        ) : (
+          <li key={m} className={`${styles.rung} ${i === reached ? styles.current : i < reached ? styles.reached : ""}`}>
+            {modeName[m]}
+          </li>
+        ),
       ])}
     </ol>
   );

@@ -31,15 +31,18 @@
   transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
 }
 
-a.rung:hover {
+a.rung:hover,
+button.rung:hover:not(:disabled) {
   background: rgba(125, 132, 150, 0.12);
 }
 
-a.rung:active {
+a.rung:active,
+button.rung:active:not(:disabled) {
   transform: translateY(1px);
 }
 
-a.rung:focus-visible {
+a.rung:focus-visible,
+button.rung:focus-visible {
   outline: 2px solid var(--pa-ink);
   outline-offset: 2px;
 }
@@ -84,7 +87,38 @@ a.rung:focus-visible {
   .rung {
     transition: none;
   }
-  a.rung:active {
+  a.rung:active,
+button.rung:active:not(:disabled) {
     transform: none;
   }
+}
+
+/* The select's Practice panel (#1411): the mark's rungs as buttons, full-size so they read as ways in. */
+.cell {
+  display: flex;
+  min-width: 0;
+}
+
+button.rung {
+  flex: 1 1 auto;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  background: none;
+  cursor: pointer;
+  padding: 1vh 0.4em;
+}
+
+button.rung:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.mark button.rung {
+  padding: 1vh 0.4em;
+}
+
+/* A rung not reached yet is still a way in: ink, not the read-only mark's dim. */
+.mark button.rung:not(.reached):not(.current):not(:disabled) {
+  color: var(--pa-ink);
 }

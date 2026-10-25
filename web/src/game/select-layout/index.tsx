@@ -165,7 +165,6 @@ export function MusicSelect({ songs, footer, corner }: { songs: Song[]; footer?:
             }}
             onPractice={practiceHref ? () => router.push(practiceHref) : null}
             onLearn={() => router.push(learnHref(song.id))}
-            onWatch={() => router.push(watchUrl(song.id))}
           >
             {/* Keyed, as the whole panel was: the panel stays mounted now (select-motion), these start over per song. */}
             <LevelToggle key={`level-${song.id}`} normal={song.level} chart={chart?.id === song.id ? chart.chart : null} />

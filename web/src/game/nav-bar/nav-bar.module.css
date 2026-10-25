@@ -10,7 +10,7 @@
   display: flex;
   align-items: stretch;
   gap: 0.4em;
-  font-size: clamp(11px, 1.5vh, 16px);
+  font-size: clamp(13px, 1.9vh, 20px); /* ~14px at 720, 20px at 1080: readable on video, inside the 4vh band */
 }
 
 .slot {
@@ -24,7 +24,11 @@
 }
 
 .slot:hover {
-  border-bottom-color: var(--pa-line); /* MonoLabel's color is inline, so hover shows as the hairline */
+  border-bottom-color: var(--pa-line);
+}
+
+.slot:not([aria-current="page"]):hover > span {
+  color: var(--pa-ink) !important; /* MonoLabel's ink is inline; hover lifts a dim label to full ink */
 }
 
 .slot[aria-current="page"] {

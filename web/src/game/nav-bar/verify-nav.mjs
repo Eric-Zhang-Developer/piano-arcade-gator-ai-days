@@ -1,5 +1,5 @@
 // Headless proof of the nav bar (spec: nav-bar, Validation 2). Its own `next dev`:
-// 1. / shows the bar with Play current, clear of the wordmark and the build stamp.
+// 1. / shows the bar with Play current, in the kit's inks, clear of the wordmark and the build stamp.
 // 2. Each slot's link answers 200 with no page error, and that page marks its own slot current.
 // 3. /play?song=twinkle, /cabinet and /?capture=1 show no bar.
 // 4. nav-1280.png and nav-1920.png of /.
@@ -83,6 +83,20 @@ try {
       return { bar: r(document.querySelector('[data-testid="nav-bar"]')), mark, stamp: r(document.querySelector('[data-testid="build-stamp"]')) };
     });
     check(!overlap(boxes.bar, boxes.mark) && !overlap(boxes.bar, boxes.stamp), `${w}×${h} /: the bar clears the wordmark and the build stamp (bar ${Math.round(boxes.bar.left)}–${Math.round(boxes.bar.right)} × 0–${Math.round(boxes.bar.bottom)})`);
+    // The labels take the kit's inks, not the link's default blue: dim off the current page, primary on it.
+    const inks = await page.evaluate(() => {
+      const ink = (v) => {
+        const s = document.createElement("span");
+        s.style.color = `var(${v})`;
+        document.body.append(s);
+        const c = getComputedStyle(s).color;
+        s.remove();
+        return c;
+      };
+      const [dim, primary] = [ink("--pa-ink-dim"), ink("--pa-primary")];
+      return [...document.querySelectorAll('[data-testid="nav-bar"] a')].map((a) => getComputedStyle(a.firstElementChild).color === (a.getAttribute("aria-current") ? primary : dim));
+    });
+    check(inks.length > 0 && inks.every(Boolean), `${w}×${h} /: each label is dim ink, the current one primary (${inks})`);
     hrefs = await page.$$eval('[data-testid="nav-bar"] a', (as) => as.map((a) => a.getAttribute("href")));
     await page.screenshot({ path: join(out, `nav-${w}.png`) });
     await page.close();

@@ -23,7 +23,7 @@ export function NavLinks({ slots }: { slots: Slot[] }) {
             aria-current={current ? "page" : undefined}
             data-testid={`nav-${s.slug}`}
           >
-            <MonoLabel dim={!current} style={{ fontSize: "inherit", color: current ? "var(--pa-primary)" : undefined }}>
+            <MonoLabel dim={!current} style={current ? { fontSize: "inherit", color: "var(--pa-primary)" } : { fontSize: "inherit" }}>
               {s.label}
             </MonoLabel>
           </Link>

@@ -93,12 +93,12 @@ type Ctx = Pick<
 
 /**
  * The card, on a 1920×1080 context. `display` is the display face's CSS family (Saira), with fallbacks: numbers and
- * titles use it, upright as on the results screen (no italic in the Duo look), labels use system-ui. Nothing is under
- * 24 px. Hype pink stays off: a saved card is a record of the take, not one of its moments.
+ * titles use it, upright as on the results screen (no italic in the Duo look). `data` is the kit's mono data face, for
+ * the labels, as the results screen sets them. Nothing is under 24 px. Hype pink stays off: a saved card is a record of the take, not one of its moments.
  */
-export function drawCard(ctx: Ctx, m: CardModel, display = "system-ui, sans-serif"): void {
+export function drawCard(ctx: Ctx, m: CardModel, display = "system-ui, sans-serif", data = "ui-monospace, monospace"): void {
   const face = (weight: number, px: number) => `${weight} ${px}px ${display}`;
-  const label = (px: number) => `600 ${px}px system-ui, sans-serif`;
+  const label = (px: number) => `500 ${px}px ${data}`;
   const text = (s: string, x: number, y: number, font: string, color: string, align: CanvasTextAlign = "left") => {
     ctx.font = font;
     ctx.fillStyle = color;

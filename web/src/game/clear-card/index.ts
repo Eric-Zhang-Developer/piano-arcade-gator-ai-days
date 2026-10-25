@@ -38,7 +38,6 @@ export function clearCard(): GamePlugin {
   let wait = false;
   let counts: Record<Judgment | "wrong", number> = { PERFECT: 0, GREAT: 0, GOOD: 0, MISS: 0, wrong: 0 };
   let card: { kind: ClearKind; shownAtMs: number } | null = null;
-  let lastCtx: CanvasRenderingContext2D | null = null;
   // Body face until the display face has loaded (or 1 s has passed), as the HUD does.
   let display = clearSettings.font;
   if (typeof document !== "undefined")
@@ -52,7 +51,6 @@ export function clearCard(): GamePlugin {
   const gone = () => {
     card = null;
     publish();
-    lastCtx?.clearRect(0, 0, lastCtx.canvas.width, lastCtx.canvas.height); // the draw loop stops with the results
   };
   return {
     id: "clear-card",
@@ -77,7 +75,6 @@ export function clearCard(): GamePlugin {
       publish();
     },
     draw(ctx, f) {
-      lastCtx = ctx;
       if (!card || wait) return;
       const t = f.nowMs - card.shownAtMs; // the chart clock, so Esc freezes the card with everything else
       if (t < 0) return;

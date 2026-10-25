@@ -2,10 +2,11 @@
 // The music select's two pieces in the Duo look (spec: duo-select, frame F-duo-1): the focused song's bracketed panel
 // and one song row, built from the Duo kit (duo-tokens). select-layout places them and owns the keys and links; these
 // only draw, and say when PLAY, PRACTICE, LEARN or WATCH is pressed.
-import { useMemo, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
+import { useMemo, useRef, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import { nextForKey, type NextFor } from "../duo-results/scores";
 import { Brackets, Button, DataCell, MonoLabel, Panel } from "../duo-tokens";
 import { LadderMark } from "../play-modes";
+import { panelFrames, useMoveAnimation } from "../select-motion";
 import { nextForText, nextForUrl, readNextFor } from "./next-for";
 import { PianoRoll } from "./PianoRoll";
 import type { Roll } from "./roll";
@@ -37,10 +38,12 @@ const fill: CSSProperties = { display: "flex", flexDirection: "column", minHeigh
 
 export function FocusPanel(p: FocusPanelProps) {
   const next = useNextFor(p.id);
+  const ref = useRef<HTMLElement>(null);
+  useMoveAnimation(ref, panelFrames); // select-motion: the panel stays mounted and moves with the focus
   return (
     <Brackets style={{ ...fill, flex: "1 1 auto" }}>
       <Panel style={{ ...fill, flex: "1 1 auto", padding: "clamp(14px, 1.4vw, 26px)" }}>
-        <section className={styles.panel} aria-live="polite" data-testid="focus-panel">
+        <section ref={ref} className={styles.panel} aria-live="polite" data-testid="focus-panel">
           <div className={styles.roll} style={{ viewTransitionName: "stage-jacket" }}>
             <PianoRoll roll={p.roll} />
           </div>
@@ -119,9 +122,10 @@ function useNextFor(id: string): NextFor | null {
 // px at 1080 (visual-direction.md).
 const rowRead = "clamp(16px, 2.25vh, 24px)";
 
+// The focused row's look is select-motion's bar, which moves between rows; the row only says it's the one.
 export function SongRow({ title, composer, level, roll, focused }: { title: string; composer: string; level: number; roll: Roll; focused: boolean }) {
   return (
-    <Panel style={focused ? { border: "1px solid var(--pa-primary)", background: "color-mix(in srgb, var(--pa-primary) 7%, var(--pa-panel))", boxShadow: "inset 4px 0 0 var(--pa-primary)" } : undefined}>
+    <Panel>
       <div className={styles.row} data-focused={focused || undefined}>
         <div className={styles.rowRoll}>
           <PianoRoll roll={roll} />

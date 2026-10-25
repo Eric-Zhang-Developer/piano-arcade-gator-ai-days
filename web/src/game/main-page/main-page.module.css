@@ -29,7 +29,9 @@
 
 /* A section's first line: its label in the display face, its count after it. A snap point, so a chip's scroll and a
    scrolled list rest on a header rather than under it. */
+/* A snap point too (select-motion): a chip's scroll rests on it, and so can the wheel. */
 .header {
+  scroll-snap-align: start;
   display: flex;
   align-items: baseline;
   gap: 0.8em;

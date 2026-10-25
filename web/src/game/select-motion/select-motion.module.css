@@ -1,0 +1,21 @@
+/* The focus bar (spec: select-motion): select-layout's old focused-row look (a primary hairline, a 7% primary wash
+   and a 4 px primary edge), drawn once over the list and moved on a spring. It sits over the rows, not under them:
+   the rows' panels are opaque. It never takes a pointer. */
+.list {
+  position: relative;
+}
+
+.bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  border: 1px solid var(--pa-primary);
+  background: color-mix(in srgb, var(--pa-primary) 7%, transparent);
+  box-shadow: inset 4px 0 0 var(--pa-primary);
+  pointer-events: none;
+  opacity: 0; /* until it has a row */
+  will-change: transform;
+}

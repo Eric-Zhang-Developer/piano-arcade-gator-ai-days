@@ -136,6 +136,9 @@ try {
   await page.waitForFunction(() => document.querySelector('[data-testid="finder-sort-recent"]')?.getAttribute("aria-pressed") === "true", null, { timeout: 10_000 }).catch(() => {});
   check((await page.getByTestId("finder-sort-recent").getAttribute("aria-pressed")) === "true", "a reload keeps Recent");
   check((await search.inputValue()) === "" && (await rows())[0] === last, "a reload empties the search box and keeps the order");
+  // The browser autofocused the server's first row (Level order); focus must follow to the row the panel shows.
+  const active = await page.evaluate(() => document.activeElement?.dataset?.testid ?? document.activeElement?.tagName);
+  check(active === `song-${last}`, `after the reload, focus is on the panel's song, so Enter plays it (${active})`);
 
   // The finder at both sizes, Recent and filtered.
   for (const [w, h] of [

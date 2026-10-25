@@ -1,7 +1,7 @@
 "use client";
 // The finder row over the select's list (spec: song-finder): a search box, the count shown, and the three sorts as
 // kit chips. useFinder holds the state; the select renders the songs it returns.
-import { useMemo, useState, useSyncExternalStore, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent, type ReactNode } from "react";
 import { kitChip } from "../duo-tokens";
 import type { Song } from "../song-select/load";
 import { filterSongs, readLastPlayed, readSort, SORT_MODES, sortSongs, writeSort, type SortMode } from ".";
@@ -61,8 +61,18 @@ function toList(e: KeyboardEvent<HTMLInputElement>) {
 // The select's list column: the finder row, then the list (children), which fills the rest and scrolls in it.
 export function Finder({ finder, children }: { finder: ReturnType<typeof useFinder>; children: ReactNode }) {
   const { shown, total, sort, setSort, query, setQuery } = finder;
+  // A new order or filter keeps the focused song in view: the list would otherwise stay scrolled where it was. If focus
+  // is in the list, it moves to that row too, so Enter plays the song the panel shows: on a reload with a stored sort,
+  // the browser has already autofocused the first row of the server's Level order.
+  const column = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const row = column.current?.querySelector<HTMLElement>("ol [data-focused]");
+    if (row && document.activeElement?.closest("ol") && column.current?.contains(document.activeElement))
+      row.closest("a")?.focus({ preventScroll: true });
+    row?.scrollIntoView({ block: "center" }); // a statement: Chrome returns a Promise here, and an effect may return only a cleanup
+  }, [sort, query]);
   return (
-    <div className={css.column}>
+    <div className={css.column} ref={column}>
       <div className={css.finder}>
         <div className={css.bar}>
           <label className={css.search}>

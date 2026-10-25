@@ -7,7 +7,7 @@
 // song's Hands and Speed (song-options).
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
+import { useEffect, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
 import type { Chart } from "../../contracts";
 import { adaptUrl, songPhrases, start } from "../adaptive-chunks/next";
 import { FocusPanel, SongRow } from "../duo-select/Select";
@@ -28,16 +28,16 @@ import { Finder, useFinder } from "../song-finder/Finder";
 // footer: the left column's last row, in flow under the focused song (the Options button, first-run's link). Outside the
 // per-song section, so it isn't remounted on every ↑/↓.
 export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNode }) {
-  const [focused, setFocused] = useState(0);
+  const [focusedId, setFocusedId] = useState<string>(); // song-finder: the focused song, by id, so it survives a sort
   const best = useBestGrades();
   const options = useSongOptions();
   const router = useRouter();
   const finder = useFinder(songs); // song-finder: the list as sorted and filtered
   const shown = finder.shown;
-  const song = shown[focused];
-  // Sorting or filtering keeps the focused song if it's still shown, else the first shown song takes focus.
-  const focusedId = useRef<string | undefined>(undefined);
-  useEffect(() => setFocused(Math.max(0, shown.findIndex((s) => s.id === focusedId.current))), [shown]);
+  // Sorting or filtering keeps the focused song if it's still shown, else the first shown song takes focus. With no
+  // match the panel keeps the last one, rather than leaving half the screen empty.
+  const focused = Math.max(0, shown.findIndex((s) => s.id === focusedId));
+  const song = shown[focused] ?? songs.find((s) => s.id === focusedId) ?? songs[0];
   const [level, setLevel] = useLevel();
   const levelParams = new URLSearchParams(level === "easy" ? "level=easy" : "");
   const bestOf = (id: string) => best[recordKey(id, levelParams)];
@@ -156,7 +156,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
               className={styles.link}
               data-testid={`song-${s.id}`}
               onClick={onPlay}
-              onFocus={() => ((focusedId.current = s.id), setFocused(i))}
+              onFocus={() => setFocusedId(s.id)}
               onMouseEnter={(e) => document.activeElement?.matches("input") || e.currentTarget.focus({ preventScroll: true })} // hover highlights too (song-preview), but never takes focus from the finder's box, where a typed P would start practice
             >
               <SongRow title={s.title} composer={s.composer} level={s.level} roll={s.roll} focused={i === focused} />

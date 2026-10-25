@@ -87,11 +87,17 @@
   position: relative; /* its lit border sits over the neighbour's hairline */
 }
 
+/* Where the first row would be, framed like one, so an empty list still reads as the list. */
 .none {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1em;
-  margin: 2.4vh 0 0;
+  margin: 1.6vh 0 0;
+  min-height: 8.5vh;
+  box-sizing: border-box;
+  padding: 0 1.2em;
+  border: 1px solid var(--pa-line);
   font-family: var(--pa-font-data), ui-monospace, monospace;
   font-size: clamp(12px, 0.85vw, 17px);
   letter-spacing: 0.08em;

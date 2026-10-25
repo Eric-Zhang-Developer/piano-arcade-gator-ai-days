@@ -346,7 +346,10 @@ inline bool demoExtras() { return DEMO_EXTRAS && cfg.demo; }
 // with its ripple; that's all. No hints before a note, no red, none of the song shows. The website sends a key on
 // for every press in demo, on any page; when the game then reports the hit on that held key, it just takes the
 // hit's color (no second ripple). Older pages sent 2 for the same thing, so 2 is demo too.
-inline bool hintsShown() { return !demoSimple(); }
+inline bool hintsShown() { return true; }
+// Demo borrows Learning's guide, small (Sharan, 2026-10-25): the hints that build from faint to gold, drawn at this
+// fraction so a press's own light and ripple stay the main thing; and the count-in bar when a song starts.
+#define DEMO_HINT_LEVEL 110
 CRGB scale8Color(CRGB c, uint8_t v) { c.nscale8_video(v); return c; }
 
 // A bloom: a soft glow that spreads from pos to `reach` LEDs either side and fades out, brightest in the middle.
@@ -822,6 +825,7 @@ void runMessage(const uint8_t *m) {
       songLive = false;
       stopShows();
       if (showsOn()) startShow(ending ? SHOW_FINALE : SHOW_INTRO);
+      else if (demoSimple() && cfg.shows && !ending) startShow(SHOW_INTRO);  // demo keeps just the count-in
       if (helloDue) helloCrash();
       break;
     }
@@ -1032,6 +1036,7 @@ void renderKeys(uint32_t now) {
       c.nscale8_video((uint8_t)(k.level * 255));
     } else if (k.hint && hintsShown()) {
       c = hintColor(k, now);  // the key layer wins over the hint while a key is lit
+      if (demoSimple()) c.nscale8_video(DEMO_HINT_LEVEL);
     }
     if (!c) continue;
     forEachLed(n, [&](int i) { leds[i] |= c; });  // overlapping keys: brightest channel wins

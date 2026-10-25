@@ -160,3 +160,119 @@ describe("bot=take", () => {
     ]);
   });
 });
+
+// golden-demo: the bot's pedal and dynamics, heard on the piano output. Synthetic chart, 500 ms a beat.
+describe("the bot on the piano: pedal and velocity", () => {
+  const chart: Chart = {
+    ...twinkle,
+    id: "local/synthetic",
+    bpm: 120,
+    notes: [
+      { id: "a", pitch: 60, beat: 0, duration: 1, hand: "R", velocity: 40 },
+      { id: "b", pitch: 64, beat: 1, duration: 1, hand: "R", velocity: 100 },
+      { id: "c", pitch: 67, beat: 2, duration: 1, hand: "R" },
+    ],
+  };
+  const pedal = { pedal: [[0.1, 0.9], [1.1, 2.9]] }; // 50–450 ms and 550–1450 ms
+  const on = (p: number, v: number) => [0x90, p, v];
+  const off = (p: number) => [0x90, p, 0];
+  const cc = (v: number) => [0xb0, 64, v];
+
+  // A starved page, as in the #586 test: frames every 100 ms drive the pump, and no timer fires.
+  async function harness(pedalFile: () => Promise<unknown> = async () => pedal) {
+    let perf = 0;
+    const raf: (() => void)[] = [];
+    const sent: number[][] = [];
+    vi.spyOn(performance, "now").mockImplementation(() => perf);
+    vi.stubGlobal("requestAnimationFrame", (cb: () => void) => raf.push(cb));
+    vi.stubGlobal("setTimeout", () => 0);
+    vi.stubGlobal("clearTimeout", () => {});
+    vi.stubGlobal("fetch", async () => ({ ok: true, json: pedalFile }));
+    const piano = { name: "Portable Grand", send: (d: number[]) => void sent.push([...d]) };
+    vi.stubGlobal("navigator", { requestMIDIAccess: async () => ({ outputs: new Map([["dgx", piano]]) }) });
+    const p = scenes();
+    p.transformChart!(chart, new URLSearchParams("song=local/synthetic&bot=perfect&audible=1"));
+    await new Promise((r) => setImmediate(r)); // the pedal read
+    await p.wrapInput!({ kind: "keys", start() {}, stop() {} }).start(() => {});
+    let zero = 0;
+    // Frames from chart time `fromMs` to `toMs`, with chart zero put where that makes `fromMs` now.
+    const frames = (fromMs: number, toMs: number) => {
+      zero = perf + 100 - fromMs;
+      for (let t = perf + 100; t - zero <= toMs; t += 100) {
+        perf = t;
+        raf.splice(0).forEach((cb) => cb());
+        perf = t + 40;
+        p.draw!({} as CanvasRenderingContext2D, { nowMs: t + 0.5 - zero } as Frame);
+      }
+    };
+    return { p, sent, frames };
+  }
+  // What the piano heard from the first note on: the pedal-ups every cancel sends before it are housekeeping.
+  const heard = (sent: number[][]) => sent.slice(sent.findIndex((m) => m[0] === 0x90 || m[2] === 127));
+  const cleanup = () => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  };
+
+  it("presses at the chart's velocity, KEYS_VELOCITY where it has none, with CC64 on the notes' queue in time order", async () => {
+    try {
+      const { sent, frames } = await harness();
+      frames(-200, 1700);
+      expect(heard(sent)).toEqual([
+        on(60, 40), cc(127), cc(0), off(60), on(64, 100), cc(127), off(64), on(67, 80), cc(0), off(67),
+      ]);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it.each(["pause", "quit", "songEnd"] as const)("%s mid-pair ends with the pedal up", async (type) => {
+    try {
+      const { p, sent, frames } = await harness();
+      frames(-200, 700);
+      expect(sent.at(-1)).toEqual(cc(127));
+      p.onEvent!({ type } as GameEvent);
+      expect(sent.at(-1)).toEqual(cc(0));
+    } finally {
+      cleanup();
+    }
+  });
+
+  it("a resume inside a pair puts that pair's pedal down first, then only what's ahead", async () => {
+    try {
+      const { p, sent, frames } = await harness();
+      frames(-200, 700);
+      p.onEvent!({ type: "pause" } as GameEvent);
+      const at = sent.length;
+      p.onEvent!({ type: "resume", atMs: 800 } as GameEvent);
+      frames(800, 1700);
+      expect(heard(sent.slice(at))).toEqual([cc(127), off(64), on(67, 80), cc(0), off(67)]);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it("a pedal read after the bot started still sends what's ahead of it", async () => {
+    try {
+      let arrive: (v: unknown) => void = () => {};
+      const { sent, frames } = await harness(() => new Promise((r) => (arrive = r)));
+      frames(-200, 500); // the first pair is over by now
+      arrive(pedal);
+      await new Promise((r) => setImmediate(r));
+      frames(600, 1700);
+      expect(heard(sent).filter((m) => m[0] === 0xb0)).toEqual([cc(127), cc(0)]);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it("no pedal.json, no pedal: only notes after the housekeeping", async () => {
+    try {
+      const { sent, frames } = await harness(async () => null);
+      frames(-200, 1700);
+      expect(heard(sent).some((m) => m[0] === 0xb0 && m[2] === 127)).toBe(false);
+    } finally {
+      cleanup();
+    }
+  });
+});

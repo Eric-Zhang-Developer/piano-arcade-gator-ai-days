@@ -20,7 +20,7 @@
 }
 
 .card[data-focused] {
-  border-color: var(--pa-magenta);
+  border-color: var(--pa-primary);
   background: var(--pa-sky);
   box-shadow: 0 0 24px rgba(255, 47, 208, 0.4);
   transform: scale(1.05);

@@ -129,7 +129,9 @@ export function SongPreview({ id, best }: { id: string; best?: { rank: Rank; acc
 
 // One compact row and a status line: the music select's left column has little room under the stats. Sizes follow the
 // screen like the rest of the select, so the row is readable on video at 1920×1080 (visual-direction: Type).
-const panel: CSSProperties = { marginTop: "1.5vh" };
+// On --pa-panel, not on the select stage: Duo's ink is a little dimmer, and the stage's sun behind the row took
+// LEARN to 4.44:1 and the status to 4.1:1, under select-stage's 4.5:1 (duo-tokens).
+const panel: CSSProperties = { marginTop: "1.5vh", background: "var(--pa-panel)" };
 const row: CSSProperties = { display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.3em 1.1em", fontSize: "clamp(16px, 1.25vw, 24px)" };
 const label: CSSProperties = { fontSize: "clamp(12px, 0.8vw, 16px)", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--pa-ink-dim)" };
 // LEARN and PRACTICE 70%: one outline, one type, set apart from the stats so an empty BEST doesn't read into LEARN.
@@ -137,7 +139,7 @@ const actions: CSSProperties = { display: "inline-flex", gap: "0.6em", marginLef
 const action: CSSProperties = {
   padding: "0.25em 0.75em",
   borderRadius: 4,
-  border: "1px solid rgba(39, 225, 255, 0.5)",
+  border: "1px solid var(--pa-line)", // Duo's hairline; the old bright cyan was the brightest pixel behind the label
   color: "var(--pa-ink)",
   fontSize: "clamp(14px, 1.25vw, 24px)",
   fontWeight: 700,

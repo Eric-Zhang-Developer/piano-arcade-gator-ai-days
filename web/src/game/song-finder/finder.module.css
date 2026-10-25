@@ -51,6 +51,8 @@
 .input {
   flex: 1;
   min-width: 0;
+  min-height: 28px; /* over the select's 24 px target (#973, #1035) */
+  box-sizing: border-box;
   appearance: none;
   border: 0;
   border-radius: 0;
@@ -102,4 +104,14 @@
   font-size: clamp(12px, 0.85vw, 17px);
   letter-spacing: 0.08em;
   color: var(--pa-ink-dim);
+}
+
+/* The live region: read out, not shown (the count beside it is the visible one). */
+.said {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

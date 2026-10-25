@@ -81,7 +81,8 @@ export function skipReason(params: URLSearchParams): string | null {
   return null;
 }
 
-// "Recording volume", 0–1, saved per browser; its own level, apart from the effects mute and the piano volume.
+// "Recording volume", 0–1, saved per browser; its own level, apart from the effects mute and the piano volume. The
+// options panel's row reads and sets it the way it does laptop-sound's piano volume; each take reads it at its start.
 const VOLUME_KEY = "pianoArcade.recordingVolume";
 export const DEFAULT_RECORDING_VOLUME = 0.7;
 export function loadRecordingVolume(): number {
@@ -92,6 +93,26 @@ export function loadRecordingVolume(): number {
   } catch {
     return DEFAULT_RECORDING_VOLUME;
   }
+}
+
+let recordingVolume: number | null = null;
+const volumeListeners = new Set<() => void>();
+
+export const getRecordingVolume = (): number => (recordingVolume ??= loadRecordingVolume());
+
+export function setRecordingVolume(v: number): void {
+  recordingVolume = Math.min(1, Math.max(0, v));
+  try {
+    localStorage.setItem(VOLUME_KEY, String(recordingVolume));
+  } catch {
+    // private mode: the level holds for this page only
+  }
+  volumeListeners.forEach((f) => f());
+}
+
+export function subscribeRecordingVolume(f: () => void): () => void {
+  volumeListeners.add(f);
+  return () => volumeListeners.delete(f);
 }
 
 interface Scheduled {
@@ -146,7 +167,7 @@ export function audioTrack(): GamePlugin {
     if (!audio || !buffer || !sidecar) return;
     bus?.disconnect();
     bus = audio.createGain();
-    bus.gain.value = loadRecordingVolume();
+    bus.gain.value = getRecordingVolume();
     bus.connect(audio.destination);
     scheduled = [];
     const nowS = audio.currentTime;
@@ -226,7 +247,7 @@ export function audioTrack(): GamePlugin {
         // The chart time now, from the clock this plugin follows; null while paused or before the take.
         chartMs: () => (anchor ? anchor.atMs + performance.now() - anchor.perf : null),
         fileTimeAt: (chartMs) => fileTimeAt(chartMs, sidecar?.offsetMs ?? 0, loop),
-          // The file time being heard now, or null when nothing sounds.
+        // The file time being heard now, or null when nothing sounds.
         positionMs: () => {
           const s = sounding();
           return s ? (s.offsetS + ctxAt(performance.now()) - latencyS() - s.whenS) * 1000 : null;

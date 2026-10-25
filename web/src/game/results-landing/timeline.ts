@@ -137,3 +137,11 @@ export const cueTimes = (plan: LandingPlan) => ({
   stampImpact: plan.stampAtMs,
   after: plan.afterAtMs,
 });
+
+// Only a primary press is followed by a click (#1335): a right or middle press that skips would leave the swallow armed,
+// and the next real click (Retry, say) would be eaten.
+export const clickFollows = (button: number) => button === 0;
+
+// The out, T0 to the results' mount, refuses a pause (#1336): every note is judged by T0, so a pause there only flashes
+// its menu before the results take the screen (decision landing-skip-seams-pause).
+export const pauseRefused = (key: string, mounted: boolean) => key === "Escape" && !mounted;

@@ -4,7 +4,7 @@
 import { useLayoutEffect } from "react";
 import { setStampTiming } from "../rank-stamp";
 import { setTallyDriver } from "../results-tally";
-import { endState, landingAt, landingSettings, mountTimes, planLanding, type LandingInput, type LandingPlan, type LandingState } from "./timeline";
+import { clickFollows, endState, landingAt, landingSettings, mountTimes, pauseRefused, planLanding, type LandingInput, type LandingPlan, type LandingState } from "./timeline";
 
 export * from "./timeline";
 
@@ -30,6 +30,7 @@ type Run = {
   swallowClick: boolean; // the click that follows a skipping pointerdown
   swallowKeyUp: string | null; // and the keyup that follows a skipping key (Space presses a button on keyup)
   unlisten: () => void;
+  endOut: () => void; // the out's pause refusal, until the mount
 };
 let run: Run | null = null;
 
@@ -54,8 +55,21 @@ export function startLanding(input: Omit<LandingInput, "reduced">, from: { score
   stopLanding();
   const plan = planLanding({ ...input, reduced: reducedMotion() });
   setStampTiming(mountTimes(plan));
-  const r: Run = { plan, t0, pausedAt: null, raf: 0, version: 0, listeners: new Set(), from, score, fly: null, swallowClick: false, swallowKeyUp: null, unlisten: () => {} };
+  const r: Run = { plan, t0, pausedAt: null, raf: 0, version: 0, listeners: new Set(), from, score, fly: null, swallowClick: false, swallowKeyUp: null, unlisten: () => {}, endOut: () => {} };
   run = r;
+  // The out refuses a pause: Esc stops here, before /play's own listener, and the pause button is hidden till the mount.
+  const refuse = (e: KeyboardEvent) => {
+    if (!pauseRefused(e.key, false)) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  };
+  window.addEventListener("keydown", refuse, true);
+  ensureStyle();
+  document.documentElement.toggleAttribute("data-landing-out", true);
+  r.endOut = () => {
+    window.removeEventListener("keydown", refuse, true);
+    document.documentElement.removeAttribute("data-landing-out");
+  };
   setTallyDriver({
     subscribe: (cb) => (r.listeners.add(cb), () => r.listeners.delete(cb)),
     version: () => r.version,
@@ -104,6 +118,7 @@ export function startLanding(input: Omit<LandingInput, "reduced">, from: { score
 export function landingMounted(counts: [number, number, number, number], maxCombo: number, score: number): void {
   const r = run;
   if (!r) return;
+  r.endOut();
   r.plan = { ...r.plan, counts, maxCombo };
   r.score = score;
   const skip = () => {
@@ -111,6 +126,11 @@ export function landingMounted(counts: [number, number, number, number], maxComb
     r.pausedAt = null;
     r.t0 = performance.now() - r.plan.endMs;
     apply();
+    // NEW RECORD and the initials run their own CSS animations, delayed to the stamp: end them too (#1334). An infinite
+    // one (the cursor's blink) has no end, and finish() would throw.
+    for (const a of document.querySelector('[data-testid="record-moment"]')?.getAnimations({ subtree: true }) ?? []) {
+      if (a.effect?.getComputedTiming().endTime !== Infinity) a.finish();
+    }
     return true;
   };
   // Any key or click jumps to the end state and does nothing else: no Retry, no button. A letter still reaches
@@ -130,10 +150,11 @@ export function landingMounted(counts: [number, number, number, number], maxComb
   };
   const onPointer = (e: PointerEvent) => {
     if (!skip()) return;
-    r.swallowClick = true;
+    r.swallowClick = clickFollows(e.button);
     e.preventDefault();
     e.stopImmediatePropagation();
   };
+  const onCancel = () => void (r.swallowClick = false); // no click follows a cancelled press
   const onClick = (e: MouseEvent) => {
     if (!r.swallowClick) return;
     r.swallowClick = false;
@@ -144,7 +165,9 @@ export function landingMounted(counts: [number, number, number, number], maxComb
   window.addEventListener("keyup", onKeyUp, true);
   window.addEventListener("pointerdown", onPointer, true);
   window.addEventListener("click", onClick, true);
+  window.addEventListener("pointercancel", onCancel, true);
   r.unlisten = () => {
+    window.removeEventListener("pointercancel", onCancel, true);
     window.removeEventListener("keydown", onKey, true);
     window.removeEventListener("keyup", onKeyUp, true);
     window.removeEventListener("pointerdown", onPointer, true);
@@ -158,6 +181,7 @@ export function stopLanding(): void {
   const r = run;
   if (!r) return;
   cancelAnimationFrame(r.raf);
+  r.endOut();
   r.unlisten();
   r.fly?.score.remove();
   r.fly?.combo.remove();
@@ -178,8 +202,10 @@ const lerp = (a: number, b: number, u: number) => a + (b - a) * u;
 
 // juice draws today's stamp as a CSS animation on the rank, which beats inline styles, and its gold ring on ::after.
 // The landing's stamp replaces both while it runs (juice/index.ts is another PR's file, so the override lives here).
+// The out hides /play's pause button (#1336), which is another PR's file too.
 const STYLE = `[data-landing] [data-testid="rank"] { animation: none !important; }
-[data-landing] [data-testid="rank"]::after { content: none !important; animation: none !important; }`;
+[data-landing] [data-testid="rank"]::after { content: none !important; animation: none !important; }
+[data-landing-out] [data-testid="pause-button"] { visibility: hidden !important; }`;
 function ensureStyle(): void {
   if (document.getElementById("results-landing-style")) return;
   const el = document.createElement("style");

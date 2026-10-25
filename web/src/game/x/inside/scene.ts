@@ -12,8 +12,9 @@ export type View = "cutaway" | "row";
 
 export const lookSettings = {
   bg: "#030607", // the Duo ground
-  felt: "#e6dfcf",
-  damperFelt: "#26262c",
+  felt: "#d8ccb2",
+  damperFelt: "#d4d5da", // the texture is light; each damper is tinted dark at rest and blue as it lifts
+  damperRest: "#2a2a31",
   maple: "#c9a06a",
   keybed: "#2b2018",
   ivory: "#ece8de",
@@ -105,12 +106,13 @@ export function makeInside(canvas: HTMLCanvasElement, labelList: HTMLUListElemen
   const felt = new THREE.MeshStandardMaterial({ map: textures[0], roughness: 1 });
   const maple = new THREE.MeshStandardMaterial({ map: textures[1], roughness: 0.6 });
   const damperFelt = new THREE.MeshStandardMaterial({ map: textures[2], roughness: 1 });
+  const damperCut = new THREE.MeshStandardMaterial({ map: textures[2], roughness: 1, color: L.damperRest });
   const keybed = new THREE.MeshStandardMaterial({ map: textures[3], roughness: 0.8 });
   const ivory = new THREE.MeshStandardMaterial({ color: L.ivory, roughness: 0.35 });
   const ebony = new THREE.MeshStandardMaterial({ color: L.ebony, roughness: 0.4 });
   const steel = new THREE.MeshStandardMaterial(L.steel);
   const strings = new THREE.MeshStandardMaterial({ ...L.steel, color: "#ffffff" });
-  const materials = [felt, maple, damperFelt, keybed, ivory, ebony, steel, strings];
+  const materials = [felt, maple, damperFelt, damperCut, keybed, ivory, ebony, steel, strings];
   const geometries: THREE.BufferGeometry[] = [];
   const geo = <T extends THREE.BufferGeometry>(g: T) => (geometries.push(g), g);
   const mesh = (g: THREE.BufferGeometry, m: THREE.Material) => new THREE.Mesh(geo(g), m);
@@ -161,7 +163,7 @@ export function makeInside(canvas: HTMLCanvasElement, labelList: HTMLUListElemen
   cut.add(hammer);
 
   const damper = new THREE.Group();
-  damper.add(new THREE.Mesh(damperGeo, damperFelt));
+  damper.add(new THREE.Mesh(damperGeo, damperCut));
   damper.add(mesh(new THREE.CylinderGeometry(1.2, 1.2, stringY - G.key.h, 8).translate(0, G.key.h + (stringY - G.key.h) / 2, z(G.damper.s)), steel));
   cut.add(damper);
   const cutString = mesh(new THREE.CylinderGeometry(G.string.r * 1.6, G.string.r * 1.6, G.string.to - G.string.from, 8).rotateX(Math.PI / 2).translate(0, stringY, z((G.string.from + G.string.to) / 2)), steel);
@@ -170,14 +172,14 @@ export function makeInside(canvas: HTMLCanvasElement, labelList: HTMLUListElemen
 
   // The parts' names, pinned to the moving groups.
   const named: [string, THREE.Object3D, THREE.Vector3][] = [
-    ["Key", key, new THREE.Vector3(0, G.key.h + 8, G.key.balance - 90)],
+    ["Key", key, new THREE.Vector3(0, G.key.h + 8, 60)],
     ["Wippen", wippen, new THREE.Vector3(0, -G.wippen.h - 4, -G.wippen.len + 25)],
     ["Jack", jack, new THREE.Vector3(0, G.jack.h + 30, 0)],
-    ["Repetition lever", rep, new THREE.Vector3(0, 46, 40)],
+    ["Repetition lever", rep, new THREE.Vector3(0, 4, -G.repetition.len - 45)],
     ["Hammer", hammer, new THREE.Vector3(0, G.head.molding + G.head.h + 6, -G.shank.len)],
     ["Backcheck", key, new THREE.Vector3(0, G.key.h + G.backcheck.h + 6, -(G.backcheck.s - G.key.balance))],
     ["Damper", damper, new THREE.Vector3(0, stringY + G.damper.block[1] + 10, z(G.damper.s))],
-    ["String", cut, new THREE.Vector3(0, stringY + 6, z(G.string.to - 110))],
+    ["String", cut, new THREE.Vector3(0, stringY + 6, z(420))],
   ];
   const labelEls = named.map(([text]) => {
     const li = document.createElement("li");
@@ -206,7 +208,11 @@ export function makeInside(canvas: HTMLCanvasElement, labelList: HTMLUListElemen
   const steelColor = new THREE.Color(L.steel.color);
   const litColor = new THREE.Color(L.lit);
   const tint = new THREE.Color();
-  for (let k = 0; k < 88; k++) rowStrings.setColorAt(k, steelColor);
+  const damperRest = new THREE.Color(L.damperRest);
+  for (let k = 0; k < 88; k++) {
+    rowStrings.setColorAt(k, steelColor);
+    dampers.setColorAt(k, damperRest);
+  }
 
   const m4 = new THREE.Matrix4();
   const q = new THREE.Quaternion();
@@ -221,7 +227,7 @@ export function makeInside(canvas: HTMLCanvasElement, labelList: HTMLUListElemen
   // --- Cameras: one per view, each with its slow sway ---
   const camera = new THREE.PerspectiveCamera(30, 1, 5, 8000);
   const views: Record<View, { at: THREE.Vector3; look: THREE.Vector3 }> = {
-    cutaway: { at: new THREE.Vector3(1000, 250, -360), look: new THREE.Vector3(0, 120, -375) },
+    cutaway: { at: new THREE.Vector3(750, 190, -380), look: new THREE.Vector3(0, 118, -385) },
     row: { at: new THREE.Vector3(0, 1100, 1250), look: new THREE.Vector3(0, 80, -420) },
   };
   let view: View = "cutaway";
@@ -252,6 +258,7 @@ export function makeInside(canvas: HTMLCanvasElement, labelList: HTMLUListElemen
       rep.rotation.x = p.phase === "repetition" || escaped ? L.repetitionRad : 0;
       hammer.rotation.x = p.hammer * blowAngle;
       damper.position.y = p.damper * G.damper.lift;
+      damperCut.color.copy(damperRest).lerp(litColor, p.damper);
       const shake = (k: number) => (still ? 0 : Math.sin((nowMs / 1000) * 2 * Math.PI * L.shimmerHz + k) * amps[k] * L.shimmerMm);
       cutString.position.y = shake(latest);
       (cutString.material as THREE.MeshStandardMaterial).emissive.copy(litColor).multiplyScalar(still ? 0 : amps[latest] * 0.6);
@@ -268,11 +275,13 @@ export function makeInside(canvas: HTMLCanvasElement, labelList: HTMLUListElemen
           place(hammers, k, hx(k), G.shank.pivotY, z(G.shank.pivotS), pk.hammer * blowAngle);
           place(heads, k, hx(k), G.shank.pivotY, z(G.shank.pivotS), pk.hammer * blowAngle);
           place(dampers, k, hx(k), pk.damper * G.damper.lift, 0, 0);
+          dampers.setColorAt(k, tint.copy(damperRest).lerp(litColor, pk.damper));
           place(rowStrings, k, hx(k), stringY + shake(k), z(G.shank.pivotS + G.shank.len - 60), 0, v3.set(1, 1, L.scale(k)));
           rowStrings.setColorAt(k, still ? steelColor : tint.copy(steelColor).lerp(litColor, Math.min(1, amps[k])));
         }
         for (const im of [whiteKeys, blackKeys, hammers, heads, dampers, rowStrings]) im.instanceMatrix.needsUpdate = true;
         rowStrings.instanceColor!.needsUpdate = true;
+        dampers.instanceColor!.needsUpdate = true;
       }
 
       // The camera: a move between views, then the slow sway about the target.

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { Chart } from "../../../contracts";
 import { msPerBeat } from "../../core/settings";
 import { parsePedal } from "../../pedal";
-import { actionSettings as S, approachMs, flightMs, KeyAction, Rail, railFor, ring, type Phase } from "./action";
+import { actionSettings as S, approachMs, flightMs, KeyAction, Rail, railFor, ring, snap, type Phase } from "./action";
 import { schedule, sendsIn } from "./schedule";
 
 const read = (f: string) => JSON.parse(readFileSync(new URL(`../../../../public/songs/moonlight-1/${f}`, import.meta.url), "utf8"));
@@ -81,6 +81,17 @@ describe("one key's stroke (inside)", () => {
       expect(flightMs(v + 9)).toBeLessThan(flightMs(v));
       expect(approachMs(v + 9)).toBeLessThan(approachMs(v));
     }
+  });
+});
+
+describe("reduced motion (inside)", () => {
+  it("parts snap to their state's position: nothing in between", () => {
+    const k = new KeyAction();
+    k.press(1000, 80, true);
+    k.release(1300);
+    const seen = new Set<number>();
+    for (let t = 0; t < 1700; t += 0.5) seen.add(snap(k.pose(t)).hammer);
+    expect([...seen].sort()).toEqual([0, S.letOff, S.check, S.repetition, 1].sort());
   });
 });
 

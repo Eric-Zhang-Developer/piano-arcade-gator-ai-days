@@ -174,3 +174,16 @@ export class Rail {
 // A string's ring, stepped per frame: struck to its velocity, decaying slowly with the damper up and fast with it down.
 export const ring = (amp: number, dtMs: number, damper: number) =>
   amp * Math.exp(-dtMs / (damper > 0.5 ? actionSettings.ring.sustainMs : actionSettings.ring.dampedMs));
+
+// Reduced motion: each part jumps to its state's position instead of travelling there.
+const SNAP: Record<Phase, () => number> = {
+  rest: () => 0,
+  approach: () => 0,
+  flight: () => actionSettings.letOff,
+  strike: () => 1,
+  rebound: () => actionSettings.check,
+  checked: () => actionSettings.check,
+  repetition: () => actionSettings.repetition,
+  return: () => 0,
+};
+export const snap = (p: Pose): Pose => ({ phase: p.phase, key: p.key >= 0.5 ? 1 : 0, hammer: SNAP[p.phase](), damper: p.damper > 0 ? 1 : 0 });

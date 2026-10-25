@@ -20,7 +20,7 @@ export const G = {
   check: 12, // the hammer's distance from the string where the backcheck catches it (Kawai US 5,159,762's rule: 10–15 mm)
   backcheck: { s: 500, h: 40, w: 10 },
   damper: { s: 560, lift: 8, block: [40, 22] as [number, number] },
-  string: { from: 300, to: 760, r: 0.6 },
+  string: { from: 300, to: 650, r: 0.6 },
   row: { keyWidth: 23.41 }, // the row view: key pitch 1194/51 mm (Voit); hammers spread evenly over the keys' span
 };
 

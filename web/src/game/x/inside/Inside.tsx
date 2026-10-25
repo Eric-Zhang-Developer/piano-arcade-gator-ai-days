@@ -14,7 +14,7 @@ import { PIANO_NAME } from "../../laptop-sound";
 import { loadPedal } from "../../pedal";
 import { createSimMidiAccess, installSim } from "../../sim/fake";
 import { AHEAD_MS, silence, type Out } from "../composers-hands/rolls";
-import { KeyAction, Rail, ring, type Phase, type Pose } from "./action";
+import { KeyAction, Rail, ring, snap, type Phase, type Pose } from "./action";
 import { SOURCE } from "./geometry";
 import { makeInside, type InsideScene, type View } from "./scene";
 import { LEAD_MS, schedule, sendsIn, SONG } from "./schedule";
@@ -138,7 +138,11 @@ export function Inside() {
     const s = makeInside(c, labels.current);
     if (!s) return setNoWebGL(true);
     scene.current = s;
-    const still = reducedMotion();
+    // Reduced motion, followed live: the OS setting can change mid-visit.
+    const mq = typeof matchMedia === "function" ? matchMedia("(prefers-reduced-motion: reduce)") : null;
+    let still = !!mq?.matches;
+    const onMotion = (e: MediaQueryListEvent) => void (still = e.matches);
+    mq?.addEventListener("change", onMotion);
     const poses: Pose[] = Array.from({ length: 88 }, () => ({ key: 0, hammer: 0, damper: 0, phase: "rest" as Phase }));
     const timing = process.env.NODE_ENV !== "production" ? (window.__inside = { workMs: [] as number[], view: "cutaway" as View, playing: false }) : null;
     let last = performance.now();
@@ -155,8 +159,9 @@ export function Inside() {
       const t0 = performance.now();
       const L = live.current;
       for (let k = 0; k < 88; k++) {
-        const p = L.keys[k].pose(t0);
-        const damper = Math.max(p.damper, L.rail.forKey(t0, k));
+        const p = still ? snap(L.keys[k].pose(t0)) : L.keys[k].pose(t0);
+        const rail = L.rail.forKey(t0, k);
+        const damper = Math.max(p.damper, still ? (rail > 0.5 ? 1 : 0) : rail);
         poses[k] = { ...p, damper };
         const v = L.keys[k].struckBetween(last, t0);
         L.amps[k] = v ? Math.max(L.amps[k], v / 127) : ring(L.amps[k], t0 - last, damper);
@@ -182,6 +187,7 @@ export function Inside() {
     raf = requestAnimationFrame(draw);
     return () => {
       cancelAnimationFrame(raf);
+      mq?.removeEventListener("change", onMotion);
       ro.disconnect();
       s.dispose();
       scene.current = null;

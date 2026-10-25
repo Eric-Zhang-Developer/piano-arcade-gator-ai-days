@@ -19,6 +19,7 @@ export function RecordMoment({ chartId, date }: { chartId: string; date: string 
       <div className={styles.stamp} data-testid="new-record">
         NEW RECORD
       </div>
+      <InitialsSaid letters={letters} done={done} saved={saved} />
       {done ? (
         <div className={styles.saved} data-testid="initials-saved">
           {letters.join("")} · {saved ? "saved" : "couldn't be saved"}
@@ -36,6 +37,17 @@ export function RecordMoment({ chartId, date }: { chartId: string; date: string 
         </div>
       )}
     </section>
+  );
+}
+
+// One polite live region for the entry (#1247): the letters so far, then the saved line. Visually hidden: the cells and
+// the line above already show it, and the look doesn't change.
+export function InitialsSaid({ letters, done, saved }: { letters: string[]; done: boolean; saved: boolean }) {
+  const text = done ? `${letters.join("")} · ${saved ? "saved" : "couldn't be saved"}` : letters.length ? `Initials: ${letters.join(" ")}` : "";
+  return (
+    <p className={styles.said} role="status" aria-live="polite" data-testid="initials-said">
+      {text}
+    </p>
   );
 }
 

@@ -1,9 +1,12 @@
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { Chart, Take } from "../../contracts";
 import { judgeTake, noteTimeMs } from "../core/judge";
 import { GOOD_MS } from "../core/settings";
 import { pianoOutSettings } from "../piano-out";
 import { highwayAt, latePresses, replayChartTime, replaySpan, replayView } from ".";
+import { ReplayOverlay } from "./overlay";
 
 // 4/4 at 120 bpm (500 ms a beat, 2 s a bar): C D E F on beats 0–3.
 const chart: Chart = {
@@ -71,5 +74,22 @@ describe("the panel", () => {
     expect(p.resultsPanel!({ chart, take, results, params: new URLSearchParams(), retry() {} })).not.toBeNull();
     const empty = { ...take, events: [] };
     expect(p.resultsPanel!({ chart, take: empty, results: judgeTake(chart, empty), params: new URLSearchParams(), retry() {} })).toBeNull();
+  });
+});
+
+describe("the overlay", () => {
+  const html = renderToStaticMarkup(createElement(ReplayOverlay, { chart, take, results, onClose() {} }));
+
+  it("is a dialog named by its caption (#1245)", () => {
+    expect(html).toMatch(/^<dialog data-testid="replay-overlay" aria-labelledby="replay-caption"/);
+    expect(html).toMatch(/<p id="replay-caption"[^>]*>.*Replay/);
+  });
+
+  it("captions on the kit with no key hint; Stop carries Esc (#1246)", () => {
+    const caption = html.match(/<p id="replay-caption".*?<\/p>/)![0];
+    expect(caption).toContain('data-kit="mono"');
+    expect(caption).toContain("clamp(16px, 1.25vw, 24px)");
+    expect(caption).not.toContain("Esc");
+    expect(html).toMatch(/<button[^>]*title="Stop \(Esc\)"[^>]*aria-keyshortcuts="Escape"[^>]*>Stop<\/button>/);
   });
 });

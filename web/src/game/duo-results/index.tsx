@@ -3,7 +3,7 @@
 // Every number comes from the take (scores.ts); every frame, label and button is the Duo kit's.
 import { useEffect, type CSSProperties, type ReactNode } from "react";
 import type { Chart, GamePlugin, Results, ResultsPanelContext, Take } from "../../contracts";
-import { Brackets, Button, MonoLabel, Panel } from "../duo-tokens";
+import { Brackets, kitButton, MonoLabel, Panel } from "../duo-tokens";
 import { isWaitMode } from "../wait-mode";
 import { playMode } from "../play-modes/modes";
 import {
@@ -193,8 +193,10 @@ const storage = () => {
   }
 };
 
-// The gator, the template line, and one primary button: PRACTICE BARS X–Y on the weak run, else NEXT SONG. After a
+// The gator, the template line, and one primary link in the kit's button look: PRACTICE BARS X–Y on the weak run,
+// else NEXT SONG. A link, not a button, so it opens in a new tab and reads as where it goes (#1244). After a
 // scored take it saves the run as "next for you" for the select (saveNextFor refuses bot, demo and practice takes).
+const primary = kitButton("primary");
 export function Tutor({ d, chart, params }: { d: DuoTake; chart: Chart; params: URLSearchParams }) {
   const { run, lines, href, hand } = d;
   useEffect(() => {
@@ -211,9 +213,9 @@ export function Tutor({ d, chart, params }: { d: DuoTake; chart: Chart; params: 
         </p>
         {lines[1] && <p style={{ margin: 0, color: "var(--pa-ink-dim)" }}>{lines[1]}</p>}
       </div>
-      <Button data-testid="duo-practice" data-href={href} onClick={() => window.location.assign(href)} style={{ flexShrink: 0, whiteSpace: "nowrap" }}>
+      <a data-testid="duo-practice" href={href} className={primary.className} style={{ ...primary.style, flexShrink: 0, whiteSpace: "nowrap", textDecoration: "none" }}>
         {run ? `PRACTICE ${span(run)}` : "NEXT SONG"}
-      </Button>
+      </a>
     </div>
   );
 }

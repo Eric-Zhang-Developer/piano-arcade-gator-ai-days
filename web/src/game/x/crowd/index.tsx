@@ -107,6 +107,8 @@ export const crowd: Experiment = {
   href: "/play?song=twinkle&x=crowd",
   plugin: (): GamePlugin => {
     let mic: Mic | null = null;
+    let simulated = false; // the checks' stand-in for a live mic: no stream is opened
+    const live = () => !!mic || simulated;
     let opening = false;
     let room = crowdRoom(120, 4);
     let running = false;
@@ -122,6 +124,7 @@ export const crowd: Experiment = {
     const stop = () => {
       mic?.stop();
       mic = null;
+      simulated = false;
       if (leave) clearInterval(leave);
       leave = null;
       if (typeof window !== "undefined") window.removeEventListener("pagehide", stop);
@@ -150,7 +153,19 @@ export const crowd: Experiment = {
       listeners.add(f);
       return () => void listeners.delete(f);
     };
-    const state = () => (mic ? "on" : opening ? "opening" : "off");
+    const state = () => (live() ? "on" : opening ? "opening" : "off");
+    // For the checks and the look loop: the room as if the mic were on, and claps fed in on the worklet's path.
+    if (typeof window !== "undefined")
+      (window as unknown as { __crowd?: unknown }).__crowd = {
+        listen() {
+          simulated = true;
+          changed();
+        },
+        clap: (perfMs = performance.now()) => onClap(perfMs),
+        get score() {
+          return room.score;
+        },
+      };
     function Panel() {
       const now = useSyncExternalStore(subscribe, state, () => "off");
       const [error, setError] = useState<string | null>(null);
@@ -191,11 +206,11 @@ export const crowd: Experiment = {
       onEvent(e) {
         if (e.type === "songStart") {
           room.reset();
-          running = !!mic;
-          heard = !!mic;
+          running = live();
+          heard = live();
           last = null;
         } else if (e.type === "pause") running = false;
-        else if (e.type === "resume") running = !!mic;
+        else if (e.type === "resume") running = live();
         else if (e.type === "songEnd" || e.type === "quit") {
           running = false;
           last = room.score;
@@ -204,7 +219,7 @@ export const crowd: Experiment = {
       },
       draw(ctx, f) {
         map = { perf: performance.now(), chart: f.nowMs };
-        if (!mic && !running) return;
+        if (!live() && !running) return;
         drawRoom(ctx, f, room, map.perf, (target) => {
           const dt = Math.max(0, map!.perf - shownAt);
           shownAt = map!.perf;

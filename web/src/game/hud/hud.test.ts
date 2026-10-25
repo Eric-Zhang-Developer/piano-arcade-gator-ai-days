@@ -145,11 +145,11 @@ describe("the HUD in wait mode", () => {
     return out;
   };
 
-  it("draws the song card only: no counters, score, multiplier or combo", () => {
-    expect(texts("")).toEqual(expect.arrayContaining(["PERFECT", "SCORE", "COMBO"]));
+  it("draws the song tag only: no combo, multiplier, accuracy or score", () => {
+    expect(texts("")).toEqual(expect.arrayContaining(["ACC", "SCORE", "COMBO", "x4", "30"]));
     const wait = texts("mode=wait");
-    expect(wait).toContain("Twinkle");
-    for (const s of ["PERFECT", "SCORE", "COMBO", "x1", "x4", "30"]) expect(wait).not.toContain(s);
+    expect(wait).toContain("TWINKLE");
+    for (const s of ["ACC", "SCORE", "COMBO", "x1", "x4", "30"]) expect(wait).not.toContain(s);
   });
 });
 
@@ -169,16 +169,24 @@ describe("the combo in the band (combo-hud)", () => {
     [1920, 1080],
   ] as const;
 
-  it.each(sizes)("at %ix%i the slots don't overlap, in order, and the combo's is centered", (w, h) => {
+  it.each(sizes)("at %ix%i the song tag and the combo cluster sit in the band, apart, clear of beat-track's gutter", (w, h) => {
     const l = hudLayout(w, makeLayout(chart, w, h, 0).judgmentLineY);
-    const order = [l.slots.card, l.slots.hits, l.slots.combo, l.slots.breaks, l.slots.score];
-    order.forEach((s, i) => {
-      expect(s.x1).toBeGreaterThan(s.x0);
-      if (i > 0) expect(s.x0).toBeGreaterThanOrEqual(order[i - 1].x1);
-    });
-    expect((l.slots.combo.x0 + l.slots.combo.x1) / 2).toBeCloseTo(w / 2);
-    expect(l.combo.cx).toBe(w / 2);
-    expect(l.combo.size).toBeGreaterThan(l.panel.h * 0.5); // bigger than the multiplier
+    for (const b of [l.tag, l.cluster]) {
+      expect(b.x1).toBeGreaterThan(b.x0);
+      expect(b.y0).toBeGreaterThanOrEqual(0);
+      expect(b.y1).toBeLessThanOrEqual(l.panel.h);
+    }
+    expect(l.tag.x1).toBeLessThan(l.cluster.x0);
+    expect(l.cluster.x1).toBeLessThanOrEqual(w - hudSettings.statusGutterPx);
+    expect(l.combo.cx).toBeGreaterThan(l.cluster.x0);
+    expect(l.combo.cx).toBeLessThan(l.stack.x);
+    expect(l.stack.x).toBeLessThan(l.cluster.x1);
+  });
+
+  it("readable on video: at 1920x1080 the combo numeral is at least 64 px and its labels at least 16 px", () => {
+    const l = hudLayout(1920, makeLayout(chart, 1920, 1080, 0).judgmentLineY);
+    expect(l.combo.size).toBeGreaterThanOrEqual(64);
+    expect(Math.round(l.stack.px)).toBeGreaterThanOrEqual(16);
   });
 
   // A fake context that records every fill with where its bottom lands, through translate, save and restore.
@@ -214,9 +222,9 @@ describe("the combo in the band (combo-hud)", () => {
     if (milestone !== null) p.onEvent!({ type: "comboMilestone", count: milestone, atMs: 1000 });
     const line = makeLayout(chart, w, h, 0).judgmentLineY;
     p.draw!(r.ctx, { width: w, height: h, judgmentLineY: line, nowMs: 1000 + sinceMs } as never);
-    return { ...r, band: hudLayout(w, line).panel.h, w };
+    return { ...r, band: hudLayout(w, line).panel.h, w, l: hudLayout(w, line) };
   };
-  const comboFills = (d: ReturnType<typeof drawAt>, n: number) => d.fills.filter((f) => f.text === String(n) && f.x === d.w / 2);
+  const comboFills = (d: ReturnType<typeof drawAt>, n: number) => d.fills.filter((f) => f.text === String(n) && f.x === d.l.combo.cx);
 
   it.each(sizes)("at %ix%i, combo 120 just after the 100 milestone: every fill stays in the band, the combo at full strength", (w, h) => {
     const d = drawAt(120, 100, 100, w, h);
@@ -246,11 +254,11 @@ describe("the combo in the band (combo-hud)", () => {
     }
   });
 
-  it("Twinkle's title fits its card at 1280x720 and 1920x1080 without shrinking (at 0.6 em per glyph)", () => {
+  it("Twinkle's title fits its tag at 1280x720 and 1920x1080 without shrinking (at 0.6 em per glyph)", () => {
     for (const [w, h] of [sizes[1], sizes[2]]) {
       const d = drawAt(0, null, 0, w, h);
-      const title = d.fills.find((f) => f.text === chart.title);
-      expect(title?.px).toBe(Math.round(d.band * 0.3));
+      const title = d.fills.find((f) => f.text === chart.title.toUpperCase());
+      expect(title?.px).toBe(Math.round(d.band * 0.21));
     }
   });
 });

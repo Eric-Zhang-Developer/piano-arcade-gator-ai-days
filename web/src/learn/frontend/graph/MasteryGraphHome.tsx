@@ -32,7 +32,8 @@ const dotRadius = (depth: number, painted: boolean) => depth === 0 ? 9 : depth =
 export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
   const { active, begin } = useGuidedEntry();
   const router = useRouter();
-  const stage = useRef<HTMLDivElement>(null), uid = useId();
+  // The stage is the map field the camera projects into; the frame also holds the companion, which sits above it when stacked.
+  const stage = useRef<HTMLDivElement>(null), frame = useRef<HTMLDivElement>(null), uid = useId();
   const [viewport, setViewport] = useState({ ...mapSize });
   const [flightCaptions, setFlightCaptions] = useState<AnchoredLabel[]>([]);
   const [loaded, setLoaded] = useState<Loaded | null>(null);
@@ -88,7 +89,7 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
   }
   function enterActivity(event: MouseEvent<HTMLButtonElement>) {
     if (!first) return guide.onStart();
-    const element = stage.current, pet = element?.querySelector<HTMLImageElement>('[data-gator-perch]');
+    const element = stage.current, pet = frame.current?.querySelector<HTMLImageElement>('[data-gator-perch]');
     const target = projected.find(point => point.node.id === first.nodeId);
     const href = activityHref(first);
     if (!element || !pet || !target || active) return;
@@ -99,7 +100,8 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
   const songs = curriculum.songs, chosen = loaded?.goals.songIds ?? [];
   return <DuoScope className={styles.home} aria-busy={!!active || !loaded} aria-label="Your map">
     <div className={styles.body}>
-      <div ref={stage} className={styles.mapStage} data-entering={!!active} data-camera-scale={camera.scale} data-camera-x={camera.x} data-camera-y={camera.y}>
+      <div ref={frame} className={styles.mapStage} data-entering={!!active} data-camera-scale={camera.scale} data-camera-x={camera.x} data-camera-y={camera.y}>
+        <div ref={stage} className={styles.mapField}>
         <svg className={styles.map} viewBox={`0 0 ${viewport.width} ${viewport.height}`} role="group" aria-label={`Your learning map: ${counts.mastered} mastered, ${counts['in-progress']} in progress, ${counts.unknown} not yet.`}>
           <defs><marker id={`${uid}-arrow`} markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1L7 4L1 7Z" className={styles.arrowhead}/></marker></defs>
           <g aria-hidden="true">{points.map(point => {
@@ -116,6 +118,7 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
           {labels.map(label => <g key={`label-${label.id}`} className={styles.caption} data-label-id={label.id} data-target={label.id === recommendedId} pointerEvents="none"><rect className={styles.labelClearance} x={label.x} y={label.y} width={label.width} height={label.height}/><text x={label.x+label.width/2} y={label.y+label.height-6} textAnchor="middle" className={label.root?styles.groupLabel:styles.nodeLabel}>{label.text}</text></g>)}
         </svg>
         <ul className={styles.legend} aria-label="Map colours">{legend.map(colour => <li key={colour} data-state={colour}><span className={styles.swatch} aria-hidden="true"/>{colourWords[colour]}</li>)}</ul>
+        </div>
         {next && (first
           ? <GraphCompanion title={shortTitle(titles.get(first.nodeId) ?? first.nodeId)} reason={first.reason} actionLabel={activityLabel(first.activity)} complete={false} entering={!!active} onStart={enterActivity}/>
           : <GraphCompanion eyebrow="Next isn't connected, so this is the prepared activity." title={guide.activity.title} reason={guide.activity.reason} actionLabel={guide.actionLabel} complete={guide.complete} entering={!!active} onStart={enterActivity}/>)}

@@ -11,7 +11,8 @@
 .legend li[data-state=mastered] .swatch { border-color:var(--pa-primary); background:var(--pa-primary); }
 
 .body { flex:1; min-height:0; display:grid; grid-template-columns:minmax(0,1fr) 360px; }
-.mapStage { min-height:0; min-width:0; position:relative; }
+.mapStage { min-height:0; min-width:0; position:relative; display:flex; flex-direction:column; }
+.mapField { flex:1; min-height:0; position:relative; }
 .map { width:100%; height:100%; display:block; overflow:hidden; outline:none; }
 
 .backbone { fill:none; stroke:var(--pa-ink-dim); stroke-width:1.6; opacity:.55; }
@@ -41,6 +42,8 @@
 .empty { color:var(--pa-ink-dim); padding:12px 14px; border:1px dashed var(--pa-line); }
 .error { color:var(--pa-ink); padding:12px 14px; border:1px solid var(--pa-secondary); }
 .songs { display:flex; flex-wrap:wrap; gap:8px; margin:0; padding:0; list-style:none; }
+/* Too narrow for the map, the companion and the rail side by side: stack them and scroll, never overprint. */
+@media (max-width:900px) { .body { display:flex; flex-direction:column; overflow:auto; } .mapStage { flex:1 0 auto; } .mapField { flex:1 0 420px; } .rail { flex:none; overflow:visible; border-left:0; border-top:1px solid var(--pa-line); } }
 
 .home button:focus-visible,.home a:focus-visible { outline:2px solid var(--pa-primary); outline-offset:3px; }
 .home button:hover:not(:disabled),.home a:hover { filter:brightness(1.12); }

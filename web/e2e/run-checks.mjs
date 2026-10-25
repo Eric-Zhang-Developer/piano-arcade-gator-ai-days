@@ -32,13 +32,17 @@ export const KNOWN_RED = {
   "web/src/game/duo-results/verify-results.mjs": 754, // a localStorage page error, under repro
   "web/src/game/first-run/verify-first-run.mjs": 1148, // reads Start by its tag; #1100 gave it an id (main's run 40192807028)
   "web/src/game/ghost/verify-ghost.mjs": 1032, // stale after judging-tiers' +60 ms late bot (#859)
+  "web/src/game/hand-mode/verify-hands.mjs": 754, // chart zero -2.1 ms from the first kick (PR run 40194634606)
   "web/src/game/learn-from-select/verify-learn.mjs": 1025, // the ? card repeats the Learn line (#796)
   "web/src/game/records/verify-records.mjs": 754, // failed its first attempt on main too: red on any one-attempt PR
+  "web/src/game/results-landing/verify-landing.mjs": 754, // `results` of undefined: drift since #978 (PR run 40194634606)
   "web/src/game/sheet-beams/verify-beams.mjs": 1053, // the paper's darker hues (#730)
+  "web/src/game/song-finder/verify-finder.mjs": 754, // focus on BODY after the reload (#1074 and #1124 runs)
   "web/src/game/song-options/verify-options.mjs": 754, // hands-R times out after a take, under repro
   "web/src/game/take-graph/verify-take-graph.mjs": 1032, // the +60 ms late bot (#859), the graph across its card (#839)
   "web/src/game/wait-mode/verify-wait.mjs": 1034, // the Flow rung read mid-take (#841)
   "web/src/game/watch-demo/verify-watch.mjs": 1100, // AutoStart clicks the first button, not Start, since #763
+  "web/src/game/x/highlight-reel/verify-highlight.mjs": 754, // a 14.854 s fallback reel, want 15.0 ± 0.1 (PR run 40194634606)
 };
 
 // Checks CI skips because other checks cover them in smaller pieces. Each stays a whole run for people and specs.

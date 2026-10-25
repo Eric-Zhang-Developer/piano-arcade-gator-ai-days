@@ -14,8 +14,8 @@ eric-agent-6, 2026-10-25. Each is the smaller, reversible option. Undo by changi
 - **MISS row:** a miss has no offset, so its × sits in its own labelled row between the plot and the velocity strip,
   not on the zero line, where the trend lines covered it (round 1).
 - **Draw-in:** a `clip-path` inset from the right to nothing, 600 ms, `cubic-bezier(0.2, 0.7, 0.2, 1)`. It starts
-  the first time a quarter of the graph is on screen (IntersectionObserver). results-landing (#978) isn't on main;
-  its end state is above the fold, so a graph that waits to be scrolled to can't play during it. Reduced motion draws
+  the first time a quarter of the graph is on screen (IntersectionObserver). results-landing (#978) plays above the
+  fold and the graph sits below it in Details, so the draw-in never plays during the landing. Reduced motion draws
   at once.
 - **Plot height:** 196 px up to 1400-px cards, then 14% of the width, capped at 260, so the 1920 card doesn't read
   flat. Type stays at its px size: the viewBox is the card's measured width.

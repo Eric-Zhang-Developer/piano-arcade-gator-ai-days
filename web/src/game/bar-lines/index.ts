@@ -49,28 +49,39 @@ function labelFont(): string {
 
 // Where a note head due at atMs would be. Lines below the judgment line (over the keys) or above the canvas don't draw.
 export function drawBarLines(ctx: CanvasRenderingContext2D, L: Layout, lines: BarLine[], nowMs: number): void {
+  const line = L.judgmentLineY;
+  const pxPerMs = line / settings.lookaheadMs;
+  ctx.save();
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = `rgba(255,255,255,${barLineSettings.lineAlpha})`;
+  for (const b of lines) {
+    const y = line - (b.atMs - nowMs) * pxPerMs;
+    if (y < 0 || y > line) continue;
+    const yy = Math.round(y) + 0.5; // a crisp 1 px line
+    ctx.beginPath();
+    ctx.moveTo(L.project(0, y), yy);
+    ctx.lineTo(L.project(L.width, y), yy);
+    ctx.stroke();
+  }
+  ctx.restore();
+  drawBarLabels(ctx, L, lines, nowMs);
+}
+
+// The bar numbers at the left edge, over each line on the highway (highway-field draws the lines themselves).
+export function drawBarLabels(ctx: CanvasRenderingContext2D, L: Layout, lines: BarLine[], nowMs: number): void {
   const s = barLineSettings;
   const line = L.judgmentLineY;
   const pxPerMs = line / settings.lookaheadMs;
   const px = Math.round((s.labelPx * L.height) / 720);
   ctx.save();
-  ctx.lineWidth = 1;
-  ctx.strokeStyle = `rgba(255,255,255,${s.lineAlpha})`;
   ctx.fillStyle = ink;
   ctx.font = `italic 700 ${px}px ${labelFont()}`;
   ctx.textBaseline = "bottom";
+  ctx.globalAlpha = s.labelAlpha;
   for (const b of lines) {
     const y = line - (b.atMs - nowMs) * pxPerMs;
-    if (y < 0 || y > line) continue;
-    const yy = Math.round(y) + 0.5; // a crisp 1 px line
-    ctx.globalAlpha = 1;
-    ctx.beginPath();
-    ctx.moveTo(L.project(0, y), yy);
-    ctx.lineTo(L.project(L.width, y), yy);
-    ctx.stroke();
-    if (b.label === null) continue;
-    ctx.globalAlpha = s.labelAlpha;
-    ctx.fillText(String(b.label), L.project(0, y) + px * 0.5, yy - 2);
+    if (y < 0 || y > line || b.label === null) continue;
+    ctx.fillText(String(b.label), L.project(0, y) + px * 0.5, Math.round(y) + 0.5 - 2);
   }
   ctx.restore();
 }

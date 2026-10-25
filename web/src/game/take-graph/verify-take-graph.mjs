@@ -1,5 +1,5 @@
 // Headless proof of the take graph, the spec's Chrome steps: /play?bot=sloppy shows dots above and below zero and
-// ×s for the misses, a dot names its bar, beat, offset and judgment, and /play?bot=late puts every dot about 40 ms
+// ×s for the misses, a dot names its bar, beat, offset and judgment, and /play?bot=late puts every dot about 60 ms
 // late. Also: the table lists one row per note. Screenshots of each. ?beat=off keeps the laptop click out of it.
 // Usage: node web/src/game/take-graph/verify-take-graph.mjs --out <dir>
 import { spawn } from "node:child_process";
@@ -86,7 +86,9 @@ try {
   const width = await sloppy.graph.evaluate((el) => el.getBoundingClientRect().width);
   const height = await sloppy.graph.evaluate((el) => el.getBoundingClientRect().height);
   if (width < 880) fail.push(`graph is ${width} px wide at 1280×720, want 900`);
-  if (height > 240) fail.push(`graph is ${height} px tall, over results-layout's 240 px`);
+  // duo-details (#839) spans the graph across its Details card, so it scales with the width; results-layout's 240 px
+  // cap was the old first screen's. What still matters: the whole graph fits on one 720 px screen.
+  if (height > 720) fail.push(`graph is ${height} px tall, more than the 720 px screen`);
   // With the graph added the results screen is taller than 720 px: scrolled to the top, the rank must be on screen.
   const top = await sloppy.page.getByTestId("results").evaluate((el) => {
     for (let a = el.parentElement; a; a = a.parentElement) a.scrollTop = 0;
@@ -107,8 +109,9 @@ try {
 
   const late = await takeWith(browser, "late");
   const lateOffs = late.labels.map(offsetOf);
-  const off = lateOffs.filter((o) => o === null || o < 30 || o > 55);
-  if (off.length) fail.push(`late: ${off.length} dots outside +30..+55 ms: ${JSON.stringify(off.slice(0, 5))}`);
+  // The late bot plays +60 ms since judging-tiers (#859), GREAT under its 40/80/120 windows: the same band around it.
+  const off = lateOffs.filter((o) => o === null || o < 50 || o > 75);
+  if (off.length) fail.push(`late: ${off.length} dots outside +50..+75 ms: ${JSON.stringify(off.slice(0, 5))}`);
   await late.graph.screenshot({ path: join(out, "late.png") });
   fail.push(...late.errors);
 

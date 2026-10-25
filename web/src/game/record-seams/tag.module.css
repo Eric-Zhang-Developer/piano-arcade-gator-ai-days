@@ -1,13 +1,13 @@
-/* The tail's lower third: pinned bottom-left in the first view, over the results' shade. */
+/* The tail's lower third: docked bottom-right, in the strip under the results card, clear of Details ↓. */
 .tag {
   position: fixed;
-  left: clamp(16px, 2vw, 40px);
-  bottom: clamp(16px, 2vw, 40px);
+  right: clamp(16px, 2vw, 40px);
+  bottom: clamp(8px, 1.4vh, 20px);
   z-index: 6;
   display: flex;
   align-items: center;
   gap: 0.9em;
-  padding: 0.7em 0.7em 0.7em 1em;
+  padding: 0.3em 0.3em 0.3em 0.8em;
   background: color-mix(in srgb, var(--pa-bg) 88%, transparent);
   border: 1px solid var(--pa-line);
   border-left: 3px solid var(--pa-primary);
@@ -32,14 +32,16 @@
   animation: drain linear both;
 }
 
-/* The field's beat: a primary glow along the bottom, where the keyboard was, on each bar line. */
+/* The field's bar line: a primary hairline along the bottom edge, in the strip under the card, that flares on each
+   bar line with a short glow above it and dies away before the next. */
 .pulse {
   position: fixed;
   inset: auto 0 0 0;
-  height: 22vh;
+  height: 7vh;
   z-index: 5;
   pointer-events: none;
-  background: linear-gradient(to top, color-mix(in srgb, var(--pa-primary) 22%, transparent), transparent);
+  border-bottom: 2px solid var(--pa-primary);
+  background: linear-gradient(to top, color-mix(in srgb, var(--pa-primary) 40%, transparent), transparent);
   mix-blend-mode: screen;
   opacity: 0;
   animation: pulse linear infinite;
@@ -63,9 +65,9 @@
 
 @keyframes pulse {
   0% {
-    opacity: 0.55;
+    opacity: 0.9;
   }
-  40%,
+  45%,
   100% {
     opacity: 0;
   }

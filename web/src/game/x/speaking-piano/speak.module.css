@@ -135,7 +135,7 @@
 }
 
 .caps dt {
-  font: 500 0.72em/1 var(--pa-font-data), ui-monospace, monospace;
+  font: 500 max(12px, 0.72em)/1 var(--pa-font-data), ui-monospace, monospace; /* the kit's 12 px floor (#1202) */
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--pa-ink-dim);
@@ -150,6 +150,11 @@
 .note {
   margin: 0;
   color: var(--pa-gold);
+}
+
+/* The status line stays mounted for screen readers; empty, it leaves the stand's flow (and its gap). */
+.note:empty {
+  position: absolute;
 }
 
 .small {

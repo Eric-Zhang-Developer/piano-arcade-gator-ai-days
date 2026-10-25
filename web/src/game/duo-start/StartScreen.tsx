@@ -14,7 +14,7 @@ import styles from "./start.module.css";
 
 export const groups = {
   card: ["stage-card"],
-  modes: ["play-modes", "chunk-practice", "wait-mode", "flow-mode", "sheet-view"],
+  modes: ["play-modes", "chunk-practice", "wait-mode", "flow-mode", "sheet-view", "stage-view"],
   bar: ["hand-mode"],
   drawer: ["leds"],
   // Labels is the drawer's own row; Z / X and ← → are key hints. See specs/decisions/duo-start-settings.md.

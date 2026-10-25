@@ -89,6 +89,13 @@ export const labGroups: LabGroup[] = [
         href: "/attract",
         open: "/attract",
       },
+      {
+        slug: "stage-view",
+        name: "Stage view",
+        description: "notes rise dim on a back slope, tip over a lit crest and speed down to the bar, over 1033 ms.",
+        href: "/stage",
+        open: "/stage",
+      },
     ],
   },
   {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Chart } from "../../contracts";
-import { fileTimeAt, loopWindow, parseSidecar, segmentsFrom, skipReason } from ".";
+import { fileTimeAt, getRecordingVolume, loopWindow, parseSidecar, segmentsFrom, setRecordingVolume, skipReason, subscribeRecordingVolume } from ".";
 
 // 120 bpm, 4/4: a beat is 500 ms, a bar 2000 ms. Eight bars, one note a bar.
 const chart: Chart = {
@@ -62,5 +62,17 @@ describe("audio-track timing", () => {
     expect(parseSidecar({ src: "golden.mp3" })).toBeNull();
     expect(parseSidecar({ src: "", offsetMs: 0 })).toBeNull();
     expect(parseSidecar(null)).toBeNull();
+  });
+
+  it("the recording volume clamps to 0–1 and tells its listeners", () => {
+    let heard = 0;
+    const off = subscribeRecordingVolume(() => heard++);
+    setRecordingVolume(1.5);
+    expect(getRecordingVolume()).toBe(1);
+    setRecordingVolume(-1);
+    expect(getRecordingVolume()).toBe(0);
+    off();
+    setRecordingVolume(0.4);
+    expect([getRecordingVolume(), heard]).toEqual([0.4, 2]);
   });
 });

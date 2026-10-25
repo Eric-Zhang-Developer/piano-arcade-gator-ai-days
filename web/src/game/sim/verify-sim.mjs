@@ -59,7 +59,7 @@ try {
   await bot.click();
   say("verify-sim: clicked Watch the bot on /sim");
 
-  const game = page.frameLocator('iframe[title="game"]');
+  const game = page.frameLocator('iframe[data-testid="sim-game"]');
   await game.locator('[data-testid="results"]').waitFor({ timeout: 90_000 });
   await page.screenshot({ path: join(out, "sim-results.png") });
   const dom = {};

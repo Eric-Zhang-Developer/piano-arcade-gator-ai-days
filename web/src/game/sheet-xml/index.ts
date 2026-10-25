@@ -6,27 +6,28 @@ import { shouldBeam } from "../sheet-beams";
 import { estimateKey, spell, spellingFor, type Key } from "./key";
 import { overrides, type Override } from "./overrides";
 
-export const DIVISIONS = 12; // per quarter note: a 16th is 3, an eighth triplet 4
+export const DIVISIONS = 24; // per quarter note: a 32nd is 3, a 16th 6, an eighth triplet 8
 
 // The note values that print as one notehead: largest first, with whether it's dotted. Lengths a multiple of 3 print
 // from the plain values; the rest are triplets (time-modification 3:2), one beat or less.
 const PLAIN: [number, string, boolean][] = [
-  [48, "whole", false],
-  [36, "half", true],
-  [24, "half", false],
-  [18, "quarter", true],
-  [12, "quarter", false],
-  [9, "eighth", true],
-  [6, "eighth", false],
-  [3, "16th", false],
+  [96, "whole", false],
+  [72, "half", true],
+  [48, "half", false],
+  [36, "quarter", true],
+  [24, "quarter", false],
+  [18, "eighth", true],
+  [12, "eighth", false],
+  [6, "16th", false],
+  [3, "32nd", false],
 ];
 const TRIPLET: [number, string, boolean][] = [
-  [8, "quarter", false],
-  [4, "eighth", false],
-  [2, "16th", false],
+  [16, "quarter", false],
+  [8, "eighth", false],
+  [4, "16th", false],
 ];
 export type Piece = [len: number, type: string, dot: boolean, triplet: boolean];
-// A span [from, to) as printable values. A length of whole 16ths prints largest first (5 16ths: a quarter and a 16th).
+// A span [from, to) as printable values. A length of whole 32nds prints largest first (5 16ths: a quarter and a 16th).
 // Anything else involves a triplet, so it splits at the beats first and each beat's part prints as triplets.
 function pieces(from: number, to: number): Piece[] {
   const greedy = (len: number, values: [number, string, boolean][], triplet: boolean): Piece[] => {
@@ -107,30 +108,35 @@ export interface Placed {
 
 // How far an onset may sit off a grid, in beats, and still print on it (decision sheet-engraving-quantize).
 const TOLERANCE = 0.06;
-const GRIDS = [6, 4, 3, 2]; // eighths, eighth triplets, 16ths, 16th sextuplets: the coarsest that fits wins
+const GRIDS = [12, 8, 6, 4, 3]; // eighths, eighth triplets, 16ths, 16th sextuplets, 32nds: the coarsest that fits wins
+// 32nds fit only on the converter's own 1/8-beat grid: within 0.06, a 16th-and-triplet beat (1/3 is 0.042 from 3/8)
+// would print as 32nds instead of snapping to the nearer of 16th and triplet.
+const tolerance = (g: number) => (g === 3 ? 1 / 48 : TOLERANCE);
 
 // The display grid: per staff and beat, the coarsest grid every onset in that beat sits within TOLERANCE of. A beat
 // that fits none (a 16th melody over triplets) snaps each onset to the nearer of the 16th and eighth-triplet grids.
 // Compound meters (6/8, 9/8, 12/8) count in eighths already, so they get no triplets.
 function snapper(notes: ChartNote[], triplets: boolean) {
   const grids = GRIDS.filter((g) => triplets || g % 3 === 0);
-  const mixed = grids.filter((g) => g === 3 || g === 4); // a beat that fits no grid
+  const mixed = grids.filter((g) => g === 6 || g === 8); // a beat that fits no grid
   const beatOf = (t: number) => Math.floor(t + TOLERANCE);
-  const fits = (rel: number[], g: number) => rel.every((r) => Math.abs(r * DIVISIONS - g * Math.round((r * DIVISIONS) / g)) <= TOLERANCE * DIVISIONS);
+  const fits = (rel: number[], g: number, tol = tolerance(g)) => rel.every((r) => Math.abs(r * DIVISIONS - g * Math.round((r * DIVISIONS) / g)) <= tol * DIVISIONS);
+  // A grid the beat sits on exactly beats a coarser one it's only near: 7/8 is a 32nd, not a sextuplet's 5/6.
+  const pick = (rel: number[]) => grids.find((g) => fits(rel, g, 1e-6)) ?? grids.find((g) => fits(rel, g));
   const at = new Map<string, number[]>(); // staff:beat -> onsets relative to the beat
   for (const n of notes) {
     const k = `${n.hand}:${beatOf(n.beat)}`;
     at.set(k, [...(at.get(k) ?? []), n.beat - beatOf(n.beat)]);
   }
-  const grid = new Map([...at].map(([k, rel]) => [k, grids.find((g) => fits(rel, g)) ?? 0]));
+  const grid = new Map([...at].map(([k, rel]) => [k, pick(rel) ?? 0]));
   // A time on its beat's grid. An end in a beat with no onsets takes the coarsest grid it fits itself.
   return (hand: string, t: number): { at: number; step: number } => {
     const k = beatOf(t);
     const r = (t - k) * DIVISIONS;
-    const g = grid.get(`${hand}:${k}`) ?? grids.find((g) => fits([t - k], g)) ?? 0;
+    const g = grid.get(`${hand}:${k}`) ?? pick([t - k]) ?? 0;
     const near = (g: number) => g * Math.round(r / g);
     const snapped = g ? near(g) : mixed.map(near).reduce((a, b) => (Math.abs(b - r) < Math.abs(a - r) ? b : a));
-    return { at: k * DIVISIONS + snapped, step: g || 3 };
+    return { at: k * DIVISIONS + snapped, step: g || DIVISIONS / 4 };
   };
 }
 
@@ -260,7 +266,7 @@ export function chartToMusicXml(chart: Chart, song: Chart = chart): string {
     const beats = new Map<string, number[]>();
     items.forEach((it, i) => {
       if (!it.piece?.[3]) return;
-      const k = it.piece[0] === 2 ? `16:${Math.floor(it.at / (DIVISIONS / 2))}` : `8:${Math.floor(it.at / DIVISIONS)}`;
+      const k = it.piece[0] === DIVISIONS / 6 ? `16:${Math.floor(it.at / (DIVISIONS / 2))}` : `8:${Math.floor(it.at / DIVISIONS)}`;
       beats.set(k, [...(beats.get(k) ?? []), i]);
     });
     for (const is of beats.values()) {

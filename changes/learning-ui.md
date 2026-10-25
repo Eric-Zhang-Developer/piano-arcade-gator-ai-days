@@ -1,5 +1,6 @@
 ## What shipped
 Current desktop learning frontend: guided mastery map, three-state parent/leaf examples, one prepared Start/real Resume, four existing activities, selected upright gator and coherent map-to-question handoff. Canonical product philosophy and a contributor design/asset handoff accompany the editable baseline.
+On `/learn`: a map of music skills, from pitch and rhythm to phrase endings, with the next lesson ready to start.
 ## Where it lives
 Start `/learn/brand-preview`; `/learn` remains Prior UI. `PRODUCT_PHILOSOPHY.md`, `PRODUCT_AND_DESIGN.md` and README explain purpose/assets/edit paths. Code lives in `web/src/learn/frontend/`, its learning routes and committed `web/public/learning/` media.
 ## How to check it

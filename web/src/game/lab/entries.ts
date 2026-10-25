@@ -59,7 +59,7 @@ export const labGroups: LabGroup[] = [
       {
         slug: "rewind",
         name: "Rewind",
-        description: "In wait mode, ◀ (or ←) moves back a bar and ▶ (or →) skips ahead one, from the HUD's buttons.",
+        description: "In Learn mode, ◀ (or ←) moves back a bar and ▶ (or →) skips ahead one, from the HUD's buttons.",
         href: "/play?song=twinkle&mode=wait",
         open: "Twinkle, Learn",
       },
@@ -168,7 +168,7 @@ export const labGroups: LabGroup[] = [
       {
         slug: "learning-ui",
         name: "Learning",
-        description: "guided mastery map, three-state parent/leaf examples, one prepared Start/real Resume, four existing activities",
+        description: "a map of music skills, from pitch and rhythm to phrase endings, with the next lesson ready to start.",
         href: "/learn",
         open: "/learn",
       },

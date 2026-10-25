@@ -1,7 +1,9 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { expect, test } from "vitest";
 import type { Chart } from "../../contracts";
+import { paperJudgmentColors } from "../sheet-view/paper-colors";
 import { DIVISIONS as XML_DIVISIONS, keyAndMeter, placeNotes, type Placed } from "../sheet-xml";
+import { paper, paperInk } from "../ui-tokens";
 import { beamGroups, beamJudgment, DIVISIONS, shouldBeam } from ".";
 
 const songs = new URL("../../../public/songs/", import.meta.url);
@@ -113,4 +115,12 @@ test("every committed chart: each beam has 2+ chords, all eighths or shorter, in
     counts.push(`${id} ${meter.beats}/${meter.beatType}: ${beams.length} beams over ${beams.flat().length} of ${placed.length} notes`);
   }
   process.stdout.write(`${counts.join("\n")}\n`);
+});
+
+// verify-beams.mjs can't import TypeScript, so it keeps its own copies of the sheet's colors: #730 moved the score to
+// paper and the check went on looking for the Duo gold and ink (#1021).
+test("verify-beams.mjs looks for the paper's PERFECT, ink and page", () => {
+  const src = readFileSync(new URL("./verify-beams.mjs", import.meta.url), "utf8");
+  const hex = (name: string) => src.match(new RegExp(`const ${name} = "(#[0-9a-f]{6})"`, "i"))?.[1];
+  expect([hex("GOLD"), hex("INK"), hex("BG")]).toEqual([paperJudgmentColors.PERFECT, paperInk, paper]);
 });

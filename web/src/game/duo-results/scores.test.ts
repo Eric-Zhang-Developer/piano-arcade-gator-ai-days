@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { Chart, GamePlugin, Judgment, Results, Take } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
+import { GOOD_MS } from "../core/settings";
 import { scorePhrases } from "../weak-bars";
 import { duoResults, duoTutor } from ".";
 import { barCount, barScores, handDrift, histogram, nextForKey, practiceBarsUrl, saveNextFor, timingCaption, tutorLine, weakestRun } from "./scores";
@@ -61,16 +62,19 @@ describe("weakestRun", () => {
 });
 
 describe("histogram", () => {
-  it("the bins sum to the judged notes, and offsets past ±100 ms land in the end bins", () => {
+  it("the bins span the judge's GOOD window, sum to the judged notes, and offsets past it land in the end bins", () => {
     const offs = [-250, -100, -5, 0, 9, 10, 99, 100, 400];
     let i = 0;
     const t = take(twinkle, (bar) => (bar > 5 ? "MISS" : "PERFECT"), () => offs[i++ % offs.length]);
     const hits = t.results.judgments.filter((j) => j.judgment !== "MISS").length;
     const { bins } = histogram(t.results);
-    expect(bins).toHaveLength(20);
+    expect(bins).toHaveLength((2 * GOOD_MS) / 10);
     expect(bins.reduce((s, b) => s + b, 0)).toBe(hits);
     const one = histogram({ ...t.results, judgments: offs.map((o, k) => ({ noteId: `n${k}`, judgment: "GOOD", offsetMs: o, eventIndex: k })) });
-    expect(one.bins).toEqual([2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 3]);
+    expect(one.bins).toEqual([1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1]);
+    // a GOOD at +110 ms is drawn at +110, not piled into a +100 end bin (#1027)
+    const late = histogram({ ...t.results, judgments: [{ noteId: "n0", judgment: "GOOD", offsetMs: 110, eventIndex: 0 }] });
+    expect(late.bins.indexOf(1)).toBe((110 + GOOD_MS) / 10);
   });
 
   it("captions the mean", () => {

@@ -4,6 +4,7 @@ import type { Chart, GamePlugin, Results, Take } from "../../contracts";
 import { passAccuracy } from "../bar-loop";
 import { msPerBeat } from "../core/settings";
 import { inMode, playMode } from "../play-modes/modes";
+import { isWaitMode } from "../wait-mode";
 
 export const weakBarsSettings = {
   phraseBars: 2, // bars per phrase, from bar 1
@@ -64,14 +65,17 @@ export function practiceUrl(chart: Chart, params: URLSearchParams, p: Phrase): s
 
 const label = (p: Phrase) => (p.from === p.to ? `Bar ${p.from}` : `Bars ${p.from}–${p.to}`);
 
-// A results panel (play-slots): accuracy per phrase, and one click to loop the weakest at a slower tempo.
+// A results panel (play-slots): accuracy per phrase. On a scored take duo-results' tutor owns the one practice
+// prescription (#1026, decision duo-results-one-prescription), so the panel shows only the numbers; on a wait take,
+// which has no tutor, it marks the weakest phrase and offers to loop it at a slower tempo.
 export function weakBars(): GamePlugin {
   return {
     id: "weak-bars",
     resultsPanel({ chart, take, results, params }) {
       if (params.has("from") || params.has("to")) return null; // bar-loop's own passes panel covers a loop take
       const scores = scorePhrases(chart, take, results);
-      const worst = weakest(scores);
+      const prescribes = isWaitMode(params);
+      const worst = prescribes ? weakest(scores) : null;
       const cell = (s: PhraseScore) =>
         createElement(
           "div",
@@ -98,7 +102,9 @@ export function weakBars(): GamePlugin {
         "div",
         { "data-testid": "weak-bars" },
         createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(112px, 1fr))", gap: 6 } }, ...scores.map(cell)),
-        worst
+        !prescribes
+          ? null
+          : worst
           ? createElement(
               "a",
               {

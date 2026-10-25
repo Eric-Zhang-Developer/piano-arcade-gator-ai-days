@@ -6,14 +6,17 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 15;
-  height: 4vh;
+  /* The smaller of the height's and the width's band: at 16:9 and wider it's 4vh as before, but a tall window (768×1024)
+     no longer grows a 41 px band over the page's wordmark and build stamp (#942). */
+  height: max(min(4vh, 2.25vw), 24px);
   /* Its own band: on a page that scrolls, content passes under the links instead of through them (#892). A modal
      (Options) still covers it, from the top layer. */
   background: var(--pa-bg);
   display: flex;
   align-items: stretch;
   gap: 0.4em;
-  font-size: clamp(16px, 2.5vh, 27px); /* 18px at 720, 27px at 1080: the condensed face reads on video, in the 4vh band */
+  font-size: clamp(16px, min(2.5vh, 1.40625vw), 27px); /* 18px at 720, 27px at 1080: the condensed face reads on video, in
+     the 4vh band. 1.40625vw is 2.5vh at 16:9, so a portrait window sizes by its width and gets 16px. */
 }
 
 /* Saira condensed, sentence case: the song titles' face, so the bar reads as pages and not as the select's mono key

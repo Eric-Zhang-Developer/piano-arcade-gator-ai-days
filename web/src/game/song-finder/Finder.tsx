@@ -4,7 +4,7 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent, type ReactNode } from "react";
 import { kitChip } from "../duo-tokens";
 import type { Song } from "../song-select/load";
-import { filterSongs, readLastPlayed, readSort, SORT_MODES, sortSongs, writeSort, type SortMode } from ".";
+import { announcement, filterSongs, readLastPlayed, readSort, SORT_MODES, sortSongs, writeSort, type SortMode } from ".";
 import css from "./finder.module.css";
 
 const LABELS: Record<SortMode, string> = {
@@ -60,7 +60,8 @@ function toList(e: KeyboardEvent<HTMLInputElement>) {
 
 // The select's list column: the finder row, then the list (children), which fills the rest and scrolls in it.
 export function Finder({ finder, children }: { finder: ReturnType<typeof useFinder>; children: ReactNode }) {
-  const { shown, total, sort, setSort, query, setQuery } = finder;
+  const { shown, total, sort, setSort, query, setQuery, touched } = finder;
+  const said = announcement(touched, query, shown.length, total);
   // A new order or filter keeps the focused song in view: the list would otherwise stay scrolled where it was. If focus
   // is in the list, it moves to that row too, so Enter plays the song the panel shows: on a reload with a stored sort,
   // the browser has already autofocused the first row of the server's Level order.
@@ -90,6 +91,9 @@ export function Finder({ finder, children }: { finder: ReturnType<typeof useFind
               onKeyDown={toList}
             />
           </label>
+          <span className={css.said} role="status" aria-live="polite" data-testid="finder-said">
+            {said}
+          </span>
           <span className={css.count} data-testid="finder-count">
             {shown.length === total ? `${total} songs` : `${shown.length} of ${total}`}
           </span>

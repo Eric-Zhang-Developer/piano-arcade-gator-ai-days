@@ -4,6 +4,7 @@
 // it on NOSTALGIA's hill. No controls show during a take; between takes, a quiet line and the full screen button. No
 // key yet (decision stage-view-look): a key needs a line on help-overlay's card, and #965 has keys.ts open.
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { Button } from "../duo-tokens";
 import { SHEET_CHANNEL, type SheetMessage } from "../sheet-view/plugin";
 import { whenDisplayFontReady } from "../ui-tokens";
@@ -12,6 +13,9 @@ import { emptyStage, reduceStage, type StageState } from "./state";
 import styles from "./stage.module.css";
 
 const fullScreen = () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()).catch(() => {});
+
+// The kit's 14 px is a desk control; this one is read from across a room, so it scales with the page like the line.
+const fullSize = { fontSize: "clamp(1rem, 2.25vh, 1.6rem)", padding: "0.75em 1.5em" };
 
 export function StageView() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -59,12 +63,15 @@ export function StageView() {
       {!live && (
         <div className={styles.idle} data-testid="stage-idle">
           {waiting && (
-            <p className={styles.wait}>
-              <span className={styles.title}>Stage</span>
-              <span className={styles.line}>Start a take on /play. This screen follows it.</span>
-            </p>
+            <div className={styles.wait}>
+              <h1 className={styles.title}>Stage</h1>
+              <p className={styles.line}>Play a song on the main screen and it shows here.</p>
+              <Link href="/" className={styles.songs} data-testid="stage-songs">
+                Pick a song →
+              </Link>
+            </div>
           )}
-          <Button kind="secondary" className={styles.full} onClick={() => void fullScreen()} data-testid="stage-fullscreen">
+          <Button kind="secondary" className={styles.full} style={fullSize} onClick={() => void fullScreen()} data-testid="stage-fullscreen">
             Full screen
           </Button>
         </div>

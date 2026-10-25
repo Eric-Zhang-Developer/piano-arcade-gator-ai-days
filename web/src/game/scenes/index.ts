@@ -22,6 +22,7 @@ export const scenesSettings = {
     "rank-d": { GREAT: 0.1, MISS: 0.4 }, // ≈ 0.55
   } as Record<string, Partial<Record<"GREAT" | "GOOD" | "MISS", number>>>,
   feverExtra: 10, // `fever` repeats the chart until it holds the fever gauge's size plus this many notes
+  lookaheadMs: 150, // MIDI out is handed to Web MIDI this far ahead, stamped with its chart time
 };
 
 export const BOTS = ["perfect", "late", "sloppy", "rank-a", "rank-b", "rank-c", "rank-d", "fever"] as const;
@@ -123,27 +124,53 @@ export function scenes(): GamePlugin {
   let latency = 0;
   let pedal: Pedal | null = null; // a local song's pedal.json, once read
   let load = 0; // which transformChart the pedal read belongs to
-  // The presses and releases still to send, in time order, each at its chart time. A timer sends each on time, so a
-  // piano hears it on time; the pump sends whatever a starved timer hasn't yet (#586). A pedal event goes only to the
-  // piano, as CC64 with its value in `velocity`: the judge never sees it.
-  let queue: { atMs: number; type: InputEvent["type"] | "pedal"; pitch: number; velocity?: number; sent: boolean }[] = [];
-  let next = 0;
+  // The presses and releases still to send, in time order, each at its chart time, on two clocks (golden-demo, part 6).
+  // The judge gets each at perfOf, calibrated, from a timer or, on a starved page, the pump (#586). The piano gets it
+  // at chart time, zeroPerf + atMs, the clock the recording follows: handed to Web MIDI up to lookaheadMs early with
+  // that timestamp, so a calibration offset never moves the sound. A pedal event goes only to the piano, as CC64 with
+  // its value in `velocity`.
+  let queue: { atMs: number; type: InputEvent["type"] | "pedal"; pitch: number; velocity?: number; sent: boolean; out?: boolean }[] = [];
+  let next = 0; // the judge's cursor
+  let nextOut = 0; // the piano's
+  const sounding = new Set<number>(); // keys the piano has been sent down and not yet up
+  let lastStamp = 0; // the latest timestamp handed to the piano
+  let ticker: ReturnType<typeof setInterval> | undefined;
   const timers: ReturnType<typeof setTimeout>[] = [];
   const cancel = () => {
     timers.forEach(clearTimeout);
     timers.length = 0;
-    [queue, next] = [[], 0];
-    out?.send([0xb0, 64, 0]); // pause, quit and songEnd end with the pedal up, even mid-pair
+    clearInterval(ticker);
+    [queue, next, nextOut] = [[], 0, 0];
+    // Pause, quit and songEnd leave no key down and the pedal up, even mid-pair. Stamped after the last thing already
+    // handed over, so a press queued a few ms ahead can't land after its own release.
+    const at = Math.max(lastStamp, performance.now());
+    sounding.forEach((p) => out?.send([0x90, p, 0], at));
+    sounding.clear();
+    out?.send([0xb0, 64, 0], at);
   };
   // /play judges arrival - zero - latency, so an event's time is read from the best zero so far, when it's sent.
   const perfOf = (chartMs: number) => zeroPerf! + latency + chartMs;
   const fire = (e: (typeof queue)[number]) => {
     if (e.sent || !emit) return;
     e.sent = true;
-    if (e.type === "pedal") return void out?.send([0xb0, 64, e.velocity!]);
-    const velocity = e.type === "on" ? (e.velocity ?? KEYS_VELOCITY) : 0;
-    emit({ type: e.type, pitch: e.pitch, velocity, timeMs: perfOf(e.atMs) });
-    out?.send([0x90, e.pitch, velocity]);
+    if (e.type === "pedal") return;
+    emit({ type: e.type, pitch: e.pitch, velocity: e.type === "on" ? (e.velocity ?? KEYS_VELOCITY) : 0, timeMs: perfOf(e.atMs) });
+  };
+  const sendOut = () => {
+    if (!out || zeroPerf === null) return;
+    const until = performance.now() + scenesSettings.lookaheadMs;
+    while (nextOut < queue.length && zeroPerf + queue[nextOut].atMs <= until) {
+      const e = queue[nextOut++];
+      if (e.out) continue;
+      e.out = true;
+      lastStamp = Math.max(lastStamp, zeroPerf + e.atMs);
+      if (e.type === "pedal") out.send([0xb0, 64, e.velocity!], lastStamp);
+      else {
+        out.send([0x90, e.pitch, e.type === "on" ? (e.velocity ?? KEYS_VELOCITY) : 0], lastStamp);
+        if (e.type === "on") sounding.add(e.pitch);
+        else sounding.delete(e.pitch);
+      }
+    }
   };
   // Run from a frame callback queued during /play's frame, so it runs before /play's next one: every event due by now
   // reaches the judge before that frame sweeps late notes to MISS. On a starved page each frame is a long task and
@@ -152,6 +179,7 @@ export function scenes(): GamePlugin {
     pumpPerf = performance.now();
     if (zeroPerf === null) return;
     while (next < queue.length && perfOf(queue[next].atMs) <= pumpPerf) fire(queue[next++]);
+    sendOut();
   };
   const play = () => {
     cancel();
@@ -165,13 +193,18 @@ export function scenes(): GamePlugin {
     }
     enqueue(keys);
     if (pedal) enqueue(pedalQueue(fromMs));
+    if (out) ticker = setInterval(sendOut, scenesSettings.lookaheadMs / 4);
+    sendOut();
   };
   const pedalQueue = (from: number): typeof queue =>
     pedalEvents(pedal!, msPerBeat(chart!.bpm), from).map((e) => ({ atMs: e.atMs, type: "pedal", pitch: 64, velocity: e.value, sent: false }));
-  // Merge events into what's still to send, each with its timer. Stable: a press before its own release at the same
-  // time, as the timers were, and a key before a pedal change at the same time, so a re-pedal catches the new chord.
+  // Merge events into the queue, each with its judge timer, and point both cursors at their first unsent event. A new
+  // event already behind the piano's cursor is past: it isn't sent late. Stable: a press before its own release at the
+  // same time, as the timers were, and a key before a pedal change at the same time, so a re-pedal catches the chord.
   const enqueue = (events: typeof queue) => {
-    queue = [...queue.slice(0, next), ...[...queue.slice(next), ...events].sort((a, b) => a.atMs - b.atMs)];
+    for (const e of events) e.out = zeroPerf !== null && zeroPerf + e.atMs < lastStamp;
+    queue = [...queue, ...events].sort((a, b) => a.atMs - b.atMs);
+    [next, nextOut] = [queue.findIndex((e) => !e.sent), queue.findIndex((e) => !e.out)].map((i) => (i < 0 ? queue.length : i));
     for (const e of events) timers.push(setTimeout(() => fire(e), perfOf(e.atMs) - performance.now()));
   };
 
@@ -213,8 +246,9 @@ export function scenes(): GamePlugin {
         void loadPedal(song).then((p) => {
           if (token !== load || !p) return;
           pedal = p;
-          // Read after the bot started: only what is still ahead, from the clock's time now.
-          if (zeroPerf !== null && emit) enqueue(pedalQueue(Math.max(fromMs, performance.now() - perfOf(0))));
+          // Read after the bot started: only what is still ahead of the piano, which runs up to lookaheadMs ahead.
+          if (zeroPerf !== null && emit)
+            enqueue(pedalQueue(Math.max(fromMs, performance.now() - perfOf(0), lastStamp - zeroPerf)));
         });
       return chart;
     },

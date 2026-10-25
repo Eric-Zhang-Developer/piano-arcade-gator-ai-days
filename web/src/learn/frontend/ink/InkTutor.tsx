@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react';
 import { createInkEngine, type InkEngine, type Point } from './engine';
 import { INK_EVENT, parseInkSignal } from './signal';
 import { collectZones } from './zones';
@@ -11,8 +11,9 @@ import styles from './ink.module.css';
 const MEASURE_MS = 400;
 
 /** The tutor, as ink across the whole screen of every /learn page. It lives in the middle of the screen and moves on its
- *  own, answers the `etude:ink` cues the activities send, and never takes a click. */
-export function InkTutor({ guide }: { guide: Point | null }) {
+ *  own, answers the `etude:ink` cues the activities send, and never takes a click. On a guided entry it follows `guide`
+ *  into the node, then opens the new page (`turn`) through a hole in itself. */
+export function InkTutor({ guide, turn }: { guide: Point | null; turn: RefObject<HTMLElement | null> | null }) {
   const layer = useRef<HTMLDivElement>(null), canvas = useRef<HTMLCanvasElement>(null), line = useRef<HTMLParagraphElement>(null);
   const engine = useRef<InkEngine | null>(null);
   const pathname = usePathname();
@@ -56,6 +57,8 @@ export function InkTutor({ guide }: { guide: Point | null }) {
   useEffect(() => { engine.current?.clearLine(); }, [pathname]);
   const gx = guide?.x, gy = guide?.y;
   useEffect(() => { engine.current?.setGuide(gx === undefined || gy === undefined ? null : { x: gx, y: gy }); }, [gx, gy]);
+  // Before paint, so the page that turns into view is never seen whole for a frame first.
+  useLayoutEffect(() => { engine.current?.turn(turn?.current ?? null); }, [turn]);
 
   return <div ref={layer} className={styles.layer}>
     <canvas ref={canvas} className={styles.ink} aria-hidden="true"/>

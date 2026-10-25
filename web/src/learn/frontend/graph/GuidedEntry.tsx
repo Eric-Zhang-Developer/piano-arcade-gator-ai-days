@@ -3,10 +3,12 @@ import { usePathname } from 'next/navigation';
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { journeyFrame, type JourneyPlan } from './guided-motion';
 import styles from './journey.module.css';
-type Journey = { plan: JourneyPlan; frame: ReturnType<typeof journeyFrame>; origin: string; routed: boolean; reduced: boolean; revealing: boolean };
+type Journey = { plan: JourneyPlan; frame: ReturnType<typeof journeyFrame>; origin: string; routed: boolean; reduced: boolean; turning: boolean };
 type Run = { frame: number; timer?: ReturnType<typeof setTimeout>; origin: string; href: string; routed: boolean; reduced: boolean };
-type Entry = { active: (Journey & { phase: 'anticipating' | 'flying' | 'arriving' | 'docking' | 'revealing' }) | null; begin: (plan: JourneyPlan, timestamp: number, arrive: () => void) => boolean; cancel: () => void };
+type Entry = { active: (Journey & { phase: 'anticipating' | 'flying' | 'arriving' | 'docking' | 'turning' }) | null; begin: (plan: JourneyPlan, timestamp: number, arrive: () => void) => boolean; cancel: () => void };
 const EntryContext = createContext<Entry | null>(null);
+/** How long the new page takes to open through the ink: the engine's TURN (ink/engine.ts), and a frame to spare. */
+const TURN_MS = 700;
 export function GuidedEntryProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [journey, setJourney] = useState<Journey | null>(null);
@@ -20,29 +22,14 @@ export function GuidedEntryProvider({ children }: { children: React.ReactNode })
     const current = run.current;
     if (!current || pathname === current.origin) return;
     if (pathname === current.href && current.routed) {
-      const perch = document.querySelector<HTMLElement>('[data-tutor-perch]')?.getBoundingClientRect();
-      if (current.reduced || !perch) {
-        const heading=document.querySelector<HTMLElement>('main h1');
-        cancel();
-        requestAnimationFrame(()=>{if(heading?.isConnected){heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true});}});
-        return;
-      }
-      // Teaching material stays hidden until the same guide occupies its slot.
-      // Two paint opportunities establish the arrival pose before the transition.
-      current.frame = requestAnimationFrame(() => { current.frame = requestAnimationFrame(() => {
+      const focus = () => { const heading = document.querySelector<HTMLElement>('main h1'); if (heading?.isConnected) { heading.setAttribute('tabindex', '-1'); heading.focus({ preventScroll: true }); } };
+      if (current.reduced) { cancel(); requestAnimationFrame(focus); return; }
+      // The new page stays hidden for one paint, then opens through a hole in the ink where the ink came to rest.
+      current.frame = requestAnimationFrame(() => {
         if (run.current !== current) return;
-        setJourney(value => value ? { ...value, frame: { ...value.frame, pet: { ...value.frame.pet, x:perch.left+perch.width/2, y:perch.top+perch.height/2, scale:1, tilt:0, squash:1 } } } : null);
-        current.timer = setTimeout(() => {
-          if (run.current !== current) return;
-          setJourney(value => value ? { ...value, revealing:true } : null);
-          current.timer = setTimeout(() => {
-            if (run.current !== current) return;
-            cancel();
-            const heading = document.querySelector<HTMLElement>('main h1');
-            heading?.setAttribute('tabindex','-1'); heading?.focus({preventScroll:true});
-          }, 220);
-        }, 580);
-      }); });
+        setJourney(value => value ? { ...value, turning: true } : null);
+        current.timer = setTimeout(() => { if (run.current !== current) return; cancel(); focus(); }, TURN_MS);
+      });
     }
     else cancel();
   }, [pathname, cancel]);
@@ -51,7 +38,7 @@ export function GuidedEntryProvider({ children }: { children: React.ReactNode })
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const current: Run = { frame: 0, origin: pathname, href: plan.href, routed: false, reduced:motion.matches };
     run.current = current;
-    const first: Journey = { plan, frame: journeyFrame(plan, 0), origin: pathname, routed: false, reduced: motion.matches, revealing:false };
+    const first: Journey = { plan, frame: journeyFrame(plan, 0), origin: pathname, routed: false, reduced: motion.matches, turning: false };
     setJourney(first);
     function route() {
       if (run.current !== current || current.routed) return;
@@ -71,8 +58,9 @@ export function GuidedEntryProvider({ children }: { children: React.ReactNode })
     current.frame = requestAnimationFrame(tick);
     return true;
   }
-  const active: Entry['active'] = journey ? { ...journey, phase: journey.routed && pathname === journey.plan.href ? journey.revealing ? 'revealing' : 'docking' : journey.frame.phase } : null;
-  // The ink (ink/InkTutor.tsx) follows active.frame.pet, so the tutor itself leads the student to the node.
+  const active: Entry['active'] = journey ? { ...journey, phase: journey.routed && pathname === journey.plan.href ? journey.turning ? 'turning' : 'docking' : journey.frame.phase } : null;
+  // The ink (ink/InkTutor.tsx) follows active.frame.pet, so the tutor itself carries the student into the node, then opens
+  // the new page through itself while the phase is 'turning'.
   return <EntryContext value={{ active, begin, cancel }}>{children}{active && <span className={styles.status} role="status">Leading you to {active.plan.title}.</span>}</EntryContext>;
 }
 export function useGuidedEntry() { const entry = useContext(EntryContext); if (!entry) throw new Error('Guided entry requires the learning layout.'); return entry; }

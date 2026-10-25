@@ -40,6 +40,9 @@ const reroll: Record<string, number> = {
   "debussy-arabesque-1": 3,
   "moment-musical-3": 2,
   "pathetique-2": 1,
+  "mary-lamb": 1,
+  "frere-jacques-solo": 2,
+  "hot-cross-buns": 3,
 };
 
 export function jacketFor(id: string, title: string, composer: string): Jacket {

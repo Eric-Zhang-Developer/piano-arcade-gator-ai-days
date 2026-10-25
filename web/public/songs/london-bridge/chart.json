@@ -1,0 +1,179 @@
+{
+  "id": "london-bridge",
+  "title": "London Bridge Is Falling Down",
+  "composer": "Traditional",
+  "catalog": "melody, right hand",
+  "source": "Wikipedia, \"London Bridge Is Falling Down\" (https://en.wikipedia.org/w/index.php?title=London_Bridge_Is_Falling_Down&oldid=1381574731), the article's LilyPond <score>, read 2026-10-25, CC BY-SA 4.0 (traditional tune, public domain). F major, 2/4; the volta repeat in the order the score's own \\unfoldRepeats MIDI plays it, compiled with LilyPond 2.26 at its tempo 4=102.",
+  "bpm": 102.0,
+  "beatsPerBar": 2,
+  "notes": [
+    {
+      "id": "n1",
+      "pitch": 72,
+      "beat": 0,
+      "duration": 0.75,
+      "hand": "R"
+    },
+    {
+      "id": "n2",
+      "pitch": 74,
+      "beat": 0.75,
+      "duration": 0.25,
+      "hand": "R"
+    },
+    {
+      "id": "n3",
+      "pitch": 72,
+      "beat": 1,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n4",
+      "pitch": 70,
+      "beat": 1.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n5",
+      "pitch": 69,
+      "beat": 2,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n6",
+      "pitch": 70,
+      "beat": 2.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n7",
+      "pitch": 72,
+      "beat": 3,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n8",
+      "pitch": 67,
+      "beat": 4,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n9",
+      "pitch": 69,
+      "beat": 4.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n10",
+      "pitch": 70,
+      "beat": 5,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n11",
+      "pitch": 69,
+      "beat": 6,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n12",
+      "pitch": 70,
+      "beat": 6.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n13",
+      "pitch": 72,
+      "beat": 7,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n14",
+      "pitch": 72,
+      "beat": 8,
+      "duration": 0.75,
+      "hand": "R"
+    },
+    {
+      "id": "n15",
+      "pitch": 74,
+      "beat": 8.75,
+      "duration": 0.25,
+      "hand": "R"
+    },
+    {
+      "id": "n16",
+      "pitch": 72,
+      "beat": 9,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n17",
+      "pitch": 70,
+      "beat": 9.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n18",
+      "pitch": 69,
+      "beat": 10,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n19",
+      "pitch": 70,
+      "beat": 10.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n20",
+      "pitch": 72,
+      "beat": 11,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n21",
+      "pitch": 67,
+      "beat": 12,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n22",
+      "pitch": 72,
+      "beat": 13,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n23",
+      "pitch": 69,
+      "beat": 14,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n24",
+      "pitch": 65,
+      "beat": 14.5,
+      "duration": 1.5,
+      "hand": "R"
+    }
+  ]
+}

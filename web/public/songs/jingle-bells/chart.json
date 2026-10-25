@@ -1,0 +1,368 @@
+{
+  "id": "jingle-bells",
+  "title": "Jingle Bells",
+  "composer": "James Lord Pierpont",
+  "catalog": "refrain, melody, right hand",
+  "source": "Wikimedia Commons, File:Jingle Bells refrain vector.svg (https://commons.wikimedia.org/wiki/File:Jingle_Bells_refrain_vector.svg), the LilyPond source on its page, read 2026-10-25, Public Domain (PD-self, Niamh O'C; the 1857 tune PD-old). A four-part choir setting; this chart is the soprano melody only, compiled to MIDI with LilyPond 2.26 at its tempo 4 = 100.",
+  "bpm": 100.0,
+  "beatsPerBar": 4,
+  "notes": [
+    {
+      "id": "n1",
+      "pitch": 71,
+      "beat": 0,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n2",
+      "pitch": 71,
+      "beat": 0.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n3",
+      "pitch": 71,
+      "beat": 1,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n4",
+      "pitch": 71,
+      "beat": 2,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n5",
+      "pitch": 71,
+      "beat": 2.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n6",
+      "pitch": 71,
+      "beat": 3,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n7",
+      "pitch": 71,
+      "beat": 4,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n8",
+      "pitch": 74,
+      "beat": 4.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n9",
+      "pitch": 67,
+      "beat": 5,
+      "duration": 0.75,
+      "hand": "R"
+    },
+    {
+      "id": "n10",
+      "pitch": 69,
+      "beat": 5.75,
+      "duration": 0.25,
+      "hand": "R"
+    },
+    {
+      "id": "n11",
+      "pitch": 71,
+      "beat": 6,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n12",
+      "pitch": 72,
+      "beat": 8,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n13",
+      "pitch": 72,
+      "beat": 8.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n14",
+      "pitch": 72,
+      "beat": 9,
+      "duration": 0.75,
+      "hand": "R"
+    },
+    {
+      "id": "n15",
+      "pitch": 72,
+      "beat": 9.75,
+      "duration": 0.25,
+      "hand": "R"
+    },
+    {
+      "id": "n16",
+      "pitch": 72,
+      "beat": 10,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n17",
+      "pitch": 71,
+      "beat": 10.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n18",
+      "pitch": 71,
+      "beat": 11,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n19",
+      "pitch": 71,
+      "beat": 11.5,
+      "duration": 0.25,
+      "hand": "R"
+    },
+    {
+      "id": "n20",
+      "pitch": 71,
+      "beat": 11.75,
+      "duration": 0.25,
+      "hand": "R"
+    },
+    {
+      "id": "n21",
+      "pitch": 71,
+      "beat": 12,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n22",
+      "pitch": 69,
+      "beat": 12.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n23",
+      "pitch": 69,
+      "beat": 13,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n24",
+      "pitch": 71,
+      "beat": 13.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n25",
+      "pitch": 69,
+      "beat": 14,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n26",
+      "pitch": 74,
+      "beat": 15,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n27",
+      "pitch": 71,
+      "beat": 16,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n28",
+      "pitch": 71,
+      "beat": 16.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n29",
+      "pitch": 71,
+      "beat": 17,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n30",
+      "pitch": 71,
+      "beat": 18,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n31",
+      "pitch": 71,
+      "beat": 18.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n32",
+      "pitch": 71,
+      "beat": 19,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n33",
+      "pitch": 71,
+      "beat": 20,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n34",
+      "pitch": 74,
+      "beat": 20.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n35",
+      "pitch": 67,
+      "beat": 21,
+      "duration": 0.75,
+      "hand": "R"
+    },
+    {
+      "id": "n36",
+      "pitch": 69,
+      "beat": 21.75,
+      "duration": 0.25,
+      "hand": "R"
+    },
+    {
+      "id": "n37",
+      "pitch": 71,
+      "beat": 22,
+      "duration": 1,
+      "hand": "R"
+    },
+    {
+      "id": "n38",
+      "pitch": 72,
+      "beat": 24,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n39",
+      "pitch": 72,
+      "beat": 24.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n40",
+      "pitch": 72,
+      "beat": 25,
+      "duration": 0.75,
+      "hand": "R"
+    },
+    {
+      "id": "n41",
+      "pitch": 72,
+      "beat": 25.75,
+      "duration": 0.25,
+      "hand": "R"
+    },
+    {
+      "id": "n42",
+      "pitch": 72,
+      "beat": 26,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n43",
+      "pitch": 71,
+      "beat": 26.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n44",
+      "pitch": 71,
+      "beat": 27,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n45",
+      "pitch": 71,
+      "beat": 27.5,
+      "duration": 0.25,
+      "hand": "R"
+    },
+    {
+      "id": "n46",
+      "pitch": 71,
+      "beat": 27.75,
+      "duration": 0.25,
+      "hand": "R"
+    },
+    {
+      "id": "n47",
+      "pitch": 74,
+      "beat": 28,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n48",
+      "pitch": 74,
+      "beat": 28.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n49",
+      "pitch": 72,
+      "beat": 29,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n50",
+      "pitch": 69,
+      "beat": 29.5,
+      "duration": 0.5,
+      "hand": "R"
+    },
+    {
+      "id": "n51",
+      "pitch": 67,
+      "beat": 30,
+      "duration": 1.5,
+      "hand": "R"
+    }
+  ]
+}

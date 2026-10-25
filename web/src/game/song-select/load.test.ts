@@ -13,7 +13,7 @@ test("the real library has Twinkle, with its note count", () => {
   expect(found).toContainEqual(expect.objectContaining({ id: "twinkle", title: "Twinkle, Twinkle, Little Star", noteCount: 42 }));
 });
 
-test("finds charts at any depth, sorted by level then title, and skips and reports invalid ones", () => {
+test("finds charts at any depth, sorted by level then title (Twinkle first in its level), and skips and reports invalid ones", () => {
   const dir = mkdtempSync(join(tmpdir(), "songs-"));
   cpSync(join(songs, "twinkle"), join(dir, "twinkle"), { recursive: true });
   mkdirSync(join(dir, "library", "bach"), { recursive: true });
@@ -27,10 +27,10 @@ test("finds charts at any depth, sorted by level then title, and skips and repor
   writeFileSync(join(dir, "garbled", "chart.json"), "{");
 
   const { songs: found, invalid } = loadSongs(dir);
-  expect(found.map((s) => s.id)).toEqual(["library/bach", "twinkle"]);
-  expect(found[0]).toEqual({ id: "library/bach", title: "A Minuet", composer: "Bach", catalog: undefined, noteCount: 1, level: 1, roll: expect.objectContaining({ rows: 1 }), key: expect.objectContaining({ tonic: expect.any(Number) }) });
-  expect(found[1].key).toEqual({ tonic: 0, mode: "major" }); // Twinkle, in C
-  expect(found[0].roll.bars).toHaveLength(1);
+  expect(found.map((s) => s.id)).toEqual(["twinkle", "library/bach"]);
+  expect(found[1]).toEqual({ id: "library/bach", title: "A Minuet", composer: "Bach", catalog: undefined, noteCount: 1, level: 1, roll: expect.objectContaining({ rows: 1 }), key: expect.objectContaining({ tonic: expect.any(Number) }) });
+  expect(found[0].key).toEqual({ tonic: 0, mode: "major" }); // Twinkle, in C
+  expect(found[1].roll.bars).toHaveLength(1);
   expect(invalid.map((i) => i.path).sort()).toEqual([join("broken", "chart.json"), join("garbled", "chart.json")]);
   expect(invalid.every((i) => i.problems.length > 0)).toBe(true);
 });
@@ -40,7 +40,7 @@ test("the real library is sorted easiest first, Twinkle at the top", () => {
   expect(found[0].id).toBe("twinkle");
   for (let i = 1; i < found.length; i++) {
     const [a, b] = [found[i - 1], found[i]];
-    expect(a.level < b.level || (a.level === b.level && a.title.localeCompare(b.title) <= 0), `${a.id} before ${b.id}`).toBe(true);
+    expect(a.level < b.level || (a.level === b.level && (a.id === "twinkle" || a.title.localeCompare(b.title) <= 0)), `${a.id} before ${b.id}`).toBe(true);
   }
 });
 

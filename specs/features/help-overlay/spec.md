@@ -17,9 +17,10 @@ Issue: #375
 ## Plan
 1. `feat(help-overlay)`, no done note: in `web/src/game/help-overlay/`, `keys.ts` (the card's lines as data),
    `<HelpOverlay />`, the `helpOverlay()` plugin (one line in `layers.ts`, which is open: it knows when a take is
-   running), the drift test and `verify-help.mjs`.
+   running) and the drift test.
 2. `fix(core-loop)`: `web/src/app/layout.tsx` mounts `<HelpOverlay />` beside `<CaptureMode />`. Then a last
-   `feat(help-overlay)` with the done note.
+   `feat(help-overlay)` with `verify-help.mjs` and the done note: before the mount, CI's every-check runs would run
+   it against a page without the card.
 
 ## Requirements
 - **Opening:** `?` (`e.key === "?"`, no Ctrl, Meta or Alt) toggles the card on `/` and `/play`, and Esc closes it.

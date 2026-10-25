@@ -351,7 +351,7 @@ export function missMoment(): GamePlugin {
           const text = String(broken.combo);
           let px = l.combo.size;
           ctx.font = `italic 900 ${Math.round(px)}px ${display}`;
-          const room = (l.slots.combo.x1 - l.slots.combo.x0) * 0.92;
+          const room = l.combo.room;
           const w = ctx.measureText(text.length < 3 ? "888" : text).width; // the HUD's own sizing, so it doesn't jump
           if (w > room) px *= room / w;
           ctx.font = `italic 900 ${Math.round(px)}px ${display}`;

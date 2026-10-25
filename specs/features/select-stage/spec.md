@@ -12,6 +12,11 @@ behind the select, dim and scrolling slowly, makes the two screens read as one c
 
 Issue: #265
 
+**Retired (Eric, 2026-10-25; contract #728):** the sun, the grid floor and `--pa-sky` are allowed nowhere. duo-select
+(#714) already took the stage off `/`; `/auth/login` still mounts `<SelectStage />`. It now draws no scene: it's a
+fixed layer on `--pa-bg`, with no WebGL context. The driver and its test are gone.
+`specs/decisions/select-stage-retire.md` has why. The Plan and Requirements below describe the stage as first built.
+
 ## Plan
 Two PRs, about an hour. fever-stage's files (`web/src/game/stage/`) don't change.
 1. `feat(select-stage)` in `web/src/game/select-stage/`:
@@ -44,22 +49,16 @@ Two PRs, about an hour. fever-stage's files (`web/src/game/stage/`) don't change
 - Out of scope: cabinet's title screen (cabinet's files; it opens `/` with a full page load, so no shared context).
 
 ## Validation
-- **After duo-select (#646),** which takes the stage off the select: the check confirms `/` mounts no stage and
-  holds no live WebGL context, and stops there. The steps below hold while the select mounts the stage.
-- `pnpm -C web test`, a fake scene counting renders: moving, the driver renders every tick until a scripted slow run
-  trips the budget, then stops; still, it renders once, not again at the same size, and once more at a new size.
+- ~~`pnpm -C web test`, a fake scene counting renders~~: retired with the driver (no scene to render).
 - `verify.py --slug select-stage` passes (its first step opens Twinkle from `/`).
-- `node web/src/game/select-stage/verify-select-stage.mjs --out <dir>`, headless Chrome at 1280×720 and 1920×1080.
-  An init script keeps every WebGL context `getContext` returns; live means `!isContextLost()`.
-  1. Open `/` -> one canvas in `select-stage`, one live context. ↑/↓ moves the focus. Click a card -> `/play`; back.
-  2. Enter on `/` -> `/play?song=…`'s start screen with 0 live contexts. Start -> 1. Go back to `/` -> 1.
-  3. `/` and `/?stage=off` screenshots differ; `/?stage=off` has no canvas.
-  4. Two screenshots 500 ms apart differ. (At 60 bpm the grid repeats every second: 1 s apart proves nothing.)
-  5. With reduced motion emulated, two screenshots 500 ms apart are identical.
-  6. Under reduced motion, make each listed text item's color transparent and take the 95th-percentile luminance
-     pixel in its box (stars are random 1 px lines; the sun is large). Lay the text's color over it (`--pa-ink-dim`
-     is 60% alpha) -> at least 4.5:1 each. `scrollHeight` is at most the viewport height.
-  If software GL in headless Chrome trips `frameBudget` (its log line), run steps 4 and 5 headed and say so.
+- `node web/src/game/select-stage/verify-select-stage.mjs --out <dir>`, headless Chrome at 1280×720 and 1920×1080
+  (reworked for the retirement, #728: the stage on `/` it used to measure can't exist any more). An init script keeps
+  every WebGL context `getContext` returns; live means `!isContextLost()`.
+  1. `/` mounts no `select-stage` and holds no live WebGL context (duo-select, #714).
+  2. `/auth/login` has one `select-stage` whose background is `--pa-bg`, no canvas in it, and no live WebGL context.
+     A screenshot at each size.
+  ~~Steps 1–6 of the stage on `/` (contexts across `/play`, `?stage=off`, motion, reduced motion, contrast)~~: retired
+  with the scene.
 - Eric's eye (mark it in the done note): on the laptop, does the stage help or distract when you pick a song?
   `not verified by Eric` until he does.
 

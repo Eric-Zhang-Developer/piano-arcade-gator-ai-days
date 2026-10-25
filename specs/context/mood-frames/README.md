@@ -10,6 +10,8 @@ them. They're not a decision either: `../visual-direction.md` is the look, and a
   current select as the baseline.
 - `codex-classical/`: classical paper across five screens. Eric rejected it as the app's look ("we lose the whole
   arcade heritage of the game"), but kept it for parts.
-- `codex-cyberpunk/`: tasteful cyberpunk, three accents across three screens. **C · Signal is the chosen look**
-  (Eric and Andres, 2026-10-25), and `../visual-direction.md` carries it as tokens. A · Acid and B · Coral are kept
-  for comparison.
+- `codex-cyberpunk/`: tasteful cyberpunk, three accents across three screens. C · Signal was chosen first, then
+  replaced by Duo (below). A · Acid and B · Coral are kept for comparison.
+- `codex-cyberpunk-duo/`: **F · Duo is the chosen look** (Eric and Andres, 2026-10-25): electric blue for the right
+  hand and primary, purple for the left hand and secondary. `../visual-direction.md` carries it as tokens. D and E
+  are kept for comparison.

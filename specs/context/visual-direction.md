@@ -23,11 +23,12 @@ clutter.
 
 **Retired as the brand:** the synthwave sun, the grid floor, magenta *chrome* (pink returns as hype, for moments
 only), and italic everywhere. Fever may keep a
-short stage moment as a reward (see Motion), **without the sun**.
+short stage moment as a reward (see Motion), **without the sun or the grid**.
 
-**The sun is gone everywhere, fever included** (Eric, 2026-10-25: "Did the sun come back? The synthwave sun. I hate
-it. I thought it got nuked."). No screen, stage, fever moment, burst or background draws it, and no spec may bring
-it back.
+**The synthwave sun and grid floor are gone everywhere, fever included.** Eric, 2026-10-25: "Did the sun come back?
+The synthwave sun. I hate it. I thought it got nuked.", then "reTire the damn grid too." No screen, stage, fever
+moment, burst or background draws either, and no spec may bring them back. `--pa-sun` and `--pa-sky` are allowed
+nowhere. FEVER itself stays: the gauge, the word and the edge glow.
 
 **Calm center, loud edges, loud moments.** Loudness lives at the screen's edges and in short moments (fever, full
 combo, the rank, a new record), never in the lanes while notes are falling.
@@ -52,8 +53,7 @@ canvas code.
 | `--pa-paper` / `--pa-paper-ink` | warm off-white / black ink (exact values: the sheet-paper feature picks and logs them) | The paper panel sheet music sits on (below) | Anything but notation |
 | `--pa-hype` (alias `--pa-magenta`) | `#ff2fd0` (hype pink, unchanged) | **Hype: the arcade's big moments only,** game lane only (below) | Notes, lanes, keys, the hit line, buttons, focus, panels, judgments, `/learn` |
 | `--pa-cyan` | retired as chrome | Its uses move to `--pa-primary`; the name goes once nothing reads it | New uses |
-| `--pa-sky` | unchanged value | Fever's short stage moment only | Any screen's base, the brand |
-| `--pa-sun` | retired | Nothing: the sun is gone (above) | Any use; the name goes once nothing reads it |
+| `--pa-sun`, `--pa-sky` | retired | Nothing: the sun and the grid are gone (above) | Any use; the names go once nothing reads them |
 | Tier colors | x1 `#e8e8ec`, x2 `#ff9f43`, x3 `#8ee05e`, x4 `#c47cff` | The multiplier (the HUD's, from Guitar Hero) | |
 
 - **Notes:** hue is the hand, brightness is time to hit. A note far from the line is dim (about 35% of full
@@ -100,8 +100,8 @@ picker, where nobody reads it. The details of the sheet player are Eric's or And
 - **The center doesn't move** except the notes. Effects rise above the hit line and never cover a note due within
   500 ms (juice-visual's rule).
 - **Moments are short:** fever starts, full combo, the rank stamp, a new record: big, at most 2 s, then out of the
-  way. Fever's stage moment may bring the old stage back briefly as a reward, without the sun; the stage is never a
-  screen's base.
+  way. Fever's moment is the gauge, the word and the edge glow; the old stage's sun, grid and sky
+  don't come back.
 - **Juice is motion, not furniture:** hit sparks that burst up from the hit line, the flare, a combo pulse.
 - **Interface motion:** 150–250 ms, ease-out. A stamp: about 300 ms with a slight overshoot. A tally: at most 1.2 s
   in total.
@@ -122,8 +122,8 @@ picker, where nobody reads it. The details of the sheet player are Eric's or And
 - **Do:** black playfield; rounded note pills sized to their key (narrower on black keys); a white-hot full-width hit
   line; judgments and combo off the lanes; sharp interface corners; one loud thing at a time.
 - **Don't:** red notes; gold, red or grey as chrome; a fourth color (no yellow, no cyan); hype pink outside its moments; rounded
-  buttons or panels; notation inverted to light-on-dark; neon soup (everything glowing); the synthwave sun anywhere, the grid
-  floor as a base; italic everywhere; recolor every note in fever (Guitar Hero's star-power mistake hides the hands);
+  buttons or panels; notation inverted to light-on-dark; neon soup (everything glowing); the synthwave sun or grid floor
+  anywhere; italic everywhere; recolor every note in fever (Guitar Hero's star-power mistake hides the hands);
   strong perspective on the highway; glitch effects; pixel art; images of other games or artists' covers on jackets;
   emoji as icons.
 - **The frames are moods, not data:** never copy a number, bar or label from them.

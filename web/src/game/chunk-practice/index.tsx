@@ -6,6 +6,7 @@ import { createElement, useEffect, useRef, type CSSProperties } from "react";
 import type { Chart, GamePlugin, Results, Take } from "../../contracts";
 import { adaptSettings, adaptState, adaptUrl, next, songPhrases, start, takeResult, type AdaptState, type Step as AdaptStep } from "../adaptive-chunks/next";
 import { Strip } from "../adaptive-chunks/Strip";
+import { kitButton } from "../duo-tokens";
 import { isWaitMode } from "../wait-mode";
 import { scorePhrases, type Phrase } from "../weak-bars";
 import { barsLabel, chunkSettings, chunksOf, isPlainTake, nextAfter, practiceStep, stepUrl, wholeSongUrl, type Chunk, type Step } from "./chunks";
@@ -67,7 +68,7 @@ export function chunkPractice(): GamePlugin {
       if (at) return createElement(StepLine, { index: at.index, of: list.length, step: at.step });
       if (!isPlainTake(params) || !phraseList.length) return null;
       return (
-        <a data-testid="chunk-start" className={styles.ghost} href={adaptUrl(params, phraseList, start(phraseList))}>
+        <a data-testid="chunk-start" {...kitButton("secondary")} href={adaptUrl(params, phraseList, start(phraseList))}>
           Practice in chunks
         </a>
       );

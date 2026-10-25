@@ -66,7 +66,7 @@ export const helpGroups: HelpGroup[] = [
   },
   {
     screen: "Start screen",
-    files: [PLAY, "game/sheet-view/SheetView.tsx"],
+    files: [PLAY, "game/duo-start/StartScreen.tsx", "game/sheet-view/SheetView.tsx"],
     lines: [
       { keys: ["Enter"], what: "start", control: "Start" },
       { keys: laptopWhites, what: "the white keys, from middle C", source: ["game/core/input.ts"], keyOnly: LAPTOP },

@@ -72,26 +72,48 @@ export function Brackets({ tone = "primary", style, children }: { tone?: "primar
 
 // primary: the blue fill, one per screen. secondary: a hairline. Both sharp, with a visible focus ring (kit.module.css).
 export function Button({ kind = "primary", style, className, ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & { kind?: "primary" | "secondary" }) {
+  const k = kitButton(kind);
+  return <button data-kit={`button-${kind}`} className={[k.className, className].filter(Boolean).join(" ")} style={{ ...k.style, ...style }} {...rest} />;
+}
+
+// The Button's look on an element that isn't a <button>, such as a link to another mode: `<a {...kitButton("secondary")}>`.
+export function kitButton(kind: "primary" | "secondary" = "primary"): { className: string; style: CSSProperties } {
   const primary = kind === "primary";
-  return (
-    <button
-      data-kit={`button-${kind}`}
-      className={[s.button, primary ? s.primary : s.secondary, className].filter(Boolean).join(" ")}
-      style={{
-        ...mono,
-        fontSize: 14,
-        fontWeight: 700,
-        padding: "12px 24px",
-        borderRadius: 0,
-        cursor: "pointer",
-        background: primary ? "var(--pa-primary)" : "transparent",
-        color: primary ? "var(--pa-bg)" : "var(--pa-ink)",
-        border: `1px solid ${primary ? "var(--pa-primary)" : "var(--pa-line)"}`,
-        ...style,
-      }}
-      {...rest}
-    />
-  );
+  return {
+    className: [s.button, primary ? s.primary : s.secondary].join(" "),
+    style: {
+      ...mono,
+      fontSize: 14,
+      fontWeight: 700,
+      padding: "12px 24px",
+      borderRadius: 0,
+      cursor: "pointer",
+      display: "inline-block",
+      textAlign: "center",
+      textDecoration: "none",
+      background: primary ? "var(--pa-primary)" : "transparent",
+      color: primary ? "var(--pa-bg)" : "var(--pa-ink)",
+      border: `1px solid ${primary ? "var(--pa-primary)" : "var(--pa-line)"}`,
+    },
+  };
+}
+
+// A small toggle, like the select's Hands and Speed chips: a hairline, lit in the primary blue when it's the setting in force.
+export function kitChip(lit: boolean): { className: string; style: CSSProperties } {
+  return {
+    className: s.button,
+    style: {
+      ...mono,
+      fontSize: "clamp(12px, 0.85vw, 17px)",
+      fontWeight: 700,
+      padding: "0.4em 0.8em",
+      borderRadius: 0,
+      cursor: "pointer",
+      border: `1px solid ${lit ? "var(--pa-primary)" : "var(--pa-line)"}`,
+      background: lit ? "color-mix(in srgb, var(--pa-primary) 14%, transparent)" : "transparent",
+      color: lit ? "var(--pa-primary)" : "var(--pa-ink)",
+    },
+  };
 }
 
 // Small monospace caps with wide tracking: labels, levels, bar numbers, ms, hints.

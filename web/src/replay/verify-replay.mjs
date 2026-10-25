@@ -73,7 +73,8 @@ try {
   page.on("pageerror", (e) => errors.push(e.message));
 
   // 1. Space plays: the laptop tone, counters, a raised pillar, a chapter.
-  await page.goto(`${base}/attract`);
+  // ?midi=off: no piano at all. Without it, laptop-sound's virtual "Portable Grand" is the piano (spec: laptop-sound).
+  await page.goto(`${base}/attract?midi=off`);
   await page.getByText("● LIVE").waitFor({ timeout: 60_000 });
   await page.locator("canvas").waitFor({ timeout: 30_000 });
   await page.keyboard.press("Space");

@@ -90,7 +90,7 @@ describe("the room never reaches the player's game", () => {
     const p = crowd.plugin();
     expect(p.transformChart!(twinkle, new URLSearchParams())).toBe(twinkle);
     const sent: InputEvent[] = [{ type: "on", pitch: 60, velocity: 90, timeMs: 10 }, { type: "off", pitch: 60, velocity: 0, timeMs: 200 }];
-    const inner = { kind: "keyboard" as const, start: (on: (e: InputEvent) => void) => sent.forEach(on), stop: () => {} };
+    const inner = { kind: "test" as const, start: (on: (e: InputEvent) => void) => sent.forEach(on), stop: () => {} };
     const got: InputEvent[] = [];
     await p.wrapInput!(inner).start((e) => got.push(e));
     expect(got).toEqual(sent);

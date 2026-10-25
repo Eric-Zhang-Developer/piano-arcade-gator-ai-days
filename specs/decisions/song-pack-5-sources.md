@@ -39,7 +39,7 @@ These are the commands, run from `game-tools/midi-to-chart/` with the five files
 .venv/bin/python convert.py source/anna-magdalena-22.mid --rh 1 --lh 2 --spans 0-16,0-16,16-40,16-40 --bpm 90 ...         # musette-d
 .venv/bin/python convert.py source/schumann-op68-10-gai-laboureur.mid --rh 1 --lh 3 --pickup 0.5 --bars 1-21 --bpm 90 ...  # happy-farmer
 .venv/bin/python convert.py source/schumann-op68-08-cavalier-sauvage.mid --rh 1 --lh 3 --spans 0-72 --start-beat 2.5 --bpm 120 ...  # wild-horseman
-.venv/bin/python convert.py source/16OldFrenchSong.mid --rh 1 --lh 2 --pickup 0.5 --bars 1-17 --bpm 60 ...                # old-french-song (held back: #989)
+.venv/bin/python convert.py source/16OldFrenchSong.mid --rh 1 --lh 2 --pickup 0.5 --bars 1-17 --bpm 60 ...                # old-french-song (followed after #989)
 ```
 
 - **Repeats:**

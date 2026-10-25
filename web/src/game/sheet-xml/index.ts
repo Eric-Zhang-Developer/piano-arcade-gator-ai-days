@@ -107,13 +107,14 @@ export interface Placed {
 
 // How far an onset may sit off a grid, in beats, and still print on it (decision sheet-engraving-quantize).
 const TOLERANCE = 0.06;
-const GRIDS = [6, 4, 3]; // eighths, eighth triplets, 16ths: the coarsest that fits wins
+const GRIDS = [6, 4, 3, 2]; // eighths, eighth triplets, 16ths, 16th sextuplets: the coarsest that fits wins
 
 // The display grid: per staff and beat, the coarsest grid every onset in that beat sits within TOLERANCE of. A beat
-// that fits none (a 16th melody over triplets) snaps each onset to the nearer of the 16th and triplet grids.
+// that fits none (a 16th melody over triplets) snaps each onset to the nearer of the 16th and eighth-triplet grids.
 // Compound meters (6/8, 9/8, 12/8) count in eighths already, so they get no triplets.
 function snapper(notes: ChartNote[], triplets: boolean) {
-  const grids = GRIDS.filter((g) => triplets || g !== 4);
+  const grids = GRIDS.filter((g) => triplets || g % 3 === 0);
+  const mixed = grids.filter((g) => g === 3 || g === 4); // a beat that fits no grid
   const beatOf = (t: number) => Math.floor(t + TOLERANCE);
   const fits = (rel: number[], g: number) => rel.every((r) => Math.abs(r * DIVISIONS - g * Math.round((r * DIVISIONS) / g)) <= TOLERANCE * DIVISIONS);
   const at = new Map<string, number[]>(); // staff:beat -> onsets relative to the beat
@@ -128,7 +129,7 @@ function snapper(notes: ChartNote[], triplets: boolean) {
     const r = (t - k) * DIVISIONS;
     const g = grid.get(`${hand}:${k}`) ?? grids.find((g) => fits([t - k], g)) ?? 0;
     const near = (g: number) => g * Math.round(r / g);
-    const snapped = g ? near(g) : grids.map(near).reduce((a, b) => (Math.abs(b - r) < Math.abs(a - r) ? b : a));
+    const snapped = g ? near(g) : mixed.map(near).reduce((a, b) => (Math.abs(b - r) < Math.abs(a - r) ? b : a));
     return { at: k * DIVISIONS + snapped, step: g || 3 };
   };
 }
@@ -252,11 +253,16 @@ export function chartToMusicXml(chart: Chart, song: Chart = chart): string {
     `${triplet ? "<time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes></time-modification>" : ""}` +
     `<staff>${staff}</staff>${beam ? `<beam number="1">${beam}</beam>` : ""}${notations ? `<notations>${notations}</notations>` : ""}</note>`;
   const forward = (staff: number, voice: number, len: number) => `<forward><duration>${len}</duration><voice>${voice}</voice><staff>${staff}</staff></forward>`;
-  // A tuplet mark per item: start on a beat's first triplet, stop on its last (both on a lone one).
+  // A tuplet mark per item: start on a group's first triplet, stop on its last (both on a lone one). A group is a beat,
+  // or half a beat for triplet 16ths, so a sextuplet prints as two 3s.
   const tuplets = (items: { at: number; piece?: Piece }[]) => {
     const marks = items.map(() => "");
-    const beats = new Map<number, number[]>();
-    items.forEach((it, i) => it.piece?.[3] && beats.set(Math.floor(it.at / DIVISIONS), [...(beats.get(Math.floor(it.at / DIVISIONS)) ?? []), i]));
+    const beats = new Map<string, number[]>();
+    items.forEach((it, i) => {
+      if (!it.piece?.[3]) return;
+      const k = it.piece[0] === 2 ? `16:${Math.floor(it.at / (DIVISIONS / 2))}` : `8:${Math.floor(it.at / DIVISIONS)}`;
+      beats.set(k, [...(beats.get(k) ?? []), i]);
+    });
     for (const is of beats.values()) {
       marks[is[0]] += '<tuplet type="start"/>';
       marks[is[is.length - 1]] += '<tuplet type="stop"/>';

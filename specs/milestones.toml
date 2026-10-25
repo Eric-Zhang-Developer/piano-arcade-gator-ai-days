@@ -179,6 +179,7 @@ features = [
   "play-modes", # Eric, 2026-10-25 (#835): Learn, Flow and Perform as a ladder; practice keeps your mode (#832)
   "demo-performance", # Eric, 2026-10-25 (#814): sustain, dynamics and legato for every demo, five songs a batch
   "results-landing", # Eric, 2026-10-25 (#959): one deep polish pass on the 3 s from the last note to the rank
+  "count-in", # Eric, 2026-10-25 (#1006): one deep polish pass on the 8 beats before the first note, a #856 hero moment
   "laptop-sound",
   "flow-mode",
   "duo-tokens",
@@ -235,6 +236,7 @@ features = ["simon-says-spike", "restyle-spike", "score-follow-spike", "wrong-no
   "conductor", # Eric, 2026-10-25 (#985): wow feeder; wave a hand at the camera and the DGX follows your tempo
   "hum-level-spike", # Eric's spike idea (#522): a tune hummed to a click becomes a local level, scored by forge diff
   "jam-mode-spike", # Eric's spike idea (#520): the DGX's drums and bass follow the chords a player holds
+  "real-keys", # Eric, 2026-10-25 (#1017): wow feeder; the notes fall onto live video of the real DGX keys
 ]
 cut = []
 

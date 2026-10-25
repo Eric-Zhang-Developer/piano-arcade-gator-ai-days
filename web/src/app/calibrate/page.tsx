@@ -109,8 +109,8 @@ function Calibrate() {
             {phase.kind === "ready" && (
               <>
                 <p className={css.text}>
-                  Tap any key, or any piano key, on each of {s.clicks} clicks. The first {s.settleClicks} are for settling
-                  in. Your taps set the latency offset {"/play"} uses.
+                  Tap a laptop key or a piano key on each of {s.clicks} clicks. The first {s.settleClicks} are for settling
+                  in. Your taps set the timing offset the game uses.
                 </p>
                 <Clicks count={s.clicks} settle={s.settleClicks} heard={0} />
                 <div className={css.row}>

@@ -89,6 +89,13 @@ export const labGroups: LabGroup[] = [
         href: "/attract",
         open: "/attract",
       },
+      {
+        slug: "stage-view",
+        name: "Stage view",
+        description: "notes rise dim on a back slope, tip over a lit crest and speed down to the bar, over 1033 ms.",
+        href: "/stage",
+        open: "/stage",
+      },
     ],
   },
   {
@@ -112,6 +119,13 @@ export const labGroups: LabGroup[] = [
         description: "plays the opening notes of a library song, you repeat them, and each round adds a note.",
         href: "/simon",
         open: "/simon",
+      },
+      {
+        slug: "wrong-note-spike",
+        name: "Spot the Wrong Note",
+        description: "the DGX plays 8 notes of Twinkle (or Ode to Joy, Minuet in G, Für Elise) with one moved 2 semitones",
+        href: "/wrong-note",
+        open: "/wrong-note",
       },
       {
         slug: "veritas",

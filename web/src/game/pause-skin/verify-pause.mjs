@@ -1,6 +1,6 @@
 // Browser proof of pause-skin (spec: pause-skin, Validation): a production build in headless Chromium, laptop keys,
 // /play?song=twinkle&beat=off (beat-track's clicks share the tick's pitches), and a page-side spy logging each
-// OscillatorNode.start's frequency and its scheduled audio time.
+// AudioBufferSourceNode.start's pitch (read from the buffer) and its scheduled audio time.
 // 1. Start, Esc -> PAUSED with Resume focused (screenshots at both sizes and reduced motion); ↓ ↓ Enter -> /.
 // 2. Start, Esc, Enter -> the countdown runs 4, 3, 2, 1: one accent click then three ticks, a beat (600 ms) apart on
 //    the audio clock; then the menu is gone and play goes on.
@@ -55,12 +55,28 @@ const check = (ok, line) => {
   if (!ok) failures.push(line);
 };
 
+// Since ui-sound-family (#1169) each UI sound, the countdown's ticks included, is one rendered buffer, not an
+// oscillator. So the spy is on AudioBufferSourceNode.start (as verify-ui-sounds.mjs's is), and a buffer's pitch is
+// read from its samples: the autocorrelation peak between 1100 and 2200 Hz, snapped to the click or the accent when
+// within 4%. The bars below are unchanged.
 const spy = () => {
   window.__oscStarts = [];
-  const start = OscillatorNode.prototype.start;
-  OscillatorNode.prototype.start = function (when = 0) {
-    window.__oscStarts.push({ hz: Math.round(this.frequency.value), when, now: this.context.currentTime });
-    return start.call(this, when);
+  const pitch = (d, sr) => {
+    let best = 0;
+    let lag = 0;
+    for (let l = Math.floor(sr / 2200); l <= Math.ceil(sr / 1100); l++) {
+      let sum = 0;
+      for (let i = 0; i + l < d.length; i++) sum += d[i] * d[i + l];
+      if (sum > best) [best, lag] = [sum, l];
+    }
+    const hz = lag ? sr / lag : 0;
+    return [1320, 1760].find((f) => Math.abs(hz - f) / f < 0.04) ?? Math.round(hz); // beatSettings.clickHz, clickAccentHz
+  };
+  const start = AudioBufferSourceNode.prototype.start;
+  AudioBufferSourceNode.prototype.start = function (when = 0, ...rest) {
+    const d = this.buffer?.getChannelData(0);
+    window.__oscStarts.push({ hz: d ? pitch(d, this.buffer.sampleRate) : 0, when, now: this.context.currentTime });
+    return start.call(this, when, ...rest);
   };
 };
 const CLICK = 1320;

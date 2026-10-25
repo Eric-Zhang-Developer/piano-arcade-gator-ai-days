@@ -142,7 +142,7 @@ for (const bot of ["perfect", "rank-c"]) {
       const L = window.__pianoArcadeLanding;
       L.play();
       L.seek(400 + k * (L.plan.endMs - 400));
-      return { at: L.t, results: window.__pianoArcade.results };
+      return { at: L.t }; // only the time: window.__pianoArcade exists only with ?input=test, which this check doesn't use (#1270)
     }, k);
     const retry = page.getByRole("button", { name: "Retry" });
     const t = Date.now();

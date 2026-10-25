@@ -6,6 +6,7 @@ import { PhoneGuard } from "../game/phone-guard";
 import { DemoReset } from "../game/demo-reset";
 import { HelpOverlay } from "../game/help-overlay";
 import { LaptopSound } from "../game/laptop-sound/install";
+import { NavBar } from "../game/nav-bar";
 import "./globals.css";
 import { APP_NAME } from "@/game/app-name";
 
@@ -42,6 +43,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <CaptureMode />
         {/* ? opens a card of every control on / and /play, not mid-take (help-overlay) */}
         <HelpOverlay />
+        {/* the top-level pages, off /play, the kiosk screens and capture mode (nav-bar) */}
+        <NavBar />
         {/* a phone or tablet on / or /play: a card saying it's made for a laptop or a piano (phone-guard) */}
         <PhoneGuard />
         {/* Shift+Esc loads / clean between judges, even from crash-guard's card (demo-reset) */}

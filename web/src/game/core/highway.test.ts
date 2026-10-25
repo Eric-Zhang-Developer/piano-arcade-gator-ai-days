@@ -25,7 +25,7 @@ const song = (id: string): Chart => JSON.parse(readFileSync(new URL(`../../../pu
 describe("the static keyboard (#384): one range per song, C to C", () => {
   it("snaps to the C at or below the lowest note and the C at or above the highest", () => {
     expect(staticRange(song("fur-elise"))).toEqual({ lowPitch: 36, highPitch: 96 }); // E2–E6 -> C2–C7
-    expect(staticRange(song("moonlight-3"))).toEqual({ lowPitch: 24, highPitch: 96 }); // A1–C#6 -> C1–C7
+    expect(staticRange(song("moonlight-3"))).toEqual({ lowPitch: 24, highPitch: 96 }); // G1–E6 -> C1–C7
     expect(staticRange(song("nocturne-op9-2"))).toEqual({ lowPitch: 24, highPitch: 96 }); // A#1–D6 -> C1–C7
     expect(staticRange(chart([50, 96]))).toEqual({ lowPitch: 48, highPitch: 96 }); // a top C ends the range on it
     expect(staticRange(chart([37, 94]))).toEqual({ lowPitch: 36, highPitch: 96 }); // black ends snap to Cs too

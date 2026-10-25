@@ -12,6 +12,9 @@
   marked eighth = 132. Turns and the trill come through as main notes; three grace notes are skipped.
 - **Maple Leaf Rag:** pickup + the A strain twice (this MIDI plays repeats), 100 BPM, a little under the MIDI's 120.
 - **Moonlight, 3rd movement:** bars 1–8, up to bar 9's new figure, 60 BPM: about 38% of a usual quarter = 160, so the
-  arpeggios can be read at all.
+  arpeggios can be read at all. **Since 2026-10-25 (Eric: "Can we do the full first fast part ... There are only 206
+  notes"): the whole exposition**, bars 1–65: moonlight3-a4.ly's `\repeat volta 2` (bars 1–64) and its first ending
+  (bar 65), at 147 BPM (`song-pack-2-moonlight-tempo.md`). 1,629 notes, G1–E6, about 106 s. The second ending (bar 66)
+  starts the development, so it's left out.
 
 **How to undo.** Change the bars or `bpm` and reconvert; the library test checks the result.

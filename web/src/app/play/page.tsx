@@ -20,7 +20,7 @@ import { StartScreen } from "../../game/duo-start/StartScreen";
 import { PauseMenu } from "../../game/pause-skin";
 import { Button, MonoLabel, Panel, kitButton } from "../../game/duo-tokens";
 import { ResultsLayout } from "../../game/results-layout";
-import { emptyHud, hudLayout, reduceHud } from "../../game/hud";
+import { emptyHud, hudLayout, hudSettings, reduceHud, tierFor } from "../../game/hud";
 import { landingAt, landingCounts, landingMounted, landingPlan, landingRuns, landingSettings, landingT, startLanding, stopLanding } from "../../game/results-landing";
 import { barStep, holdClock, isWaitMode } from "../../game/wait-mode";
 import { isFlowMode } from "../../game/flow-mode/clock";
@@ -346,11 +346,22 @@ export default function Play() {
       t0Chart = now;
       const r = canvas.getBoundingClientRect();
       const hl = hudLayout(layout!.width, layout!.judgmentLineY);
-      const size = hl.panel.h * 0.42;
+      // Where the HUD drew its score: right-aligned left of the multiplier badge, as its draw code places it.
+      // ponytail: mirrors hud/index.ts's score placement (that file is another PR's); move it to a hud export once free.
+      const h = hl.panel.h;
+      const pad = Math.max(10, h * 0.25);
+      const fam = `${getComputedStyle(document.documentElement).getPropertyValue("--pa-font-display").trim() || "system-ui"}, system-ui, sans-serif`;
+      ctx.save();
+      ctx.font = `italic 900 ${Math.round(h * 0.5)}px ${fam}`;
+      const badgeW = ctx.measureText(`x${tierFor(hud.combo).mult}`).width;
+      ctx.font = `italic 800 ${Math.round(h * 0.42)}px ${fam}`;
+      const scoreW = ctx.measureText(hud.score.toLocaleString("en-US")).width;
+      ctx.restore();
+      const scoreRight = layout!.width - pad - hudSettings.statusGutterPx - badgeW - pad;
       startLanding(
         { bpm: chart.bpm, mountChartMs: now + landingSettings.outMs, counts: landingCounts(hud), combo: hud.combo, maxCombo },
         {
-          score: { x: r.left + (hl.slots.score.x0 + hl.slots.score.x1) / 2, y: r.top + hl.panel.h * 0.4, size },
+          score: { x: r.left + scoreRight - scoreW / 2, y: r.top + h * 0.42, size: h * 0.42 },
           combo: { x: r.left + hl.combo.cx, y: r.top + hl.combo.cy, size: hl.combo.size },
         },
         hud.score,

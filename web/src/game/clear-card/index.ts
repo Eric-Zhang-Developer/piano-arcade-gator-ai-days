@@ -87,14 +87,14 @@ export function clearCard(): GamePlugin {
       ctx.fillRect(0, band, f.width, f.height - band);
 
       let size = Math.max(24, (f.judgmentLineY - band) * s.sizeOfPlayfield);
-      ctx.font = `italic 900 ${size}px ${display}`;
+      ctx.font = `900 ${size}px ${display}`; // upright, the kit's display type (no italic in the Duo look)
       const w = ctx.measureText(card.kind).width;
       if (w > f.width * s.maxWidth) size *= (f.width * s.maxWidth) / w;
       const color = card.kind === "CLEAR" ? ink : gold;
       const scale = s.fromScale + (1 - s.fromScale) * e;
       ctx.translate(f.width / 2, (band + f.judgmentLineY) / 2);
       ctx.scale(scale, scale);
-      ctx.font = `italic 900 ${size}px ${display}`;
+      ctx.font = `900 ${size}px ${display}`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.globalAlpha = e;

@@ -108,3 +108,9 @@ it("the toast is square, its cyan accent bar and 200 ms motion unchanged (#1137)
   expect(rule).toMatch(/animation: pa-toast-in 200ms ease-out/);
   expect(rule).toMatch(/transition: opacity 200ms ease-out, transform 200ms ease-out/);
 });
+
+it("the toast's ring is the kit's hairline, not the retired cyan (#1240)", () => {
+  const rule = toastCss.match(/\.pa-toast \{[^}]*\}/)![0];
+  expect(toastCss).not.toMatch(/39, 225, 255/);
+  expect(rule).toMatch(/box-shadow: 0 0 0 1px var\(--pa-line\)/);
+});

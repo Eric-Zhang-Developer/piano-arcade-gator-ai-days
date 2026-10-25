@@ -10,7 +10,7 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  font: 700 clamp(12px, 0.85vw, 16px) var(--pa-font-data), ui-monospace, monospace;
+  font: 700 clamp(16px, 1.25vw, 24px) var(--pa-font-data), ui-monospace, monospace; /* read on video: 16 px at 1280, 24 px at 1920 (#1239) */
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }

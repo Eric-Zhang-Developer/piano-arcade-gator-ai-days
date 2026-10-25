@@ -7,7 +7,7 @@
 // song's Hands and Speed (song-options).
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
 import type { Chart } from "../../contracts";
 import { adaptUrl, songPhrases, start } from "../adaptive-chunks/next";
 import { FocusPanel, SongRow } from "../duo-select/Select";
@@ -23,6 +23,7 @@ import { goToStage } from "./go-to-stage";
 import styles from "./select-layout.module.css";
 import { APP_NAME } from "../app-name";
 import { HelpLink } from "../help-overlay";
+import { Finder, useFinder } from "../song-finder/Finder";
 
 // footer: the left column's last row, in flow under the focused song (the Options button, first-run's link). Outside the
 // per-song section, so it isn't remounted on every ↑/↓.
@@ -31,7 +32,12 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
   const best = useBestGrades();
   const options = useSongOptions();
   const router = useRouter();
-  const song = songs[focused];
+  const finder = useFinder(songs); // song-finder: the list as sorted and filtered
+  const shown = finder.shown;
+  const song = shown[focused];
+  // Sorting or filtering keeps the focused song if it's still shown, else the first shown song takes focus.
+  const focusedId = useRef<string | undefined>(undefined);
+  useEffect(() => setFocused(Math.max(0, shown.findIndex((s) => s.id === focusedId.current))), [shown]);
   const [level, setLevel] = useLevel();
   const levelParams = new URLSearchParams(level === "easy" ? "level=easy" : "");
   const bestOf = (id: string) => best[recordKey(id, levelParams)];
@@ -140,23 +146,25 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
         )}
         {footer && <div className={styles.footer}>{footer}</div>}
       </div>
+      <Finder finder={finder}>
       <ol className={styles.list} onKeyDown={onKeyDown} aria-label="Songs">
-        {songs.map((s, i) => (
+        {shown.map((s, i) => (
           <li key={s.id}>
             <Link
               href={playHref(s.id)}
-              autoFocus={i === 0}
+              autoFocus={i === 0 && !finder.touched}
               className={styles.link}
               data-testid={`song-${s.id}`}
               onClick={onPlay}
-              onFocus={() => setFocused(i)}
-              onMouseEnter={(e) => e.currentTarget.focus({ preventScroll: true })} // hover highlights too (song-preview)
+              onFocus={() => ((focusedId.current = s.id), setFocused(i))}
+              onMouseEnter={(e) => document.activeElement?.matches("input") || e.currentTarget.focus({ preventScroll: true })} // hover highlights too (song-preview), but never takes focus from the finder's box, where a typed P would start practice
             >
               <SongRow title={s.title} composer={s.composer} level={s.level} roll={s.roll} focused={i === focused} />
             </Link>
           </li>
         ))}
       </ol>
+      </Finder>
     </main>
   );
 }

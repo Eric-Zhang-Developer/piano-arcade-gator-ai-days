@@ -12,7 +12,7 @@ A `browser` CI job runs the headless checks on GitHub: `web/e2e/verify.mjs` plus
 - **What's left is every-check runs at about 17 min** (main, and PRs touching shared code: #575 16.2, #527 16.4). They're bounded by the slowest shard. The longest check is verify-sheet at 425 s.
 - **Shared-code detection is wide:** a CSS-only `style(veritas)` PR (#607) also ran every check.
 - **Flaky reruns:** not counted for these runs. Before #530 it was 0 in 9 PRs.
-- **Known red:** verify-toast (#584, fixed by #587; it leaves after 2 main passes, 1 so far) and verify-replay (#552; #593 drops it).
+- **Known red:** none once #593 merges. verify-toast (#584, fixed by #587) and verify-replay (#552, fixed by #557) each passed 2 main runs after their fix.
 - **Not done:** the two throwaway-PR validations, and a local before/after `verify.py` timing (the spec's 115 s → 75 s is unremeasured).
 - **Shards:** up to 8, not the spec's 4.
 - Eric's eye: not verified by Eric.

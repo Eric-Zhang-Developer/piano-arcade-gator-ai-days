@@ -104,7 +104,20 @@ def allowed(title: str, cfg: dict, specs: dict, shipped: dict, done: set, revert
             return (lambda p: True), f"{scope} is bootstrap: anything"
         spec_dir = fm["_path"].rsplit("/", 1)[0] + "/"
         prefixes = as_list(fm.get("owns")) + open_paths + [f"{changes}/{scope}.md", spec_dir, f"{sp}/decisions/{scope}-"]
+        if person := lane(fm):
+            # The lane widens to its other features' owns, never to a path an in-flight feature of another lane holds.
+            # "No open PR is working on them" is on the agent (AGENTS.md): this script doesn't ask GitHub.
+            mine = [e for s, o in {**shipped, **specs}.items() if s != scope and lane(o) == person
+                    for e in as_list(o.get("owns"))]
+            theirs = [e for o in in_flight(specs, done).values() if lane(o) != person for e in as_list(o.get("owns"))]
+            return (lambda p: under(p, prefixes) or (under(p, mine) and not under(p, theirs))), \
+                f"{prefixes}, plus {person}'s lane: {mine}"
     return (lambda p: under(p, prefixes)), f"{prefixes}"
+
+
+def lane(fm: dict) -> str | None:
+    """The person whose lane a feature is in: its assignee up to the first `-` (eric-agent-1 -> eric), or None."""
+    return str(fm.get("assignee") or "").split("-", 1)[0].strip() or None
 
 
 def hint(path: str, cfg: dict, specs: dict, shipped: dict, done: set) -> str:

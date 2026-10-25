@@ -102,6 +102,13 @@ Supabase Postgres, in `sharan`'s lane. `supabase/README.md` lists what's in it a
 
 The bootstrap feature (`bootstrap: true`) may change anything.
 
+**Ownership is open within a lane.** A `feat(<slug>)` or `fix(<slug>)` PR (and its `refactor`, `perf`, ... kin) may
+also change the `owns` of other features in the same person's lane, but only while no open PR is working on those
+files. A feature's person is its spec's `assignee` up to the first `-` (`eric`, `eric-agent-1` and
+`eric-foreman-agent` are all `eric`); an empty `assignee` is no lane, so no widening. `check_ownership.py` checks the
+lane, not GitHub: checking for an open PR on those files (`gh pr list`, then its files) is on you. A path an in-flight
+feature of another lane owns stays closed: cross-lane changes still need the owner's own PR.
+
 ## When something needs a person
 - Could running something answer it (a script, a throwaway prototype in a scratch dir)? Then run it instead of asking.
 - Two fixes for the same failure didn't work? Write down what both assumed before trying a third.
@@ -141,7 +148,8 @@ Search open issues and PRs first: a likely duplicate gets a linking comment.
 ## Prefer (engineering judgment)
 - Review comments are claims to check: fix with a failing check, or reply with why not.
 - One feature at a time. A second is fine while the first waits on review or CI.
-- Keep PRs reviewable: past a few hundred changed lines, split along logical seams or say why it's one piece (CI warns).
+- One PR per thing a person sees (a screen or a moment), up to about 1000 changed lines (CI warns past that). Split
+  only at a real seam, such as a component other screens share.
 - Not everything needs a spec: a small bug in shared code is a `fix: ...` PR; new behavior gets a spec.
 - If your own spec is wrong, fix it in the same PR as the code. If another feature's spec is wrong, file an issue.
 - Never resolve a conflict in a file you don't own. Abort, file a `blocked` issue for the owner, and switch tasks.

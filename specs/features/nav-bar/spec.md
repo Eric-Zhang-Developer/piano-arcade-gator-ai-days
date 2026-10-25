@@ -42,9 +42,13 @@ A nav link to a half-done Lab looks worse than none.
   | Lab | `/lab` | `lab` |
   | How it's built | `/how` | `how-it-works` |
   | Progress | `/progress` | `take-store` |
+  | Status | `/operator` | `operator-board`, and only when `NODE_ENV !== "production"`: `/operator`'s API routes return 404 in production |
 
   How it's built appears once #443 and #460 merge and `changes/how-it-works.md` lands. That needs no change to the bar:
   the test reads the folder.
+- **A GitHub link at the right end** (Eric, 2026-10-25, via the planner: he couldn't find status or the repo from `/`):
+  `https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days`, opened in a new tab with
+  `rel="noopener noreferrer"`.
 - **Login at the right.** Move the login link that `/` already shows into the bar. Reuse its component and its
   signed-in behavior; don't write a second copy. If it can't move without changing another lane's folder, leave it
   where it is and log why in `specs/decisions/nav-bar-login.md`.
@@ -64,6 +68,7 @@ A nav link to a half-done Lab looks worse than none.
 1. `pnpm -C web exec vitest run --passWithNoTests src/game/nav-bar`:
    - every slot's slug has a `changes/<slug>.md` (the test reads the folder), and no done slot is missing;
    - every slot's path is a page under `web/src/app/`;
+  - Status links to `/operator` and is left out of a production build; the GitHub link is the repo's URL;
    - the hide rule returns true for `/play`, `/cabinet`, `/attract`, `/operator` and capture mode, and false for `/`,
      `/learn`, `/lab` and `/progress`.
 2. Headless, once, under `verify.lock`:

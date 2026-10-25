@@ -21,8 +21,9 @@ const still = () => (motionQuery ??= typeof matchMedia === "function" ? matchMed
 
 declare global {
   interface Window {
-    // For the /sim timing log: each echo sent, at its performance time and when it was due.
-    __round?: { sent: { bytes: number[]; at: number; due: number }[]; counts: { received: number; filtered: number; dropped: number } };
+    // For the /sim timing log: each echo, the performance time it plays at, and when send() handed it over. at < sentAt
+    // is a late echo: the piano plays it on arrival.
+    __round?: { presses: { type: string; pitch: number; at: number }[]; sent: { bytes: number[]; at: number; sentAt: number }[]; counts: { received: number; filtered: number; dropped: number } };
   }
 }
 
@@ -37,7 +38,7 @@ function roundPlugin(): GamePlugin {
   let ticker: ReturnType<typeof setInterval> | null = null;
   let ended = false;
   let dropped = 0; // echoes a pause dropped before they went out
-  const log = () => (window.__round ??= { sent: [], counts: { received: 0, filtered: 0, dropped: 0 } });
+  const log = () => (window.__round ??= { presses: [], sent: [], counts: { received: 0, filtered: 0, dropped: 0 } });
 
   const heard = (e: Event) => {
     const m = e as MIDIMessageEvent;
@@ -76,7 +77,7 @@ function roundPlugin(): GamePlugin {
       const at = zero + s.atMs;
       output.send(s.bytes, at);
       if ((s.bytes[0] & 0xf0) === 0x90) filter.sent(s.bytes[1], s.bytes[2], at);
-      rec.sent.push({ bytes: s.bytes, at, due: at });
+      rec.sent.push({ bytes: s.bytes, at, sentAt: performance.now() });
     }
     scheduledUntil = until;
     rec.counts = { ...filter.counts(), dropped };
@@ -99,7 +100,10 @@ function roundPlugin(): GamePlugin {
         start: (onEvent) =>
           dev.start((e) => {
             if (entry && filter.drop(e.type, e.pitch, e.velocity, e.timeMs)) return; // the piano echoing a voice: never judged
-            if (entry && ticker) played.push({ type: e.type, pitch: e.pitch, velocity: e.velocity, atMs: e.timeMs - zero });
+            if (entry && ticker) {
+              played.push({ type: e.type, pitch: e.pitch, velocity: e.velocity, atMs: e.timeMs - zero });
+              log().presses.push({ type: e.type, pitch: e.pitch, at: e.timeMs });
+            }
             onEvent(e);
           }),
       };
@@ -112,6 +116,7 @@ function roundPlugin(): GamePlugin {
         ended = false;
         dropped = 0;
         filter.clear();
+        window.__round = undefined; // a fresh log per take
         zero = performance.now() - e.atMs;
         scheduledUntil = -Infinity;
         if (output) for (const b of programChanges(entry.voices)) output.send(b);

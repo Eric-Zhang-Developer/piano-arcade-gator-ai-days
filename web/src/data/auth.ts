@@ -66,13 +66,37 @@ function load(): Session | null {
   }
 }
 
+// Everything that shows who's playing (the menu chip, /auth/login, /progress, the save line) listens here, so signing
+// in or out anywhere, in this tab or another, updates all of them at once.
+const listeners = new Set<() => void>();
+const changed = () => listeners.forEach((l) => l());
+
+/** Calls `listener` whenever this browser's session changes (sign-in, sign-out, a new guest). Returns unsubscribe. */
+export function onSessionChange(listener: () => void): () => void {
+  if (listeners.size === 0 && typeof window !== "undefined") window.addEventListener("storage", fromOtherTab);
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+    if (listeners.size === 0 && typeof window !== "undefined") window.removeEventListener("storage", fromOtherTab);
+  };
+}
+
+function fromOtherTab(e: StorageEvent): void {
+  if (e.key === SESSION_KEY || e.key === null) changed();
+}
+
+/** Who a session is, for telling a new player apart from a refreshed token. */
+const who = (s: Session | null) => (s ? `${s.user_id}:${s.is_anonymous}` : "");
+
 function store(s: Session | null): void {
+  const before = who(load());
   try {
     if (s) localStorage.setItem(SESSION_KEY, JSON.stringify(s));
     else localStorage.removeItem(SESSION_KEY);
   } catch {
     // storage blocked: the session lasts until the tab closes
   }
+  if (who(s) !== before) changed();
 }
 
 interface TokenResponse {
@@ -80,7 +104,7 @@ interface TokenResponse {
   refresh_token: string;
   expires_in: number;
   expires_at?: number;
-  user: { id: string; is_anonymous?: boolean };
+  user: { id: string; is_anonymous?: boolean; email?: string };
 }
 
 function toSession(t: TokenResponse): Session {
@@ -90,6 +114,7 @@ function toSession(t: TokenResponse): Session {
     expires_at: t.expires_at ?? Math.floor(Date.now() / 1000) + t.expires_in,
     user_id: t.user.id,
     is_anonymous: t.user.is_anonymous ?? true,
+    ...(t.user.email ? { email: t.user.email } : {}),
   };
 }
 
@@ -105,39 +130,69 @@ async function authFetch(path: string, init: RequestInit = {}, token?: string): 
   });
 }
 
-async function refresh(s: Session): Promise<Session | null> {
+/**
+ * Runs `make` once at a time: callers that arrive while it's running share its result. Two saves (or a save and the
+ * coach) asking at once must not make two guests, and a refresh token is single-use, so two refreshes would race.
+ */
+function once<T>(make: () => Promise<T>): () => Promise<T> {
+  let pending: Promise<T> | null = null;
+  return () => (pending ??= make().finally(() => (pending = null)));
+}
+
+/**
+ * Refreshes the stored session. Null only when Supabase says it's gone for good (signed out elsewhere, or the guest
+ * was deleted): then it's forgotten. Throws when offline or Supabase is busy, so nobody mistakes a blip for "signed
+ * out" and starts a new guest, splitting the player's history in two.
+ */
+const refreshStored = once(async (): Promise<Session | null> => {
+  const s = load();
+  if (!s) return null;
   const res = await authFetch("/token?grant_type=refresh_token", {
     method: "POST",
     body: JSON.stringify({ refresh_token: s.refresh_token }),
   });
-  if (!res.ok) return null;
-  const next = toSession(await res.json());
+  if (res.status === 400 || res.status === 401 || res.status === 403) {
+    const now = load();
+    if (now && now.refresh_token !== s.refresh_token) return now; // another tab refreshed first: use its session
+    store(null);
+    return null;
+  }
+  if (!res.ok) throw new Error(`session refresh failed: ${res.status}`);
+  const fresh = toSession(await res.json());
+  const next = { ...fresh, email: fresh.email ?? s.email };
   store(next);
   return next;
-}
+});
 
-/** The current session, refreshed if it expires within a minute. Null when signed out or offline. */
-export async function getSession(): Promise<Session | null> {
+/** The current session; throws when it needs a refresh and Supabase can't be reached. */
+async function current(): Promise<Session | null> {
   if (!isConfigured()) return null;
   const s = load();
   if (!s) return null;
   if (s.expires_at - 60 > Date.now() / 1000) return s;
+  return refreshStored();
+}
+
+/** The current session, refreshed if it expires within a minute. Null when signed out or offline. */
+export async function getSession(): Promise<Session | null> {
   try {
-    return await refresh(s);
+    return await current();
   } catch {
     return null; // offline: try again next time
   }
 }
 
-/** The current session, or a new anonymous one. Throws when offline; callers keep the take in the outbox. */
-export async function ensureSession(): Promise<Session> {
-  const s = await getSession();
-  if (s) return s;
+const newGuest = once(async (): Promise<Session> => {
   const res = await authFetch("/signup", { method: "POST", body: JSON.stringify({}) });
   if (!res.ok) throw new Error(`anonymous sign-in failed: ${res.status}`);
   const next = toSession(await res.json());
   store(next);
   return next;
+});
+
+/** The current session, or a new anonymous one. Throws when offline; callers keep the take in the outbox. */
+export async function ensureSession(): Promise<Session> {
+  return (await current()) ?? (await newGuest());
 }
 
 /** Sends the player to Google; they come back to /auth/callback signed in as the same user, then to `next`. */
@@ -197,8 +252,10 @@ async function mergeRemembered(into: string): Promise<string | null> {
  * On /auth/callback: read the tokens Supabase put in the URL hash. Returns null on success, "redirecting" when it
  * sent the player on to Google sign-in, or an error message.
  */
-export async function finishRedirect(hash: string): Promise<string | null> {
+export async function finishRedirect(hash: string, search = ""): Promise<string | null> {
   const p = new URLSearchParams(hash.replace(/^#/, ""));
+  // Supabase reports errors in the hash or, depending on the flow, the query string.
+  for (const [k, v] of new URLSearchParams(search)) if (k.startsWith("error") && !p.has(k)) p.set(k, v);
   if (p.get("error_code") === "identity_already_exists") {
     // This Google account already belongs to a player (linked on another device): sign in to it instead.
     await signInWithGoogle(peekNext());

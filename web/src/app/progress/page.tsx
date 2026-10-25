@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { validateChart, type Chart } from "../../contracts";
 import { judgeTake } from "../../game/core/judge";
-import { getSession, linkGoogle, signInWithGoogle, signOut, type Session } from "../../data/auth";
+import { getSession } from "../../data/auth";
 import { isConfigured } from "../../data/config";
 import { takeRows, type NoteRow } from "../../data/mapping";
 import { readOutbox } from "../../data/outbox";
@@ -24,7 +24,8 @@ import {
   type HandStatRow,
   type SessionRow,
 } from "../../data/progress";
-import { flushOutbox } from "../../data/save-plugin";
+import { flushOutbox, signOutAfterSaving } from "../../data/save-plugin";
+import { useSession } from "../../data/useSession";
 import { AccuracyChart, HandsPanel, JudgmentBar, panel, panelTitle, PracticeCalendar, SongsTable, StatTile, tableStyle, td, th } from "./panels";
 
 // The player's profile: headline numbers, accuracy over time, a practice calendar, every note's judgment, both
@@ -96,16 +97,17 @@ function ProgressPage() {
   const song = useSearchParams().get("song");
   const [data, setData] = useState<ProfileData | null>(null);
   const [source, setSource] = useState<Source>("device");
-  const [session, setSession] = useState<Session | null>(null);
+  const session = useSession();
+  const player = session === undefined ? undefined : (session?.user_id ?? null);
   const [note, setNote] = useState("");
 
   useEffect(() => {
+    if (player === undefined) return; // still checking who's playing
     let live = true;
     (async () => {
       await flushOutbox().catch(() => 0);
       const s = await getSession();
       if (!live) return;
-      setSession(s);
       if (isConfigured() && s) {
         try {
           const auth = { headers: { Authorization: `Bearer ${s.access_token}` } };
@@ -131,12 +133,14 @@ function ProgressPage() {
         if (live) setNote("Your account's history didn't load just now, so this shows the takes saved in this browser. Refresh to try again.");
       }
       const local = await localData(song);
-      if (live) setData(local);
+      if (!live) return;
+      setData(local);
+      setSource("device");
     })();
     return () => {
       live = false;
     };
-  }, [song]); // ?song= changes in place when a song or "all songs" is clicked
+  }, [song, player]); // ?song= changes in place when a song or "all songs" is clicked; sign-in or out reloads
 
   const google = Boolean(session && !session.is_anonymous);
   const sessions = data?.sessions ?? null;
@@ -162,11 +166,11 @@ function ProgressPage() {
         <h1 style={title}>{song ? (songTitle ?? song) : google ? "Your profile" : "Your practice"}</h1>
         {last && !song && <span style={{ color: "var(--pa-ink-dim)" }}>last played {when(last.created_at)}</span>}
       </header>
-      <p style={{ color: "var(--pa-ink-dim)", margin: "0 0 4px" }}>
-        {google ? (
+      <p style={{ color: "var(--pa-ink-dim)", margin: "0 0 4px", minHeight: "1.6em" }}>
+        {session === undefined ? null : google ? (
           <>
             Signed in with Google{session?.email ? ` as ${session.email}` : ""} · saved to your account
-            <button style={plain} onClick={() => void signOut().then(() => window.location.reload())}>
+            <button style={plain} onClick={() => void signOutAfterSaving()} data-testid="progress-signout">
               Sign out
             </button>
           </>
@@ -174,16 +178,9 @@ function ProgressPage() {
           <>
             {source === "account" ? "Guest · saved to this browser's player" : "On this device"}
             {isConfigured() && (
-              <>
-                {session && (
-                  <button style={linkButton} onClick={() => void linkGoogle().catch((e) => setNote(String(e.message ?? e)))}>
-                    Keep my progress with Google
-                  </button>
-                )}
-                <button style={plain} onClick={() => void signInWithGoogle()}>
-                  Already have an account? Sign in with Google
-                </button>
-              </>
+              <Link href="/auth/login?next=/progress" style={linkButton} data-testid="progress-signin">
+                Continue with Google
+              </Link>
             )}
           </>
         )}
@@ -315,7 +312,7 @@ const title: React.CSSProperties = { margin: 0, fontFamily: display, fontStyle: 
 const tiles: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(140px, 100%), 1fr))", gap: 12, marginTop: 20 };
 const twoUp: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(340px, 100%), 1fr))", gap: 16, marginTop: 16 };
 const plain: React.CSSProperties = { marginLeft: 12, padding: 0, border: 0, background: "transparent", color: "var(--pa-ink-dim)", textDecoration: "underline", cursor: "pointer" };
-const linkButton: React.CSSProperties = { marginLeft: 16, padding: "4px 12px", borderRadius: 6, border: "1px solid var(--pa-cyan)", background: "transparent", color: "var(--pa-cyan)", cursor: "pointer" };
+const linkButton: React.CSSProperties = { marginLeft: 16, padding: "4px 12px", borderRadius: 6, border: "1px solid var(--pa-cyan)", background: "transparent", color: "var(--pa-cyan)", cursor: "pointer", textDecoration: "none" };
 const playButton: React.CSSProperties = {
   display: "inline-block",
   marginTop: 16,

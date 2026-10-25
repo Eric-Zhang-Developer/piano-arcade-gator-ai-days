@@ -225,21 +225,71 @@
   outline: none;
 }
 
-.divider {
+/* The Google button wears .play: the one big choice, with Google's mark on a white key and a light sweep on hover. */
+.withMark {
+  position: relative;
+  overflow: hidden;
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 8px;
-  text-align: center;
-  font-size: 13px;
-  color: var(--pa-ink-dim);
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 16px 10px;
+  font-size: 24px;
+  white-space: nowrap;
+  color: var(--pa-ink);
+  cursor: pointer;
 }
 
-.divider::before,
-.divider::after {
+.withMark svg {
+  flex: none;
+  box-sizing: content-box;
+  width: 20px;
+  height: 20px;
+  padding: 6px;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.withMark::after {
   content: "";
-  flex: 1;
-  border-top: 1px solid rgba(242, 242, 245, 0.14);
+  position: absolute;
+  inset: 0 auto 0 -40%;
+  width: 30%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+
+.withMark:hover::after,
+.withMark:focus-visible::after {
+  animation: sweep 700ms ease-out;
+}
+
+@keyframes sweep {
+  to {
+    left: 120%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .withMark::after {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .withMark {
+    gap: 10px;
+    padding-inline: 10px;
+    font-size: 19px;
+  }
+}
+
+.withMark:disabled {
+  opacity: 0.6;
+  cursor: wait;
+  transform: none;
 }
 
 .google {

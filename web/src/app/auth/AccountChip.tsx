@@ -3,24 +3,29 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchHandle, fetchUserDetails } from "../../data/account";
-import { googleSession, signOut, type Session } from "../../data/auth";
 import { isConfigured } from "../../data/config";
+import { signOutAfterSaving } from "../../data/save-plugin";
+import { useSession } from "../../data/useSession";
 
 // Who's playing, for a menu corner: "Sign in" for guests, or the Google player (their handle, else their Google
 // name, else their email's name; click it for the profile: every session, when and for how long) with History and
-// Sign out.
+// Sign out. It follows the one session (useSession), so signing in or out anywhere updates it.
 // One line to mount (`<AccountChip />`); it hides itself when Supabase isn't configured and in capture mode.
 export function AccountChip() {
-  const [session, setSession] = useState<Session | null | undefined>(undefined);
-  const [label, setLabel] = useState<string | null>(null);
+  const any = useSession();
+  const session = any === undefined ? undefined : any && !any.is_anonymous ? any : null;
+  const [named, setNamed] = useState<{ id: string; label: string | null } | null>(null); // whose label it is
+  const label = session && named?.id === session.user_id ? named.label : null;
   useEffect(() => {
-    void googleSession().then(async (s) => {
-      setSession(s);
-      if (!s) return;
-      const [handle, details] = await Promise.all([fetchHandle(s), fetchUserDetails(s)]);
-      setLabel(handle || details?.name || null);
+    if (!session) return;
+    let live = true;
+    void Promise.all([fetchHandle(session), fetchUserDetails(session)]).then(([handle, details]) => {
+      if (live) setNamed({ id: session.user_id, label: handle || details?.name || null });
     });
-  }, []);
+    return () => {
+      live = false;
+    };
+  }, [session?.user_id]); // eslint-disable-line react-hooks/exhaustive-deps -- a refreshed token is the same player
   if (!isConfigured() || session === undefined) return null;
 
   return (
@@ -34,7 +39,7 @@ export function AccountChip() {
           <Link href="/progress" style={item}>
             History
           </Link>
-          <button style={item} onClick={() => void signOut().then(() => setSession(null))}>
+          <button style={item} onClick={() => void signOutAfterSaving()}>
             Sign out
           </button>
         </>

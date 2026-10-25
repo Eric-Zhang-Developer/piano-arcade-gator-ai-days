@@ -1,7 +1,8 @@
 // The whole login and save journey in a real browser, against the database the app points at: the sign-in screen,
 // "Play as guest", the menu, a song played on laptop keys, the results screen's save line, Easy not saving, the
-// profile, the row in Supabase, both Google buttons reaching Google's sign-in page (it stops there: no account is
-// used), and a failed Google return. Deletes the guest and its takes at the end.
+// profile, the row in Supabase, the profile's sign-in leading to that same page as the same guest,
+// both Google buttons reaching Google's sign-in page (it stops there: no account is used), and a failed
+// Google return. Deletes the guest and its takes at the end.
 // With the app running (pnpm -C web dev), from the repo root:
 //   node supabase/tests/login-e2e.mjs [appOrigin=http://localhost:3000]
 // Reads web/.env.local and prints no keys. Google sign-in itself needs a person: see supabase/README.md.
@@ -67,6 +68,9 @@ try {
   await check("a failed Google return shows a clear message, not a broken page", async () => {
     await page.goto(`${app}/auth/callback#error=access_denied&error_description=The+user+cancelled`);
     await page.getByRole("alert").filter({ hasText: "The user cancelled" }).waitFor({ timeout: 30_000 });
+    await page.getByTestId("callback-retry").waitFor(); // and a way on: Google again, or keep playing
+    await page.goto(`${app}/auth/callback?error=server_error&error_description=Query+string+error`);
+    await page.getByRole("alert").filter({ hasText: "Query string error" }).waitFor({ timeout: 30_000 });
   });
 
   await check("\"Play as guest\" opens the menu, whose account chip offers Sign in", async () => {
@@ -115,8 +119,17 @@ try {
     assert.match(await page.locator("main").textContent(), /Guest · saved to this browser's player/);
   });
 
-  await check("\"Keep my progress with Google\" reaches Google's sign-in page (stops there)", async () => {
-    await page.getByRole("button", { name: "Keep my progress with Google" }).click();
+  await check("the profile's sign-in goes to the one sign-in page, which knows the same guest", async () => {
+    await page.getByTestId("progress-signin").click();
+    await page.waitForURL(`${app}/auth/login?next=/progress`, { timeout: 30_000 });
+    await page.getByTestId("login-guest").filter({ hasText: "Keep playing as guest" }).waitFor({ timeout: 30_000 });
+    assert.equal(await page.getByTestId("login-guest").getAttribute("href"), "/progress");
+    const id = await page.evaluate(() => JSON.parse(localStorage.getItem("pianoArcade.session") ?? "null")?.user_id);
+    assert.equal(id, guestId, "still the guest who saved the take");
+  });
+
+  await check("a guest's \"Continue with Google\" links this same player and reaches Google (stops there)", async () => {
+    await page.getByTestId("login-google").click();
     await page.waitForURL(/accounts\.google\.com/, { timeout: 30_000 });
   });
 

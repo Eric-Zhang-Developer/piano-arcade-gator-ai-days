@@ -37,20 +37,14 @@ export function PracticeWorkspace() {
   const takeLabel = state.stage === 'fade' ? state.hints ? 'Example without note names' : state.tempo < targetTempo ? `Example at ${targetTempo} bpm` : 'See an example take' : 'See an example take';
   return <section className={styles.workspace} aria-label="Guided practice">
     <div className={styles.stage} aria-busy={locked}>
-      <header className={styles.header}><div><h1>{music.title}</h1><p>Opening two bars · right hand</p></div><span className={styles.preview}>Interactive demo</span></header>
-      <div className={styles.tools}>
-        <label className={styles.tempo}>Tempo <input aria-label="Practice tempo" name="practice-tempo" type="range" min="48" max={targetTempo} step="2" value={state.tempo} disabled={locked} onChange={(e) => dispatch({ type: 'settings', settings: { tempo: Number(e.target.value) } })} /><output>{state.tempo} bpm</output></label>
-        <details className={styles.settings}><summary>Practice settings</summary><label><input type="checkbox" name="note-names" checked={state.hints} disabled={locked} onChange={(e) => dispatch({ type: 'settings', settings: { hints: e.target.checked } })} /> Show note names</label></details>
-      </div>
+      <header className={styles.header}><div><h1>{music.title}</h1></div><span className={styles.preview}>Interactive demo</span></header>
       <div className={styles.scoreArea}><Score beat={playback.beat} hints={state.hints} /><ScoreSource /></div>
     </div>
     <aside className={styles.guide} aria-label="Current practice step">
       <div className={styles.guideBody}>
         <div aria-live="polite"><h2>{instruction[0]}</h2><p>{instruction[1]}</p></div>
         {state.stage === 'drill' && <p className={styles.repetitions}>{state.repetitions} of 4 repetitions</p>}
-        {demo && <p role="status">Playing the opening…</p>}
         {state.error && <p role="alert" className={styles.error}>{state.error}</p>}
-        <details className={styles.details}><summary>About these examples{state.takes > 0 ? ` · ${state.takes} example ${state.takes === 1 ? 'take' : 'takes'}` : ''}</summary><p>No piano input is recorded or graded. Example takes show a scripted practice flow, including feedback on the example and one step of support removal at a time. Repetitions are self-reported. The score stays available throughout.</p></details>
       </div>
       <div className={styles.actions}>
         {locked ? <button type="button" className={styles.secondary} onClick={stop}>Stop {demo ? 'demo' : 'example'}</button>

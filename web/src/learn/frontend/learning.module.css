@@ -100,14 +100,15 @@
 .phrase[data-playing=true] figcaption { color:var(--pa-cyan); }
 
 .topbar { height:var(--learn-header-height); flex:none; display:flex; align-items:center; gap:48px; padding:0 32px; border-bottom:1px solid var(--learn-border); background:var(--pa-bg); }
-.brand { font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-weight:900; font-size:24px; line-height:1; letter-spacing:-.02em; text-transform:uppercase; }
+.chrome { flex:none; }
+.brand { font-family:var(--learn-font-display); font-style:normal; font-stretch:75%; font-weight:800; font-size:clamp(28px,2.1vw,40px); line-height:1; letter-spacing:.01em; text-transform:uppercase; }
+.brand:hover { color:var(--learn-accent); }
 .topbar nav { display:flex; align-self:stretch; gap:12px; }
-.topbar nav a { display:flex; align-items:center; padding:0 18px; border-bottom:2px solid transparent; font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-weight:800; font-size:16px; letter-spacing:.04em; text-transform:uppercase; }
-.topbar nav a:hover { background:rgb(242 242 245 / .05); }
-.topbar nav a[aria-current] { color:var(--pa-cyan); border-bottom-color:var(--pa-cyan); }
-.honest { margin:0 0 0 auto; color:var(--learn-muted); font-size:14px; }
-.arcade { font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-weight:800; font-size:16px; letter-spacing:.04em; text-transform:uppercase; }
-.arcade:hover { color:var(--learn-accent); }
+.topbar nav a, .arcade { font-family:var(--learn-font-display); font-style:normal; font-stretch:75%; font-weight:700; font-size:clamp(18px,1.25vw,24px); letter-spacing:.04em; text-transform:uppercase; }
+.topbar nav a { display:flex; align-items:center; padding:0 18px; border-bottom:2px solid transparent; }
+.topbar nav a:hover, .arcade:hover { color:var(--learn-accent); }
+.topbar nav a[aria-current] { color:var(--learn-accent); border-bottom-color:var(--learn-accent); }
+.honest { margin:0 0 0 auto; color:var(--learn-muted); font-size:clamp(16px,1.25vw,24px); }
 .landing { min-height:calc(100dvh - var(--learn-header-height)); max-width:1080px; margin:0 auto; padding:68px 56px 40px; }
 .landingIntro { margin-bottom:52px; }
 .landingIntro h1 { margin:0 0 16px; font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-weight:900; font-size:40px; line-height:1.05; letter-spacing:-.01em; text-transform:uppercase; }

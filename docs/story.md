@@ -238,7 +238,8 @@ Readers: judges · team
 [flow-mode's spec](../specs/features/flow-mode/spec.md), [#625], [flow-mode's done note](../changes/flow-mode.md).*
 
 **A real pianist couldn't pass.** Eric played Flower Dance on the DGX and called strict mode "completely
-undemoable". As relayed in [#618], he scored 10 to 20%, got lost, and couldn't rejoin because the song had already moved on.
+undemoable". As relayed in [#618], he scored 10 to 20%, got lost, and couldn't rejoin because the song had
+already moved on.
 
 **The audience rule.** Eric's point: listeners forgive a lot, and "most people won't even notice if you're a little
 off in dynamics or your tempo" ([spec](../specs/features/flow-mode/spec.md)). They do notice wrong notes and

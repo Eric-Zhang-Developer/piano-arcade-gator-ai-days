@@ -134,3 +134,25 @@ export function rememberNameSkipped(userId: string): void {
     // storage blocked: the prompt may ask again next time
   }
 }
+
+const HELLO_KEY = "pianoArcade.hello";
+
+/** After a Google sign-in: the name the profile button greets once, on the next page, instead of a welcome screen. */
+export function rememberHello(name: string): void {
+  try {
+    sessionStorage.setItem(HELLO_KEY, name);
+  } catch {
+    // storage blocked: no greeting, sign-in is unaffected
+  }
+}
+
+/** The greeting left by sign-in, once: it's gone after this read. */
+export function takeHello(): string | null {
+  try {
+    const name = sessionStorage.getItem(HELLO_KEY);
+    sessionStorage.removeItem(HELLO_KEY);
+    return name;
+  } catch {
+    return null;
+  }
+}

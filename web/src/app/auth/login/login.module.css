@@ -97,7 +97,13 @@
   border-radius: 6px;
   background: var(--pa-sky);
   box-shadow: 0 0 20px rgba(255, 47, 208, 0.35);
-  object-fit: cover;
+  display: grid;
+  place-items: center;
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 900;
+  font-size: 36px;
+  color: var(--pa-ink);
 }
 
 .who {
@@ -225,21 +231,71 @@
   outline: none;
 }
 
-.divider {
+/* The Google button wears .play: the one big choice, with Google's mark on a white key and a light sweep on hover. */
+.withMark {
+  position: relative;
+  overflow: hidden;
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 8px;
-  text-align: center;
-  font-size: 13px;
-  color: var(--pa-ink-dim);
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 16px 10px;
+  font-size: 24px;
+  white-space: nowrap;
+  color: var(--pa-ink);
+  cursor: pointer;
 }
 
-.divider::before,
-.divider::after {
+.withMark svg {
+  flex: none;
+  box-sizing: content-box;
+  width: 20px;
+  height: 20px;
+  padding: 6px;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.withMark::after {
   content: "";
-  flex: 1;
-  border-top: 1px solid rgba(242, 242, 245, 0.14);
+  position: absolute;
+  inset: 0 auto 0 -40%;
+  width: 30%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+
+.withMark:hover::after,
+.withMark:focus-visible::after {
+  animation: sweep 700ms ease-out;
+}
+
+@keyframes sweep {
+  to {
+    left: 120%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .withMark::after {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .withMark {
+    gap: 10px;
+    padding-inline: 10px;
+    font-size: 19px;
+  }
+}
+
+.withMark:disabled {
+  opacity: 0.6;
+  cursor: wait;
+  transform: none;
 }
 
 .google {
@@ -311,10 +367,118 @@
   align-items: flex-end;
   justify-content: center;
   padding: 0 32px 8vh;
+  overflow: hidden;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent 40%);
 }
 
+/* FlowLines: the lines fill the panel behind the quote; each bright stretch runs the length of its line. */
+.flowWrap {
+  position: absolute;
+  inset: 0;
+}
+
+/* The keyboard lies back in the lines like a floor, a little above the quote. */
+.keysStage {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  width: min(78%, 620px);
+  transform: translate(-50%, -50%) perspective(900px) rotateX(58deg) rotateZ(-8deg);
+  opacity: 0;
+  animation: flow-in 1200ms ease-out 300ms forwards;
+}
+
+.keys {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 6px rgba(255, 47, 208, 0.35));
+}
+
+.keyLit {
+  opacity: 0;
+  animation: key-lit linear infinite;
+}
+
+.rush .keyLit {
+  animation-duration: 2.2s !important;
+}
+
+/* A note: on at once, then fading out across its beat (one beat is about 1/16 of the loop). */
+@keyframes key-lit {
+  0% {
+    opacity: 0.85;
+  }
+  6% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.flow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  animation: flow-in 900ms ease-out 100ms forwards;
+}
+
+.flowRun {
+  stroke-dasharray: 0.22 0.78;
+  animation: flow-run linear infinite;
+}
+
+.rush .flowRun {
+  animation-duration: 1.6s !important;
+}
+
+@keyframes flow-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes flow-run {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow {
+    opacity: 1;
+    animation: none;
+  }
+
+  .flowRun,
+  .keyLit {
+    animation: none;
+  }
+
+  .keysStage {
+    opacity: 1;
+    animation: none;
+  }
+}
+
+/* Darkens the bottom of the panel over the lines, so the quote reads. */
+.visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(4, 4, 8, 0.92) 8%, transparent 55%);
+  pointer-events: none;
+}
+
 .quote {
+  position: relative;
+  z-index: 1;
   margin: 0;
   max-width: 34em;
   text-align: center;

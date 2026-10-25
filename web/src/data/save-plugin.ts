@@ -6,7 +6,7 @@
 import { createElement } from "react";
 import type { Chart, GamePlugin, InputDevice, InputKind, Take } from "../contracts";
 import { loadLatencyOffset } from "../game/core/settings";
-import { ensureSession } from "./auth";
+import { ensureSession, getSession, signOut } from "./auth";
 import { isConfigured } from "./config";
 import { enqueue, flush, type OutboxItem, type SendResult } from "./outbox";
 import { SaveStatusLine } from "./SaveStatus";
@@ -191,6 +191,15 @@ export async function sendTake(item: OutboxItem): Promise<SendResult> {
 export function flushOutbox(): Promise<number> {
   if (!isConfigured()) return Promise.resolve(0);
   return flush(localStorage, sendTake, (id, result) => report({ id, result }));
+}
+
+/**
+ * Sign out from any screen: first send this browser's waiting takes, so they land with the player who played them
+ * rather than with whoever plays here next. Offline, they wait and go to the next player on this browser.
+ */
+export async function signOutAfterSaving(): Promise<void> {
+  if (await getSession()) await flushOutbox().catch(() => 0); // no session: nothing to send, and no new guest for it
+  await signOut();
 }
 
 /** The default sink: queue locally, then try to send in the background. Never throws into the game. */

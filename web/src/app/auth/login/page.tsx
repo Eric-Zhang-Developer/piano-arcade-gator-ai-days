@@ -4,13 +4,16 @@ import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { SelectStage } from "@/game/select-stage";
 import { fetchHandle, fetchUserDetails, HANDLE_MAX, saveHandle, type UserDetails } from "../../../data/account";
-import { getSession, linkGoogle, safeNext, signInWithGoogle, signOut, type Session } from "../../../data/auth";
+import { linkGoogle, safeNext, signInWithGoogle, type Session } from "../../../data/auth";
 import { isConfigured } from "../../../data/config";
+import { signOutAfterSaving } from "../../../data/save-plugin";
+import { useSession } from "../../../data/useSession";
+import { FlowLines } from "./FlowLines";
 import styles from "./login.module.css";
 
 // The front door, optional: sign in with Google so your takes follow you, or play as a guest (takes still save, on
 // this device's anonymous player). A guest who has played can set a handle and keep their progress by linking Google;
-// a Google player sees their name, email and avatar as Google gives them. Then the menu, or the page in ?next=.
+// a Google player sees their name and email as Google gives them, under their initial. Then the menu, or the page in ?next=.
 
 // Real lines, each from the file named next to it.
 const QUOTES = [
@@ -52,24 +55,20 @@ function useTypewriter(lines: string[]) {
   return { shown: still ? line : line.slice(0, n), index: i };
 }
 
+const noSubscribe = () => () => {};
+const nextFromUrl = () => safeNext(new URLSearchParams(window.location.search).get("next"));
+
 type View = { kind: "checking" } | { kind: "none" } | { kind: "guest"; session: Session } | { kind: "google"; session: Session };
 
 export default function Login() {
-  const [next, setNext] = useState("/");
-  const [view, setView] = useState<View>({ kind: "checking" });
+  const next = useSyncExternalStore(noSubscribe, nextFromUrl, () => "/");
+  const session = useSession();
+  const view: View =
+    session === undefined ? { kind: "checking" } : !session ? { kind: "none" } : session.is_anonymous ? { kind: "guest", session } : { kind: "google", session };
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const quote = useTypewriter(LINES);
 
-  useEffect(() => {
-    const target = safeNext(new URLSearchParams(window.location.search).get("next"));
-    void getSession()
-      .catch(() => null)
-      .then((s) => {
-        setNext(target);
-        setView(!s ? { kind: "none" } : s.is_anonymous ? { kind: "guest", session: s } : { kind: "google", session: s });
-      });
-  }, []);
 
   const toGoogle = (go: (next: string) => Promise<void>) => () => {
     setBusy(true);
@@ -92,54 +91,36 @@ export default function Login() {
           {view.kind === "checking" ? (
             <p className={styles.sub}>Checking…</p>
           ) : view.kind === "google" ? (
-            <SignedIn session={view.session} next={next} onSignOut={() => setView({ kind: "none" })} />
+            <SignedIn session={view.session} next={next} />
           ) : (
             <>
               <div className={styles.head}>
                 <h1 className={styles.title}>Player 1</h1>
                 <p className={styles.sub}>
-                  {view.kind === "guest"
-                    ? "Playing as a guest on this browser."
-                    : "Sign in to keep your scores and progress on any computer."}
+                  {view.kind === "guest" ? "Your scores are saving to this browser." : "Your scores save either way."}
                 </p>
               </div>
 
-              {view.kind === "guest" && <HandleEntry session={view.session} />}
-
-              <Link className={styles.play} href={next} data-testid="login-guest">
-                Play as guest
-              </Link>
-
-              {isConfigured() ? (
-                <>
-                  <div className={styles.divider}>
-                    <span>{view.kind === "guest" ? "or keep your progress everywhere" : "or keep your records everywhere"}</span>
-                  </div>
-                  {view.kind === "guest" ? (
-                    <>
-                      <button type="button" className={styles.google} onClick={toGoogle(linkGoogle)} disabled={busy} data-testid="login-keep">
-                        <GoogleMark />
-                        {busy ? "Opening Google…" : "Keep my progress"}
-                      </button>
-                      <button type="button" className={styles.textButton} onClick={toGoogle(signInWithGoogle)} disabled={busy}>
-                        Already linked Google on another computer? Sign in
-                      </button>
-                    </>
-                  ) : (
-                    <button type="button" className={styles.google} onClick={toGoogle(signInWithGoogle)} disabled={busy} data-testid="login-google">
-                      <GoogleMark />
-                      {busy ? "Opening Google…" : "Sign in with Google"}
-                    </button>
-                  )}
-                  <p className={styles.note}>
-                    {view.kind === "guest"
-                      ? "Same player, same takes: Google just remembers you."
-                      : "Guests' takes stay with this browser. Sign in later and they come with you."}
-                  </p>
-                </>
-              ) : (
-                <p className={styles.note}>Sign-in isn&apos;t set up on this computer.</p>
+              {isConfigured() && (
+                <button
+                  type="button"
+                  className={`${styles.play} ${styles.withMark}`}
+                  onClick={toGoogle(view.kind === "guest" ? linkGoogle : signInWithGoogle)}
+                  disabled={busy}
+                  data-testid="login-google"
+                >
+                  <GoogleMark />
+                  {busy ? "Opening Google…" : "Continue with Google"}
+                </button>
               )}
+              <Link className={styles.google} href={next} data-testid="login-guest">
+                {view.kind === "guest" ? "Keep playing as guest" : "Play as guest"}
+              </Link>
+              <p className={styles.note}>
+                {isConfigured()
+                  ? "Google keeps your scores on every computer. Anything you played as a guest comes with you."
+                  : "Sign-in isn’t set up on this computer."}
+              </p>
             </>
           )}
           {error && (
@@ -151,6 +132,7 @@ export default function Login() {
       </section>
 
       <aside className={styles.visual} aria-label="Quotes from our playtests">
+        <FlowLines rush={busy} />
         <blockquote className={styles.quote}>
           <p>
             &ldquo;{quote.shown}
@@ -166,21 +148,18 @@ export default function Login() {
   );
 }
 
-function SignedIn({ session, next, onSignOut }: { session: Session; next: string; onSignOut: () => void }) {
+function SignedIn({ session, next }: { session: Session; next: string }) {
   const [details, setDetails] = useState<UserDetails | null | undefined>(undefined); // undefined = loading
   useEffect(() => {
     void fetchUserDetails(session).then(setDetails);
-  }, [session]);
+  }, [session.user_id]); // eslint-disable-line react-hooks/exhaustive-deps -- a refreshed token is the same player
 
   return (
     <>
       <div className={styles.profile} data-testid="login-signed-in">
-        {details?.avatarUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element -- Google's avatar host, sized here; no image pipeline
-          <img className={styles.avatar} src={details.avatarUrl} alt="" referrerPolicy="no-referrer" width={72} height={72} />
-        ) : (
-          <span className={styles.avatar} aria-hidden="true" />
-        )}
+        <span className={styles.avatar} aria-hidden="true">
+          {(details?.name ?? details?.email ?? session.email ?? "").trim().slice(0, 1).toUpperCase()}
+        </span>
         <div className={styles.who}>
           <span className={styles.label}>Signed in with Google</span>
           <strong className={styles.name} data-testid="login-name">
@@ -200,7 +179,7 @@ function SignedIn({ session, next, onSignOut }: { session: Session; next: string
       </Link>
       <div className={styles.links}>
         <Link href="/progress">My progress</Link>
-        <button type="button" className={styles.textButton} onClick={() => void signOut().then(onSignOut)} data-testid="login-signout">
+        <button type="button" className={styles.textButton} onClick={() => void signOutAfterSaving()} data-testid="login-signout">
           Sign out
         </button>
       </div>
@@ -220,7 +199,7 @@ function HandleEntry({ session }: { session: Session }) {
       setStored(h);
       if (h) setValue(h);
     });
-  }, [session]);
+  }, [session.user_id]); // eslint-disable-line react-hooks/exhaustive-deps -- a refreshed token is the same player
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();

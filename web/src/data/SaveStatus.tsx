@@ -1,17 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useSyncExternalStore } from "react";
-import { googleSession } from "./auth";
+import { useSyncExternalStore } from "react";
 import type { StatusStore } from "./save-plugin";
+import { useSession } from "./useSession";
 
 // One line under the score: did this take reach the player's history, and if not, why. take-store's results panel.
 export function SaveStatusLine({ store }: { store: StatusStore }) {
   const status = useSyncExternalStore(store.subscribe, store.get, () => null);
-  const [google, setGoogle] = useState<boolean | null>(null);
-  useEffect(() => {
-    if (status?.state === "saved") void googleSession().then((s) => setGoogle(Boolean(s)));
-  }, [status?.state]);
+  const session = useSession();
+  const google = session === undefined ? null : Boolean(session && !session.is_anonymous);
   if (!status) return null;
 
   let text: React.ReactNode;

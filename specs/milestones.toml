@@ -229,6 +229,12 @@ features = [
   "main-page", # Eric, 2026-10-25 (#851): "we would have to redo our main page"; the select laid out for 40 songs
   "video-shots", # Eric, 2026-10-25 (#852): visuals for the hackathon video; a shot list, two cards, capture clean
   "screen-shake", # catalog G13 (#990): a small shake on each combo milestone, a Lab experiment, off by default
+  "lab-pages-a11y", # polish refill (#1128, #1129, #1143, #1130): the Lab's pages get titles, announcements, focus, Lab lit
+  "kit-leftovers-overlays", # polish refill (#1132, #1135, #1137): wait hint upright, L / R legend and toasts square
+  "kit-leftovers-screens", # polish refill (#1133, #1134, #1136): chunk panel, phone guard, crash screen on the kit
+  "select-lab-charts", # polish refill (#1165): charts under songs/x/ stay off the select
+  "learn-titles", # polish refill (#1141): each /learn page names its own tab
+  "docs-refresh", # polish refill (#1140, #1142): README routes and devpost.md experiments; docs only
 ]
 cut = []
 

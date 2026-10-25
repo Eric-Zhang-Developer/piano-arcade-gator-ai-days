@@ -1,7 +1,6 @@
 'use client';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { journeyFrame, type JourneyPlan } from './guided-motion';
 import styles from './journey.module.css';
 type Journey = { plan: JourneyPlan; frame: ReturnType<typeof journeyFrame>; origin: string; routed: boolean; reduced: boolean; revealing: boolean };
@@ -73,8 +72,7 @@ export function GuidedEntryProvider({ children }: { children: React.ReactNode })
     return true;
   }
   const active: Entry['active'] = journey ? { ...journey, phase: journey.routed && pathname === journey.plan.href ? journey.revealing ? 'revealing' : 'docking' : journey.frame.phase } : null;
-  return <EntryContext value={{ active, begin, cancel }}>{children}{active && <div className={styles.overlay} data-guided-phase={active.phase} data-progress={active.frame.progress} data-href={active.plan.href} data-reduced={active.reduced} aria-hidden="true">
-    <div className={styles.character} style={{ '--pet-x': `${active.frame.pet.x}px`, '--pet-y': `${active.frame.pet.y}px`, '--pet-scale': active.frame.pet.scale, '--pet-tilt': `${active.frame.pet.tilt}deg`, '--pet-squash': active.frame.pet.squash } as CSSProperties}><Image src="/learning/companion-gator.svg" width={112} height={112} alt="" unoptimized loading="eager"/></div>
-  </div>}{active && <span className={styles.status} role="status">Following the gator to {active.plan.title}.</span>}</EntryContext>;
+  // The ink (ink/InkTutor.tsx) follows active.frame.pet, so the tutor itself leads the student to the node.
+  return <EntryContext value={{ active, begin, cancel }}>{children}{active && <span className={styles.status} role="status">Leading you to {active.plan.title}.</span>}</EntryContext>;
 }
 export function useGuidedEntry() { const entry = useContext(EntryContext); if (!entry) throw new Error('Guided entry requires the learning layout.'); return entry; }

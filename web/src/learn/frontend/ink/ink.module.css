@@ -1,0 +1,12 @@
+/* Above the page so it can dim itself over text (engine.ts), below the skip link and any dialog; it never takes a click. */
+.layer { position:fixed; inset:0; z-index:4; pointer-events:none; }
+.ink { position:absolute; inset:0; width:100%; height:100%; color:var(--pa-ink); }
+/* The tutor's line: placed by the engine in open water beside the ink, so it never sits on the page's own text. */
+.line { position:fixed; left:0; top:0; margin:0; width:max-content; max-width:min(22rem, calc(100vw - 48px)); color:var(--pa-ink); font:16px/1.5 var(--pa-font-data),system-ui,sans-serif; text-wrap:pretty; }
+.line:empty { display:none; }
+.line[data-pending] { opacity:0; }
+.line[data-writing] { animation:bleed .7s cubic-bezier(.3,.7,.2,1) both; }
+/* No open water on this screen: the line gets a ground of its own so it still reads over the page. */
+.line[data-crowded=true] { padding:8px 12px; background:var(--pa-bg); box-shadow:0 0 0 1px var(--pa-line); }
+@keyframes bleed { from { opacity:0; filter:blur(5px); } to { opacity:1; filter:none; } }
+@media (prefers-reduced-motion:reduce) { .line[data-writing] { animation:none; } }

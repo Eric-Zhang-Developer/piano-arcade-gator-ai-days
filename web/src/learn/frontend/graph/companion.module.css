@@ -1,18 +1,14 @@
 .companion { position:absolute; left:24px; top:24px; width:470px; display:flex; align-items:flex-start; gap:14px; max-width:470px; color:var(--pa-ink); }
 
-.pet { display:block; width:112px; height:112px; flex:none; margin-top:20px; }
+.perch { display:block; width:112px; height:112px; flex:none; margin-top:20px; }
 .message { min-width:0; max-width:344px; padding:5px 16px 0 0; }
 .message h2 { margin:0 0 8px; font:700 28px/1.12 var(--pa-font-display),system-ui,sans-serif; text-wrap:balance; }
 .message p { margin:0 0 14px; color:var(--pa-ink-dim); font:16px/1.5 var(--pa-font-data),system-ui,sans-serif; }
 .companion .action { display:flex; align-items:center; gap:20px; padding:10px 20px; color:var(--pa-bg); background:var(--pa-primary); border:0; border-radius:0; font:700 16px var(--pa-font-display),system-ui,sans-serif; letter-spacing:.02em; cursor:pointer; }
 .companion .action:hover { filter:brightness(1.12); }
 .companion button:focus-visible { outline:2px solid var(--pa-primary); outline-offset:4px; }
-@media (prefers-reduced-motion:no-preference) { .pet[data-idle=true] { animation:companion-idle 6s ease-in-out infinite; } }
-@keyframes companion-idle { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-2px); } }
-@media (prefers-reduced-motion:reduce) { .pet { animation:none; transform:none; } }
 .eyebrow { display:block; margin-bottom:9px; color:var(--pa-ink-dim); font:16px/1.4 var(--pa-font-data),system-ui,sans-serif; }
 @media (max-width:1300px) { .companion { left:16px; top:18px; } .message h2 { font-size:26px; } }
 /* Stacked (graph.module.css): the companion takes its own row above the map instead of floating over it. */
 @media (max-width:900px) { .companion { position:static; order:-1; width:auto; max-width:none; margin:18px 16px 0; } }
 .companion .action:disabled { cursor:wait; }
-.companion[data-entering=true] .pet { visibility:hidden; }

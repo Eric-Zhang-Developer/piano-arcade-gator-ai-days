@@ -5,7 +5,7 @@ import { journeyFrame } from './guided-motion';
 import { layoutGraph } from './layout';
 import { projectGraph } from './projection';
 
-it('takes the gator and camera from the perch to every supported learning/retrieval target at both desktop sizes', () => {
+it('takes the ink and camera from the perch to every supported learning/retrieval target at both desktop sizes', () => {
   const ids = ['theory.phrase-endings','theory.tonal-center','procedure.short-phrase-coordination','procedure.held-endings','procedure.steady-pulse'];
   for (const [width,height] of [[1392,736],[1232,636]]) for (const id of ids) {
     const skill = byId.get(id)!, activity = contextualActivity(actionFor(skill).action!)!;

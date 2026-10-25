@@ -130,6 +130,9 @@ Search open issues and PRs first: a likely duplicate gets a linking comment.
 ## Must (in parentheses: the check that enforces it, or *on you* where none can)
 - Only change files your PR title allows (the table above); frozen files only through `contract:` (`check_ownership.py`).
 - Never merge with red CI. If `main` is red, merge nothing but the fix; after 20 minutes anyone may revert (`ci`, watchdog).
+  Until the freeze, a red *scheduled* full browser run doesn't count: it files a `ci-red` issue, merges go on, and you
+  fix forward. Before the video or the submission build, dispatch a full run and wait for it (decision
+  `ci-browser-pr-scope.md`).
 - No conflict markers or debug leftovers, and don't bypass the hook (`check_markers.py` + pre-commit, and CI).
 - Never weaken your spec's Validation, a golden test or `[verify].command` to get a pass. If one is wrong, fix it
   and say why in the PR (`check_gates.py` warns on Validation edits).

@@ -82,17 +82,18 @@ async function render(page, name) {
   await page.waitForFunction(() => ["done", "error"].includes(window.__highlightReel?.state), null, { timeout: 120_000 });
   const hook = await page.evaluate(() => {
     const h = window.__highlightReel;
-    return { state: h.state, edl: h.edl, bestRun: h.bestRun, expected: h.expectedOnsetsMs, framesRequested: h.framesRequested, framesLate: h.framesLate, audioHash: h.audioHash, mimeType: h.mimeType, blobBytes: h.blobBytes };
+    return { state: h.state, edl: h.edl, bestRun: h.bestRun, expected: h.expectedOnsetsMs, framesRequested: h.framesRequested, framesLate: h.framesLate, drawMs: h.drawMs, audioHash: h.audioHash, mimeType: h.mimeType, blobBytes: h.blobBytes };
   });
   if (hook.state !== "done") throw new Error(`${name}: the render ended in "${hook.state}"`);
   const [download] = await Promise.all([page.waitForEvent("download"), page.getByTestId("highlight-save").click()]);
   const file = join(out, `${name}.webm`);
   await download.saveAs(file);
+  writeFileSync(join(out, `${name}.json`), JSON.stringify(hook, null, 2));
   return { ...hook, file };
 }
 
 async function measure(page, name, r) {
-  say(`verify-highlight: ${name}: ${r.mimeType}, ${(r.blobBytes / 1e6).toFixed(1)} MB, framesRequested ${r.framesRequested}, framesLate ${r.framesLate}`);
+  say(`verify-highlight: ${name}: ${r.mimeType}, ${(r.blobBytes / 1e6).toFixed(1)} MB, framesRequested ${r.framesRequested}, framesLate ${r.framesLate}, drawFrame median ${r.drawMs.median.toFixed(1)} ms, p95 ${r.drawMs.p95.toFixed(1)} ms`);
   const fb = FF ? null : await page.evaluate(() => window.__highlightReel.fallback());
   // 1 length
   let dur;
@@ -107,7 +108,7 @@ async function measure(page, name, r) {
   check(Math.abs(dur - 15) <= 0.1, `${name}: length ${dur.toFixed(3)} s${FF ? "" : " (fallback)"}, want 15.0 ± 0.1`);
   // 2 60 fps
   if (FF) {
-    const pts = probe(r.file, ["-select_streams", "v:0", "-show_entries", "packet=pts_time", "-of", "csv=p=0"]).split("\n").map(Number).filter(Number.isFinite).sort((a, b) => a - b);
+    const pts = probe(r.file, ["-select_streams", "v:0", "-show_entries", "packet=pts_time", "-of", "csv=p=0"]).split("\n").map((l) => Number(l.split(",")[0])).filter(Number.isFinite).sort((a, b) => a - b);
     const gap = median(pts.slice(1).map((t, i) => (t - pts[i]) * 1000));
     check(Math.abs(pts.length - 900) <= 6 && Math.abs(gap - 16.7) <= 0.5, `${name}: ${pts.length} video packets, median spacing ${gap.toFixed(2)} ms, want 900 ± 6 at 16.7 ± 0.5`);
   } else check(Math.abs(fb.frames - 900) <= 6, `${name}: ${fb.frames} frames over a 1× playback (fallback), want 900 ± 6`);
@@ -122,7 +123,11 @@ async function measure(page, name, r) {
   let detected;
   if (FF) {
     const raw = ff(["-i", r.file, "-f", "f32le", "-ac", "1", "-ar", "48000", "-"]);
-    detected = detectOnsets(new Float32Array(raw.buffer, raw.byteOffset, raw.byteLength / 4), 48000);
+    // decoded samples start at the audio stream's start; put them on the file's timeline, where video frame 0 is
+    const starts = Object.fromEntries(probe(r.file, ["-show_entries", "stream=codec_type,start_time", "-of", "csv=p=0"]).split("\n").map((l) => l.split(",")).map(([t, s]) => [t, Number(s) || 0]));
+    const shift = ((starts.audio ?? 0) - (starts.video ?? 0)) * 1000;
+    detected = detectOnsets(new Float32Array(raw.buffer, raw.byteOffset, raw.byteLength / 4), 48000).map((t) => t + shift);
+    say(`  audio starts ${shift.toFixed(1)} ms after video in the file`);
   } else detected = fb.onsetsMs;
   const m = matchOnsets(r.expected, detected);
   check(m.matched >= 0.9 * m.expected && m.median <= 10, `${name}: sync ${m.matched}/${m.expected} expected onsets matched within 50 ms, median ${m.median?.toFixed(1)} ms, p90 ${m.p90?.toFixed(1)} ms${FF ? "" : " (fallback)"}, want ≥ 90% and median ≤ 10`);

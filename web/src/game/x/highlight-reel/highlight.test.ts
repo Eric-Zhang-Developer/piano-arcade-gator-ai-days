@@ -92,6 +92,12 @@ describe("the cut (highlight-reel)", () => {
     const f = 123;
     expect(slowSourceFrames(f + 0.001) - slowSourceFrames(f)).toBeCloseTo(slowRateAt(f) * 0.001, 6);
   });
+  it("never opens more than a beat before the first press, padding a short opening run to the right", () => {
+    const early = takeOf(c, "PPPPP" + "G".repeat(55));
+    const e = cut(c, early.take, early.results)!;
+    expect(e.segments[0].srcFromMs).toBeCloseTo(-500);
+    expect(e.segments[0].srcToMs).toBeGreaterThan(e.run.toMs + 500);
+  });
   it("pads a run too short to fill the cold open, centered on it, and takes a run reaching the finish early", () => {
     const short = takeOf(c, "G".repeat(20) + "PPP" + "G".repeat(37));
     const e = cut(c, short.take, short.results)!;

@@ -89,8 +89,9 @@ export function slowSourceFrames(f: number, s: HighlightSettings = highlightSett
 const frameMs = (s: HighlightSettings) => 1000 / s.fps;
 
 // The edit list, or null when the take has no hits. The finish ends a beat after the last release; the cold open
-// shows the best run's middle, padded to a beat each side, and more when the run is too short to fill it; it ends
-// before the finish starts, taking the run's earlier part when the run reaches the finish.
+// shows the best run's middle, padded to a beat each side, and more when the run is too short to fill it, but never
+// from more than a beat before the first press; it ends before the finish starts, taking the run's earlier part when
+// the run reaches the finish.
 export function cut(chart: Chart, take: Take, results: Results, s: HighlightSettings = highlightSettings): Edl | null {
   const run = bestRun(chart, results);
   if (!run || !take.events.some((e) => e.velocity > 0)) return null;
@@ -105,6 +106,7 @@ export function cut(chart: Chart, take: Take, results: Results, s: HighlightSett
   const [lo, hi] = [run.fromMs - beat, run.toMs + beat];
   let s0 = (lo + hi) / 2 - slowMs / 2; // the middle; a short run is padded evenly past its beat
   if (hi - lo >= slowMs) s0 = Math.max(lo, Math.min(s0, hi - slowMs));
+  s0 = Math.max(s0, span.firstPressMs - beat); // never open on the empty highway before the take
   if (s0 + slowMs > f0) s0 = f0 - slowMs; // the run reaches the finish: its earlier part
   if (f0 < s0 + slowMs) f0 = s0 + slowMs; // a take too short for both: the finish runs on past the end
 

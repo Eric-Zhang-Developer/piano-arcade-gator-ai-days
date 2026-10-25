@@ -4,10 +4,16 @@
 import { highlightSettings as S } from "./cut";
 
 export const encodeSettings = {
-  mimeTypes: ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"],
+  // VP8 first: in the first local run VP9 kept 662 of 900 frames at 1080p60 (FINDINGS.md)
+  mimeTypes: ["video/webm;codecs=vp8,opus", "video/webm;codecs=vp9,opus", "video/webm"],
   videoBitsPerSecond: 12_000_000,
   leadS: 0.02, // the sound and frame 0 start this long after the recorder (its own start-up)
   tailS: 1 / 60, // and the recorder stops one frame after the last frame is due
+  // ponytail: one measured constant, not a per-machine calibration. The sound reaches the recorder this much later
+  // than a requested frame (the first local run: 65–72 ms over all 11 onsets, FINDINGS.md), so each frame is
+  // requested this much later on the audio clock. If another machine measures differently, calibrate per run from
+  // the first onset.
+  avLatencyMs: 66,
 };
 
 export interface Encoded {
@@ -15,6 +21,7 @@ export interface Encoded {
   mimeType: string;
   framesRequested: number;
   framesLate: number;
+  drawMs: { median: number; p95: number }; // drawFrame's own time per frame
 }
 
 type CaptureTrack = MediaStreamTrack & { requestFrame(): void };
@@ -54,20 +61,25 @@ export async function encode(
   src.start(t0);
   let n = 0;
   let late = 0;
+  const drawn: number[] = [];
   while (n < S.frames) {
-    const due = (ac.currentTime - t0) * S.fps;
+    const due = (ac.currentTime - t0 - encodeSettings.avLatencyMs / 1000) * S.fps;
     if (due >= n) {
       if (due - n > 1) late++;
+      const t = performance.now();
       drawFrame(n);
+      drawn.push(performance.now() - t);
       video.requestFrame();
       onProgress(n);
       n++;
     } else await tick();
   }
-  while (ac.currentTime < t0 + S.frames / S.fps + encodeSettings.tailS) await tick();
+  while (ac.currentTime < t0 + encodeSettings.avLatencyMs / 1000 + S.frames / S.fps + encodeSettings.tailS) await tick();
   rec.stop();
   await stopped;
   video.stop();
   await ac.close();
-  return { blob: new Blob(chunks, { type: mimeType || "video/webm" }), mimeType: rec.mimeType || mimeType, framesRequested: n, framesLate: late };
+  drawn.sort((a, b) => a - b);
+  const q = (p: number) => drawn[Math.min(drawn.length - 1, Math.floor(p * (drawn.length - 1)))];
+  return { blob: new Blob(chunks, { type: mimeType || "video/webm" }), mimeType: rec.mimeType || mimeType, framesRequested: n, framesLate: late, drawMs: { median: q(0.5), p95: q(0.95) } };
 }

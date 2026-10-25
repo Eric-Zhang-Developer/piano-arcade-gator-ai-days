@@ -26,6 +26,7 @@ declare global {
       expectedOnsetsMs: number[];
       framesRequested: number;
       framesLate: number;
+      drawMs: { median: number; p95: number };
       frameHash(n: number): string;
       framePng(n: number): Promise<string>;
       audioHash: string | null;
@@ -128,6 +129,7 @@ export function Highlight() {
       expectedOnsetsMs: edl ? expectedOnsetsMs(edl, saved.take) : [],
       framesRequested: 0,
       framesLate: 0,
+      drawMs: { median: 0, p95: 0 },
       frameHash(n) {
         const ctx = scratch();
         drawer?.drawFrame(ctx, n);
@@ -167,7 +169,7 @@ export function Highlight() {
       hook.audioHash = audioHash(sound);
       const out = await encode(monitor.current, sound, (n) => drawer.drawFrame(ctx, n), (n) => n % 6 === 0 && setFrame(n));
       blobRef.current = out.blob;
-      Object.assign(hook, { framesRequested: out.framesRequested, framesLate: out.framesLate, blobBytes: out.blob.size, mimeType: out.mimeType, state: "done" });
+      Object.assign(hook, { framesRequested: out.framesRequested, framesLate: out.framesLate, drawMs: out.drawMs, blobBytes: out.blob.size, mimeType: out.mimeType, state: "done" });
       setVideo({ url: URL.createObjectURL(out.blob), bytes: out.blob.size, late: out.framesLate });
       setFrame(S.frames);
       setPhase("done");

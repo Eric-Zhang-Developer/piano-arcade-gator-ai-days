@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import type { Chart, GameEvent, GamePlugin } from "../../contracts";
 import { settings } from "../core/settings";
+import { kitSettings } from "../duo-tokens";
 import { hudBottom, hudLayout } from "../hud";
-import { ink, panel, whenDisplayFontReady } from "../ui-tokens";
+import { ink, line, panel, whenDisplayFontReady } from "../ui-tokens";
 import { cueAlpha, cueAt, cueBand, cuesFor, firstRunUrl, isFirstRun, type Cue, type CueId } from "./cues";
 import styles from "./first-run.module.css";
 
@@ -72,8 +73,11 @@ export function firstRun(): GamePlugin & { cue(nowMs: number): Cue | null } {
       const h = size * 1.8;
       ctx.fillStyle = panel;
       ctx.beginPath();
-      ctx.roundRect(f.width / 2 - w / 2, y - h / 2, w, h, 8);
+      ctx.rect(f.width / 2 - w / 2, y - h / 2, w, h); // Duo: a square panel in a hairline frame
       ctx.fill();
+      ctx.strokeStyle = line;
+      ctx.lineWidth = kitSettings.hairline;
+      ctx.stroke();
       ctx.fillStyle = ink;
       ctx.fillText(c.text, f.width / 2, y);
       ctx.restore();

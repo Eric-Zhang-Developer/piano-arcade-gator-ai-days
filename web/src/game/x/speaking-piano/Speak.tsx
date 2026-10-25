@@ -4,7 +4,7 @@
 // became; the keys light as they sound; the words appear only once the piano has finished. Reduced motion: two still
 // panels, voiceprint above and roll below, no morph. The mic's audio is analyzed in memory and dropped after playback.
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button, DataCell, MonoLabel } from "../../duo-tokens";
+import { Button, canvasFonts, MonoLabel } from "../../duo-tokens";
 import { PIANO_NAME } from "../../laptop-sound";
 import { bg, ink, inkDim, line, panel, primary, secondary } from "../../ui-tokens";
 import { analysisDefaults, analyze, HIGH_KEY, LOW_KEY } from "./analysis";
@@ -39,6 +39,9 @@ const PICK = { fps: welcome.fps, n: welcome.n }; // the sweep's pick, which the 
 const CAPS = { velCap: analysisDefaults.velCap, n: PICK.n };
 const MIC_MS = 3000;
 const KEYS = HIGH_KEY - LOW_KEY + 1;
+// The kit sizes its buttons and labels in px; this page scales its type with the width (as /conduct), so they follow.
+const SCALED = { fontSize: "0.85em", padding: "0.85em 1.2em" };
+const LABEL = { fontSize: "0.7em" };
 const MORPH_MS = 260; // a cell turns into its strike over this, just behind the playhead
 
 type Phase = "idle" | "listening" | "playing" | "done";
@@ -104,9 +107,14 @@ export function drawSpeak(ctx: CanvasRenderingContext2D, w: number, h: number, p
     ctx.globalAlpha = 1;
     ctx.fillStyle = line;
     ctx.fillRect(keyW + 1, pn.y, 1, pn.h);
+    // The pitch axis: each C named beside its key, so an empty band reads as where the voice never goes.
+    ctx.font = canvasFonts.data(Math.max(9, Math.round(h * 0.022)));
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = inkDim;
+    for (let key = 24; key <= HIGH_KEY; key += 12) ctx.fillText(`C${key / 12 - 1}`, keyW + 5, rowY(key) + rowH / 2);
     if (!p) continue;
 
-    const x0 = keyW + Math.round(w * 0.012);
+    const x0 = keyW + Math.round(w * 0.04);
     const span = w - x0 - pad;
     const total = p.frames.length * p.frameMs;
     const xAt = (t: number) => x0 + (t / total) * span;
@@ -148,7 +156,7 @@ export function drawSpeak(ctx: CanvasRenderingContext2D, w: number, h: number, p
 
 export function Speak() {
   const canvas = useRef<HTMLCanvasElement>(null);
-  const [phrase, setPhrase] = useState<Phrase | null>(null);
+  const [phrase, setPhrase] = useState<Phrase | null>(PRESETS[0]); // its voiceprint at rest, not played
   const [phase, setPhase] = useState<Phase>("idle");
   const [outName, setOutName] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
@@ -276,15 +284,15 @@ export function Speak() {
           </p>
         </div>
         <aside className={s.stand}>
-          <MonoLabel>Presets</MonoLabel>
+          <MonoLabel style={LABEL}>Presets</MonoLabel>
           <div className={s.presets}>
             {PRESETS.map((p) => (
-              <Button key={p.label} kind={phrase?.label === p.label ? "primary" : "secondary"} disabled={busy} onClick={() => void speak(p)} data-testid="speak-preset">
+              <Button key={p.label} kind={phrase?.label === p.label ? "primary" : "secondary"} style={SCALED} disabled={busy} onClick={() => void speak(p)} data-testid="speak-preset">
                 {p.label}
               </Button>
             ))}
           </div>
-          <MonoLabel>Your voice, up to 3 s</MonoLabel>
+          <MonoLabel style={LABEL}>Your voice, up to 3 s</MonoLabel>
           <button
             type="button"
             className={s.mic}
@@ -298,15 +306,22 @@ export function Speak() {
           >
             {phase === "listening" ? "Listening" : "Hold to speak"}
           </button>
-          <Button kind="secondary" onClick={() => (stop(), setPhase(phrase ? "done" : "idle"))} disabled={phase !== "playing"}>
+          <Button kind="secondary" style={SCALED} onClick={() => (stop(), setPhase(phrase ? "done" : "idle"))} disabled={phase !== "playing"}>
             Stop
           </Button>
-          <div className={s.caps}>
-            <DataCell label="Velocity cap" value={CAPS.velCap} size={34} />
-            <DataCell label="Keys a frame" value={CAPS.n} size={34} />
-            <DataCell label="Frames a second" value={PICK.fps} size={34} />
-          </div>
-          <MonoLabel style={{ color: outName ? undefined : inkDim }}>{outName ? `Out: ${outName}` : "Out: the piano, when you press"}</MonoLabel>
+          <dl className={s.caps}>
+            {[
+              ["Velocity cap", CAPS.velCap],
+              ["Keys a frame", CAPS.n],
+              ["Frames a second", PICK.fps],
+            ].map(([k, v]) => (
+              <div key={k}>
+                <dt>{k}</dt>
+                <dd>{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <MonoLabel style={{ ...LABEL, color: outName ? undefined : inkDim }}>{outName ? `Out: ${outName}` : "Out: the piano, when you press"}</MonoLabel>
           {note && <p className={s.note}>{note}</p>}
           <p className={s.small} style={{ background: panel }}>
             The mic&apos;s sound stays in this tab: analyzed in memory, dropped after it plays, never stored or sent.

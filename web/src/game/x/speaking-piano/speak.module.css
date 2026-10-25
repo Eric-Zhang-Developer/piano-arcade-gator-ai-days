@@ -121,10 +121,30 @@
   cursor: default;
 }
 
+/* The caps, one a row: the label on the left, the number on the right, under a hairline. */
 .caps {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: 0.4em 0;
+  margin: 0.2em 0;
+}
+
+.caps div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.35em 0;
+  border-top: 1px solid var(--pa-line);
+}
+
+.caps dt {
+  font: 500 0.72em/1 var(--pa-font-data), ui-monospace, monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pa-ink-dim);
+}
+
+.caps dd {
+  margin: 0;
+  font: 800 1.6em/1 var(--pa-font-display), system-ui, sans-serif;
+  font-stretch: 75%;
 }
 
 .note {

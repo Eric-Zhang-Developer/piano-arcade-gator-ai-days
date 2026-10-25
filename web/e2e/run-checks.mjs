@@ -1,6 +1,7 @@
 // CI's browser job (specs/features/ci-browser/spec.md): pick the headless checks a change needs, split them across
 // shards, run them one at a time. On main a failure reruns once (a pass on the rerun is `flaky`; two failures fail
-// the shard); on a pull request the first failure fails it. Node stdlib only, so `--list` runs before `pnpm install` and an empty shard skips the Chromium install.
+// the shard); on a pull request the first failure fails it. Node stdlib only, so `--list` runs before
+// `pnpm install` and an empty shard skips the Chromium install.
 // Usage (from anywhere in the repo):
 //   node web/e2e/run-checks.mjs --list [--base <ref> | --all] [--shard i/n]   print the selected checks, one per line
 //   node web/e2e/run-checks.mjs --out <dir> [--base <ref> | --all] [--shard i/n]   run them

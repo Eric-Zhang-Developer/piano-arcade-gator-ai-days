@@ -168,3 +168,33 @@ describe("the wrapper", () => {
     vi.useRealTimers();
   });
 });
+
+describe("the piano volume", () => {
+  // A fresh module per case, so each reads storage once, the way a page load does.
+  async function fresh(saved: string | null) {
+    const store = new Map<string, string>(saved === null ? [] : [["pianoArcade.pianoVolume", saved]]);
+    vi.stubGlobal("localStorage", { getItem: (k: string) => store.get(k) ?? null, setItem: (k: string, v: string) => store.set(k, v) });
+    vi.resetModules();
+    return { v: await import("./volume"), store };
+  }
+
+  it("reads a saved level, and 0.7 when it's missing or out of range", async () => {
+    expect((await fresh("0.3")).v.getPianoVolume()).toBe(0.3);
+    expect((await fresh(null)).v.getPianoVolume()).toBe(0.7);
+    expect((await fresh("2")).v.getPianoVolume()).toBe(0.7);
+    vi.unstubAllGlobals();
+  });
+
+  it("clamps to 0–1, saves it and tells its listeners", async () => {
+    const { v, store } = await fresh(null);
+    let heard = 0;
+    const off = v.subscribePianoVolume(() => heard++);
+    v.setPianoVolume(1.5);
+    expect([v.getPianoVolume(), store.get("pianoArcade.pianoVolume")]).toEqual([1, "1"]);
+    v.setPianoVolume(-1);
+    off();
+    v.setPianoVolume(0.4);
+    expect([v.getPianoVolume(), heard]).toEqual([0.4, 2]);
+    vi.unstubAllGlobals();
+  });
+});

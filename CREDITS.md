@@ -78,6 +78,10 @@ Sources whose licenses ask for credit. Each chart's `source` field names its sou
   chart, Hot Cross Buns' "Alternative" tune only ([decision](specs/decisions/song-pack-9-sources.md)).
 - **Frère Jacques** (traditional), `web/public/songs/frere-jacques-solo/`: the round's chart above, copied under a new
   id; same source and license.
+- **Flower Dance** (DJ Okawari), `web/public/songs/flower-dance-demo/`: Flower Dance, DJ Okawari; arrangement Pianubi,
+  modified by Syle; a 12-bar excerpt (bars 13–24) included by the project owner's decision
+  ([decision](specs/decisions/song-pack-9-flower-dance-excerpt.md)). Not openly licensed; the full piece, the scans, the
+  MIDI and any recording stay local.
 
 ## Spikes
 

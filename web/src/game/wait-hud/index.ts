@@ -2,6 +2,7 @@
 // the counters and the score. hud draws the band and song card; this draws into it, and nothing in plain mode.
 import type { Frame, GameEvent, GamePlugin } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
+import { kitSettings } from "../duo-tokens";
 import { hudLayout, hudSettings } from "../hud";
 import { cyan, whenDisplayFontReady } from "../ui-tokens";
 import { isWaitMode } from "../wait-mode";
@@ -49,9 +50,9 @@ function drawWaitHud(ctx: CanvasRenderingContext2D, f: Frame, s: WaitHudState, d
   const w = ctx.measureText("LEARN").width + size * 0.7;
   const bh = size * 1.15;
   ctx.strokeStyle = cyan;
-  ctx.lineWidth = Math.max(2, h * 0.03);
+  ctx.lineWidth = kitSettings.hairline; // Duo: a square hairline frame, like every interface element
   ctx.beginPath();
-  ctx.roundRect(right - w, h * 0.5 - bh / 2, w, bh, bh * 0.22);
+  ctx.rect(right - w, h * 0.5 - bh / 2, w, bh);
   ctx.stroke();
   ctx.textAlign = "center";
   ctx.fillStyle = cyan;

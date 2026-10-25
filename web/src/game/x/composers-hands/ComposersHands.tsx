@@ -34,7 +34,8 @@ const noteName = (p: number) => `${NAMES[Math.round(p) % 12]}${Math.floor(Math.r
 
 declare global {
   interface Window {
-    __composersHands?: { startPerf: number; mode: Mode; rollOnMs: number[]; ended: boolean };
+    __composersHandsSim?: ReturnType<typeof createSimMidiAccess>;
+    __composersHands?: { startPerf: number; mode: Mode; rollOnMs: number[]; ended: boolean; lateMs: number[]; right: [number, number][] }; // lateMs: how far past its own time each note-on was handed to the piano
   }
 }
 
@@ -76,7 +77,10 @@ export function ComposersHands() {
 
   // ?midi=sim: /sim's fake piano, so a check reads what was sent and when (Validation c).
   useEffect(() => {
-    if (params.get("midi") === "sim") installSim(createSimMidiAccess());
+    if (params.get("midi") !== "sim") return;
+    const sim = createSimMidiAccess();
+    installSim(sim);
+    window.__composersHandsSim = sim; // a check plays the right hand through it
   }, [params]);
 
   useEffect(() => {
@@ -155,7 +159,7 @@ export function ComposersHands() {
           pressed.add(e.pitch);
           judge?.press(e.pitch, e.timeMs - startPerf, index++);
         });
-      window.__composersHands = { startPerf, mode: m, rollOnMs: played.map((n) => n.onMs), ended: false };
+      const hook = (window.__composersHands = { startPerf, mode: m, rollOnMs: played.map((n) => n.onMs), ended: false, lateMs: [] as number[], right: m === "duet" ? judged.notes.map((n) => [n.pitch, n.beat * 1000] as [number, number]) : [] });
 
       let queuedTo = -LEAD_MS;
       const pedal = m === "listen" ? roll.pedal : [];
@@ -163,9 +167,12 @@ export function ComposersHands() {
         const to = performance.now() - startPerf + AHEAD_MS;
         for (const s of sendsBetween(played, pedal, queuedTo, to)) {
           out?.send(s.bytes, startPerf + s.atMs);
-          if (s.bytes[0] === 0x90) echo.sent(s.bytes[1], startPerf + s.atMs);
+          if (s.bytes[0] !== 0x90) continue;
+          echo.sent(s.bytes[1], startPerf + s.atMs);
+          hook.lateMs.push(Math.max(0, performance.now() - (startPerf + s.atMs)));
         }
         queuedTo = to;
+        if (to - AHEAD_MS > endMs + 1200) finish(); // here, not in the frame loop: a hidden tab stops drawing
       };
       tick();
       const timer = setInterval(tick, 25);
@@ -190,7 +197,6 @@ export function ComposersHands() {
           if (judge) plugin.draw?.(ctx, { nowMs, lowPitch: layout.lowPitch, highPitch: layout.highPitch, judgmentLineY: layout.judgmentLineY, keyX: layout.keyX, width, height });
           setPassage(Math.max(0, Math.floor(nowMs / rollSettings.passageMs)));
         }
-        if (nowMs > endMs + 1200) return finish();
         raf = requestAnimationFrame(draw);
       };
       raf = requestAnimationFrame(draw);
@@ -225,6 +231,19 @@ export function ComposersHands() {
   );
 
   useEffect(() => () => stopRef.current(), []);
+
+  // At rest the stage shows the roll's opening, as it will fall, rather than an empty field.
+  useEffect(() => {
+    const c = canvas.current;
+    const ctx = c?.getContext("2d");
+    if (playing || mode === "compare" || !ctx || !c || !seconds) return;
+    const dpr = window.devicePixelRatio || 1;
+    const { width, height } = c.getBoundingClientRect();
+    [c.width, c.height] = [Math.round(width * dpr), Math.round(height * dpr)];
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const first = seconds.notes.reduce((m, n) => Math.min(m, n.beat * 1000), Infinity);
+    drawHighway(ctx, makeLayout(seconds, width, height, 0), seconds, { nowMs: first - 400, noteState: new Map(), pressed: new Set(), latest: null, countInBeat: null });
+  }, [playing, mode, seconds]);
 
   // Compare: three tempo lines over the score's time, in bpm.
   useEffect(() => {
@@ -275,6 +294,13 @@ export function ComposersHands() {
                 <DataCell label={<span className={css.cell}>YEAR</span>} value={info.year || "—"} size={34} />
               </Panel>
             )}
+            {(isTest || !info) && roll && (
+              <Panel style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", flex: "none" }}>
+                <DataCell label={<span className={css.cell}>NOTES</span>} value={roll.notes.length} size={34} style={{ borderLeft: "none" }} />
+                <DataCell label={<span className={css.cell}>LENGTH</span>} value={clock(roll.notes.reduce((e, n) => Math.max(e, n.offMs), 0))} size={34} />
+                <DataCell label={<span className={css.cell}>TEMPO</span>} value={chart?.bpm ?? "—"} size={34} />
+              </Panel>
+            )}
             {roll && !roll.dynamics && <p className={css.note}>This roll records no dynamics</p>}
             <nav className={css.modes} aria-label="Mode">
               {(["listen", "duet", "compare"] as const).map((m) => {
@@ -287,10 +313,22 @@ export function ComposersHands() {
               })}
             </nav>
             <p className={css.line}>
-              {mode === "listen" && "The piano plays his roll: both hands, his timing, his pedal."}
-              {mode === "duet" && "He plays the left hand. You play the right, judged against his timing."}
-              {mode === "compare" && results && `Your right hand: ${(results.accuracy * 100).toFixed(1)}%, rank ${results.rank}.`}
+              {mode === "listen" && (isTest || !info ? "The piano plays the test roll: both hands, at the score's tempo." : "The piano plays his roll: both hands, his timing, his pedal.")}
+              {mode === "duet" && (isTest || !info ? "The piano plays the left hand. You play the right, judged against the roll's timing." : "He plays the left hand. You play the right, judged against his timing.")}
+              {mode === "compare" && results && "Your right hand against the roll's timing. The lines are each tempo, bar by bar."}
             </p>
+            {mode === "compare" && results && (
+              <Panel style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", flex: "none" }}>
+                <DataCell label={<span className={css.cell}>ACCURACY</span>} value={<span data-testid="ch-accuracy">{(results.accuracy * 100).toFixed(1)}%</span>} size={34} style={{ borderLeft: "none" }} />
+                <DataCell label={<span className={css.cell}>RANK</span>} value={results.rank} size={34} />
+                <DataCell label={<span className={css.cell}>MISSED</span>} value={results.counts.MISS} size={34} />
+              </Panel>
+            )}
+            {mode === "compare" && (
+              <Button kind="secondary" onClick={() => play("duet")} style={{ fontSize: READ, padding: "1.4vh 0" }} data-testid="ch-again">
+                DUET AGAIN
+              </Button>
+            )}
             {mode !== "compare" && (
               <Button kind="primary" onClick={() => (playing ? stop() : play(mode))} disabled={!seconds} data-testid="ch-play" style={{ fontSize: READ, padding: "1.4vh 0" }}>
                 {playing ? "STOP" : mode === "duet" ? "PLAY THE RIGHT HAND" : "LISTEN"}
@@ -299,7 +337,7 @@ export function ComposersHands() {
             {mode !== "compare" && split !== undefined && (
               <div className={css.split} data-testid="ch-split">
                 <MonoLabel style={{ fontSize: READ }}>
-                  Hands split at {noteName(split + 0.5)}, passage {passage + 1} of {splits.length}
+                  Left hand up to {noteName(Math.ceil(split) - 1)}, passage {passage + 1} of {splits.length}
                 </MonoLabel>
                 <div className={css.splitButtons}>
                   {[
@@ -345,6 +383,7 @@ export function ComposersHands() {
 }
 
 const READ = "clamp(16px, 2.25vh, 24px)";
+const clock = (ms: number) => `${Math.floor(ms / 60000)}:${String(Math.round((ms % 60000) / 1000)).padStart(2, "0")}`;
 
 function Header() {
   return (
@@ -367,8 +406,19 @@ function drawCompare(ctx: CanvasRenderingContext2D, w: number, h: number, chart:
     { pts: hisPts, color: handL },
     { pts: yourPts, color: handR },
   ];
-  const pad = { l: 72, r: 24, t: 24, b: 56 };
-  const [lo, hi] = [chart.bpm * tempoCurveSettings.minTempo, chart.bpm * tempoCurveSettings.maxTempo];
+  const pad = { l: 72, r: 24, t: 72, b: 56 };
+  // The curves first, so the scale fits them: a tempo that wavers by 5% should look like it.
+  const drawn = lines
+    .filter(({ pts }) => pts.length >= tempoCurveSettings.minHits)
+    .map(({ pts, color }) => {
+      const curve = fitCurve(pts, windowMs);
+      const [t0, t1] = [Math.min(...pts.map((q) => q.t)), Math.max(...pts.map((q) => q.t))];
+      return { color, samples: Array.from({ length: 201 }, (_, k) => t0 + ((t1 - t0) * k) / 200).map((t) => ({ t, bpm: curve.tempo(t) * chart.bpm })) };
+    });
+  const all = [chart.bpm, ...drawn.flatMap((d) => d.samples.map((q) => q.bpm))];
+  const span = Math.max(chart.bpm * 0.1, Math.max(...all) - Math.min(...all));
+  const mid = (Math.max(...all) + Math.min(...all)) / 2;
+  const [lo, hi] = [mid - span * 0.65, mid + span * 0.65];
   const x = (t: number) => pad.l + (t / end) * (w - pad.l - pad.r);
   const y = (bpm: number) => pad.t + (1 - (bpm - lo) / (hi - lo)) * (h - pad.t - pad.b);
   ctx.font = canvasFonts.data(Math.max(16, Math.min(24, h * 0.03)));
@@ -387,19 +437,11 @@ function drawCompare(ctx: CanvasRenderingContext2D, w: number, h: number, chart:
   ctx.lineTo(x(end), y(chart.bpm));
   ctx.stroke();
   ctx.setLineDash([]);
-  for (const { pts, color } of lines) {
-    if (pts.length < tempoCurveSettings.minHits) continue;
-    const curve = fitCurve(pts, windowMs);
-    const [t0, t1] = [Math.min(...pts.map((q) => q.t)), Math.max(...pts.map((q) => q.t))];
+  for (const { color, samples } of drawn) {
     ctx.strokeStyle = color;
     ctx.lineWidth = 4;
     ctx.beginPath();
-    for (let k = 0; k <= 200; k++) {
-      const t = t0 + ((t1 - t0) * k) / 200;
-      const v = y(curve.tempo(t) * chart.bpm);
-      if (k) ctx.lineTo(x(t), v);
-      else ctx.moveTo(x(t), v);
-    }
+    samples.forEach((q, k) => (k ? ctx.lineTo(x(q.t), y(q.bpm)) : ctx.moveTo(x(q.t), y(q.bpm))));
     ctx.stroke();
   }
 }

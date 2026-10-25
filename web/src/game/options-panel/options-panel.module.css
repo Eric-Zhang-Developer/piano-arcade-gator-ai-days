@@ -8,10 +8,10 @@
   gap: 10px;
   padding: 3px 6px 3px 12px;
   border: 1px solid rgb(242 242 245 / 0.18);
-  border-radius: 6px;
+  border-radius: 0;
   background: var(--pa-panel);
   color: var(--pa-ink);
-  font: italic 800 clamp(16px, 2.222vh, 24px) var(--pa-font-display), system-ui, sans-serif;
+  font: 800 clamp(16px, 2.222vh, 24px) var(--pa-font-display), system-ui, sans-serif;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;
@@ -77,7 +77,7 @@
 
 .title {
   margin: 0;
-  font: italic 900 calc(var(--size) * 2) / 1 var(--pa-font-display), system-ui, sans-serif;
+  font: 800 calc(var(--size) * 2) / 1 var(--pa-font-display), system-ui, sans-serif;
   letter-spacing: -0.01em;
   text-transform: uppercase;
 }
@@ -85,7 +85,7 @@
 .close {
   padding: 2px 10px;
   border: 1px solid rgb(242 242 245 / 0.3);
-  border-radius: 4px;
+  border-radius: 0;
   background: none;
   color: var(--pa-ink-dim);
   font: 700 var(--size) system-ui, sans-serif;
@@ -118,15 +118,58 @@
   gap: var(--size);
 }
 
+/* Duo sliders (#784): a hairline track and a square primary thumb, not the browser's rounded ones. Firefox also
+   fills the track up to the value; Chrome has no CSS hook for that without the value in a variable. */
 .control input[type="range"] {
   flex: 1;
-  accent-color: var(--pa-cyan);
+  appearance: none;
   height: calc(var(--size) * 1.2);
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.control input[type="range"]::-webkit-slider-runnable-track {
+  height: 2px;
+  background: color-mix(in srgb, var(--pa-ink-dim) 55%, transparent);
+}
+
+.control input[type="range"]::-moz-range-track {
+  height: 2px;
+  background: color-mix(in srgb, var(--pa-ink-dim) 55%, transparent);
+}
+
+.control input[type="range"]::-moz-range-progress {
+  height: 2px;
+  background: var(--pa-primary);
+}
+
+.control input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: calc(var(--size) * 0.7);
+  height: calc(var(--size) * 0.7);
+  margin-top: calc(1px - var(--size) * 0.35); /* centered on the 2 px track */
+  border: 0;
+  border-radius: 0;
+  background: var(--pa-primary);
+}
+
+.control input[type="range"]::-moz-range-thumb {
+  width: calc(var(--size) * 0.7);
+  height: calc(var(--size) * 0.7);
+  border: 0;
+  border-radius: 0;
+  background: var(--pa-primary);
+}
+
+.control input[type="range"]:focus-visible {
+  outline: 2px solid var(--pa-primary);
+  outline-offset: 4px;
 }
 
 .value {
   min-width: 4.2em;
-  font: italic 800 var(--size) var(--pa-font-display), system-ui, sans-serif;
+  font: 800 var(--size) var(--pa-font-display), system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
@@ -138,10 +181,37 @@
   font-size: var(--size);
 }
 
+/* Duo checkboxes (#784): a square hairline box, filled primary with a dark tick when on. */
 .check {
+  appearance: none;
+  display: grid;
+  place-content: center;
   width: calc(var(--size) * 1.1);
   height: calc(var(--size) * 1.1);
-  accent-color: var(--pa-cyan);
+  margin: 0;
+  border: 1px solid color-mix(in srgb, var(--pa-ink-dim) 70%, transparent);
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.check:checked {
+  border-color: var(--pa-primary);
+  background: var(--pa-primary);
+}
+
+.check:checked::after {
+  content: "";
+  width: 0.55em;
+  height: 0.28em;
+  border-bottom: 2px solid var(--pa-bg);
+  border-left: 2px solid var(--pa-bg);
+  transform: translateY(-20%) rotate(-45deg);
+}
+
+.check:focus-visible {
+  outline: 2px solid var(--pa-primary);
+  outline-offset: 3px;
 }
 
 .segments {
@@ -150,14 +220,14 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 4px;
   padding: 3px;
-  border-radius: 6px;
+  border-radius: 0;
   background: rgb(0 0 0 / 0.35);
 }
 
 .segment {
   padding: calc(var(--size) * 0.35) 4px;
   border: none;
-  border-radius: 4px;
+  border-radius: 0;
   background: none;
   color: var(--pa-ink-dim);
   font: inherit;

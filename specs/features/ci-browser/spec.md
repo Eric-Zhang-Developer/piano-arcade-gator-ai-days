@@ -43,15 +43,12 @@ Issue: #407
   `node <check> --out <dir>`, and each check keeps spawning its own server: GitHub's CPU, not Eric's. A shard runs
   its checks one at a time.
 - **Selection** (`run-checks.mjs --base <ref> --shard <i>/<n> --out <dir>`, or `--all` in place of `--base`):
-  - Always `web/e2e/verify.mjs`.
-  - For each file the PR changes (`git diff --name-only <base>...HEAD`) under `web/src/`, walk up from its folder and
-    take the `verify*.mjs` files of the first folder that has any. `web/src/game/notice-toast/index.ts` gives
-    `verify-toast.mjs`; `web/src/operator/x.tsx` gives `verify-operator.mjs`; `web/src/game/fever-stage/x.ts` gives
-    none.
-  - Every check only when the PR changes the runner or the workflow: `web/e2e/` or `.github/workflows/ci.yml`. Shared
-    app code (core, contracts, `app/`, `layers.ts`, `package.json`, …) gets the per-folder pick like any other file:
-    main's push runs every check (`--all`), and the red-main revert rule is the guard (Eric, 2026-10-25; decision
-    `ci-browser-pr-scope.md`).
+  - **A pull request and a push to main: the smoke check only,** `web/e2e/verify.mjs` on one shard. The exception is a
+    change to the runner or the workflow (`web/e2e/` or `.github/workflows/ci.yml`), which runs every check.
+  - **The full suite** (`--all`) runs on a `schedule` every 30 min and by hand (`workflow_dispatch`), over at most
+    8 shards. A red full run files or updates one issue labeled `bug` and `ci-red`. It names the failing checks and
+    the commits since the last green full run, and it doesn't freeze merges. The decision is
+    `ci-browser-pr-scope.md` (Eric, 2026-10-25).
   - "Every check" is `web/e2e/verify.mjs` plus `web/src/**/verify*.mjs`, found at run time, so a new check joins
     without editing the runner.
   - Shards balance by each check's measured seconds (`run-checks.seconds.json`): longest first, onto the lightest

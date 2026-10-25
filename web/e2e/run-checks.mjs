@@ -5,19 +5,19 @@
 // Usage (from anywhere in the repo):
 //   node web/e2e/run-checks.mjs --list [--base <ref> | --all] [--shard i/n]   print the selected checks, one per line
 //   node web/e2e/run-checks.mjs --out <dir> [--base <ref> | --all] [--shard i/n]   run them
-// --base <ref>: verify.mjs plus the checks nearest each file changed since <ref>, or every check when shared code
-// changed. --all (or no --base): every check.
+// --base <ref>: the smoke check (verify.mjs) alone, or every check when the runner or workflow changed since <ref>.
+// --all (or no --base): every check. A PR and a push to main use --base; the full run (schedule, by hand) uses --all.
 import { execFileSync, spawn } from "node:child_process";
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const MAIN_CHECK = "web/e2e/verify.mjs";
 const say = (s) => process.stdout.write(`${s}\n`);
 
-// The paths whose change runs every check on a pull request: the runner and the workflow themselves. Shared app code
-// (core, contracts, app/, layers.ts, package.json…) no longer does: a PR runs verify.mjs plus the checks of the
-// folders it touched, and main's push runs every check (Eric, 2026-10-25; decision ci-browser-pr-scope.md).
+// The paths whose change runs every check on a pull request or a push: the runner and the workflow themselves.
+// Everything else gets the smoke check only; the full suite runs every 30 min and by hand (Eric, 2026-10-25;
+// decision ci-browser-pr-scope.md).
 export const FULL_RUN = ["web/e2e/", ".github/workflows/ci.yml"];
 // The runner's own ceiling, so a hung check still fails its shard (and uploads evidence) inside the job's 20 min.
 // Not a check's timeout: decision ci-browser-check-timeout.md.
@@ -38,24 +38,10 @@ export function allChecks(files) {
   return [MAIN_CHECK, ...feature];
 }
 
-/**
- * The checks a change needs: verify.mjs, plus for each changed file under web/src/ the checks of the nearest folder
- * (its own, then each parent) that has any. Every check when a FULL_RUN path changed.
- */
+/** The checks a change needs: the smoke check alone, or every check when a FULL_RUN path changed. */
 export function selectChecks(checks, changed) {
-  if (changed.some((f) => FULL_RUN.some((s) => f === s || (s.endsWith("/") && f.startsWith(s))))) return checks;
-  const byFolder = Map.groupBy(checks.filter((c) => c !== MAIN_CHECK), (c) => dirname(c));
-  const picked = new Set([MAIN_CHECK]);
-  for (const f of changed.filter((f) => f.startsWith("web/src/"))) {
-    for (let dir = dirname(f); dir.startsWith("web/src"); dir = dirname(dir)) {
-      const here = byFolder.get(dir);
-      if (here) {
-        here.forEach((c) => picked.add(c));
-        break;
-      }
-    }
-  }
-  return checks.filter((c) => picked.has(c));
+  const full = changed.some((f) => FULL_RUN.some((s) => f === s || (s.endsWith("/") && f.startsWith(s))));
+  return full ? checks : checks.filter((c) => c === MAIN_CHECK);
 }
 
 // Each check's seconds on CI (main's full run 40164489468, 2026-10-25), to balance the shards; a check not in the

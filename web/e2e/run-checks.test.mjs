@@ -18,27 +18,10 @@ describe("allChecks", () => {
 });
 
 describe("selectChecks", () => {
-  it("takes the check of the changed file's folder", () => {
-    expect(selectChecks(checks, ["web/src/game/notice-toast/index.ts"])).toEqual([MAIN_CHECK, TOAST]);
-    expect(selectChecks(checks, ["web/src/operator/x.tsx"])).toEqual([MAIN_CHECK, OPERATOR]);
-  });
-
-  it("walks up to the nearest folder with a check", () => {
-    expect(selectChecks(checks, ["web/src/operator/board/tile.tsx"])).toEqual([MAIN_CHECK, OPERATOR]);
-  });
-
-  it("gives verify.mjs alone when no folder on the way up has a check", () => {
-    expect(selectChecks(checks, ["specs/features/x/spec.md"])).toEqual([MAIN_CHECK]);
-    expect(selectChecks(checks, ["web/src/game/fever-stage/x.ts"])).toEqual([MAIN_CHECK]);
-  });
-
-  it("doesn't match a folder that only shares a name prefix", () => {
-    expect(selectChecks(checks, ["web/src/game/simple/x.ts"])).toEqual([MAIN_CHECK]);
-  });
-
-  it.each(["web/e2e/verify.mjs", ".github/workflows/ci.yml"])("gives every check when the runner or workflow changes (%s)", (f) => {
-    expect(selectChecks(checks, [f])).toEqual(checks);
-  });
+  it.each(["web/src/game/notice-toast/index.ts", "web/src/operator/board/tile.tsx", "specs/features/x/spec.md"])(
+    "gives the smoke check alone for any other change (%s)",
+    (f) => expect(selectChecks(checks, [f])).toEqual([MAIN_CHECK]),
+  );
 
   it.each([
     "web/src/game/core/judge.ts",
@@ -47,11 +30,14 @@ describe("selectChecks", () => {
     "web/src/game/layers.ts",
     "web/package.json",
     "web/pnpm-lock.yaml",
-    "web/next.config.ts",
-    "web/public/songs/twinkle/chart.json",
-  ])("gives only verify.mjs for shared code with no checks of its own (%s): main's full run covers it", (f) => {
+  ])("gives the smoke check alone for shared app code too (%s): the 30 min full run covers it", (f) => {
     expect(selectChecks(checks, [f])).toEqual([MAIN_CHECK]);
   });
+
+  it.each(["web/e2e/verify.mjs", "web/e2e/run-checks.mjs", ".github/workflows/ci.yml"])(
+    "gives every check when the runner or workflow changes (%s)",
+    (f) => expect(selectChecks(checks, ["web/src/game/x.ts", f])).toEqual(checks),
+  );
 });
 
 describe("shard", () => {

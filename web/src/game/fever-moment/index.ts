@@ -11,7 +11,7 @@ import { arcNow, ignitionFor, markLit } from "../fever-arc";
 
 export const momentSettings = {
   totalMs: 2000, // spec: all done within 2 s
-  peakMs: 200, // the edge flash peaks here, then fades into juice's steady glow
+  peakMs: 50, // the edge flash peaks here, then fades into juice's steady glow: a drop's attack, on the beat (fever-arc)
   edgePx: 300, // over three times juice's steady fever edge (90 px)
   edgeAlpha: 1, // juice's steady edge is 0.38
   clearMs: 500, // nothing below the line where notes are due within this (0.75 of the line today)

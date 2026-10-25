@@ -13,8 +13,7 @@ export const arcSettings = {
   releaseMs: 400, // a combo break powers fever down over this
   handoffMs: landingSettings.outMs, // a song ending in fever drains on results-landing's out
   pulse: 0.12, // the stars' streak swells this much on each beat in the sustain
-  tint: 0.35, // how far the stars and sparks move toward fever's amber in the sustain (0 none, 1 all the way)
-  amber: [255, 176, 46] as const, // #ffb02e, fever-gauge's fill
+  tint: 0.7, // how far the stars move toward fever's amber in the sustain (0 none, 1 all the way): they carry no hand
 };
 
 export type Phase = "idle" | "build" | "ignite" | "sustain" | "release" | "handoff";
@@ -94,32 +93,9 @@ let state = emptyArc();
 export const arcNow = (nowMs: number): Arc => arcAt(state, nowMs);
 /** Where a feverStart at atMs ignites: for the sound, which is scheduled at event time. */
 export const ignitionFor = (atMs: number): number => nextBeat(atMs, state.beatMs);
-// The sustain's tint toward amber at the last drawn frame, for readers that don't see the chart clock (the sparks).
-let tintNow = 0;
-export const feverTint = (): number => tintNow;
-
-/** A hand color moved toward fever's amber by k (0–1) in hue only, so the hands still read. Channels 0–255 or 0–1. */
-export function towardAmber(rgb: readonly number[], k: number): number[] {
-  if (k <= 0) return [...rgb];
-  const scale = Math.max(...rgb) > 1 ? 255 : 1;
-  const [r, g, b] = rgb.map((v) => v / scale);
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const l = (max + min) / 2;
-  const d = max - min;
-  if (d === 0) return [...rgb]; // grey has no hue to shift
-  const sat = d / (1 - Math.abs(2 * l - 1));
-  let h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
-  h *= 60;
-  const target = 37; // #ffb02e's hue
-  const dh = (((target - h) % 360) + 540) % 360 - 180; // the short way round
-  h = (h + dh * k + 360) % 360;
-  const c = (1 - Math.abs(2 * l - 1)) * sat;
-  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
-  const m = l - c / 2;
-  const [r1, g1, b1] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
-  return [r1 + m, g1 + m, b1 + m].map((v) => v * scale);
-}
+// fever's heat at the last drawn frame, for readers that don't see the chart clock (the sparks).
+let heatNow = 0;
+export const feverHeat = (): number => heatNow;
 
 declare global {
   interface Window {
@@ -137,14 +113,14 @@ export function feverArc(): GamePlugin {
     id: "fever-arc",
     transformChart(chart) {
       state = emptyArc(chart.notes.length, chart.bpm);
-      tintNow = 0;
+      heatNow = 0;
       return chart;
     },
     onEvent(e) {
       state = reduceArc(state, e);
     },
     draw(_ctx, f) {
-      tintNow = arcNow(f.nowMs).heat * arcSettings.tint;
+      heatNow = arcNow(f.nowMs).heat;
       const hook = typeof window !== "undefined" ? window.__pianoArcadeFever : undefined;
       if (!hook) return;
       // The readers drew on the previous frame (they're mounted after this plugin): log that frame's set, then clear.

@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import type { GameEvent } from "../../contracts";
 import { msPerBeat } from "../core/settings";
-import { momentSettings } from "../fever-moment";
-import { type ArcState, arcAt, arcSettings, emptyArc, feverArc, ignitionFor, nextBeat, reduceArc, towardAmber } from ".";
+import { flashAt, momentSettings } from "../fever-moment";
+import { shimmerAt } from "../fever-gauge";
+import { type ArcState, arcAt, arcSettings, emptyArc, feverArc, ignitionFor, nextBeat, reduceArc } from ".";
 
 const hit: GameEvent = { type: "noteHit", noteId: "n", pitch: 60, judgment: "PERFECT", offsetMs: 0, atMs: 0 };
 const run = (events: GameEvent[], s: ArcState = emptyArc(42, 120)) => events.reduce(reduceArc, s);
@@ -81,15 +82,11 @@ describe("ignitionFor", () => {
   });
 });
 
-describe("toward amber", () => {
-  it("moves a hue part way to fever's amber, keeps grey grey, and leaves k = 0 alone", () => {
-    const blue = [70, 130, 255];
-    expect(towardAmber(blue, 0)).toEqual(blue);
-    expect(towardAmber([128, 128, 128], 0.5)).toEqual([128, 128, 128]);
-    const all = towardAmber(blue, 1);
-    expect(all[0]).toBeGreaterThan(all[1]);
-    expect(all[1]).toBeGreaterThan(all[2]); // amber: red > green > blue
-    const unit = towardAmber([70 / 255, 130 / 255, 1], 1);
-    unit.forEach((v, i) => expect(v * 255).toBeCloseTo(all[i], 6));
+describe("reduced motion", () => {
+  it("cuts: no shimmer in the build, which still shows it with motion on", () => {
+    const build = arcAt(run(Array(11).fill(hit)), 1000);
+    expect(shimmerAt(build, true)).toBeNull();
+    expect(shimmerAt(build, false)).not.toBeNull();
+    expect(flashAt(0)).toBe(0); // the flash still starts dark, then peaks fast: momentSettings.peakMs
   });
 });

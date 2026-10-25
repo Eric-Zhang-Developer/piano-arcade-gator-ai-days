@@ -42,7 +42,8 @@ function drawMeter(ctx: CanvasRenderingContext2D, f: Frame, g: Gauge, arc: Arc, 
   // Flat amber, filling toward fever and full while it lasts: the Duo look has no gradients (#885). It burns full
   // from fever-arc's ignition beat, and drains with its release (heat) after a break or into the results.
   const lit = arc.phase === "ignite" || arc.phase === "sustain";
-  const share = g.fever ? 1 : Math.max(g.fill / g.size, arc.phase === "release" || arc.phase === "handoff" ? arc.heat : 0);
+  const draining = !still && (arc.phase === "release" || arc.phase === "handoff"); // reduced motion: a cut, no drain
+  const share = g.fever ? 1 : Math.max(g.fill / g.size, draining ? arc.heat : 0);
   if (share > 0) {
     ctx.fillStyle = meterSettings.fill;
     ctx.fillRect(bar.x, bar.y, bar.w * share, bar.h);

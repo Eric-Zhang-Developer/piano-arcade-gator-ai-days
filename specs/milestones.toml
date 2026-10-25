@@ -244,6 +244,7 @@ features = [
   "kit-leftovers-small", # polish sweep 2 (#1208, #1209, #1210): data-face labels, square key chips, /real-keys upright
   "select-motion", # Eric, 2026-10-25 (#1212): one deep polish pass on the select's motion, springs and no queue, a #856 hero item
   "inside", # Eric, 2026-10-25 (#1226): wow feeder; a live cutaway of a grand's action driven by the DGX, an experiment
+  "lab-gallery", # Eric, 2026-10-25 (#1249): the Lab's On trial as an exhibition with posters, and Eric's verdict sheet
 ]
 cut = []
 

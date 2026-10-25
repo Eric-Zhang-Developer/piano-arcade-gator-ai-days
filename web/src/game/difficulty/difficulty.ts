@@ -3,12 +3,14 @@
 import type { Chart } from "../../contracts";
 import { msPerBeat } from "../core/settings";
 
-// Calibrated on the charts on main so the song-pack rungs keep their order (the done note lists every level).
+// Calibrated on the charts on main so the song-pack rungs keep their order, and so speed outweighs reach: at 0.7 a
+// leap of 43 semitones was worth 30 notes a second, and Flower Dance tied Moonlight's Presto at 15 (decision
+// song-pack-2-moonlight-tempo lists every level before and after). Range adds nothing the leap doesn't, so it weighs 0.
 // Tune these, not the inputs.
 export const difficultySettings = {
-  weights: { nps: 1, chordShare: 1, maxLeap: 0.7, range: 0.05, bothHands: 2 },
-  offset: -6, // the weighted sum where level 1 sits
-  scale: 0.4, // levels per point of the sum
+  weights: { nps: 1, chordShare: 0.5, maxLeap: 0.2, range: 0, bothHands: 1 },
+  offset: -2.9, // the weighted sum where level 1 sits: Twinkle's
+  scale: 0.64, // levels per point of the sum: Moonlight's Presto, the hardest song on main, at 15
   windowMs: 10_000, // nps counts the busiest window this long
   warnFrom: 13, // the WARNING card shows from this level
 };

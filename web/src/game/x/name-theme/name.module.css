@@ -97,11 +97,8 @@
   font-size: max(12px, 0.9em);
 }
 
-.side .small:last-child {
-  margin-top: auto;
-}
-
 .main {
+  container-type: inline-size;
   display: grid;
   grid-template-rows: auto 1fr auto;
   gap: 1.2em;
@@ -114,7 +111,6 @@
   margin: 0;
   padding: 0;
   display: flex;
-  flex-wrap: wrap;
   gap: 0 0.15em;
 }
 
@@ -126,11 +122,11 @@
 .silent {
   display: grid;
   justify-items: center;
-  min-width: 1.4em;
+  min-width: 0;
 }
 
 .letter {
-  font: italic 900 clamp(48px, 5.4vw, 120px) / 1 var(--pa-font-display), system-ui, sans-serif;
+  font: italic 900 min(clamp(72px, 8vw, 180px), calc(118cqw / var(--n))) / 0.95 var(--pa-font-display), system-ui, sans-serif;
   padding: 0 0.04em 0.1em;
   border-bottom: 1px solid var(--pa-line);
   width: 100%;
@@ -139,7 +135,7 @@
 
 .note {
   padding-top: 0.35em;
-  font: 700 clamp(14px, 1.3vw, 28px) / 1 var(--pa-font-data), ui-monospace, monospace;
+  font: 700 clamp(20px, 1.9vw, 42px) / 1 var(--pa-font-data), ui-monospace, monospace;
   color: var(--pa-primary);
 }
 
@@ -152,10 +148,25 @@
   color: var(--pa-ink-dim);
 }
 
+.rollBox {
+  position: relative;
+  min-height: 10em;
+}
+
+/* Each letter rides its note in the roll: where the name turned into the music. */
+.tag {
+  position: absolute;
+  transform: translate(0.2em, -125%);
+  font: italic 900 clamp(13px, 1.1vw, 24px) / 1 var(--pa-font-display), system-ui, sans-serif;
+  color: var(--pa-ink);
+  pointer-events: none;
+}
+
 .roll {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  min-height: 12em;
   background: var(--pa-panel);
   outline: 1px solid var(--pa-line);
 }

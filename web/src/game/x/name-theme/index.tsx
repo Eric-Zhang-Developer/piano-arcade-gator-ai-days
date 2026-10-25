@@ -8,15 +8,15 @@ import { msPerBeat, settings } from "../../core/settings";
 import { isBlack } from "../../core/highway";
 import { canvasFonts, kitButton } from "../../duo-tokens";
 import { pillRect } from "../../note-pills";
-import { ink, inkDim, primary } from "../../ui-tokens";
+import { inkDim, primary } from "../../ui-tokens";
 import { FRENCH } from "./cipher";
 import { compose, type Theme } from "./compose";
 import { heldTheme, SONG } from "./memory";
 
 export const nameSettings = {
-  lettersY: 0.2, // of the canvas height: under the HUD's band
+  lettersY: 0.3, // of the canvas height: under the HUD's band and clear of the judgment word
   letterPx: 40, // at 720 px tall, scaled
-  noteLetterPx: 13,
+  noteLetterPx: 18, // the display face in the kit's blue, so it reads as the name and not a laptop key's letter
   sweepMs: 240, // a letter's light-up: from 1.3× to its size
 };
 
@@ -38,7 +38,7 @@ export function lettered(chart: Chart, f: Frame, letterOf: Record<string, number
     const y = line - (n.beat * beatMs - f.nowMs) * pxPerMs;
     if (y < 0 || y > line) continue;
     const pill = pillRect(f.keyX(n.pitch), isBlack(n.pitch));
-    out.push({ x: pill.x + pill.width + 4, y, letter });
+    out.push({ x: pill.x + pill.width + 6, y, letter });
   }
   return out;
 }
@@ -74,9 +74,9 @@ export const nameTheme: Experiment = {
         ctx.save();
         ctx.textBaseline = "alphabetic";
         // Each motif note's letter, beside its pill.
-        ctx.font = canvasFonts.data(Math.round(nameSettings.noteLetterPx * k));
+        ctx.font = canvasFonts.display(Math.round(nameSettings.noteLetterPx * k));
         ctx.textAlign = "left";
-        ctx.fillStyle = ink;
+        ctx.fillStyle = primary;
         for (const n of lettered(chart, f, theme.letterOf)) ctx.fillText(theme.letters[n.letter], n.x, n.y - 4 * k);
         // The name, lighting letter by letter.
         const px = Math.round(nameSettings.letterPx * k);

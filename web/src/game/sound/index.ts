@@ -14,7 +14,7 @@ export type Sound = "stinger" | "sweep" | "fanfare" | "drumroll" | "rankHit" | "
 
 export const soundSettings = {
   fanfareAfterHitMs: 150, // a full combo's fanfare follows the rank hit
-  missLevel: 0.15, // the miss cue's; the milestone voices' levels are milestone-sfx's
+  missLevel: 0.05, // the miss cue's: 21.1 dB under the laptop piano's C4 (0.15 was 12.6; miss-moment wants 18 or more). The milestone voices' levels are milestone-sfx's
   missGapMs: 120, // miss-moment: in a run of misses, at most one cue per this
 };
 

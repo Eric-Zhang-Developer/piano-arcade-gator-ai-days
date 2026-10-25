@@ -21,7 +21,8 @@ export const missSettings = {
   restWidth: 0.6,
   outlineMs: 400, // the key's hairline outline
   outlineHoldMs: 250, // full strength until here, then it fades
-  outlinePx: 1.5,
+  outlinePerHeight: 540, // the outline's width: round(height / 540) px, 2 at 1080 (1.5 px vanished on the ivory keys)
+  outlineFill: 0.18, // and a faint fill of the miss token inside it, so a white key reads as marked
   pulseMs: 180, // the wrong key's one pulse
   pulseAlpha: 0.55,
   breakFrom: 10, // a combo this big drops its digits as it breaks; under it, a plain cut
@@ -147,7 +148,10 @@ declare global {
     // The luminance probe (spec Validation c), off unless a harness creates it before the take: each frame, the mean
     // luminance of the playfield above the keyboard, read from the highway and overlay canvases; and the take's misses
     // and hits with their chart times.
-    __pianoArcadeMiss?: { frames: { nowMs: number; luma: number }[]; events?: { type: string; judgment?: string; atMs: number }[] };
+    __pianoArcadeMiss?: {
+      frames: { nowMs: number; luma: number; tails: { t: number; width: number; alpha: number }[] }[];
+      events?: { type: string; judgment?: string; atMs: number }[];
+    };
     __pianoArcadeMissCue?: typeof measureCue; // verify-miss.mjs and the PR's measurement
   }
 }
@@ -245,6 +249,8 @@ export function missMoment(): GamePlugin {
     },
     draw(ctx, f) {
       if (!chart) return;
+      const probeLog = typeof window !== "undefined" ? window.__pianoArcadeMiss : undefined;
+      const tails: { t: number; width: number; alpha: number }[] = [];
       const reduced = reducedMotion();
       const now = f.nowMs;
       const line = f.judgmentLineY;
@@ -266,6 +272,7 @@ export function missMoment(): GamePlugin {
         ctx.globalAlpha = look.alpha;
         ctx.fillStyle = desaturate(color(m.hand), look.sat);
         ctx.fillRect(k.x + (k.width - w) / 2, top, w, line - top);
+        if (probeLog) tails.push({ t: now - m.atMs, width: look.width, alpha: look.alpha });
       }
       ctx.restore();
 
@@ -283,11 +290,14 @@ export function missMoment(): GamePlugin {
         const a = outlineAt(now - m.atMs, reduced);
         if (a <= 0) continue;
         const cap = shape(m.pitch);
+        const px = Math.max(1, Math.round(f.height / missSettings.outlinePerHeight));
+        ctx.globalAlpha = a * missSettings.outlineFill;
+        ctx.fillStyle = missToken;
+        ctx.fillRect(cap.x, cap.y, cap.w, cap.h);
         ctx.globalAlpha = a;
         ctx.strokeStyle = missToken;
-        ctx.lineWidth = missSettings.outlinePx;
-        const h = missSettings.outlinePx / 2;
-        ctx.strokeRect(cap.x + h, cap.y + h, cap.w - 2 * h, cap.h - 2 * h);
+        ctx.lineWidth = px;
+        ctx.strokeRect(cap.x + px / 2, cap.y + px / 2, cap.w - px, cap.h - px);
         ctx.restore();
       }
       for (const p of pulses) {
@@ -323,8 +333,7 @@ export function missMoment(): GamePlugin {
         }
       }
 
-      const probeLog = typeof window !== "undefined" ? window.__pianoArcadeMiss : undefined;
-      if (probeLog) probeLog.frames.push({ nowMs: now, luma: playfieldLuma(ctx.canvas, line, f.height) });
+      if (probeLog) probeLog.frames.push({ nowMs: now, luma: playfieldLuma(ctx.canvas, line, f.height), tails });
     },
   };
 }

@@ -5,6 +5,7 @@ import { useEffect, useMemo } from "react";
 import type { Chart, GamePlugin } from "../../contracts";
 import { difficulty } from "../difficulty/difficulty";
 import { PianoRoll } from "../duo-select/PianoRoll";
+import { shortComposer } from "../duo-select/Select";
 import { roll } from "../duo-select/roll";
 import { DataCell, MonoLabel, Panel } from "../duo-tokens";
 import { uiSound } from "../ui-sounds";
@@ -27,8 +28,8 @@ export function StageCard({ title, composer, catalog, level, notes, beatsPerBar 
       </div>
       <h1 className={styles.title}>{title}</h1>
       <MonoLabel style={{ fontSize: "clamp(13px, 1vw, 19px)" }}>
-        <span className={styles.composer}>
-          {composer}
+        <span className={styles.composer} title={composer}>
+          {shortComposer(composer)}
           {catalog && ` · ${catalog}`}
         </span>
       </MonoLabel>

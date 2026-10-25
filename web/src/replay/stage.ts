@@ -1,4 +1,4 @@
-// The attract-mode stage: a synthwave grid running to a low sun, one pillar per feature, a floor line per depends_on.
+// The attract-mode stage: a dark field, one pillar per feature, a floor line per depends_on. No sun or grid (#728).
 // Plain three.js meshes, lines and built-in materials; no postprocessing. createStage returns null without WebGL.
 import * as THREE from "three";
 import type { State } from "../operator/board";
@@ -14,7 +14,7 @@ export interface Stage {
 const SPACING = 3.2;
 const TALL = 3.2;
 const LOW = 0.14;
-const SKY = 0x12001f;
+const SKY = 0x06020c; // the dark field, as /operator's background
 const COLOR: Record<State, number> = {
   done: 0x74ffa6, "in flight": 0x4ef6ff, ready: 0xf4ecff, blocked: 0xff7b7b, backlog: 0xc9b8e6, cut: 0xc9b8e6, unknown: 0xffd36b,
 };
@@ -66,14 +66,7 @@ export function createStage(
   renderer.domElement.style.display = "block";
 
   const scene = new THREE.Scene();
-  scene.background = canvasTexture(4, 256, (g) => {
-    const grad = g.createLinearGradient(0, 0, 0, 256);
-    grad.addColorStop(0, "#05000c");
-    grad.addColorStop(0.62, "#1b0038");
-    grad.addColorStop(1, "#3a0a4a");
-    g.fillStyle = grad;
-    g.fillRect(0, 0, 4, 256);
-  });
+  scene.background = new THREE.Color(SKY);
   scene.fog = new THREE.Fog(SKY, 30, 110);
 
   const depth = Math.max(0, ...[...pos.values()].map((p) => p.z));
@@ -83,28 +76,6 @@ export function createStage(
     const p = pos.get(slug) ?? { x: 0, z: 0 };
     return new THREE.Vector3(p.x * SPACING, 0, -p.z * SPACING);
   };
-
-  const grid = new THREE.GridHelper(400, 160, 0xff5ad9, 0xff5ad9);
-  (grid.material as THREE.Material).transparent = true;
-  (grid.material as THREE.Material).opacity = 0.35;
-  scene.add(grid);
-
-  const sun = new THREE.Mesh(
-    new THREE.CircleGeometry(16, 64),
-    new THREE.MeshBasicMaterial({
-      fog: false,
-      transparent: true,
-      map: canvasTexture(256, 256, (g) => {
-        const grad = g.createLinearGradient(0, 0, 0, 256);
-        grad.addColorStop(0, "#ffd36b");
-        grad.addColorStop(1, "#ff2fb4");
-        g.fillStyle = grad;
-        g.fillRect(0, 0, 256, 256);
-        for (let k = 0; k < 7; k++) g.clearRect(0, 150 + k * 16, 256, 3 + k); // the stripes of a synthwave sun
-      }),
-    }),
-  );
-  scene.add(sun); // kept on the horizon behind whatever the camera looks at, every frame
 
   const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 400);
   const radius = Math.max(width * 0.55, depth) * SPACING + 9;
@@ -289,9 +260,6 @@ export function createStage(
     focus.lerp(focusGoal, opts.reduced ? 1 : Math.min(1, dt * 1.6));
     camera.position.set(focus.x + Math.sin(angle) * radius, 6 + depth * 0.5, focus.z + Math.cos(angle) * radius);
     camera.lookAt(focus);
-    const away = focus.clone().sub(camera.position).setY(0).normalize();
-    sun.position.copy(focus).addScaledVector(away, 95).setY(9);
-    sun.lookAt(camera.position);
     renderer.render(scene, camera);
   };
   raf = requestAnimationFrame(frame);

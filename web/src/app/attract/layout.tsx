@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// operator-board's synthwave look, borrowed (read-only) so the two pages are one cabinet.
+// operator-board's dark-field look, borrowed (read-only) so the two pages are one cabinet.
 export default function AttractLayout({ children }: LayoutProps<"/attract">) {
   return <div className={`${styles.root} ${body.variable} ${display.variable}`}>{children}</div>;
 }

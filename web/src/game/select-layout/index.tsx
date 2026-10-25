@@ -21,6 +21,7 @@ import { uiSound } from "../ui-sounds";
 import type { Song } from "../song-select/load";
 import { goToStage } from "./go-to-stage";
 import styles from "./select-layout.module.css";
+import { APP_NAME } from "../app-name";
 
 // footer: the left column's last row, in flow under the focused song (the Options button, first-run's link). Outside the
 // per-song section, so it isn't remounted on every ↑/↓.
@@ -91,7 +92,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
     <main className={styles.screen}>
       <SelectStage />
       <header className={styles.top}>
-        <h1 className={styles.wordmark}>Piano Arcade</h1>
+        <h1 className={styles.wordmark}>{APP_NAME}</h1>
         <p className={styles.hint}>
           <b>↑ ↓</b> choose · <b>Enter</b> play · <b>L</b> learn · <b>W</b> watch · <b>E</b> easy
         </p>

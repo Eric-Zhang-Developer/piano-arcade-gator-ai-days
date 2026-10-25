@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join, sep } from "node:path";
 import { validateChart, type Chart } from "../../contracts";
 import { difficulty } from "../difficulty/difficulty";
+import { roll, type Roll } from "../duo-select/roll";
 
 export interface Song {
   id: string; // the chart's folder under songs/, what /play?song= takes
@@ -11,6 +12,7 @@ export interface Song {
   catalog?: string;
   noteCount: number;
   level: number; // 1–15, computed from the chart (difficulty)
+  roll: Roll; // the opening as piano-roll bars for the select's thumbnails (duo-select), so no row fetches its chart
 }
 
 export function loadSongs(songsDir: string): { songs: Song[]; invalid: { path: string; problems: string[] }[] } {
@@ -31,7 +33,7 @@ export function loadSongs(songsDir: string): { songs: Song[]; invalid: { path: s
       continue;
     }
     const id = dirname(path).split(sep).join("/");
-    songs.push({ id, title: chart.title, composer: chart.composer, catalog: chart.catalog, noteCount: chart.notes.length, level: difficulty(chart).level });
+    songs.push({ id, title: chart.title, composer: chart.composer, catalog: chart.catalog, noteCount: chart.notes.length, level: difficulty(chart).level, roll: roll(chart) });
   }
   songs.sort((a, b) => a.level - b.level || a.title.localeCompare(b.title)); // easiest first
   return { songs, invalid };

@@ -39,7 +39,7 @@ again before each edit (`gh pr list --state open`, then each PR's files).
 | `web/src/game/hit-particles/gl.ts` | hit-particles | free |
 | `web/src/game/x/speaking-piano/mic.ts`, `speaking-piano.test.ts` | speaking-piano | free; lab-midi-release edits `playback.ts`, `Speak.tsx` and the test |
 | `web/src/game/x/highlight-reel/Highlight.tsx`, `encode.ts`, `highlight.test.ts` | experiments (`x/`) | free |
-| `web/src/game/video-shots/Cards.tsx`, `verify-shots.mjs` | video-shots | free |
+| `web/src/game/video-shots/Cards.tsx`, `verify-shots.mjs` | video-shots; **video-cards** (#1306, in `extras` ahead of this) owns `web/src/game/video-shots/` while in flight | switch once video-cards' PR frees it, or fix #1321 in `capture-mode/index.tsx` alone |
 | `web/src/game/capture-mode/index.tsx` | capture-mode | free |
 | `spikes/hum-level/index.html` | hum-level-spike | free |
 

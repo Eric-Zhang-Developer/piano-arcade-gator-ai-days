@@ -1,5 +1,7 @@
 // The stretch (spec: record-follows): a phase vocoder with identity phase locking, after Laroche & Dolson, "Improved
-// phase vocoder time-scale modification of audio" (IEEE Trans. Speech and Audio Processing 7(3), 1999). Each output
+// phase vocoder time-scale modification of audio" (IEEE Trans. Speech and Audio Processing 7(3), 1999,
+// doi:10.1109/89.759041), as read in Driedger & Müller's open review, "A Review of Time-Scale Modification of Music
+// Signals" (Applied Sciences 6(2):57, 2016, https://www.mdpi.com/2076-3417/6/2/57, §5.6). Each output
 // hop analyses the recording at `pos`, estimates each bin's instantaneous frequency from a second frame one hop
 // earlier, advances the phase of the spectral peaks by that frequency, and locks every other bin to its peak's phase
 // difference in the analysis (identity locking), which keeps a partial's bins coherent and cuts the "phasiness".

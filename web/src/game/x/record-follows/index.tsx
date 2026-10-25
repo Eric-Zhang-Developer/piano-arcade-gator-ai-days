@@ -9,8 +9,9 @@ import { getRecordingOffset, parseSidecar } from "../../audio-track";
 import { msPerBeat } from "../../core/settings";
 import { canvasFonts, MonoLabel } from "../../duo-tokens";
 import { meterLayout } from "../../fever-gauge";
+import { hudLayout, hudSettings } from "../../hud";
 import { isFlowMode, onsetsOf } from "../../flow-mode/clock";
-import { bg, ink, line, primary } from "../../ui-tokens";
+import { bg, ink, inkDim, line, primary } from "../../ui-tokens";
 import { isWaitMode } from "../../wait-mode";
 import { beatMap, detectOnsets, type BeatMap } from "./beatmap";
 import { recordDriver } from "./driver";
@@ -22,8 +23,7 @@ export const recordSettings = {
   detectRate: 22050, // onsets are found at about this rate, the tests' (the render is decimated to it)
   windowN: 2048, // the vocoder's window: a seek starts this half a window early, so the first frame centres on the note
   fadeS: 0.08, // the record's fade out at the take's end
-  chipPx: 14,
-  marginPx: 16,
+  chipPx: [12, 0.0085, 17], // min, share of the width, max: the DOM kitChip's clamp(12px, 0.85vw, 17px)
 };
 
 type Mode = "wait" | "flow" | "off";
@@ -179,19 +179,22 @@ export function recordFollows(): GamePlugin {
   };
 }
 
-// The chip, under the fever gauge at the right: the kit's chip drawn on canvas (Kit.tsx kitChip), lit while it follows,
-// a hairline while it's held, with the ratio's place on a 0.5–1.5× rail under it. Nothing in it animates.
+// The chip, under the fever gauge, its right edge on the HUD's (wait-hud's mode badge): the kit's chip drawn on canvas
+// (Kit.tsx kitChip), lit while it follows, a hairline while it's held, with the ratio's place on a 0.5–1.5× rail under
+// it, dim where it stopped while held. Nothing in it animates.
 function drawChip(ctx: CanvasRenderingContext2D, f: Frame, frozen: boolean, rate: number) {
-  const s = recordSettings;
+  const [lo, share, hi] = recordSettings.chipPx;
+  const px = Math.round(Math.min(hi, Math.max(lo, f.width * share)));
   const text = chipText(frozen, rate);
   ctx.save();
-  ctx.font = canvasFonts.data(s.chipPx);
+  ctx.font = canvasFonts.data(px);
   ctx.textBaseline = "middle";
-  ctx.textAlign = "left";
-  const padX = s.chipPx * 0.8;
-  const h = Math.round(s.chipPx * 2.2);
+  ctx.textAlign = "center"; // as the DOM chip: a steady width, its words centred in it
+  const padX = px * 0.8;
+  const h = Math.round(px * 2.2);
   const w = Math.round(Math.max(ctx.measureText(chipText(false, 1.5)).width, ctx.measureText(text).width) + padX * 2); // a steady width
-  const x = Math.round(f.width - s.marginPx - w);
+  const band = hudLayout(f.width, f.judgmentLineY).panel.h;
+  const x = Math.round(f.width - Math.max(10, band * 0.25) - hudSettings.statusGutterPx - w);
   const y = Math.round(meterLayout(f.width, f.judgmentLineY).bottom + 8);
   ctx.fillStyle = bg;
   ctx.fillRect(x, y, w, h);
@@ -205,16 +208,16 @@ function drawChip(ctx: CanvasRenderingContext2D, f: Frame, frozen: boolean, rate
   ctx.lineWidth = 1;
   ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
   ctx.fillStyle = frozen ? ink : primary;
-  ctx.fillText(text, x + padX, y + h / 2 + 1);
+  ctx.fillText(text, x + w / 2, y + h / 2 + 1);
   // the rail: 0.5× at the left, 1× at the tick, 1.5× at the right
-  const ry = y + h + 6;
-  ctx.fillStyle = line;
+  const ry = y + h + Math.round(px * 0.6);
+  ctx.fillStyle = bg;
+  ctx.fillRect(x, ry - 5, w, 11);
+  ctx.fillStyle = inkDim;
   ctx.fillRect(x, ry, w, 1);
   ctx.fillRect(Math.round(x + w / 2), ry - 3, 1, 7);
-  if (!frozen) {
-    ctx.fillStyle = primary;
-    ctx.fillRect(Math.round(x + (rate - 0.5) * w) - 1, ry - 4, 3, 9);
-  }
+  ctx.fillStyle = frozen ? inkDim : primary; // held: where it stopped, dim
+  ctx.fillRect(Math.round(x + (rate - 0.5) * w) - 2, ry - 5, 4, 11);
   ctx.restore();
 }
 

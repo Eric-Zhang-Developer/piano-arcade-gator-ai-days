@@ -11,6 +11,7 @@ import { driverSettings, recordDriver } from "./driver";
 import { steerer, steerSettings } from "./steer";
 import { renderSynthetic } from "./synth";
 import { Stretcher } from "./vocoder";
+import { processorSource } from "./worklet";
 
 const song = (id: string): Chart => JSON.parse(readFileSync(`public/songs/${id}/chart.json`, "utf8"));
 const onsetBeats = (c: Chart) => onsetsOf(c).map((o) => o.ms / msPerBeat(c.bpm));
@@ -194,4 +195,31 @@ describe("CPU (c)", () => {
     );
     for (const m of means) expect(m / budget).toBeLessThan(0.3);
   }, 60_000);
+});
+
+describe("the worklet", () => {
+  it("its Blob source runs: the processor registers, takes the buffer and plays the Stretcher's output on both channels", () => {
+    type Proc = { port: { onmessage: (e: { data: unknown }) => void }; process(i: unknown[], o: Float32Array[][]): boolean };
+    let P: (new () => Proc) | null = null;
+    class AudioWorkletProcessor {
+      port = { onmessage: (() => {}) as (e: { data: unknown }) => void, postMessage() {} };
+    }
+    new Function("AudioWorkletProcessor", "registerProcessor", "sampleRate", processorSource())(AudioWorkletProcessor, (name: string, c: new () => Proc) => {
+      expect(name).toBe("record-follows");
+      P = c;
+    }, 48000);
+    const p = new P!();
+    const out = [new Float32Array(128), new Float32Array(128)];
+    p.process([], [out]);
+    expect(out[0].every((v) => v === 0)).toBe(true); // no buffer yet: silent
+    p.port.onmessage({ data: { buffer: new Float32Array(48000).map((_, i) => 0.3 * Math.sin((2 * Math.PI * 220 * i) / 48000)) } });
+    p.port.onmessage({ data: { mode: "playing" } });
+    let peak = 0;
+    for (let i = 0; i < 40; i++) {
+      p.process([], [out]);
+      peak = Math.max(peak, ...out[0].map(Math.abs));
+      expect(out[1]).toEqual(out[0]);
+    }
+    expect(peak).toBeGreaterThan(0.1);
+  });
 });

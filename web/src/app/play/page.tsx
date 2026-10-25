@@ -13,6 +13,7 @@ import { drawHighway, makeLayout, staticRange, type HighwayState, type KeyRange,
 import { createZoom, zoomOn } from "../../game/highway-zoom";
 import { Judge, noteTimeMs } from "../../game/core/judge";
 import { keysDevice, midiDevice, testDevice } from "../../game/core/input";
+import { laptopKey } from "../../game/laptop-sound";
 import { describeTiming, timingSummary, type TimingSummary } from "../../game/timing";
 import { SfxControls } from "../../game/sound/SfxControls";
 import { nextPause, pauseClock, type PauseAction, type PauseMode } from "../../game/play-slots";
@@ -190,6 +191,9 @@ export default function Play() {
     // Input: every device feeds one handler; a key's judged time is its arrival minus the latency offset.
     let firstKind = true;
     const onInput = (kind: Take["inputDevice"]) => (e: InputEvent) => {
+      // laptop-sound: a laptop key sounds here, still inside its key event (no frame wait), after laptop-octaves'
+      // shift, so the note heard is the note judged; before the pause check, as a piano's keys sound while paused.
+      if (kind === "keys") laptopKey(e.type, e.pitch, e.velocity);
       if (pauses.paused) return; // keys while paused are neither judged nor recorded
       // A press during a hold lands on the held note's time; taking off the latency could put it outside GOOD.
       const t = held?.holding ? clock.now(e.timeMs) : clock.now(e.timeMs) - latencyRef.current;

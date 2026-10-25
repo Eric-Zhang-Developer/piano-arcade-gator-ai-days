@@ -8,7 +8,10 @@
 // 5. without the flag nothing changes: no landing, today's tail and today's CSS stamp;
 // 6. no console error;
 // 7. a perfect take ends in fever, and fever drains over the out on the landing's timeline: handoff frames, and no
-//    sustain after the first (frozen-clock-fades, #1333).
+//    sustain after the first (frozen-clock-fades, #1333);
+// 8. a record take skipped at mount + 50 ms: on the next frame NEW RECORD and the initials are in (landing-skip-seams, #1334);
+// 9. Esc just after T0 never opens the pause menu, and a right press mid-cut doesn't eat the next click: Retry still
+//    starts a new take (#1336, #1335).
 // Usage: node web/src/game/results-landing/verify-landing.mjs --out <dir>
 import { spawn } from "node:child_process";
 import { mkdirSync } from "node:fs";
@@ -85,7 +88,7 @@ const watch = () => {
   }).observe(document, { childList: true, subtree: true });
 };
 
-async function open(path, { reduced = false } = {}) {
+async function open(path, { reduced = false, start = true } = {}) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, reducedMotion: reduced ? "reduce" : "no-preference" });
   page.on("pageerror", (e) => errors.push(`${path}: ${e.message}`));
   page.on("console", (m) => m.type() === "error" && errors.push(`${path}: ${m.text()}`));
@@ -99,7 +102,7 @@ async function open(path, { reduced = false } = {}) {
       await page.waitForTimeout(1000); // the dev server is still starting
     }
   }
-  await page.getByRole("button", { name: "Start" }).click({ timeout: 60_000 }).catch(() => {}); // bots may start themselves
+  if (start) await page.getByRole("button", { name: "Start" }).click({ timeout: 60_000 }).catch(() => {}); // bots may start themselves
   return page;
 }
 const results = (page) => page.getByTestId("results").waitFor({ timeout: 180_000 });
@@ -174,6 +177,81 @@ for (const bot of ["perfect", "rank-c"]) {
   check(first?.landing === "end" && !first.rankTransform && first.rankOpacity === "1" && first.flies === 0, `${bot}: reduced motion's first frame after the mount is the end state (${JSON.stringify(first)})`);
   await rm.screenshot({ path: join(out, `landing-${bot}-reduced-motion-1280x720.png`) });
   await rm.close();
+}
+
+// 8: a record take (the test hook's, which is stored; a bot's isn't), skipped by a click at mount + 50 ms.
+{
+  const page = await open("/play?song=twinkle&input=test&beat=off&stage=off&idle=3600&x=results-landing", { start: false });
+  await page.evaluate(() => localStorage.removeItem("pianoArcade.records"));
+  await page.waitForFunction(() => window.__pianoArcade?.ready === true, null, { timeout: 60_000 });
+  const skipped = page.evaluate(
+    () =>
+      new Promise((done) => {
+        const go = () => {
+          const w = window.__landingWatch;
+          if (w.mount === null) return void setTimeout(go, 2);
+          setTimeout(() => {
+            const o = { bubbles: true, cancelable: true, button: 0, clientX: innerWidth / 2, clientY: innerHeight / 3 };
+            const el = document.elementFromPoint(o.clientX, o.clientY) ?? document.body;
+            el.dispatchEvent(new PointerEvent("pointerdown", o));
+            el.dispatchEvent(new MouseEvent("click", o));
+            requestAnimationFrame(() => {
+              const op = (id) => {
+                const e = document.querySelector(`[data-testid="${id}"]`);
+                return e ? getComputedStyle(e).opacity : null;
+              };
+              done({ newRecord: op("new-record"), initials: op("initials-entry"), sinceMount: Math.round(performance.now() - w.mount) });
+            });
+          }, Math.max(0, w.mount + 50 - performance.now()));
+        };
+        go();
+      }),
+  );
+  await page.evaluate(() => {
+    const c = window.__pianoArcade.chart;
+    const mpb = 60000 / c.bpm;
+    c.notes.forEach((n) => window.__pianoArcade.press(n.pitch, n.beat * mpb));
+  });
+  const s8 = await skipped;
+  check(s8.newRecord === "1" && s8.initials === "1", `a record take skipped at mount + 50 ms shows NEW RECORD and the initials on the next frame (${JSON.stringify(s8)})`);
+  await page.screenshot({ path: join(out, "landing-skip-record-1280x720.png") });
+  await page.close();
+}
+
+// 9: Esc at T0 + 20 ms, then a right press at mount + 50 ms, then Retry.
+{
+  const page = await open("/play?song=twinkle&bot=perfect&stage=off&idle=3600&x=results-landing");
+  const seen = page.evaluate(
+    () =>
+      new Promise((done) => {
+        const r = { escAt: null, pauseSeen: false, pressed: false };
+        const go = () => {
+          const w = window.__landingWatch;
+          if (document.querySelector('[data-testid="pause"]')) r.pauseSeen = true;
+          if (w.t0 !== null && r.escAt === null && performance.now() >= w.t0 + 20) {
+            r.escAt = Math.round(performance.now() - w.t0);
+            document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+          }
+          if (w.mount !== null && !r.pressed && performance.now() >= w.mount + 50) {
+            r.pressed = true;
+            const o = { bubbles: true, cancelable: true, button: 2, clientX: innerWidth / 2, clientY: innerHeight / 3 };
+            (document.elementFromPoint(o.clientX, o.clientY) ?? document.body).dispatchEvent(new PointerEvent("pointerdown", o));
+            return void setTimeout(() => done(r), 200);
+          }
+          setTimeout(go, 2);
+        };
+        go();
+      }),
+  );
+  const s9 = await seen;
+  check(s9.escAt !== null && !s9.pauseSeen, `Esc ${s9.escAt} ms after T0 never opens the pause menu (${JSON.stringify(s9)})`);
+  await page.getByRole("button", { name: "Retry" }).click({ timeout: 5000 });
+  const retried = await page.getByTestId("results").waitFor({ state: "detached", timeout: 3000 }).then(
+    () => true,
+    () => false,
+  );
+  check(retried, "after a right press mid-cut, the next click on Retry starts a new take");
+  await page.close();
 }
 
 // 5: without the flag, nothing changes.

@@ -5,6 +5,6 @@ Each hit's MIDI velocity is matched by pitch and placed within the take's own ra
 ## How to check it
 not verified locally; covered by CI. Unit tests: `vitest run src/game/touch-visible src/game/hit-particles` 19/19.
 ## Gaps
-- The energy-scaled wisps and dust wait on juice's call site (#761 holds `juice/index.ts`). The key light (`core/highway.ts`) is a follow-up.
+- The key light (`core/highway.ts`) is a follow-up. The energy-scaled wisps and dust landed after #761 closed: juice's `gpu.hit` passes each hit's touch. The 2D no-WebGL fallback stays unscaled.
 - Not measured, shipping on Eric's call to stop verification: the luma ratio (pp vs MISS, ff:pp) and perf.
 - Not seen by Eric.

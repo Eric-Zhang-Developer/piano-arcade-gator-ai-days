@@ -7,6 +7,8 @@ import { seededRandom } from "../sim/fake";
 import { alphaOf, spawn, step, type Particle } from "./particles";
 import { hitParticles, type HitParticles } from "../hit-particles/gl";
 import { impactT, stampKeyframes, stampSettings, stampStartMs } from "../rank-stamp";
+import { touchFor } from "../touch-visible";
+import type { Touch } from "../touch-visible/energy";
 
 export const juiceSettings = {
   clearMs: 500, // spec: effects never cover a note less than 500 ms from the line
@@ -38,7 +40,7 @@ export function juiceVisual(): GamePlugin {
   let chart: Chart | null = null;
   let particles: Particle[] = [];
   let lastNow: number | null = null;
-  let pending: { pitch: number; judgment: Judgment; color: string }[] = [];
+  let pending: { pitch: number; judgment: Judgment; color: string; touch?: Touch }[] = [];
   const flares: { pitch: number; atMs: number; bright: number; color: string }[] = [];
   const misses: { pitch: number; atMs: number }[] = [];
   const pressed = new Set<number>();
@@ -108,7 +110,7 @@ export function juiceVisual(): GamePlugin {
       if (e.type === "noteHit") {
         hitIds.add(e.noteId);
         const c = color(handOf.get(e.noteId) ?? "R");
-        pending.push({ pitch: e.pitch, judgment: e.judgment, color: c });
+        pending.push({ pitch: e.pitch, judgment: e.judgment, color: c, touch: touchFor(e.noteId) }); // touch-visible: mounted before juice
         flares.push({ pitch: e.pitch, atMs: e.atMs, bright: s.bright[e.judgment], color: c });
         if (pressed.has(e.pitch)) heldHits.set(e.pitch, c);
       }
@@ -162,7 +164,7 @@ export function juiceVisual(): GamePlugin {
       // New hits become wisps; held hit notes stream sparks.
       for (const h of pending) {
         const { x, width } = f.keyX(h.pitch);
-        if (gpu) gpu.hit(x, width, line, h.judgment, h.color);
+        if (gpu) gpu.hit(x, width, line, h.judgment, h.color, h.touch?.energy, h.touch?.wispOnly);
         else particles = spawn(particles, "wisp", s.wisps[h.judgment], x, width, line, s.bright[h.judgment], random, h.color);
       }
       pending = [];

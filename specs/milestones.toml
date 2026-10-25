@@ -258,6 +258,7 @@ features = [
   "learn-kit", # polish refill 4 (#947, #1279, #1280, #1281): /learn practice upright and square, 12 px floor, links
   "learn-a11y", # polish refill 4 (#1273-#1278): /learn's h1, planning status, focus, heard verdicts, chip titles
   "harmony-map", # Eric, 2026-10-25 (#1299): wow feeder; chords light triangles on the Tonnetz, every song a constellation, an experiment
+  "video-cards", # Eric, 2026-10-25 (#1306): the title played letter by letter and a true end card, the video's first and last frames, a #856 hero item
 ]
 cut = []
 

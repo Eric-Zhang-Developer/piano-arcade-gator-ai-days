@@ -13,6 +13,7 @@ type Strand = { knot: boolean; rank: number; x: number; y: number; vx: number; v
   dead: boolean; race: number; w: number; a: number; crisp: boolean; u: number; u2: number; ph: number; sp: number; off: number; dir: number };
 type Bloom = { x: number; y: number; r: number; t0: number; grow: number; life: number; seed: number };
 type Blob = { x: number; y: number; seed: number };
+type Turn = { page: HTMLElement; t0: number; cx: number; cy: number; left: number; top: number; rMax: number; seed: number };
 type Physics = { R: number; k: number; rel: number; amp: number; sw: number; rise: number; sc: number; fz: number; rot: number };
 
 export type InkEngine = {
@@ -22,6 +23,8 @@ export type InkEngine = {
   setZones(zones: Rect[]): void;
   /** A point the ink must follow closely (the guided entry), or null to let it go. */
   setGuide(guide: Point | null): void;
+  /** Opens the page through a hole in the ink, or with null ends an opening early. */
+  turn(page: HTMLElement | null): void;
   setColour(colour: string): void;
   setReduced(reduced: boolean): void;
   /** Runs or pauses the loop (the tab is hidden). */
@@ -39,12 +42,15 @@ const GAP = 24, FEATHER = 48, DIM = .8;
 const HOME = .15;
 /** The water the body sits in travels with it, so it drifts as one cloud instead of combing out a wake. */
 const CARRY = .85;
+/** A new page opens through the ink in this many seconds. */
+const TURN = .65;
 const ACT: Record<State, (m: number) => number> = { rest: m => 170 + 110 * m, gather: () => 290, speak: () => 300, burst: () => N, core: () => 260 };
 const VIS: Record<State, number> = { rest: 30, gather: 18, speak: 22, burst: 26, core: 10 };
 const AM: Record<State, number> = { rest: .8, gather: .9, speak: 1, burst: 1, core: 1.2 };
 const CH = [.3, .6, 1] as const;
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+const ease = (e: number) => e < .5 ? 4 * e * e * e : 1 - Math.pow(-2 * e + 2, 3) / 2;
 /** The ink holds long enough to read the line after it bleeds in: about 60ms a character on a 2s floor. */
 const holdMs = (text: string) => 2000 + 60 * text.length;
 
@@ -58,7 +64,7 @@ export function createInkEngine(cv: HTMLCanvasElement, line: HTMLElement): InkEn
   const MV = { x: 0, y: 0 };
   let blooms: Bloom[] = [], reduced = false, running = false, raf = 0, last = 0, colour = '#e2e6f0', rgb = '226,230,240';
   let pages: Rect[] = [], pagesKey = '', Z: Rect[] = [], zKey = '';
-  let guide: Point | null = null;
+  let guide: Point | null = null, PT: Turn | null = null;
   let seq = 0;
   const timers = new Set<ReturnType<typeof setTimeout>>();
   const later = (fn: () => void, ms: number) => { const id = setTimeout(() => { timers.delete(id); fn(); }, ms); timers.add(id); };
@@ -245,7 +251,7 @@ export function createInkEngine(cv: HTMLCanvasElement, line: HTMLElement): InkEn
   }
   /** Every few seconds a drop lands in open water and blooms; outer filaments leave the body for it, then race home. */
   function drop() {
-    if (!MC || ST !== 'rest' || guide) { nextDrop = T + 1; return; }
+    if (!MC || ST !== 'rest' || guide || PT) { nextDrop = T + 1; return; }
     nextDrop = T + 2.6 + rand() * 3.2;
     for (let i = 0; i < 16; i++) {
       const a = rand() * TAU, d = 130 + rand() * 300, x = MC.x + Math.cos(a) * d, y = MC.y + Math.sin(a) * d, r = 9 + rand() * 18;
@@ -271,10 +277,11 @@ export function createInkEngine(cv: HTMLCanvasElement, line: HTMLElement): InkEn
     const ox = MC ? MC.x : 0, oy = MC ? MC.y : 0;
     moveMass(dt, still);
     if (!MC) return;
-    // The water the body sits in travels with it, so it drifts as one cloud instead of combing out a wake.
+    // The water the body sits in travels with it, so it drifts as one cloud instead of combing out a wake. Carrying the
+    // student it moves fast and all of a piece, knot included, so nothing is left behind as a streak.
     const cdx = (MC.x - ox) * CARRY, cdy = (MC.y - oy) * CARRY;
-    if (!still && (cdx || cdy) && Math.abs(cdx) + Math.abs(cdy) < 40) for (const s of S) {
-      if (s.dead || s.knot) continue;
+    if (!still && (cdx || cdy) && (guide || Math.abs(cdx) + Math.abs(cdy) < 40)) for (const s of S) {
+      if (s.dead || (s.knot && !guide)) continue;
       s.x += cdx; s.y += cdy; const t = s.tr; for (let i = 0; i < TL * 2; i += 2) { t[i] += cdx; t[i + 1] += cdy; }
     }
     if (!still && T > nextDrop) drop();
@@ -284,8 +291,10 @@ export function createInkEngine(cv: HTMLCanvasElement, line: HTMLElement): InkEn
     veilR += ((ST === 'core' ? 14 + 18 * (1 - tight) : ST === 'speak' ? p.R * 1.05 : ST === 'gather' || guide ? 30 : 54) - veilR) * e;
     // The swirl turns over every half minute or so, so the body never settles into one spin.
     spin = Math.sin(T * .21 + 1.3) * .7 + Math.sin(T * .07) * .3;
-    // The knot sits in the core while the core is clear of the text, else just beside it.
-    KN = hub(MC.x, MC.y, 8) ?? { x: MC.x, y: MC.y };
+    // The knot sits in the core while the core is clear of the text, else just beside it; never out of the body, or it
+    // would draw a line across the screen to get there.
+    const kn = hub(MC.x, MC.y, 8);
+    KN = kn && Math.hypot(kn.x - MC.x, kn.y - MC.y) < Math.max(40, Rcur * .5) ? kn : { x: MC.x, y: MC.y };
     // Speaking: a few strands reach toward the words and stop short of them.
     const tip = TR && ST === 'speak' ? { x: SP.x < TR.left ? TR.left - GAP : TR.right + GAP, y: TR.top + TR.height / 2, h: Math.max(14, TR.height) } : null;
     const R = Rcur, R2 = R * R * 1.4 + 1;
@@ -321,7 +330,37 @@ export function createInkEngine(cv: HTMLCanvasElement, line: HTMLElement): InkEn
   function tick(dt: number, still: boolean) {
     m = Math.max(.12, m - .015 * dt / 60);
     visCur += (VIS[ST] - visCur) * Math.min(1, .1 * dt);
+    if (PT) { const e = (T - PT.t0) / TURN; if (e >= 1) finishTurn(); else applyTurn(ease(e)); }
     step(dt, still);
+  }
+
+  /* ---------- the page turn: the next page is seen through a hole that opens in the ink ---------- */
+  function holePts(r: number, ox = 0, oy = 0): [number, number][] {
+    const o: [number, number][] = [];
+    if (!PT) return o;
+    for (let i = 0; i < 48; i++) {
+      const a = i / 48 * TAU, rr = r * (1 + .07 * Math.sin(5 * a + PT.seed + T * 3) + .04 * Math.sin(9 * a + 2 * PT.seed));
+      o.push([PT.cx + ox + Math.cos(a) * rr, PT.cy + oy + Math.sin(a) * rr]);
+    }
+    return o;
+  }
+  function startTurn(page: HTMLElement) {
+    finishTurn();
+    if (reduced || !running || !W || !H) return;
+    const o = MC ?? { x: W / 2, y: H / 2 }, C = page.getBoundingClientRect();
+    // Only the screen needs to open: the hole is done once it clears the farthest corner of the viewport.
+    const rMax = Math.max(...[[0, 0], [W, 0], [0, H], [W, H]].map(([x, y]) => Math.hypot(x - o.x, y - o.y))) + 60;
+    PT = { page, t0: T, cx: o.x - C.left, cy: o.y - C.top, left: C.left, top: C.top, rMax, seed: rand() * 6 };
+    const b = hub(o.x, o.y, 55); if (b && Math.hypot(b.x - o.x, b.y - o.y) < 80) addBloom(b.x, b.y, 42);
+    applyTurn(0);
+  }
+  function applyTurn(e: number) {
+    if (!PT) return;
+    PT.page.style.clipPath = `polygon(${holePts(Math.max(.1, PT.rMax * e)).map(([x, y]) => `${x.toFixed(1)}px ${y.toFixed(1)}px`).join(',')})`;
+  }
+  function finishTurn() {
+    if (!PT) return;
+    PT.page.style.clipPath = ''; PT = null; measure();
   }
 
   /* ---------- drawing ---------- */
@@ -397,10 +436,21 @@ export function createInkEngine(cv: HTMLCanvasElement, line: HTMLElement): InkEn
       // A few crisp hairlines carry the detail on top of the washes.
       if (s.crisp) { strandPath(cx, s, Math.min(n - 1, 12), 0); cx.globalAlpha = Math.min(1, .75 * am); cx.lineWidth = .55; cx.stroke(); }
     }
-    // Dim, not erase: ink in the quiet fields keeps about a fifth of its strength.
-    if (mask.width && mask.height) {
+    // Dim, not erase: ink in the quiet fields keeps about a fifth of its strength. Carrying the student there is nothing
+    // to read (the map is flying past and the next page is not open yet), so the ink is drawn at full strength.
+    if (mask.width && mask.height && !guide) {
       cx.globalAlpha = DIM; cx.globalCompositeOperation = 'destination-out'; cx.drawImage(mask, 0, 0, W, H);
       cx.globalCompositeOperation = 'source-over'; cx.globalAlpha = 1;
+    }
+    // The hole's rim is inked, three rings that blur outward like a wet edge.
+    if (PT) {
+      const r = PT.rMax * ease(Math.min(1, (T - PT.t0) / TURN));
+      for (const [w, off, al] of [[2.5, 0, .85], [1.2, 5, .5], [.6, 11, .35]]) {
+        const pts = holePts(r + off, PT.left, PT.top);
+        cx.beginPath(); pts.forEach(([x, y], i) => i ? cx.lineTo(x, y) : cx.moveTo(x, y)); cx.closePath();
+        cx.globalAlpha = al; cx.lineWidth = w; cx.strokeStyle = colour; cx.stroke();
+      }
+      cx.globalAlpha = 1;
     }
   }
 
@@ -501,6 +551,7 @@ export function createInkEngine(cv: HTMLCanvasElement, line: HTMLElement): InkEn
       if (reduced) renderStill();
     },
     setGuide(g) { guide = g; if (reduced) renderStill(); },
+    turn(page) { if (page) startTurn(page); else finishTurn(); },
     setColour(c) {
       if (c === colour) return;
       colour = c;
@@ -508,10 +559,11 @@ export function createInkEngine(cv: HTMLCanvasElement, line: HTMLElement): InkEn
       if (parts && parts.length >= 3) rgb = parts.slice(0, 3).join(',');
       if (reduced) renderStill();
     },
-    setReduced(r) { reduced = r; if (r) { stopLoop(); renderStill(); } else startLoop(); },
-    setRunning(r) { running = r; if (r) startLoop(); else stopLoop(); },
+    setReduced(r) { reduced = r; if (r) { stopLoop(); finishTurn(); renderStill(); } else startLoop(); },
+    // A hidden tab never finishes a turn, so it ends at once rather than leave the page clipped.
+    setRunning(r) { running = r; if (r) startLoop(); else { stopLoop(); finishTurn(); } },
     cue,
     clearLine() { line.textContent = ''; delete line.dataset.writing; delete line.dataset.pending; measure(); if (reduced) renderStill(); },
-    destroy() { stopLoop(); for (const t of timers) clearTimeout(t); timers.clear(); },
+    destroy() { stopLoop(); finishTurn(); for (const t of timers) clearTimeout(t); timers.clear(); },
   };
 }

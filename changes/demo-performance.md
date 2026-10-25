@@ -1,0 +1,8 @@
+## What shipped
+The bot's demo of every library song plays the dynamics its cited score prints, on one ladder (pp 33 … ff 112, a hairpin one step, an accent or sf one step on its note), and 15 of the 20 songs sustain with a `pedal.json`: the printed Ped. marks where the score has them, else golden-demo's per-harmony rule. Legato is the written lengths the bot already holds (#809). Five batches: #857 (1), #879 (2), #868 (3), #957 (4), and Flower Dance (5, #820), which stays local and gitignored.
+## Where it lives
+`web/public/songs/*/pedal.json` and each chart's `velocity`; `web/src/game/pedal/library.json`; `game-tools/midi-to-chart/perform.py` and its README (every command, per song); `specs/decisions/demo-performance-pedal.md` and `-dynamics.md` (each song's source and choice).
+## How to check it
+`vitest run src/game/pedal src/game/songs src/game/dynamics src/game/scenes`: 81 passed, 1 skipped at 354ff1b (`library.json` matches the pedal files, each in order and inside its song; every velocity 1–127). `perform.py --self-test`: pass. Browser checks: not verified locally; covered by main's scheduled full run.
+## Gaps
+Not heard by Eric: no batch has been played on the DGX, and nothing here claims how one sounds. No pedal on twinkle and minuet-g (no left hand), or on burgmuller-arabesque, mountain-king and alla-turca (staccato scores; Burgmüller's is batch 3's default, put to Eric on #818). Open for Eric: chopin-prelude-4 keeps its MIDI-only dynamics layer until he picks printed marks or that (#815). Text *cresc.*/*dim.* markup isn't read by `perform.py dynamics`; the hairpins are. Flower Dance's pedal at bars 24, 41, 82 and 90 is one reading applied to all four (#820).

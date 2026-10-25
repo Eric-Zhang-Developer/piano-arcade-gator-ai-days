@@ -142,7 +142,12 @@ export function ResultsLayout({
               </div>
             </Brackets>
             <div className={styles.name}>
-              {title && <p className={styles.song}>{title}</p>}
+              {title && (
+                <h1 className={styles.song}>
+                  {title}
+                  <span className={styles.srOnly}>, rank {results.rank}</span>
+                </h1>
+              )}
               {composer && <MonoLabel style={{ fontSize: 14, letterSpacing: "0.3em" }}>{composer}</MonoLabel>}
               <p className={styles.extra}>
                 <MonoLabel>
@@ -173,7 +178,7 @@ export function ResultsLayout({
           </header>
         ) : (
           <>
-            {title && <p className={styles.song}>{title}</p>}
+            {title && <h1 className={styles.song}>{title}</h1>}
             <h2 data-testid="unscored" className={styles.unscored}>
               Learn: not scored
             </h2>

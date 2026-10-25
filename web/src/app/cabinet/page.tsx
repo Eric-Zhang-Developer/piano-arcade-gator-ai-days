@@ -8,6 +8,7 @@ import { cabinetSettings, demoResults, demoUrl, keyUrl, start, tick, timers, typ
 import type { CabinetMessage } from "../../game/cabinet/plugin";
 import { pickOutput } from "../../replay/piano";
 import { APP_NAME } from "@/game/app-name";
+import { Button } from "@/game/duo-tokens";
 
 const ALL_NOTES_OFF_CH1 = [0xb0, 123, 0];
 
@@ -64,6 +65,12 @@ export default function Cabinet() {
       e.preventDefault();
       go("laptop");
     };
+    // Mouse first (#772): a click anywhere but a button is a key press. The iframes take no pointer events, so this
+    // hears clicks in every phase, as onKey hears keys.
+    const onClick = (e: MouseEvent) => {
+      if (e.target instanceof Element && e.target.closest("button")) return;
+      go("laptop");
+    };
     const onMidi = (m: Event) => {
       const d = (m as MIDIMessageEvent).data;
       if (!d || (d[0] & 0xf0) !== 0x90 || d[2] === 0) return;
@@ -86,6 +93,7 @@ export default function Cabinet() {
       () => {},
     );
     window.addEventListener("keydown", onKey);
+    window.addEventListener("click", onClick);
     window.addEventListener("message", onMessage);
     const interval = setInterval(() => {
       const s = loopRef.current;
@@ -103,6 +111,7 @@ export default function Cabinet() {
       clearInterval(interval);
       inputs.forEach((i) => i.removeEventListener("midimessage", onMidi));
       window.removeEventListener("keydown", onKey);
+      window.removeEventListener("click", onClick);
       window.removeEventListener("message", onMessage);
     };
   }, []);
@@ -125,9 +134,9 @@ export default function Cabinet() {
           <p data-testid="press-any-key" style={press}>
             PRESS ANY KEY
           </p>
-          <button tabIndex={-1} style={kiosk} onClick={() => void document.documentElement.requestFullscreen?.().catch(() => {})}>
+          <Button kind="secondary" tabIndex={-1} style={kiosk} onClick={() => void document.documentElement.requestFullscreen?.().catch(() => {})}>
             Start kiosk
-          </button>
+          </Button>
         </>
       ) : (
         <iframe
@@ -159,22 +168,11 @@ const screen: CSSProperties = {
 const wordmark: CSSProperties = {
   margin: 0,
   fontFamily: "var(--pa-font-display), system-ui, sans-serif",
-  fontStyle: "italic",
-  fontWeight: 900,
+  fontWeight: 700, // Duo: upright, wide-tracked caps, as the select's wordmark
   fontSize: "clamp(48px, 9vw, 160px)",
   textTransform: "uppercase",
-  letterSpacing: "-0.02em",
+  letterSpacing: "0.08em",
 };
 const press: CSSProperties = { marginTop: "4vh", fontSize: "clamp(20px, 2.4vw, 40px)", fontWeight: 700, letterSpacing: "0.2em" };
-const kiosk: CSSProperties = {
-  position: "absolute",
-  right: 24,
-  bottom: 24,
-  padding: "6px 12px",
-  borderRadius: 6,
-  border: "none",
-  background: "var(--pa-panel)",
-  color: "var(--pa-ink)",
-  cursor: "pointer",
-};
+const kiosk: CSSProperties = { position: "absolute", right: 24, bottom: 24 }; // the kit's secondary Button, in the corner
 const frame: CSSProperties = { position: "absolute", inset: 0, width: "100%", height: "100%", border: 0, pointerEvents: "none" };

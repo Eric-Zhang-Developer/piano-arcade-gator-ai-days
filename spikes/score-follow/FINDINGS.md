@@ -9,6 +9,97 @@ GREAT window (50 ms) of a player whose tempo drifts? **Yes** needs, on Twinkle a
 jitter" player: median ≤ 25 ms and p95 ≤ 50 ms of |band send − press|, and both better than the same band on flow
 mode's own clock.
 
+## Second box: a Kalman follower (2026-10-25, eric-agent-7)
+The first box's recommendation, measured with the same harness, the same seed (519) and the same runs, against the
+same bar (median ≤ 25 ms, p95 ≤ 50 ms on the drift-with-jitter player), with flow's clock as the baseline.
+`kalmanFollower` in `follow.ts` is a Kalman filter whose state is the wall time of the last onset, the ms per beat
+and (order 3) its change per beat. Wall time is linear in that state between onsets, so the filter is exact: predict
+the next onset's wall time, measure the press. The first press fixes the phase, and a wide start variance on the
+tempo lets the second press set it. `band=follow` now runs it.
+
+**The answer: yes on Für Elise, half yes on Twinkle.**
+- **Für Elise, drift with jitter: median 15, p95 33.** Both clear the bar (it was 18 / 58).
+- **Twinkle, drift with jitter: median 15, p95 63.** The median clears the bar; p95 misses by 13 ms (it was 30 / 72).
+- Clean drift: Twinkle 5 / 21 (was 23 / 68), Für Elise 1 / 4 (was 4 / 6). Steady and stop are unchanged.
+- Flow's clock on the same runs is 147–363 ms behind, as before.
+
+| song | player | clock | n | median |ms| | p95 |ms| | max |ms| | signed median ms | hat spread (sd/mean) | past the stop |
+|---|---|---|---|---|---|---|---|---|---|
+| twinkle | steady | kalman | 66 | 0 | 1 | 150 | 0 | 0.039 | – |
+| twinkle | steady | follow | 66 | 0 | 0 | 150 | 0 | 0.040 | – |
+| twinkle | steady | hold | 66 | 147 | 159 | 160 | 147 | 0.013 | – |
+| twinkle | drift | kalman | 66 | 5 | 21 | 251 | -4 | 0.187 | – |
+| twinkle | drift | follow | 66 | 23 | 68 | 251 | 22 | 0.186 | – |
+| twinkle | drift | hold | 66 | 291 | 356 | 366 | 291 | 0.183 | – |
+| twinkle | drift+jitter | kalman | 66 | 15 | 63 | 224 | -7 | 0.187 | – |
+| twinkle | drift+jitter | follow | 66 | 30 | 72 | 224 | 16 | 0.188 | – |
+| twinkle | drift+jitter | hold | 66 | 284 | 354 | 356 | 284 | 0.184 | – |
+| twinkle | stop | kalman | 66 | 0 | 150 | 2250 | 0 | 0.395 | 0 |
+| twinkle | stop | follow | 66 | 0 | 150 | 2250 | 0 | 0.395 | 0 |
+| twinkle | stop | hold | 66 | 147 | 292 | 1914 | 143 | 0.348 | 0 |
+| fur-elise | steady | kalman | 132 | 0 | 0 | 114 | 0 | 0.001 | – |
+| fur-elise | steady | follow | 132 | 0 | 0 | 114 | 0 | 0.001 | – |
+| fur-elise | steady | hold | 132 | 267 | 271 | 271 | 267 | 0.011 | – |
+| fur-elise | drift | kalman | 132 | 1 | 4 | 193 | -1 | 0.157 | – |
+| fur-elise | drift | follow | 132 | 4 | 6 | 193 | 4 | 0.157 | – |
+| fur-elise | drift | hold | 132 | 363 | 391 | 393 | 363 | 0.165 | – |
+| fur-elise | drift+jitter | kalman | 132 | 15 | 33 | 167 | 3 | 0.157 | – |
+| fur-elise | drift+jitter | follow | 132 | 18 | 58 | 167 | 5 | 0.161 | – |
+| fur-elise | drift+jitter | hold | 132 | 212 | 274 | 285 | 212 | 0.163 | – |
+| fur-elise | stop | kalman | 132 | 0 | 0 | 3409 | 0 | 0.351 | 1 |
+| fur-elise | stop | follow | 132 | 0 | 0 | 3409 | 0 | 0.351 | 1 |
+| fur-elise | stop | hold | 132 | 259 | 267 | 2855 | 259 | 0.314 | 0 |
+
+(kalman: order 3, R = 17² ms², the sd of the scripted ±30 ms uniform jitter; q = 1. follow: the first box's mean
+follower. hold: flow's clock.)
+
+### Why order 3, not the planned two states
+`SF_SWEEP=1` prints the grid. Only q / R matters (R 10 with q 6 prints the same as R 25 with q 15). Median / p95 ms:
+
+| tune | twinkle drift | twinkle drift+jitter | fur-elise drift | fur-elise drift+jitter |
+|---|---|---|---|---|
+| order 2, R 10, q 15 | 13 / 43 | 25 / 70 | 5 / 7 | 19 / 48 |
+| order 2, R 10, q 30 | 10 / 35 | 34 / 73 | 3 / 5 | 21 / 51 |
+| order 2, R 17, q 30 | 12 / 41 | 26 / 68 | 5 / 7 | 19 / 48 |
+| order 3, R 17, q 0.5 | 8 / 21 | 16 / 66 | 3 / 6 | 14 / 32 |
+| **order 3, R 17, q 1** | **5 / 21** | **15 / 63** | **1 / 4** | **15 / 33** |
+| order 3, R 17, q 2 | 3 / 21 | 19 / 60 | 1 / 3 | 16 / 36 |
+| order 3, R 17, q 4 | 2 / 20 | 23 / 68 | 0 / 3 | 16 / 39 |
+
+Two states still trade one failure for the other. A q that tracks the accelerating player lets every press's jitter
+through, and a q that filters the jitter lags the drift. The third state carries the acceleration, so a low q
+filters jitter without the lag. Order 3 at q 1 is the best on Twinkle's jittered median and close to the best p95
+(60 at q 2, which costs Twinkle's median and Für Elise's p95).
+
+Letting the band enter only after two presses (so it never plays the second onset on the chart's tempo) was also
+tried. It made every jittered p95 worse: the band's first beats then went out late, as a burst. It is not kept.
+
+### Where Twinkle's p95 comes from
+From a per-onset dump (not committed), there is no one bad spot: errors of 40–75 ms are spread over the song. The
+second onset (−224 ms, before any tempo is known) is the largest. Twinkle gives one press per beat. Each press is
+±30 ms off the player's intended beat, and the scripted tempo moves about 1.2% a beat, so a filter has few samples
+to average before the tempo moves on. Für Elise's eighth notes give it twice the samples, and it clears the bar.
+For scale: a band exactly on the intended beat would measure p95 about 28 ms against this jitter (first box). The
+filter's own prediction error adds the rest.
+
+### Browser check
+`verify-follow.mjs` through `verify.py`, once, at a5b12c0 with the Kalman follower: "pass, 74 band notes on channels
+2 and 10, hi-hat asynchrony median 11.4 ms over 42 presses (max 203.7; 42 on script), All Notes Off on both after
+the song". It's a steady 80% player, so this checks the plumbing in the browser, not the drift result. The first
+box's run measured 28.6 ms, but 5 of its 42 presses were off script, so the two medians aren't a like-for-like
+comparison. (A plain `verify.py` without `--cmd` ran the core check first, which passed 42/42 PERFECT. That is
+not verify-follow.)
+
+### Recommendation: promote to Eric's listen; no more estimator boxes
+- The estimator question is answered as far as scripted players can answer it. It is better than the first box on
+  every drifting run and never worse. Für Elise clears the bar. Twinkle misses p95 by 13 ms, on a player who moves
+  ±30 ms on every press and 50% in tempo over 42 notes.
+- Whether 63 ms at p95 on that player is audible is a question for the piano, not the harness. The next step is
+  Eric's listen below, with `band=follow` (now the Kalman follower) against `band=hold`.
+- Kill it if he hears the band pulling him or lagging. Promote it to a feature spec if he hears it play with him.
+
+## The first box (05:40–06:10 ET)
+
 ## The answer: no, by the bar; yes against the baseline
 - **Twinkle, drift with jitter: median 30, p95 72.** Both miss (25 and 50).
 - **Für Elise, drift with jitter: median 18, p95 58.** The median passes; p95 misses.
@@ -99,11 +190,11 @@ locally through `verify.py`, twice:
   1's dump the presses that kept time were within ±40 ms of their hi-hats), but that reading isn't proven.
 
 ## Eric's listen
-Pending. On the DGX, about 5 minutes: Twinkle in Flow, `band=follow` then `band=hold`
+Pending. `band=follow` is the Kalman follower since the second box. On the DGX, about 5 minutes: Twinkle in Flow, `band=follow` then `band=hold`
 (`/play?song=twinkle&mode=flow&band=follow`, then `&band=hold`), once steady and once speeding up. One line each:
 does the band play with you, and which is better? No claim about sound is made here.
 
-## Recommendation: iterate
+## Recommendation (first box): iterate
 One more time box, on the predictor only, with this harness as the bar:
 1. A two-state estimator (phase and tempo, a small Kalman or alpha-beta filter) instead of a mean plus a full phase
    jump, so jitter is averaged out and steady acceleration is still tracked. The sweep says neither half alone does it.

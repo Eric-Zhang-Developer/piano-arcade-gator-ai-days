@@ -7,7 +7,7 @@ import type { Chart, GameEvent, InputDevice, InputEvent } from "../../contracts"
 import { msPerBeat } from "../core/settings";
 import { onsetsOf } from "../flow-mode/clock";
 import { FlowJudge } from "../flow-mode/judge";
-import { bandEvents, follower, followSettings, scheduler, silence, specTune, type Tune } from "./follow";
+import { bandEvents, follower, followSettings, kalmanFollower, kalmanTune, scheduler, silence, specTune, type KalmanTune, type Tune } from "./follow";
 import { scoreFollow } from ".";
 
 const song = (id: string): Chart => JSON.parse(readFileSync(`public/songs/${id}/chart.json`, "utf8"));
@@ -93,9 +93,17 @@ const endOf = (chart: Chart, presses: Press[]) => Math.max(...presses.map((p) =>
 
 // The predicting clock, as the plugin runs it: each frame, the onsets pressed by now are played at their press times,
 // then the lookahead is filled.
+type Clock = Pick<ReturnType<typeof follower>, "played" | "wallAt">;
 function runFollow(chart: Chart, presses: Press[], tune: Tune = specTune): Sent[] {
+  return runClock(chart, presses, (beats) => follower(chart, beats, 1, tune));
+}
+// The two-state follower, through the same loop.
+function runKalman(chart: Chart, presses: Press[], tune: KalmanTune = kalmanTune): Sent[] {
+  return runClock(chart, presses, (beats) => kalmanFollower(chart, beats, 1, tune));
+}
+function runClock(chart: Chart, presses: Press[], make: (beats: number[]) => Clock): Sent[] {
   const beats = onsetsOf(chart).map((o) => o.ms / msPerBeat(chart.bpm));
-  const f = follower(chart, beats, 1, tune);
+  const f = make(beats);
   const sched = scheduler(bandEvents(chart), beats[0]);
   const first = [...firstPresses(presses).entries()].sort((a, b) => a[1] - b[1]);
   const sent: Sent[] = [];
@@ -182,14 +190,14 @@ describe("score follow: the measurement", () => {
       for (const [name, play] of Object.entries(PLAYERS)) {
         const presses = play(chart);
         const stop = name === "stop" ? stopAt(onsetsOf(chart).length) : null;
-        for (const [clock, run] of [["follow", runFollow], ["hold", runHold]] as const) {
+        for (const [clock, run] of [["kalman", runKalman], ["follow", runFollow], ["hold", runHold]] as const) {
           const m = measure(chart, presses, run(chart, presses), stop);
           rows.push(`| ${id} | ${name} | ${clock} | ${m.n} | ${fmt(m.median)} | ${fmt(m.p95)} | ${fmt(m.max)} | ${fmt(m.signed)} | ${fmt(m.spread, 3)} | ${fmt(m.past)} |`);
         }
       }
     }
     process.stdout.write(`\nscore-follow measurement (seed ${SEED}, frame ${FRAME} ms, lookahead ${followSettings.lookaheadMs} ms)\n${rows.join("\n")}\n\n`);
-    expect(rows.length).toBe(2 + 2 * 4 * 2);
+    expect(rows.length).toBe(2 + 2 * 4 * 3);
   });
 });
 
@@ -208,9 +216,28 @@ describe.skipIf(!process.env.SF_SWEEP)("score follow: the variant sweep", () => 
   });
 });
 
+describe.skipIf(!process.env.SF_SWEEP)("score follow: the Kalman sweep", () => {
+  it("prints the two-state follower's numbers per tune", () => {
+    const rows: string[] = [];
+    for (const pressSdMs of [10, 17])
+      for (const [order, drifts] of [[2, [15, 30]], [3, [0.25, 0.5, 1, 2, 4]]] as const)
+      for (const drift of drifts) {
+        const cells = Object.entries(SONGS).flatMap(([, chart]) =>
+          ["steady", "drift", "drift+jitter"].map((name) => {
+            const presses = PLAYERS[name](chart);
+            const m = measure(chart, presses, runKalman(chart, presses, { ...kalmanTune, order, pressSdMs, drift }), null);
+            return `${fmt(m.median)}/${fmt(m.p95)}`;
+          }),
+        );
+        rows.push(`order ${order} R ${pressSdMs} q ${drift} | ${cells.join(" | ")}`);
+      }
+    process.stdout.write(`kalman: twinkle steady | drift | drift+jitter | fur-elise steady | drift | drift+jitter (median/p95)\n${rows.join("\n")}\n`);
+  });
+});
+
 describe("score follow: the plumbing", () => {
   for (const [id, chart] of Object.entries(SONGS))
-    for (const [clock, run] of [["follow", runFollow], ["hold", runHold]] as const)
+    for (const [clock, run] of [["kalman", runKalman], ["follow", runFollow], ["hold", runHold]] as const)
       it(`${id}, ${clock}: nothing on channel 1, and every note-on has its note-off`, () => {
         const sent = run(chart, PLAYERS["drift+jitter"](chart));
         expect(sent.length).toBeGreaterThan(0);
@@ -224,10 +251,10 @@ describe("score follow: the plumbing", () => {
         expect([...open.entries()].filter(([, n]) => n !== 0)).toEqual([]);
       });
 
-  it("the band waits at your next note: nothing more than waitBeats past it until you play it", () => {
+  it.each([["mean", follower], ["kalman", kalmanFollower]] as const)("%s: the band waits at your next note: nothing more than waitBeats past it until you play it", (_, make) => {
     const chart = SONGS.twinkle;
     const beats = onsetsOf(chart).map((o) => o.ms / msPerBeat(chart.bpm));
-    const f = follower(chart, beats);
+    const f = make(chart, beats);
     f.played(0, 0);
     f.played(1, 600);
     expect(f.beatAt(1e6)).toBeCloseTo(beats[2] + followSettings.waitBeats);

@@ -4,7 +4,7 @@
 import type { Chart, GamePlugin, InputDevice } from "../../contracts";
 import { msPerBeat } from "../core/settings";
 import { isFlowMode, onsetsOf } from "../flow-mode/clock";
-import { bandEvents, follower, followSettings, scheduler, silence, type Follower } from "./follow";
+import { bandEvents, followSettings, kalmanFollower, scheduler, silence, type Follower } from "./follow";
 
 type Band = "off" | "follow" | "hold";
 
@@ -73,7 +73,7 @@ export function scoreFollow(): GamePlugin {
     onEvent(e) {
       if (band === "off" || !chart) return;
       if (e.type === "songStart") {
-        f = follower(chart, beats);
+        f = kalmanFollower(chart, beats);
         sched = scheduler(bandEvents(chart), beats[0]);
         send([0xc0 | followSettings.bassChannel, followSettings.bassProgram]);
         running = true;

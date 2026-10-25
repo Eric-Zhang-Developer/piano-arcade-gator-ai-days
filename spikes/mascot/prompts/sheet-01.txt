@@ -1,0 +1,4 @@
+The image: a character model sheet of an original cartoon alligator mascot, a calm, slightly dapper piano teacher who encourages and never hypes. Three views side by side on one canvas, left to right: front view, three-quarter view, side view, each the same scale, about two-thirds of the body visible (head to mid-thigh), evenly spaced with clear empty space between them.
+Style: flat vector illustration, monoline dark ink outline of even weight, exactly 4 flat colors: muted sage green skin (#6f8f5e), cream belly and snout underside (#efe6cf), near-black ink (#16130f) for outline and eyes, and one small bright blue bow tie (#2b9bff). No gradients, no shading, no shine, no texture, no text, no logos.
+Background: fully transparent PNG (alpha), no ground shadow.
+Must NOT resemble the University of Florida's Albert mascot: no orange, no jersey, no sports uniform, no letters.

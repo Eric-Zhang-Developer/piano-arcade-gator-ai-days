@@ -178,6 +178,7 @@ features = [
   "duo-details", # Eric, 2026-10-25 (#833): the results screen's Details grid in the Duo look, settings in Options
   "play-modes", # Eric, 2026-10-25 (#835): Learn, Flow and Perform as a ladder; practice keeps your mode (#832)
   "demo-performance", # Eric, 2026-10-25 (#814): sustain, dynamics and legato for every demo, five songs a batch
+  "results-landing", # Eric, 2026-10-25 (#959): one deep polish pass on the 3 s from the last note to the rank
   "laptop-sound",
   "flow-mode",
   "duo-tokens",
@@ -215,6 +216,8 @@ features = [
   "song-pack-7", # Eric, 2026-10-25 (#849): five famous Medium to Medium-hard pieces
   "song-pack-8", # Eric, 2026-10-25 (#849): five Medium-hard to Expert showpieces
   "song-finder", # Eric, 2026-10-25 (#850): sort by level, composer or recently played, and filter, at about 40 songs
+  "main-page", # Eric, 2026-10-25 (#851): "we would have to redo our main page"; the select laid out for 40 songs
+  "video-shots", # Eric, 2026-10-25 (#852): visuals for the hackathon video; a shot list, two cards, capture clean
 ]
 cut = []
 

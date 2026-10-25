@@ -66,6 +66,19 @@ Sources whose licenses ask for credit. Each chart's `source` field names its sou
   excerpt (bars 1–14 and bar 15's first eighth, to the A minor cadence) converted to a chart, with the ornaments
   charted as their main notes; the chart is shared under the same license.
 
+- **Hot Cross Buns**, **Mary Had a Little Lamb** and **London Bridge Is Falling Down** (traditional),
+  `web/public/songs/hot-cross-buns/`, `mary-lamb/` and `london-bridge/`: compiled from the LilyPond scores in
+  Wikipedia, "Hot Cross Buns (song)" revision 1380991341
+  (<https://en.wikipedia.org/w/index.php?title=Hot_Cross_Buns_(song)&oldid=1380991341>), Italian Wikipedia, "Mary had
+  a little lamb" revision 150827858 (<https://it.wikipedia.org/w/index.php?title=Mary_had_a_little_lamb&oldid=150827858>),
+  and Wikipedia, "London Bridge Is Falling Down" revision 1381574731
+  (<https://en.wikipedia.org/w/index.php?title=London_Bridge_Is_Falling_Down&oldid=1381574731>), whose text is
+  licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The melodies are public domain; as with
+  Twinkle, they're credited because the license may reach the transcription. Changes: each melody converted to a
+  chart, Hot Cross Buns' "Alternative" tune only ([decision](specs/decisions/song-pack-9-sources.md)).
+- **Frère Jacques** (traditional), `web/public/songs/frere-jacques-solo/`: the round's chart above, copied under a new
+  id; same source and license.
+
 ## Spikes
 
 - **Twelve Variations on "Ah vous dirai-je, Maman", K. 265** (Wolfgang Amadeus Mozart), `spikes/twinkle-13/out/`

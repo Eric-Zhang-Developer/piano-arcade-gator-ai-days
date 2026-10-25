@@ -52,7 +52,7 @@ access can set it, so an unlabeled request is only an idea.
 - Claim it with a draft PR titled `chore(song-requests): chart <piece>` with `Closes #<n>`, then follow
   `specs/features/song-requests/spec.md`: a source decision 003 lets you commit, the converter, the library test.
 - A request adds one chart, nothing else: no game code, no new scope, no notes from memory. A credit the source asks
-  for goes in `CREDITS.md` through a `docs:` PR.
+  for goes in `CREDITS.md` through a `docs:` PR (a `feat(song-pack-<n>)` PR appends its own; see below).
 - No allowed source, or the piece is unclear? Comment what you searched, label it `needs-info`, and switch.
 
 ## The database
@@ -108,6 +108,10 @@ files. A feature's person is its spec's `assignee` up to the first `-` (`eric`, 
 `eric-foreman-agent` are all `eric`); an empty `assignee` is no lane, so no widening. `check_ownership.py` checks the
 lane, not GitHub: checking for an open PR on those files (`gh pr list`, then its files) is on you. A path an in-flight
 feature of another lane owns stays closed: cross-lane changes still need the owner's own PR.
+**Mounts and credits ride along.** A game-lane (`eric`) `feat`/`fix(<slug>)` PR may add its own mount to
+`web/src/app/layout.tsx`, `web/src/app/page.tsx` or `web/src/game/layers.ts`, whoever owns them: at most 4 added and
+2 removed lines per file, or the owner rule applies. A `feat(song-pack-<n>)` PR may append its credits to
+`CREDITS.md` (no removed lines). Both are checked by `check_ownership.py`.
 
 ## When something needs a person
 - Could running something answer it (a script, a throwaway prototype in a scratch dir)? Then run it instead of asking.

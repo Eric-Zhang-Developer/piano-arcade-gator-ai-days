@@ -23,12 +23,14 @@ SPECS = {
     "old-game": spec("old-game", "eric", "web/src/app/"),  # done, and broader than takes below
     "takes": spec("takes", "sharan", "web/src/app/api/takes/"),
     "nobody": spec("nobody", "", "tools/rip/"),
+    "shell": spec("shell", "", "web/src/app/layout.tsx"),  # in flight, no lane: the lane rule alone keeps it closed
+    "song-pack-9": spec("song-pack-9", "eric", "web/public/songs/x/"),
 }
 DONE = {"old-game"}
 
 
-def ok(title, path):
-    return check_ownership.allowed(title, CFG, SPECS, {}, DONE)[0](path)
+def ok(title, path, stat=None):
+    return check_ownership.allowed(title, CFG, SPECS, {}, DONE, stat=stat)[0](path)
 
 
 class Lane(unittest.TestCase):
@@ -62,6 +64,39 @@ class Lane(unittest.TestCase):
     def test_a_lane_mates_spec_folder_and_done_note_stay_closed(self):
         self.assertFalse(ok("feat(hud): x", "specs/features/juice/spec.md"))
         self.assertFalse(ok("feat(hud): x", "changes/juice.md"))
+
+
+LAYOUT = "web/src/app/layout.tsx"
+
+
+class Mount(unittest.TestCase):
+    def test_a_small_mount_passes_for_the_game_lane(self):
+        self.assertTrue(ok("feat(hud): x", LAYOUT, {LAYOUT: (4, 2)}))
+        self.assertTrue(ok("fix(juice): x", LAYOUT, {LAYOUT: (1, 0)}))
+
+    def test_over_the_limit_falls_back_to_the_owner_rule(self):
+        self.assertFalse(ok("feat(hud): x", LAYOUT, {LAYOUT: (5, 0)}))
+        self.assertFalse(ok("feat(hud): x", LAYOUT, {LAYOUT: (1, 3)}))
+        self.assertFalse(ok("feat(hud): x", LAYOUT))  # no numstat, no mount
+
+    def test_another_lane_gets_no_mount(self):
+        self.assertFalse(ok("feat(takes): x", LAYOUT, {LAYOUT: (1, 0)}))
+        self.assertFalse(ok("feat(nobody): x", LAYOUT, {LAYOUT: (1, 0)}))
+
+    def test_only_the_three_paths(self):
+        self.assertFalse(ok("feat(hud): x", "web/src/contracts/chart.ts", {"web/src/contracts/chart.ts": (1, 0)}))
+        self.assertFalse(ok("feat(hud): x", "supabase/a.sql", {"supabase/a.sql": (1, 0)}))
+
+
+class Credits(unittest.TestCase):
+    def test_a_song_pack_appends_credits(self):
+        self.assertTrue(ok("feat(song-pack-9): x", "CREDITS.md", {"CREDITS.md": (12, 0)}))
+
+    def test_a_credits_deletion_fails(self):
+        self.assertFalse(ok("feat(song-pack-9): x", "CREDITS.md", {"CREDITS.md": (3, 1)}))
+
+    def test_other_features_still_need_docs(self):
+        self.assertFalse(ok("feat(hud): x", "CREDITS.md", {"CREDITS.md": (1, 0)}))
 
 
 if __name__ == "__main__":

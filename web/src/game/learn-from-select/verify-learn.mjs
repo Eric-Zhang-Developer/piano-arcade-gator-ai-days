@@ -79,6 +79,7 @@ await home();
 const ids = await page.locator("ol a").evaluateAll((as) => as.map((a) => new URL(a.href).searchParams.get("song")));
 // L, W and E are listed on the ? card, behind the select's "Controls" link (mouse-first): one line each, its key alone
 // in the chip and the word in the line, so the check reads the keys, not one exact string.
+await page.getByTestId("options-open").click(); // select-calm (#1411): Controls moved into Options
 await page.getByTestId("help-link").click();
 await page.getByTestId("help").waitFor({ timeout: 10_000 });
 const lines = await page

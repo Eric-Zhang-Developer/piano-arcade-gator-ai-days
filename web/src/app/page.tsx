@@ -3,6 +3,8 @@ import { join } from "node:path";
 import { AccountChip } from "@/app/auth/AccountChip";
 import { BuildStamp } from "@/game/build-stamp";
 import { FirstRunLink } from "@/game/first-run";
+import { HelpLink } from "@/game/help-overlay";
+import { ConnectLights, DemoLights, LightBrightness, LightColors } from "@/game/leds";
 import { LabLink } from "@/game/lab/LabLink";
 import { OptionsDrawer } from "@/game/options-panel";
 import { MusicSelect } from "@/game/select-layout";
@@ -26,7 +28,16 @@ export default function Home() {
         corner={<BuildStamp />}
         footer={
           <>
-            <OptionsDrawer recording={recording} />
+            {/* select-calm (#1411): Controls and the lights live in Options, off the top band. */}
+            <OptionsDrawer recording={recording}>
+              <HelpLink />
+              <span style={{ display: "flex" }}>
+                <ConnectLights />
+                <DemoLights />
+              </span>
+              <LightColors />
+              <LightBrightness />
+            </OptionsDrawer>
             <FirstRunLink />
             <LabLink />
           </>

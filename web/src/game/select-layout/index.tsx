@@ -22,7 +22,6 @@ import type { Song } from "../song-select/load";
 import { goToStage } from "./go-to-stage";
 import styles from "./select-layout.module.css";
 import { APP_NAME } from "../app-name";
-import { HelpLink } from "../help-overlay";
 import { Finder, useFinder } from "../song-finder/Finder";
 import { readLastPlayed } from "../song-finder";
 import { sectionsOf } from "../main-page";
@@ -139,12 +138,11 @@ export function MusicSelect({ songs, footer, corner }: { songs: Song[]; footer?:
   const playHref = (id: string) => withOptions(withLevel(`/play?song=${id}`, level), options[id]);
   const learnHref = (id: string) => withOptions(withLevel(learnUrl(id), level), options[id]);
   return (
-    <main className={styles.screen}>
+    <main className={styles.screen} data-select>
       <header className={styles.top}>
         <h1 className={styles.wordmark}>{APP_NAME}</h1>
         <div className={styles.corner}>
           {corner}
-          <HelpLink />
         </div>
       </header>
       <div className={styles.left}>

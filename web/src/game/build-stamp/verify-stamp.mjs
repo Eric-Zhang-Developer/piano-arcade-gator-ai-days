@@ -60,7 +60,7 @@ try {
     const page = await browser.newPage({ viewport: { width: w, height: h } });
     const errors = [];
     page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
-    await page.goto(base);
+    await page.goto(`${base}/?debug=1`); // select-calm (#1411): the stamp shows in debug mode only
     const stamp = page.getByTestId("build-stamp");
     await page.waitForFunction(() => /old/.test(document.querySelector('[data-testid="build-stamp"]')?.textContent ?? ""), null, { timeout: 30_000 });
     const text = await stamp.textContent();
@@ -84,7 +84,7 @@ try {
     await page.close();
   }
   const cap = await browser.newPage({ viewport: { width: 1280, height: 720 } });
-  await cap.goto(`${base}/?capture=1`);
+  await cap.goto(`${base}/?debug=1&capture=1`); // capture hides it even in debug mode
   await cap.waitForFunction(() => document.documentElement.hasAttribute("data-capture"), null, { timeout: 30_000 });
   if (await cap.getByTestId("build-stamp").isVisible()) fail.push("?capture=1: the stamp is still visible");
   if (fail.length) throw new Error(fail.join("; "));

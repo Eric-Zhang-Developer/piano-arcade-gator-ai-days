@@ -105,3 +105,9 @@
   outline: none;
   scroll-snap-align: start;
 }
+
+/* select-calm (#1411): on /, the Lights chip lives in Options, so the band keeps only the wordmark. The floating one
+   stays mounted (leds/everywhere.tsx keeps the ripples on every page) and is only hidden here. */
+:global(body:has(main[data-select])) :global([data-testid="lights-everywhere"]) {
+  display: none !important;
+}

@@ -118,7 +118,10 @@ export function HelpLink() {
     <button
       type="button"
       className={styles.link}
-      onClick={() => window.dispatchEvent(new Event(OPEN))}
+      onClick={(e) => {
+        e.currentTarget.closest("dialog")?.close(); // in the Options drawer on / (select-calm): the card opens over the page
+        window.dispatchEvent(new Event(OPEN));
+      }}
       aria-keyshortcuts="?"
       title="Controls (?)"
       data-capture-hide

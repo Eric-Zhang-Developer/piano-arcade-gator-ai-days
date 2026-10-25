@@ -1,6 +1,12 @@
 /* Quiet on purpose: body face, ink-dim, no panel. In /'s top band, beside Controls (select-layout's corner), so it
-   never stacks on the Lights button; bottom-right covers the song list (specs/decisions/build-stamp-corner.md). */
+   never stacks on the Lights button; bottom-right covers the song list (specs/decisions/build-stamp-corner.md).
+   Debug mode only (select-calm, #1411): /?debug=1 shows it; a player's band stays clean. */
 .stamp {
+  display: none;
+}
+
+:global(html[data-debug]) .stamp {
+  display: block;
   color: var(--pa-ink-dim);
   font: clamp(12px, 1.3vh, 14px) system-ui, sans-serif;
 }

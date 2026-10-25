@@ -9,7 +9,7 @@ Five Medium to Medium-hard songs, charted from Mutopia (all Public Domain) with 
 | `moment-musical-3` | bars 1–34, to the second double bar | Allegro moderato · 80 · 80 | 438 (206+232) | C2–B♭5 | 9 |
 | `debussy-arabesque-1` | bars 1–38, the E major section | Andantino con moto · 144 · 120 | 515 (219+296) | E1–F♯6 | 11 |
 
-- **Levels:** the library's Medium songs sit at 5–7 (moonlight-1 5, fur-elise 7); its Medium-hard ones at 8–12 (mountain-king 8, entertainer 12). The prelude, the Raindrop and the Pathétique land with the Medium songs, the Arabesque with the Medium-hard. The Moment musical (9), meant as Medium, lands with the Medium-hard.
+- **Levels:** the library's Medium songs are 4–7 (bach-prelude-c 4, moonlight-1 and gnossienne-1 5, mozart-545-1 and gymnopedie-1 6, fur-elise 7). Its Medium-hard songs are 3, 8 and 12 (clair-de-lune, mountain-king, entertainer). The prelude, the Raindrop and the Pathétique sit with the Medium songs. The Moment musical (9), meant as Medium, lands above them, and the Arabesque (11) sits between mountain-king and the Entertainer. Reported, not retuned.
 - **Tempo:** no source prints a metronome number. Four charts use the MIDI's own tempo; the Arabesque is under it, as the pack's Medium-hard. Eric tunes each `bpm` on the piano.
 - **Note check:** each chart was diffed against its LilyPond score note by note, with a LilyPond engraver listing every struck head:
   - two match exactly;

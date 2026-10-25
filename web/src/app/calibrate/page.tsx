@@ -6,7 +6,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { beatSettings } from "../../game/beat";
 import { calibrate, calibrationSettings, clickTimes, type Calibration } from "../../game/calibration";
 import { midiDevice } from "../../game/core/input";
-import { loadLatencyOffset, saveLatencyOffset, settings } from "../../game/core/settings";
+import { loadLatencyOffset, saveLatencyOffset } from "../../game/core/settings";
+import { Brackets, Button, MonoLabel, Panel } from "../../game/duo-tokens";
+import css from "./calibrate.module.css";
 
 const SIDE_STICK = 37; // beat-track's click: General MIDI side stick on channel 10
 
@@ -99,44 +101,55 @@ function Calibrate() {
 
   const s = calibrationSettings;
   return (
-    <main style={page} data-testid="calibrate" data-clicks={phase.kind === "running" ? phase.clicks.join(",") : undefined}>
-      <h1 style={{ margin: 0, fontSize: 32 }}>Calibrate latency</h1>
-      {phase.kind === "ready" && (
-        <>
-          <p style={text}>
-            Tap any key, or any piano key, on each of {s.clicks} clicks. The first {s.settleClicks} are for settling in.
-            Your taps set the latency offset {"/play"} uses.
-          </p>
-          <p style={dim}>Saved offset now: {saved} ms</p>
-          <button style={button} onClick={start} autoFocus>
-            Start
-          </button>
-        </>
-      )}
-      {phase.kind === "running" && (
-        <>
-          <p style={text}>Tap along</p>
-          <div style={{ display: "flex", gap: 10 }} aria-label={`${heard} of ${s.clicks} clicks`}>
-            {phase.clicks.map((c, i) => (
-              <span
-                key={c}
-                style={{
-                  width: 18,
-                  height: 18,
-                  borderRadius: 9,
-                  background: i < heard ? (i < s.settleClicks ? "var(--pa-ink-dim)" : settings.noteColor) : "rgba(242,242,245,0.12)",
-                }}
-              />
-            ))}
+    <main className={css.page} data-testid="calibrate" data-clicks={phase.kind === "running" ? phase.clicks.join(",") : undefined}>
+      <Brackets style={{ padding: 0 }}>
+        <Panel>
+          <div className={css.panel}>
+            <h1 className={css.title}>Calibrate latency</h1>
+            {phase.kind === "ready" && (
+              <>
+                <p className={css.text}>
+                  Tap any key, or any piano key, on each of {s.clicks} clicks. The first {s.settleClicks} are for settling
+                  in. Your taps set the latency offset {"/play"} uses.
+                </p>
+                <Clicks count={s.clicks} settle={s.settleClicks} heard={0} />
+                <div className={css.row}>
+                  <Button onClick={start} autoFocus style={kitSize}>
+                    Start
+                  </Button>
+                  <div className={css.cell}>
+                    <MonoLabel style={{ fontSize: "0.7em" }}>Saved offset now</MonoLabel>
+                    <span className={css.numeral}>{saved} ms</span>
+                  </div>
+                </div>
+              </>
+            )}
+            {phase.kind === "running" && (
+              <>
+                <p className={css.text}>Tap along</p>
+                <Clicks count={phase.clicks.length} settle={s.settleClicks} heard={heard} />
+              </>
+            )}
+            {phase.kind === "done" && <Result result={phase.result} onRetry={start} />}
+            {midiStatus && <p className={css.status}>{midiStatus}</p>}
+            <Link href="/" className={css.back}>
+              Back to songs
+            </Link>
           </div>
-        </>
-      )}
-      {phase.kind === "done" && <Result result={phase.result} onRetry={start} />}
-      {midiStatus && <p style={{ ...dim, fontSize: 13 }}>{midiStatus}</p>}
-      <Link href="/" style={{ color: settings.noteColor }}>
-        Back to songs
-      </Link>
+        </Panel>
+      </Brackets>
     </main>
+  );
+}
+
+// The clicks as square cells, the settling ones set apart: empty before Start, lit as each is heard.
+function Clicks({ count, settle, heard }: { count: number; settle: number; heard: number }) {
+  return (
+    <div className={css.clicks} aria-label={`${heard} of ${count} clicks`}>
+      {Array.from({ length: count }, (_, i) => (
+        <span key={i} className={css.click} data-settle-end={i === settle - 1 || undefined} data-heard={i < heard ? (i < settle ? "settle" : "count") : undefined} />
+      ))}
+    </div>
   );
 }
 
@@ -145,20 +158,20 @@ function Result({ result, onRetry }: { result: Calibration; onRetry: () => void 
   return (
     <>
       {result.ok ? (
-        <p style={text} data-testid="calibrate-result">
+        <p className={css.text} data-testid="calibrate-result">
           Latency offset <b>{result.offsetMs} ms</b>, spread ±{result.spreadMs} ms, from {result.taps} taps. Saved.
         </p>
       ) : (
-        <p style={text} data-testid="calibrate-result">
+        <p className={css.text} data-testid="calibrate-result">
           {result.reason === "too few"
             ? `Too few taps: ${result.taps} landed near a click after the first ${s.settleClicks}; it needs ${s.minTaps}.`
             : `Too spread: taps varied ±${result.spreadMs} ms; it needs ±${s.maxSpreadMs} ms or less.`}{" "}
           Nothing saved.
         </p>
       )}
-      <button style={button} onClick={onRetry} autoFocus>
+      <Button onClick={onRetry} autoFocus style={kitSize}>
         Try again
-      </button>
+      </Button>
     </>
   );
 }
@@ -172,27 +185,5 @@ async function pianoOutput(): Promise<MIDIOutput | null> {
   }
 }
 
-const page: React.CSSProperties = {
-  minHeight: "100vh",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: 20,
-  padding: 16,
-  background: "var(--pa-bg)",
-  color: "var(--pa-ink)",
-  fontFamily: "system-ui, sans-serif",
-  textAlign: "center",
-};
-const text: React.CSSProperties = { maxWidth: 520, margin: 0, fontSize: 18, lineHeight: 1.5 };
-const dim: React.CSSProperties = { margin: 0, color: "var(--pa-ink-dim)" };
-const button: React.CSSProperties = {
-  padding: "12px 32px",
-  fontSize: 20,
-  borderRadius: 8,
-  border: "none",
-  background: settings.noteColor,
-  color: "#000",
-  cursor: "pointer",
-};
+// The kit's button text is a fixed 14 px; here it follows the page's height-scaled size.
+const kitSize: React.CSSProperties = { fontSize: "calc(var(--size) * 0.8)", padding: "0.75em 1.8em" };

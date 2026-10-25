@@ -5,7 +5,7 @@ import { flashAt, momentSettings } from "../fever-moment";
 import { shimmerAt } from "../fever-gauge";
 import { landingSettings } from "../results-landing";
 import { type Arc, type ArcState, arcAt, arcSettings, emptyArc, feverArc, ignitionFor, nextBeat, reduceArc } from ".";
-import { emberRate, flameScale, lookSettings } from "./look";
+import { calm, emberRate, flameScale, lookSettings } from "./look";
 
 const hit: GameEvent = { type: "noteHit", noteId: "n", pitch: 60, judgment: "PERFECT", offsetMs: 0, atMs: 0 };
 const run = (events: GameEvent[], s: ArcState = emptyArc(42, 120)) => events.reduce(reduceArc, s);
@@ -132,5 +132,19 @@ describe("the look (#1374)", () => {
     expect(emberRate(arc("build", 0, 0.5), false)).toBeGreaterThan(0);
     expect(emberRate(arc("build", 0, 0.5), false)).toBeLessThan(emberRate(arc("sustain", 1), false));
     expect(emberRate(arc("release", 0.8), false)).toBe(0);
+  });
+});
+
+describe("the walls' breathing between beats", () => {
+  it("stays small and slow: within -1…1 and never more than a small step per 60 Hz frame", () => {
+    let last = calm(0, 3);
+    for (let t = 0; t < 20; t += 1 / 60) {
+      const v = calm(t * 1.6, 3);
+      expect(Math.abs(v)).toBeLessThanOrEqual(1);
+      expect(Math.abs(v - last)).toBeLessThan(0.05);
+      last = v;
+    }
+    expect(lookSettings.lick).toBeLessThanOrEqual(0.1);
+    expect(lookSettings.shimmer).toBeLessThanOrEqual(0.1);
   });
 });

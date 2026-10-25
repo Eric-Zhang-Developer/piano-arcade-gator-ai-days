@@ -86,6 +86,28 @@ describe("sheet-view plugin", () => {
     expect((await heard).map((m) => m.type)).toEqual(["take", "end"]);
   });
 
+  it("answers a viewer's hello with the chart during a take, and stays quiet outside one (#1405)", async () => {
+    const viewer = new BroadcastChannel(SHEET_CHANNEL);
+    const got: SheetMessage[] = [];
+    viewer.onmessage = (e: MessageEvent<SheetMessage>) => void got.push(e.data);
+    const settle = () => new Promise((r) => setTimeout(r, 30));
+    const p = sheetView();
+    p.transformChart!(chart, new URLSearchParams());
+    p.onEvent!({ type: "songStart", atMs: -2000 });
+    await settle();
+    got.length = 0; // a /stage opened after the take went out: it missed the take
+    viewer.postMessage({ type: "hello" } satisfies SheetMessage);
+    await settle();
+    expect(got).toEqual([{ type: "catchUp", chart }]);
+    p.onEvent!({ type: "songEnd", atMs: 1500, results: {} as never });
+    await settle();
+    got.length = 0;
+    viewer.postMessage({ type: "hello" } satisfies SheetMessage); // the results screen: no take to catch up on
+    await settle();
+    expect(got).toEqual([]);
+    viewer.close();
+  });
+
   it("opens the song /play has, default twinkle", () => {
     expect(sheetUrl(new URLSearchParams("song=library/x&hands=R"))).toBe("/sheet?song=library%2Fx");
     expect(sheetUrl(new URLSearchParams())).toBe("/sheet?song=twinkle");

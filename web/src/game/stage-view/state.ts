@@ -33,6 +33,11 @@ export function reduceStage(s: StageState, m: SheetMessage, at: number): StageSt
   switch (m.type) {
     case "take":
       return { ...emptyStage, chart: m.chart }; // the latest take wins, as on /sheet
+    case "catchUp":
+      // opened mid-take: the chart joins the clock and combo already streaming; a live take keeps its own; after an
+      // end it's a new take
+      if (!s.chart) return { ...s, chart: m.chart };
+      return s.ended ? { ...emptyStage, chart: m.chart } : s;
     case "clock":
       return { ...s, nowMs: m.nowMs, hits: s.hits.length && s.hits[0].atMs < at - keepMs ? s.hits.filter((h) => h.atMs >= at - keepMs) : s.hits };
     case "judgment": {

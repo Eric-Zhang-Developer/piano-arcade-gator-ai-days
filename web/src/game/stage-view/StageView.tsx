@@ -27,11 +27,13 @@ export function StageView() {
   useEffect(() => {
     const ch = new BroadcastChannel(SHEET_CHANNEL);
     ch.onmessage = ({ data: m }: MessageEvent<SheetMessage>) => {
+      const before = stateRef.current.chart;
       const s = (stateRef.current = reduceStage(stateRef.current, m, performance.now()));
-      if (m.type === "take") lookRef.current = lookup(m.chart);
+      if (s.chart && s.chart !== before) lookRef.current = lookup(s.chart);
       setLive(!!s.chart && !s.ended);
       setWaiting(!s.chart);
     };
+    ch.postMessage({ type: "hello" } satisfies SheetMessage); // a take already playing answers with its chart
     return () => ch.close();
   }, []);
 

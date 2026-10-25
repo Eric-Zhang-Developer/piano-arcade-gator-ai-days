@@ -14,7 +14,9 @@ export type SheetMessage =
   | { type: "combo"; count: number } // the judge's own combo, so WRONG presses and Flow's lost stops break it too
   | { type: "milestone"; count: number } // the judge's comboMilestone: its rule, and none in Learn
   | { type: "fullCombo" }
-  | { type: "end" };
+  | { type: "end" }
+  | { type: "hello" } // a viewer opened: /stage, after the take may have started
+  | { type: "catchUp"; chart: Chart }; // the answer to hello during a take: the chart, without take's reset
 export type Judgment = "PERFECT" | "GREAT" | "GOOD" | "MISS";
 
 export function sheetUrl(params: URLSearchParams): string {
@@ -24,11 +26,17 @@ export function sheetUrl(params: URLSearchParams): string {
 export function sheetView(): GamePlugin {
   let chart: Chart | null = null;
   let ch: BroadcastChannel | null = null;
+  let live = false; // between songStart and songEnd or quit: no clock from the results screen
   const post = (m: SheetMessage) => {
-    ch ??= new BroadcastChannel(SHEET_CHANNEL);
+    if (!ch) {
+      ch = new BroadcastChannel(SHEET_CHANNEL);
+      // take goes out once, at songStart: a viewer opened later says hello and gets the chart as a catchUp
+      ch.onmessage = ({ data }: MessageEvent<SheetMessage>) => {
+        if (data.type === "hello" && live && chart) post({ type: "catchUp", chart });
+      };
+    }
     ch.postMessage(m);
   };
-  let live = false; // between songStart and songEnd or quit: no clock from the results screen
   return {
     id: "sheet-view",
     transformChart(c) {

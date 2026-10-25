@@ -18,10 +18,12 @@ piano in Chrome, or on laptop keys with no piano at all ([mission.md](../specs/m
   ([timing-feedback](../changes/timing-feedback.md)), loudness against the score ([dynamics](../changes/dynamics.md)),
   evenness of runs ([evenness](../changes/evenness.md)), and the weakest bars, with a link to practice them slower
   ([weak-bars](../changes/weak-bars.md)).
-- **See progress.** Every finished take is saved and re-judged on the server, and `/progress` shows it over time
-  ([chapter 8](story.md#chapter-8-sharans-lane-saving-takes-lighting-keys)).
-- **Lights on the keys.** An LED strip on the piano lights the next key and every hit
-  ([led-game](../changes/led-game.md), [chapter 8](story.md#chapter-8-sharans-lane-saving-takes-lighting-keys)).
+- **See progress.** A finished take is saved and re-judged on the server, and `/progress` shows it over time
+  ([chapter 8](story.md#chapter-8-sharans-lane-saving-takes-lighting-keys)). Two limits are open; see below.
+- **Lights on the keys.** An LED strip sits over the keys. Keys played on the DGX-660 light it, though it isn't
+  calibrated yet, so on-key placement is unchecked ([firmware results](../firmware/RESULTS.md), [#639]). The game
+  sends it the next key and every hit; that link is checked against a simulated board (42 of 42 hints) and hasn't run
+  with the real strip ([led-game](../changes/led-game.md)).
 
 ## Technicality: how it was built
 
@@ -32,8 +34,10 @@ Eric, Sharan and Andres built it in one weekend, with a swarm of coding agents. 
   ([chapter 2](story.md#chapter-2-the-swarm)).
 - **CI on GitHub's machines.** Every browser check (56) runs on `main` in about 17 minutes, and an ordinary PR in about
   2 ([chapter 3](story.md#chapter-3-the-machine-fights-back)).
-- **A backend that guards itself.** The browser never writes to the database. All 10 committed songs save and read
-  back, and 14 of 14 abuse checks are blocked ([chapter 8](story.md#chapter-8-sharans-lane-saving-takes-lighting-keys)).
+- **A backend that guards itself.** The browser never writes to the database. When the backend went live, all 10 songs
+  committed then saved and read back against it, and 14 of 14 abuse checks were blocked
+  ([chapter 8](story.md#chapter-8-sharans-lane-saving-takes-lighting-keys), [#660]). The library has 40 songs now; that
+  check loops over all of them and hasn't been re-run since.
 
 ## Design
 
@@ -49,13 +53,19 @@ still open ([#10]), so this page claims none.
 ## Presentation: limitations and trust
 
 **Veritas: the judge on trial.** `/veritas` runs test players that plant known mistakes in real songs, and the game's
-own judge has to find exactly those. On Für Elise: **2 planted, 2 found, 0 false alarms**. Every player on all 10
-committed songs finds exactly what it planted ([chapter 6](story.md#chapter-6-veritas-the-judge-on-trial)).
+own judge has to find exactly those. On Für Elise: **2 planted, 2 found, 0 false alarms**. Every player on all 40
+committed songs finds exactly what it planted: [players.test.ts](../web/src/veritas/players.test.ts) reads every
+committed chart, and on `main` at `b878080d` it passes 247 tests, with rushing as its one expected fail
+([chapter 6](story.md#chapter-6-veritas-the-judge-on-trial), [#545]).
 
 What we know is not yet true:
 
 - **The judge can't flag rushing.** `/veritas` shows that gap instead of hiding it ([#545]).
 - **Flow mode hasn't been played on the piano yet.** That check is Eric's ([flow-mode](../changes/flow-mode.md)).
+- **Not every take saves right yet.** A Flow take saves as all MISS ([#869]), and the live site has no Supabase keys
+  yet, so saving answers 503 there ([#792]).
+- **The lights haven't played a song with the game.** The firmware lights the strip on the piano, and the game's
+  messages are checked against a simulated board, but the two haven't run together ([led-game](../changes/led-game.md)).
 - **We got things wrong and wrote them down.** One playtest ran on a build 9 hours old; its "live check" covered 7 of
   82 finished features ([chapter 4](story.md#chapter-4-the-stale-build)). `main` went red eight times on Saturday; each
   time got an issue, and nothing merges on a red `main` ([chapter 5](story.md#chapter-5-main-went-red-and-we-said-so)).
@@ -75,4 +85,7 @@ What we know is not yet true:
 [#545]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/545
 [#625]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/625
 [#636]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/636
+[#639]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/639
 [#660]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/660
+[#792]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/792
+[#869]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/869

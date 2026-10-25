@@ -11,7 +11,8 @@ export const SORT_KEY = "pianoArcade.songSort";
 type LastPlayed = Record<string, string>;
 type Store = Pick<Storage, "getItem" | "setItem"> | null;
 
-const byLevel = (a: Song, b: Song) => a.level - b.level || a.title.localeCompare(b.title);
+// Twinkle stays the front door (the first row takes focus); other ties sort by title (song-pack-9 tied it at level 1).
+const byLevel = (a: Song, b: Song) => a.level - b.level || +(b.id === "twinkle") - +(a.id === "twinkle") || a.title.localeCompare(b.title);
 
 // The last word before any parenthesis: "Ludwig van Beethoven" is Beethoven, "Christian Petzold (attributed; …)" Petzold.
 export function surname(composer: string): string {

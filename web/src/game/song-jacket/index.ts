@@ -42,6 +42,7 @@ const reroll: Record<string, number> = {
   "pathetique-2": 1,
   "mary-lamb": 1,
   "frere-jacques-solo": 2,
+  "hot-cross-buns": 3,
 };
 
 export function jacketFor(id: string, title: string, composer: string): Jacket {

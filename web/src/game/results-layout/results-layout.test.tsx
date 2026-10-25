@@ -99,3 +99,9 @@ test("a NEW RECORD take features record-moment alone, and the graph moves to the
   const plain = render({ plugins: all, newRecord: false });
   expect(between(plain, 'data-testid="results"', 'id="results-details"')).toContain("GRAPH");
 });
+
+test("the hold bonus names the take's own scoring policy and records namespace", () => {
+  const sustain = { version: 2 as const, notes: [], earnedPoints: 0, possiblePoints: 0 };
+  expect(render({ results: { ...results, sustain }, scoringVersion: 3 })).toContain("Scoring v3 · timing points + confirmed hold bonus · separate v3 records");
+  expect(render({ results: { ...results, sustain }, params: new URLSearchParams("scoring=2") })).toContain("Scoring v2 · timing points + confirmed hold bonus · separate v2 records");
+});

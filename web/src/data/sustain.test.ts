@@ -86,3 +86,23 @@ test("disconnect remains unknown after a late release and later retrigger", asyn
   expect(saved[0].events.map(e => e.offTimeMs)).toEqual([null, 2000]);
   expect(judgeTake(repeated, saved[0]).sustain!.notes.map(n => n.earnedPoints)).toEqual([0, 100]);
 });
+
+test.each([[false, 2000], [true, 400]] as const)("a confirmed hold still down at songEnd closes at the finish cutoff; paused=%s", async (paused, off) => {
+  let now = 1000;
+  vi.spyOn(performance, "now").mockImplementation(() => now);
+  vi.stubGlobal("localStorage", { getItem: () => null });
+  const saved: Take[] = [];
+  const plugin = createSavePlugin((_id, take) => saved.push(take), async () => chart);
+  plugin.transformChart!(chart, new URLSearchParams("scoring=3"));
+  let fire: (e: InputEvent) => void = () => {};
+  plugin.wrapInput!({ kind: "midi", start(cb) { fire = cb; }, stop() {} }).start(() => {});
+  plugin.onEvent!({ type: "songStart", atMs: 0, performanceMs: 1000 });
+  fire({ type: "on", pitch: 60, velocity: 80, timeMs: 1000 });
+  fire({ type: "on", pitch: 62, velocity: 80, timeMs: 1100 });
+  fire({ type: "off", pitch: 62, velocity: 0, timeMs: 1200, cancelled: true });
+  if (paused) { now = 1400; plugin.onEvent!({ type: "pause", atMs: 400 }); }
+  plugin.onEvent!({ type: "songEnd", atMs: 2000, results: {} as never });
+  await vi.waitFor(() => expect(saved).toHaveLength(1));
+  expect(saved[0].events.map(e => e.offTimeMs)).toEqual([off, null]);
+  expect(judgeTake(chart, saved[0]).sustain!.earnedPoints).toBe(paused ? 40 : 100);
+});

@@ -342,6 +342,13 @@ export default function Play() {
     };
     const finish = (now: number) => {
       done = true;
+      if ((take.scoringVersion ?? 1) >= 2) {
+        const at = now - latencyRef.current;
+        for (const [pitch, index] of activeEvents) {
+          take.events[index].offTimeMs = Math.max(take.events[index].timeMs, at);
+          judge.release(pitch, at, index);
+        }
+      }
       const r = judge.finish(now);
       stop();
       if (background) idleRaf = requestAnimationFrame(idle);
@@ -511,6 +518,7 @@ export default function Play() {
               panel={(p) => take && loaded && p.resultsPanel?.({ ...loaded, take, results, retry: () => start() })}
               onRetry={() => start()}
               settings={controls}
+              scoringVersion={take?.scoringVersion ?? 1}
             />
           )}
           {/* not while loading: the slider would show useState's 0 before the stored offset is read (#447, #478) */}

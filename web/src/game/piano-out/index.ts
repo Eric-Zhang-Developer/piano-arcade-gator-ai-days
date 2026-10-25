@@ -189,6 +189,7 @@ export function pianoOut(): GamePlugin {
       }
       if (e.type === "songEnd") {
         recording = false;
+        if (scoringVersion(params) >= 2) for (const index of active.values()) events[index].offTimeMs = Math.max(events[index].timeMs, pausedChart ?? e.atMs);
         const take: Take = { ...(scoringVersion(params) >= 2 ? { scoringVersion: scoringVersion(params) } : {}), chartId, startedAt: new Date().toISOString(), latencyOffsetMs: 0, inputDevice: inputKind, events };
         set({ take, canReplay: !!output && events.length > 0 });
       }

@@ -160,6 +160,7 @@ export function createSavePlugin(sink: TakeSink, loadChart: LoadChart = loadComm
         const r = rec;
         const played = chart;
         rec = null;
+        if (r.scoringVersion >= 2) for (const index of r.active.values()) r.events[index].offTimeMs = Math.max(r.events[index].timeMs, r.pausedChartMs ?? e.atMs - r.latency);
         if (skip || r.kind === "test" || r.events.length === 0) {
           setStatus({ state: "skipped", why: skip ?? (r.kind === "test" ? "test input" : "no notes were played") });
           return;

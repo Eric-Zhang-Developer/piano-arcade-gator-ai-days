@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import type { GamePlugin, Results } from "../../contracts";
 import { Slots } from "../play-slots/ui";
 import { showsMoment } from "../record-moment/timing";
+import { scoringVersion as policyFor } from "../core/sustain";
 import { takeOutcome } from "../records";
 import { Tally } from "../results-tally";
 import styles from "./results-layout.module.css";
@@ -59,6 +60,7 @@ export function ResultsLayout({
   settings,
   params = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search),
   newRecord = showsMoment(takeOutcome()),
+  scoringVersion = policyFor(params),
 }: {
   results: Results;
   title?: string; // the song's title, over the rank
@@ -71,6 +73,7 @@ export function ResultsLayout({
   settings?: ReactNode; // latency, sound and MIDI controls: last, under the details
   params?: URLSearchParams; // the take's URL; /play's own when not given
   newRecord?: boolean; // this take set a new record (records' outcome when not given): record-moment's first view
+  scoringVersion?: 1 | 2 | 3; // the take's scoring policy; the URL's when not given
 }) {
   const { actions } = resultsLayoutSettings;
   const featured = featuredFor(params, newRecord);
@@ -131,7 +134,7 @@ export function ResultsLayout({
         {scored && results.sustain && <section data-testid="sustain-results" aria-label="Hold completion" style={{ textAlign: "center", padding: 12 }}>
           <strong>Long-note hold bonus: {results.sustain.earnedPoints} / {results.sustain.possiblePoints} points</strong>
           <p>Timing grade stays separate. Hold marked notes through their tails, then release. Early releases earn partial credit; unconfirmed releases earn none. Extra time earns no extra points.</p>
-          <small>Scoring v2 · timing points + confirmed hold bonus · separate v2 records</small>
+          <small>Scoring v{scoringVersion} · timing points + confirmed hold bonus · separate v{scoringVersion} records</small>
         </section>}
         <div className={styles.featured}>
           <Slots plugins={only(featured)} panel={panel} />

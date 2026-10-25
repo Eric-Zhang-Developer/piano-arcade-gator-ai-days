@@ -65,6 +65,22 @@ describe("the plugin (play-slots)", () => {
     return p;
   }
 
+  it("closes confirmed holds at songEnd under policy 2+, leaving cancelled holds unknown and policy 1 as it was", async () => {
+    for (const [scoring, offs] of [["scoring=3", [300, null]], ["scoring=1", [null, 200]]] as const) {
+      vi.spyOn(performance, "now").mockReturnValue(1000);
+      const p = pianoOut();
+      p.transformChart!({ id: "t" } as Chart, new URLSearchParams(scoring));
+      let key: (e: InputEvent) => void = () => {};
+      await p.wrapInput!({ kind: "keys", start: (cb) => void (key = cb), stop() {} }).start(() => {});
+      p.onEvent!({ type: "songStart", atMs: 0, performanceMs: 1000 });
+      key({ type: "on", pitch: 60, velocity: 80, timeMs: 1100 });
+      key({ type: "on", pitch: 62, velocity: 80, timeMs: 1150 });
+      key({ type: "off", pitch: 62, velocity: 0, timeMs: 1200, cancelled: true });
+      p.onEvent!({ type: "songEnd", atMs: 300, results: {} as Results });
+      expect(getReplayState().take!.events.map((e) => e.offTimeMs)).toEqual(offs);
+    }
+  });
+
   it("records no keys while paused, and the replay skips the pause", async () => {
     await playTake([{ name: "Digital Piano-1 Portable Grand" }]);
     expect(getReplayState().take!.events.map((e) => [e.pitch, e.timeMs])).toEqual([

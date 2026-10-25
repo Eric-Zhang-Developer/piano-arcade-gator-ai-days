@@ -4,10 +4,10 @@
 import Link from "next/link";
 import type { Frame, GamePlugin, InputDevice } from "../../../contracts";
 import { settings } from "../../core/settings";
-import { canvasFonts, DataCell, MonoLabel, Panel } from "../../duo-tokens";
+import { canvasFonts, DataCell, kitButton, MonoLabel, Panel } from "../../duo-tokens";
 import { meterLayout } from "../../fever-gauge";
 import { PIANO_NAME } from "../../laptop-sound";
-import { bg, gold, ink, secondary } from "../../ui-tokens";
+import { bg, gold, ink, primary, secondary } from "../../ui-tokens";
 import type { Experiment } from "..";
 import { saveLast } from "../highlight-reel/take";
 import { echoes, echoFilter, entryFor, programChanges, roundSettings, silence, type Played } from "./echo";
@@ -200,18 +200,33 @@ function roundPlugin(): GamePlugin {
     resultsPanel: ({ chart: c, take, results }) => {
       if (!entry) return null;
       saveLast({ chart: c, take, results }); // highlight-reel renders it from here
-      const counts = window.__round?.counts;
+      // What voices 2–4 sing in all: the card shows at your last note, while they're still singing.
+      const sung = played.filter((p) => p.type === "on").length * (entry.voices - 1);
+      const filtered = window.__round?.counts.filtered ?? 0;
+      const link = kitButton("secondary");
       return (
-        <Panel style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <span data-testid="round-card">
-            <MonoLabel dim={false}>{entry.voices} voices, all you</MonoLabel>
-          </span>
-          <DataCell label="Echoes heard" value={counts ? counts.received : 0} size={24} />
-          <DataCell label="Filtered" value={counts ? counts.filtered : 0} size={24} />
-          {output ? null : <MonoLabel>No piano: voices 2–{entry.voices} had nowhere to play</MonoLabel>}
-          <Link href="/highlight?take=last" style={{ color: "var(--pa-primary)" }}>
-            Highlight reel →
-          </Link>
+        <Panel style={{ display: "flex", alignItems: "stretch", flexWrap: "wrap", gap: 0 }}>
+          <div data-testid="round-card" style={{ display: "flex", flexDirection: "column", gap: 8, padding: "10px 14px 10px 0" }}>
+            <MonoLabel>Voices, all you</MonoLabel>
+            {/* One chip per voice, in the colors they fell in: you, then 2, 3, 4. */}
+            <span style={{ display: "flex", gap: 6, alignItems: "center", height: 32 }}>
+              {[primary, ...voiceColors.slice(0, entry.voices - 1)].map((c) => (
+                <span key={c} style={{ width: 22, height: 22, border: `2px solid ${c}`, background: c === primary ? c : "transparent" }} />
+              ))}
+            </span>
+          </div>
+          <DataCell label="Notes sung back" value={sung} size={32} />
+          {filtered ? <DataCell label="Echoes filtered" value={filtered} size={32} /> : null}
+          {output ? null : (
+            <div style={{ display: "flex", alignItems: "center", padding: "10px 14px", borderLeft: "1px solid var(--pa-line)" }}>
+              <MonoLabel>No piano: voices 2–{entry.voices} had nowhere to play</MonoLabel>
+            </div>
+          )}
+          <div style={{ display: "flex", alignItems: "center", marginLeft: "auto", paddingLeft: 14 }}>
+            <Link href="/highlight?take=last" className={link.className} style={link.style}>
+              Highlight reel →
+            </Link>
+          </div>
         </Panel>
       );
     },

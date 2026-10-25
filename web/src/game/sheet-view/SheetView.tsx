@@ -6,11 +6,11 @@ import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import type { Chart } from "../../contracts";
 import { validateChart } from "../../contracts";
 import { Panel } from "../duo-tokens";
-import { hudSettings } from "../hud";
 import { loadReview, reviewLine, type SheetReview } from "../sheet-review/review";
 import { chartToMusicXml } from "../sheet-xml";
 import { paperInk as ink, primary } from "../ui-tokens"; // the score is ink on paper (sheet-paper), never inverted
 import { follow, type Follower } from "./follow";
+import { paperJudgmentColors } from "./paper-colors";
 import { SHEET_CHANNEL, type Judgment, type SheetMessage } from "./plugin";
 import styles from "./sheet-view.module.css";
 
@@ -21,7 +21,7 @@ const ZOOM_MIN = 0.5;
 const ZOOM_MAX = 2.5;
 const ZOOM_STEP = 0.1;
 const JUDGMENTS: Judgment[] = ["PERFECT", "GREAT", "GOOD", "MISS"];
-const COLORS = hudSettings.judgmentColors; // the HUD's, so a notehead means what the counter means
+const COLORS = paperJudgmentColors; // the HUD's hues, darkened for the paper, so a notehead means what the counter means
 
 // For headless checks: where the cursor is, and how many noteheads are painted per judgment (not judgments heard).
 interface SheetHook {

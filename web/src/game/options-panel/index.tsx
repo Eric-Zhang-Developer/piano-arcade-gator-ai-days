@@ -8,7 +8,17 @@ import { LATENCY_MAX, LATENCY_MIN, loadLatencyOffset, saveLatencyOffset } from "
 import { LABEL_SETTINGS, LABELS_KEY, labelSetting, type LabelSetting } from "../note-labels/labels";
 import { DEFAULT_PREFS, getPrefs, savePrefs, subscribePrefs, type Prefs } from "../sound";
 import { DEFAULT_PIANO_VOLUME, getPianoVolume, setPianoVolume, subscribePianoVolume } from "../laptop-sound/volume";
-import { DEFAULT_RECORDING_VOLUME, getRecordingVolume, setRecordingVolume, subscribeRecordingVolume } from "../audio-track";
+import {
+  DEFAULT_RECORDING_VOLUME,
+  getRecordingOffset,
+  getRecordingVolume,
+  RECORDING_OFFSET_MAX,
+  RECORDING_OFFSET_MIN,
+  setRecordingOffset,
+  setRecordingVolume,
+  subscribeRecordingOffset,
+  subscribeRecordingVolume,
+} from "../audio-track";
 import styles from "./options-panel.module.css";
 
 export const LABEL_NAMES: Record<LabelSetting, string> = { auto: "Auto", notes: "Note names", keys: "Laptop keys", off: "Off" };
@@ -94,6 +104,39 @@ function RecordingVolumeRow() {
   );
 }
 
+// audio-track's "Recording offset" (golden-demo): moves the recording against the chart, for a sidecar a little off on
+// this machine. The piano and the judge don't move. Positive plays the recording earlier.
+function RecordingOffsetRow() {
+  const offset = useSyncExternalStore(subscribeRecordingOffset, getRecordingOffset, () => 0);
+  return (
+    <div className={styles.row}>
+      <label className={styles.label} htmlFor="opt-recording-offset">
+        Recording offset
+      </label>
+      <div className={styles.control}>
+        <input
+          id="opt-recording-offset"
+          data-row
+          data-testid="opt-recording-offset"
+          type="range"
+          min={RECORDING_OFFSET_MIN}
+          max={RECORDING_OFFSET_MAX}
+          step={5}
+          value={offset}
+          onChange={(e) => setRecordingOffset(Number(e.target.value))}
+        />
+        <output className={styles.value} data-testid="opt-recording-offset-value">
+          {offset > 0 ? "+" : offset < 0 ? "\u2212" : ""}
+          {Math.abs(offset)} ms
+        </output>
+      </div>
+      {/* Which way it moves, in the label row's right slot (Latency's Calibrate link sits there), so the value cell
+          keeps every row's width and the tracks line up. */}
+      {offset !== 0 && <span className={styles.hint}>{offset > 0 ? "Plays early" : "Plays late"}</span>}
+    </div>
+  );
+}
+
 // The rows, in the spec's order. Each row's first control carries data-row, the target of ↑/↓.
 export function OptionsRows({
   values,
@@ -106,7 +149,7 @@ export function OptionsRows({
   onLatency(ms: number): void;
   onPrefs(p: Partial<Prefs>): void;
   onLabels(s: LabelSetting): void;
-  recording?: boolean; // a song on this machine has a recording (audio-track): only then the Recording volume row
+  recording?: boolean; // a song on this machine has a recording (audio-track): only then the Recording rows
 }) {
   const { latency, prefs, labels } = values;
   const enterToggles = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -160,6 +203,7 @@ export function OptionsRows({
       </div>
       <PianoVolumeRow />
       {recording && <RecordingVolumeRow />}
+      {recording && <RecordingOffsetRow />}
       <label className={styles.row}>
         <span className={styles.label}>Mute</span>
         <input data-row data-testid="opt-mute" type="checkbox" className={styles.check} checked={prefs.muted} onKeyDown={enterToggles} onChange={(e) => onPrefs({ muted: e.target.checked })} />
@@ -290,7 +334,7 @@ export function OptionsDrawer({
           }}
         />
         {children && <div className={styles.extra}>{children}</div>}
-        <p className={styles.note}>{onLatency ? "Labels apply when you press Start." : "Latency and labels apply from the next song."}</p>
+        <p className={styles.note}>{onLatency ? "Labels apply when you press Start." : `Latency, labels${recording ? " and the recording" : ""} apply from the next song.`}</p>
       </dialog>
     </>
   );

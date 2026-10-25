@@ -110,12 +110,17 @@
   text-transform: uppercase;
 }
 
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* The way back, as /conduct and /highlight place theirs: the header's far end, in the page's own face. */
 .back {
-  justify-self: start;
+  padding: 0.4em 0;
   color: var(--pa-ink-dim);
-  font: 700 clamp(12px, 0.75vw, 15px) / 1 var(--pa-font-data), ui-monospace, monospace;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   text-decoration: none;
 }
 

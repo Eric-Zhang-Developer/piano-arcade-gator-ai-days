@@ -612,10 +612,12 @@ export function RealKeys() {
       {!capture && (
         <aside className={css.rail} aria-label="Real Keys setup">
           <header className={css.head}>
-            <Link href="/lab" className={css.back}>
-              Lab
-            </Link>
-            <h1 className={css.title}>Real Keys</h1>
+            <div className={css.titleRow}>
+              <h1 className={css.title}>Real Keys</h1>
+              <Link href="/lab" className={css.back}>
+                Lab
+              </Link>
+            </div>
             <MonoLabel>{chart ? `${chart.title} · ${chart.notes.length} notes` : (error ?? "loading")}</MonoLabel>
           </header>
           <ol className={css.steps}>

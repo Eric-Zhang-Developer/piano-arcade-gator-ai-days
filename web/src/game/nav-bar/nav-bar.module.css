@@ -1,0 +1,37 @@
+/* The top edge's empty band: the select's 4vh top padding, centered so it clears the wordmark's accent on the left and
+   the build stamp on the right (decision nav-bar-layout). Over the page, never in its flow, so / keeps its layout. */
+.bar {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  height: 4vh;
+  display: flex;
+  align-items: stretch;
+  gap: 0.4em;
+  font-size: clamp(11px, 1.5vh, 16px);
+}
+
+.slot {
+  display: flex;
+  align-items: center;
+  padding: 0 0.8em;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.slot:hover {
+  border-bottom-color: var(--pa-line); /* MonoLabel's color is inline, so hover shows as the hairline */
+}
+
+.slot[aria-current="page"] {
+  border-bottom-color: var(--pa-primary);
+}
+
+.slot:focus-visible {
+  outline: 2px solid var(--pa-primary);
+  outline-offset: -2px;
+}

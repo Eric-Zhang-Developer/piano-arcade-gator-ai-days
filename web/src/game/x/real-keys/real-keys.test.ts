@@ -1,10 +1,15 @@
 import { readFileSync } from "node:fs";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { isBlack } from "../../core/highway";
 import { apply, homography, invert, type H, type Pt } from "./homography";
 import { bedQuads, BED_CORNERS, keySettings, mapQuad, meanLuma, samplePoints } from "./keys";
 import { pressDelays, summarize, type Sample } from "./latency";
 import { containFit, laneDepth, noteSpan, overlaySettings, parseLog } from "./overlay";
+import { metadata } from "../../../app/real-keys/layout";
+import { APP_NAME } from "../../app-name";
+import { RealKeys } from "./RealKeys";
 
 // A seeded generator, so the "random" points are the same every run.
 const rng = (seed: number) => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32);
@@ -168,3 +173,36 @@ describe("overlay geometry", () => {
     expect(parseLog(null)).toEqual([]);
   });
 });
+
+describe("the page's basics (lab-pages-a11y, #1128)", () => {
+  const page = () => renderToStaticMarkup(createElement(RealKeys));
+
+  it("the tab reads Real Keys · the app's name", () => {
+    expect(metadata.title).toBe(`Real Keys · ${APP_NAME}`);
+  });
+
+  it("one h1, and a Lab link on the rail that capture mode leaves out", () => {
+    const html = page();
+    expect(html.match(/<h1/g)).toHaveLength(1);
+    expect(html).toContain('href="/lab"');
+    const doc = globalThis.document;
+    globalThis.document = { documentElement: { hasAttribute: (a: string) => a === "data-capture" } } as unknown as Document;
+    try {
+      expect(page()).not.toContain('href="/lab"');
+    } finally {
+      globalThis.document = doc;
+    }
+  });
+
+  it("no canvas font reads a CSS variable, and nothing is set under the kit's 12 px floor", () => {
+    const tsx = readFileSync(new URL("./RealKeys.tsx", import.meta.url), "utf8");
+    const css = readFileSync(new URL("./real-keys.module.css", import.meta.url), "utf8");
+    expect(tsx.match(/ctx\.font\s*=\s*[`"'][^`"']*var\(/g)).toBeNull();
+    const sizes = [...`${tsx}\n${css}`.matchAll(/(\d+(?:\.\d+)?)px/g)].filter((m) => /font/.test(lineOf(`${tsx}\n${css}`, m.index!)));
+    for (const m of sizes) expect(Number(m[1]), lineOf(`${tsx}\n${css}`, m.index!)).toBeGreaterThanOrEqual(12);
+    // An em size in the rail (13 px at its smallest) has a 12 px floor: max(12px, …).
+    for (const m of css.matchAll(/font(?:-size)?:[^;]*?\b0\.[0-8]\d*em/g)) expect(m[0]).toContain("max(12px");
+  });
+});
+
+const lineOf = (s: string, i: number) => s.slice(s.lastIndexOf("\n", i) + 1, s.indexOf("\n", i));

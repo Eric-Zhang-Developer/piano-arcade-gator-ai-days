@@ -158,3 +158,14 @@
   color: var(--pa-ink);
   border-bottom-color: var(--pa-primary);
 }
+
+/* Read by screen readers, not shown (lab-pages-a11y). */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

@@ -1,5 +1,8 @@
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { Chart } from "../../../contracts";
+import { ErrorLine, StateLine, TrackerStatus, trackerLine, type Cam } from "./announce";
 import { beatDetector, isFist, type Sample } from "./beats";
 import { clockSettings, conductorClock } from "./clock";
 import { scheduler, scheduleSettings, scoreEvents, velocityFactor } from "./schedule";
@@ -228,5 +231,41 @@ describe("the dynamics (conductor)", () => {
     expect(velocityFactor(3)).toBe(1.5);
     expect(velocityFactor(40)).toBe(1.6);
     expect(velocityFactor(0)).toBe(0.5);
+  });
+});
+
+describe("what /conduct announces (lab-pages-a11y, #1129)", () => {
+  it("the error is an alert, and the state and tracker lines are polite status regions", () => {
+    expect(renderToStaticMarkup(createElement(ErrorLine, { error: "No camera" }))).toMatch(/^<p[^>]*role="alert"[^>]*>No camera<\/p>$/);
+    expect(renderToStaticMarkup(createElement(ErrorLine, { error: null }))).toBe("");
+    expect(renderToStaticMarkup(createElement(StateLine, { cam: "on", state: "running" }))).toMatch(/role="status"[^>]*>Following your tempo</);
+    // Mounted while off and empty, so the loading line is a change the region announces.
+    expect(renderToStaticMarkup(createElement(TrackerStatus, { cam: "off" }))).toMatch(/role="status"[^>]*><\/p>$/);
+    expect(["off", "loading", "on"].map((c) => trackerLine(c as Cam))).toEqual(["", "Loading the hand tracker…", "Hand tracker ready"]);
+  });
+
+  it("through prep, conducting, a hold and a cutoff, the state line changes once per state, not per frame", () => {
+    const c = conductorClock(60);
+    const beats = [0, 1000, 2000, 5000, 6000, 9000, 10000];
+    let cut = false;
+    const lines: string[] = [];
+    for (let t = 0; t <= 11000; t += 16) {
+      while (beats.length && beats[0] <= t) {
+        c.beat(beats.shift()!);
+        if (c.state === "running") cut = false;
+      }
+      if (t === 3008) c.hold(t); // the beats stopped: Session holds the same way
+      if (t === 7008) {
+        c.cut(t); // a fist
+        cut = true;
+      }
+      const state = cut && c.state === "prep" ? "cut" : c.state; // as Session.state reads it
+      lines.push(renderToStaticMarkup(createElement(StateLine, { cam: "on", state })));
+    }
+    const changes = lines.filter((l, i) => i > 0 && l !== lines[i - 1]).length;
+    const texts = [...new Set(lines.map((l) => l.replace(/<[^>]+>/g, "")))];
+    expect(texts).toEqual(["Waiting for two beats", "Following your tempo", "Held. Beat again to go on", "Cut off"]);
+    expect(lines.length).toBeGreaterThan(600);
+    expect(changes).toBe(5); // prep → running → held → running → cut → running
   });
 });

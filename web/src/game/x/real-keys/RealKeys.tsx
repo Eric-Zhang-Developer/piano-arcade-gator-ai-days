@@ -3,6 +3,7 @@
 // it through a 4-corner homography and sparks on the key pressed, delayed by the camera's measured latency. The same
 // chart, judge and HUD as /play: a new view of a take, not a new game. Clip mode (?clip=1) runs it all on a recorded
 // clip and its MIDI log instead of the camera and the piano. Frames never leave the browser.
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import type { Chart, GameEvent, InputDevice, InputEvent, Results } from "../../../contracts";
 import { validateChart } from "../../../contracts";
@@ -11,6 +12,7 @@ import { keysDevice, midiDevice } from "../../core/input";
 import { settings as coreSettings, msPerBeat } from "../../core/settings";
 import { captureOn } from "../../capture-mode";
 import { Button, MonoLabel, kitChip } from "../../duo-tokens";
+import { canvasFonts } from "../../duo-tokens/canvas";
 import { noteColorFor } from "../../hand-colors";
 import { hitParticles, type HitParticles } from "../../hit-particles/gl";
 import { hud } from "../../hud";
@@ -436,7 +438,7 @@ export function RealKeys() {
           ctx.lineTo(x, y + 14);
           ctx.stroke();
           ctx.strokeRect(x - 6, y - 6, 12, 12);
-          ctx.font = "600 11px var(--pa-font-data), ui-monospace, monospace";
+          ctx.font = canvasFonts.data(12);
           ctx.fillStyle = primary;
           ctx.fillText(`${i + 1} ${Math.round(c[0])},${Math.round(c[1])}`, x + 10, y - 10);
         });
@@ -610,7 +612,12 @@ export function RealKeys() {
       {!capture && (
         <aside className={css.rail} aria-label="Real Keys setup">
           <header className={css.head}>
-            <span className={css.title}>Real Keys</span>
+            <div className={css.titleRow}>
+              <h1 className={css.title}>Real Keys</h1>
+              <Link href="/lab" className={css.back}>
+                Lab
+              </Link>
+            </div>
             <MonoLabel>{chart ? `${chart.title} · ${chart.notes.length} notes` : (error ?? "loading")}</MonoLabel>
           </header>
           <ol className={css.steps}>

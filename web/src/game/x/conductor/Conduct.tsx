@@ -11,6 +11,7 @@ import { Button, canvasFonts, DataCell, MonoLabel } from "../../duo-tokens";
 import { PIANO_NAME } from "../../laptop-sound";
 import { loadPedal } from "../../pedal";
 import { ink, inkDim, primary } from "../../ui-tokens";
+import { ErrorLine, StateLine, TrackerStatus, type Cam } from "./announce";
 import styles from "./conduct.module.css";
 import { createSession, type Output, type Session, type SessionState } from "./session";
 import { loadLandmarker, trackVideo } from "./tracker";
@@ -21,15 +22,6 @@ const SONGS = [
   { id: "minute-waltz", label: "Minute Waltz" },
 ];
 const GOLDEN = { id: "local/golden-hard", label: "Golden" }; // local and optional: listed only when it loads
-
-const STATE_LINE: Record<SessionState | "off", string> = {
-  off: "Camera off",
-  prep: "Waiting for two beats",
-  running: "Following your tempo",
-  held: "Held. Beat again to go on",
-  cut: "Cut off",
-  fin: "Fine",
-};
 
 const loadChart = async (id: string): Promise<Chart> => {
   if (!/^(local\/)?[\w-]+$/.test(id)) throw new Error(`No song called "${id}".`);
@@ -93,7 +85,7 @@ export function Conduct() {
   const [chart, setChart] = useState<Chart | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [golden, setGolden] = useState(false);
-  const [cam, setCam] = useState<"off" | "loading" | "on">("off");
+  const [cam, setCam] = useState<Cam>("off");
   const [readout, setReadout] = useState<Readout>({ state: "off", bpm: null, ratio: null, fps: null, beats: 0 });
   const [copied, setCopied] = useState(false);
   const highway = useRef<HTMLCanvasElement>(null);
@@ -281,7 +273,7 @@ export function Conduct() {
           Lab
         </Link>
       </header>
-      {error && <p className={styles.note}>{error}</p>}
+      <ErrorLine error={error} />
       <div className={styles.podium}>
         <canvas ref={highway} className={styles.highway} aria-label="The song's highway, moving at your tempo" />
         <aside className={styles.stand}>
@@ -294,6 +286,7 @@ export function Conduct() {
               </MonoLabel>
             )}
             {cam === "loading" && <MonoLabel style={{ position: "absolute", top: 8, left: 10, fontSize: 12 }}>Loading the hand tracker…</MonoLabel>}
+            <TrackerStatus cam={cam} />
           </div>
           <div className={styles.tempo}>
             <MonoLabel>Tempo</MonoLabel>
@@ -302,9 +295,7 @@ export function Conduct() {
             </span>
             <MonoLabel>{readout.ratio === null ? "BPM · as written" : `BPM · ×${readout.ratio.toFixed(2)} the chart's ${chart?.bpm}`}</MonoLabel>
           </div>
-          <p className={styles.state} data-testid="conduct-state">
-            {STATE_LINE[cam === "on" ? readout.state : "off"]}
-          </p>
+          <StateLine cam={cam} state={readout.state} />
           <div className={styles.cells}>
             <DataCell label="Beats" value={readout.beats} size={28} />
             <DataCell label="Camera fps" value={readout.fps === null ? "—" : Math.round(readout.fps)} size={28} />

@@ -1,8 +1,11 @@
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { Chart, Judgment, Results, Take } from "../../../contracts";
 import { msPerBeat } from "../../core/settings";
 import { bestRun, cut, expectedOnsetsMs, highlightSettings as S, reelMsOf, slowRateAt, slowSourceFrames, takeTimeAt, type Edl } from "./cut";
 import { detectOnsets, matchOnsets } from "./onsets";
+import { focusSave, ReelStatus, renderLock } from "./status";
 
 // A synthetic chart: n quarter notes at 120 bpm, pitches cycling, no song's notes.
 function chartOf(n: number, bpm = 120): Chart {
@@ -150,5 +153,27 @@ describe("the onset detector (highlight-reel)", () => {
     expect(found).toHaveLength(clicks.length);
     found.forEach((t, i) => expect(Math.abs(t - clicks[i])).toBeLessThanOrEqual(1));
     expect(matchOnsets(clicks, found)).toMatchObject({ expected: clicks.length, matched: clicks.length });
+  });
+});
+
+describe("Render reel's focus and the done line (lab-pages-a11y, #1143)", () => {
+  it("Render stays focusable while it records, and is disabled only when it can't run at all", () => {
+    expect(renderLock("ready")).toEqual({ disabled: false, "aria-disabled": undefined });
+    expect(renderLock("rendering")).toEqual({ disabled: false, "aria-disabled": true });
+    for (const s of ["loading", "no-reel", "error"] as const) expect(renderLock(s).disabled).toBe(true);
+  });
+
+  it("Save video takes the focus when the reel is done, only from a Render that had it", () => {
+    expect(focusSave("rendering", "done", true)).toBe(true);
+    expect(focusSave("rendering", "done", false)).toBe(false); // the keyboard went elsewhere while it recorded
+    expect(focusSave("rendering", "error", true)).toBe(false);
+    expect(focusSave("done", "done", true)).toBe(false); // a re-render of the page doesn't steal it again
+  });
+
+  it("a status region is there from the start and carries the done line once the reel is done", () => {
+    const before = renderToStaticMarkup(createElement(ReelStatus, { state: "rendering", video: null }));
+    expect(before).toMatch(/role="status"[^>]*>Plays the reel once/);
+    const after = renderToStaticMarkup(createElement(ReelStatus, { state: "done", video: { bytes: 4_200_000, late: 3 } }));
+    expect(after).toMatch(/role="status"[^>]*>4\.2 MB WebM · 3 late frames<\/p>$/);
   });
 });

@@ -64,6 +64,8 @@
 #define FLASH_MS 120           // hit flash decay
 #define WATCHDOG_MS 2500       // silence with keys held: release them (Chrome stalled)
 #define IDLE_MS 8000           // no play this long (heartbeats, hello and pings don't count): idle lights
+#define LINK_LOST_MS 3000      // no byte at all this long (the game beats every 1 s): no laptop is connected
+#define STANDBY_LEDS 6         // idle with no laptop: only these first LEDs pulse, like a standby light
 #define FRAME_MS 10            // frame period while only animating (fades, pulses): 100 fps
 #define INPUT_FRAME_MS 2       // new input draws almost at once; the show() itself is ~5 ms
 #define MAX_RIPPLES 12         // a fast run reuses the oldest ripple
@@ -324,7 +326,11 @@ void burst(float pos, CRGB color, int count, float speed) {
 }
 
 // Classy (the default) draws every show with brightness alone: blooms, swells, breathing. Demo adds the sparks.
-inline bool demo() { return cfg.demo; }
+// Demo mode (setting 15) is the ripple: every hit breaks out both ways along the strip (rippleLife). The extra
+// demo effects (sparks, bursts, comets, fireworks, shooting stars) stay behind DEMO_EXTRAS, off: Sharan wants demo to
+// be just the ripple. With them off, every show is drawn the calm way in both modes.
+#define DEMO_EXTRAS 0
+inline bool demoExtras() { return DEMO_EXTRAS && cfg.demo; }
 CRGB scale8Color(CRGB c, uint8_t v) { c.nscale8_video(v); return c; }
 
 // A bloom: a soft glow that spreads from pos to `reach` LEDs either side and fades out, brightest in the middle.
@@ -373,7 +379,7 @@ void launch(uint8_t note) {
   showMode = SHOW_NONE;
   introExpectMs = min<uint32_t>(8000, max<uint32_t>(1500, millis() - showStart));
   float c = ledCenterOf(note);
-  if (!demo()) { bloom(c, CRGB(110, 120, 170), 1100, 60); return; }
+  if (!demoExtras()) { bloom(c, CRGB(110, 120, 170), 1100, 60); return; }
   spark(c, 0.35f, CRGB::White, 450);
   spark(c, -0.35f, CRGB::White, 450);
   burst(c, UI_VIOLET, 10, 0.15f);
@@ -393,15 +399,15 @@ void drawIntro(uint32_t t) {
   uint32_t sinceStep = t - (uint32_t)((step - 1) * (float)introExpectMs / INTRO_STEPS);
   bool fresh = step != introStep;
   introStep = step;
-  if (fresh && demo()) {
+  if (fresh && demoExtras()) {
     spark(edge, 0.08f, UI_VIOLET, 500);
     spark(activeLeds - 1 - edge, -0.08f, UI_BLUE, 500);
   }
-  uint8_t flash = demo() && sinceStep < 150 ? 255 - sinceStep * 255 / 150 : 0;  // demo: each step flashes 150 ms
-  uint8_t fadeIn = demo() || sinceStep >= 300 ? 255 : sinceStep * 255 / 300;     // classy: each step fades in
+  uint8_t flash = demoExtras() && sinceStep < 150 ? 255 - sinceStep * 255 / 150 : 0;  // demo: each step flashes 150 ms
+  uint8_t fadeIn = demoExtras() || sinceStep >= 300 ? 255 : sinceStep * 255 / 300;     // classy: each step fades in
   uint8_t base = 70 + step * 14;                                                 // brighter with every step
   if (p >= 1) base = 90 + scale8(sin8(t / 4), 80);                               // full: breathe until the hint
-  uint8_t shimmer = demo() ? 55 : 20;
+  uint8_t shimmer = demoExtras() ? 55 : 20;
   for (int i = 0; i < activeLeds; i++) {
     bool left = i <= mid;
     float d = left ? i : activeLeds - 1 - i;  // distance in from its own end
@@ -411,7 +417,7 @@ void drawIntro(uint32_t t) {
     CRGB c = left ? UI_VIOLET : UI_BLUE;  // the hands: left (bass) violet, right (treble) blue
     c.nscale8_video(v);
     fx[i] |= c;
-    if (demo() && d > edge - 1.5f) fx[i] |= CRGB(v, v, v);  // the edge burns white
+    if (demoExtras() && d > edge - 1.5f) fx[i] |= CRGB(v, v, v);  // the edge burns white
   }
 }
 
@@ -451,7 +457,7 @@ void feverBreak(uint8_t note) {
   fever = false;
   gaugeFill = 0;
   feverGlow = 0;
-  if (!demo()) {
+  if (!demoExtras()) {
     for (int i = 0; i < activeLeds; i++) fx[i] |= CRGB(50, 0, 4);
     return;
   }
@@ -466,7 +472,7 @@ void feverHit(uint8_t note, uint8_t j) {
   if (j == J_MISS) { feverBreak(note); return; }
   float c = ledCenterOf(note);
   if (fever) {  // every hit in fever: classy, a small warm bloom; demo, pulses out both ways
-    if (!demo()) { bloom(c, CRGB(120, 80, 20), 450, 6); return; }
+    if (!demoExtras()) { bloom(c, CRGB(120, 80, 20), 450, 6); return; }
     spark(c, 0.3f, UI_GOLD, 350);
     spark(c, -0.3f, UI_MAGENTA, 350);
     return;
@@ -474,7 +480,7 @@ void feverHit(uint8_t note, uint8_t j) {
   gaugeFill = min((float)gaugeSize, gaugeFill + (j == J_PERFECT ? 1.0f : j == J_GREAT ? 0.5f : 0.0f));
   if (gaugeFill >= gaugeSize) {  // FEVER. Classy: a warm swell from this key. Demo: a gold flash and a burst
     fever = true;
-    if (!demo()) { bloom(c, CRGB(150, 100, 25), 1500, 90); return; }
+    if (!demoExtras()) { bloom(c, CRGB(150, 100, 25), 1500, 90); return; }
     for (int i = 0; i < activeLeds; i++) fx[i] |= CRGB(150, 110, 20);
     burst(c, UI_GOLD, 20, 0.2f);
   }
@@ -494,20 +500,20 @@ void feverReset(bool songEnded) {
 // gauge shows: classy, a faint warm underglow that rises as it fills; demo, gold embers sparking more often.
 bool drawFever(uint32_t now, float dt) {
   if (!cfg.shows) { feverGlow = 0; return false; }  // shows off: the gauge still counts, nothing draws
-  feverGlow = fever ? min(1.0f, feverGlow + dt / (demo() ? 400 : 900)) : 0;
+  feverGlow = fever ? min(1.0f, feverGlow + dt / (demoExtras() ? 400 : 900)) : 0;
   if (feverGlow > 0) {
-    uint8_t breath = demo() ? 255 : 190 + scale8(sin8(now / 9), 65);
+    uint8_t breath = demoExtras() ? 255 : 190 + scale8(sin8(now / 9), 65);
     for (int i = 0; i < activeLeds; i++) {
       uint8_t hue = 232 + scale8(sin8(i * 3 + now / 13), 70);  // wraps past 255: pink, red, orange, gold
-      uint8_t wave = sin8(i * 6 - now / (demo() ? 5 : 14));
-      uint8_t v = scale8(demo() ? 26 + scale8(wave, 54) : 45 + scale8(wave, 75), (uint8_t)(feverGlow * breath));
+      uint8_t wave = sin8(i * 6 - now / (demoExtras() ? 5 : 14));
+      uint8_t v = scale8(demoExtras() ? 26 + scale8(wave, 54) : 45 + scale8(wave, 75), (uint8_t)(feverGlow * breath));
       fx[i] |= CRGB(CHSV(hue, 230, v));
     }
     return true;
   }
   if (!songLive || gaugeFill <= 0) return false;
   float full = gaugeFill / gaugeSize;
-  if (!demo()) {
+  if (!demoExtras()) {
     uint8_t v = (uint8_t)(6 + 45 * full);
     v = scale8(v, 215 + scale8(sin8(now / 8), 40));
     for (int i = 0; i < activeLeds; i++) fx[i] |= CRGB(CHSV(32, 210, v));
@@ -527,7 +533,7 @@ bool renderShow(uint32_t now, float dt) {
     else { drawIntro(t); live = true; }
   } else if (showMode == SHOW_FINALE) {
     if (t > FINALE_MS) showMode = SHOW_NONE;
-    else if (!demo()) {
+    else if (!demoExtras()) {
       // Classy: a warm gold wash swells out from the middle over 1 s, shimmers gently, and fades away.
       float mid = (activeLeds - 1) / 2.0f;
       float reach = mid * 1.1f * min(1.0f, t / 1000.0f);
@@ -546,7 +552,7 @@ bool renderShow(uint32_t now, float dt) {
       }
       live = true;
     }
-  } else if (showMode == SHOW_PAUSE && !demo()) {
+  } else if (showMode == SHOW_PAUSE && !demoExtras()) {
     // Classy pause: the whole strip breathes slowly in violet, the paused hint on top.
     uint8_t in = t < 600 ? t * 255 / 600 : 255;
     uint8_t v = scale8(12 + scale8(sin8(t / 8), 45), in);
@@ -623,7 +629,7 @@ void idleTouch(uint8_t note) {
   if (note < LOW_NOTE || note > HIGH_NOTE) return;
   float c = ledCenterOf(note);
   CRGB tone = blend(UI_VIOLET, UI_BLUE, (note - LOW_NOTE) * 255 / (HIGH_NOTE - LOW_NOTE));  // bass violet, treble blue
-  if (!demo()) { bloom(c, scale8Color(tone, 170), 900, 14); return; }
+  if (!demoExtras()) { bloom(c, scale8Color(tone, 170), 900, 14); return; }
   burst(c, tone, 10, 0.12f);
   spark(c, 0, CRGB::White, 300);
 }
@@ -632,7 +638,26 @@ void idleTouch(uint8_t note) {
 // the treble (~50 LEDs a second) and a smaller, slower one rolling back. Squaring each wave turns it into a
 // distinct band instead of a wash. The hue sways between cyan, violet and pink. Peaks near 170 of 255 before
 // the master brightness, so it reads across a room without glaring. Fades in over 1.5 s.
+// Idle shows whether a laptop is on the other end: with the game connected (its heartbeat), the aurora; with no
+// byte for LINK_LOST_MS, a standby light instead, a slow dim blue pulse on the first STANDBY_LEDS at the bass end
+// and the rest dark. Switching either way fades the new look in again.
+bool idleLinked = true;
+
 void renderIdle(uint32_t now, float dt) {
+  bool linked = now - lastByteAt < LINK_LOST_MS;
+  if (linked != idleLinked) { idleLinked = linked; idleStart = now; }
+  if (!linked) {
+    showLive = renderShow(now, dt);  // let any last sparks finish, but draw none of them
+    uint8_t breath = 6 + scale8(sin8((now - idleStart) / 12 + 192), 50);  // ~3 s a breath, starting dark
+    for (int i = 0; i < activeLeds; i++) {
+      leds[i] = CRGB::Black;
+      if (i >= STANDBY_LEDS) continue;
+      CRGB c = UI_BLUE;
+      c.nscale8_video(scale8(breath, 255 - i * 255 / STANDBY_LEDS));  // brightest at the end, tapering in
+      leds[i] = c;
+    }
+    return;
+  }
   showLive = renderShow(now, dt);  // stars and touch sparks
   uint32_t t = now - idleStart;
   uint8_t fadeIn = t < 1500 ? t * 255 / 1500 : 255;
@@ -645,7 +670,7 @@ void renderIdle(uint32_t now, float dt) {
     f.nscale8_video(SHOW_LEVEL);
     leds[i] += f;
   }
-  if (demo() && (int32_t)(now - nextStarAt) >= 0) {  // shooting stars are demo only
+  if (demoExtras() && (int32_t)(now - nextStarAt) >= 0) {  // shooting stars are demo only
     bool fromBass = random8() & 1;
     spark(fromBass ? 0 : activeLeds - 1, fromBass ? 0.2f : -0.2f, CRGB(200, 220, 255), 1400);
     nextStarAt = now + 3000 + random16(4000);
@@ -661,7 +686,7 @@ void clearAll() {
 
 // How long a key on's ripple lasts: setting 6 if set; otherwise demo mode brings it back at 700 ms (the hit
 // "breaks to both sides", as the strip first did) and classy keeps each key's light on its key.
-uint16_t rippleLife() { return cfg.rippleMs ? cfg.rippleMs : demo() && cfg.shows ? 700 : 0; }
+uint16_t rippleLife() { return cfg.rippleMs ? cfg.rippleMs : cfg.demo && cfg.shows ? 700 : 0; }
 
 void startRipple(uint8_t note, CRGB color) {
   if (!rippleLife()) return;

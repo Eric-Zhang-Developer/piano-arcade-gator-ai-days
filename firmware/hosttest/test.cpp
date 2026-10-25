@@ -311,6 +311,18 @@ int main() {
   Serial.feed({0x90, 62, 0, 127, 0}); pump(20);
   std::printf("idle: %d LEDs lit after 9 s; a key on ends it -> %d lit\n", idleLit, countLit());
   CHECK(!attractOn && countLit() == (int)litFor(62).size(), "play ends idle: %d lit", countLit());
+  // No laptop: with no byte at all for 3 s, idle shows a standby pulse on the first 6 LEDs only, in the UI blue;
+  // a heartbeat brings the aurora back.
+  Serial.feed({0x80, 62}); for (int i = 0; i < 9; i++) { Serial.feed({0xFE}); pump(1000); }
+  CHECK(attractOn && countLit() > 100, "connected idle: the aurora");
+  pump(4500);
+  int standbyLit = 0, maxPulse = 0;
+  for (int k = 0; k < 40; k++) { pump(100); standbyLit = max(standbyLit, countLit()); maxPulse = max<int>(maxPulse, leds[0].b); }
+  CHECK(standbyLit > 0 && standbyLit <= STANDBY_LEDS && maxPulse > 20 && leds[0].r < leds[0].b, "no laptop: standby pulse, %d lit, peak %d", standbyLit, maxPulse);
+  Serial.feed({0xFE}); pump(1600);
+  std::printf("idle link: standby %d LEDs (peak blue %d); heartbeat back -> %d lit\n", standbyLit, maxPulse, countLit());
+  CHECK(attractOn && countLit() > 100, "a heartbeat brings the aurora back: %d", countLit());
+  Serial.feed({0x90, 62, 0, 127, 0, 0x80, 62}); pump(300);
   Serial.feed({0xF0}); defaults(); pump(5);
 
   // A save from older firmware (no hintRampMs at the end) still loads its calibration.

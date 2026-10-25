@@ -180,6 +180,7 @@ features = [
   "sheet-review",
   "rewind",
   "score-card",
+  "adaptive-chunks",
 ]
 cut = []
 

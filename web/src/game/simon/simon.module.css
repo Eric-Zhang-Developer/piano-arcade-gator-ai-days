@@ -1,0 +1,181 @@
+/* Simon Says (spec: simon-says-spike): visual-direction.md's tokens, one quiet page over the sky. */
+.page {
+  box-sizing: border-box;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 2vh;
+  padding: 4vh 4vw;
+  background: radial-gradient(ellipse at 50% 120%, rgba(255, 63, 164, 0.18), transparent 60%), var(--pa-sky);
+  color: var(--pa-ink);
+  overflow: hidden;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1em 2em;
+}
+
+.mark {
+  margin: 0;
+  font: italic 900 clamp(32px, 4.4vw, 64px) / 1 var(--pa-font-display);
+  letter-spacing: 0.02em;
+}
+
+.songs {
+  display: flex;
+  gap: 1.4em;
+}
+
+.songs a {
+  color: var(--pa-ink-dim);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.songs a[aria-current] {
+  color: var(--pa-cyan);
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4vh;
+}
+
+.call {
+  margin: 0;
+  font: italic 800 clamp(24px, 3.2vw, 48px) / 1.15 var(--pa-font-display);
+  text-align: center;
+  max-width: 28ch;
+}
+
+.turn {
+  color: var(--pa-hand-r);
+}
+
+.over {
+  color: var(--pa-wrong);
+}
+
+.won {
+  color: var(--pa-gold);
+}
+
+.dots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  max-width: 60vw;
+}
+
+.dots span {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--pa-ink-dim);
+}
+
+.dots span[data-done] {
+  background: var(--pa-hand-r);
+  border-color: var(--pa-hand-r);
+}
+
+.keys {
+  display: flex;
+  height: clamp(140px, 30vh, 280px);
+  max-width: 92vw;
+}
+
+.white,
+.black {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 12px;
+  font: 700 18px/1 var(--pa-font-display);
+  transition: background 60ms linear;
+}
+
+.white {
+  width: clamp(36px, 5vw, 72px);
+  margin-right: 3px;
+  border-radius: 0 0 8px 8px;
+  background: var(--pa-tier-x1);
+  color: #222;
+}
+
+.black {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: calc(-30% - 1.5px);
+  width: 60%;
+  height: 62%;
+  border-radius: 0 0 6px 6px;
+  background: #16161c;
+  color: var(--pa-ink-dim);
+  font-size: 14px;
+}
+
+.white[data-held],
+.black[data-held] {
+  background: var(--pa-cyan);
+  color: #000;
+}
+
+.white[data-lit],
+.black[data-lit] {
+  background: var(--pa-hand-r);
+  color: #000;
+  box-shadow: 0 0 24px var(--pa-hand-r);
+}
+
+.white[data-wrong],
+.black[data-wrong] {
+  background: var(--pa-wrong);
+}
+
+.again {
+  font: italic 800 22px/1 var(--pa-font-display);
+  padding: 14px 36px;
+  border: 2px solid var(--pa-magenta);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--pa-ink);
+  cursor: pointer;
+}
+
+.again kbd {
+  margin-left: 0.6em;
+  font: 600 13px/1 system-ui;
+  color: var(--pa-ink-dim);
+}
+
+.foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2em;
+  color: var(--pa-ink-dim);
+  font-size: 14px;
+}
+
+.foot p {
+  margin: 0;
+}
+
+.runs {
+  margin: 0;
+  padding-left: 1.4em;
+  max-height: 20vh;
+  overflow: auto;
+}

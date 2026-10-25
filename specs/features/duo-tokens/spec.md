@@ -33,9 +33,22 @@ screen repaints at once.
    - load the fonts in `layout.tsx`;
    - update the test.
 2. **`fix(hand-colors)`:** R `#2B9BFF`, L `#A07CFF`; `core/settings.ts` `noteColor`; the two tests that pin the old hex.
-3. **`fix(fever-stage)`:** the stage draws only during fever, as a short moment. Otherwise the playfield base is plain
-   `--pa-bg`.
-4. **`feat(duo-tokens)`:** `verify-duo.mjs`, the screenshots, the done note.
+3. *(Done separately: Eric's removal PR takes the stage off normal play and the black-key lane shading off /play.
+   Rebase on it. No stage work is left here, except that `<SelectStage/>` comes off the select in duo-select.)*
+4. **`feat(duo-tokens)`, the Duo kit** (Eric, 2026-10-25: "add the shared Duo kit to #645 and have select, HUD and
+   results use it"), in `web/src/game/duo-tokens/`. These are the pieces duo-select, duo-hud and duo-results share, so
+   there's one bracket style, not three:
+   - `Panel`: a hairline frame, 0 radius, `--pa-panel` fill, with a `paper` variant for sheet-paper;
+   - `Brackets`: corner brackets around any box, in `--pa-primary` or `--pa-line`;
+   - `Button`: `primary` (blue fill, light text) and `secondary` (hairline), with a visible focus ring, 0 radius;
+   - `DataCell`: a small monospace caps label over a big condensed numeral, with an optional judgment color for the
+     number only;
+   - `MonoLabel`: small monospace caps with wide tracking;
+   - **canvas twins:** `drawBrackets`, `drawPanel` and the font strings, from the same TS values, for the HUD's
+     canvas.
+   - A vitest render test renders every piece and state. A kit page is optional: `/lab` belongs to lab, so it'd be
+     a `fix(lab)` link to a route this feature owns.
+5. **`feat(duo-tokens)`:** `verify-duo.mjs`, the screenshots, the done note.
 
 ## Requirements
 - **Values, exactly as in visual-direction.md:**
@@ -43,7 +56,9 @@ screen repaints at once.
   - `--pa-hand-r` = `--pa-primary` = `#2B9BFF`, `--pa-hand-l` = `--pa-secondary` = `#A07CFF`;
   - `--pa-miss` `#8A8F98`;
   - `--pa-line` = ink-dim at about 25% alpha;
-  - `--pa-magenta` and `--pa-cyan` stay defined but alias `--pa-primary` and `--pa-secondary`, so old readers repaint
+  - `--pa-hype` `#ff2fd0` is added, and `--pa-magenta` stays `#ff2fd0` as its alias (hype pink, Eric 2026-10-25:
+    moments only, see visual-direction.md). Any `--pa-magenta` reader that isn't one of the hype moments moves to
+    `--pa-primary`. `--pa-cyan` aliases `--pa-primary`, so old readers repaint
     instead of breaking;
   - GOOD, gold, WRONG, flare, the sun and sky colors, and the tier colors are **unchanged**.
 - **Paper:** `--pa-paper` (warm off-white) and `--pa-paper-ink` (near-black). The worker picks the exact values with
@@ -74,7 +89,9 @@ screen repaints at once.
    2. `/play`: no stage canvas outside fever, with fever forced through the test hook if one exists.
    3. A button on `/` has a computed `border-radius` of `0px`; `/learn`'s radii are unchanged from main.
    4. Screenshots `duo-select.png` and `duo-play.png` at 1280×720 and 1920×1080.
-4. Eric looks once, and the LED strip shows blue for the right hand and purple for the left. Mark it in the done
+4. The kit: its render test shows each piece (Panel and its paper variant, Brackets, Button primary,
+   secondary and focused, DataCell, MonoLabel) with 0 radius, and `drawBrackets` draws four corners inside its box.
+5. Eric looks once, and the LED strip shows blue for the right hand and purple for the left. Mark it in the done
    note.
 
 ## Defaults

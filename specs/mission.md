@@ -11,7 +11,9 @@ A person at a real piano keyboard who wants to get better and have fun doing it.
 judges: they can play the browser version on laptop keys.
 
 ## What
-Piano Arcade: a Japanese-style arcade rhythm game played on a real 88-key piano (a Yamaha DGX-660) in Chrome. Notes
+*Named Étude on 2026-10-25; the working name was Piano Arcade (`specs/context/naming.md`).*
+
+Étude: a Japanese-style arcade rhythm game played on a real 88-key piano (a Yamaha DGX-660) in Chrome. Notes
 fall toward the keys, every note you play is judged to the millisecond, and the game answers with combo, bursts and
 sound. A learning side reads your takes and tells you what to fix. At the end a player can play a real piece on a
 real piano, see exactly how they played it, and be told what to practice next.

@@ -3,7 +3,7 @@ import { actionFor, byId } from './data';
 import { contextualActivity, preparedActivity } from './prepared';
 
 describe('contextual activity entry', () => {
-  it('enters each supported demonstration directly with its skill and musical example', () => {
+  it('routes each supported demonstration to its activity', () => {
     const mappings = {
       'theory.phrase-endings': '/learn/understand',
       'theory.tonal-center': '/learn/review/theory',
@@ -15,7 +15,6 @@ describe('contextual activity entry', () => {
       const skill = byId.get(id)!;
       const target = contextualActivity(actionFor(skill).action!);
       expect(target?.activity.href).toBe(href);
-      expect(target?.context).toMatchObject({ title: skill.title, demoActivity: skill.activity });
     }
     expect(contextualActivity(preparedActivity.action)?.activity.id).toBe(preparedActivity.activityId);
   });

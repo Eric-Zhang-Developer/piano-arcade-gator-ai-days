@@ -10,7 +10,7 @@ export function contextualActivity(action: GraphAction) {
   const group: 'Learn' | 'Review' = action.intent === 'learn' ? 'Learn' : 'Review';
   const title = action.domain === 'theory' ? 'Theory' : 'Practice';
   const activity = activities.find(item => item.group === group && item.title === title)!;
-  return { activity, context: { activityId: activity.id, group, title: skill.title, demoActivity: skill.activity } };
+  return { activity };
 }
 
 // An authored prepared example, not a cross-domain ranking or a connected agent.

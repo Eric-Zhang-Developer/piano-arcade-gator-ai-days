@@ -9,7 +9,6 @@ export function LearningLanding() {
   const target = contextualActivity(preparedActivity.action)!;
   const complete = isSessionComplete(target.activity.id, sessions);
   function openPreparedActivity() {
-    sessions.setGraphContext(target.context);
     if (complete) sessions.restart(target.activity.id);
     router.push(target.activity.href);
   }

@@ -542,7 +542,7 @@
       "id": "n77",
       "pitch": 65,
       "beat": 31,
-      "duration": 2,
+      "duration": 0.833333,
       "hand": "L"
     },
     {
@@ -570,7 +570,7 @@
       "id": "n81",
       "pitch": 65,
       "beat": 33,
-      "duration": 2,
+      "duration": 1.75,
       "hand": "L"
     },
     {
@@ -591,7 +591,7 @@
       "id": "n84",
       "pitch": 65,
       "beat": 35,
-      "duration": 0.5,
+      "duration": 0.833333,
       "hand": "L"
     }
   ]

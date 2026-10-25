@@ -132,11 +132,11 @@ function AdaptAfter(props: { chart: Chart; params: URLSearchParams; take: Take; 
         <span className={styles.dim}>{pass ? pct : `· ${Math.round(adaptSettings.passAccuracy * 100)}% to pass`}</span>
       </p>
       <Strip list={list} from={state.from} to={state.to} scores={new Map(r.phrases.map((p) => [p.from, p.accuracy]))} />
-      <a ref={ref} data-testid="adapt-next" className={styles.next} href={href}>
+      <a ref={ref} data-testid="adapt-next" {...kitButton("primary")} href={href}>
         {text}
       </a>
       {step === "floor" && tempo > adaptSettings.slowTempo && playMode(params) !== "flow" && (
-        <a data-testid="adapt-slower" className={styles.ghost} href={url(to, adaptSettings.slowTempo)}>
+        <a data-testid="adapt-slower" {...kitButton("secondary")} href={url(to, adaptSettings.slowTempo)}>
           Slower: {adaptSettings.slowTempo}%
         </a>
       )}
@@ -159,7 +159,8 @@ function StepLine({ index, of, step, flow }: { index: number; of: number; step: 
   );
 }
 
-function AfterPlay({ params, results, list, index }: { params: URLSearchParams; results: Results; list: Chunk[]; index: number }) {
+// Exported for its kit test.
+export function AfterPlay({ params, results, list, index }: { params: URLSearchParams; results: Results; list: Chunk[]; index: number }) {
   const go = nextAfter(list, index, results.accuracy);
   const ref = useRef<HTMLAnchorElement>(null);
   // An effect runs after Retry's autoFocus, so the way on takes focus and Enter moves on. The panel is featured in the
@@ -176,7 +177,7 @@ function AfterPlay({ params, results, list, index }: { params: URLSearchParams; 
         <p className={styles.verdict}>
           <span className={styles.clear}>Chunk {index + 1} clear</span> <span className={styles.dim}>{pct}</span>
         </p>
-        <a ref={ref} data-testid="chunk-next" className={styles.next} href={"next" in go ? stepUrl(params, go.next, "learn") : wholeSongUrl(params)}>
+        <a ref={ref} data-testid="chunk-next" {...kitButton("primary")} href={"next" in go ? stepUrl(params, go.next, "learn") : wholeSongUrl(params)}>
           {"next" in go ? `Next: ${barsLabel(go.next)}` : "Play the whole song"}
         </a>
       </div>
@@ -190,7 +191,7 @@ function AfterPlay({ params, results, list, index }: { params: URLSearchParams; 
         <span className={styles.fill} />
         <span className={styles.gate} />
       </div>
-      <a data-testid="chunk-again" className={styles.ghost} href={stepUrl(params, list[index], "learn")}>
+      <a data-testid="chunk-again" {...kitButton("secondary")} href={stepUrl(params, list[index], "learn")}>
         Learn {barsLabel(list[index])} again
       </a>
     </div>

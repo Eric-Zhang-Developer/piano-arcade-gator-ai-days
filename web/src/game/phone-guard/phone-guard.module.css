@@ -19,9 +19,8 @@
   box-sizing: border-box; /* the padding inside the width, or a phone's card runs edge to edge */
   width: min(100%, 480px);
   padding: 28px 24px;
-  border-radius: 14px;
+  border: 1px solid var(--pa-line); /* the kit's Panel: a hairline, square */
   background: var(--pa-panel);
-  box-shadow: 0 0 0 1px rgba(255, 47, 208, 0.35), 0 0 32px rgba(255, 47, 208, 0.18);
   color: var(--pa-ink);
   font: 400 17px / 1.45 system-ui, sans-serif;
   text-align: center;
@@ -30,7 +29,6 @@
 .wordmark {
   margin: 0 0 18px;
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
   font-weight: 900;
   font-size: 36px;
   line-height: 1;
@@ -63,19 +61,12 @@
   text-underline-offset: 3px;
 }
 
-.link:focus-visible,
-.anyway:focus-visible {
+.link:focus-visible {
   outline: 2px solid var(--pa-primary);
   outline-offset: 3px;
 }
 
+/* The kit's secondary button (index.tsx), kept a thumb's height. */
 .anyway {
   min-height: 44px;
-  padding: 0 20px;
-  border: 1px solid var(--pa-ink-dim);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--pa-ink);
-  font: 600 16px system-ui, sans-serif;
-  cursor: pointer;
 }

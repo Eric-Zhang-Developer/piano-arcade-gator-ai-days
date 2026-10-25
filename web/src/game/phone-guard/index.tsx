@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import styles from "./phone-guard.module.css";
 import { APP_NAME } from "../app-name";
+import { kitButton } from "../duo-tokens";
 
 export const phoneGuardSettings = {
   repoUrl: "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days",
@@ -69,7 +70,7 @@ export function PhoneGuard() {
             </a>
           )}
         </div>
-        <button type="button" className={styles.anyway} onClick={playAnyway}>
+        <button type="button" className={[kitButton("secondary").className, styles.anyway].join(" ")} style={kitButton("secondary").style} onClick={playAnyway}>
           Play anyway
         </button>
       </div>

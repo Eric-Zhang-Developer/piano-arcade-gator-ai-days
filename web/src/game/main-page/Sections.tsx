@@ -51,9 +51,11 @@ export function SectionChips({
       </nav>
       {count > 0 && (
         <MonoLabel style={{ fontSize: READ }}>
-          <span className={css.place} data-testid="list-place" aria-label={`Song ${place} of ${count}`}>
+          {/* A span can't take a name, so the place is read from text (#1237). */}
+          <span className={css.place} data-testid="list-place" aria-hidden="true">
             <b>{place}</b> / {count}
           </span>
+          <span className={css.srOnly}>{`Song ${place} of ${count}`}</span>
         </MonoLabel>
       )}
     </div>

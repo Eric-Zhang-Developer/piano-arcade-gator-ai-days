@@ -2,8 +2,9 @@
 // the counters and the score. hud draws the band and song card; this draws into it, and nothing in plain mode.
 import type { Frame, GameEvent, GamePlugin } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
+import { canvasFonts, kitSettings } from "../duo-tokens";
 import { hudLayout, hudSettings } from "../hud";
-import { cyan, whenDisplayFontReady } from "../ui-tokens";
+import { cyan } from "../ui-tokens";
 import { isWaitMode } from "../wait-mode";
 
 export interface WaitHudState {
@@ -25,7 +26,7 @@ export function reduceWaitHud(s: WaitHudState, e: GameEvent): WaitHudState {
   return s; // a WRONG, an extra or anything else changes nothing
 }
 
-function drawWaitHud(ctx: CanvasRenderingContext2D, f: Frame, s: WaitHudState, display: string): void {
+function drawWaitHud(ctx: CanvasRenderingContext2D, f: Frame, s: WaitHudState): void {
   const { h } = hudLayout(f.width, f.judgmentLineY).panel;
   const pad = Math.max(10, h * 0.25);
   ctx.textBaseline = "middle";
@@ -35,7 +36,7 @@ function drawWaitHud(ctx: CanvasRenderingContext2D, f: Frame, s: WaitHudState, d
   const mid = f.width / 2;
   ctx.textAlign = "center";
   ctx.fillStyle = "#ffffff";
-  ctx.font = `italic 800 ${Math.round(h * 0.42)}px ${display}`;
+  ctx.font = canvasFonts.numeral(Math.round(h * 0.42)); // Duo: upright, the kit's condensed numeral
   ctx.fillText(`${noteOn(s)} / ${s.N}`, mid, h * 0.42);
   ctx.fillStyle = "rgba(255,255,255,0.55)";
   ctx.font = `600 ${Math.round(h * 0.16)}px ${hudSettings.font}`;
@@ -44,14 +45,14 @@ function drawWaitHud(ctx: CanvasRenderingContext2D, f: Frame, s: WaitHudState, d
   // Where the score and multiplier were: a LEARN badge in the cabinet's cyan, the word at the multiplier's size in a
   // cyan frame, so it reads as a mode and not as a number.
   const size = Math.round(h * 0.5);
-  ctx.font = `italic 900 ${size}px ${display}`;
+  ctx.font = canvasFonts.display(size);
   const right = f.width - pad - hudSettings.statusGutterPx;
   const w = ctx.measureText("LEARN").width + size * 0.7;
   const bh = size * 1.15;
   ctx.strokeStyle = cyan;
-  ctx.lineWidth = Math.max(2, h * 0.03);
+  ctx.lineWidth = kitSettings.hairline; // Duo: a square hairline frame, like every interface element
   ctx.beginPath();
-  ctx.roundRect(right - w, h * 0.5 - bh / 2, w, bh, bh * 0.22);
+  ctx.rect(right - w, h * 0.5 - bh / 2, w, bh);
   ctx.stroke();
   ctx.textAlign = "center";
   ctx.fillStyle = cyan;
@@ -67,12 +68,6 @@ declare global {
 export function waitHud(): GamePlugin {
   let wait = false;
   let state: WaitHudState = { N: 0, hits: 0 };
-  let display = hudSettings.font; // the display face once it has loaded, as the HUD does
-  if (typeof document !== "undefined")
-    void whenDisplayFontReady().then(() => {
-      const family = getComputedStyle(document.documentElement).getPropertyValue("--pa-font-display").trim();
-      if (family) display = `${family}, ${hudSettings.font}`;
-    });
   const publish = () => {
     if (wait && typeof window !== "undefined") window.__pianoArcadeWaitHud = { n: noteOn(state), N: state.N };
   };
@@ -90,7 +85,7 @@ export function waitHud(): GamePlugin {
       publish();
     },
     draw(ctx, frame) {
-      if (wait) drawWaitHud(ctx, frame, state, display);
+      if (wait) drawWaitHud(ctx, frame, state);
     },
   };
 }

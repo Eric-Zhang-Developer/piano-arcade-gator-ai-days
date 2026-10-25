@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { GameEvent } from "../../contracts";
+import { canvasFonts } from "../duo-tokens";
 import { cyan } from "../ui-tokens";
 import { noteOn, reduceWaitHud, waitHud } from ".";
 
@@ -54,7 +55,8 @@ describe("the plugin", () => {
     expect(out.map((o) => o.text)).toEqual(["6 / 42", "NOTE", "LEARN"]);
     const learn = out.find((o) => o.text === "LEARN")!;
     expect(learn.fill).toBe(cyan); // the token, which Duo repaints (duo-tokens)
-    expect(learn.font).toMatch(/^italic 900 /);
+    expect(learn.font).toBe(canvasFonts.display(Number(/(\d+)px/.exec(learn.font)![1]))); // Duo: upright, the kit's face
+    expect(out[0].font).not.toMatch(/italic/);
     for (const o of [learn, out[0]]) expect(Number(/(\d+)px/.exec(o.font)![1])).toBeGreaterThanOrEqual(24);
   });
 

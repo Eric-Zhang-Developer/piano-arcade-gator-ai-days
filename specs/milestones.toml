@@ -183,6 +183,9 @@ features = [
   "miss-moment", # Eric, 2026-10-25 (#1038): one deep polish pass on a miss, quiet and readable, a #856 hero moment
   "take-graph-pass", # Eric, 2026-10-25 (#1083): one deep polish pass on the take graph, read in 5 s, a #856 hero item
   "highway-field", # Eric, 2026-10-25 (#1114): one deep polish pass on the highway's dark field, a #856 hero item
+  "round", # Eric, 2026-10-25 (#1123): wow feeder; play a round once and the DGX echoes it as voices 2-4, an experiment
+  "fever-arc", # Eric, 2026-10-25 (#1150): fever as one designed arc, build-up, drop, sustain, release, a #856 hero item
+  "hand-palette", # Eric, 2026-10-25 (#1127): the hand and judgment colors solved for CVD, compared in the Lab first
   "laptop-sound",
   "flow-mode",
   "duo-tokens",
@@ -242,6 +245,7 @@ features = ["simon-says-spike", "restyle-spike", "score-follow-spike", "wrong-no
   "real-keys", # Eric, 2026-10-25 (#1017): wow feeder; the notes fall onto live video of the real DGX keys
   "composers-hands", # Eric, 2026-10-25 (#1069): wow feeder; the composer's own piano roll on the DGX, then a duet
   "wet-paint", # Eric, 2026-10-25 (#1106): wow feeder; free play where every note blooms as paint, wet under the pedal
+  "speaking-piano", # Eric, 2026-10-25 (#1153): wow feeder; can the DGX say a short phrase a listener understands
 ]
 cut = []
 

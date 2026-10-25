@@ -178,3 +178,23 @@ RL@85-89.5~-16,RL@96-101.5~+16,RL@101.5-104~-16"
 for s in debussy-arabesque-1 pathetique-2; do .venv/bin/python perform.py pedal $S/$s/chart.json --harmony; done
 python3 -c 'import json; print(json.dumps({"pedal": [[float(b), float(b + 1)] for b in range(48)]}))' > $S/chopin-prelude-20/pedal.json
 ```
+Batch 9 (#1105), from each piece page's `.ly` and `.mid` on Mutopia: `ftp/ChopinFF/O66/chopin_fantaisie-impromptu/`,
+`ftp/ChopinFF/O10/op-10-12-wfi/`, `ftp/LisztF/S.172/liszt-consolation-no3/`, `ftp/RachmaninoffS/O3/rach-prelude-op3-no2/`
+and `ftp/BeethovenLv/O13/pathetique-3/`. Main's `dynamics` misreads four of them; #1121's reader prints the lists, which
+are applied with `velocity --marks`. For the Revolutionary and the Pathétique, the marks the reader misses are added by
+hand. The Consolation is hand-read, because its staves are inline.
+```bash
+S=../../web/public/songs
+.venv/bin/python perform.py dynamics $S/chopin-fantaisie-impromptu/chart.json --ly source/chopin_fantaisie-impromptu.ly \
+  --right upper --left lower --midi source/chopin_fantaisie-impromptu.mid --bars 1-24   # #1121's reader; prints the list
+.venv/bin/python perform.py dynamics $S/chopin-revolutionary/chart.json --ly source/op-10-12-wfi.ly --right rechts \
+  --left links --midi source/op-10-12-wfi.mid --bars 1-18   # #1121's; then velocity --marks "<it>,RL@26-28~+16"
+.venv/bin/python perform.py dynamics $S/rachmaninoff-prelude-cs/chart.json --ly source/rach-prelude-op3-no2.ly \
+  --right righthand --left lefthand --midi source/rach-prelude-op3-no2.mid --pickup 2 --bars 1-14   # #1121's
+.venv/bin/python perform.py velocity $S/liszt-consolation-3/chart.json --marks "RL@0=ppp,R@48!,RL@52-54~+16,R@109/2!,R@56!"
+.venv/bin/python perform.py velocity $S/pathetique-3/chart.json \
+  --marks "RL@5/2=p,RL@65=f,RL@72=p,RL@72!,RL@88=p,RL@88!,RL@132=p,L@134!,L@138!,RL@175=p"
+.venv/bin/python perform.py pedal $S/chopin-fantaisie-impromptu/chart.json --midi source/chopin_fantaisie-impromptu.mid --bars 1-24
+.venv/bin/python perform.py pedal $S/liszt-consolation-3/chart.json --midi source/liszt-consolation-no3.mid --bars 1-18
+for s in rachmaninoff-prelude-cs pathetique-3; do .venv/bin/python perform.py pedal $S/$s/chart.json --harmony; done
+```

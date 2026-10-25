@@ -14,8 +14,13 @@ export type Sound = "stinger" | "sweep" | "fanfare" | "drumroll" | "rankHit" | "
 
 export const soundSettings = {
   fanfareAfterHitMs: 150, // a full combo's fanfare follows the rank hit
-  missLevel: 0.15, // the miss cue's; the milestone voices' levels are milestone-sfx's
+  missLevel: 0.05, // the miss cue's: 21.1 dB under the laptop piano's C4 (0.15 was 12.6; miss-moment wants 18 or more). The milestone voices' levels are milestone-sfx's
+  missGapMs: 120, // miss-moment: in a run of misses, at most one cue per this
 };
+
+// The last miss cue's chart time, so a run of misses makes at most one cue per missGapMs (miss-moment). One per take.
+export type MissGate = { lastMissMs: number };
+export const missGate = (): MissGate => ({ lastMissMs: -Infinity });
 
 export interface Prefs {
   volume: number; // 0–1, master for effects
@@ -66,7 +71,7 @@ export function savePrefs(p: Prefs): void {
 
 // Pure: which sounds a list of events makes, and when on the audio clock. audioAtZero is the audio time (s) of
 // chart time 0. The rank hit lands when rank-stamp's stamp hits.
-export function soundsFor(events: GameEvent[], audioAtZero: number, missCue = true): { sound: Sound; startTime: number }[] {
+export function soundsFor(events: GameEvent[], audioAtZero: number, missCue = true, gate = missGate()): { sound: Sound; startTime: number }[] {
   const at = (ms: number) => audioAtZero + ms / 1000;
   const { fanfareAfterHitMs } = soundSettings;
   return events.flatMap((e): { sound: Sound; startTime: number }[] => {
@@ -75,8 +80,12 @@ export function soundsFor(events: GameEvent[], audioAtZero: number, missCue = tr
         return [{ sound: "stinger", startTime: at(e.atMs) }];
       case "feverStart":
         return [{ sound: "sweep", startTime: at(e.atMs) }];
-      case "noteMiss":
-        return missCue ? [{ sound: "miss", startTime: at(e.atMs) }] : [];
+      case "noteMiss": {
+        const since = e.atMs - gate.lastMissMs;
+        if (!missCue || (since >= 0 && since < soundSettings.missGapMs)) return []; // a rewind moves time back: a new run
+        gate.lastMissMs = e.atMs;
+        return [{ sound: "miss", startTime: at(e.atMs) }];
+      }
       case "fullCombo":
         return [{ sound: "fanfare", startTime: at(e.atMs + stampImpactMs() + fanfareAfterHitMs) }];
       case "songEnd":
@@ -135,13 +144,14 @@ export interface SchedulerOptions {
 // RECORD's at its stamp. Every milestone sound passes the loudness rule; the miss cue stays as juice-sound has it.
 export function scheduler(o: SchedulerOptions): (e: GameEvent, audioAtZero: number) => Scheduled[] {
   const clear = clearWatch(o.notes);
+  const gate = missGate();
   let clearMs: number | null = null; // the clear card's moment: a combo step on the same note gives way to it
   return (e, audioAtZero) => {
     if (o.wait && (e.type === "songEnd" || e.type === "fullCombo")) return []; // the judge sends no fullCombo in wait mode today
     const kind = clear(e);
     if (kind) clearMs = e.atMs;
     if (e.type === "comboMilestone" && e.atMs === clearMs) return [];
-    const atMs: { sound: Voice | "miss"; ms: number }[] = soundsFor([e], 0, o.missCue()).map((s) => ({ sound: s.sound, ms: s.startTime * 1000 }));
+    const atMs: { sound: Voice | "miss"; ms: number }[] = soundsFor([e], 0, o.missCue(), gate).map((s) => ({ sound: s.sound, ms: s.startTime * 1000 }));
     if (kind && !o.wait) atMs.push({ sound: CLEAR_VOICE[kind], ms: e.atMs });
     if (e.type === "songEnd" && o.newRecord()) atMs.push({ sound: "newRecord", ms: e.atMs + newRecordImpactMs() });
     return atMs.map(({ sound, ms }) => ({
@@ -153,8 +163,12 @@ export function scheduler(o: SchedulerOptions): (e: GameEvent, audioAtZero: numb
   };
 }
 
+// The miss cue: low and short, so it's heard but never mistaken for the piano. miss-moment measures it against the piano.
+export const playMissCue = (ctx: BaseAudioContext, out: AudioNode, t: number, level = soundSettings.missLevel) =>
+  tone(ctx as AudioContext, out, "sine", 98, t, 0.12, level);
+
 function play(ctx: AudioContext, out: AudioNode, s: Scheduled, t: number) {
-  if (s.sound === "miss") tone(ctx, out, "sine", 98, t, 0.12, soundSettings.missLevel); // low and short, so it's heard but never mistaken for the piano
+  if (s.sound === "miss") playMissCue(ctx, out, t);
   else playVoice(ctx, out, s.sound, t, s.gain, s.count);
 }
 

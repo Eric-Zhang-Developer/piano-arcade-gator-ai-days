@@ -1,6 +1,7 @@
 "use client";
-// Help overlay (spec: help-overlay): ? opens one card with every control, on /, /simon and /play's start screen and
-// results. On / and /simon the keys are listed only here, behind the quiet HelpLink (spec: mouse-first).
+// Help overlay (spec: help-overlay): ? opens one card with every control, on /, /simon, /wrong-note and /play's start
+// screen and results. On /, /simon and /wrong-note the keys are listed only here, behind the quiet HelpLink (spec:
+// mouse-first).
 // Not during a take or its pause menu: /play's own Esc listener would see the Esc that closes the card and resume.
 // A native <dialog> (showModal): Esc, the focus trap and the inert page are the browser's.
 import { usePathname } from "next/navigation";
@@ -35,7 +36,7 @@ export function HelpOverlay() {
   const ref = useRef<HTMLDialogElement>(null);
   const back = useRef<HTMLElement | null>(null);
   const path = usePathname();
-  const here = path === "/" || path === "/play" || path === "/simon";
+  const here = path === "/" || path === "/play" || path === "/simon" || path === "/wrong-note";
 
   useEffect(() => {
     if (!here) return;
@@ -111,7 +112,7 @@ export function HelpOverlay() {
   );
 }
 
-// The one way to the card by mouse on / and /simon: quiet, so it never competes with the song list or Start.
+// The one way to the card by mouse on /, /simon and /wrong-note: quiet, so it never competes with the song list or Start.
 export function HelpLink() {
   return (
     <button

@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Chart } from "../../contracts";
 import { Brackets, Button, MonoLabel, kitButton, kitChip } from "../../game/duo-tokens";
+import { HelpLink } from "../../game/help-overlay";
 import { PIANO_NAME } from "../../game/laptop-sound";
 import { melody } from "../../game/simon";
 import { newSet, roundMessages, score, sendAhead, step, wrongNoteSettings, type WrongNoteEvent, type WrongNoteSet } from "../../game/wrong-note";
@@ -230,6 +231,7 @@ function WrongNote() {
       </section>
 
       <footer className={styles.foot}>
+        <HelpLink />
         {/* The seed shows in the set list below, which is what gets copied into FINDINGS.md (#1039: no debug line). */}
         <p>{outName === null ? "Looking for the piano" : outName ? `On ${outName}` : "No piano output: nothing will sound"}</p>
         {sets.length > 0 && (

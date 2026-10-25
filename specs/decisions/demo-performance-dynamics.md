@@ -90,6 +90,21 @@ before comes out unchanged.
 - raindrop-prelude (bars 1–27): p at bars 1, 8 (its fourth beat) and 20, with the swells in bars 2–4, 6–8, 13–14,
   18–19, 21–23 and 25–27: 49–65.
 
+**Batch 9** (#1105). Main's `dynamics` misreads the Fantaisie (called music), the Revolutionary (German `h`), the
+Rachmaninoff (`\octaveCheck`) and the Pathétique (`\slashedGrace`); #1121's reader reads them true. Its printed lists are
+applied with `velocity --marks`, plus the two marks it misses (below). The Consolation is hand-read (inline staves). The
+four charts that carried their MIDI's velocities have them replaced.
+- chopin-fantaisie-impromptu (bars 1–24): LH sf on the opening octave and f at bar 3; RH p at bar 5, f at bar 13 with
+  accents on every beat to bar 16, p at bar 17 with accents on each second 16th; *cresc.*, *dim.* and hairpins: 17–112.
+  Bars 20–24's three diminuendos stack down to 17 under the hairpin rule, not a printed ppp.
+- chopin-revolutionary (bars 1–18): f at bars 1 and 3, RH f/p in bars 10–13, an fz at bar 14, hairpins, LH accents on
+  every beat of bars 1–6, and a *cresc.* markup at bar 7 beat 3 that the reader misses (added by hand): 49–113.
+- liszt-consolation-3 (bars 1–18): ppp *sempre legatissimo*; accents at bars 13 and 15, a hairpin and a marcato in bar 14: 16–48.
+- rachmaninoff-prelude-cs (pickup and bars 1–13): ff with accents on the three opening chords, ppp at bar 3, mf at bar
+  7, ppp at bars 9 and 13: 16, 80 and 127 (ff plus an accent clamps at 127).
+- pathetique-3 (pickup and bars 1–43): p, f at bar 16, fp at bars 18 and 22, p at bars 33 and 43, and LH sf in bars
+  33–34, written inside a chord, which the reader misses (added by hand): 49, 65 and 96.
+
 A single level reads as "This score marks no dynamics" in the dynamics grade (it needs two levels), as before.
 
 **How to undo.** Strip `velocity` from a chart: it plays at 80 again.

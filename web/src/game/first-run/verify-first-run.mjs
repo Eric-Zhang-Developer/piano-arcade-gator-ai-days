@@ -106,7 +106,9 @@ for (const [w, h] of [
   await page.waitForURL((u) => u.searchParams.get("firstrun") === "1", { timeout: 60_000 });
   check(page.url() === base + FIRST_RUN, `${size} 2: the link opens ${FIRST_RUN} (${page.url().slice(base.length)})`);
   await page.getByTestId("first-run-start").waitFor({ timeout: 60_000 });
-  check((await activeId(page)) === "BUTTON", `${size} 2: Start keeps its focus`);
+  // Start's id since #1100 (watch-demo clicks Start by it); activeId reads the id before the tag.
+  const startFocus = await activeId(page);
+  check(startFocus === "start", `${size} 2: Start keeps its focus (${startFocus})`);
   await page.screenshot({ path: join(out, `${size}-start.png`) });
 
   await page.goto(`${base}${FIRST_RUN}&input=test`);

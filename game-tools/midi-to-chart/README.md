@@ -76,3 +76,14 @@ Batch 1 (#815), with the song pack's sources plus `fur_Elise_WoO59.ly`
 .venv/bin/python perform.py velocity ../../web/public/songs/fur-elise/chart.json --mark pp
 .venv/bin/python perform.py velocity ../../web/public/songs/moonlight-1/chart.json --mark pp
 ```
+Batch 3 (#818), with `25EF-02.ly` and `K545-1.ly` (Mutopia 203 and 998) read by hand for the marks:
+```bash
+.venv/bin/python perform.py pedal ../../web/public/songs/clementi-sonatina-36-1/chart.json --harmony
+.venv/bin/python perform.py pedal ../../web/public/songs/bach-prelude-c/chart.json --harmony
+.venv/bin/python perform.py pedal ../../web/public/songs/mozart-545-1/chart.json --harmony
+.venv/bin/python perform.py velocity ../../web/public/songs/burgmuller-arabesque/chart.json \
+  --marks "L@0=p,R@4=p,RL@8-18~+16,R@19!,RL@20=p,RL@24-34~+16"
+.venv/bin/python perform.py velocity ../../web/public/songs/mozart-545-1/chart.json --marks "R@0=mp,L@0=p,R@8!,\
+RL@10-11~+16,R@12!,RL@13-14~-16,RL@16=p,RL@16-17.75~+16,RL@18-19.75~-16,RL@20-21.75~+16,RL@22-23.75~-16,\
+RL@24-25.75~+16,RL@26-27.75~-16,RL@28-29.75~+16,RL@30-31.75~-16,RL@32=p,RL@34.25-35.75~+16,RL@40=f,R@40!"
+```

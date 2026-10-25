@@ -13,7 +13,7 @@
       "beat": 0,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n2",
@@ -21,7 +21,7 @@
       "beat": 0,
       "duration": 2,
       "hand": "R",
-      "velocity": 77
+      "velocity": 64
     },
     {
       "id": "n3",
@@ -29,7 +29,7 @@
       "beat": 0.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n4",
@@ -37,7 +37,7 @@
       "beat": 1,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n5",
@@ -45,7 +45,7 @@
       "beat": 1.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n6",
@@ -53,7 +53,7 @@
       "beat": 2,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n7",
@@ -61,7 +61,7 @@
       "beat": 2,
       "duration": 1,
       "hand": "R",
-      "velocity": 77
+      "velocity": 64
     },
     {
       "id": "n8",
@@ -69,7 +69,7 @@
       "beat": 2.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n9",
@@ -77,7 +77,7 @@
       "beat": 3,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n10",
@@ -85,7 +85,7 @@
       "beat": 3,
       "duration": 1,
       "hand": "R",
-      "velocity": 77
+      "velocity": 64
     },
     {
       "id": "n11",
@@ -93,7 +93,7 @@
       "beat": 3.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n12",
@@ -101,7 +101,7 @@
       "beat": 4,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n13",
@@ -109,7 +109,7 @@
       "beat": 4,
       "duration": 1.5,
       "hand": "R",
-      "velocity": 77
+      "velocity": 64
     },
     {
       "id": "n14",
@@ -117,7 +117,7 @@
       "beat": 4.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n15",
@@ -125,7 +125,7 @@
       "beat": 5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n16",
@@ -133,7 +133,7 @@
       "beat": 5.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n17",
@@ -141,7 +141,7 @@
       "beat": 5.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 77
+      "velocity": 64
     },
     {
       "id": "n18",
@@ -149,7 +149,7 @@
       "beat": 5.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 77
+      "velocity": 64
     },
     {
       "id": "n19",
@@ -157,7 +157,7 @@
       "beat": 6,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n20",
@@ -165,7 +165,7 @@
       "beat": 6,
       "duration": 1,
       "hand": "R",
-      "velocity": 77
+      "velocity": 64
     },
     {
       "id": "n21",
@@ -173,7 +173,7 @@
       "beat": 6.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n22",
@@ -181,7 +181,7 @@
       "beat": 7,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n23",
@@ -189,7 +189,7 @@
       "beat": 7.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n24",
@@ -197,7 +197,7 @@
       "beat": 8,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n25",
@@ -205,7 +205,7 @@
       "beat": 8,
       "duration": 2,
       "hand": "R",
-      "velocity": 77
+      "velocity": 80
     },
     {
       "id": "n26",
@@ -213,7 +213,7 @@
       "beat": 8.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n27",
@@ -221,7 +221,7 @@
       "beat": 9,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n28",
@@ -229,7 +229,7 @@
       "beat": 9.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n29",
@@ -237,7 +237,7 @@
       "beat": 10,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n30",
@@ -245,7 +245,7 @@
       "beat": 10,
       "duration": 1,
       "hand": "R",
-      "velocity": 77
+      "velocity": 64
     },
     {
       "id": "n31",
@@ -253,7 +253,7 @@
       "beat": 10.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 57
     },
     {
       "id": "n32",
@@ -261,7 +261,7 @@
       "beat": 11,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 65
     },
     {
       "id": "n33",
@@ -269,7 +269,7 @@
       "beat": 11,
       "duration": 1,
       "hand": "R",
-      "velocity": 106
+      "velocity": 80
     },
     {
       "id": "n34",
@@ -277,7 +277,7 @@
       "beat": 11.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 65
     },
     {
       "id": "n35",
@@ -285,7 +285,7 @@
       "beat": 12,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 65
     },
     {
       "id": "n36",
@@ -293,7 +293,7 @@
       "beat": 12,
       "duration": 1,
       "hand": "R",
-      "velocity": 106
+      "velocity": 96
     },
     {
       "id": "n37",
@@ -301,7 +301,7 @@
       "beat": 12.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 65
     },
     {
       "id": "n38",
@@ -309,7 +309,7 @@
       "beat": 13,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 65
     },
     {
       "id": "n39",
@@ -317,7 +317,7 @@
       "beat": 13,
       "duration": 0.5,
       "hand": "R",
-      "velocity": 106
+      "velocity": 80
     },
     {
       "id": "n40",
@@ -325,7 +325,7 @@
       "beat": 13.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 57
     },
     {
       "id": "n41",
@@ -333,7 +333,7 @@
       "beat": 13.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 91
+      "velocity": 72
     },
     {
       "id": "n42",
@@ -341,7 +341,7 @@
       "beat": 13.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 84
+      "velocity": 68
     },
     {
       "id": "n43",
@@ -349,7 +349,7 @@
       "beat": 14,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n44",
@@ -357,7 +357,7 @@
       "beat": 14,
       "duration": 1,
       "hand": "R",
-      "velocity": 77
+      "velocity": 64
     },
     {
       "id": "n45",
@@ -365,7 +365,7 @@
       "beat": 14.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n46",
@@ -373,7 +373,7 @@
       "beat": 15,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n47",
@@ -381,7 +381,7 @@
       "beat": 15.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n48",
@@ -389,7 +389,7 @@
       "beat": 16,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n49",
@@ -397,7 +397,7 @@
       "beat": 16,
       "duration": 0.5,
       "hand": "R",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n50",
@@ -405,7 +405,7 @@
       "beat": 16.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 78
+      "velocity": 54
     },
     {
       "id": "n51",
@@ -413,7 +413,7 @@
       "beat": 16.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 82
+      "velocity": 56
     },
     {
       "id": "n52",
@@ -421,7 +421,7 @@
       "beat": 17,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 86
+      "velocity": 58
     },
     {
       "id": "n53",
@@ -429,7 +429,7 @@
       "beat": 17.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 90
+      "velocity": 60
     },
     {
       "id": "n54",
@@ -437,7 +437,7 @@
       "beat": 17.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 94
+      "velocity": 63
     },
     {
       "id": "n55",
@@ -445,7 +445,7 @@
       "beat": 17.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n56",
@@ -453,7 +453,7 @@
       "beat": 18,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n57",
@@ -461,7 +461,7 @@
       "beat": 18.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 94
+      "velocity": 63
     },
     {
       "id": "n58",
@@ -469,7 +469,7 @@
       "beat": 18.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 90
+      "velocity": 60
     },
     {
       "id": "n59",
@@ -477,7 +477,7 @@
       "beat": 18.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 86
+      "velocity": 58
     },
     {
       "id": "n60",
@@ -485,7 +485,7 @@
       "beat": 19,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 56
     },
     {
       "id": "n61",
@@ -493,7 +493,7 @@
       "beat": 19,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 56
     },
     {
       "id": "n62",
@@ -501,7 +501,7 @@
       "beat": 19,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 82
+      "velocity": 56
     },
     {
       "id": "n63",
@@ -509,7 +509,7 @@
       "beat": 19.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 78
+      "velocity": 54
     },
     {
       "id": "n64",
@@ -517,7 +517,7 @@
       "beat": 19.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 73
+      "velocity": 51
     },
     {
       "id": "n65",
@@ -525,7 +525,7 @@
       "beat": 19.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n66",
@@ -533,7 +533,7 @@
       "beat": 20,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n67",
@@ -541,7 +541,7 @@
       "beat": 20,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n68",
@@ -549,7 +549,7 @@
       "beat": 20,
       "duration": 0.5,
       "hand": "R",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n69",
@@ -557,7 +557,7 @@
       "beat": 20.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 78
+      "velocity": 54
     },
     {
       "id": "n70",
@@ -565,7 +565,7 @@
       "beat": 20.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 82
+      "velocity": 56
     },
     {
       "id": "n71",
@@ -573,7 +573,7 @@
       "beat": 21,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 86
+      "velocity": 58
     },
     {
       "id": "n72",
@@ -581,7 +581,7 @@
       "beat": 21.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 90
+      "velocity": 60
     },
     {
       "id": "n73",
@@ -589,7 +589,7 @@
       "beat": 21.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 94
+      "velocity": 63
     },
     {
       "id": "n74",
@@ -597,7 +597,7 @@
       "beat": 21.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n75",
@@ -605,7 +605,7 @@
       "beat": 22,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n76",
@@ -613,7 +613,7 @@
       "beat": 22.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 94
+      "velocity": 63
     },
     {
       "id": "n77",
@@ -621,7 +621,7 @@
       "beat": 22.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 90
+      "velocity": 60
     },
     {
       "id": "n78",
@@ -629,7 +629,7 @@
       "beat": 22.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 86
+      "velocity": 58
     },
     {
       "id": "n79",
@@ -637,7 +637,7 @@
       "beat": 23,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 56
     },
     {
       "id": "n80",
@@ -645,7 +645,7 @@
       "beat": 23,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 56
     },
     {
       "id": "n81",
@@ -653,7 +653,7 @@
       "beat": 23,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 82
+      "velocity": 56
     },
     {
       "id": "n82",
@@ -661,7 +661,7 @@
       "beat": 23.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 78
+      "velocity": 54
     },
     {
       "id": "n83",
@@ -669,7 +669,7 @@
       "beat": 23.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 73
+      "velocity": 51
     },
     {
       "id": "n84",
@@ -677,7 +677,7 @@
       "beat": 23.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n85",
@@ -685,7 +685,7 @@
       "beat": 24,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n86",
@@ -693,7 +693,7 @@
       "beat": 24,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n87",
@@ -701,7 +701,7 @@
       "beat": 24,
       "duration": 0.5,
       "hand": "R",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n88",
@@ -709,7 +709,7 @@
       "beat": 24.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 78
+      "velocity": 54
     },
     {
       "id": "n89",
@@ -717,7 +717,7 @@
       "beat": 24.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 82
+      "velocity": 56
     },
     {
       "id": "n90",
@@ -725,7 +725,7 @@
       "beat": 25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 86
+      "velocity": 58
     },
     {
       "id": "n91",
@@ -733,7 +733,7 @@
       "beat": 25.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 90
+      "velocity": 60
     },
     {
       "id": "n92",
@@ -741,7 +741,7 @@
       "beat": 25.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 94
+      "velocity": 63
     },
     {
       "id": "n93",
@@ -749,7 +749,7 @@
       "beat": 25.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n94",
@@ -757,7 +757,7 @@
       "beat": 26,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n95",
@@ -765,7 +765,7 @@
       "beat": 26.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 94
+      "velocity": 63
     },
     {
       "id": "n96",
@@ -773,7 +773,7 @@
       "beat": 26.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 90
+      "velocity": 60
     },
     {
       "id": "n97",
@@ -781,7 +781,7 @@
       "beat": 26.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 86
+      "velocity": 58
     },
     {
       "id": "n98",
@@ -789,7 +789,7 @@
       "beat": 27,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 56
     },
     {
       "id": "n99",
@@ -797,7 +797,7 @@
       "beat": 27,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 56
     },
     {
       "id": "n100",
@@ -805,7 +805,7 @@
       "beat": 27,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 82
+      "velocity": 56
     },
     {
       "id": "n101",
@@ -813,7 +813,7 @@
       "beat": 27.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 78
+      "velocity": 54
     },
     {
       "id": "n102",
@@ -821,7 +821,7 @@
       "beat": 27.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 73
+      "velocity": 51
     },
     {
       "id": "n103",
@@ -829,7 +829,7 @@
       "beat": 27.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n104",
@@ -837,7 +837,7 @@
       "beat": 28,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n105",
@@ -845,7 +845,7 @@
       "beat": 28,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n106",
@@ -853,7 +853,7 @@
       "beat": 28,
       "duration": 0.5,
       "hand": "R",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n107",
@@ -861,7 +861,7 @@
       "beat": 28.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 78
+      "velocity": 54
     },
     {
       "id": "n108",
@@ -869,7 +869,7 @@
       "beat": 28.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 82
+      "velocity": 56
     },
     {
       "id": "n109",
@@ -877,7 +877,7 @@
       "beat": 29,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 86
+      "velocity": 58
     },
     {
       "id": "n110",
@@ -885,7 +885,7 @@
       "beat": 29.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 90
+      "velocity": 60
     },
     {
       "id": "n111",
@@ -893,7 +893,7 @@
       "beat": 29.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 94
+      "velocity": 63
     },
     {
       "id": "n112",
@@ -901,7 +901,7 @@
       "beat": 29.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n113",
@@ -909,7 +909,7 @@
       "beat": 30,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n114",
@@ -917,7 +917,7 @@
       "beat": 30.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 94
+      "velocity": 63
     },
     {
       "id": "n115",
@@ -925,7 +925,7 @@
       "beat": 30.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 90
+      "velocity": 60
     },
     {
       "id": "n116",
@@ -933,7 +933,7 @@
       "beat": 30.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 86
+      "velocity": 58
     },
     {
       "id": "n117",
@@ -941,7 +941,7 @@
       "beat": 31,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 56
     },
     {
       "id": "n118",
@@ -949,7 +949,7 @@
       "beat": 31,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 56
     },
     {
       "id": "n119",
@@ -957,7 +957,7 @@
       "beat": 31,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 82
+      "velocity": 56
     },
     {
       "id": "n120",
@@ -965,7 +965,7 @@
       "beat": 31.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 78
+      "velocity": 54
     },
     {
       "id": "n121",
@@ -973,7 +973,7 @@
       "beat": 31.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 73
+      "velocity": 51
     },
     {
       "id": "n122",
@@ -981,7 +981,7 @@
       "beat": 31.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n123",
@@ -989,7 +989,7 @@
       "beat": 32,
       "duration": 4,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n124",
@@ -997,7 +997,7 @@
       "beat": 32,
       "duration": 4,
       "hand": "L",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n125",
@@ -1005,7 +1005,7 @@
       "beat": 32,
       "duration": 0.5,
       "hand": "R",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n126",
@@ -1013,7 +1013,7 @@
       "beat": 32.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n127",
@@ -1021,7 +1021,7 @@
       "beat": 32.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n128",
@@ -1029,7 +1029,7 @@
       "beat": 33,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n129",
@@ -1037,7 +1037,7 @@
       "beat": 33.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n130",
@@ -1045,7 +1045,7 @@
       "beat": 33.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n131",
@@ -1053,7 +1053,7 @@
       "beat": 33.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n132",
@@ -1061,7 +1061,7 @@
       "beat": 34,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n133",
@@ -1069,7 +1069,7 @@
       "beat": 34.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 69
+      "velocity": 49
     },
     {
       "id": "n134",
@@ -1077,7 +1077,7 @@
       "beat": 34.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 74
+      "velocity": 52
     },
     {
       "id": "n135",
@@ -1085,7 +1085,7 @@
       "beat": 34.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 79
+      "velocity": 54
     },
     {
       "id": "n136",
@@ -1093,7 +1093,7 @@
       "beat": 35,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 84
+      "velocity": 57
     },
     {
       "id": "n137",
@@ -1101,7 +1101,7 @@
       "beat": 35.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 88
+      "velocity": 60
     },
     {
       "id": "n138",
@@ -1109,7 +1109,7 @@
       "beat": 35.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 93
+      "velocity": 62
     },
     {
       "id": "n139",
@@ -1117,7 +1117,7 @@
       "beat": 35.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n140",
@@ -1125,7 +1125,7 @@
       "beat": 36,
       "duration": 1.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 65
     },
     {
       "id": "n141",
@@ -1133,7 +1133,7 @@
       "beat": 36,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n142",
@@ -1141,7 +1141,7 @@
       "beat": 36.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n143",
@@ -1149,7 +1149,7 @@
       "beat": 36.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n144",
@@ -1157,7 +1157,7 @@
       "beat": 36.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n145",
@@ -1165,7 +1165,7 @@
       "beat": 37,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n146",
@@ -1173,7 +1173,7 @@
       "beat": 37.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n147",
@@ -1181,7 +1181,7 @@
       "beat": 37.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 65
     },
     {
       "id": "n148",
@@ -1189,7 +1189,7 @@
       "beat": 37.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n149",
@@ -1197,7 +1197,7 @@
       "beat": 37.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n150",
@@ -1205,7 +1205,7 @@
       "beat": 38,
       "duration": 1.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 65
     },
     {
       "id": "n151",
@@ -1213,7 +1213,7 @@
       "beat": 38,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n152",
@@ -1221,7 +1221,7 @@
       "beat": 38.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n153",
@@ -1229,7 +1229,7 @@
       "beat": 38.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n154",
@@ -1237,7 +1237,7 @@
       "beat": 38.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n155",
@@ -1245,7 +1245,7 @@
       "beat": 39,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n156",
@@ -1253,7 +1253,7 @@
       "beat": 39.25,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n157",
@@ -1261,7 +1261,7 @@
       "beat": 39.5,
       "duration": 0.5,
       "hand": "L",
-      "velocity": 69
+      "velocity": 65
     },
     {
       "id": "n158",
@@ -1269,7 +1269,7 @@
       "beat": 39.5,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n159",
@@ -1277,7 +1277,7 @@
       "beat": 39.75,
       "duration": 0.25,
       "hand": "R",
-      "velocity": 98
+      "velocity": 65
     },
     {
       "id": "n160",
@@ -1285,7 +1285,7 @@
       "beat": 40,
       "duration": 0.25,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n161",
@@ -1293,7 +1293,7 @@
       "beat": 40,
       "duration": 0.5,
       "hand": "R",
-      "velocity": 95
+      "velocity": 112
     },
     {
       "id": "n162",
@@ -1301,7 +1301,7 @@
       "beat": 40.25,
       "duration": 0.25,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n163",
@@ -1309,7 +1309,7 @@
       "beat": 40.5,
       "duration": 0.25,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n164",
@@ -1317,7 +1317,7 @@
       "beat": 40.5,
       "duration": 0.5,
       "hand": "R",
-      "velocity": 95
+      "velocity": 96
     },
     {
       "id": "n165",
@@ -1325,7 +1325,7 @@
       "beat": 40.75,
       "duration": 0.25,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n166",
@@ -1333,7 +1333,7 @@
       "beat": 41,
       "duration": 0.25,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n167",
@@ -1341,7 +1341,7 @@
       "beat": 41,
       "duration": 0.5,
       "hand": "R",
-      "velocity": 95
+      "velocity": 96
     },
     {
       "id": "n168",
@@ -1349,7 +1349,7 @@
       "beat": 41.25,
       "duration": 0.25,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n169",
@@ -1357,7 +1357,7 @@
       "beat": 41.5,
       "duration": 0.25,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n170",
@@ -1365,7 +1365,7 @@
       "beat": 41.5,
       "duration": 0.5,
       "hand": "R",
-      "velocity": 95
+      "velocity": 96
     },
     {
       "id": "n171",
@@ -1373,7 +1373,7 @@
       "beat": 41.75,
       "duration": 0.25,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n172",
@@ -1381,7 +1381,7 @@
       "beat": 42,
       "duration": 0.25,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n173",
@@ -1389,7 +1389,7 @@
       "beat": 42,
       "duration": 0.5,
       "hand": "R",
-      "velocity": 95
+      "velocity": 96
     },
     {
       "id": "n174",
@@ -1397,7 +1397,7 @@
       "beat": 42.25,
       "duration": 0.25,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n175",
@@ -1405,7 +1405,7 @@
       "beat": 42.5,
       "duration": 0.25,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n176",
@@ -1413,7 +1413,7 @@
       "beat": 42.5,
       "duration": 0.5,
       "hand": "R",
-      "velocity": 95
+      "velocity": 96
     },
     {
       "id": "n177",
@@ -1421,7 +1421,7 @@
       "beat": 42.75,
       "duration": 0.25,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n178",
@@ -1429,7 +1429,7 @@
       "beat": 43,
       "duration": 0.25,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n179",
@@ -1437,7 +1437,7 @@
       "beat": 43,
       "duration": 0.5,
       "hand": "R",
-      "velocity": 95
+      "velocity": 96
     },
     {
       "id": "n180",
@@ -1445,7 +1445,7 @@
       "beat": 43.25,
       "duration": 0.25,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n181",
@@ -1453,7 +1453,7 @@
       "beat": 43.5,
       "duration": 0.25,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n182",
@@ -1461,7 +1461,7 @@
       "beat": 43.5,
       "duration": 0.5,
       "hand": "R",
-      "velocity": 95
+      "velocity": 96
     },
     {
       "id": "n183",
@@ -1469,7 +1469,7 @@
       "beat": 43.75,
       "duration": 0.25,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n184",
@@ -1477,7 +1477,7 @@
       "beat": 44,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n185",
@@ -1485,7 +1485,7 @@
       "beat": 44,
       "duration": 1,
       "hand": "R",
-      "velocity": 95
+      "velocity": 96
     },
     {
       "id": "n186",
@@ -1493,7 +1493,7 @@
       "beat": 45,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n187",
@@ -1501,7 +1501,7 @@
       "beat": 45,
       "duration": 1,
       "hand": "R",
-      "velocity": 95
+      "velocity": 96
     },
     {
       "id": "n188",
@@ -1509,7 +1509,7 @@
       "beat": 45,
       "duration": 1,
       "hand": "R",
-      "velocity": 95
+      "velocity": 96
     },
     {
       "id": "n189",
@@ -1517,7 +1517,7 @@
       "beat": 45,
       "duration": 1,
       "hand": "R",
-      "velocity": 95
+      "velocity": 96
     },
     {
       "id": "n190",
@@ -1525,7 +1525,7 @@
       "beat": 46,
       "duration": 1,
       "hand": "L",
-      "velocity": 69
+      "velocity": 96
     },
     {
       "id": "n191",
@@ -1533,7 +1533,7 @@
       "beat": 46,
       "duration": 1,
       "hand": "R",
-      "velocity": 95
+      "velocity": 96
     }
   ]
 }

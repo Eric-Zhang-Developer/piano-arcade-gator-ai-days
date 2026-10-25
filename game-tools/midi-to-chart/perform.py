@@ -5,13 +5,18 @@ Pedal, three sources, in order of preference:
   --midi    the score's MIDI export's CC64 (LilyPond renders \\sustainOn/Off that way), over the chart's bars or spans
   --ly      a LilyPond pedal line (a Dynamics or Staff context of skips with \\sustainOn/Off) the MIDI didn't render
   --harmony the per-harmony rule, for a score with no Ped. marks (an arrangement choice; decision demo-performance-pedal)
-Velocity: --mark pp sets every note to that mark's level on the library's one ladder (decision demo-performance-dynamics),
-for an excerpt under a single printed mark that the MIDI export didn't render.
+Velocity, on the library's one ladder (decision demo-performance-dynamics): --mark pp sets every note to that mark's
+level, for an excerpt under a single printed mark; --marks lists an excerpt's marks in chart beats, as read from the score:
+  R@4=p        a level from beat 4 on, in that staff (L, R, or RL for a mark between the staves)
+  RL@8-18~+16  a hairpin: ramps linearly from the level at 8 to it +16 (or -16) at 18, then holds
+  R@19!        an accent or sf: one step (+16) on the notes starting at 19, in that staff, only
+Before the first mark a staff is at mf.
 
   python3 perform.py pedal chart.json --midi song.mid --pickup 1 --bars 1-13
   python3 perform.py pedal chart.json --ly song.ly --context pedalOne --spans 0-12,0-11 --start-beat 1
   python3 perform.py pedal chart.json --harmony
   python3 perform.py velocity chart.json --mark pp
+  python3 perform.py velocity chart.json --marks "L@0=p,R@4=p,RL@8-18~+16,R@19!"
   python3 perform.py --self-test
 Writes pedal.json next to the chart, or the chart in place with only velocity fields changed.
 """
@@ -179,6 +184,43 @@ def harmony_pedal(chart):
     return pairs
 
 
+MARK = re.compile(r"^(R|L|RL|LR)@([\d./]+)(?:=(\w+)|-([\d./]+)~([+-]\d+)|(!))$")
+
+
+def mark_velocities(notes, marks):
+    """Each note's velocity from --marks (see the docstring): its staff's level at its onset, +16 if accented, 1-127."""
+    sets, ramps, accents = {"R": [], "L": []}, {"R": [], "L": []}, {"R": set(), "L": set()}
+    for item in marks.split(","):
+        m = MARK.match(item.strip())
+        if not m:
+            raise SystemExit(f"--marks: can't read {item!r}")
+        hands, at = set(m.group(1)), Fraction(m.group(2))
+        for h in hands:
+            if m.group(3):
+                sets[h].append((at, LADDER[m.group(3)]))
+            elif m.group(4):
+                ramps[h].append((at, Fraction(m.group(4)), int(m.group(5))))
+            else:
+                accents[h].add(at)
+
+    def level(h, t):  # the latest set or finished ramp before t, or the ramp t falls inside
+        lv, events = LADDER["mf"], sorted([(a, 0, v) for a, v in sets[h]] + [(a, 1, (b, d)) for a, b, d in ramps[h]])
+        for a, kind, v in events:
+            if a > t:
+                break
+            if kind == 0:
+                lv = v
+            else:
+                b, d = v
+                lv = lv + d * min(Fraction(1), (t - a) / (b - a)) if t < b else lv + d
+        return lv
+
+    for n in notes:
+        t = Fraction(n["beat"]).limit_denominator(4096)
+        accent = any(abs(t - a) < Fraction(1, 96) for a in accents[n["hand"]])
+        n["velocity"] = max(1, min(127, round(level(n["hand"], t) + (16 if accent else 0))))
+
+
 def write_pedal(chart_path, pairs):
     chart = json.loads(Path(chart_path).read_text())
     end = max(Fraction(n["beat"]) + Fraction(n["duration"]) for n in chart["notes"])
@@ -203,6 +245,9 @@ def self_test():
         {"hand": "L", "pitch": 43, "beat": 8, "duration": 4}, {"hand": "R", "pitch": 72, "beat": 0, "duration": 12}]}
     got = [(float(d), float(u)) for d, u in harmony_pedal(chart)]
     assert got == [(0.12, 1.96), (2.12, 4.0), (8.12, 12.0)], got  # the second lifts at the bar's rest
+    notes = [{"hand": h, "beat": b} for h, b in [("L", 0), ("R", 4), ("R", 8), ("L", 13), ("R", 18), ("R", 19), ("R", 20)]]
+    mark_velocities(notes, "L@0=p,R@4=p,RL@8-18~+16,R@19!,R@20=p")
+    assert [n["velocity"] for n in notes] == [49, 49, 49, 57, 65, 81, 49], [n["velocity"] for n in notes]
     print("self-test: pass")
 
 
@@ -221,11 +266,15 @@ def main():
     ap.add_argument("--spans")
     ap.add_argument("--start-beat", type=Fraction, default=0)
     ap.add_argument("--mark", choices=list(LADDER))
+    ap.add_argument("--marks")
     a = ap.parse_args()
     if a.what == "velocity":
         chart = json.loads(Path(a.chart).read_text())
-        for n in chart["notes"]:
-            n["velocity"] = LADDER[a.mark]
+        if a.marks:
+            mark_velocities(chart["notes"], a.marks)
+        else:
+            for n in chart["notes"]:
+                n["velocity"] = LADDER[a.mark]
         Path(a.chart).write_text(json.dumps(chart, indent=2, ensure_ascii=False) + "\n")
         return
     spans = [tuple(Fraction(x) for x in s.split("-")) for s in a.spans.split(",")] if a.spans else None

@@ -140,6 +140,17 @@ describe("runChecks", () => {
 });
 
 describe("KNOWN_RED", () => {
+  it("gives a known-red check one attempt, so its rerun doesn't spend the shard's time, and doesn't gate on it", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "run-checks-red-"));
+    writeFileSync(join(dir, "red.mjs"), "process.exit(1);\n");
+    const out = join(dir, "out");
+    const rows = await runChecks(dir, ["red.mjs"], out, "1/1", 2, { "red.mjs": 754 });
+    expect(rows.map((r) => [r.check, r.result, r.knownRed])).toEqual([["red.mjs", "FAIL", 754]]);
+    expect(existsSync(join(out, "red"))).toBe(true);
+    expect(existsSync(join(out, "red-retry"))).toBe(false);
+    expect(exitCode(rows)).toBe(0);
+  });
+
   const repo = resolve(import.meta.dirname, "../..");
   it.each(Object.entries(KNOWN_RED))("%s names its issue and is a real check", (check, issue) => {
     expect(Number.isInteger(issue) && issue > 0).toBe(true);

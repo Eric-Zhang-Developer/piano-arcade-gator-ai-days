@@ -34,17 +34,20 @@ describe("a hit's energy (touch-visible)", () => {
   afterEach(() => vi.unstubAllGlobals());
   it("full energy is today's burst; less scales dust and brightness; wispOnly is one wisp, no dust", async () => {
     vi.stubGlobal("document", { createElement: () => ({}) });
+    vi.spyOn(Math, "random").mockReturnValue(0.999); // fractional counts round down (gl rounds them at random)
     const { hitParticles } = await import("./gl");
     const sparks = hitParticles()!;
+    vi.restoreAllMocks();
     const burst = (...a: [number?, boolean?]) => {
       spawns.length = 0;
       sparks.hit(0, 20, 100, "PERFECT", "#ffffff", ...a);
       return spawns.map((s) => [s.kind === DUST ? "dust" : "wisp", +s.n.toFixed(3), +s.bright.toFixed(3)]);
     };
-    const today = [["dust", S.dust.PERFECT, S.bright.PERFECT], ["wisp", S.wisps.PERFECT, S.bright.PERFECT]];
+    const wisps = Math.floor(S.wisps.PERFECT);
+    const today = [["dust", S.dust.PERFECT, S.bright.PERFECT], ["wisp", wisps, S.bright.PERFECT]];
     expect(burst()).toEqual(today);
     expect(burst(1)).toEqual(today); // so a 10-note ff chord asks no more than today's, under the pool's own cap
-    expect(burst(0.25)).toEqual([["dust", S.dust.PERFECT * 0.25, 0.25], ["wisp", S.wisps.PERFECT, 0.25]]);
+    expect(burst(0.25)).toEqual([["dust", S.dust.PERFECT * 0.25, 0.25], ["wisp", wisps, 0.25]]);
     expect(burst(0.25, true)).toEqual([["dust", 0, 0.25], ["wisp", 1, 0.25]]);
   });
 });

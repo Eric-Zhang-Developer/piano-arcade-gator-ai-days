@@ -7,6 +7,7 @@ import { loopChart } from "../bar-loop";
 import { isWaitMode } from "../wait-mode";
 import { isFlowMode } from "../flow-mode/clock";
 import { savedNumber } from "../laptop-sound/volume";
+import { levelEnvelope, loudnessSettings } from "../milestone-sfx";
 
 export const audioTrackSettings = {
   fadeOutS: 0.25, // after songEnd: a short fade, then silence
@@ -115,9 +116,14 @@ declare global {
   }
 }
 
+// The recording's level (dBFS) at a chart time, for milestone-sfx's loudness rule; null when no recording is playing.
+let levelNow: ((chartMs: number) => number | null) | null = null;
+export const recordingLevelAt = (chartMs: number): number | null => levelNow?.(chartMs) ?? null;
+
 export function audioTrack(): GamePlugin {
   let audio: AudioContext | null = null;
   let buffer: AudioBuffer | null = null;
+  let envelope: Float32Array | null = null; // the buffer's level per loudnessSettings.windowMs
   let sidecar: Sidecar | null = null;
   let loop: LoopWindow | null = null;
   let bus: GainNode | null = null; // this run's sources; disconnecting it silences them at once
@@ -198,6 +204,8 @@ export function audioTrack(): GamePlugin {
     transformChart(c, params) {
       silence();
       buffer = null;
+      envelope = null;
+      levelNow = (ms) => (anchor && envelope ? (envelope[Math.floor(fileTimeAt(ms, fileOffset(), loop) / loudnessSettings.windowMs)] ?? null) : null);
       sidecar = null;
       loop = null;
       const song = params.get("song") ?? "";
@@ -226,7 +234,7 @@ export function audioTrack(): GamePlugin {
           });
           const decoded = await audio!.decodeAudioData(bytes);
           if (token !== load) return;
-          [sidecar, buffer] = [s, decoded];
+          [sidecar, buffer, envelope] = [s, decoded, levelEnvelope(decoded)];
           if (anchor) play(anchor.atMs + performance.now() - anchor.perf); // arrived mid-take: join at the clock's time
         })
         .catch((e: Error) => console.warn(`audio-track: no recording: ${e.message}`));

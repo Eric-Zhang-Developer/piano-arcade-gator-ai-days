@@ -8,6 +8,7 @@ import { GOOD_WEIGHT, msPerBeat } from "../core/settings";
 import { barReadout } from "../duo-hud/bar";
 import { canvasFonts, drawBrackets, kitSettings } from "../duo-tokens";
 import { isWaitMode } from "../wait-mode";
+import { blueAt, blueStart } from "../fever-arc/tier";
 import { bg, gold, good, ink, inkDim, line as hairline, miss, panel, primary, tierX1, tierX2, tierX3, tierX4, wrong } from "../ui-tokens";
 
 // visual-direction.md's --pa-line: ink-dim at about 25%, for the divider and the progress line's track.
@@ -19,6 +20,7 @@ export const hudSettings = {
   popMs: 110, // each increment ticks the numeral up and back; short, so a fast run reads as a pulse, not a jitter
   popScale: 1.08,
   feverColor: "#ffb02e", // fever's amber (fever-arc's wisps use the same): the numeral warms with fever's heat
+  blueColor: "#bfe4ff", // Blue Fever: the numeral cools to a whiter blue than its own --pa-primary
   heatMs: 400, // the warm-up and cool-down. From the HUD's own fever events: importing fever-arc pulls results-landing's
   // React hooks into the server graph through /'s imports
   points: { PERFECT: 100, GREAT: 50, GOOD: 25 },
@@ -316,7 +318,15 @@ function drawCenterCombo(ctx: CanvasRenderingContext2D, f: Frame, l: HudLayout, 
   const still = reducedMotion();
   const m = s.milestone && s.milestone.count >= hudSettings.swellFrom && !still ? s.milestone : null;
   const t = m ? f.nowMs - m.atMs : Infinity;
-  const color = mixHex(primary, hudSettings.feverColor, heat);
+  // Blue Fever (fever-arc's tier seam): the numeral goes a whiter blue over the upgrade beat, and swells one ghost.
+  const blue = blueAt(f.nowMs, hudSettings.heatMs) * heat;
+  const color = mixHex(mixHex(primary, hudSettings.feverColor, heat), hudSettings.blueColor, blue);
+  const up = blueStart();
+  const ut = up === null || still ? Infinity : f.nowMs - up;
+  if (ut >= 0 && ut < hudSettings.ghostMs && alpha > 0) {
+    const k = ut / hudSettings.ghostMs;
+    drawCombo(ctx, l, String(s.combo), 1 + (hudSettings.ghostScale - 1) * k, hudSettings.ghostAlpha * (1 - k), color);
+  }
   if (m && t >= 0 && t < hudSettings.ghostMs) {
     const k = t / hudSettings.ghostMs;
     drawCombo(ctx, l, String(m.count), 1 + (hudSettings.ghostScale - 1) * k, hudSettings.ghostAlpha * (1 - k), color);

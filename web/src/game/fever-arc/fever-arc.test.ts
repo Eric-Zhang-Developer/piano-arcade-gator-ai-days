@@ -110,7 +110,7 @@ describe("reduced motion", () => {
 });
 
 describe("the look (#1374)", () => {
-  const arc = (phase: Arc["phase"], heat: number, progress = 0, beat = 0.5): Arc => ({ phase, progress, beat, igniteAtMs: 0, heat });
+  const arc = (phase: Arc["phase"], heat: number, progress = 0, beat = 0.5): Arc => ({ phase, progress, beat, igniteAtMs: 0, heat, blue: 0, blueAtMs: null });
 
   it("the walls stand only while fever has heat, swell on the beat, and drain with it", () => {
     expect(flameScale(arc("idle", 0), false)).toBe(0);
@@ -146,5 +146,39 @@ describe("the walls' breathing between beats", () => {
     }
     expect(lookSettings.lick).toBeLessThanOrEqual(0.1);
     expect(lookSettings.shimmer).toBeLessThanOrEqual(0.1);
+  });
+});
+
+describe("Blue Fever", () => {
+  const lit = () => run([{ type: "songStart", atMs: 0 }, ...Array(12).fill(hit), { type: "feverStart", atMs: 6100 }], emptyArc(42, 120));
+  const hitAt = (atMs: number, judgment: "PERFECT" | "GREAT" = "PERFECT"): GameEvent => ({ ...hit, judgment, atMs });
+
+  it("a second full gauge in fever turns blue on the next beat, over one beat", () => {
+    let s = lit();
+    expect(s.gauge.size).toBe(12);
+    s = run(Array.from({ length: 11 }, (_, i) => hitAt(6500 + i * 100)), s);
+    expect(s.blueAtMs).toBeNull();
+    s = reduceArc(s, hitAt(7650));
+    expect(s.blueAtMs).toBe(8000);
+    expect(arcAt(s, 7900).blue).toBe(0);
+    expect(arcAt(s, 8250).blue).toBeCloseTo(0.5);
+    expect(arcAt(s, 9000).blue).toBe(1);
+  });
+
+  it("counts the gauge's points (a GREAT is half), never before the ignition's feverStart", () => {
+    const s = run(Array.from({ length: 12 }, (_, i) => hitAt(6500 + i * 100, "GREAT")), lit());
+    expect(s.blueAtMs).toBeNull();
+    expect(s.feverPts).toBe(6);
+  });
+
+  it("a break drops straight out; the next fever starts amber", () => {
+    let s = run(Array.from({ length: 12 }, (_, i) => hitAt(6500 + i * 100)), lit());
+    expect(s.blueAtMs).not.toBeNull();
+    s = brk(s, 9100);
+    expect(arcAt(s, 9200).phase).toBe("release");
+    expect(arcAt(s, 9200).blue).toBe(1); // the release drains blue, not amber
+    s = run([...Array(12).fill(hit), { type: "feverStart", atMs: 12100 }], s);
+    expect(s.blueAtMs).toBeNull();
+    expect(arcAt(s, 13000).blue).toBe(0);
   });
 });

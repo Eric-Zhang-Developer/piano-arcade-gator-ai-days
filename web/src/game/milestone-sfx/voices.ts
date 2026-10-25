@@ -4,12 +4,13 @@
 import type { ClearVoice } from ".";
 import { stampImpactMs } from "../rank-stamp";
 
-export type Voice = "stinger" | "sweep" | "fanfare" | "drumroll" | "rankHit" | ClearVoice | "newRecord" | "start" | "comboBreak" | "settle" | "tutorPop";
+export type Voice = "stinger" | "sweep" | "sweepBlue" | "fanfare" | "drumroll" | "rankHit" | ClearVoice | "newRecord" | "start" | "comboBreak" | "settle" | "tutorPop";
 
 export const voiceSettings = {
   levels: {
     stinger: 0.18,
     sweep: 0.16,
+    sweepBlue: 0.15, // Blue Fever's riser: the fever riser a fifth up and brighter
     fanfare: 0.2,
     drumroll: 0.2,
     rankHit: 0.35,
@@ -141,17 +142,21 @@ export function playVoice(ctx: AudioContext, out: AudioNode, v: Voice, t: number
       noise(ctx, out, t, 0.03, L * 0.4, "highpass", 5000);
       return;
     }
-    case "sweep": {
-      // a noise riser and a detuned saw pair climbing to the flash's peak, then the chord lands
+    case "sweep":
+    case "sweepBlue": {
+      // a noise riser and a detuned saw pair climbing to the flash's peak, then the chord lands. Blue Fever's is the
+      // same a fifth up, its riser and air brighter.
       const p = voiceSettings.feverPeakS;
-      noise(ctx, out, t, p, L * 0.6, "bandpass", 1500, true).frequency.exponentialRampToValueAtTime(7000, t + p);
+      const blue = v === "sweepBlue";
+      const up = blue ? 1.5 : 1;
+      noise(ctx, out, t, p, L * 0.6, "bandpass", 1500 * up, true).frequency.exponentialRampToValueAtTime(7000 * up, t + p);
       for (const d of [-8, 8])
-        osc(ctx, out, "sawtooth", 220, t, p + 0.05, L * 0.5, d, 3000).frequency.exponentialRampToValueAtTime(
-          1760,
+        osc(ctx, out, "sawtooth", 220 * up, t, p + 0.05, L * 0.5, d, 3000 * up).frequency.exponentialRampToValueAtTime(
+          1760 * up,
           t + p,
         );
-      chord(ctx, out, [0, 4, 7, 12], t + p, 0.7, L);
-      noise(ctx, out, t + p, 0.25, L * 0.5, "highpass", 6000);
+      chord(ctx, out, blue ? [7, 11, 14, 19] : [0, 4, 7, 12], t + p, 0.7, L);
+      noise(ctx, out, t + p, 0.25, L * 0.5, "highpass", blue ? 8000 : 6000);
       return;
     }
     case "drumroll": // snare taps, crescendo, filling the gap before the rank hit (the stamp's)

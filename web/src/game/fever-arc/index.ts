@@ -4,10 +4,11 @@
 // sound read it instead of their own clocks. Judging is untouched: only when the visuals and the sound fire moves.
 import type { GameEvent, GamePlugin } from "../../contracts";
 import { msPerBeat } from "../core/settings";
-import { type Gauge, emptyGauge, reduceGauge } from "../fever-gauge/gauge";
+import { type Gauge, emptyGauge, feverGaugeSettings, reduceGauge } from "../fever-gauge/gauge";
 import { landingPlan, landingSettings, landingT } from "../results-landing";
 import { momentSettings } from "../fever-moment"; // read at call time only: fever-moment imports this module too
 import { fireLook } from "./look";
+import { setBlueAt } from "./tier";
 
 export const arcSettings = {
   buildFrom: 0.8, // the gauge share where the build-up starts (spec: its last ~20%)
@@ -25,6 +26,8 @@ export interface ArcState {
   igniteAtMs: number | null; // the visuals' fever start: the beat on or after the judge's feverStart
   endAtMs: number | null; // feverEnd or songEnd during fever
   endKind: "break" | "song" | null;
+  feverPts: number; // gauge points scored since the ignition: a second full gauge turns fever blue
+  blueAtMs: number | null; // Blue Fever: the beat on or after the hit that filled the gauge a second time
 }
 
 export interface Arc {
@@ -33,6 +36,8 @@ export interface Arc {
   beat: number; // 0–1 through the current beat, on the chart's grid from chart time 0
   igniteAtMs: number | null;
   heat: number; // 0–1: how much of fever's look is on (ignite and sustain 1, draining to 0 in release or handoff)
+  blue: number; // 0–1: Blue Fever, over one beat from blueAtMs; it holds through the release
+  blueAtMs: number | null;
 }
 
 export const emptyArc = (notes = 0, bpm = 120): ArcState => ({
@@ -41,6 +46,8 @@ export const emptyArc = (notes = 0, bpm = 120): ArcState => ({
   igniteAtMs: null,
   endAtMs: null,
   endKind: null,
+  feverPts: 0,
+  blueAtMs: null,
 });
 
 /** The first beat at or after atMs on a grid of beatMs from chart time 0: at most one beat later. */
@@ -53,9 +60,16 @@ export function reduceArc(s: ArcState, e: GameEvent): ArcState {
   const gauge = reduceGauge(s.gauge, e);
   switch (e.type) {
     case "songStart":
-      return { ...s, gauge: { ...s.gauge, fill: 0, fever: false }, igniteAtMs: null, endAtMs: null, endKind: null };
+      return { ...s, gauge: { ...s.gauge, fill: 0, fever: false }, igniteAtMs: null, endAtMs: null, endKind: null, feverPts: 0, blueAtMs: null };
     case "feverStart":
-      return { ...s, gauge, igniteAtMs: nextBeat(e.atMs, s.beatMs), endAtMs: null, endKind: null };
+      return { ...s, gauge, igniteAtMs: nextBeat(e.atMs, s.beatMs), endAtMs: null, endKind: null, feverPts: 0, blueAtMs: null };
+    case "noteHit": {
+      // Blue Fever: in fever, unbroken, the gauge's points count again; a second full gauge upgrades on the next beat.
+      // Visual and sound only: the judge and the score never see it.
+      if (!s.gauge.fever || s.blueAtMs !== null || s.endAtMs !== null) return { ...s, gauge };
+      const feverPts = s.feverPts + feverGaugeSettings.points[e.judgment];
+      return { ...s, gauge, feverPts, blueAtMs: feverPts >= s.gauge.size ? nextBeat(e.atMs, s.beatMs) : null };
+    }
     case "feverEnd":
       return { ...s, gauge, endAtMs: e.atMs, endKind: "break" };
     case "songEnd":
@@ -75,7 +89,8 @@ const easeInOut = (u: number) => (u < 0.5 ? 4 * u ** 3 : 1 - (-2 * u + 2) ** 3 /
  */
 export function arcAt(s: ArcState, nowMs: number, landingMs: number | null = null): Arc {
   const beat = (((nowMs / s.beatMs) % 1) + 1) % 1;
-  const at = (phase: Phase, progress: number, heat: number): Arc => ({ phase, progress: clamp01(progress), beat, igniteAtMs: s.igniteAtMs, heat });
+  const blue = s.blueAtMs === null || nowMs < s.blueAtMs ? 0 : clamp01((nowMs - s.blueAtMs) / s.beatMs);
+  const at = (phase: Phase, progress: number, heat: number): Arc => ({ phase, progress: clamp01(progress), beat, igniteAtMs: s.igniteAtMs, heat, blue: heat > 0 ? blue : 0, blueAtMs: s.blueAtMs });
   const lit = s.igniteAtMs !== null && nowMs >= s.igniteAtMs;
   if (landingMs !== null && lit && s.endKind !== "break") {
     const u = landingMs / arcSettings.handoffMs;
@@ -106,10 +121,14 @@ export const ignitionFor = (atMs: number): number => nextBeat(atMs, state.beatMs
 // fever's heat at the last drawn frame, for readers that don't see the chart clock (the sparks).
 let heatNow = 0;
 export const feverHeat = (): number => heatNow;
+// The hit that made fever blue, for the sound, which sees the same event right after this plugin (mounted later).
+let blueTrigger: GameEvent | null = null;
+/** The upgrade beat if e is the hit that turned fever blue, else null. */
+export const blueIgnitionFor = (e: GameEvent): number | null => (e === blueTrigger ? state.blueAtMs : null);
 
 declare global {
   interface Window {
-    __pianoArcadeFever?: { frames: { nowMs: number; phase: Phase; lit: string[] }[]; lit?: Set<string> };
+    __pianoArcadeFever?: { frames: { nowMs: number; phase: Phase; lit: string[]; blue?: number }[]; lit?: Set<string> };
   }
 }
 
@@ -129,11 +148,17 @@ export function feverArc(): GamePlugin {
     transformChart(chart) {
       state = emptyArc(chart.notes.length, chart.bpm);
       heatNow = 0;
+      setBlueAt(null);
       look.reset();
       return chart;
     },
     onEvent(e) {
+      const before = state.blueAtMs;
       state = reduceArc(state, e);
+      if (state.blueAtMs !== before) {
+        setBlueAt(state.blueAtMs);
+        if (state.blueAtMs !== null) blueTrigger = e; // the sound schedules the blue riser off this hit
+      }
     },
     draw(ctx, f) {
       const arc = arcNow(f.nowMs);
@@ -146,7 +171,8 @@ export function feverArc(): GamePlugin {
       const last = hook.frames.at(-1);
       if (last) last.lit = [...(hook.lit ?? [])];
       hook.lit = new Set();
-      hook.frames.push({ nowMs: f.nowMs, phase: arcNow(f.nowMs).phase, lit: [] });
+      const now = arcNow(f.nowMs);
+      hook.frames.push({ nowMs: f.nowMs, phase: now.phase, lit: [], blue: now.blue });
     },
   };
 }

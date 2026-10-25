@@ -13,7 +13,7 @@ import styles from "./login.module.css";
 
 // The front door, optional: sign in with Google so your takes follow you, or play as a guest (takes still save, on
 // this device's anonymous player). A guest who has played can set a handle and keep their progress by linking Google;
-// a Google player sees their name, email and avatar as Google gives them. Then the menu, or the page in ?next=.
+// a Google player sees their name and email as Google gives them, under their initial. Then the menu, or the page in ?next=.
 
 // Real lines, each from the file named next to it.
 const QUOTES = [
@@ -157,12 +157,9 @@ function SignedIn({ session, next }: { session: Session; next: string }) {
   return (
     <>
       <div className={styles.profile} data-testid="login-signed-in">
-        {details?.avatarUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element -- Google's avatar host, sized here; no image pipeline
-          <img className={styles.avatar} src={details.avatarUrl} alt="" referrerPolicy="no-referrer" width={72} height={72} />
-        ) : (
-          <span className={styles.avatar} aria-hidden="true" />
-        )}
+        <span className={styles.avatar} aria-hidden="true">
+          {(details?.name ?? details?.email ?? session.email ?? "").trim().slice(0, 1).toUpperCase()}
+        </span>
         <div className={styles.who}>
           <span className={styles.label}>Signed in with Google</span>
           <strong className={styles.name} data-testid="login-name">

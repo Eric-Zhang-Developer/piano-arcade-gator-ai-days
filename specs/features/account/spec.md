@@ -27,7 +27,8 @@ guest", never required to play. Merge that first too.
 - **Signed out or guest:** one big "Continue with Google" and "Play as guest" (a guest sees "Keep playing as guest"),
   then `?next=` or the menu. For a guest, Google links the same user (`linkGoogle`); if that Google account already
   has a player, the callback signs in to it and this browser's takes move there. Guests name themselves after Google.
-- **Signed in with Google:** name, email and avatar, read from the Supabase user's Google identity on each visit,
+- **Signed in with Google:** name and email (shown under the name's first letter, never the Google photo: Sharan,
+  2026-10-25), read from the Supabase user's Google identity on each visit,
   never stored in our tables. Whatever Google doesn't give stays empty and visible, never a placeholder name.
   `AccountChip` shows the handle when there is one, else the Google name, else what it shows today.
 - After a Google sign-in (`/auth/callback`): a player with no handle, who hasn't skipped on this device, sees one field,
@@ -54,7 +55,7 @@ guest", never required to play. Merge that first too.
   for that id only. Set `<script>` -> refused with the reason shown, the row unchanged. Keep the responses and the row.
 - Route without a token, or with another player's id in the body -> refused, no row changed (add to
   `supabase/tests/local-stack/attacks.mjs`).
-- Signed in with Google (a Gmail added as a test user on the consent screen): name, email and avatar show; the chip
+- Signed in with Google (a Gmail added as a test user on the consent screen): name, email and the initial show; the chip
   shows the handle; "Sign out" -> the signed-out view, and the takes are still on `/progress` after signing back in.
   This needs a person: say so in the done note if it wasn't tried.
 - 375 px wide -> no horizontal scroll. Screenshot both widths.

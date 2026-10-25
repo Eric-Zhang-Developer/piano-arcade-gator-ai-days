@@ -8,7 +8,7 @@ import { signOutAfterSaving } from "../../data/save-plugin";
 import { useSession } from "../../data/useSession";
 import { signInLights } from "./lights";
 
-// The profile button, top right: "Sign in" for guests, or the Google player's avatar (else their initial). Click it
+// The profile button, top right: "Sign in" for guests, or the first letter of the player's name. Click it
 // for who's signed in, Progress, Account and Sign out. Right after a sign-in it says hi for a moment and the LED strip
 // sweeps once (lights.ts). It follows the one session (useSession), so signing in or out anywhere updates it.
 // Square like every button here (globals.css).
@@ -21,7 +21,7 @@ let greeted = false;
 export function AccountChip() {
   const any = useSession();
   const session = any === undefined ? undefined : any && !any.is_anonymous ? any : null;
-  const [who, setWho] = useState<{ id: string; label: string | null; avatar: string | null } | null>(null);
+  const [who, setWho] = useState<{ id: string; label: string | null } | null>(null);
   const [open, setOpen] = useState(false);
   const [hello, setHello] = useState<string | null>(null);
   const box = useRef<HTMLDivElement>(null);
@@ -33,7 +33,7 @@ export function AccountChip() {
     if (!session) return;
     let live = true;
     void Promise.all([fetchHandle(session), fetchUserDetails(session)]).then(([handle, details]) => {
-      if (live) setWho({ id: session.user_id, label: handle || details?.name || null, avatar: details?.avatarUrl ?? null });
+      if (live) setWho({ id: session.user_id, label: handle || details?.name || null });
     });
     return () => {
       live = false;
@@ -97,12 +97,7 @@ export function AccountChip() {
         style={{ ...avatar, boxShadow: hello ? "0 0 0 2px var(--pa-cyan), 0 0 18px var(--pa-cyan)" : avatar.boxShadow }}
         data-testid="account-profile"
       >
-        {me?.avatar ? (
-          // eslint-disable-next-line @next/next/no-img-element -- Google's avatar host, sized here; no image pipeline
-          <img src={me.avatar} alt="" width={32} height={32} referrerPolicy="no-referrer" style={{ width: "100%", height: "100%" }} />
-        ) : (
-          label.slice(0, 1).toUpperCase()
-        )}
+        {label.slice(0, 1).toUpperCase()}
       </button>
       {open && (
         <div role="menu" style={menu} data-testid="account-menu">

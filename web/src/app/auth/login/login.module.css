@@ -97,7 +97,13 @@
   border-radius: 6px;
   background: var(--pa-sky);
   box-shadow: 0 0 20px rgba(255, 47, 208, 0.35);
-  object-fit: cover;
+  display: grid;
+  place-items: center;
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 900;
+  font-size: 36px;
+  color: var(--pa-ink);
 }
 
 .who {
@@ -366,6 +372,51 @@
 }
 
 /* FlowLines: the lines fill the panel behind the quote; each bright stretch runs the length of its line. */
+.flowWrap {
+  position: absolute;
+  inset: 0;
+}
+
+/* The keyboard lies back in the lines like a floor, a little above the quote. */
+.keysStage {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  width: min(78%, 620px);
+  transform: translate(-50%, -50%) perspective(900px) rotateX(58deg) rotateZ(-8deg);
+  opacity: 0;
+  animation: flow-in 1200ms ease-out 300ms forwards;
+}
+
+.keys {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 6px rgba(255, 47, 208, 0.35));
+}
+
+.keyLit {
+  opacity: 0;
+  animation: key-lit linear infinite;
+}
+
+.rush .keyLit {
+  animation-duration: 2.2s !important;
+}
+
+/* A note: on at once, then fading out across its beat (one beat is about 1/16 of the loop). */
+@keyframes key-lit {
+  0% {
+    opacity: 0.85;
+  }
+  6% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 .flow {
   position: absolute;
   inset: 0;
@@ -405,7 +456,13 @@
     animation: none;
   }
 
-  .flowRun {
+  .flowRun,
+  .keyLit {
+    animation: none;
+  }
+
+  .keysStage {
+    opacity: 1;
     animation: none;
   }
 }

@@ -1,5 +1,5 @@
 ## What shipped
-Five Easy-pack songs from Mutopia notation MIDI. Every source, license and tempo is in `specs/decisions/song-pack-5-sources.md`.
+Four of the pack's five Easy songs, from Mutopia notation MIDI. The fifth, the Old French Song, waits on a `sheet-xml` fix (#989). Every source, license and tempo is in `specs/decisions/song-pack-5-sources.md`.
 
 | Song | Excerpt | bpm | Notes (R+L) | Range | Level |
 |---|---|---|---|---|---|
@@ -7,28 +7,29 @@ Five Easy-pack songs from Mutopia notation MIDI. Every source, license and tempo
 | `musette-d` | the whole piece, both repeats | 90 | 342 (182+160) | D2–A5 | 7 |
 | `happy-farmer` | the whole piece | 90 | 352 (240+112) | B♭2–F5 | 6 |
 | `wild-horseman` | A twice, then B | 120 | 312 (147+165) | C3–F5 | 8 |
-| `old-french-song` | bars 1–16 | 60 | 91 (50+41) | G2–E♭5 | 4 |
 
 - **Tempo, printed against MIDI:**
   - The two Bach pieces print none; their MIDI tempos are 140 and 120.
   - Happy Farmer: "Frais et gaillard", MIDI 100.
   - Wild Horseman: "vif", MIDI 152.
-  - Old French Song: "Moderato assai.", MIDI 70.
   - No metronome number is printed anywhere. Every `bpm` is below its MIDI's; Eric tunes them.
 - **Note counts:** counted from each piece's LilyPond source, bar by bar. Chord notes count one by one; tied-to notes,
   rests and spacers don't count. Each count equals the chart's, less the same-staff unisons sounded once (2 in the
-  Happy Farmer's L, 4 in the Old French Song's L).
+  Happy Farmer's L).
 
 ## Where it lives
-- `web/public/songs/{minuet-g-minor,musette-d,happy-farmer,wild-horseman,old-french-song}/chart.json`
+- `web/public/songs/{minuet-g-minor,musette-d,happy-farmer,wild-horseman}/chart.json`
 - `specs/decisions/song-pack-5-sources.md`
 - The CC BY-SA credit for the two Schumanns is a separate `docs:` PR, linked from #968.
 
 ## How to check it
-`pnpm -C web exec vitest run src/game/songs/library.test.ts`: 32 passed. The Perfect player gives each new chart
+`pnpm -C web exec vitest run src/game/songs/library.test.ts`: 31 passed, and `sheet-xml.test.ts` passes with all four. The Perfect player gives each new chart
 all PERFECT. `/play?song=<id>`: not verified locally; covered by main's scheduled full run.
 
 ## Gaps
+- **The Old French Song is held back.** Its chart (bars 1–16, 60 BPM, 91 notes, count exact, level 4) is commit
+  292ad44 on this branch. `sheet-xml` reads its held bass G3 back as two notes, so main's ci failed. It returns
+  as a `fix(song-pack-5)` cherry-pick once #989 is fixed.
 - **Validation skipped:** Eric's piano pass (is it the piece, are the lanes readable, which `bpm` needs tuning), and
   the screenshot of the widest chart (the Musette, D2–A5), both under the load rule.
 - **Two levels sit far above Easy:** the Musette at 7 and the Wild Horseman at 8, against the library's other Easy

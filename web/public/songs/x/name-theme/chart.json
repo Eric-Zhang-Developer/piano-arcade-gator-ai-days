@@ -1,0 +1,402 @@
+{
+ "id": "name-theme",
+ "title": "Your Name, in Music",
+ "composer": "Étude's name-theme generator",
+ "source": "Composed in the browser from a name's letters by web/src/game/x/name-theme (rules: specs/decisions/name-theme-composition.md)",
+ "bpm": 84,
+ "beatsPerBar": 4,
+ "notes": [
+  {
+   "id": "l1-1",
+   "pitch": 43,
+   "beat": 0,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "l2-1",
+   "pitch": 50,
+   "beat": 0,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "l3-1",
+   "pitch": 59,
+   "beat": 0,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "m1",
+   "pitch": 71,
+   "beat": 0,
+   "duration": 2,
+   "hand": "R",
+   "velocity": 80
+  },
+  {
+   "id": "l1-2",
+   "pitch": 45,
+   "beat": 2,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "l2-2",
+   "pitch": 48,
+   "beat": 2,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "l3-2",
+   "pitch": 52,
+   "beat": 2,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "m2",
+   "pitch": 69,
+   "beat": 2,
+   "duration": 2,
+   "hand": "R",
+   "velocity": 80
+  },
+  {
+   "id": "l1-3",
+   "pitch": 38,
+   "beat": 4,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "l2-3",
+   "pitch": 45,
+   "beat": 4,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "l3-3",
+   "pitch": 53,
+   "beat": 4,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "m3",
+   "pitch": 74,
+   "beat": 4,
+   "duration": 2,
+   "hand": "R",
+   "velocity": 80
+  },
+  {
+   "id": "l1-4",
+   "pitch": 43,
+   "beat": 6,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "l2-4",
+   "pitch": 47,
+   "beat": 6,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "l3-4",
+   "pitch": 50,
+   "beat": 6,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "m4",
+   "pitch": 74,
+   "beat": 6,
+   "duration": 2,
+   "hand": "R",
+   "velocity": 80
+  },
+  {
+   "id": "l1-5",
+   "pitch": 36,
+   "beat": 8,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "l2-5",
+   "pitch": 43,
+   "beat": 8,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "l3-5",
+   "pitch": 52,
+   "beat": 8,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "m5",
+   "pitch": 79,
+   "beat": 8,
+   "duration": 2,
+   "hand": "R",
+   "velocity": 80
+  },
+  {
+   "id": "l1-6",
+   "pitch": 43,
+   "beat": 10,
+   "duration": 4,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "l2-6",
+   "pitch": 47,
+   "beat": 10,
+   "duration": 4,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "l3-6",
+   "pitch": 50,
+   "beat": 10,
+   "duration": 4,
+   "hand": "L",
+   "velocity": 49
+  },
+  {
+   "id": "m6",
+   "pitch": 79,
+   "beat": 10,
+   "duration": 2,
+   "hand": "R",
+   "velocity": 80
+  },
+  {
+   "id": "m7",
+   "pitch": 71,
+   "beat": 12,
+   "duration": 2,
+   "hand": "R",
+   "velocity": 96
+  },
+  {
+   "id": "l1-8",
+   "pitch": 36,
+   "beat": 14,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "l2-8",
+   "pitch": 43,
+   "beat": 14,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "l3-8",
+   "pitch": 52,
+   "beat": 14,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "m8",
+   "pitch": 72,
+   "beat": 14,
+   "duration": 2,
+   "hand": "R",
+   "velocity": 96
+  },
+  {
+   "id": "l1-9",
+   "pitch": 43,
+   "beat": 16,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "l2-9",
+   "pitch": 47,
+   "beat": 16,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "l3-9",
+   "pitch": 50,
+   "beat": 16,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "m9",
+   "pitch": 67,
+   "beat": 16,
+   "duration": 2,
+   "hand": "R",
+   "velocity": 96
+  },
+  {
+   "id": "l1-10",
+   "pitch": 36,
+   "beat": 18,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "l2-10",
+   "pitch": 43,
+   "beat": 18,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "l3-10",
+   "pitch": 52,
+   "beat": 18,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "m10",
+   "pitch": 67,
+   "beat": 18,
+   "duration": 2,
+   "hand": "R",
+   "velocity": 96
+  },
+  {
+   "id": "l1-11",
+   "pitch": 38,
+   "beat": 20,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "l2-11",
+   "pitch": 45,
+   "beat": 20,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "l3-11",
+   "pitch": 53,
+   "beat": 20,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "m11",
+   "pitch": 62,
+   "beat": 20,
+   "duration": 2,
+   "hand": "R",
+   "velocity": 96
+  },
+  {
+   "id": "l1-12",
+   "pitch": 43,
+   "beat": 22,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "l2-12",
+   "pitch": 47,
+   "beat": 22,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "l3-12",
+   "pitch": 50,
+   "beat": 22,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "m12",
+   "pitch": 62,
+   "beat": 22,
+   "duration": 2,
+   "hand": "R",
+   "velocity": 96
+  },
+  {
+   "id": "l1-13",
+   "pitch": 36,
+   "beat": 24,
+   "duration": 4,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "l2-13",
+   "pitch": 43,
+   "beat": 24,
+   "duration": 4,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "l3-13",
+   "pitch": 52,
+   "beat": 24,
+   "duration": 4,
+   "hand": "L",
+   "velocity": 64
+  },
+  {
+   "id": "m13",
+   "pitch": 72,
+   "beat": 24,
+   "duration": 4,
+   "hand": "R",
+   "velocity": 96
+  }
+ ]
+}

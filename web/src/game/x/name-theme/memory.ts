@@ -6,12 +6,12 @@ import type { Theme } from "./compose";
 
 export const SONG = "x/name-theme";
 
-let held: { name: string; theme: Theme } | null = null;
+let held: { name: string; cipher: string; theme: Theme } | null = null;
 
 export const heldTheme = () => held;
 
-export function hold(name: string, theme: Theme): void {
-  held = { name, theme };
+export function hold(name: string, cipher: string, theme: Theme): void {
+  held = { name, cipher, theme };
   holdPedal(SONG, theme.pedal);
 }
 

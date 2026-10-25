@@ -79,6 +79,7 @@ export interface Theme {
   key: number;
   motif: number[]; // pitch classes, one per letter
   chords: string[]; // roman numerals, one per melody note of the theme then the variation
+  variationAt: number; // the beat the variation starts on
   chart: Chart;
   pedal: Pedal;
   letterOf: Record<string, number>; // a melody note's id → its letter's index in `letters`
@@ -165,7 +166,7 @@ export function compose(letters: string, cipher: Cipher): Theme | null {
     };
     const roots = at(r, S.bass[0], S.bass[1]);
     const thirds = at(t, S.bass[0], S.bass[1]);
-    let b = roots[0];
+    let b: number = roots[0];
     if (bass !== null) {
       b = roots.sort((x, y) => Math.abs(x - bass!) - Math.abs(y - bass!))[0];
       const third = thirds.sort((x, y) => Math.abs(x - bass!) - Math.abs(y - bass!))[0];
@@ -175,12 +176,12 @@ export function compose(letters: string, cipher: Cipher): Theme | null {
     const hi = Math.min(b + 16, S.leftTop);
     const pairs: [number, number][] = [];
     for (const x of at(others[0], b + 3, hi)) for (const y of at(others[1], b + 3, hi)) if (x !== y) pairs.push(x < y ? [x, y] : [y, x]);
-    const ref = inner ?? [b + 7, b + 12];
-    const pair = pairs.sort((p, q) => Math.abs(p[0] - ref[0]) + Math.abs(p[1] - ref[1]) - (Math.abs(q[0] - ref[0]) + Math.abs(q[1] - ref[1])) || p[0] - q[0])[0];
+    const ref: [number, number] = inner ?? [b + 7, b + 12];
+    const pair: [number, number] = pairs.sort((p, q) => Math.abs(p[0] - ref[0]) + Math.abs(p[1] - ref[1]) - (Math.abs(q[0] - ref[0]) + Math.abs(q[1] - ref[1])) || p[0] - q[0])[0];
     left.push({ beat: e.beat, dur: e.dur, pitches: [b, pair[0], pair[1]], theme: e.theme });
     const mel = toPitch(e.step);
     if (prevOuter) {
-      const [pm, pb] = prevOuter;
+      const [pm, pb]: [number, number] = prevOuter;
       const iv = (mel - b) % 12;
       const piv = (pm - pb) % 12;
       if ((iv === 7 || iv === 0) && iv === piv && mel !== pm && b !== pb) parallels++;
@@ -222,6 +223,7 @@ export function compose(letters: string, cipher: Cipher): Theme | null {
     key,
     motif: pcs,
     chords: evs.map((e) => CHORD[e.root]),
+    variationAt: themeEnd,
     chart: {
       id: "name-theme",
       title: "Your Name, in Music",

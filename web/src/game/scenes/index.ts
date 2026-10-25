@@ -1,6 +1,6 @@
 import type { Chart, GamePlugin, InputDevice, InputEvent, TakeEvent } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
-import { KEYS_VELOCITY, loadLatencyOffset } from "../core/settings";
+import { KEYS_VELOCITY, loadLatencyOffset, msPerBeat } from "../core/settings";
 import { gaugeSize } from "../fever-gauge/gauge";
 import { seededRandom } from "../sim/fake";
 import { toast } from "../notice-toast";
@@ -9,7 +9,7 @@ import { readTakeMidi } from "../take-midi";
 
 export const scenesSettings = {
   seed: 118,
-  holdMs: 100, // how long a bot holds each key (shorter for notes closer together)
+  restrikeGapMs: 20, // a held key lets go this long before its own pitch strikes again, so the piano re-articulates
   lateMs: 40, // `late`: every note GREAT, late
   offsets: { PERFECT: 0, GREAT: 40, GOOD: 75 }, // a bot's offset for each judgment, sign seeded
   sloppy: { GREAT: 0.2, GOOD: 0.15, MISS: 0.1, wrong: 3 }, // fractions of notes; `wrong` is a count
@@ -73,14 +73,21 @@ export function botPresses(chart: Chart, name: BotName): Press[] {
     for (const i of shuffled.slice(at, at + count)) judgments[i] = j;
     at += count;
   }
+  // Each key is held for its note's written length, as a player would, so a legato chart sounds legato (a fixed 100 ms
+  // hold made every demo staccato). It lets go early only where the same pitch strikes again.
+  const holds = chart.notes.map((note, i) => {
+    const written = note.duration * msPerBeat(chart.bpm);
+    const again = times.filter((t, k) => k !== i && chart.notes[k].pitch === note.pitch && t > times[i]);
+    const restrike = again.length ? Math.min(...again) - times[i] - s.restrikeGapMs : Infinity;
+    return Math.max(10, Math.min(written, restrike));
+  });
   const presses: Press[] = [];
-  order.forEach((i, k) => {
+  order.forEach((i) => {
     const j = judgments[i];
     if (j === "MISS") return;
     const sign = name === "late" ? 1 : r() < 0.5 ? -1 : 1;
     const offset = name === "late" ? s.lateMs : sign * s.offsets[j];
-    const next = order[k + 1] === undefined ? Infinity : times[order[k + 1]] - times[i];
-    presses.push({ pitch: chart.notes[i].pitch, timeMs: times[i] + offset, holdMs: Math.min(s.holdMs, next * 0.6) });
+    presses.push({ pitch: chart.notes[i].pitch, timeMs: times[i] + offset, holdMs: holds[i] });
   });
   if (name === "sloppy") {
     // WRONG notes: a pitch the chart never uses, between notes, so they break the combo without stealing a hit.

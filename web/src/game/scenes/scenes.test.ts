@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { Chart, Frame, GameEvent } from "../../contracts";
 import { Judge } from "../core/judge";
 import { gaugeSize } from "../fever-gauge/gauge";
-import { BOTS, botPresses, feverChart, scenes, TAKE_FILE, takePresses, type BotName } from ".";
+import { BOTS, botPresses, feverChart, scenes, scenesSettings, TAKE_FILE, takePresses, type BotName } from ".";
 
 const twinkle: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
 
@@ -13,6 +13,31 @@ function judge(chart: Chart, name: BotName) {
   botPresses(chart, name).forEach((p, i) => j.press(p.pitch, p.timeMs, i));
   return { results: j.finish(1e9), events };
 }
+
+describe("bot holds", () => {
+  // 120 bpm: a beat is 500 ms. A half note, then the same pitch again; a held whole note under a second voice.
+  const chart: Chart = {
+    ...twinkle,
+    bpm: 120,
+    notes: [
+      { id: "a", pitch: 60, beat: 0, duration: 2, hand: "R" },
+      { id: "b", pitch: 60, beat: 2, duration: 1, hand: "R" },
+      { id: "c", pitch: 48, beat: 0, duration: 4, hand: "L" },
+      { id: "d", pitch: 64, beat: 3, duration: 1, hand: "R" },
+    ],
+  };
+  const hold = (pitch: number, timeMs: number) => botPresses(chart, "perfect").find((p) => p.pitch === pitch && p.timeMs === timeMs)!.holdMs;
+
+  it("holds each key for its written length, so a legato chart sounds legato", () => {
+    expect(hold(48, 0)).toBe(2000); // the whole note, under the other voice's notes
+    expect(hold(64, 1500)).toBe(500);
+  });
+
+  it("lets go just before the same pitch strikes again", () => {
+    expect(hold(60, 0)).toBe(1000 - scenesSettings.restrikeGapMs);
+    expect(hold(60, 1000)).toBe(500);
+  });
+});
 
 describe("bots on Twinkle, judged by the real judge", () => {
   it.each(BOTS)("%s presses the same notes on two runs", (name) => {

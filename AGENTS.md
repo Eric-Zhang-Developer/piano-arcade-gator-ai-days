@@ -52,7 +52,7 @@ access can set it, so an unlabeled request is only an idea.
 - Claim it with a draft PR titled `chore(song-requests): chart <piece>` with `Closes #<n>`, then follow
   `specs/features/song-requests/spec.md`: a source decision 003 lets you commit, the converter, the library test.
 - A request adds one chart, nothing else: no game code, no new scope, no notes from memory. A credit the source asks
-  for goes in `CREDITS.md` through a `docs:` PR.
+  for goes in `CREDITS.md` through a `docs:` PR (a `feat(song-pack-<n>)` PR appends its own; see below).
 - No allowed source, or the piece is unclear? Comment what you searched, label it `needs-info`, and switch.
 
 ## The database
@@ -84,9 +84,10 @@ Supabase Postgres, in `sharan`'s lane. `supabase/README.md` lists what's in it a
    Validation step you skipped, with the reason). A person follows the release from these.
 6. Wait for CI, check GitHub's whole verdict, then squash-merge it yourself:
    `gh pr checks --watch && python3 .agents/scripts/pr_ready.py && gh pr merge --squash --delete-branch`.
-   Not for `plan:` PRs (except those `specs/decisions/002-overnight-planner.md` allows), `contract:` PRs that change
-   `AGENTS.md` (rules bind every future agent), or PRs that touch a path `.github/CODEOWNERS` assigns to a person other
-   than your own: those wait for that person. Paths assigned to your own person don't stop you; that's your lane.
+   `plan:` and `contract:` PRs merge on green the same way, `AGENTS.md` changes included (Eric, 2026-10-25). A PR waits
+   for a person only when it touches a path `.github/CODEOWNERS` assigns to a person other than your own, or changes
+   `web/src/contracts/`, which both people see. Paths assigned to your own person don't stop you; that's your lane.
+   One-way doors still go to Eric as `needs-human` + `one-way-door` issues: that's about decisions, not PR review.
 
 **PR titles** ([Conventional Commits](https://www.conventionalcommits.org/)); CI checks the files against the title:
 
@@ -97,10 +98,21 @@ Supabase Postgres, in `sharan`'s lane. `supabase/README.md` lists what's in it a
 | `fix: ...` with no scope (same types) | anything not frozen, not in `specs/` or `changes/`, and not owned by a feature in flight |
 | `docs: ...` | open paths (like `NOW.md`), and Markdown outside `specs/`, `changes/`, frozen paths and features in flight |
 | `contract: ...` | frozen paths and `specs/`: additive changes only |
-| `plan: ...` | `specs/features/`, `specs/shipped/`, `specs/milestones.toml`, `specs/roadmap.md`, `specs/context/findings.md`; a person merges it |
+| `plan: ...` | `specs/features/`, `specs/shipped/`, `specs/milestones.toml`, `specs/roadmap.md`, `specs/context/findings.md` |
 | `revert: ...` | exactly what the reverted commit changed; make it with `git revert` |
 
 The bootstrap feature (`bootstrap: true`) may change anything.
+
+**Ownership is open within a lane.** A `feat(<slug>)` or `fix(<slug>)` PR (and its `refactor`, `perf`, ... kin) may
+also change the `owns` of other features in the same person's lane, but only while no open PR is working on those
+files. A feature's person is its spec's `assignee` up to the first `-` (`eric`, `eric-agent-1` and
+`eric-foreman-agent` are all `eric`); an empty `assignee` is no lane, so no widening. `check_ownership.py` checks the
+lane, not GitHub: checking for an open PR on those files (`gh pr list`, then its files) is on you. A path an in-flight
+feature of another lane owns stays closed: cross-lane changes still need the owner's own PR.
+**Mounts and credits ride along.** A game-lane (`eric`) `feat`/`fix(<slug>)` PR may add its own mount to
+`web/src/app/layout.tsx`, `web/src/app/page.tsx` or `web/src/game/layers.ts`, whoever owns them: at most 4 added and
+2 removed lines per file, or the owner rule applies. A `feat(song-pack-<n>)` PR may append its credits to
+`CREDITS.md` (no removed lines). Both are checked by `check_ownership.py`.
 
 ## When something needs a person
 - Could running something answer it (a script, a throwaway prototype in a scratch dir)? Then run it instead of asking.
@@ -144,7 +156,8 @@ Search open issues and PRs first: a likely duplicate gets a linking comment.
 ## Prefer (engineering judgment)
 - Review comments are claims to check: fix with a failing check, or reply with why not.
 - One feature at a time. A second is fine while the first waits on review or CI.
-- Keep PRs reviewable: past a few hundred changed lines, split along logical seams or say why it's one piece (CI warns).
+- One PR per thing a person sees (a screen or a moment), up to about 1000 changed lines (CI warns past that). Split
+  only at a real seam, such as a component other screens share.
 - Not everything needs a spec: a small bug in shared code is a `fix: ...` PR; new behavior gets a spec.
 - If your own spec is wrong, fix it in the same PR as the code. If another feature's spec is wrong, file an issue.
 - Never resolve a conflict in a file you don't own. Abort, file a `blocked` issue for the owner, and switch tasks.

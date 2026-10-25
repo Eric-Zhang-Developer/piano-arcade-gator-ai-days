@@ -135,8 +135,8 @@ def main(argv=None) -> int:
         n = changed_lines(root, args.base, as_list(cfg["pr"]["exclude"]))
         line += f"; {n} changed lines"
         if n > warn:
-            big = (f"large PR ({n} changed lines, guideline {warn}): split along logical seams if it helps review, "
-                   "or say in the description why it's one piece")
+            big = (f"large PR ({n} changed lines, guideline {warn}): split only at a real seam (a component other "
+                   "screens share), or say in the description why it's one piece")
 
     print(f"gates: {line}")
     for w in (big, unchecked_note(root, cfg, t), validation_changed(root, args.base, t, specs, shipped)):

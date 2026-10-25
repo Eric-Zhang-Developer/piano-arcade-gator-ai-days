@@ -102,8 +102,13 @@ await page.getByTestId("play-judged").click();
 await page.waitForFunction(() => window.__pianoArcade?.ready === true, null, { timeout: 60_000 });
 const judged = new URL(page.url());
 check(judged.searchParams.get("mode") === "flow" && judged.searchParams.get("song") === "twinkle", `the ladder's next step opens ${judged.pathname}${judged.search}`);
-// ?input=test starts the take at once, so the ladder (a start and results panel) shows once this Flow take ends.
-await page.getByTestId("results").waitFor({ timeout: 120_000 });
+// The ladder is a start and results panel (play-modes spec, item 3). ?input=test starts this Flow take at once, and
+// a Flow take waits for the player, so it never ends unplayed: the same URL without input=test stops on the start
+// screen, whose ladder must light Flow.
+const flowStart = new URL(judged.href);
+flowStart.searchParams.delete("input");
+await page.goto(flowStart.href);
+await page.getByTestId("ladder-flow").waitFor({ timeout: 60_000 });
 check((await page.getByTestId("ladder-flow").getAttribute("aria-current")) === "step", "… Flow, lit on its ladder");
 await page.goto(perform.href);
 await page.getByTestId("results").waitFor({ timeout: 120_000 }); // nothing pressed: Perform calls every note a MISS

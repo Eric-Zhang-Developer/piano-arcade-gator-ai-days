@@ -115,22 +115,29 @@ function Picker({ c, v }: { c: Candidate; v: Vision }) {
     else q.set("sim", sim);
     return `${location.pathname}?${q}`;
   };
-  const row = (label: string, items: [string, string, boolean][], testid: string) =>
+  const row = (label: string, items: [string, string, boolean, string?][], testid: string) =>
     createElement(
       "div",
       { style: { display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }, "data-testid": testid },
       createElement("span", { style: { font: "700 clamp(12px, 0.85vw, 17px) var(--pa-font-mono, ui-monospace, monospace)", letterSpacing: "0.12em", color: "var(--pa-ink-dim)", minWidth: "6.5em" } }, label),
-      ...items.map(([text, to, lit]) => createElement("a", { key: text, ...kitChip(lit), href: to, "aria-current": lit ? "true" : undefined }, text)),
+      ...items.map(([text, to, lit, title]) => createElement("a", { key: text, ...kitChip(lit), href: to, title, "aria-current": lit ? "true" : undefined }, text)),
     );
-  const swatches = (Object.entries(c.palette) as [string, string][]).map(([slot, hex]) =>
-    createElement("span", { key: slot, title: `${slot} ${hex}`, style: { display: "inline-block", width: "1.1em", height: "1.1em", background: hex, outline: "1px solid var(--pa-line)" } }),
-  );
+  // The hands larger and first, then the judgments and fever's amber: the pair this experiment is about leads.
+  const swatch = (slot: string, hex: string, em: number) =>
+    createElement("span", { key: slot, title: `${slot} ${hex}`, style: { display: "inline-block", width: `${em}em`, height: `${em}em`, background: hex, outline: "1px solid var(--pa-line)" } });
+  const p = c.palette;
+  const swatches = [
+    swatch("Right hand", p.R, 1.5),
+    swatch("Left hand", p.L, 1.5),
+    createElement("span", { key: "gap", style: { width: "0.75em" } }),
+    ...(["PERFECT", "GREAT", "GOOD", "MISS", "WRONG", "AMBER"] as const).map((k) => swatch(k === "AMBER" ? "Fever" : k, p[k], 1)),
+  ];
   return createElement(
     "div",
     { "data-testid": "x-hand-palette-panel", style: { display: "grid", gap: 10 } },
-    row("PALETTE", Object.values(candidates).map((k) => [`${k.id} · ${k.name}`, href(k.id, v), k.id === c.id]), "x-hand-palette-p"),
+    row("PALETTE", Object.values(candidates).map((k) => [`${k.id} · ${k.short}`, href(k.id, v), k.id === c.id, k.name]), "x-hand-palette-p"),
     row("SEE AS", visions.map((s) => [s.toUpperCase(), href(c.id, s), s === v]), "x-hand-palette-sim"),
-    createElement("div", { style: { display: "flex", gap: 6 }, "aria-label": `Palette ${c.id}'s colors` }, ...swatches),
+    createElement("div", { style: { display: "flex", alignItems: "flex-end", gap: 6 }, role: "img", "aria-label": `Palette ${c.id}, ${c.name}: ${Object.entries(p).map(([k, h]) => `${k} ${h}`).join(", ")}` }, ...swatches),
   );
 }
 

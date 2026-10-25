@@ -10,6 +10,7 @@ export type CandidateId = "A" | "B" | "C";
 export interface Candidate {
   id: CandidateId;
   name: string;
+  short: string; // the picker's chip
   palette: Palette;
 }
 
@@ -23,17 +24,20 @@ export const candidates: Record<CandidateId, Candidate> = {
   A: {
     id: "A",
     name: "Today, plus the shape",
+    short: "Today",
     palette: { R: handR, L: handL, PERFECT: gold, GREAT: MINT, GOOD: good, MISS: miss, WRONG: wrong, AMBER },
   },
   B: {
     id: "B",
     name: "Blue and orange",
+    short: "Orange",
     // Okabe–Ito's pairing: the left hand takes the orange, so fever leaves amber for the kit's hype magenta.
     palette: { R: handR, L: "#e6870a", PERFECT: gold, GREAT: MINT, GOOD: good, MISS: miss, WRONG: wrong, AMBER: "#ff2fd0" },
   },
   C: {
     id: "C",
     name: "Blue and rose",
+    short: "Rose",
     // The left hand turns rose, which keeps fever's amber and PERFECT's gold to themselves.
     palette: { R: handR, L: "#f34fc2", PERFECT: gold, GREAT: MINT, GOOD: good, MISS: miss, WRONG: wrong, AMBER },
   },

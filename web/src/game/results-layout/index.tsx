@@ -14,6 +14,7 @@ import { showsMoment } from "../record-moment/timing";
 import { takeOutcome } from "../records";
 import { Tally } from "../results-tally";
 import styles from "./results-layout.module.css";
+import { useLandingLayout } from "../results-landing";
 
 export const resultsLayoutSettings = {
   // panels in the first view, under the counts (record-moment: NEW RECORD takes only; flow-mode: its headline, Flow takes only)
@@ -129,6 +130,7 @@ export function ResultsLayout({
     const node = panel(p);
     return node === null || node === undefined ? node : card(panelName(p.id), node, wide.includes(p.id));
   };
+  useLandingLayout(); // results-landing's first frame, before paint (a no-op without ?x=results-landing)
   const tutor = only(resultsLayoutSettings.tutor);
   const tallies = dataCells(results).filter((c) => c.tally).length + 2; // the cells, then WRONG and EXTRA
   return (

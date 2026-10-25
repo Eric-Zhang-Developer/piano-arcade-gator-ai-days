@@ -1,6 +1,7 @@
 // Results landing (spec: results-landing), behind ?x=results-landing: one clock from T0 drives the out on /play's
 // canvas, then the results' DOM (the flying score and combo, the counts, the rank's stamp, its corners, the after).
 // The page owns T0 and the out; this module owns the clock, the seek hook, the skip and every DOM write.
+import { useLayoutEffect } from "react";
 import { setStampTiming } from "../rank-stamp";
 import { setTallyDriver } from "../results-tally";
 import { endState, landingAt, landingSettings, mountTimes, planLanding, type LandingInput, type LandingPlan, type LandingState } from "./timeline";
@@ -26,7 +27,8 @@ type Run = {
   from: { score: FlyFrom; combo: FlyFrom };
   score: number;
   fly: { score: HTMLElement; combo: HTMLElement } | null;
-  swallowClick: boolean;
+  swallowClick: boolean; // the click that follows a skipping pointerdown
+  swallowKeyUp: string | null; // and the keyup that follows a skipping key (Space presses a button on keyup)
   unlisten: () => void;
 };
 let run: Run | null = null;
@@ -52,7 +54,7 @@ export function startLanding(input: Omit<LandingInput, "reduced">, from: { score
   stopLanding();
   const plan = planLanding({ ...input, reduced: reducedMotion() });
   setStampTiming(mountTimes(plan));
-  const r: Run = { plan, t0, pausedAt: null, raf: 0, version: 0, listeners: new Set(), from, score, fly: null, swallowClick: false, unlisten: () => {} };
+  const r: Run = { plan, t0, pausedAt: null, raf: 0, version: 0, listeners: new Set(), from, score, fly: null, swallowClick: false, swallowKeyUp: null, unlisten: () => {} };
   run = r;
   setTallyDriver({
     subscribe: (cb) => (r.listeners.add(cb), () => r.listeners.delete(cb)),
@@ -116,6 +118,13 @@ export function landingMounted(counts: [number, number, number, number], maxComb
   const onKey = (e: KeyboardEvent) => {
     if (!skip()) return;
     if (/^[a-z]$/i.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) return;
+    r.swallowKeyUp = e.key;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  };
+  const onKeyUp = (e: KeyboardEvent) => {
+    if (r.swallowKeyUp !== e.key) return;
+    r.swallowKeyUp = null;
     e.preventDefault();
     e.stopImmediatePropagation();
   };
@@ -132,10 +141,12 @@ export function landingMounted(counts: [number, number, number, number], maxComb
     e.stopImmediatePropagation();
   };
   window.addEventListener("keydown", onKey, true);
+  window.addEventListener("keyup", onKeyUp, true);
   window.addEventListener("pointerdown", onPointer, true);
   window.addEventListener("click", onClick, true);
   r.unlisten = () => {
     window.removeEventListener("keydown", onKey, true);
+    window.removeEventListener("keyup", onKeyUp, true);
     window.removeEventListener("pointerdown", onPointer, true);
     window.removeEventListener("click", onClick, true);
   };
@@ -154,6 +165,12 @@ export function stopLanding(): void {
   setStampTiming(null);
   setTallyDriver(null);
   delete window.__pianoArcadeLanding;
+}
+
+// The results' first frame is the landing's: its DOM writes land after React's and before the first paint, so the
+// rank, the tutor and the shade never show their final state for a frame before the cut takes them.
+export function useLandingLayout(): void {
+  useLayoutEffect(() => apply(), []);
 }
 
 const lerp = (a: number, b: number, u: number) => a + (b - a) * u;
@@ -224,7 +241,10 @@ function apply(): void {
   }
   const acc = results.querySelector<HTMLElement>('[data-testid="accuracy"]');
   if (acc) acc.style.opacity = String(st.acc);
-  for (const el of results.querySelectorAll<HTMLElement>("[data-landing-after]")) el.style.opacity = String(st.after);
+  // The after: the tutor, and NEW RECORD (its own stamp runs on stampAfterMs(); this holds it for a seeked frame too).
+  for (const el of results.querySelectorAll<HTMLElement>('[data-landing-after], [data-testid="record-moment"]')) el.style.opacity = String(st.after);
+  // The tutor rises into its panel as it fades in, so it reads as an arrival, not a hole that fills.
+  for (const el of results.querySelectorAll<HTMLElement>("[data-landing-after]")) el.style.transform = st.after < 1 ? `translateY(${(12 * (1 - st.after) ** 2).toFixed(2)}px)` : "";
 
   // The score and the combo fly in, keep their values, and hand over to the real cells once they've landed.
   const scoreEl = results.querySelector<HTMLElement>('[data-testid="score"]');
@@ -242,10 +262,6 @@ function apply(): void {
     r.fly.score.remove();
     r.fly.combo.remove();
     r.fly = null;
-  }
-  if (done) {
-    r.unlisten();
-    r.unlisten = () => {};
   }
 }
 

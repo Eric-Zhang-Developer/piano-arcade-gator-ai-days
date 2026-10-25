@@ -2,9 +2,9 @@
 // labeled DEMO, and goes back to / eight seconds after the results. Without demo=1 it does nothing.
 import { useEffect, useRef } from "react";
 import type { Frame, GamePlugin } from "../../contracts";
-import { kitSettings } from "../duo-tokens";
+import { canvasFonts, kitSettings } from "../duo-tokens";
 import { hudLayout, hudSettings } from "../hud";
-import { bg, cyan, whenDisplayFontReady } from "../ui-tokens";
+import { bg, cyan } from "../ui-tokens";
 import { pickOutput, toneVoice, type Voice } from "../../replay/piano";
 import { returnAt, watchSettings } from "./demo";
 import styles from "./watch-demo.module.css";
@@ -48,11 +48,11 @@ function Back() {
 // wait-hud's LEARN badge, saying DEMO, right-aligned in the HUD band's song-card slot so it covers no counter, score or
 // multiplier. The card's text runs the slot's full width, so the badge sits on the composer row only, on the band's own
 // fill: it hides that line's tail cleanly, and the title stays whole.
-function drawBadge(ctx: CanvasRenderingContext2D, f: Frame, display: string) {
+function drawBadge(ctx: CanvasRenderingContext2D, f: Frame) {
   const { panel, slots } = hudLayout(f.width, f.judgmentLineY);
   const h = panel.h;
   const size = Math.round(h * 0.24);
-  ctx.font = `italic 900 ${size}px ${display}`;
+  ctx.font = canvasFonts.display(size); // Duo: upright, the kit's face
   const w = ctx.measureText("DEMO").width + size * 0.8;
   const bh = size * 1.25;
   const right = slots.card.x1 - Math.max(10, h * 0.25) * 0.5;
@@ -79,12 +79,6 @@ export function watchDemo(): GamePlugin {
   let voice: Voice | null = null; // laptop tones when there's no piano; null while the piano plays scenes' notes
   let audio: AudioContext | null = null;
   let noteMs = new Map<string, number>();
-  let display = hudSettings.font;
-  if (typeof document !== "undefined")
-    void whenDisplayFontReady().then(() => {
-      const family = getComputedStyle(document.documentElement).getPropertyValue("--pa-font-display").trim();
-      if (family) display = `${family}, ${hudSettings.font}`;
-    });
   const publish = () => {
     if (on && typeof window !== "undefined") window.__pianoArcadeDemo = { on, returnAt: at };
   };
@@ -129,7 +123,7 @@ export function watchDemo(): GamePlugin {
       arm(returnAt(at, e, performance.now()));
     },
     draw(ctx, f) {
-      if (on) drawBadge(ctx, f, display);
+      if (on) drawBadge(ctx, f);
     },
     startPanel: () => (on ? <AutoStart /> : null),
     resultsPanel: () => (on ? <Back /> : null),

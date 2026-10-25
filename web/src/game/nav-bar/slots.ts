@@ -32,7 +32,7 @@ const ownSlot = (slot: Slot, pathname: string) => (slot.path === "/" ? pathname 
 // The experiments' own pages: the pathnames of x/index.ts's experiments[].href. Listed, not imported, because the
 // registry imports every experiment and would put them all in the nav bar on every page (4.5 KB to 206 KB minified;
 // decision lab-pages-a11y-nav). nav-bar.test.ts fails when an experiment's page is missing here.
-export const EXPERIMENT_PAGES = ["/play", "/conduct", "/highlight", "/real-keys", "/composers-hands", "/sonata", "/paint", "/speak", "/musicbox", "/name", "/inside"];
+export const EXPERIMENT_PAGES = ["/play", "/conduct", "/highlight", "/real-keys", "/composers-hands", "/sonata", "/paint", "/speak", "/musicbox", "/name", "/inside", "/harmony"];
 
 // The pages you reach from the Lab that no other slot owns (/simon, /wrong-note, /conduct, …): Lab is current there
 // (#1043, #1130). Read from the Lab's own list, so a new entry lights Lab without an edit here.

@@ -46,6 +46,21 @@ describe('listenToPiano', () => {
     expect(win.__masteryMidi).toBeUndefined();
   });
 
+  it('with ?sim, a late stop from an earlier listener leaves the newer hook in place', async () => {
+    const win: Window = { location: { search: '?sim' } } as unknown as Window;
+    vi.stubGlobal('window', win);
+    const first = listen();
+    const second = listen();
+    const endFirst = await first.stop;
+    const endSecond = await second.stop;
+    endFirst();
+    win.__masteryMidi?.push({ data: [0x90, 60, 80], timeMs: 3 });
+    expect(first.events).toEqual([]);
+    expect(second.events).toEqual([{ type: 'on', pitch: 60, velocity: 80, timeMs: 3 }]);
+    endSecond();
+    expect(win.__masteryMidi).toBeUndefined();
+  });
+
   it('says there is no piano without Web MIDI', async () => {
     vi.stubGlobal('window', { location: { search: '' } });
     vi.stubGlobal('navigator', {});

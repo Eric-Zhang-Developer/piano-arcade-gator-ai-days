@@ -147,10 +147,10 @@ await page.eval(async () => {
   await click('Hear the opening');
   await playingAudio();
   await click('Stop demo');
-  await click('Start preview take');
+  await click('See an example take');
   await recover();
-  assert(text().includes('Start preview take') && !document.querySelector('main').textContent.includes('example take'), 'Interrupted practice take completed or stayed active');
-  await click('Start preview take');
+  assert(text().includes('See an example take') && !document.querySelector('main').textContent.includes('1 example take'), 'Interrupted practice take completed or stayed active');
+  await click('See an example take');
   await until(() => text().includes('Practise the held note'), 'Practice could not finish after recovery');
   await click('Practise the held note');
   await click('I played it');
@@ -159,7 +159,7 @@ await page.eval(async () => {
   assert(text().includes('2 of 4 repetitions') && document.querySelector('main').textContent.includes('1 example take') && tempo().value === '80', 'Practice repetitions, take count or settings reset');
   await click('I played it');
   await click('I played it');
-  await click('Preview at');
+  await click('Example at');
   await until(() => !!document.querySelector('main a[href="/learn"]'), 'Practice support fading did not finish');
   await recover();
   assert(!!document.querySelector('main a[href="/learn"]') && document.querySelector('main').textContent.includes('2 example takes'), 'Completed practice reset');

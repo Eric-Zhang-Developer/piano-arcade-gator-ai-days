@@ -120,6 +120,7 @@ async function main() {
     if (fail.length) throw new Error(fail.join("; "));
     say(`verify: test input pass, ${n}/${n} PERFECT; results panels: ${slots.join(", ") || "none"}, no errors`);
 
+    const simFrom = consoleLines.length; // /sim's own page errors and console.errors, as verify-sim.mjs checked
     await page.goto(`${base}/sim`);
     await page.getByRole("button", { name: "Watch the bot" }).click({ timeout: 60_000 }); // enabled once the game is ready
     const game = page.frameLocator('iframe[title="game"]');
@@ -147,6 +148,8 @@ async function main() {
     if ((await game.locator('[data-testid="slot-piano-out"] [data-testid="replay"]').count()) !== 1) {
       fail.push('/sim results: no "Replay on piano" inside slot-piano-out');
     }
+    const simErrors = consoleLines.slice(simFrom);
+    if (simErrors.length) fail.push(`/sim errors: ${simErrors.join(" | ")}`);
     if (fail.length) throw new Error(fail.join("; "));
     say(`verify: pass, ${n}/${n} PERFECT with test input and through the MIDI path on /sim (evidence: ${out})`);
   } catch (e) {

@@ -1,0 +1,314 @@
+/* /veritas: cabinet chrome on the sky (visual-direction.md). All of the page's styling lives here, so veritas-polish
+   changes CSS only; components set nothing inline but data positions (--x, --y, --row, --i). */
+.page {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 32px 40px 80px;
+  min-height: 100vh;
+  color: var(--pa-ink);
+  font-family: system-ui, sans-serif;
+  font-size: max(16px, 1.25vw);
+  line-height: 1.4;
+  box-sizing: content-box;
+}
+
+:global(html):has(.page),
+:global(body):has(.page) {
+  background: var(--pa-sky);
+}
+
+.header {
+  border-bottom: 2px solid var(--pa-magenta);
+  margin-bottom: 24px;
+}
+
+.title,
+.player,
+.h2 {
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.title {
+  margin: 0 0 8px;
+  font-size: max(32px, 3vw);
+  color: var(--pa-magenta);
+}
+
+.header p {
+  margin: 0 0 12px;
+  max-width: 64ch;
+}
+
+.h2 {
+  margin: 0 0 16px;
+  font-size: max(22px, 1.8vw);
+  color: var(--pa-cyan);
+}
+
+.dim {
+  color: var(--pa-ink-dim);
+}
+
+.num {
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 800;
+}
+
+/* --- the hero ---------------------------------------------------------------------------------------------------- */
+
+.hero {
+  --sweep: 4s;
+  margin-bottom: 40px;
+}
+
+.runs {
+  display: grid;
+  gap: 20px;
+}
+
+.run {
+  padding: 12px 16px 14px;
+  border: 2px solid var(--pa-cyan);
+  border-radius: 10px;
+  background: var(--pa-panel);
+}
+
+.runHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+}
+
+.player {
+  margin: 0;
+  font-size: max(20px, 1.5vw);
+  color: var(--pa-ink);
+}
+
+.does,
+.song {
+  margin: 0;
+}
+
+.song {
+  color: var(--pa-ink-dim);
+}
+
+.strip {
+  position: relative;
+  height: 130px;
+  margin: 10px 0 6px;
+  border-bottom: 1px solid rgba(242, 242, 245, 0.2);
+  overflow: hidden;
+}
+
+.tick,
+.press {
+  position: absolute;
+  left: calc(var(--x) * 100%);
+}
+
+.tick {
+  top: calc(26px + var(--y) * 80px);
+  width: 3px;
+  height: 8px;
+  background: var(--pa-cyan);
+}
+
+.planted {
+  outline: 2px solid var(--pa-sun);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+.press {
+  bottom: 0;
+  width: 2px;
+  height: 10px;
+  background: var(--pa-ink-dim);
+}
+
+/* The judge's marks: hidden until the playhead reaches them. */
+.mark {
+  position: absolute;
+  left: calc(var(--x) * 100%);
+  top: calc(var(--row) * 18px);
+  transform: translateX(-50%);
+  font-size: 14px;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  opacity: 0;
+  animation: reveal 1ms linear forwards;
+  animation-delay: calc(var(--i) * var(--sweep) + var(--x) * var(--sweep));
+}
+
+.wrong {
+  color: var(--pa-wrong);
+  font-size: 18px;
+}
+
+.early,
+.late {
+  color: var(--pa-sun);
+}
+
+.rolled {
+  color: var(--pa-magenta);
+}
+
+.playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: var(--pa-magenta);
+  opacity: 0;
+  animation: sweep var(--sweep) linear forwards;
+  animation-delay: calc(var(--i) * var(--sweep));
+}
+
+.tally {
+  margin: 0;
+  opacity: 0;
+  animation: reveal 1ms linear forwards;
+  animation-delay: calc((var(--i) + 1) * var(--sweep));
+}
+
+@keyframes reveal {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sweep {
+  0% {
+    left: 0;
+    opacity: 1;
+  }
+  99% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mark,
+  .tally {
+    animation: none;
+    opacity: 1;
+  }
+
+  .playhead {
+    display: none;
+  }
+}
+
+.note {
+  margin: 12px 0 0;
+  color: var(--pa-ink-dim);
+}
+
+.replay {
+  margin-left: 12px;
+  padding: 4px 14px;
+  border: 2px solid var(--pa-magenta);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--pa-ink);
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.replay:focus-visible {
+  outline: 3px solid var(--pa-magenta);
+  outline-offset: 3px;
+}
+
+/* --- the dashboard ----------------------------------------------------------------------------------------------- */
+
+.dashboard {
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 47, 208, 0.4);
+}
+
+.dash a {
+  color: var(--pa-cyan);
+  text-underline-offset: 3px;
+}
+
+.dash a:focus-visible {
+  outline: 3px solid var(--pa-magenta);
+  outline-offset: 3px;
+}
+
+.h3 {
+  margin: 24px 0 8px;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 800;
+}
+
+.jobs,
+.suites {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.suites {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+}
+
+/* Pass and fail say so in words; the color only repeats it. Red stays WRONG's alone (visual-direction.md). */
+.pass {
+  color: var(--pa-cyan);
+}
+
+.fail {
+  color: var(--pa-sun);
+  font-weight: 800;
+}
+
+.checks {
+  border-collapse: collapse;
+}
+
+.checks td {
+  padding: 2px 24px 2px 0;
+}
+
+.shots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.shots figure {
+  margin: 0;
+}
+
+.shots img {
+  display: block;
+  width: 100%;
+  border: 1px solid rgba(242, 242, 245, 0.2);
+}
+
+.shots figcaption {
+  color: var(--pa-ink-dim);
+  font-size: 0.8em;
+}

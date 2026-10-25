@@ -1,9 +1,12 @@
 // The Build Sonata's Validation (a) and (b), on a fixture log, plus the committed snapshot and chart.
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { validateChart } from "../../../contracts";
 import { parsePedal } from "../../pedal";
+import { Sonata } from "./SonataPage";
 import { CHORD_TONES, buildSonata, counterAt, laneOf, parseSubject, scrub, VELOCITY_CAP, type Lane, type Snapshot, type SonataCommit } from "./sonata";
 
 const NAMES = ["eric", "Eric-Zhang-Developer", "sharan", "iKnow24"];
@@ -132,5 +135,25 @@ describe("the committed snapshot", () => {
     expect(text).not.toMatch(/Zhang|Developer/); // no piece of a handle either
     for (const c of snap.commits) expect(c.subject).not.toMatch(/ from [^\s/]+\/[^\s]*\//); // a branch keeps one segment
     expect(text).not.toMatch(/[\w.+-]+@[\w-]+\.[a-z]{2,}/i);
+  });
+});
+
+// roll-pages-polish (#1205): the live readout holds the PR's lines and none of the links; the roll is a slider.
+describe("the sonata page's readout", () => {
+  const html = renderToStaticMarkup(createElement(Sonata));
+  const said = html.match(/<div[^>]*data-testid="sonata-said"[^>]*>([\s\S]*?)<\/div>/)?.[1] ?? "";
+
+  it("keeps the action links out of the live region", () => {
+    expect(html).toMatch(/<div[^>]*aria-live="polite"[^>]*data-testid="sonata-said"/);
+    expect(said).toContain("PR #");
+    for (const words of ["Listen on the piano", "Play it, Easy", "Play it, full"]) {
+      expect(html).toContain(words);
+      expect(said).not.toContain(words);
+    }
+    expect(html.match(/aria-live=/g)).toHaveLength(1);
+  });
+
+  it("names the roll a slider, valued by the selected note", () => {
+    expect(html).toMatch(/role="slider"[^>]*aria-valuemin="1"[^>]*aria-valuemax="\d+"[^>]*aria-valuenow="\d+"[^>]*aria-valuetext="Note \d+ of \d+, PR #\d+"/);
   });
 });

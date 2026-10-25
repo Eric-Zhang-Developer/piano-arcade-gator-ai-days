@@ -1,9 +1,12 @@
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { validateChart } from "../../../contracts";
 import { noteTimeMs } from "../../core/judge";
 import { echoGuard, playbackBetween, splitHands } from "../../hand-mode/hands";
 import { dtw, sections, sequence, timeMap, type Seq } from "./align";
-import { sendsBetween, testRoll } from "./rolls";
+import { StatusLine } from "./ComposersHands";
+import { AHEAD_MS, sendsBetween, silence, testRoll, type Out } from "./rolls";
 import { handOf, parseMidi, rollSettings, secondsChart, splitPoints, spoolRate, unspool, type Roll, type RollNote } from "./roll";
 
 // Synthetic rolls only: the real ones stay local (specs/decisions/composers-hands-rolls-local.md).
@@ -169,5 +172,41 @@ describe("the sends", () => {
     const chart = { id: "t", title: "T", composer: "T", source: "s", bpm: 120, beatsPerBar: 4, notes: [{ id: "a", pitch: 60, beat: 1, duration: 0.5, hand: "R" as const }] };
     expect(testRoll(chart).notes).toEqual([{ pitch: 60, onMs: 500, offMs: 750, velocity: 80 }]);
     expect(testRoll(chart).dynamics).toBe(false);
+  });
+});
+
+// roll-pages-polish (#1206, #1207): a stop leaves nothing sounding, and the status line is read out.
+describe("a stop", () => {
+  const fake = (withClear: boolean) => {
+    const log: (string | [number[], number | undefined])[] = [];
+    const out: Out = { send: (d, t) => void log.push([d, t]) };
+    if (withClear) out.clear = () => void log.push("clear");
+    return { out, log };
+  };
+
+  it("clears the queue first, then All Notes Off and the pedal up, now and AHEAD_MS later", () => {
+    const { out, log } = fake(true);
+    silence(out, 1000);
+    expect(log[0]).toBe("clear");
+    const sends = log.slice(1) as [number[], number][];
+    for (const at of [1000, 1000 + AHEAD_MS]) {
+      for (let ch = 0; ch < 16; ch++) expect(sends).toContainEqual([[0xb0 + ch, 123, 0], at]);
+      expect(sends).toContainEqual([[0xb0, 64, 0], at]);
+    }
+    expect(sends).toHaveLength(2 * 17);
+  });
+
+  it("works on a port with no clear(), and on no port at all", () => {
+    const { out, log } = fake(false);
+    silence(out, 0);
+    expect(log).toHaveLength(2 * 17);
+    expect(() => silence(null, 0)).not.toThrow();
+  });
+});
+
+describe("the status line", () => {
+  it("sits in a polite status region", () => {
+    const html = renderToStaticMarkup(createElement(StatusLine, { text: "No piano output: the highway plays silent" }));
+    expect(html).toMatch(/<p[^>]*role="status"[^>]*aria-live="polite"[^>]*>No piano output: the highway plays silent<\/p>/);
   });
 });

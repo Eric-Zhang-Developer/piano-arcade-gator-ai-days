@@ -133,16 +133,18 @@ export function Sonata() {
         </p>
       </section>
 
-      <section className={s.readout} aria-live="polite" aria-label="The selected merged PR">
-        <p className={s.meta}>
-          <span className={s.lane} style={{ background: n.red ? RED : LANE_COLOR[n.lane] }} />
-          {LANE_NAME[n.lane]} · PR #{n.pr} · {n.hash.slice(0, 7)} · {etLabel(n.time)} ET{n.red ? " · main was red" : ""}
-        </p>
-        <p className={s.subject}>{n.subject.replace(/\s*\(#\d+\)$/, "")}</p>
-        <p className={s.music}>
-          Note {sel + 1} of {notes.length} · chord {n.chord}
-          {n.kind === "pass" ? ", a passing tone (a fix)" : n.kind === "resolve" ? ", the fix that turned main green" : ""}
-        </p>
+      <section className={s.readout} aria-label="The selected merged PR">
+        <div className={s.said} aria-live="polite" data-testid="sonata-said">
+          <p className={s.meta}>
+            <span className={s.lane} style={{ background: n.red ? RED : LANE_COLOR[n.lane] }} />
+            {LANE_NAME[n.lane]} · PR #{n.pr} · {n.hash.slice(0, 7)} · {etLabel(n.time)} ET{n.red ? " · main was red" : ""}
+          </p>
+          <p className={s.subject}>{n.subject.replace(/\s*\(#\d+\)$/, "")}</p>
+          <p className={s.music}>
+            Note {sel + 1} of {notes.length} · chord {n.chord}
+            {n.kind === "pass" ? ", a passing tone (a fix)" : n.kind === "resolve" ? ", the fix that turned main green" : ""}
+          </p>
+        </div>
         <nav className={s.actions} aria-label="Hear it or play it">
           <a {...kitButton("primary")} href={LINKS.listen} data-testid="sonata-listen">
             Listen on the piano
@@ -167,8 +169,12 @@ export function Sonata() {
             ref={canvas}
             className={s.roll}
             tabIndex={0}
-            role="img"
-            aria-label={`The night as a piano roll: ${notes.length} notes; arrow keys step through them`}
+            role="slider"
+            aria-label="The night as a piano roll: arrow keys step through the merged PRs"
+            aria-valuemin={1}
+            aria-valuemax={notes.length}
+            aria-valuenow={sel + 1}
+            aria-valuetext={`Note ${sel + 1} of ${notes.length}, PR #${n.pr}`}
             onPointerMove={pick}
             onKeyDown={step}
             data-testid="sonata-roll"

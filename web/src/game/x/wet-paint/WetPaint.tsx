@@ -5,12 +5,13 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { InputEvent } from "../../../contracts";
 import { keysDevice, midiDevice } from "../../core/input";
-import { Brackets, Button, canvasFonts, MonoLabel, Panel } from "../../duo-tokens";
+import { Button, canvasFonts, MonoLabel } from "../../duo-tokens";
 import { canMove, laptopMap } from "../../laptop-octaves";
 import { laptopKey, PIANO_NAME } from "../../laptop-sound";
-import { keyOff, keyOn, rgb7 } from "../../leds/messages";
+import { rgb7 } from "../../leds/messages";
 import { connect, linkState, send, subscribe, type LinkState } from "../../leds/serial";
 import { hexOf, rgbOf } from "./colors";
+import { caption, clock, focusAfter, frameAnnouncement, FramedPainting, Live, stripLights, type Framed } from "./framing";
 import { createPainter, keyboard, pedalSettings, ranges, xOfPitch, type Painter } from "./paint";
 import styles from "./wet-paint.module.css";
 import { createFluid, type Fluid } from "./vendor/fluid";
@@ -30,23 +31,13 @@ export interface PaintEvent {
   value?: number; // CC64
 }
 
-interface Framed {
-  url: string; // the frozen canvas
-  ms: number; // the session's length
-  notes: number;
-}
 
-const clock = (ms: number) => {
-  const s = Math.max(0, Math.round(ms / 1000));
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-};
 
 const onLights = (l: () => void) => {
   const off = subscribe(l);
   return () => void off();
 };
 
-export const caption = (f: Pick<Framed, "ms" | "notes">) => `Free play · ${clock(f.ms)} · ${f.notes} notes · after Scriabin`;
 
 export function WetPaint() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -64,6 +55,11 @@ export function WetPaint() {
   const [status, setStatus] = useState("Looking for a piano");
   const [noGl] = useState(() => !document.createElement("canvas").getContext("webgl2")); // client-only page
   const [framed, setFramed] = useState<Framed | null>(null);
+  const [said, setSaid] = useState(""); // the polite status region's line
+  const [strip] = useState(() => stripLights(send));
+  const mainRef = useRef<HTMLElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const wasFramed = useRef(false);
   const lights = useSyncExternalStore<LinkState>(onLights, linkState, () => "off");
 
   const frameIt = useCallback(() => {
@@ -73,18 +69,24 @@ export function WetPaint() {
     frozenRef.current = true;
     fluid.render(); // drawn and read in one task: the drawing buffer isn't preserved
     const url = canvasRef.current!.toDataURL("image/png");
-    setFramed({ url, ms: startRef.current === null ? 0 : performance.now() - startRef.current, notes: painter.notes });
-  }, []);
+    const f = { url, ms: startRef.current === null ? 0 : performance.now() - startRef.current, notes: painter.notes };
+    strip.frame(); // play() ignores the key-offs from here on, so the lit keys go out now
+    setHeld(new Set());
+    setFramed(f);
+    setSaid(frameAnnouncement(f));
+  }, [strip]);
 
   const again = useCallback(() => {
     painterRef.current?.again();
     startRef.current = null;
     frozenRef.current = false;
+    strip.clear();
     setFramed(null);
+    setSaid("");
     setNotes(0);
     setElapsed(0);
     setHeld(new Set());
-  }, []);
+  }, [strip]);
 
   // One event in, from any source: the painter, the held keys, the lights.
   const play = useCallback((e: { type: "on" | "off"; pitch: number; velocity: number } | { type: "cc"; value: number }) => {
@@ -98,14 +100,32 @@ export function WetPaint() {
     if (e.type === "on") {
       startRef.current ??= performance.now();
       painter.noteOn(e.pitch, e.velocity);
-      send(keyOn(e.pitch, rgb7(hexOf(e.pitch))));
+      strip.on(e.pitch, rgb7(hexOf(e.pitch)));
     } else {
       painter.noteOff(e.pitch);
-      send(keyOff(e.pitch));
+      strip.off(e.pitch);
     }
     setHeld(painter.held);
     setNotes(painter.notes);
-  }, []);
+  }, [strip]);
+
+  // Leaving the page, or closing it, puts the strip out: connect() registers no pagehide CLEAR of its own.
+  useEffect(() => {
+    const leave = () => strip.clear();
+    addEventListener("pagehide", leave);
+    return () => {
+      removeEventListener("pagehide", leave);
+      leave();
+    };
+  }, [strip]);
+
+  // Framed: Save PNG takes focus. Again: the page gets it back.
+  useEffect(() => {
+    const to = focusAfter(wasFramed.current, !!framed);
+    wasFramed.current = !!framed;
+    if (to === "save") dialogRef.current?.querySelector<HTMLButtonElement>('[data-testid="save-png"]')?.focus();
+    if (to === "page") mainRef.current?.focus({ preventScroll: true });
+  }, [framed]);
 
   // The solver and its loop.
   useEffect(() => {
@@ -263,11 +283,12 @@ export function WetPaint() {
   const keys = keyboard(range.lo, range.hi);
 
   return (
-    <main className={styles.page} data-testid="wet-paint">
+    <main ref={mainRef} tabIndex={-1} className={styles.page} data-testid="wet-paint">
       <canvas ref={canvasRef} className={styles.canvas} data-testid="paint-canvas" aria-label="The painting, made by what you play" />
       {noGl && <p className={styles.noGl}>This browser has no WebGL, so there&apos;s nothing to paint on. Chrome has it.</p>}
 
-      <header className={styles.rail}>
+      {/* While framed, the dialog is modal (aria-modal): what's behind it takes no focus or clicks. */}
+      <header className={styles.rail} inert={!!framed}>
         <h1 className={styles.mark}>Wet paint</h1>
         <dl className={styles.data}>
           <div>
@@ -302,8 +323,10 @@ export function WetPaint() {
         </div>
       </header>
 
-      <p className={styles.status}>
-        <MonoLabel style={{ fontSize: "inherit" }}>{status}</MonoLabel>
+      <p className={styles.status} inert={!!framed}>
+        <span role="status" aria-live="polite">
+          <MonoLabel style={{ fontSize: "inherit" }}>{status}</MonoLabel>
+        </span>
         <span className={styles.hint}>Pedal or Space keeps it wet. Let go and it dries.</span>
       </p>
 
@@ -317,27 +340,8 @@ export function WetPaint() {
         ))}
       </div>
 
-      {framed && (
-        <div className={styles.gallery} role="dialog" aria-label="Your painting" data-testid="framed">
-          <Brackets style={{ maxWidth: "min(84vw, 132vh)" }}>
-            <Panel paper style={{ padding: "clamp(16px, 2.4vw, 44px)", paddingBottom: 0 }}>
-              {/* eslint-disable-next-line @next/next/no-img-element -- a data URL from the canvas, not an asset */}
-              <img src={framed.url} alt={caption(framed)} className={styles.painting} />
-              <p className={styles.caption} data-testid="caption">
-                {caption(framed)}
-              </p>
-            </Panel>
-          </Brackets>
-          <div className={styles.actions}>
-            <Button onClick={save} data-testid="save-png">
-              Save PNG
-            </Button>
-            <Button kind="secondary" onClick={again} data-testid="again">
-              Again
-            </Button>
-          </div>
-        </div>
-      )}
+      <Live text={said} />
+      {framed && <FramedPainting framed={framed} onSave={save} onAgain={again} dialogRef={dialogRef} />}
     </main>
   );
 }

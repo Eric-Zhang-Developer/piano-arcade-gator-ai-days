@@ -7,11 +7,9 @@
 .sandbox :is(p,h1,h2,h3,span,li,label,div,textarea)::selection { background:var(--learn-accent); color:var(--learn-bg); }
 .sandbox :is(.head,.work,.chat) button:disabled { opacity:1; cursor:not-allowed; border-color:var(--learn-border); color:var(--learn-muted); background:transparent; filter:none; }
 
-/* Header: a hairline under the title, the gate count in mono, and Stop. */
+/* Header: a hairline under the title, and Stop. */
 .head { grid-area:head; display:flex; align-items:center; gap:24px; padding:12px 24px; border-bottom:1px solid var(--learn-border); }
 .head h1 { margin:0; font-size:24px; line-height:1.2; flex:1; min-width:0; }
-.count { font-family:var(--learn-font-data); font-size:16px; letter-spacing:.08em; text-transform:uppercase; color:var(--learn-muted); }
-.count strong { color:var(--learn-text); font-weight:600; }
 .sandbox .stop { display:inline-flex; align-items:center; font-family:var(--learn-font-data); font-size:16px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:8px 20px; border:1px solid var(--learn-border); color:var(--learn-text); }
 .sandbox .stop:hover { border-color:var(--learn-text); }
 
@@ -49,9 +47,6 @@
 .actions { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
 .feedback { max-width:560px; margin:0 0 24px; padding:16px; border:1px solid var(--learn-border); display:grid; gap:8px; }
 .feedback p { margin:0; }
-.later { color:var(--learn-muted); }
-.sandbox .link { appearance:none; background:transparent; border:0; padding:0; color:var(--learn-accent); font-size:16px; text-decoration:underline; text-underline-offset:4px; }
-.sandbox .link:hover { color:var(--learn-text); }
 .saveFailed { margin:24px 0 0; color:var(--learn-muted); }
 .done { display:grid; gap:16px; justify-items:start; max-width:560px; }
 .done p { margin:0; font-size:18px; }
@@ -68,7 +63,6 @@
 .chat { grid-area:chat; display:grid; grid-template-rows:auto minmax(0,1fr) auto; min-height:0; border-left:1px solid var(--learn-border); }
 :is(.chat,.explore) .chatHead { margin:0; line-height:24px; padding:12px 24px; border-bottom:1px solid var(--learn-border); font-family:var(--learn-font-data); font-size:16px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; }
 .log { overflow-y:auto; padding:24px; display:grid; align-content:start; gap:20px; min-height:0; }
-.empty { margin:0; color:var(--learn-muted); }
 .message { display:grid; gap:4px; }
 .message p { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; }
 .who { font-family:var(--learn-font-data); font-size:16px; letter-spacing:.08em; text-transform:uppercase; color:var(--learn-muted); }

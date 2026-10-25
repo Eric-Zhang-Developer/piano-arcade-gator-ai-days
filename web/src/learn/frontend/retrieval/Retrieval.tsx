@@ -9,9 +9,10 @@ import styles from './retrieval.module.css';
 
 /**
  * The clean retrieval test: one question at a time in one panel, with no workspace or reference
- * beside it. A checked answer is final; the end view counts only the answers given in this round.
- * With a node, the test is that node's items and every checked answer is appended to the device's attempts;
- * Next decides what comes after, so there is no count and the end view only leads back to the map. A null node has no items to test.
+ * beside it. A checked answer is final; the end view counts only the answers given in this round, and lists the
+ * questions to revisit when there are any. Next decides what comes after, so the end view only leads back to the map.
+ * With a node, the test is that node's items and every checked answer is appended to the device's attempts.
+ * A null node has no items to test.
  */
 export function Retrieval({ initial = initialRetrieval, node }: { initial?: RetrievalState; node?: NodeScreen | null }) {
   return <DuoScope className={styles.screen}>
@@ -57,7 +58,7 @@ function Test({ initial, node }: { initial: RetrievalState; node?: NodeScreen })
   return <>
     {current(state, round.list)
       ? <Question state={state} round={round} dispatch={dispatch} check={check} heading={heading} focusHeading={focusHeading}/>
-      : <End state={state} round={round} heading={heading} restart={() => { dispatch({ type: 'restart' }); focusHeading(); }}/>}
+      : <End state={state} round={round} heading={heading}/>}
     {unsaved && <p className={styles.note} role="status">Answers aren&apos;t being saved on this device.</p>}
   </>;
 }
@@ -66,7 +67,6 @@ function Question({ state, round, dispatch, check, heading, focusHeading }: { st
   const item = current(state, round.list)!;
   const { question } = item;
   const result = verdict(state, round.list);
-  const last = state.index === round.list.length - 1;
   function next(event: MouseEvent<HTMLButtonElement>) {
     // A double click on Check must not also skip the question it just checked.
     if (event.detail > 1) return;
@@ -74,7 +74,6 @@ function Question({ state, round, dispatch, check, heading, focusHeading }: { st
     focusHeading();
   }
   return <>
-    {!round.node && <p className={styles.count}>Question {state.index + 1} of {round.list.length}</p>}
     <h1 id="retrieval-question" ref={heading} tabIndex={-1} className={styles.prompt}>{question.prompt}</h1>
     <fieldset key={question.id} className={styles.options} aria-describedby="retrieval-question">
       <legend className={styles.hidden}>Your answer</legend>
@@ -94,29 +93,24 @@ function Question({ state, round, dispatch, check, heading, focusHeading }: { st
     </fieldset>
     <div className={styles.actions}>
       {state.checked
-        ? <Button style={{ fontSize: 16 }} onClick={next}>{last ? 'See results' : 'Next'}</Button>
+        ? <Button style={{ fontSize: 16 }} onClick={next}>Next</Button>
         : <Button style={{ fontSize: 16 }} disabled={state.selected === null} onClick={check}>Check</Button>}
     </div>
   </>;
 }
 
-function End({ state, round, heading, restart }: { state: RetrievalState; round: Round; heading: Heading; restart: () => void }) {
+function End({ state, round, heading }: { state: RetrievalState; round: Round; heading: Heading }) {
   if (round.node) return <>
     <h1 ref={heading} tabIndex={-1} className={styles.prompt}>Test done</h1>
     <div className={styles.actions}><Link href="/learn" className={styles.primaryLink}>Back to map</Link></div>
   </>;
   const { right, revisit, answered } = summary(state.attempts, round.gates);
   return <>
-    <p className={styles.count}>Round complete</p>
     <h1 ref={heading} tabIndex={-1} className={styles.prompt}>{right.length} of {answered} right on the first try</h1>
-    <h2 className={styles.subhead}>To revisit</h2>
-    {revisit.length
-      ? <ul className={styles.revisit}>{revisit.map(q => <li key={q.id}>{q.prompt}</li>)}</ul>
-      : <p className={styles.body}>Nothing to revisit from this round.</p>}
-    <p className={styles.note}>Counted only from the answers you gave in this round.</p>
-    <div className={styles.actions}>
-      <Link href="/learn" className={styles.primaryLink}>Back to map</Link>
-      <Button kind="secondary" style={{ fontSize: 16 }} onClick={restart}>Try again</Button>
-    </div>
+    {revisit.length > 0 && <>
+      <h2 className={styles.subhead}>To revisit</h2>
+      <ul className={styles.revisit}>{revisit.map(q => <li key={q.id}>{q.prompt}</li>)}</ul>
+    </>}
+    <div className={styles.actions}><Link href="/learn" className={styles.primaryLink}>Back to map</Link></div>
   </>;
 }

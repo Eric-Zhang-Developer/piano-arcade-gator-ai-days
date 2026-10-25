@@ -21,7 +21,6 @@ import {
   emptyProgress,
   exploreNodes,
   findQuestion,
-  firstTry,
   gateProgress,
   isCorrect,
   loadProgress,
@@ -111,12 +110,8 @@ function useGates(gates: readonly Gate[], attempts: readonly Attempt[], dispatch
     setSelected(null);
     requestAnimationFrame(() => prompt.current?.focus());
   };
-  const clear = () => {
-    setJudged(null);
-    setSelected(null);
-  };
   const question = shown && { shown, judged, selected, promptRef: prompt, onSelect: setSelected, onCheck: check, onReveal: reveal, onNext: next };
-  return { shown, complete, clear, question };
+  return { shown, complete, question };
 }
 
 function TwinkleSandbox() {
@@ -127,15 +122,9 @@ function TwinkleSandbox() {
 
   const attempts = progress.attempts;
   const dispatch = (e: ProgressEvent) => setSaveFailed(!record(e));
-  const { shown, complete, clear, question } = useGates(theoryGates, attempts, dispatch);
-  const passedGates = theoryGates.filter(g => gateProgress(g, attempts).status === 'passed').length;
+  const { shown, complete, question } = useGates(theoryGates, attempts, dispatch);
   const lastGate = theoryGates[theoryGates.length - 1];
   const focus = shown ? { gateId: shown.gate.id, questionId: shown.question.id } : { gateId: lastGate?.id ?? '' };
-
-  const startOver = () => {
-    dispatch({ type: 'reset' });
-    clear();
-  };
 
   const onTabKey = (e: KeyboardEvent<HTMLButtonElement>) => {
     const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
@@ -150,7 +139,6 @@ function TwinkleSandbox() {
   return <DuoScope className={s.sandbox}>
     <header className={s.head}>
       <h1>{theoryTitle}</h1>
-      <span className={s.count} data-passed={passedGates}><strong>{passedGates}</strong>/{theoryGates.length} gates passed</span>
       <Link href="/learn" className={s.stop}>Stop</Link>
     </header>
 
@@ -188,11 +176,9 @@ function TwinkleSandbox() {
               </li>;
             })}
           </ol>
-          {question && <Question {...question} later onScore={() => setTab('score')} />}
+          {question && <Question {...question} />}
           {complete && <div className={s.done} data-complete="true">
             <h2>All three gates passed</h2>
-            <p>{firstTry(attempts).right.length} of {theoryGates.reduce((n, g) => n + g.questions.length, 0)} right on the first try.</p>
-            <Button kind="secondary" className={s.outline} style={owned} onClick={startOver}>Start over</Button>
           </div>}
           {saveFailed && <p className={s.saveFailed} role="status">Progress isn&apos;t saved on this device.</p>}
         </>}
@@ -278,7 +264,7 @@ function NoQuestions() {
   </DuoScope>;
 }
 
-function Question({ shown, judged, selected, promptRef, onSelect, onCheck, onReveal, onNext, later = false, onScore }: {
+function Question({ shown, judged, selected, promptRef, onSelect, onCheck, onReveal, onNext }: {
   shown: Judged;
   judged: Judged | null;
   selected: string | null;
@@ -287,10 +273,6 @@ function Question({ shown, judged, selected, promptRef, onSelect, onCheck, onRev
   onCheck: () => void;
   onReveal: () => void;
   onNext: () => void;
-  /** Says a missed question comes back later in the round. */
-  later?: boolean;
-  /** Opens the phrase the question is about in the score. */
-  onScore?: () => void;
 }) {
   const { gate, question, round } = shown;
   const picked = judged?.choiceId ? choiceById(question, judged.choiceId) : undefined;
@@ -317,7 +299,6 @@ function Question({ shown, judged, selected, promptRef, onSelect, onCheck, onRev
           {picked
             ? <><p><Mark kind={right ? 'correct' : 'wrong'} /></p><p>{picked.explanation}</p></>
             : <><p>The answer is {question.answer.text}.</p><p>{question.answer.explanation}</p></>}
-          {later && !right && <p className={s.later}>This question comes back later.</p>}
         </div>
         <div className={s.actions}>
           <Button kind="primary" className={s.solid} style={owned} onClick={onNext} autoFocus>Next</Button>
@@ -326,7 +307,6 @@ function Question({ shown, judged, selected, promptRef, onSelect, onCheck, onRev
       : <div className={s.actions}>
         <Button kind="primary" className={s.solid} style={owned} disabled={!selected} onClick={onCheck}>Check</Button>
         <Button kind="secondary" className={s.outline} style={owned} onClick={onReveal}>Show answer</Button>
-        {onScore && question.phrase && <button type="button" className={s.link} onClick={onScore}>See phrase {question.phrase} in Score</button>}
       </div>}
   </>;
 }
@@ -397,7 +377,6 @@ function Chat({ focus, attempts }: { focus: { gateId: string; questionId?: strin
   return <aside className={s.chat} aria-label="Tutor chat">
     <h2 className={s.chatHead}>Tutor chat</h2>
     <div ref={log} className={s.log} role="log" aria-live="polite">
-      {messages.length === 0 && !pending && <p className={s.empty}>Ask about the current question.</p>}
       {messages.map((m, i) => <div key={i} className={s.message} data-role={m.role}>
         <span className={s.who}>{m.role === 'student' ? 'You' : 'Tutor'}</span>
         <p>{m.text}</p>

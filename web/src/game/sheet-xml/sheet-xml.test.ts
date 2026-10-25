@@ -298,3 +298,61 @@ it("the charts use what the spec's planning check found: at most 2 voices a hand
   const most = charts.map((c) => Math.max(0, ...[...chartToMusicXml(c).matchAll(/<voice>(\d)<\/voice>/g)].map((m) => ((Number(m[1]) - 1) % 4) + 1)));
   expect(Math.max(...most)).toBe(2);
 });
+
+// ---------- engraving (sheet-engraving) ----------
+
+describe("engraving", () => {
+  const measures = (c: Chart) => kids(kid(parse(chartToMusicXml(c)), "part")!, "measure");
+  const clefsIn = (m: El) => kids(kid(m, "attributes") ?? m, "clef").map((c) => `${c.attrs.number}=${kid(c, "sign")!.text}`);
+  // n quarter notes a bar for `bars` bars, from bar `from`, at one pitch
+  const bar = (from: number, bars: number, pitch: number, hand: "R" | "L") =>
+    Array.from({ length: bars * 4 }, (_, i) => ({ id: `${hand}${pitch}-${from * 4 + i}`, pitch, beat: from * 4 + i, duration: 1, hand }));
+
+  it("a left hand that climbs mid-piece changes to treble for the passage and back to bass after", () => {
+    const c = synthetic({ notes: [...bar(0, 2, 48, "L"), ...bar(2, 2, 72, "L"), ...bar(4, 2, 48, "L"), ...bar(0, 6, 76, "R")] });
+    const ms = measures(c);
+    expect(ms.map(clefsIn)).toEqual([["1=G", "2=F"], [], ["2=G"], [], ["2=F"], []]);
+    // the notes stay on the left hand's staff
+    expect(readBack(chartToMusicXml(c)).notes.filter((n) => n.pitch === 72).every((n) => n.staff === 2)).toBe(true);
+  });
+
+  it("one stray high note doesn't change the clef", () => {
+    const notes = [...bar(0, 3, 48, "L")];
+    notes[5] = { ...notes[5], pitch: 79 };
+    expect(measures(synthetic({ notes })).map(clefsIn)).toEqual([["1=G", "2=F"], [], []]);
+  });
+
+  it("a high right-hand run starts and stops an 8va, and the notes keep their real pitch", () => {
+    const c = synthetic({ notes: [...bar(0, 1, 72, "R"), ...bar(1, 2, 96, "R"), ...bar(3, 1, 72, "R")] });
+    const xml = chartToMusicXml(c);
+    const shifts = measures(c).map((m) => [...JSON.stringify(m).matchAll(/"type":"(down|up|stop)","size":"8"/g)].map((x) => x[1]));
+    expect(shifts).toEqual([[], ["down"], ["stop"], []]);
+    expect(readBack(xml).notes.filter((n) => n.onset >= 4 * DIVISIONS && n.onset < 12 * DIVISIONS).map((n) => n.pitch)).toEqual(Array(8).fill(96));
+    expect(placeNotes(c).filter((p) => p.pitch === 96)).toHaveLength(8);
+  });
+
+  it("a run of eighths each a little off the grid prints as beamed eighths, with no ties", () => {
+    const off = [0.03, -0.04, 0.05, -0.02, 0.04, -0.05, 0.02, -0.03];
+    const notes = off.map((d, i) => ({ id: `e${i}`, pitch: 72 + (i % 3), beat: Math.max(0, i / 2 + d), duration: 0.45, hand: "R" as const }));
+    const xml = chartToMusicXml(synthetic({ notes }));
+    expect([...xml.matchAll(/<type>(\w+)<\/type>/g)].map((m) => m[1]).filter((t) => t !== "whole")).toEqual(Array(8).fill("eighth"));
+    expect([...xml.matchAll(/<beam number="1">(\w+)<\/beam>/g)].map((m) => m[1]).join(" ")).toBe("begin end begin end begin end begin end");
+    expect(xml).not.toContain("<tie ");
+  });
+
+  it("a moonlight-1 triplet comes back as three triplet eighths in one beat", () => {
+    const moon = byId("moonlight-1");
+    const beat = moon.notes.find((n) => n.hand === "R" && Math.abs(n.beat % 1 - 1 / 3) < 0.01)!.beat;
+    const k = Math.floor(beat);
+    const three = moon.notes.filter((n) => n.hand === "R" && n.beat >= k && n.beat < k + 1 && n.duration < 0.5);
+    const placed = placeNotes(moon).filter((p) => three.some((n) => n.id === p.id));
+    expect(placed.map((p) => [p.onset - k * DIVISIONS, p.end - k * DIVISIONS])).toEqual([
+      [0, 4],
+      [4, 8],
+      [8, 12],
+    ]);
+    const xml = chartToMusicXml(moon);
+    expect(xml).toContain("<time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes></time-modification>");
+    expect((xml.match(/<tuplet type="start"\/>/g) ?? []).length).toBe((xml.match(/<tuplet type="stop"\/>/g) ?? []).length);
+  });
+});

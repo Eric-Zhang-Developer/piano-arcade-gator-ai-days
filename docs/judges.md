@@ -37,8 +37,8 @@ Eric, Sharan and Andres built it in one weekend, with a swarm of coding agents. 
 
 ## Design
 
-The look is Duo: two hands as the brand, sharp corners, sheet music on paper ([#636]). The name Étude came from the team, as
-the arcade became a tutor ([chapter 9](story.md#chapter-9-andres-and-the-tutor-becoming-étude)). The product
+The look is Duo: two hands as the brand, sharp corners, sheet music on paper ([#636]). The name Étude came from the team,
+as the arcade became a tutor ([chapter 9](story.md#chapter-9-andres-and-the-tutor-becoming-étude)). The product
 philosophy's first principle is "Resolve feeling lost." ([PRODUCT_PHILOSOPHY.md](../PRODUCT_PHILOSOPHY.md)).
 
 ## Novelty

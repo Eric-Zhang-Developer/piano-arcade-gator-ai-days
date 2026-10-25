@@ -63,7 +63,7 @@ screen where the tutor visibly decides", and this screen is that moment. Every n
 - **The template line,** from the take only:
   - `Your {left|right} hand {drags|rushes} in bars X–Y, about N ms {late|early}.` when one hand's mean offset in that
     run is past ±20 ms;
-  - else `Bars X–Y were your weakest: N% of notes right.`;
+  - else `Bars X–Y were your weakest: N% accuracy.`, adding `, every note hit but off the beat` when the run has no MISS or WRONG (accuracy is the judge's weighted score, not a count of notes right);
   - then `Let's loop just those bars at 70%, then play it through.`;
   - with no weak run (every bar at least 95%), `Clean take. Try it faster, or pick the next song.`, and the primary
     button becomes `NEXT SONG`.

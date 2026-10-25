@@ -31,13 +31,13 @@ export function duoTake(chart: Chart, take: Take, results: Results, params: URLS
   const per = Math.max(1, Math.ceil(barCount(chart) / duoPanelSettings.maxCells));
   const run = weakestRun(barScores(chart, take, results)); // always found bar by bar, then shown on the cells
   const drift = run ? handDrift(chart, results, run.from, run.to) : { L: null, R: null };
-  const accuracy = run ? rangeScore(chart, take, results, run.from, run.to).accuracy : null;
+  const cell = run ? rangeScore(chart, take, results, run.from, run.to) : null;
   return {
     per,
     cells: barScores(chart, take, results, per),
     run,
     timing: histogram(results),
-    lines: tutorLine({ run, accuracy, drift }),
+    lines: tutorLine({ run, accuracy: cell?.accuracy ?? null, drift, misses: cell?.misses }),
     hand: driftingHand(drift)[0],
     href: run ? practiceBarsUrl(chart.id, params, run) : "/",
   };

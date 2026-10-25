@@ -1,8 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { inkCue } from '../ink/cue';
 import { MAX_HELP_SHARE } from '../mastery/engine';
-import { type Hands, handsOf, type PlayingNode } from './attempt';
-import { Passage } from './Passage';
+import { type Hands, handsOf, notesFor, type PlayingNode } from './attempt';
+import { Passage, useNoteCues } from './Passage';
 import { countIn, ProblemLine, takeNotes, TakeNotes, useKeepFocus } from './TakeParts';
 import { useTake } from './useTake';
 import styles from './playing.module.css';
@@ -30,6 +31,10 @@ export function NodePractice({ node, items }: PlayingNode) {
   const result = take.phase === 'result' ? take.result : null;
   // A clean take that counts moves on; Next picks the passage, so there is no list to choose from.
   const next = !!result?.verdict.pass && result.counts && index + 1 < items.length;
+  useNoteCues(notesFor(item, hands), take.played);
+  const scored = result?.attempt.id;
+  const passed = result?.verdict.pass;
+  useEffect(() => { if (scored) inkCue({ kind: passed ? 'pass' : 'fail' }); }, [scored, passed]);
 
   function pick(i: number) {
     take.reset();
@@ -78,7 +83,7 @@ export function NodePractice({ node, items }: PlayingNode) {
       </div>
       <div className={styles.actions} ref={actions}>
         {busy ? <button type="button" className={styles.primary} onClick={take.stop}>Stop</button>
-          : next ? <button type="button" className={styles.primary} onClick={() => pick(index + 1)}>Next passage</button>
+          : next ? <button type="button" className={styles.primary} onClick={() => { inkCue({ kind: 'next' }); pick(index + 1); }}>Next passage</button>
           : <button type="button" className={styles.primary} disabled={!piano} onClick={() => void take.start(options)}>{result ? 'Try again' : 'Start take'}</button>}
       </div>
     </aside>

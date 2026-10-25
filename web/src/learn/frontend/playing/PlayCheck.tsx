@@ -1,7 +1,9 @@
 'use client';
 import Link from 'next/link';
+import { useEffect } from 'react';
+import { inkCue } from '../ink/cue';
 import type { PlayingNode } from './attempt';
-import { Passage } from './Passage';
+import { Passage, useNoteCues } from './Passage';
 import { countIn, ProblemLine, takeNotes, TakeNotes } from './TakeParts';
 import { useTake } from './useTake';
 import styles from './playing.module.css';
@@ -16,6 +18,10 @@ export function PlayCheck({ node, items, itemId }: PlayingNode & { itemId?: stri
   const busy = take.phase === 'countin' || take.phase === 'playing';
   const piano = take.status?.state === 'piano';
   const result = take.phase === 'result' ? take.result : null;
+  useNoteCues(item.notes, take.played);
+  const scored = result?.attempt.id;
+  const passed = result?.verdict.pass;
+  useEffect(() => { if (scored) inkCue({ kind: passed ? 'pass' : 'fail' }); }, [scored, passed]);
 
   const title = take.phase === 'playing' ? 'Play' : result ? result.verdict.pass ? 'Passed' : 'Not yet' : 'Play it cold';
 
@@ -40,7 +46,7 @@ export function PlayCheck({ node, items, itemId }: PlayingNode & { itemId?: stri
           {result && <TakeNotes notes={takeNotes(result, { status: take.status, silent: take.silent })} />}
         </div>
         {result && !result.verdict.pass && <p className={styles.note}>
-          <Link href={`/learn/practice?node=${encodeURIComponent(node.id)}`}>Practise this passage</Link> with help, then come back for another cold take.
+          <Link href={`/learn/practice?node=${encodeURIComponent(node.id)}`} onClick={() => inkCue({ kind: 'next' })}>Practise this passage</Link> with help, then come back for another cold take.
         </p>}
       </div>
       <div className={styles.actions}>

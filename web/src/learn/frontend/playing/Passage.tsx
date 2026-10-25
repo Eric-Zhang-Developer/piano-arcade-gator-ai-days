@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+import { inkCue } from '../ink/cue';
 import type { PassageNote } from '../mastery/schema';
 import { type Hands, keyName, missedNotes, passageBeats } from './attempt';
 import type { PlayedBar } from './useTake';
@@ -59,4 +61,17 @@ export function Passage({ notes, hands = 'both', beat = -1, guide = false, playe
     {played.map((p, i) => p.pitch >= low && p.pitch < low + rows && <rect key={`p${i}`} className={styles.played} x={x(Math.max(0, p.from))} y={y(p.pitch) + rowH / 2 - 2} width={Math.max(2, x(Math.min(beats, p.to)) - x(Math.max(0, p.from)))} height={4} rx={2} />)}
     {beat >= 0 && beat <= beats && <line className={styles.playhead} x1={x(beat)} x2={x(beat)} y1={top - 4} y2={height} />}
   </svg>;
+}
+
+/**
+ * Tells the ink about each key as it is pressed in a take: right when it answers a note of the passage by the rule
+ * `missedNotes` uses, wrong otherwise. A take that starts over clears what was judged.
+ */
+export function useNoteCues(notes: readonly PassageNote[], played: readonly PlayedBar[]) {
+  const judged = useRef(0);
+  useEffect(() => {
+    if (played.length < judged.current) judged.current = 0;
+    for (const bar of played.slice(judged.current)) inkCue({ kind: missedNotes(notes, [bar]).size < notes.length ? 'right' : 'wrong' });
+    judged.current = played.length;
+  }, [notes, played]);
 }

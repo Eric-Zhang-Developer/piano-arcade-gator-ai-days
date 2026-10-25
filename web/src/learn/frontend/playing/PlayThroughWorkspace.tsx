@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { inkCue } from '../ink/cue';
 import { music, totalBeats } from './model';
 import { Score, ScoreSource } from './Score';
 import { useLearningSessions } from '../LearningSessions';
@@ -52,7 +53,7 @@ export function PlayThroughWorkspace() {
       <div className={styles.actions} ref={actions}>
         {phase === 'ready' && <button type="button" className={styles.primary} onClick={begin}>See an example take</button>}
         {running && <button type="button" className={styles.secondary} onClick={() => { stop(); send('stop'); }}>Stop example</button>}
-        {phase === 'result' && <Link className={styles.primary} href="/learn">Back to map</Link>}
+        {phase === 'result' && <Link className={styles.primary} href="/learn" onClick={() => inkCue({ kind: 'next' })}>Back to map</Link>}
       </div>
     </aside>
   </section>;

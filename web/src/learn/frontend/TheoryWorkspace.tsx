@@ -1,15 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { type CSSProperties, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { inkCue } from './ink/cue';
 import { evaluateAnswer, questions, reviewQuestions, score, source } from './lesson';
 import { PhraseScore } from './Score';
 import { useTheorySession } from './LearningSessions';
 import { playPhrase } from './audio';
 import styles from './learning.module.css';
 
-export function TheoryWorkspace({ review = false, guide }: { review?: boolean; guide?: { instruction: string; imageSrc?: string; size?: number } }) {
+export function TheoryWorkspace({ review = false, guide }: { review?: boolean; guide?: { instruction: string } }) {
   const guided = Boolean(guide);
   const items = review ? reviewQuestions : questions;
   const { state, update, setPaneWidth } = useTheorySession(review);
@@ -63,7 +63,8 @@ export function TheoryWorkspace({ review = false, guide }: { review?: boolean; g
     catch { setAudioError('Audio could not start. Check your browser’s audio permissions, then try again.'); setPlaying(null); }
   }
   function advance() {
-    if (!checked) { update({ checked: true }); requestAnimationFrame(() => questionBody.current?.scrollTo({ top: questionBody.current.scrollHeight })); return; }
+    if (!checked) { if (outcome !== 'compare') inkCue({ kind: outcome === 'correct' ? 'right' : 'wrong' }); update({ checked: true }); requestAnimationFrame(() => questionBody.current?.scrollTo({ top: questionBody.current.scrollHeight })); return; }
+    inkCue({ kind: 'next' });
     update({ history: [...history, { prompt: question.prompt, answer, explanation: question.explanation, outcome }], index: index+1, answer: '', checked: false, hint: false, ...(review ? { tab: 'music' as const } : {}) });
     stopAudio.current?.(); setPlaying(null);
     requestAnimationFrame(() => { questionHeading.current?.focus(); questionBody.current?.scrollTo({ top: questionBody.current.scrollHeight }); });
@@ -72,7 +73,9 @@ export function TheoryWorkspace({ review = false, guide }: { review?: boolean; g
     <div ref={studio} className={styles.theoryStudio} style={{ '--question-width': `${paneWidth}%` } as CSSProperties}>
       <section className={styles.questionPane} aria-label="Current question">
         <header className={styles.lessonFocus}>
-          {guide ? <div className={styles.tutorHeading}><Image data-tutor-perch src={guide.imageSrc ?? "/learning/companion-gator.svg"} alt="Your gator guide" width={guide.size ?? 56} height={guide.size ?? 56} style={{width:guide.size ?? 56,height:guide.size ?? 56}} unoptimized/><h1 tabIndex={-1}>{review ? 'Recall a sense of home' : 'Hearing a phrase come home'}</h1></div> : <h1>{review ? 'Recall a sense of home' : 'Hearing a phrase come home'}</h1>}
+          {/* The perch is where the ink rests beside the guided lesson, out of the text's way. */}
+          {guide && <span data-tutor-perch className={styles.tutorPerch} aria-hidden="true"/>}
+          <h1 tabIndex={guide ? -1 : undefined}>{review ? 'Recall a sense of home' : 'Hearing a phrase come home'}</h1>
           <p>{guide?.instruction ?? (review ? 'Review theory · Try each answer before opening the reference.' : 'Learn theory · Explore with the score and reference.')}</p>
           <span>{done ? 'Complete' : `Question ${index+1} of ${items.length}`}</span>
         </header>
@@ -86,7 +89,7 @@ export function TheoryWorkspace({ review = false, guide }: { review?: boolean; g
         </div>
         <div className={styles.answerComposer}>
           {!done && (question.options ? <fieldset className={styles.answers} aria-describedby="current-question"><legend>Your answer</legend>{question.options.map(option => <label key={option}><input type="radio" name="answer" value={option} checked={answer===option} onChange={()=>update({ answer: option })} disabled={checked}/><span>{option}</span></label>)}</fieldset> : <label className={styles.explanation}>Your explanation<textarea id="learning-explanation" name="explanation" rows={3} value={answer} onChange={e=>update({ answer: e.target.value })} readOnly={checked} aria-describedby="current-question" placeholder="It feels settled because…"/></label>)}
-          <footer className={styles.questionActions}>{done ? <Link href="/learn" className={styles.primary}>Back to map <span aria-hidden="true">→</span></Link> : <>{!review && !checked ? <button className={styles.textButton} onClick={()=>update({ hint: !hint })} aria-expanded={hint}>{hint ? 'Hide hint' : 'Need a hint?'}</button> : <span/>}<button className={styles.primary} disabled={!answer.trim()} onClick={advance}>{checked ? index===items.length-1 ? 'Finish' : 'Continue' : question.options ? 'Check answer' : 'Compare answer'} <span aria-hidden="true">→</span></button></>}</footer>
+          <footer className={styles.questionActions}>{done ? <Link href="/learn" className={styles.primary} onClick={() => inkCue({ kind: 'next' })}>Back to map <span aria-hidden="true">→</span></Link> : <>{!review && !checked ? <button className={styles.textButton} onClick={()=>update({ hint: !hint })} aria-expanded={hint}>{hint ? 'Hide hint' : 'Need a hint?'}</button> : <span/>}<button className={styles.primary} disabled={!answer.trim()} onClick={advance}>{checked ? index===items.length-1 ? 'Finish' : 'Continue' : question.options ? 'Check answer' : 'Compare answer'} <span aria-hidden="true">→</span></button></>}</footer>
         </div>
       </section>
       <div role="separator" aria-label="Resize question pane" aria-orientation="vertical" aria-valuemin={Math.round(paneBounds.min)} aria-valuemax={Math.round(paneBounds.max)} aria-valuenow={Math.round(paneWidth)} tabIndex={0} className={styles.paneDivider}

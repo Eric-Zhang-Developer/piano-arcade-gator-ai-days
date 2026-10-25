@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { inkCue } from '../ink/cue';
 import { music, passageBeats, targetTempo } from './model';
 import { Score, ScoreSource } from './Score';
 import { useLearningSessions } from '../LearningSessions';
@@ -28,6 +29,8 @@ export function PracticeWorkspace() {
     try { await playback.start({ tempo, beats: passageBeats, sound: false, onEnd: () => dispatch({ type: 'finish' }) }); }
     catch { dispatch({ type: 'error', message: 'The preview could not start. Try again.' }); }
   }
+  // Nothing here is judged (#946), so the ink hears only the student moving on.
+  function onward(type: 'drill' | 'repeat') { inkCue({ kind: 'next' }); dispatch({ type }); }
   function stop() { playback.stop(); setDemo(false); dispatch({ type: 'stop' }); }
   // #946: the take is a sample learner's, never the player's: nothing is heard, so nothing here describes their playing.
   const instruction = state.busy ? ['An example take', 'Follow the score while a sample learner plays both bars. Nothing you play is heard.']
@@ -49,9 +52,9 @@ export function PracticeWorkspace() {
       </div>
       <div className={styles.actions} ref={actions}>
         {locked ? <button type="button" className={styles.secondary} onClick={stop}>Stop {demo ? 'demo' : 'example'}</button>
-          : state.stage === 'feedback' ? <button type="button" className={styles.primary} onClick={() => dispatch({ type: 'drill' })}>Practise the held note</button>
-          : state.stage === 'drill' ? <button type="button" className={styles.primary} onClick={() => dispatch({ type: 'repeat' })}>I played it</button>
-          : state.stage === 'complete' ? <Link className={styles.primary} href="/learn">Back to map</Link>
+          : state.stage === 'feedback' ? <button type="button" className={styles.primary} onClick={() => onward('drill')}>Practise the held note</button>
+          : state.stage === 'drill' ? <button type="button" className={styles.primary} onClick={() => onward('repeat')}>I played it</button>
+          : state.stage === 'complete' ? <Link className={styles.primary} href="/learn" onClick={() => inkCue({ kind: 'next' })}>Back to map</Link>
           : <button type="button" className={styles.primary} onClick={take}>{takeLabel}</button>}
         {!locked && state.stage !== 'complete' && <button type="button" className={styles.secondary} onClick={hear}>Hear the opening</button>}
       </div>

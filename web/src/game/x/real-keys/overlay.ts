@@ -51,6 +51,6 @@ export function parseLog(raw: unknown): LoggedNote[] {
   const list = Array.isArray(raw) ? raw : Array.isArray((raw as { notes?: unknown })?.notes) ? (raw as { notes: unknown[] }).notes : [];
   return list
     .filter((n): n is LoggedNote => !!n && Number.isFinite((n as LoggedNote).t) && Number.isFinite((n as LoggedNote).pitch))
-    .map((n) => ({ t: n.t, type: n.type === "off" ? "off" : "on", pitch: n.pitch, velocity: n.velocity ?? 64 }))
+    .map((n): LoggedNote => ({ t: n.t, type: n.type === "off" ? "off" : "on", pitch: n.pitch, velocity: n.velocity ?? 64 }))
     .sort((a, b) => a.t - b.t);
 }

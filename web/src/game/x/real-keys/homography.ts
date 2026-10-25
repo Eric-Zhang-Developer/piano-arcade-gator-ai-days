@@ -12,7 +12,7 @@ function normalizer(pts: Pt[]): H {
   return [k, 0, -k * cx, 0, k, -k * cy, 0, 0, 1];
 }
 
-const mul = (a: H, b: H): H => {
+export const mul = (a: H, b: H): H => {
   const r = new Array<number>(9).fill(0);
   for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) for (let k = 0; k < 3; k++) r[i * 3 + j] += a[i * 3 + k] * b[k * 3 + j];
   return r;

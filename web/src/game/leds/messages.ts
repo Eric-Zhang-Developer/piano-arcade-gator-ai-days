@@ -2,8 +2,9 @@
 // the tests pin the exact messages: guide-light hints from a chart, a clock time and the judged notes, and key on/off.
 import type { Chart, GameEvent, Hand } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
-import { handColor, noteColorFor } from "../hand-colors";
+import { noteColorFor } from "../hand-colors";
 import { hudSettings } from "../hud";
+import { hype, primary } from "../ui-tokens";
 
 export const ledSettings = {
   leadMs: 1500, // a note's key glows this long before its time: very faint at first, gold when due (the board's ramp)
@@ -27,21 +28,55 @@ export function rgb7(hex: string, k = 1): Rgb {
 export const keyOn = (pitch: number, [r, g, b]: Rgb): Message => [0x90, pitch, r, g, b];
 export const keyOff = (pitch: number): Message => [0x80, pitch];
 export const hint = (pitch: number, [r, g, b]: Rgb): Message => [0xa0, pitch, r, g, b];
-// The board's mode (firmware setting 15): 0 calm, 1 demo (every key pressed on the piano lights with its ripple,
-// and nothing else; the site sends the presses, see everywhere.tsx). A board older than the setting ignores it.
+// The board's mode (firmware setting 15): 0 learning, 1 demo (every key pressed on the piano lights with a quick
+// ripple, and nothing else; the site sends the presses, see everywhere.tsx). A board older than the setting ignores it.
 export type LightMode = 0 | 1;
 export const lightMode = (m: LightMode): Message => [0xb0, 15, m, 0];
+// Demo's ripple length (setting 6; 0 = the board's own 600 ms). The sustain pedal stretches it (everywhere.tsx):
+// held, every new ripple lasts sustainMs and, as the reach grows with the length, travels further.
+export const sustainMs = 1200;
+export const rippleLength = (ms: number): Message => [0xb0, 6, ms & 127, ms >> 7];
+// The board's brightness (setting 1, 0-255) and its save (setting 20: survives power off).
+export const boardBrightnessTo = (v: number): Message => [0xb0, 1, v & 127, v >> 7];
+export const SAVE: Message = [0xb0, 20, 0, 0];
+// A MIDI sustain pedal message (controller 64): true down, false up, null for anything else.
+export function pedal(data: ArrayLike<number>): boolean | null {
+  return (data[0] & 0xf0) === 0xb0 && data[1] === 64 ? data[2] >= 64 : null;
+}
 // The board's hint ramp (setting 7) matches leadMs, so a hint reaches its full color, then gold, as its note lands.
 export const hintRamp = (ms = ledSettings.leadMs): Message => [0xb0, 7, ms & 127, ms >> 7];
+// Demo's two colors on the strip, one per hand ("#rrggbb"). The default is the left hand blue and the right hand pink,
+// from the site's palette (primary, hype), so a palette change reaches the strip; the Lights panel can pick others
+// (LightColors). The board deepens them for its LEDs (firmware DEMO_GAMMA).
+export type HandColors = Record<Hand, string>;
+export const ledHandColors: HandColors = { L: primary, R: hype };
+// A press with no note to match: the color of its side of middle C.
+export const sideColor = (pitch: number, colors: HandColors = ledHandColors): Rgb => rgb7(colors[pitch < 60 ? "L" : "R"]);
 // A piano's MIDI message to the board's key on or off, for demo mode on every page (everywhere.tsx): a press lights
-// its key in the hand color of its side of middle C, a release (or a note on at velocity 0) darkens it.
-// The color is scaled by how hard the key went down (45% to 100%): the board reads that as the splash's power.
-export function pressKey(data: ArrayLike<number>): Message | null {
+// its key in its side's color, a release (or a note on at velocity 0) darkens it.
+export function pressKey(data: ArrayLike<number>, colors: HandColors = ledHandColors): Message | null {
   const kind = data[0] & 0xf0;
   const pitch = data[1];
-  if (kind === 0x90 && data[2] > 0) return keyOn(pitch, rgb7(handColor(pitch < 60 ? "L" : "R"), 0.45 + (0.55 * data[2]) / 127));
+  if (kind === 0x90 && data[2] > 0) return keyOn(pitch, sideColor(pitch, colors));
   if (kind === 0x80 || kind === 0x90) return keyOff(pitch);
   return null;
+}
+
+// Demo on /play: a press lights its key in its falling note's hand (the note hintsAt lights for that key: the
+// earliest unjudged one within leadMs): its hand's color. A key with no note falling takes its side's color.
+export function pressColor(
+  chart: Chart,
+  nowMs: number,
+  judged: ReadonlySet<string>,
+  pitch: number,
+  colors: HandColors = ledHandColors,
+  leadMs = ledSettings.leadMs,
+): Rgb {
+  for (const n of chart.notes) {
+    if (n.pitch !== pitch || judged.has(n.id) || noteTimeMs(chart, n) - leadMs > nowMs) continue;
+    return rgb7(colors[n.hand as Hand]);
+  }
+  return sideColor(pitch, colors);
 }
 export const CLEAR: Message = [0xf0];
 export const HELLO: Message = [0xf1];

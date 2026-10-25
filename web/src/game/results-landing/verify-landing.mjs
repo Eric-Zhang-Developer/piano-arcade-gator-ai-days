@@ -6,7 +6,9 @@
 //    300 ms and doesn't press Retry;
 // 4. reduced motion: the first frame after the mount is the end state;
 // 5. without the flag nothing changes: no landing, today's tail and today's CSS stamp;
-// 6. no console error.
+// 6. no console error;
+// 7. a perfect take ends in fever, and fever drains over the out on the landing's timeline: handoff frames, and no
+//    sustain after the first (frozen-clock-fades, #1333).
 // Usage: node web/src/game/results-landing/verify-landing.mjs --out <dir>
 import { spawn } from "node:child_process";
 import { mkdirSync } from "node:fs";
@@ -62,6 +64,7 @@ const errors = [];
 // landing's state at the results' first mutation.
 const watch = () => {
   const w = (window.__landingWatch = { t0: null, mount: null, end: null, long: [], first: null });
+  window.__pianoArcadeFever = { frames: [] }; // fever-arc's frame log: one row per drawn frame with its phase
   new PerformanceObserver((l) => {
     for (const e of l.getEntries()) w.long.push({ at: e.startTime, ms: e.duration });
   }).observe({ type: "longtask", buffered: true });
@@ -114,6 +117,12 @@ for (const bot of ["perfect", "rank-c"]) {
   const long = w.long.filter((l) => w.t0 !== null && l.at >= w.t0 - 50 && l.ms > 300);
   check(long.length === 0, `${bot}: no long task over 300 ms from T0 to the end state (${JSON.stringify(long)})`);
   await page.screenshot({ path: join(out, `landing-${bot}-end-1280x720.png`) });
+  if (bot === "perfect") {
+    const phases = await page.evaluate(() => window.__pianoArcadeFever.frames.map((f) => f.phase));
+    const from = phases.indexOf("handoff");
+    const after = from < 0 ? [] : phases.slice(from);
+    check(from >= 0 && !after.includes("sustain"), `${bot}: fever drains over the out (${after.filter((p) => p === "handoff").length} handoff frames, ${after.filter((p) => p === "sustain").length} sustain after them)`);
+  }
 
   // 1: the stamp settles on its planned frame, stepped at 60 fps from the seek hook.
   const steps = await page.evaluate((FRAME) => {

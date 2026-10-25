@@ -12,6 +12,7 @@ import { createSynth } from "../laptop-sound/synth";
 import { DEFAULT_PIANO_VOLUME } from "../laptop-sound/volume";
 import { DEFAULT_PREFS, playMissCue, soundSettings } from "../sound";
 import { dip } from "../stage";
+import { isWaitMode } from "../wait-mode";
 import { miss as missToken, whenDisplayFontReady, wrong as wrongToken } from "../ui-tokens";
 
 export const missSettings = {
@@ -91,6 +92,13 @@ export const dipsStage = (oldCombo: number, reduced = false) => !reduced && oldC
 export const lateT = (now: number, atMs: number, seenMs: number, spanMs: number) =>
   seenMs <= atMs ? now - atMs : ((now - seenMs) * spanMs) / Math.max(1, atMs + spanMs - seenMs);
 
+/**
+ * A key's pulse or a combo break, which belong to the moment, not to the chart: at least the wall time since its first
+ * drawn frame, so it still ends in its own duration while the chart clock holds (Learn, Flow's wait, the pause; #1331).
+ * While the clock runs, the chart's time is the same or ahead, so nothing changes there.
+ */
+export const heldT = (chartT: number, wallNow: number, seenWall: number) => Math.max(chartT, wallNow - seenWall);
+
 type Rect = { x: number; y: number; w: number; h: number };
 
 /** A key's cap, the part of the drawn keyboard that's that key's (core/highway.ts's keyboard): a black key's short cap,
@@ -158,7 +166,7 @@ declare global {
     // luminance of the playfield above the keyboard, read from the highway and overlay canvases; and the take's misses
     // and hits with their chart times.
     __pianoArcadeMiss?: {
-      frames: { nowMs: number; luma: number; tails: { t: number; width: number; alpha: number }[] }[];
+      frames: { nowMs: number; luma: number; tails: { t: number; width: number; alpha: number }[]; pulse?: number; digits?: boolean }[];
       events?: { type: string; judgment?: string; atMs: number }[];
     };
     __pianoArcadeMissCue?: typeof measureCue; // verify-miss.mjs and the PR's measurement
@@ -197,9 +205,10 @@ export function missMoment(): GamePlugin {
   let color: (hand: Hand) => string = () => settings.noteColor;
   let notes = new Map<string, { endMs: number; hand: Hand }>();
   let misses: Miss[] = [];
-  let pulses: { pitch: number; atMs: number }[] = [];
+  let pulses: { pitch: number; atMs: number; seenWall?: number }[] = [];
   let combo = 0;
-  let broken: { atMs: number; seenMs?: number; combo: number } | null = null;
+  let broken: { atMs: number; seenMs?: number; seenWall?: number; combo: number } | null = null;
+  let wait = false; // Learn has no combo to break (#1331)
   let display = hudSettings.font;
   if (typeof document !== "undefined")
     void whenDisplayFontReady().then(() => {
@@ -213,8 +222,8 @@ export function missMoment(): GamePlugin {
     broken = null;
   };
   const breakAt = (atMs: number) => {
-    if (combo >= missSettings.breakFrom) broken = { atMs, combo };
-    if (dipsStage(combo, reducedMotion())) dip(atMs);
+    if (!wait && combo >= missSettings.breakFrom) broken = { atMs, combo };
+    if (!wait && dipsStage(combo, reducedMotion())) dip(atMs);
     combo = 0;
   };
   const log = (e: { type: string; judgment?: string; atMs: number }) => {
@@ -223,8 +232,9 @@ export function missMoment(): GamePlugin {
 
   return {
     id: "miss-moment",
-    transformChart(c) {
+    transformChart(c, params) {
       chart = c;
+      wait = params ? isWaitMode(params) : false;
       color = noteColorFor(c);
       const beatMs = msPerBeat(c.bpm);
       notes = new Map(c.notes.map((n) => [n.id, { endMs: noteTimeMs(c, n) + n.duration * beatMs, hand: n.hand }]));
@@ -235,6 +245,10 @@ export function missMoment(): GamePlugin {
       switch (e.type) {
         case "songStart":
           reset();
+          break;
+        case "resume": // a rewind lands the clock before them: they'd pulse again for keys not pressed yet
+          pulses = pulses.filter((p) => p.atMs <= e.atMs);
+          if (broken && broken.atMs > e.atMs) broken = null;
           break;
         case "combo":
           combo = e.count;
@@ -260,11 +274,15 @@ export function missMoment(): GamePlugin {
       if (!chart) return;
       const probeLog = typeof window !== "undefined" ? window.__pianoArcadeMiss : undefined;
       const tails: { t: number; width: number; alpha: number }[] = [];
+      let pulseMax = 0;
+      let digits = false;
       const reduced = reducedMotion();
       const now = f.nowMs;
+      const wall = performance.now();
       const line = f.judgmentLineY;
       misses = misses.filter((m) => now - m.atMs < missSettings.outlineMs);
-      pulses = pulses.filter((p) => now - p.atMs < missSettings.pulseMs);
+      const pulseT = (p: (typeof pulses)[number]) => heldT(now - p.atMs, wall, (p.seenWall ??= wall));
+      pulses = pulses.filter((p) => pulseT(p) < missSettings.pulseMs);
 
       // The missed notes' tails, clipped to the highway: still moving at the highway's speed, now thin, grey and fading.
       const pxPerMs = line / settings.lookaheadMs;
@@ -311,8 +329,9 @@ export function missMoment(): GamePlugin {
         ctx.restore();
       }
       for (const p of pulses) {
-        const a = pulseAt(now - p.atMs, reduced);
+        const a = pulseAt(pulseT(p), reduced);
         if (a <= 0) continue;
+        pulseMax = Math.max(pulseMax, a);
         const cap = shape(p.pitch);
         ctx.globalAlpha = a;
         ctx.fillStyle = wrongToken;
@@ -324,7 +343,8 @@ export function missMoment(): GamePlugin {
       // The broken combo's old digits, dropping and fading in the HUD's combo slot (the HUD has already cut to blank).
       if (broken) {
         broken.seenMs ??= now;
-        const b = comboBreakAt(lateT(now, broken.atMs, broken.seenMs, missSettings.breakMs), broken.combo, f.height, reduced);
+        const t = heldT(lateT(now, broken.atMs, broken.seenMs, missSettings.breakMs), wall, (broken.seenWall ??= wall));
+        const b = comboBreakAt(t, broken.combo, f.height, reduced);
         if (!b) broken = null;
         else {
           const l = hudLayout(f.width, line);
@@ -340,11 +360,12 @@ export function missMoment(): GamePlugin {
           ctx.globalAlpha = b.alpha;
           ctx.fillStyle = "#ffffff";
           ctx.fillText(text, l.combo.cx, l.combo.cy + b.dy);
+          digits = true;
           ctx.globalAlpha = 1;
         }
       }
 
-      if (probeLog) probeLog.frames.push({ nowMs: now, luma: playfieldLuma(ctx.canvas, line, f.height), tails });
+      if (probeLog) probeLog.frames.push({ nowMs: now, luma: playfieldLuma(ctx.canvas, line, f.height), tails, pulse: pulseMax, digits });
     },
   };
 }

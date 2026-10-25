@@ -14,6 +14,7 @@ import { ink, inkDim, primary } from "../../ui-tokens";
 import { ErrorLine, StateLine, TrackerStatus, type Cam } from "./announce";
 import styles from "./conduct.module.css";
 import { createSession, type Output, type Session, type SessionState } from "./session";
+import { mediaRun, stopTracks } from "../media-run";
 import { loadLandmarker, trackVideo } from "./tracker";
 
 const SONGS = [
@@ -92,7 +93,9 @@ export function Conduct() {
   const thumb = useRef<HTMLCanvasElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const session = useRef<Session | null>(null);
-  const stopRef = useRef<() => void>(() => {});
+  // The camera, the tracker and the session, each held by its start as it opens (#1315): Stop, a newer start, a song
+  // change (#1316), pagehide and unmount stop all of them, even mid-start.
+  const runs = useRef(mediaRun()).current;
   const pedal = useRef<Awaited<ReturnType<typeof loadPedal>>>(null);
 
   useEffect(() => {
@@ -105,8 +108,10 @@ export function Conduct() {
       .catch(() => {});
     return () => {
       live = false;
+      runs.stop(); // a new song: its own session, from Start
+      setCam("off");
     };
-  }, [songId]);
+  }, [songId, runs]);
 
   // The draw loop: the highway at the conducted time, the beat pulse, the camera with its trail, the readout.
   useEffect(() => {
@@ -196,51 +201,48 @@ export function Conduct() {
   }, [chart]);
 
   const stop = () => {
-    stopRef.current();
-    stopRef.current = () => {};
-    session.current?.stop();
+    runs.stop();
     setCam("off");
   };
 
   useEffect(() => {
-    const end = () => stopRef.current();
-    addEventListener("pagehide", end);
+    addEventListener("pagehide", runs.stop);
     return () => {
-      removeEventListener("pagehide", end);
-      end();
-      session.current?.stop();
+      removeEventListener("pagehide", runs.stop);
+      runs.stop();
     };
-  }, []);
+  }, [runs]);
 
   // Camera or clip: the same detector and clock either way.
   const start = async (file?: File) => {
     const v = video.current;
     if (!chart || !v) return;
-    stop();
+    const run = runs.start();
     setError(null);
     setCam("loading");
     try {
-      let stream: MediaStream | null = null;
       if (file) {
         v.srcObject = null;
-        v.src = URL.createObjectURL(file);
+        const url = (v.src = URL.createObjectURL(file));
+        run.hold(() => URL.revokeObjectURL(url));
       } else {
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: 640, height: 480, frameRate: { ideal: 60 } }, audio: false });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: 640, height: 480, frameRate: { ideal: 60 } }, audio: false });
+        if (!run.hold(() => stopTracks(stream))) return;
         v.srcObject = stream;
       }
+      run.hold(() => v.pause());
       const [lm, out] = await Promise.all([loadLandmarker(), pianoOutput()]);
+      if (!run.live()) return;
       await v.play();
+      if (!run.live()) return;
       const s = createSession(chart, pedal.current, out);
-      session.current = s;
-      const untrack = trackVideo(v, lm, s.frame);
-      stopRef.current = () => {
-        untrack();
-        stream?.getTracks().forEach((track) => track.stop());
-        v.pause();
-        if (file) URL.revokeObjectURL(v.src);
-      };
+      session.current = s; // kept after Stop, so Copy log still has the take
+      run.hold(() => s.stop());
+      run.hold(trackVideo(v, lm, s.frame));
       setCam("on");
     } catch (e) {
+      if (!run.live()) return; // superseded or stopped: nothing to report
+      runs.stop();
       setCam("off");
       setError(e instanceof DOMException && e.name === "NotAllowedError" ? "The camera wasn't allowed." : `Couldn't start: ${(e as Error).message}`);
     }

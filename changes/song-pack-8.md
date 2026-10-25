@@ -4,11 +4,11 @@ Five showpieces from Mutopia notation MIDI for the Medium-hard to Expert rungs:
 - `rachmaninoff-prelude-cs`: the Lento, pickup and bars 1–13, 60 BPM, 466 notes, C♯1–B5, level 11.
 - `pathetique-3`: the Rondo, pickup and bars 1–43, 192 BPM, 528 notes, G1–F6, level 10.
 - `chopin-revolutionary`: bars 1–18, 120 BPM, 464 notes, G1–A♭6, level 15.
-- `fantaisie-impromptu`: bars 1–24, 120 BPM, 582 notes, C♯2–B6, level 11.
+- `chopin-fantaisie-impromptu`: bars 1–24, 120 BPM, 582 notes, C♯2–B6, level 11.
 
 Counts from the LilyPond sources equal the charts' (R + L: 70+186, 230+240, 263+265, 180+284, 315+267), less the Prelude's four unisons, which are kept once.
 ## Where it lives
-- Charts: `web/public/songs/{liszt-consolation-3,rachmaninoff-prelude-cs,pathetique-3,chopin-revolutionary,fantaisie-impromptu}/chart.json`.
+- Charts: `web/public/songs/{liszt-consolation-3,rachmaninoff-prelude-cs,pathetique-3,chopin-revolutionary,chopin-fantaisie-impromptu}/chart.json`.
 - Decisions: `specs/decisions/song-pack-8-excerpts.md`.
 - Credits for the CC BY 3.0 and CC BY-SA 4.0 sources go in a separate `docs:` PR.
 ## How to check it

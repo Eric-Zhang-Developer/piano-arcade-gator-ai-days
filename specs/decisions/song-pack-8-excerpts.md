@@ -31,6 +31,7 @@ reassigned notes match the score's right-hand voice note for note.
 **Ids.** Two of the spec's ids hash to a jacket (angle and first color) already taken, which song-jacket's test
 forbids: `rach-prelude-cs` looked like `moonlight-1` and `revolutionary-etude` like `ode-to-joy`. They're
 `rachmaninoff-prelude-cs` and `chopin-revolutionary`, both clear of the library and of the ten songs packs 6 and 7 add.
+Then song-pack-5's `old-french-song` landed on `fantaisie-impromptu`'s jacket, so that one is `chopin-fantaisie-impromptu`.
 
 **How to undo.** Reconvert with other bars or `bpm`. For the Étude, redo the hand edit. To restore an id, rename its
 folder and its `id`, and the jacket test will name the clash.

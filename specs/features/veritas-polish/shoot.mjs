@@ -5,8 +5,11 @@
 // Usage: node specs/features/veritas-polish/shoot.mjs <base url> <out dir> <tag>
 //   e.g. node specs/features/veritas-polish/shoot.mjs http://localhost:3101 specs/features/veritas-polish before
 import { mkdirSync } from "node:fs";
+import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
-import { chromium } from "playwright";
+
+// playwright lives in web/node_modules, which Node doesn't search from this folder
+const { chromium } = createRequire(new URL("../../../web/package.json", import.meta.url))("playwright");
 
 const [base, outArg, tag] = process.argv.slice(2);
 if (!base || !outArg || !tag) {

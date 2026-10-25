@@ -27,3 +27,22 @@
 Pass 2 happens only if that review leaves a top-three problem.
 
 **How to undo:** revert #607. The CSS before it is main's `veritas.module.css` at c6d5db0.
+
+## The Look review (taste v2, step 8), 2026-10-24 after the quiet window
+- **Round 1** (pass 1 as first pushed): design 7 · usability 7.5 · creativity 8 · content 8 → 7.5. Top three:
+  1. Dense marks fused into glowing bars (Jitter's 79 EARLY/LATE, Chord Roller's 89 ROLLED).
+  2. Planted rings merged into orange bars on the same runs.
+  3. The sky's glow tiled every 1080 px with a seam.
+- **Round 2** (fixed in #607):
+  - EARLY/LATE/ROLLED drop to 0.6em with no glow, so a dense run reads as a band and its tally states the number.
+  - Rings are 1 px.
+  - The sky is drawn once.
+  - The header paragraph has no orphan.
+  - Score: design 7.5 · usability 8 · creativity 8 · content 8 → 7.8.
+- **Stopped at round 2.** Chord Roller's ROLLED band is still three thin magenta lines, because 89 labels over about
+  560 px overlap at any size. Fixing it needs markup (one mark per run of equal marks), which this feature can't
+  add, so it's an issue for eric-foreman-agent.
+- **The one exception to the 24 px floor:** dense EARLY/LATE/ROLLED marks are 0.6em (14 px at 1920). Not one of 79
+  is readable at any size, and the tally beside them is.
+- **Not applied:** the rubric's "decorative gradient" cap. visual-direction.md's synthwave sky and loud edges win,
+  as the spec says. The "four real pictures" cap doesn't fit either: the spec forbids images.

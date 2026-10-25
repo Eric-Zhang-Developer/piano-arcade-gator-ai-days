@@ -32,8 +32,8 @@ export const experiments: Experiment[] = [
   highlightReel, // a take becomes a 15-second broadcast replay video (#913, spike)
   composersHands,
   wetPaint, // #1106: its own page, /paint
-  handPalette, // #1127: the hand and judgment colors three ways, with a colour-blind simulation
   round, // #1123: play a round once, the DGX plays it back as voices 2–4
+  handPalette, // #1127: the hand and judgment colors three ways, with a colour-blind simulation
 ];
 
 // The names a take's ?x= turns on.

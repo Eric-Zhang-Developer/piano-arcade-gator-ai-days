@@ -10,6 +10,13 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 
+// select-calm (#1411): Learn, Flow, the level, Hands, Speed and the source sit in the Practice panel; open it first.
+const openPractice = async (p) => {
+  const b = p.getByTestId("practice-open");
+  await b.waitFor({ timeout: 60_000 });
+  if ((await b.getAttribute("aria-expanded")) !== "true") await b.click();
+};
+
 const webDir = fileURLToPath(new URL("../../../", import.meta.url));
 const outArg = process.argv.indexOf("--out");
 if (outArg < 0 || !process.argv[outArg + 1]) {
@@ -92,11 +99,13 @@ await page.keyboard.press("Enter");
 await page.waitForURL(/\/play\?/, { timeout: 30_000 });
 check(params(page).get("song") === first && !params(page).has("practice") && !params(page).has("mode"), `Enter opens ${new URL(page.url()).search}, judged`);
 await home();
+await openPractice(page);
 await page.getByTestId("select-practice").and(page.locator(":not([disabled])")).waitFor({ timeout: 30_000 });
 await page.keyboard.press("p");
 await page.waitForURL(/\/play\?/, { timeout: 30_000 });
 check(params(page).get("song") === first && params(page).get("practice") === "adapt" && params(page).get("mode") === "flow", `P opens ${new URL(page.url()).search} (want practice=adapt in Flow, play-modes)`);
 await home();
+await openPractice(page);
 await page.getByTestId("select-practice").and(page.locator(":not([disabled])")).waitFor({ timeout: 30_000 });
 await page.getByTestId("select-practice").click();
 await page.waitForURL(/\/play\?/, { timeout: 30_000 });
@@ -105,15 +114,15 @@ await home();
 await page.keyboard.press("l");
 await page.waitForURL(/\/play\?/, { timeout: 30_000 });
 check(params(page).get("song") === first && params(page).get("mode") === "wait", `L opens ${new URL(page.url()).search} (want mode=wait)`);
-// mouse-first: LEARN and WATCH as buttons on the panel, the same as L and W.
+// mouse-first: LEARN as a rung in the Practice panel, the same as L. WATCH left the select for /play's start screen
+// (select-calm, #1411): no button here.
 await home();
+await openPractice(page);
 await page.getByTestId("select-learn").click();
 await page.waitForURL(/\/play\?/, { timeout: 30_000 });
 check(params(page).get("song") === first && params(page).get("mode") === "wait", `LEARN opens ${new URL(page.url()).search} (want mode=wait)`);
 await home();
-await page.getByTestId("select-watch").click();
-await page.waitForURL(/\/play\?/, { timeout: 30_000 });
-check(params(page).get("song") === first && params(page).get("demo") === "1" && params(page).get("bot") === "perfect", `WATCH opens ${new URL(page.url()).search} (want the perfect-bot demo)`);
+check((await page.getByTestId("select-watch").count()) === 0, "WATCH is off the select (select-calm: it's on /play's start screen)");
 
 // 3. Next for you: none unsaved, the saved bars once seeded.
 await home();

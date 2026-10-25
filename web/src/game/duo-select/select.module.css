@@ -37,12 +37,54 @@
   overflow: hidden;
 }
 
+/* Muted sentence case (#1411): the composer stays quieter than the title, on the card and in the rows. */
 .composer,
 .rowComposer {
   display: block;
+  margin: 0;
+  color: var(--pa-ink-dim);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.composer {
+  flex: none;
+  font-size: clamp(16px, 1.25vw, 24px);
+}
+
+.rowComposer {
+  min-width: 0;
+  flex: 1 1 0;
+}
+
+/* One quiet line for what the three cells said: Lv 1 · 42 notes · best 75.7%. */
+.meta {
+  flex: none;
+  margin: 1.2vh 0 0;
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: clamp(14px, 1.05vw, 20px);
+  color: var(--pa-ink-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.meta span {
+  color: var(--pa-ink);
+}
+
+/* The Practice panel: the ladder's rungs as its ways in, then the level, Hands, Speed and the source. */
+.practice {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2vh;
+  margin-top: 1.4vh;
+  padding-top: 1.4vh;
+  border-top: 1px solid var(--pa-line);
+}
+
+.practice[hidden] {
+  display: none;
 }
 
 .next {
@@ -88,7 +130,6 @@
   grid-template-areas: "opts opts" "level source" "level status";
   align-items: center;
   column-gap: 1.4vw;
-  margin-top: 1.6vh;
 }
 
 .extras > [data-testid="song-preview"] {
@@ -188,14 +229,6 @@
     margin-top: 1.2vh;
   }
 
-  .extras {
-    margin-top: 1vh;
-  }
-}
-
-/* The focused song's stat labels scale with the panel: 16 px at 1280, 24 px at 1920 (#1033, visual-direction.md). */
-.cellLabel {
-  font-size: clamp(16px, 1.25vw, 24px);
 }
 
 /* Read by screen readers, not drawn. */
@@ -206,4 +239,10 @@
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/* Only the focused row draws its roll; the others keep the column, unframed. */
+.rowRoll:empty {
+  border-color: transparent;
+  background: none;
 }

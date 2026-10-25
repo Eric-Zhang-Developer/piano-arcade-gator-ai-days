@@ -99,27 +99,20 @@ export function Finder({ finder, children }: { finder: ReturnType<typeof useFind
           <span className={css.said} role="status" aria-live="polite" data-testid="finder-said">
             {said}
           </span>
-          <span className={css.count} data-testid="finder-count">
-            {shown.length === total ? `${total} songs` : `${shown.length} of ${total}`}
-          </span>
-          <div className={css.sorts} role="group" aria-label="Sort songs">
-            {SORT_MODES.map((m) => {
-              const chip = kitChip(m === sort);
-              return (
-                <button
-                  key={m}
-                  type="button"
-                  className={chip.className}
-                  style={chip.style}
-                  aria-pressed={m === sort}
-                  data-testid={`finder-sort-${m}`}
-                  onClick={() => setSort(m)}
-                >
-                  {LABELS[m]}
-                </button>
-              );
-            })}
-          </div>
+          {/* Sort as a small dropdown, no count (#1411): the level tabs and the search carry the list. */}
+          <select
+            className={css.sort}
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortMode)}
+            aria-label="Sort songs"
+            data-testid="finder-sort"
+          >
+            {SORT_MODES.map((m) => (
+              <option key={m} value={m}>
+                {LABELS[m]}
+              </option>
+            ))}
+          </select>
         </div>
         {!shown.length && (
           <p className={css.none} data-testid="finder-none">

@@ -1,5 +1,5 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 import type { Chart, GamePlugin } from "../../contracts";
 import { chunkPractice } from "../chunk-practice";
 import { flowMode } from "../flow-mode";
@@ -13,6 +13,8 @@ import { sheetView } from "../sheet-view/plugin";
 import { stageCard } from "../stage-card";
 import { waitMode } from "../wait-mode/plugin";
 import { groups, StartScreen } from "./StartScreen";
+
+vi.mock("next/navigation", () => ({ useSearchParams: () => new URLSearchParams("song=t") }));
 
 // Two hands, eight bars, and a pitch beyond the laptop keys' reach, so every start panel has something to show.
 const chart: Chart = {
@@ -80,4 +82,10 @@ test("a panel in no group still shows, under Start", () => {
   const extra: GamePlugin = { id: "someone-new", startPanel: () => <p data-testid="new-line">hello</p> };
   expect(region(render([stageCard(), extra]), "new-line")).toBe("notes");
   expect(Object.values(groups).flat()).not.toContain("someone-new");
+});
+
+test("Watch first sits on the start screen, the perfect-bot demo of this song (select-calm, #1411)", () => {
+  const html = render([]);
+  const a = html.match(/<a[^>]*data-testid="start-watch"[^>]*>/)?.[0] ?? "";
+  expect(a).toContain('href="/play?song=t&amp;bot=perfect&amp;audible=1&amp;demo=1"');
 });

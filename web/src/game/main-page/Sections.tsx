@@ -52,10 +52,7 @@ export function SectionChips({
       {count > 0 && (
         <MonoLabel style={{ fontSize: READ }}>
           {/* A span can't take a name, so the place is read from text (#1237). */}
-          <span className={css.place} data-testid="list-place" aria-hidden="true">
-            <b>{place}</b> / {count}
-          </span>
-          <span className={css.srOnly}>{`Song ${place} of ${count}`}</span>
+          <span className={css.srOnly} data-testid="list-place">{`Song ${place} of ${count}`}</span>
         </MonoLabel>
       )}
     </div>
@@ -64,13 +61,11 @@ export function SectionChips({
 
 // A chip that lands on this section settles its header in (select-motion).
 export function SectionHeader({ section }: { section: Section }) {
-  const n = section.songs.length;
   const ref = useRef<HTMLHeadingElement>(null);
   useMoveAnimation(ref, useMemo(() => headerFrames(section.key), [section.key]));
   return (
     <h3 ref={ref} className={css.header} id={sectionId(section.key)} data-testid={`section-${section.key}`}>
       <span>{section.label}</span>
-      <MonoLabel style={{ fontSize: READ }}>{n === 1 ? "1 song" : `${n} songs`}</MonoLabel>
     </h3>
   );
 }

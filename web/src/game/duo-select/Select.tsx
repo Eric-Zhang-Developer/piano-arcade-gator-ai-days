@@ -4,7 +4,7 @@
 // only draw, and say when PLAY, PRACTICE, LEARN or WATCH is pressed.
 import { useMemo, useRef, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import { nextForKey, type NextFor } from "../duo-results/scores";
-import { Brackets, Button, DataCell, MonoLabel, Panel } from "../duo-tokens";
+import { Brackets, Button, MonoLabel, Panel } from "../duo-tokens";
 import { LadderMark } from "../play-modes";
 import { panelFrames, useMoveAnimation } from "../select-motion";
 import { nextForText, nextForUrl, readNextFor } from "./next-for";
@@ -28,22 +28,24 @@ export interface FocusPanelProps {
   notes: number;
   best?: { accuracy: number }; // records' best for this level; absent if never played
   onPlay: () => void;
-  onPractice: (() => void) | null; // null until the chart is in (adaptive practice needs its phrases)
-  onLearn?: () => void; // learn-from-select's L, as a button (mouse-first)
-  onWatch?: () => void; // watch-demo's W, as a button (mouse-first)
-  children?: ReactNode; // under the buttons: the level toggle, the preview's options and status
+  onPractice: (() => void) | null; // Flow: null until the chart is in (adaptive practice needs its phrases)
+  onLearn?: () => void; // learn-from-select's L, as the ladder's first rung (mouse-first)
+  children?: ReactNode; // in the Practice panel: the level toggle, the preview's options and source
 }
 
 const fill: CSSProperties = { display: "flex", flexDirection: "column", minHeight: 0 };
 
+// One Play, one Practice (#1411, select-calm): the ladder, speed and level wait in the Practice panel, so the card
+// reads as a song and a way in, not a control board.
 export function FocusPanel(p: FocusPanelProps) {
   const next = useNextFor(p.id);
   const ref = useRef<HTMLElement>(null);
+  const [practice, setPractice] = usePracticeOpen(); // stays open from song to song, and across a reload
   useMoveAnimation(ref, panelFrames); // select-motion: the panel stays mounted and moves with the focus
   return (
     <Brackets style={{ ...fill, flex: "1 1 auto" }}>
       <Panel style={{ ...fill, flex: "1 1 auto", padding: "clamp(14px, 1.4vw, 26px)" }}>
-        <section ref={ref} className={styles.panel} data-testid="focus-panel">
+        <section ref={ref} className={styles.panel} data-practice={practice || undefined} data-testid="focus-panel">
           {/* An arrow step reads the song, not the whole panel and its buttons (#1236). */}
           <p className={styles.srOnly} aria-live="polite" data-testid="focus-live">
             {`${p.title}, ${shortComposer(p.composer)}, level ${p.level}`}
@@ -52,18 +54,14 @@ export function FocusPanel(p: FocusPanelProps) {
             <PianoRoll roll={p.roll} />
           </div>
           <h2 className={styles.title}>{p.title}</h2>
-          <MonoLabel style={{ fontSize: "clamp(14px, 1.1vw, 21px)" }}>
-            <span className={styles.composer} title={p.composer}>
-              {shortComposer(p.composer)}
-              {p.catalog && ` · ${p.catalog}`}
-            </span>
-          </MonoLabel>
-          <Panel style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", marginTop: "2.2vh", flex: "none" }}>
-            <DataCell label={<span className={styles.cellLabel}>LV</span>} value={<span data-testid="cell-lv">{lv(p.level)}</span>} style={{ ...cell, borderLeft: "none" }} />
-            <DataCell label={<span className={styles.cellLabel}>NOTES</span>} value={<span data-testid="cell-notes">{p.notes}</span>} style={cell} />
-            <DataCell label={<span className={styles.cellLabel}>BEST</span>} value={<span data-testid="cell-best">{p.best ? `${(p.best.accuracy * 100).toFixed(1)}%` : "—"}</span>} style={cell} />
-          </Panel>
-          <LadderMark song={p.id} />
+          <p className={styles.composer} title={p.composer}>
+            {shortComposer(p.composer)}
+            {p.catalog && ` · ${p.catalog}`}
+          </p>
+          <p className={styles.meta}>
+            Lv <span data-testid="cell-lv">{p.level}</span> · <span data-testid="cell-notes">{p.notes}</span> notes · best{" "}
+            <span data-testid="cell-best">{p.best ? `${(p.best.accuracy * 100).toFixed(1)}%` : "—"}</span>
+          </p>
           {next && (
             <a className={styles.next} href={nextForUrl(next)} data-testid="next-for-you">
               <Panel style={{ display: "flex", alignItems: "center", gap: "1.1em", padding: "0.9vh 1em" }}>
@@ -76,34 +74,55 @@ export function FocusPanel(p: FocusPanelProps) {
             </a>
           )}
           <div className={styles.buttons}>
-            {/* 2×2 (mouse-first): PLAY primary, then the three ways in that were keys only. Keys stay in title and aria. */}
             <Button kind="primary" onClick={p.onPlay} title="Play (Enter)" aria-keyshortcuts="Enter" data-testid="select-play" style={buttonSize}>
               PLAY
             </Button>
-            <Button kind="secondary" onClick={p.onPractice ?? undefined} disabled={!p.onPractice} title="Practice (P)" aria-keyshortcuts="P" data-testid="select-practice" style={buttonSize}>
-              PRACTICE
+            <Button
+              kind="secondary"
+              onClick={() => setPractice(!practice)}
+              aria-expanded={practice}
+              aria-controls="practice-panel"
+              data-testid="practice-open"
+              style={buttonSize}
+            >
+              PRACTICE {practice ? "▴" : "▾"}
             </Button>
-            {p.onLearn && (
-              <Button kind="secondary" onClick={p.onLearn} title="Learn: the song waits for each note (L)" aria-keyshortcuts="L" data-testid="select-learn" style={buttonSize}>
-                LEARN
-              </Button>
-            )}
-            {p.onWatch && (
-              <Button kind="secondary" onClick={p.onWatch} title="Watch the perfect bot play it (W)" aria-keyshortcuts="W" data-testid="select-watch" style={buttonSize}>
-                WATCH
-              </Button>
-            )}
           </div>
-          {p.children && <div className={styles.extras}>{p.children}</div>}
+          <div id="practice-panel" className={styles.practice} hidden={!practice} data-testid="practice-panel">
+            <LadderMark song={p.id} on={{ learn: p.onLearn, flow: p.onPractice ?? undefined, perform: p.onPlay }} />
+            {p.children && <div className={styles.extras}>{p.children}</div>}
+          </div>
         </section>
       </Panel>
     </Brackets>
   );
 }
 
-// The kit's 10 px, in vh: about the same at 1080, and 6 px back at 720 (#863).
-const cell: CSSProperties = { paddingTop: "1vh", paddingBottom: "1vh" };
 const buttonSize: CSSProperties = { fontSize: "clamp(15px, 1.2vw, 23px)", padding: "1.2vh 0", letterSpacing: "0.16em" };
+
+// The Practice panel's open state, kept so a player who practises finds it open again. Storage that throws: closed.
+const PRACTICE_KEY = "pianoArcade.practiceOpen";
+const practiceListeners = new Set<() => void>();
+function usePracticeOpen(): [boolean, (open: boolean) => void] {
+  const open = useSyncExternalStore(
+    (l) => (practiceListeners.add(l), () => void practiceListeners.delete(l)),
+    () => {
+      try {
+        return localStorage.getItem(PRACTICE_KEY) === "1";
+      } catch {
+        return false;
+      }
+    },
+    () => false,
+  );
+  const set = (v: boolean) => {
+    try {
+      localStorage.setItem(PRACTICE_KEY, v ? "1" : "0");
+    } catch {}
+    practiceListeners.forEach((l) => l());
+  };
+  return [open, set];
+}
 
 // The browser's storage, read as a snapshot (none on the server), so the strip appears after hydration.
 const noop = () => () => {};
@@ -131,18 +150,15 @@ export function SongRow({ title, composer, level, roll, focused }: { title: stri
   return (
     <Panel>
       <div className={styles.row} data-focused={focused || undefined}>
-        <div className={styles.rowRoll}>
-          <PianoRoll roll={roll} />
-        </div>
+        {/* The roll only on the focused row (#1411): fifty small rolls read as noise; the column stays, so titles align. */}
+        <div className={styles.rowRoll}>{focused && <PianoRoll roll={roll} />}</div>
         <div className={styles.rowText}>
           <div className={styles.rowTitle} title={title}>
             {title}
           </div>
-          <MonoLabel style={{ fontSize: rowRead, minWidth: 0, flex: "1 1 0" }}>
-            <span className={styles.rowComposer} title={composer}>
-              {shortComposer(composer)}
-            </span>
-          </MonoLabel>
+          <span className={styles.rowComposer} title={composer} style={{ fontSize: rowRead }}>
+            {shortComposer(composer)}
+          </span>
         </div>
         <div className={styles.rowLevel}>
           <MonoLabel style={{ fontSize: rowRead }}>LV</MonoLabel> <b>{lv(level)}</b>

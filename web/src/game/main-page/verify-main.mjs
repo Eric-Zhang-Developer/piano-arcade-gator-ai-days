@@ -82,7 +82,8 @@ try {
   await page.waitForFunction((id) => document.activeElement?.dataset?.testid === id, first, { timeout: 10_000 }).catch(() => {});
   check((await active()) === first, `the first row is focused (${await active()})`);
   const total = await page.locator('ol[aria-label="Songs"] a').count();
-  check((await page.getByTestId("list-place").textContent())?.replace(/\s/g, "") === `1/${total}`, `the place reads 1 / ${total}`);
+  // select-calm (#1411): the visible N / M is gone; readers still get the place.
+  check((await page.getByTestId("list-place").textContent())?.trim() === `Song 1 of ${total}`, `the place reads Song 1 of ${total}`);
 
   // 2. The last chip.
   const lastId = level[level.length - 1];
@@ -100,14 +101,14 @@ try {
   check((await active()) === next, `↓ from ${sec0[sec0.length - 1]} lands on ${next} (${await active()})`);
 
   // 4. Composer, then "chopin".
-  await page.getByTestId("finder-sort-composer").click();
+  await page.getByTestId("finder-sort").selectOption("composer");
   const labels = await chips.allTextContents();
   check(labels.length > level.length && labels.includes("Chopin") && labels.every((l) => !/^LV/.test(l)), `Composer's chips are surnames (${labels.join(", ")})`);
   await page.screenshot({ path: join(out, "composer-1280.png") });
   await page.getByTestId("finder-search").fill("chopin");
   check((await headers()).join() === "section-by-chopin" && (await chips.allTextContents()).join() === "Chopin", "chopin leaves only the Chopin section");
   await page.getByTestId("finder-search").fill("");
-  await page.getByTestId("finder-sort-level").click();
+  await page.getByTestId("finder-sort").selectOption("level");
 
   // 5. Both sizes: no page scroll, and the list's own text at the floor.
   for (const [w, h, floor] of [

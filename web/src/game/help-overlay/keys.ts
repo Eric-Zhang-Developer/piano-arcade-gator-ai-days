@@ -41,13 +41,13 @@ const INITIALS = "typing your initials";
 export const helpGroups: HelpGroup[] = [
   {
     screen: "Music select",
-    files: [SELECT, "game/song-finder/Finder.tsx", "game/duo-select/Select.tsx", SONG_OPTIONS, "game/easy-charts/level.tsx", "game/first-run/index.tsx", OPTIONS, "game/lab/LabLink.tsx"],
+    files: [SELECT, "game/song-finder/Finder.tsx", "game/duo-select/Select.tsx", SONG_OPTIONS, "game/easy-charts/level.tsx", "game/first-run/index.tsx", OPTIONS, "game/lab/LabLink.tsx", "game/play-modes/modes.ts"],
     lines: [
       { keys: ["↑", "↓"], what: "choose a song", source: [SELECT, "game/song-finder/Finder.tsx"], match: ["ArrowUp", "ArrowDown"], control: "Songs" },
       { keys: ["Enter"], what: "Perform: on the beat, ranked", control: "PLAY" },
-      { keys: ["L"], what: "Learn: the song waits for each note", source: [SELECT], control: "LEARN" },
+      { keys: ["L"], what: "Learn: the song waits for each note", source: [SELECT], control: "Learn" }, // the Practice panel's first rung (select-calm)
       { keys: ["P"], what: "practice it in Flow: narrows onto the bars you miss", source: [SELECT], match: ["p"], control: "PRACTICE" },
-      { keys: ["W"], what: "watch it: the perfect bot plays it", source: [SELECT], control: "WATCH" }, // through watch-demo's isWatchKey (#580)
+      { keys: ["W"], what: "watch it: the perfect bot plays it", source: [SELECT], keyOnly: "Watch first is on /play's start screen; the select keeps only the key (select-calm, #1411)" }, // through watch-demo's isWatchKey (#580)
       { keys: ["H"], what: "Hands: both, right or left", source: [SONG_OPTIONS], match: ["h"], control: "Hands" },
       { keys: ["←", "→"], what: "Speed: slower or faster", source: [SONG_OPTIONS], match: ["ArrowLeft", "ArrowRight"], control: "Speed" },
       { keys: ["E"], what: "switch Normal and Easy", source: [SELECT], match: ["e"], control: "EASY Lv" },

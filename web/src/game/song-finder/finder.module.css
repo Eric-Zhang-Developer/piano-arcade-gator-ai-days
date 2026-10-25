@@ -115,3 +115,21 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* The sort, a small dropdown in the data face (#1411). */
+.sort {
+  font: 700 clamp(12px, 0.85vw, 17px) var(--pa-font-data), ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pa-ink-dim);
+  background: var(--pa-bg);
+  border: 1px solid var(--pa-line);
+  border-radius: 0;
+  padding: 0.35em 0.5em;
+  cursor: pointer;
+}
+
+.sort:focus-visible {
+  outline: 2px solid var(--pa-ink);
+  outline-offset: 2px;
+}

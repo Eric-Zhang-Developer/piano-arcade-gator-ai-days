@@ -5,179 +5,156 @@
   color: var(--pa-ink);
   text-align: center;
   /* Over the page's dimmed overlay: the frozen highway (combo, keys) stays a hint, not a second layer of text. */
-  background: radial-gradient(ellipse at 50% 35%, rgb(11 2 32 / 0.6), rgb(0 0 0 / 0.7) 70%);
+  background: rgb(3 6 7 / 0.88);
 }
 
-.song {
-  margin: 0 0 -0.6vh;
-  font-size: clamp(12px, 0.9vw, 17px);
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--pa-ink-dim);
-}
-
-/* The ceremony: exactly one window tall, so the rank, counts, featured panel and buttons need no scroll. */
+/* The ceremony: exactly one window tall, so the rank, cells, middle band and buttons need no scroll. */
 .ceremony {
   box-sizing: border-box;
+  width: min(1760px, 94vw);
   min-height: 100dvh;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
-  gap: clamp(10px, 2.4vh, 32px);
-  padding: 3vh 4vw 1.5vh;
+  gap: clamp(12px, 2.6vh, 40px);
+  padding: 3vh 0 1.5vh;
 }
 
-.head {
+/* Top band: the rank in brackets, the title, then the six data cells. */
+.top {
   display: flex;
   align-items: center;
-  gap: clamp(24px, 4vw, 80px);
+  gap: clamp(16px, 2.2vw, 48px);
+  text-align: left;
 }
 
 .rank {
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 900;
-  font-size: clamp(120px, 27vh, 320px);
-  line-height: 0.8;
-  padding-right: 0.08em; /* the italic's overhang */
+  font-stretch: 75%;
+  font-weight: 800;
+  font-size: clamp(88px, 19vh, 220px);
+  line-height: 0.82;
   color: var(--pa-gold);
-  text-shadow: 0 0 0.25em rgb(255 226 122 / 0.35);
 }
 
-.tally {
+.name {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: clamp(10px, 2vh, 24px);
-  text-align: left;
+  gap: 8px;
 }
 
-.counts {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(6.5em, auto));
-  gap: clamp(8px, 1.6vh, 18px) clamp(16px, 2.2vw, 40px);
-  margin: 0;
-}
-
-.count {
-  padding-left: 0.7em;
-  border-left: 3px solid var(--tone);
-}
-
-.count dt,
-.stats dt {
-  font-size: clamp(11px, 0.8vw, 15px);
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.count dt {
-  color: var(--tone);
-}
-
-.count dd,
-.stats dd {
+.song {
   margin: 0;
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.05;
+  font-stretch: 75%;
+  font-weight: 700;
+  font-size: clamp(28px, 3.2vw, 64px);
+  line-height: 1;
+  color: var(--pa-ink);
+  overflow-wrap: anywhere;
 }
 
-.count dd {
-  font-size: clamp(28px, 2.6vw, 52px);
+.extra {
+  margin: 6px 0 0;
 }
 
-.stats {
+.wrong {
+  color: var(--pa-wrong);
+}
+
+.cells {
   display: flex;
-  gap: clamp(20px, 3vw, 56px);
-  margin: 0;
-  padding-top: clamp(8px, 1.6vh, 18px);
-  border-top: 1px solid rgb(242 242 245 / 0.15);
-}
-
-.stats dt {
-  color: var(--pa-ink-dim);
-}
-
-.stats dd {
-  font-size: clamp(22px, 1.9vw, 38px);
+  gap: clamp(6px, 0.6vw, 14px);
 }
 
 .unscored {
   margin: 0;
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
+  font-stretch: 75%;
   font-weight: 800;
   font-size: clamp(28px, 3vw, 56px);
 }
 
-.timing {
-  color: var(--pa-ink-dim);
-}
-
-/* The page's timing panel and the slots carry their own top margins; the gap spaces the ceremony instead. */
-.timing > *,
+/* The slots carry their own top margins; the gap spaces the ceremony instead. */
 .featured > *,
+.tutor > *,
 .actions > * {
   margin-top: 0 !important;
 }
 
 .featured {
-  width: min(1100px, 92vw);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 2vh, 24px);
 }
 
 .featured:empty {
   display: none;
 }
 
+/* Bottom band: the tutor, then the buttons, in one hairline panel. */
+.bottom {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: clamp(12px, 2vh, 24px) clamp(16px, 1.6vw, 32px);
+}
+
+.tutor {
+  flex: 1;
+  min-width: 0;
+}
+
+.tutor:empty {
+  display: none;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   gap: 12px;
+  margin: 0 auto;
 }
 
-.retry,
+.tutor:not(:empty) + .actions {
+  margin-right: 0;
+}
+
+/* Songs is a link: the kit's secondary button, drawn the same way (duo-tokens' Button). */
 .songs {
-  padding: 12px 36px;
-  border-radius: 6px;
-  font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 800;
-  font-size: 20px;
-  letter-spacing: 0.04em;
+  padding: 12px 24px;
+  border: 1px solid var(--pa-line);
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   text-decoration: none;
-  cursor: pointer;
-}
-
-.retry {
-  border: none;
-  background: var(--pa-cyan);
-  color: var(--pa-bg);
-}
-
-.songs {
-  border: 1px solid var(--pa-ink-dim);
   color: var(--pa-ink);
 }
 
-.retry:focus-visible,
+.songs:hover {
+  background: rgba(125, 132, 150, 0.12);
+}
+
 .songs:focus-visible,
 .cue:focus-visible {
-  outline: 2px solid var(--pa-primary);
-  outline-offset: 3px;
+  outline: 2px solid var(--pa-ink);
+  outline-offset: 2px;
 }
 
 .cue {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
+  align-self: center;
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   text-decoration: none;
   color: var(--pa-ink-dim);
@@ -188,21 +165,27 @@
   width: min(1200px, 94vw);
   margin: 0 auto;
   padding: 4vh 0 8vh;
-  border-top: 1px solid rgb(242 242 245 / 0.12);
+  border-top: 1px solid var(--pa-line);
+}
+
+.detailsName,
+.cardName {
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .detailsName {
   margin: 0 0 16px;
-  font-size: 13px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
   color: var(--pa-ink-dim);
 }
 
 .grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0 16px;
+  gap: 0 16px; /* each slot carries a 16 px top margin */
 }
 
 @media (min-width: 1280px) {
@@ -216,17 +199,13 @@
   box-sizing: border-box;
   padding: 14px 20px 18px;
   background: var(--pa-panel);
-  border: 1px solid rgb(242 242 245 / 0.1);
-  border-top: 2px solid var(--pa-primary);
-  border-radius: 6px;
+  border: 1px solid var(--pa-line);
+  border-radius: 0;
 }
 
 .cardName {
   margin: 0 0 10px;
-  font-size: 12px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--pa-cyan);
+  color: var(--pa-primary);
 }
 
 .settings {

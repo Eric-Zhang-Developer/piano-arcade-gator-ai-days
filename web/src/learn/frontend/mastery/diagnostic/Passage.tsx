@@ -29,16 +29,19 @@ const end = (notes: readonly PassageNote[]) => Math.max(0, ...notes.map((n) => n
 /** The passage on a grand staff, four bars to a row: right hand on the treble, left on the bass. */
 export function Passage({ notes, label }: { notes: readonly PassageNote[]; label: string }) {
   const total = Math.max(BEATS_PER_BAR, Math.ceil(end(notes) / BEATS_PER_BAR) * BEATS_PER_BAR);
-  const rows = Math.ceil(total / ROW_BEATS);
-  const height = TOP + rows * ROW_HEIGHT;
+  // A passage shorter than a row spreads across the whole paper rather than filling its left part.
+  const rowBeats = Math.min(ROW_BEATS, total);
+  const rows = Math.ceil(total / rowBeats);
+  // The last row ends just under its bass staff, with room for a ledger line or a stem below it.
+  const height = TOP + (rows - 1) * ROW_HEIGHT + BASS_OFFSET + STAFF + TOP;
   return <svg viewBox={`0 0 ${WIDTH} ${height}`} role="img" aria-label={label} width="100%" style={{ display: 'block' }}>
     {Array.from({ length: rows }, (_, row) => {
-      const first = row * ROW_BEATS;
-      const beats = Math.min(ROW_BEATS, total - first);
-      const width = (beats / ROW_BEATS) * (RIGHT - NOTES_LEFT) + NOTES_LEFT;
+      const first = row * rowBeats;
+      const beats = Math.min(rowBeats, total - first);
+      const width = (beats / rowBeats) * (RIGHT - NOTES_LEFT) + NOTES_LEFT;
       const treble = TOP + row * ROW_HEIGHT;
       const bass = treble + BASS_OFFSET;
-      const x = (beat: number) => NOTES_LEFT + ((beat - first) / ROW_BEATS) * NOTES_WIDTH + 14;
+      const x = (beat: number) => NOTES_LEFT + ((beat - first) / rowBeats) * NOTES_WIDTH + 14;
       return <g key={row}>
         {[treble, bass].map((top) => [0, 1, 2, 3, 4].map((i) =>
           <line key={`${top}-${i}`} x1={LEFT} x2={width} y1={top + i * GAP} y2={top + i * GAP} stroke="currentColor" strokeWidth={1} opacity={0.5}/>))}
@@ -55,7 +58,7 @@ export function Passage({ notes, label }: { notes: readonly PassageNote[]; label
           <text x={LEFT + 62} y={bass + 19} fontSize={22} fontFamily="serif" fontWeight={700} fill="currentColor">4</text>
           <text x={LEFT + 62} y={bass + 39} fontSize={22} fontFamily="serif" fontWeight={700} fill="currentColor">4</text>
         </>}
-        {notes.filter((n) => n.startBeat >= first && n.startBeat < first + ROW_BEATS).map((n, i) =>
+        {notes.filter((n) => n.startBeat >= first && n.startBeat < first + rowBeats).map((n, i) =>
           <Note key={i} note={n} x={x(n.startBeat)} top={n.hand === 'left' ? bass : treble}/>)}
       </g>;
     })}
@@ -74,7 +77,7 @@ function Note({ note, x, top }: { note: PassageNote; x: number; top: number }) {
   const up = step < 4;
   const stemX = up ? x + 6.4 : x - 6.4;
   const stemEnd = up ? y - 30 : y + 30;
-  return <g data-pitch={note.pitch}>
+  return <g data-pitch={note.pitch} data-beat={note.startBeat} data-beats={note.beats}>
     {ledgers.map((s) => <line key={s} x1={x - 12} x2={x + 12} y1={top + STAFF - s * (GAP / 2)} y2={top + STAFF - s * (GAP / 2)} stroke="currentColor" strokeWidth={1}/>)}
     {SHARP[note.pitch % 12] === 1 && <text x={x - 24} y={y + 7} fontSize={22} fontFamily="serif" fill="currentColor">♯</text>}
     <ellipse cx={x} cy={y} rx={7} ry={4.8} transform={`rotate(-18 ${x} ${y})`} stroke="currentColor" strokeWidth={1.7}

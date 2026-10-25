@@ -125,8 +125,10 @@ function countIn(bpm: number): () => void {
       osc.start(at);
       osc.stop(at + 0.07);
     }
-    const close = setTimeout(() => void ctx.close(), BEATS_PER_BAR * beatMs(bpm) + 500);
-    return () => { clearTimeout(close); void ctx.close(); };
+    // Closed once, by the timer or by leaving the item, whichever comes first.
+    const close = () => { if (ctx.state !== 'closed') void ctx.close(); };
+    const timer = setTimeout(close, BEATS_PER_BAR * beatMs(bpm) + 500);
+    return () => { clearTimeout(timer); close(); };
   } catch {
     return () => {};
   }

@@ -135,9 +135,12 @@ export interface SchedulerOptions {
 // RECORD's at its stamp. Every milestone sound passes the loudness rule; the miss cue stays as juice-sound has it.
 export function scheduler(o: SchedulerOptions): (e: GameEvent, audioAtZero: number) => Scheduled[] {
   const clear = clearWatch(o.notes);
+  let clearMs: number | null = null; // the clear card's moment: a combo step on the same note gives way to it
   return (e, audioAtZero) => {
-    if (o.wait && e.type === "songEnd") return [];
+    if (o.wait && (e.type === "songEnd" || e.type === "fullCombo")) return []; // the judge sends no fullCombo in wait mode today
     const kind = clear(e);
+    if (kind) clearMs = e.atMs;
+    if (e.type === "comboMilestone" && e.atMs === clearMs) return [];
     const atMs: { sound: Voice | "miss"; ms: number }[] = soundsFor([e], 0, o.missCue()).map((s) => ({ sound: s.sound, ms: s.startTime * 1000 }));
     if (kind && !o.wait) atMs.push({ sound: CLEAR_VOICE[kind], ms: e.atMs });
     if (e.type === "songEnd" && o.newRecord()) atMs.push({ sound: "newRecord", ms: e.atMs + newRecordImpactMs() });

@@ -7,7 +7,11 @@ import { impactT } from "../rank-stamp";
 import { momentSettings, momentTimes } from "../record-moment/timing";
 
 export type ClearVoice = "clear" | "fullComboCard" | "allPerfect";
-export const CLEAR_VOICE: Record<ClearKind, ClearVoice> = { CLEAR: "clear", "FULL COMBO": "fullComboCard", "ALL PERFECT": "allPerfect" };
+export const CLEAR_VOICE: Record<ClearKind, ClearVoice> = {
+  CLEAR: "clear",
+  "FULL COMBO": "fullComboCard",
+  "ALL PERFECT": "allPerfect",
+};
 
 // The clear card's moment: the event that judges the chart's last note, as clear-card shows it. Once per take.
 export function clearWatch(notes: number): (e: GameEvent) => ClearKind | null {
@@ -45,7 +49,9 @@ export function loudnessGain(atMs: number, levelAt: (chartMs: number) => number 
 }
 
 // RMS level per windowMs of a decoded recording, in dBFS, its channels averaged (audio-track keeps one per recording).
-export function levelEnvelope(buf: Pick<AudioBuffer, "numberOfChannels" | "sampleRate" | "length" | "getChannelData">): Float32Array {
+export function levelEnvelope(
+  buf: Pick<AudioBuffer, "numberOfChannels" | "sampleRate" | "length" | "getChannelData">,
+): Float32Array {
   const w = Math.round((buf.sampleRate * loudnessSettings.windowMs) / 1000);
   const chans = Array.from({ length: buf.numberOfChannels }, (_, c) => buf.getChannelData(c));
   const out = new Float32Array(Math.floor(buf.length / w));

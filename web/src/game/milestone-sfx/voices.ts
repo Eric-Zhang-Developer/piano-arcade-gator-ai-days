@@ -26,7 +26,17 @@ const C5 = 523.25;
 const semis = (n: number) => C5 * 2 ** (n / 12);
 
 // One oscillator with a fast attack and an exponential decay, through an optional low-pass.
-function osc(ctx: AudioContext, out: AudioNode, type: OscillatorType, hz: number, t: number, len: number, level: number, detune = 0, lowpass = 0) {
+function osc(
+  ctx: AudioContext,
+  out: AudioNode,
+  type: OscillatorType,
+  hz: number,
+  t: number,
+  len: number,
+  level: number,
+  detune = 0,
+  lowpass = 0,
+) {
   const o = ctx.createOscillator();
   const g = ctx.createGain();
   o.type = type;
@@ -52,7 +62,16 @@ function osc(ctx: AudioContext, out: AudioNode, type: OscillatorType, hz: number
 
 // White noise through a filter, from one buffer per context.
 const noiseBufs = new WeakMap<AudioContext, AudioBuffer>();
-function noise(ctx: AudioContext, out: AudioNode, t: number, len: number, level: number, type: BiquadFilterType, hz: number, rise = false) {
+function noise(
+  ctx: AudioContext,
+  out: AudioNode,
+  t: number,
+  len: number,
+  level: number,
+  type: BiquadFilterType,
+  hz: number,
+  rise = false,
+) {
   let buf = noiseBufs.get(ctx);
   if (!buf) {
     buf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
@@ -93,7 +112,8 @@ function bell(ctx: AudioContext, out: AudioNode, n: number, t: number, len: numb
 }
 
 // How far up a combo step's arpeggio starts: 25 at the root, then a step higher each milestone, up to a fifth.
-export const comboLift = (count: number) => (count < 50 ? 0 : count < 100 ? 2 : Math.min(7, 2 + Math.floor(count / 100)));
+export const comboLift = (count: number) =>
+  count < 50 ? 0 : count < 100 ? 2 : Math.min(7, 2 + Math.floor(count / 100));
 
 export function playVoice(ctx: AudioContext, out: AudioNode, v: Voice, t: number, gain = 1, count = 0) {
   const L = voiceSettings.levels[v] * gain;
@@ -112,7 +132,11 @@ export function playVoice(ctx: AudioContext, out: AudioNode, v: Voice, t: number
       // a noise riser and a detuned saw pair climbing to the flash's peak, then the chord lands
       const p = voiceSettings.feverPeakS;
       noise(ctx, out, t, p, L * 0.6, "bandpass", 1500, true).frequency.exponentialRampToValueAtTime(7000, t + p);
-      for (const d of [-8, 8]) osc(ctx, out, "sawtooth", 220, t, p + 0.05, L * 0.5, d, 3000).frequency.exponentialRampToValueAtTime(1760, t + p);
+      for (const d of [-8, 8])
+        osc(ctx, out, "sawtooth", 220, t, p + 0.05, L * 0.5, d, 3000).frequency.exponentialRampToValueAtTime(
+          1760,
+          t + p,
+        );
       chord(ctx, out, [0, 4, 7, 12], t + p, 0.7, L);
       noise(ctx, out, t + p, 0.25, L * 0.5, "highpass", 6000);
       return;

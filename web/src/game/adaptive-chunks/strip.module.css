@@ -34,15 +34,15 @@
 
 /* The window's edges: a magenta bracket, so a narrow window still reads from across the room. */
 .first {
-  box-shadow: -3px 0 0 var(--pa-magenta), 0 0 10px rgb(39 225 255 / 0.55);
+  box-shadow: -3px 0 0 var(--pa-primary), 0 0 10px rgb(39 225 255 / 0.55);
 }
 
 .last {
-  box-shadow: 3px 0 0 var(--pa-magenta), 0 0 10px rgb(39 225 255 / 0.55);
+  box-shadow: 3px 0 0 var(--pa-primary), 0 0 10px rgb(39 225 255 / 0.55);
 }
 
 .first.last {
-  box-shadow: -3px 0 0 var(--pa-magenta), 3px 0 0 var(--pa-magenta), 0 0 10px rgb(39 225 255 / 0.55);
+  box-shadow: -3px 0 0 var(--pa-primary), 3px 0 0 var(--pa-primary), 0 0 10px rgb(39 225 255 / 0.55);
 }
 
 /* After a take: the phrase's accuracy, MISS (0%) to PERFECT (100%). */

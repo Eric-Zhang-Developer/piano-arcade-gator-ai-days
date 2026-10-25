@@ -147,7 +147,7 @@
 .again {
   font: italic 800 22px/1 var(--pa-font-display);
   padding: 14px 36px;
-  border: 2px solid var(--pa-magenta);
+  border: 2px solid var(--pa-primary);
   border-radius: 8px;
   background: transparent;
   color: var(--pa-ink);

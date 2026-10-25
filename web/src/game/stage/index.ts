@@ -175,16 +175,7 @@ export function feverStage(): GamePlugin {
       let drawn = false;
       return {
         frame(f) {
-          if (frozen) return;
-          // Duo (duo-tokens): the stage is fever's short moment, not the playfield's base. It fades in and out with
-          // fever's heat and isn't rendered at all outside it, so the playfield is plain --pa-bg.
-          const heat = look(state, f.nowMs).heat;
-          el.style.opacity = String(heat);
-          if (heat === 0) {
-            drawn = false; // reduced motion draws its one still frame again at the next fever
-            return;
-          }
-          if (still && drawn) return;
+          if (frozen || (still && drawn)) return;
           if (!document.hidden && overBudget(performance.now() - mountedAt)) {
             frozen = true;
             console.info(`fever-stage: frames averaged over ${stageSettings.budgetMs} ms for 1 s; the stage is frozen for this take`);

@@ -1,7 +1,7 @@
 ---
 name: "Learn titles: each /learn page names its own tab, in the form <page> · Learn · Étude"
 depends_on: ["learning-ui"]
-owns: ["specs/features/learn-titles/", "changes/learn-titles.md", "specs/decisions/learn-titles-", "web/src/app/learn/layout.tsx", "web/src/app/learn/brand-preview/page.tsx", "web/src/app/learn/play-through/page.tsx", "web/src/app/learn/practice/page.tsx", "web/src/app/learn/review/theory/page.tsx", "web/src/app/learn/understand/page.tsx"]
+owns: ["specs/features/learn-titles/", "changes/learn-titles.md", "specs/decisions/learn-titles-", "web/src/app/learn/layout.tsx", "web/src/app/learn/brand-preview/page.tsx", "web/src/app/learn/play-through/page.tsx", "web/src/app/learn/practice/page.tsx", "web/src/app/learn/review/theory/page.tsx", "web/src/app/learn/understand/page.tsx", "web/src/app/learn/learn-titles.test.ts"]
 assignee: "eric"
 ---
 
@@ -14,7 +14,7 @@ the per-page half, and it does the name in the titles too.
 
 **Lane.** `/learn` is the learning lane, which has no person yet (AGENTS.md, Lanes); #1141 says to spec it with
 `assignee: "eric"`. learning-ui has no assignee, so the lane rule can't open its files to this PR: this spec owns the
-six files it edits, listed in `owns`. `fix(learning-ui)` PRs still pass on learning-ui's own `owns`.
+six files it edits and one new test, listed in `owns`. `fix(learning-ui)` PRs still pass on learning-ui's own `owns`.
 
 ## The change
 - The layout's title becomes Next's title object, from `APP_NAME`: a `default` of `` `Learn · ${APP_NAME}` `` (the
@@ -41,13 +41,13 @@ open PRs (`gh pr list --author seeko-codes`). When this spec was written:
   edited.
 
 ## Validation
-- **(a) Titles:** a unit test imports each page's `metadata` and the layout's, and checks:
+- **(a) Titles:** a unit test, `web/src/app/learn/learn-titles.test.ts` (tests already sit beside routes there), imports each page's `metadata` and the layout's, and checks:
   - the layout's `template` is `` `%s · Learn · ${APP_NAME}` `` and its `default` is `` `Learn · ${APP_NAME}` ``;
   - each of the five rendering pages (four if #1147 still holds practice) has a non-empty `title`.
 - **(b) No old name:** `grep -rn "Piano Arcade" web/src/app/learn/` prints nothing.
 - **(c) In the browser:** on your own dev server, each page's `document.title` reads `<page> · Learn · Étude`, and
   `/learn` reads `Learn · Étude`. List them in the PR.
-- **Unit tests:** `pnpm -C web exec vitest run <the new test's folder>`.
+- **Unit tests:** `pnpm -C web exec vitest run src/app/learn/learn-titles.test.ts`.
 - **Design pass:** none. Only the tab's title changes; no page's layout, style or pixels do. The PR's Design section
   says so.
 

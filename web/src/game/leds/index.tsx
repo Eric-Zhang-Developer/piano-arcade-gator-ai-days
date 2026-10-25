@@ -4,6 +4,7 @@
 import { useEffect, useSyncExternalStore } from "react";
 import type { Chart, GamePlugin, InputDevice } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
+import { kitChip } from "../duo-tokens";
 import { CLEAR, hintDiff, hintsAt, judgedKey, keyOff, ledSettings, type Rgb } from "./messages";
 import { autoConnect, connect, linkState, send, subscribe, type LinkState } from "./serial";
 
@@ -84,16 +85,8 @@ function ConnectLights() {
       data-state={s}
       disabled={!idle}
       onClick={connect}
-      style={{
-        padding: "6px 14px",
-        fontSize: 15,
-        borderRadius: 6,
-        border: "1px solid rgba(242,242,245,0.3)",
-        background: "transparent",
-        color: "inherit",
-        cursor: idle ? "pointer" : "default",
-        opacity: s === "unsupported" ? 0.6 : 1,
-      }}
+      className={kitChip(s === "ready").className}
+      style={{ ...kitChip(s === "ready").style, cursor: idle ? "pointer" : "default", opacity: s === "unsupported" ? 0.6 : 1 }}
     >
       {label[s]}
     </button>

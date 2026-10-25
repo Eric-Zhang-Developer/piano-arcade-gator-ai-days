@@ -1,7 +1,7 @@
 // sheet-view's half on /play: it posts the take to /sheet on a BroadcastChannel and puts "Sheet music ↗" on the start
 // screen. It draws nothing (decision 001 row 13: the score is never on the arcade screen).
-import type { CSSProperties } from "react";
 import type { Chart, GamePlugin } from "../../contracts";
+import { kitButton } from "../duo-tokens";
 
 export const SHEET_CHANNEL = "pianoArcade.sheet";
 
@@ -51,7 +51,7 @@ export function sheetView(): GamePlugin {
       <button
         data-capture-hide
         data-testid="sheet-music"
-        style={button}
+        {...kitButton("secondary")}
         onClick={() => window.open(sheetUrl(params), "pianoArcadeSheet", "popup")}
       >
         Sheet music ↗
@@ -59,13 +59,3 @@ export function sheetView(): GamePlugin {
     ),
   };
 }
-
-const button: CSSProperties = {
-  padding: "8px 24px",
-  fontSize: 16,
-  borderRadius: 8,
-  border: "none",
-  background: "#ddd",
-  color: "#000",
-  cursor: "pointer",
-};

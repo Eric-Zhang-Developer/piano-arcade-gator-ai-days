@@ -1,5 +1,6 @@
 "use client";
 // Right, Left or Both on the start screen. Each choice reloads /play with hands= set, so the judged chart is rebuilt.
+import { kitChip } from "../duo-tokens";
 import type { HandsSetting } from "./hands";
 
 const CHOICES: [HandsSetting, string][] = [
@@ -16,22 +17,14 @@ export function HandPicker({ current }: { current: HandsSetting }) {
     window.location.assign(url);
   };
   return (
-    <div role="group" aria-label="Hands to play" data-testid="hand-picker" style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+    <div role="group" aria-label="Hands to play" data-testid="hand-picker" style={{ display: "flex", gap: 6 }}>
       {CHOICES.map(([h, label]) => (
         <button
           key={h}
           type="button"
           aria-pressed={current === h}
           onClick={() => current !== h && pick(h)}
-          style={{
-            padding: "6px 14px",
-            fontSize: 15,
-            borderRadius: 6,
-            border: "1px solid rgba(242,242,245,0.3)",
-            background: current === h ? "rgba(242,242,245,0.15)" : "transparent",
-            color: "inherit",
-            cursor: current === h ? "default" : "pointer",
-          }}
+          {...kitChip(current === h)}
         >
           {label}
         </button>

@@ -171,6 +171,23 @@
   font-weight: 700;
 }
 
+/* What a page adds under the rows: on /play, Connect lights and the MIDI status. */
+.extra {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--size) * 0.6);
+  margin-top: calc(var(--size) * 1.2);
+  padding-top: calc(var(--size) * 1.2);
+  border-top: 1px solid var(--pa-line);
+  color: var(--pa-ink-dim);
+  font-size: var(--size);
+}
+
+.extra p {
+  margin: 0;
+}
+
 .note {
   margin: calc(var(--size) * 1.2) 0 0;
   color: var(--pa-ink-dim);

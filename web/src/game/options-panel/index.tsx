@@ -3,7 +3,7 @@
 // use. A native <dialog> with showModal(): it keeps Tab inside, closes on Esc, puts the focus back and makes the page
 // behind inert, so ↑/↓ never reach the song list.
 import Link from "next/link";
-import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent, type ReactNode } from "react";
 import { LATENCY_MAX, LATENCY_MIN, loadLatencyOffset, saveLatencyOffset } from "../core/settings";
 import { LABEL_SETTINGS, LABELS_KEY, labelSetting, type LabelSetting } from "../note-labels/labels";
 import { DEFAULT_PREFS, getPrefs, savePrefs, subscribePrefs, type Prefs } from "../sound";
@@ -203,7 +203,19 @@ export function OptionsRows({
 const typing = (t: EventTarget | null) => t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
 
 // The Options button and its drawer. O toggles it from anywhere on the page; Esc closes it (the dialog's own).
-export function OptionsDrawer({ recording = false }: { recording?: boolean }) {
+// /play's start screen (duo-start) passes keys={false}, since O is a laptop piano key there, its own onLatency so the
+// next take uses the new offset, and the start panels that belong in it (Connect lights, the MIDI status) as children.
+export function OptionsDrawer({
+  recording = false,
+  keys = true,
+  onLatency,
+  children,
+}: {
+  recording?: boolean;
+  keys?: boolean;
+  onLatency?: (ms: number) => void;
+  children?: ReactNode;
+}) {
   const ref = useRef<HTMLDialogElement>(null);
   const prefs = useSyncExternalStore(subscribePrefs, getPrefs, () => DEFAULT_PREFS);
   const [latency, setLatency] = useState(0);
@@ -220,6 +232,7 @@ export function OptionsDrawer({ recording = false }: { recording?: boolean }) {
   const toggle = () => (ref.current?.open ? ref.current.close() : open());
 
   useEffect(() => {
+    if (!keys) return;
     const onKey = (e: globalThis.KeyboardEvent) => {
       if (e.key.toLowerCase() !== "o" || e.metaKey || e.ctrlKey || e.altKey || typing(e.target)) return;
       e.preventDefault();
@@ -241,7 +254,7 @@ export function OptionsDrawer({ recording = false }: { recording?: boolean }) {
   return (
     <>
       <button type="button" className={styles.open} onClick={open} data-capture-hide data-testid="options-open">
-        Options <kbd className={styles.kbd}>O</kbd>
+        Options{keys && <> <kbd className={styles.kbd}>O</kbd></>}
       </button>
       <dialog ref={ref} className={styles.drawer} onKeyDown={onKeyDown} aria-labelledby="options-title" data-testid="options">
         <header className={styles.head}>
@@ -257,7 +270,8 @@ export function OptionsDrawer({ recording = false }: { recording?: boolean }) {
           recording={recording}
           onLatency={(ms) => {
             setLatency(ms);
-            saveLatencyOffset(ms);
+            if (onLatency) onLatency(ms); // saves it too
+            else saveLatencyOffset(ms);
           }}
           onPrefs={(p) => savePrefs({ ...getPrefs(), ...p })}
           onLabels={(s) => {
@@ -267,7 +281,8 @@ export function OptionsDrawer({ recording = false }: { recording?: boolean }) {
             requestAnimationFrame(() => ref.current?.querySelector<HTMLElement>(`[data-testid="opt-labels-${s}"]`)?.focus());
           }}
         />
-        <p className={styles.note}>Latency and labels apply from the next song.</p>
+        {children && <div className={styles.extra}>{children}</div>}
+        <p className={styles.note}>{onLatency ? "Labels apply when you press Start." : "Latency and labels apply from the next song."}</p>
       </dialog>
     </>
   );

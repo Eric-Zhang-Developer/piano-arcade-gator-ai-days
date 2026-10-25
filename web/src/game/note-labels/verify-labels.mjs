@@ -76,16 +76,21 @@ try {
     await page.close();
   }
 
-  // The start screen's toggle: Auto -> Note names, remembered for the next visit.
+  // The start screen's Options drawer (duo-start): Auto -> Note names, remembered, and the take uses it after Start.
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   await page.goto(`${base}/play?song=twinkle&beat=off`);
-  const toggle = page.getByTestId("labels-toggle");
-  const before = await toggle.textContent({ timeout: 60_000 });
-  await toggle.click();
-  const after = await toggle.textContent();
+  await page.getByTestId("options-open").click({ timeout: 60_000 });
+  const pick = (s) => page.getByTestId(`opt-labels-${s}`);
+  const before = (await pick("auto").getAttribute("aria-checked")) === "true" ? "Auto" : "?";
+  await pick("notes").click();
+  const after = (await pick("notes").getAttribute("aria-checked")) === "true" ? "Note names" : "?";
   const stored = await page.evaluate(() => localStorage.getItem("pianoArcade.labels"));
   await page.screenshot({ path: join(out, "start-toggle.png") });
-  if (before !== "Labels: Auto" || after !== "Labels: Note names" || stored !== "notes") fail.push(`toggle: "${before}" -> "${after}", stored ${stored}`);
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.waitForTimeout(1000);
+  const used = await page.evaluate(() => window.__pianoArcadeLabels?.setting);
+  if (before !== "Auto" || after !== "Note names" || stored !== "notes" || used !== "notes") fail.push(`toggle: "${before}" -> "${after}", stored ${stored}, the take uses ${used}`);
 
   if (fail.length) throw new Error(fail.join("; "));
   say(`verify-labels: pass, auto shows laptop letters without MIDI, ?labels=notes and off work, the toggle went "${before}" -> "${after}" (evidence: ${out})`);

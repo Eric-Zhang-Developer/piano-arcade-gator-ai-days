@@ -4,7 +4,7 @@
 // canvas height. One line per frame, a pass count per set.
 // Usage: node spikes/mascot/check.mjs spikes/mascot/out. It first runs a self-test on two synthetic PNGs it writes.
 // Exit 0 once the self-test passes and every set is checked (frames may still fail: the lines say which).
-import { mkdirSync, readdirSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { blank, readPng, writePng } from "./png.mjs";
@@ -104,19 +104,23 @@ function selfTest() {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   if (!selfTest()) process.exit(1);
-  const root = join(process.argv[2] ?? "spikes/mascot/out", "sets");
+  const out = process.argv[2] ?? "spikes/mascot/out";
+  const root = join(out, "sets");
   const sets = [];
-  for (const sheet of readdirSync(root).filter((d) => statSync(join(root, d)).isDirectory()))
+  for (const sheet of (existsSync(root) ? readdirSync(root) : []).filter((d) => statSync(join(root, d)).isDirectory()))
     for (const set of readdirSync(join(root, sheet)).filter((d) => statSync(join(root, sheet, d)).isDirectory())) sets.push(join(sheet, set));
   if (!sets.length) {
     say(`no pose sets under ${root}`);
     process.exit(1);
   }
+  const results = {}; // for pick.html, which can't fetch from file://
   for (const set of sets.sort()) {
-    const files = readdirSync(join(root, set)).filter((f) => /-f\d+\.png$/.test(f)).sort();
+    const files = readdirSync(join(root, set)).filter((f) => /^f\d+\.png$/.test(f)).sort();
     const frames = files.map((file) => ({ file: join(set, file), stats: frameStats(readPng(join(root, set, file))) }));
     const rows = checkSet(frames);
     for (const r of rows) say(r.line);
     say(`set ${set}: ${rows.filter((r) => r.pass).length}/${rows.length} frames pass\n`);
+    results[set] = { pass: rows.filter((r) => r.pass).length, of: rows.length, lines: rows.map((r) => r.line) };
   }
+  writeFileSync(join(out, "check.js"), `window.MASCOT_CHECK = ${JSON.stringify(results, null, 1)};\n`);
 }

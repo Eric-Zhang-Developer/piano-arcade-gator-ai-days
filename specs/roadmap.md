@@ -70,6 +70,9 @@ Last, on his word (#601): `adaptive-chunks`, chunk practice that shrinks onto th
 you prove them. Cut if it isn't done by Sunday noon.
 First in the queue, on his word (#612): `laptop-sound`, the laptop plays the game's piano part and your key presses
 when no piano is connected. Cut if it isn't done by Sunday noon.
+Then, on his word: `flow-mode` (#618), the song waits for you and follows your tempo, judging what a listener
+hears (Eric: strict mode is "completely undemoable"); then `lab` (#619), one page that opens every hidden feature.
+Both are cut if they aren't done by Sunday noon.
 
 ## Spikes
 Milestone **spikes**, after `extras`: `simon-says-spike`, then `restyle-spike`. About 3 hours each, findings whatever

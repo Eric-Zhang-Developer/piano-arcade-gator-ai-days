@@ -1,0 +1,26 @@
+Please use your image generation tool to create exactly one image from the art brief below. Make it landscape 16:9 with a fully opaque background (no transparency anywhere). Save it in the current directory as 1-select.png (PNG). Don't create, edit or delete any other file. When you're done, reply with just the saved file's path. Thank you, and take care with the details: this is a reference the whole team will build from.
+
+Art brief:
+Product: Piano Arcade, a Japanese-style arcade rhythm game played on a real 88-key digital piano in Chrome: notes fall toward the keys, every note is judged (PERFECT, GREAT, GOOD, MISS), and a learning side shows you what to practice.
+
+Art direction, "classical paper": the whole interface is printed matter. It feels like a fine engraved music edition (Henle, Bärenreiter) and a letterpress concert program, but it is still clearly a game: bold, legible at a glance, with a few confident celebratory moments. Restraint over decoration: one ornament per panel at most, lots of calm cream space.
+
+Rendering: a high-fidelity, flat, straight-on UI design mockup of one screen, as a 1920x1080 browser screenshot. No browser chrome, no device frame, no desk, no hands, no people, no perspective tilt. Crisp edges, precise alignment, a clear hierarchy. Text is minimal, set large, and spelled exactly as given; leave out any text not listed.
+
+Palette (use only these): paper cream #f4ecdc with a faint laid-paper texture (never pure white); ink #1b1712 for text and staff lines; gold leaf #b8892b, slightly metallic, for the most important accent; viridian #1f6f5c for the right hand; Prussian blue #2b4c7e for the left hand; vermilion #c0392b only for a WRONG note; faded rose-grey #a88a8f for MISS.
+
+Type: titles in a high-contrast engraving serif like Didot or Bodoni; labels in small caps with wide letter-spacing; big numbers in elegant lining serif numerals.
+
+Components: primary buttons are ink-filled with gold-leaf small-caps text and a hairline gold inner border, gently letterpress-embossed; secondary buttons are cream with a hairline ink border. Cards are cream paper panels with a thin double rule and a whisper of shadow.
+
+Avoid: parchment that looks old, stained or burned; heavy filigree; fantasy or medieval styling; neon; glow effects; pixel art; random musical-note confetti; lens flare.
+
+Screen: the music select menu.
+
+Layout: top left, the title "Piano Arcade" set like the title page of a score, with a thin gold double rule under it; top right, a small quiet hint "↑↓ choose · Enter play". Below, two columns.
+
+Left column (about 40% width): the focused song. A large cover framed like an engraved plate with a thin gold border: the opening bars of a piano score (treble and bass staves joined by a brace, in G major, 3/4), beautifully engraved in ink. Under it the title "Minuet in G" in large serif, the composer "PETZOLD" in small caps, a row "LEVEL 3" and "128 NOTES" separated by a hairline, then two buttons side by side: "PLAY" (primary, ink with gold) and "LEARN" (secondary).
+
+Right column: a vertical list of six song cards, each a cream paper card with a small engraved-score thumbnail on the left, the title in serif, the composer in small caps, and a level number on the right in a small circular embossed badge. Top to bottom: "Twinkle, Twinkle" / "TRADITIONAL" / 1; "Minuet in G" / "PETZOLD" / 3 (focused: lifted slightly, a gold-leaf rule on its left edge); "Für Elise" / "BEETHOVEN" / 5; "Clair de lune" / "DEBUSSY" / 7; "Gymnopédie No. 1" / "SATIE" / 4; "Prelude in E minor" / "CHOPIN" / 6.
+
+Mood: walking into a quiet recital hall foyer and picking a program.

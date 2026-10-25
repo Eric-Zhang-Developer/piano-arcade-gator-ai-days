@@ -1,7 +1,7 @@
 ---
 name: "Highlight reel spike: a take becomes a 15-second broadcast replay video, rendered from the take and saved as WebM"
 depends_on: ["experiments", "replay-view", "take-midi", "scenes", "laptop-sound", "duo-tokens"]
-owns: ["specs/features/highlight-reel/", "changes/highlight-reel.md", "web/src/app/highlight/", "specs/decisions/highlight-reel-"]
+owns: ["specs/features/highlight-reel/", "changes/highlight-reel.md", "web/src/app/highlight/", "specs/decisions/highlight-reel-", "spikes/highlight-reel/"]
 assignee: "eric"
 ---
 
@@ -111,7 +111,16 @@ The bars are the planner's, not measured thresholds, except where the pitch sets
    - **onsets:** the take's events map to the expected reel times through a hand-built edit list;
    - **the onset detector** that Validation 2 uses (pure, in the folder): on a synthetic signal of clicks at known
      times, every click is found within 1 ms.
-2. `node web/src/game/x/highlight-reel/verify-highlight.mjs --out <dir>` renders three takes:
+2. **Two scripts, one harness** (`web/src/game/x/highlight-reel/reel-check.mjs`). The spike's yes/no bars below can
+   fail by design when the answer is "no", and a CI check that fails by design keeps main red forever. So the
+   question's bars live outside `web/src/`, where CI doesn't look (planner, 2026-10-25; this replaces the earlier text
+   that put every bar in the CI check):
+   - `node spikes/highlight-reel/measure.mjs --out <dir>`: every bar below, each labeled PASS or FAIL. It exits 0 once
+     it has measured. FINDINGS.md quotes its output.
+   - `node web/src/game/x/highlight-reel/verify-highlight.mjs --out <dir>`: the regression check, bars 1, 3, 6 and 7
+     only (what works and must keep working), strict. ci-browser's suite picks it up by name.
+
+   Both render three takes:
    - `/highlight?take=bot:rank-b&song=twinkle`;
    - `/highlight?take=bot:sloppy&song=minuet-g`;
    - `/play?song=twinkle&bot=rank-c&x=highlight-reel`, played to the results, then its Highlight reel link (the
@@ -145,8 +154,7 @@ The bars are the planner's, not measured thresholds, except where the pitch sets
    - frame count from `requestVideoFrameCallback` over a 1× playback;
    - sync from `decodeAudioData` on the blob, through the same onset detector.
 
-   Bars 6–7 always run. Locally it runs at most twice, under `verify.lock`, with a timeout. ci-browser's suite picks it
-   up by name.
+   Bars 6–7 always run. Locally the reel check runs at most twice, under `verify.lock`, with a timeout.
 3. **The perf gate** (contract item 4): `node web/src/game/perf-budget/perf.mjs --params x=highlight-reel`, p95 ≤ 6 ms
    at 1920×1080. It covers `/play` with the flag on, where only the results panel is added. Run it locally only under
    `verify.lock`; otherwise the PR says "not run locally; main's scheduled run covers it".

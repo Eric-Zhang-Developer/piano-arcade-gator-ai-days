@@ -118,6 +118,15 @@ export const helpGroups: HelpGroup[] = [
     ],
   },
   {
+    screen: "Spot the wrong note",
+    files: ["app/wrong-note/page.tsx"],
+    lines: [
+      { keys: ["Space"], what: "start a set, or the next round; Enter too", source: ["app/wrong-note/page.tsx"], match: ["Space", "Enter"], control: "Start" },
+      { keys: ["2–8"], what: "the note that changed", source: ["app/wrong-note/page.tsx"], control: "The phrase's 8 notes" },
+      { keys: ["R"], what: "hear the phrase again", source: ["app/wrong-note/page.tsx"], match: ["r", "R"], control: "Replay" },
+    ],
+  },
+  {
     screen: "Anywhere",
     files: ["game/help-overlay/index.tsx"],
     lines: [
@@ -137,7 +146,9 @@ export const helpGroups: HelpGroup[] = [
 export const unlisted: Record<string, string> = {
   "game/audio-track/index.ts": "starts a local song's recording on the first key or pointer press: not a control",
   "game/cabinet/idle.ts": "any key restarts the cabinet's idle timer: not a control",
+  "game/take-graph/TakeGraph.tsx": "arrows, Home and End step the take graph's readout only while the graph has focus, like a slider: the graph names its own keys",
   "game/song-preview/index.tsx": "Enter and L stop the preview as you leave the select: the select's lines cover them",
+  "game/results-landing/index.ts": "any key or click skips the results landing to its end state and does nothing else: not a control",
   "game/laptop-sound/index.ts": "starts the laptop's audio on the first key or pointer press; its notes are the laptop keys' lines: not a control",
   "game/ui-sounds/index.ts": "notes the page's first key or pointer press, after which UI sounds may play: not a control",
 };

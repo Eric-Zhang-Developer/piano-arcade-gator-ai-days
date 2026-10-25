@@ -4,8 +4,10 @@
 import { createElement, Fragment, type ReactNode } from "react";
 import type { GamePlugin } from "../../contracts";
 import { createGuard, type Guard } from "../crash-guard";
+import { composersHands } from "./composers-hands";
 import { conductor } from "./conductor";
 import { realKeys } from "./real-keys";
+import { highlightReel } from "./highlight-reel";
 import { sample } from "./sample";
 import { screenShake } from "./screen-shake";
 import { wetPaint } from "./wet-paint";
@@ -25,6 +27,8 @@ export const experiments: Experiment[] = [
   screenShake,
   conductor,
   realKeys, // #1017: its own page, /real-keys; on /play only a start-panel link to it
+  highlightReel, // a take becomes a 15-second broadcast replay video (#913, spike)
+  composersHands,
   wetPaint, // #1106: its own page, /paint
 ];
 

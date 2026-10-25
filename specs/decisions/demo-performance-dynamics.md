@@ -54,9 +54,12 @@ themes too), and it doesn't read `fz` or a marcato.
   each bar; p in A′, a *cresc.* into an fz, p again, an accent: 49–80.
 - minute-waltz (bars 1–20): no level mark, so mf; an accent on the first note, then six one-step hairpins: 64–96.
 
-**Batch 6** (#1102). All hand-read `--marks`, checked against the chart's notes at each beat. `dynamics` lays a
-dynamics line kept outside a `\repeat volta` (Wild Horseman) straight over the unfolded MIDI, which moves B's marks onto
-A's second pass. It also misplaces accents inside `\voiceOne << >>` blocks (Happy Farmer).
+**Batch 6** (#1102). All hand-read `--marks`, checked against the chart's notes at each beat. `dynamics` laid a
+dynamics line kept outside a `\repeat volta` (Wild Horseman) straight over the unfolded MIDI, which moved B's marks onto
+A's second pass, and it misplaced accents inside `\voiceOne << >>` blocks (Happy Farmer). The reader fix after it
+places such a line at every pass its staff's voice plays, starts each block of a `<< >>` with no `\\` together, and
+takes a `\partial`'s duration as the next note's; it prints both songs' hand-read lists, and every chart it built
+before comes out unchanged.
 - happy-farmer (the pickup and bars 1–20): f, restated at bars 4, 10 and 16; accents on both hands' melody notes in
   bars 9, 10, 15 and 16: 96, the accents 112.
 - wild-horseman (A twice, then B): mf at the pickup; sf on the downbeats of bars 2, 3, 6 and 7 in both passes of A,
@@ -86,6 +89,21 @@ A's second pass. It also misplaces accents inside `\voiceOne << >>` blocks (Happ
 - pathetique-2 (bars 1–16): p, nothing else before bar 24's *cresc.*: every note 49.
 - raindrop-prelude (bars 1–27): p at bars 1, 8 (its fourth beat) and 20, with the swells in bars 2–4, 6–8, 13–14,
   18–19, 21–23 and 25–27: 49–65.
+
+**Batch 9** (#1105). Main's `dynamics` misreads the Fantaisie (called music), the Revolutionary (German `h`), the
+Rachmaninoff (`\octaveCheck`) and the Pathétique (`\slashedGrace`); #1121's reader reads them true. Its printed lists are
+applied with `velocity --marks`, plus the two marks it misses (below). The Consolation is hand-read (inline staves). The
+four charts that carried their MIDI's velocities have them replaced.
+- chopin-fantaisie-impromptu (bars 1–24): LH sf on the opening octave and f at bar 3; RH p at bar 5, f at bar 13 with
+  accents on every beat to bar 16, p at bar 17 with accents on each second 16th; *cresc.*, *dim.* and hairpins: 17–112.
+  Bars 20–24's three diminuendos stack down to 17 under the hairpin rule, not a printed ppp.
+- chopin-revolutionary (bars 1–18): f at bars 1 and 3, RH f/p in bars 10–13, an fz at bar 14, hairpins, LH accents on
+  every beat of bars 1–6, and a *cresc.* markup at bar 7 beat 3 that the reader misses (added by hand): 49–113.
+- liszt-consolation-3 (bars 1–18): ppp *sempre legatissimo*; accents at bars 13 and 15, a hairpin and a marcato in bar 14: 16–48.
+- rachmaninoff-prelude-cs (pickup and bars 1–13): ff with accents on the three opening chords, ppp at bar 3, mf at bar
+  7, ppp at bars 9 and 13: 16, 80 and 127 (ff plus an accent clamps at 127).
+- pathetique-3 (pickup and bars 1–43): p, f at bar 16, fp at bars 18 and 22, p at bars 33 and 43, and LH sf in bars
+  33–34, written inside a chord, which the reader misses (added by hand): 49, 65 and 96.
 
 A single level reads as "This score marks no dynamics" in the dynamics grade (it needs two levels), as before.
 

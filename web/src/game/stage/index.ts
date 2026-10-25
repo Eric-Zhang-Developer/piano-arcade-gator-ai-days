@@ -8,8 +8,8 @@ import { makeScene } from "./scene";
 export const stageSettings = {
   maxLaneLuma: 0.35, // 0–1: the stage's brightest pixel behind the lanes, after the highway's backdrop
   pixelRatioCap: 1.5,
-  dipMs: 300, // miss / WRONG desaturation
-  dipDepth: 0.85, // 0–1 of the saturation taken out at the dip's start
+  dipMs: 100, // a big combo break's desaturation (miss-moment calls dip(); a plain miss or WRONG no longer dips)
+  dipDepth: 0.15, // 0–1 of the saturation taken out at the dip's start
   feverEaseMs: 400, // into and out of the hot palette
   budgetMs: 20, // freeze if the mean frame time over budgetWindowMs goes above this
   budgetWindowMs: 1000,
@@ -34,9 +34,6 @@ export function reduceStage(s: StageState, e: GameEvent): StageState {
   switch (e.type) {
     case "songStart":
       return emptyStage();
-    case "noteMiss":
-    case "wrongNote":
-      return { ...s, dipAtMs: e.atMs };
     case "feverStart":
       return { ...s, fever: true, feverAtMs: e.atMs };
     case "feverEnd":
@@ -45,6 +42,14 @@ export function reduceStage(s: StageState, e: GameEvent): StageState {
       return s;
   }
 }
+
+// miss-moment's hook: a combo break at 50 or more dips the stage once (spec: miss-moment). The plugin picks it up on
+// its next frame; a miss or WRONG by itself is quiet (decision miss-moment-stage-dip).
+let pendingDip: number | null = null;
+export function dip(atMs: number): void {
+  pendingDip = atMs;
+}
+export const applyDip = (s: StageState, atMs: number): StageState => ({ ...s, dipAtMs: atMs });
 
 // What the scene shows at nowMs, each 0–1.
 export interface Look {
@@ -132,6 +137,10 @@ export function feverStage(): GamePlugin {
       let drawn = false;
       return {
         frame(f) {
+          if (pendingDip !== null) {
+            state = applyDip(state, pendingDip);
+            pendingDip = null;
+          }
           // Plain black in normal play (Eric, 2026-10-25): the stage fades in and out with fever's heat and isn't
           // drawn at all outside it. Reduced motion shows fever's stage at once, with no fade.
           const l = look(state, f.nowMs);

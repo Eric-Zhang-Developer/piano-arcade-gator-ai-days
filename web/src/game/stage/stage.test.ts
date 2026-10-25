@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Chart, GameEvent } from "../../contracts";
 import { blackKeyLaneSettings } from "../black-key-lanes";
 import { settings as core } from "../core/settings";
-import { emptyStage, feverStage, frameBudget, look, reduceStage, STAGE_KEY, stageOpacity, stageSettings } from ".";
+import { applyDip, emptyStage, feverStage, frameBudget, look, reduceStage, STAGE_KEY, stageOpacity, stageSettings } from ".";
 
 const run = (events: GameEvent[]) => events.reduce(reduceStage, emptyStage());
 const combo = (count: number, atMs = 0): GameEvent => ({ type: "combo", count, atMs });
@@ -16,15 +16,17 @@ describe("reduceStage", () => {
     expect(look(emptyStage(), 0).heat).toBe(0);
   });
 
-  it("dips on a miss and on a WRONG for about 300 ms", () => {
+  it("a miss or WRONG alone doesn't dip; miss-moment's dip() takes about 15% for about 100 ms", () => {
     for (const bad of [
       { type: "noteMiss", noteId: "n", pitch: 60, atMs: 2000 },
       { type: "wrongNote", pitch: 61, atMs: 2000 },
     ] as GameEvent[]) {
       const s = run([combo(25), bad]);
-      expect(look(s, 2000).dip).toBeGreaterThan(0);
-      expect(look(s, 2150).dip).toBeGreaterThan(0);
-      expect(look(s, 2300).dip).toBe(0);
+      expect(look(s, 2000).dip).toBe(0);
+      const d = applyDip(s, 2000);
+      expect(look(d, 2000).dip).toBeCloseTo(0.15);
+      expect(look(d, 2050).dip).toBeGreaterThan(0);
+      expect(look(d, 2100).dip).toBe(0);
     }
   });
 

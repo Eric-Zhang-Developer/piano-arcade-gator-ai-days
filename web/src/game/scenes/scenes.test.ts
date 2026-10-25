@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
-import type { Chart, GameEvent } from "../../contracts";
+import { describe, expect, it, vi } from "vitest";
+import type { Chart, Frame, GameEvent } from "../../contracts";
 import { Judge } from "../core/judge";
 import { gaugeSize } from "../fever-gauge/gauge";
 import { BOTS, botPresses, feverChart, scenes, TAKE_FILE, takePresses, type BotName } from ".";
@@ -76,6 +76,38 @@ describe("the plugin", () => {
     const midi = { kind: "midi" as const, start() {}, stop() {} };
     expect(p.wrapInput!(midi)).toBe(midi);
     expect(p.wrapInput!({ kind: "keys", start() {}, stop() {} }).kind).toBe("test");
+  });
+
+  it("on a starved page every press reaches the judge within a frame, timed by /play's own zero (#586)", async () => {
+    let perf = 0;
+    const raf: (() => void)[] = [];
+    vi.spyOn(performance, "now").mockImplementation(() => perf);
+    vi.stubGlobal("requestAnimationFrame", (cb: () => void) => raf.push(cb));
+    vi.stubGlobal("setTimeout", () => 0); // every timer starved behind frames: none fires
+    vi.stubGlobal("clearTimeout", () => {});
+    try {
+      const p = scenes();
+      const chart = p.transformChart!(twinkle, params("bot=perfect"));
+      const presses = botPresses(chart, "perfect");
+      const zero = 1000; // /play's chart zero, in performance.now() time
+      const got: { timeMs: number; at: number }[] = [];
+      await p.wrapInput!({ kind: "keys", start() {}, stop() {} }).start((e) => void (e.type === "on" && got.push({ timeMs: e.timeMs, at: perf })));
+      for (let t = 0; t < zero + presses.at(-1)!.timeMs + 500; t += 100) {
+        perf = t; // a frame every 100 ms: first the callbacks queued in the last one
+        raf.splice(0).forEach((cb) => cb());
+        const nowMs = t + 0.5 - zero; // then /play reads its clock
+        perf = t + 40; // and draws the highway and the plugins before this one
+        p.draw!({} as CanvasRenderingContext2D, { nowMs } as Frame);
+      }
+      expect(got.length).toBe(presses.length);
+      got.forEach((g, i) => {
+        expect(Math.abs(g.timeMs - zero - presses[i].timeMs)).toBeLessThan(1); // judged at its time, not 40 ms late
+        expect(g.at - zero - presses[i].timeMs).toBeLessThanOrEqual(100); // sent by the next frame, before its sweep
+      });
+    } finally {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    }
   });
 
   it("?bot=fever lengthens a short chart", () => {

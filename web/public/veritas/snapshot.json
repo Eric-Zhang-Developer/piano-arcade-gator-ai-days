@@ -1,39 +1,19 @@
 {
-  "frozenAt": "2026-10-24T23:39:11.421Z",
+  "frozenAt": "2026-10-25T10:14:55.537Z",
   "run": {
-    "id": 40142731333,
-    "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/actions/runs/40142731333",
-    "sha": "8337a3ba476f3453d721d40ee325a983ea76267c",
-    "createdAt": "2026-10-24T23:26:15Z",
+    "id": 40183729648,
+    "url": "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/actions/runs/40183729648",
+    "sha": "22b15eb1dfadde274eadb58c5c2e9393f36decf7",
+    "createdAt": "2026-10-25T10:11:14Z",
     "conclusion": "success"
   },
   "jobs": [
-    {
-      "name": "plan",
-      "conclusion": "success"
-    },
     {
       "name": "ci",
       "conclusion": "success"
     },
     {
-      "name": "browser (4)",
-      "conclusion": "success"
-    },
-    {
-      "name": "browser (3)",
-      "conclusion": "success"
-    },
-    {
-      "name": "browser (7)",
-      "conclusion": "success"
-    },
-    {
-      "name": "browser (8)",
-      "conclusion": "success"
-    },
-    {
-      "name": "browser (5)",
+      "name": "plan",
       "conclusion": "success"
     },
     {
@@ -41,29 +21,1025 @@
       "conclusion": "success"
     },
     {
-      "name": "browser (2)",
-      "conclusion": "success"
-    },
-    {
-      "name": "browser (6)",
-      "conclusion": "success"
-    },
-    {
       "name": "issues",
       "conclusion": "success"
+    },
+    {
+      "name": "ci-red",
+      "conclusion": "skipped"
     }
   ],
   "unit": {
-    "source": "log",
+    "source": "artifact",
     "totals": {
-      "files": 96,
-      "tests": 765,
-      "passed": 764,
+      "files": 141,
+      "tests": 1380,
+      "passed": 1377,
       "failed": 0,
-      "skipped": 1
+      "skipped": 3
     },
-    "suites": null
+    "suites": [
+      {
+        "path": "web/e2e/run-checks.test.mjs",
+        "tests": 25,
+        "passed": 25,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/app/api/forge/check.test.ts",
+        "tests": 1,
+        "passed": 0,
+        "failed": 0,
+        "skipped": 1
+      },
+      {
+        "path": "web/src/app/learn/api/chat/route.test.ts",
+        "tests": 14,
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/app/learn/api/chat/tutor.test.ts",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/contracts/contracts.test.ts",
+        "tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/data/account.test.ts",
+        "tests": 10,
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/data/auth.test.ts",
+        "tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/data/merge.test.ts",
+        "tests": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/data/profile-stats.test.ts",
+        "tests": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/data/take-store.test.ts",
+        "tests": 23,
+        "passed": 23,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/adaptive-chunks/adaptive-chunks.test.ts",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/audio-track/audio-track.test.ts",
+        "tests": 9,
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/bar-lines/bar-lines.test.ts",
+        "tests": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/bar-loop/bar-loop.test.ts",
+        "tests": 16,
+        "passed": 16,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/beat/beat.test.ts",
+        "tests": 15,
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/black-key-lanes/black-key-lanes.test.ts",
+        "tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/build-stamp/build-stamp.test.ts",
+        "tests": 3,
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/cabinet/cabinet.test.ts",
+        "tests": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/cabinet/idle.test.ts",
+        "tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/calibration/calibration.test.ts",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/capture-mode/capture-mode.test.ts",
+        "tests": 3,
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/chord-sync/chords.test.ts",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/chunk-practice/chunk-practice.test.ts",
+        "tests": 10,
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/clear-card/clear-card.test.ts",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/core/highway.test.ts",
+        "tests": 22,
+        "passed": 22,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/core/input.test.ts",
+        "tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/core/judge.test.ts",
+        "tests": 20,
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/crash-guard/crash-guard.test.ts",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/demo-reset/demo-reset.test.ts",
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/difficulty/difficulty.test.ts",
+        "tests": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/difficulty/warning.test.ts",
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/duo-hud/duo-hud.test.ts",
+        "tests": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/duo-results/scores.test.ts",
+        "tests": 15,
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/duo-select/next-for.test.ts",
+        "tests": 3,
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/duo-select/roll.test.ts",
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/duo-start/start.test.tsx",
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/duo-tokens/duo-tokens.test.tsx",
+        "tests": 9,
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/dynamics/dynamics.test.ts",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/easy-charts/easy-charts.test.ts",
+        "tests": 27,
+        "passed": 27,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/evenness/evenness.test.ts",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/fever-gauge/gauge.test.ts",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/fever-moment/fever-moment.test.ts",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/first-run/first-run.test.ts",
+        "tests": 9,
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/flow-mode/flow-mode.test.ts",
+        "tests": 18,
+        "passed": 18,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/flow-mode/replay.test.ts",
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/ghost/ghost.test.ts",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/hand-colors/hand-colors.test.ts",
+        "tests": 3,
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/hand-mode/hands.test.ts",
+        "tests": 9,
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/help-overlay/help-overlay.test.ts",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/highway-zoom/highway-zoom.test.ts",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/hit-line/hit-line.test.ts",
+        "tests": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/hit-particles/pool.test.ts",
+        "tests": 8,
+        "passed": 8,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/hud/hud.test.ts",
+        "tests": 28,
+        "passed": 28,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/juice/juice.test.ts",
+        "tests": 3,
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/juice/particles.test.ts",
+        "tests": 3,
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/key-preview/key-preview.test.ts",
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/key-skin/key-skin.test.ts",
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/lab/lab.test.ts",
+        "tests": 34,
+        "passed": 34,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/laptop-octaves/laptop-octaves.test.ts",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/laptop-sound/laptop-sound.test.ts",
+        "tests": 16,
+        "passed": 16,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/leds/leds.test.ts",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/midi-watchdog/watchdog.test.ts",
+        "tests": 11,
+        "passed": 11,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/nav-bar/nav-bar.test.ts",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/note-labels/labels.test.ts",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/note-pills/note-pills.test.ts",
+        "tests": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/notice-toast/notice-toast.test.ts",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/options-panel/options-panel.test.tsx",
+        "tests": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/pause-skin/pause-skin.test.ts",
+        "tests": 3,
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/pedal/pedal.test.ts",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/perf-budget/perf-budget.test.ts",
+        "tests": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/phone-guard/phone-guard.test.ts",
+        "tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/piano-out/piano-out.test.ts",
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/piano-voice/piano-voice.test.ts",
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/play-modes/play-modes.test.ts",
+        "tests": 12,
+        "passed": 12,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/play-slots/play-slots.test.ts",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/rank-stamp/rank-stamp.test.ts",
+        "tests": 3,
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/record-moment/record-moment.test.ts",
+        "tests": 3,
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/records/records.test.ts",
+        "tests": 13,
+        "passed": 13,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/replay-view/replay-view.test.ts",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/restyle/restyle.test.ts",
+        "tests": 9,
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/results-layout/results-layout.test.tsx",
+        "tests": 13,
+        "passed": 13,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/results-tally/results-tally.test.tsx",
+        "tests": 3,
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/scenes/scenes.test.ts",
+        "tests": 36,
+        "passed": 36,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/score-card/score-card.test.ts",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/score-follow/follow.test.ts",
+        "tests": 11,
+        "passed": 10,
+        "failed": 0,
+        "skipped": 1
+      },
+      {
+        "path": "web/src/game/select-layout/go-to-stage.test.ts",
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/sheet-beams/sheet-beams.test.ts",
+        "tests": 9,
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/sheet-review/sheet-review.test.ts",
+        "tests": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/sheet-view/paper-colors.test.ts",
+        "tests": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/sheet-view/plugin.test.ts",
+        "tests": 3,
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/sheet-xml/sheet-xml.test.ts",
+        "tests": 118,
+        "passed": 118,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/sim/sim.test.ts",
+        "tests": 11,
+        "passed": 11,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/simon/simon.test.ts",
+        "tests": 10,
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/song-card/song-card.test.tsx",
+        "tests": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/song-jacket/song-jacket.test.ts",
+        "tests": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/song-options/song-options.test.tsx",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/song-preview/song-preview.test.tsx",
+        "tests": 9,
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/song-select/load.test.ts",
+        "tests": 3,
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/song-sources/song-sources.test.tsx",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/songs/library.test.ts",
+        "tests": 28,
+        "passed": 27,
+        "failed": 0,
+        "skipped": 1
+      },
+      {
+        "path": "web/src/game/songs/minuet-g.test.ts",
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/sound/sound.test.ts",
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/stage-card/stage-card.test.tsx",
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/stage/stage.test.ts",
+        "tests": 12,
+        "passed": 12,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/take-graph/graph.test.ts",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/take-midi/take-midi.test.ts",
+        "tests": 13,
+        "passed": 13,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/tempo-curve/tempo-curve.test.ts",
+        "tests": 8,
+        "passed": 8,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/timing/timing.test.ts",
+        "tests": 10,
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/ui-sounds/ui-sounds.test.ts",
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/ui-tokens/ui-tokens.test.ts",
+        "tests": 30,
+        "passed": 30,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/versus/versus.test.ts",
+        "tests": 9,
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/wait-hint/wait-hint.test.ts",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/wait-hud/wait-hud.test.ts",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/wait-mode/wait-mode.test.ts",
+        "tests": 9,
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/watch-demo/watch-demo.test.ts",
+        "tests": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/weak-bars/weak-bars.test.tsx",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/game/wrong-note/wrong-note.test.ts",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/brand-preview/directions.test.ts",
+        "tests": 1,
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/duo/duo.test.tsx",
+        "tests": 12,
+        "passed": 12,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/graph/graph.test.ts",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/graph/guided-motion.test.ts",
+        "tests": 1,
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/graph/mastery-distributions.test.ts",
+        "tests": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/graph/prepared.test.ts",
+        "tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/lesson.test.ts",
+        "tests": 3,
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/mastery/curriculum/audit.test.ts",
+        "tests": 13,
+        "passed": 13,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/mastery/engine/replay.test.ts",
+        "tests": 16,
+        "passed": 16,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/mastery/engine/store.test.ts",
+        "tests": 9,
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/mastery/piano/capture.test.ts",
+        "tests": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/mastery/piano/score.test.ts",
+        "tests": 12,
+        "passed": 12,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/playing/model.test.ts",
+        "tests": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/playing/Score.test.tsx",
+        "tests": 1,
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/retrieval/retrieval.test.tsx",
+        "tests": 13,
+        "passed": 13,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/theory/chat.test.ts",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/theory/content.test.ts",
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/theory/model.test.ts",
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/learn/frontend/theory/progress.test.ts",
+        "tests": 11,
+        "passed": 11,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/operator/board.test.ts",
+        "tests": 17,
+        "passed": 17,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/operator/collect.test.ts",
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/replay/replay.test.ts",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/veritas/freeze.test.mjs",
+        "tests": 7,
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "web/src/veritas/players.test.ts",
+        "tests": 128,
+        "passed": 128,
+        "failed": 0,
+        "skipped": 0
+      }
+    ]
   },
-  "browser": null,
-  "shots": null
+  "browser": [
+    {
+      "check": "web/e2e/verify.mjs",
+      "result": "pass",
+      "seconds": 73,
+      "knownRed": null
+    }
+  ],
+  "shots": [
+    {
+      "check": "web/e2e/verify.mjs",
+      "src": "/veritas/shots/web_e2e_verify.png"
+    }
+  ]
 }

@@ -172,6 +172,9 @@ ship = ""
 features = [
   "golden-demo", # Eric, 2026-10-25 (#807): Golden's DGX autoplay sounds like a performance; his priority now
   "key-polish", # Eric, 2026-10-25 (#848): the keyboard and falling notes polished to hit-particles' level; a priority
+  "stage-view", # Eric, 2026-10-25 (#875): a NOSTALGIA-style audience highway on a second display, mirroring the live take
+  "milestone-sfx", # Eric, 2026-10-25 (#877): Chunithm-level sound on milestones only, never per hit
+  "experiments", # Eric, 2026-10-25 (#878): many variations on main, off by default, reviewed from a Lab gallery, pruned later
   "duo-details", # Eric, 2026-10-25 (#833): the results screen's Details grid in the Duo look, settings in Options
   "play-modes", # Eric, 2026-10-25 (#835): Learn, Flow and Perform as a ladder; practice keeps your mode (#832)
   "demo-performance", # Eric, 2026-10-25 (#814): sustain, dynamics and legato for every demo, five songs a batch

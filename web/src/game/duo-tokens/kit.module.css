@@ -1,0 +1,11 @@
+/* The Duo kit's states inline styles can't express (Kit.tsx). */
+.button:focus-visible {
+  outline: 2px solid var(--pa-ink);
+  outline-offset: 2px;
+}
+.primary:hover {
+  filter: brightness(1.12);
+}
+.secondary:hover {
+  background: rgba(125, 132, 150, 0.12);
+}

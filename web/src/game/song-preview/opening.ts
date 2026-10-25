@@ -1,11 +1,12 @@
-// Song preview's opening: the chart's first two bars, and the players that sound them (spec: song-preview).
+// Song preview's opening: the chart's first 5 s, and the players that sound them (spec: song-preview).
 import type { Chart } from "../../contracts";
 import { msPerBeat } from "../core/settings";
 
 export const previewSettings = {
   delayMs: 400, // a row must stay highlighted this long before its preview starts
-  bars: 2,
-  maxMs: 8000,
+  lengthMs: 5000, // every song's preview, from its first note (Eric: "maybe 5 seconds")
+  lookaheadMs: 60, // the piano gets each note this far ahead, never the whole opening (see playOnPiano)
+  tickMs: 20,
   velocity: 80, // when the chart has none
   toneVolume: 0.08, // laptop tones, 0–1: quiet
 };
@@ -17,17 +18,17 @@ export interface PreviewNote {
   velocity: number;
 }
 
-// The notes that start in bars 1–2, at the chart's own tempo, cut at 8 s. Time starts at the first note, so a chart
-// that opens on rests doesn't preview as silence (specs/decisions/song-preview-start.md).
+// The notes that start in the first 5 s, at the chart's own tempo, held notes cut at 5 s. Time starts at the first
+// note, so a chart that opens on rests doesn't preview as silence (specs/decisions/song-preview-start.md).
 export function opening(chart: Chart): PreviewNote[] {
+  if (!chart.notes.length) return [];
+  const { lengthMs, velocity } = previewSettings;
   const mpb = msPerBeat(chart.bpm);
-  const inBars = chart.notes.filter((n) => n.beat < previewSettings.bars * chart.beatsPerBar);
-  if (!inBars.length) return [];
-  const zero = Math.min(...inBars.map((n) => n.beat)) * mpb;
-  return inBars
-    .map((n) => ({ pitch: n.pitch, startMs: n.beat * mpb - zero, durMs: n.duration * mpb, velocity: n.velocity ?? previewSettings.velocity }))
-    .filter((n) => n.startMs < previewSettings.maxMs)
-    .map((n) => ({ ...n, durMs: Math.min(n.durMs, previewSettings.maxMs - n.startMs) }))
+  const zero = Math.min(...chart.notes.map((n) => n.beat)) * mpb;
+  return chart.notes
+    .map((n) => ({ pitch: n.pitch, startMs: n.beat * mpb - zero, durMs: n.duration * mpb, velocity: n.velocity ?? velocity }))
+    .filter((n) => n.startMs < lengthMs)
+    .map((n) => ({ ...n, durMs: Math.min(n.durMs, lengthMs - n.startMs) }))
     .sort((a, b) => a.startMs - b.startMs);
 }
 
@@ -39,16 +40,35 @@ export const openingMs = (notes: PreviewNote[]) => Math.max(0, ...notes.map((n) 
 
 type Out = Pick<MIDIOutput, "send"> & { clear?(): void };
 
-// On the piano, channel 1, queued with timestamps. stop() drops the queue (where Chrome has clear()) and sends All
-// Notes Off, so nothing hangs.
-export function playOnPiano(out: Out, notes: PreviewNote[], at = performance.now()): () => void {
-  for (const n of notes) {
-    out.send([0x90, n.pitch, n.velocity], at + n.startMs);
-    out.send([0x80, n.pitch, 0], at + n.startMs + n.durMs);
-  }
+// On the piano, channel 1. A timestamped message can't be taken back (Chrome has no MIDIOutput.clear()), so a timer
+// hands the output only the notes due within lookaheadMs, never the whole opening: queuing it all at once is why
+// previews kept playing over each other on the DGX. stop() ends the timer, lifts every key it pressed, after its
+// note-on so none sticks, and sends All Notes Off.
+export function playOnPiano(out: Out, notes: PreviewNote[]): () => void {
+  const { lookaheadMs, tickMs } = previewSettings;
+  const at = performance.now();
+  const pressed: { pitch: number; onAt: number }[] = [];
+  let next = 0;
+  const tick = () => {
+    for (; next < notes.length && at + notes[next].startMs <= performance.now() + lookaheadMs; next++) {
+      const n = notes[next];
+      const onAt = at + n.startMs;
+      out.send([0x90, n.pitch, n.velocity], onAt);
+      out.send([0x80, n.pitch, 0], onAt + n.durMs);
+      pressed.push({ pitch: n.pitch, onAt });
+    }
+  };
+  tick();
+  const timer = setInterval(() => {
+    tick();
+    if (next >= notes.length) clearInterval(timer);
+  }, tickMs);
   return () => {
+    clearInterval(timer);
     out.clear?.();
-    out.send([0xb0, 123, 0]);
+    const t = Math.max(performance.now(), ...pressed.map((p) => p.onAt)) + 1;
+    for (const p of pressed) out.send([0x80, p.pitch, 0], t);
+    out.send([0xb0, 123, 0], t);
   };
 }
 

@@ -138,8 +138,8 @@ export function ReplayOverlay({ chart, take, results, onClose }: Props & { onClo
     };
   }, [chart, take, results, sound, onClose]);
 
-  // The caption reads on video (16 px at 1280, 24 at 1920) and carries no key hint: Stop's title does, and the ? card
-  // lists Esc (#1246).
+  // The caption and Stop read on video (16 px at 1280, 24 at 1920). The caption carries no key hint: Stop's title does,
+  // and the ? card lists Esc (#1246).
   return (
     <dialog ref={dialog} data-testid="replay-overlay" aria-labelledby="replay-caption" style={full}>
       <canvas ref={canvas} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
@@ -149,7 +149,7 @@ export function ReplayOverlay({ chart, take, results, onClose }: Props & { onClo
         </MonoLabel>
       </p>
       <span ref={stop} style={{ position: "absolute", top: 12, right: 16 }}>
-        <Button kind="secondary" data-testid="replay-stop" onClick={onClose} title="Stop (Esc)" aria-keyshortcuts="Escape">
+        <Button kind="secondary" data-testid="replay-stop" onClick={onClose} title="Stop (Esc)" aria-keyshortcuts="Escape" style={{ fontSize: "clamp(16px, 1.25vw, 24px)" }}>
           Stop
         </Button>
       </span>

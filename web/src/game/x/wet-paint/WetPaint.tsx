@@ -320,14 +320,14 @@ export function WetPaint() {
       {framed && (
         <div className={styles.gallery} role="dialog" aria-label="Your painting" data-testid="framed">
           <Brackets style={{ maxWidth: "min(84vw, 132vh)" }}>
-            <Panel style={{ padding: "clamp(16px, 2.4vw, 44px)" }}>
+            <Panel paper style={{ padding: "clamp(16px, 2.4vw, 44px)", paddingBottom: 0 }}>
               {/* eslint-disable-next-line @next/next/no-img-element -- a data URL from the canvas, not an asset */}
               <img src={framed.url} alt={caption(framed)} className={styles.painting} />
+              <p className={styles.caption} data-testid="caption">
+                {caption(framed)}
+              </p>
             </Panel>
           </Brackets>
-          <p className={styles.caption} data-testid="caption">
-            {caption(framed)}
-          </p>
           <div className={styles.actions}>
             <Button onClick={save} data-testid="save-png">
               Save PNG
@@ -355,13 +355,13 @@ async function savePng(f: Framed) {
   const ctx = c.getContext("2d")!;
   const css = getComputedStyle(document.documentElement);
   const v = (name: string, fallback: string) => css.getPropertyValue(name).trim() || fallback;
-  ctx.fillStyle = v("--pa-panel", "#11131a");
+  ctx.fillStyle = v("--pa-paper", "#f2ede3"); // the same paper mat the page hangs it in
   ctx.fillRect(0, 0, c.width, c.height);
   ctx.drawImage(img, mat, mat);
-  ctx.strokeStyle = v("--pa-line", "#2a2f3a");
+  ctx.strokeStyle = "rgba(22, 19, 15, 0.35)";
   ctx.lineWidth = 1;
   ctx.strokeRect(mat - 0.5, mat - 0.5, img.width + 1, img.height + 1);
-  ctx.fillStyle = v("--pa-ink-dim", "#8b93a5");
+  ctx.fillStyle = v("--pa-paper-ink", "#16130f");
   ctx.font = canvasFonts.data(Math.round(foot * 0.32));
   ctx.textBaseline = "middle";
   ctx.fillText(caption(f).toUpperCase(), mat, mat * 2 + img.height + foot * 0.25);

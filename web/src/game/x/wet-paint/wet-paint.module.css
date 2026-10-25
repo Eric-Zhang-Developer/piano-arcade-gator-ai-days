@@ -177,27 +177,31 @@
   z-index: 1;
 }
 
-/* Framed: the wall dims, the painting hangs in its mat, the caption under it like a gallery label. */
+/* Framed: the wall goes dark, the painting hangs in a paper mat, the caption printed on the mat's foot like a
+   gallery label (the saved PNG draws the same). */
 .gallery {
   position: absolute;
   inset: 4vh 0 0;
+  z-index: 2; /* over the black keys */
   display: grid;
   place-content: center;
   justify-items: center;
   gap: clamp(14px, 2vh, 28px);
-  background: color-mix(in srgb, var(--pa-bg) 94%, transparent);
+  background: var(--pa-bg); /* the keys and the live wall go: only the painting hangs */
   animation: hang 420ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 .painting {
   display: block;
   max-width: 100%;
-  max-height: 62vh;
+  max-height: 58vh;
+  outline: 1px solid rgb(22 19 15 / 0.35); /* the mat's cut edge */
 }
 
 .caption {
   margin: 0;
-  color: var(--pa-ink-dim);
+  padding: clamp(10px, 1.4vh, 20px) 0;
+  color: var(--pa-paper-ink);
   font-family: var(--pa-font-data), ui-monospace, monospace;
   font-size: clamp(14px, 1.1vw, 22px);
   letter-spacing: 0.14em;

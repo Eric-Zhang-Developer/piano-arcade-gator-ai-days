@@ -15,11 +15,10 @@ import { Judge, noteTimeMs } from "../../game/core/judge";
 import { keysDevice, midiDevice, testDevice } from "../../game/core/input";
 import { laptopKey } from "../../game/laptop-sound";
 import { describeTiming, timingSummary, type TimingSummary } from "../../game/timing";
-import { SfxControls } from "../../game/sound/SfxControls";
 import { nextPause, pauseClock, type PauseAction, type PauseMode } from "../../game/play-slots";
 import { StartScreen } from "../../game/duo-start/StartScreen";
 import { PauseMenu } from "../../game/pause-skin";
-import { Button } from "../../game/duo-tokens";
+import { Button, MonoLabel, Panel, kitButton } from "../../game/duo-tokens";
 import { ResultsLayout } from "../../game/results-layout";
 import { emptyHud, reduceHud } from "../../game/hud";
 import { barStep, holdClock, isWaitMode } from "../../game/wait-mode";
@@ -27,8 +26,6 @@ import { isFlowMode } from "../../game/flow-mode/clock";
 import { FlowJudge } from "../../game/flow-mode/judge";
 import {
   GOOD_MS,
-  LATENCY_MAX,
-  LATENCY_MIN,
   loadLatencyOffset,
   msPerBeat,
   saveLatencyOffset,
@@ -421,27 +418,6 @@ export default function Play() {
     saveLatencyOffset(v);
   };
 
-  // Latency, sound and MIDI status on the error screen; the start and results screens have them in their Options
-  // drawers (duo-start, duo-details). Setup, not the game: ?capture=1 hides each of them (capture-mode); the SfxControls
-  // wrapper has no box, so nothing moves without it.
-  const controls = (
-    <>
-      <label data-capture-hide style={{ marginTop: 24, display: "flex", gap: 8, alignItems: "center" }}>
-        Latency offset
-        <input type="range" min={LATENCY_MIN} max={LATENCY_MAX} step={1} value={latency} onChange={(e) => onLatency(Number(e.target.value))} />
-        <output style={{ width: 64 }}>{latency} ms</output>
-      </label>
-      <div data-capture-hide style={{ display: "contents" }}>
-        <SfxControls />
-      </div>
-      {!isTest && (
-        <p data-capture-hide style={{ opacity: 0.6, fontSize: 14 }}>
-          {midiStatus}
-        </p>
-      )}
-    </>
-  );
-
   return (
     <main style={{ position: "fixed", inset: 0, overflow: "hidden" }}>
       <div ref={backgroundRef} style={canvasStyle} />
@@ -481,14 +457,17 @@ export default function Play() {
       )}
       {phase !== "playing" && (
         <div style={overlay}>
-          {phase === "loading" && <p>Loading chart…</p>}
+          {/* Loading and a bad song link in the Duo kit; settings live in the Options drawers, not here (#889, #890). */}
+          {phase === "loading" && <MonoLabel style={{ margin: "auto", fontSize: "clamp(13px, 1vw, 18px)" }}>Loading chart…</MonoLabel>}
           {phase === "error" && (
-            <>
-              <p role="alert">{error}</p>
-              <Link href="/" style={{ color: settings.noteColor }}>
-                Back to the song list
+            <Panel style={{ margin: "auto", padding: "clamp(20px, 2.4vw, 44px)", display: "flex", flexDirection: "column", gap: "2.4vh", alignItems: "flex-start", maxWidth: "min(640px, 90vw)" }}>
+              <p role="alert" style={stateTitle}>
+                {error}
+              </p>
+              <Link href="/" {...kitButton("primary")}>
+                Songs
               </Link>
-            </>
+            </Panel>
           )}
           {phase === "ready" && loaded && (
             <StartScreen
@@ -514,9 +493,6 @@ export default function Play() {
               status={!isTest && <p data-capture-hide>{midiStatus}</p>}
             />
           )}
-          {/* the start and results screens have them in their Options drawers. Not while loading: the slider would show useState's 0 before
-              the stored offset is read (#447, #478) */}
-          {phase === "error" && controls}
         </div>
       )}
     </main>
@@ -551,6 +527,17 @@ function TimingPanel({ timing, latency, onLatency }: { timing: TimingSummary; la
 }
 
 const canvasStyle: React.CSSProperties = { position: "absolute", inset: 0, width: "100%", height: "100%" };
+// The error screen's line, in the kit's display type (upright, condensed).
+const stateTitle: React.CSSProperties = {
+  margin: 0,
+  fontFamily: "var(--pa-font-display), system-ui, sans-serif",
+  fontStretch: "75%",
+  fontWeight: 700,
+  fontSize: "clamp(24px, 2.4vw, 44px)",
+  lineHeight: 1.1,
+  color: "var(--pa-ink)",
+};
+
 const overlay: React.CSSProperties = {
   position: "absolute",
   inset: 0,
@@ -562,11 +549,9 @@ const overlay: React.CSSProperties = {
   background: "rgba(0,0,0,0.75)",
 };
 
-// The play corner (mouse-first): small square kit buttons in the HUD's top-right status gutter (hudSettings.statusGutterPx,
-// 120 px), under beat-track's status line at y = 20 and inside the band, so they cover neither the HUD nor the lanes.
-// Mouse-first's only way to pause or rewind with a mouse: sized with the window (about 45 px at 1080p), and under the
-// HUD band (hudLayout's clamp(44, 11% of the judgment line, 84) px, about 8.4vh), clear of its badge and the beat
-// track's status line (#888).
+// The play corner (mouse-first): square kit buttons, the only way to pause or rewind with a mouse. Sized with the
+// window (about 45 px at 1080p) and under the HUD band (hudLayout's clamp(44, 11% of the judgment line, 84) px, about
+// 8.4vh), clear of its badge and the beat track's status line (#888).
 const corner: React.CSSProperties = { position: "fixed", top: "calc(clamp(44px, 8.4vh, 84px) + 8px)", right: 12, display: "flex", gap: 6, zIndex: 5 };
 const cornerButton: React.CSSProperties = {
   width: "clamp(36px, 4.2vh, 56px)",

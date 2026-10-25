@@ -52,9 +52,9 @@ export function FocusPanel(p: FocusPanelProps) {
             </span>
           </MonoLabel>
           <Panel style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", marginTop: "2.2vh", flex: "none" }}>
-            <DataCell label="LV" value={<span data-testid="cell-lv">{lv(p.level)}</span>} style={{ ...cell, borderLeft: "none" }} />
-            <DataCell label="NOTES" value={<span data-testid="cell-notes">{p.notes}</span>} style={cell} />
-            <DataCell label="BEST" value={<span data-testid="cell-best">{p.best ? `${(p.best.accuracy * 100).toFixed(1)}%` : "—"}</span>} style={cell} />
+            <DataCell label={<span className={styles.cellLabel}>LV</span>} value={<span data-testid="cell-lv">{lv(p.level)}</span>} style={{ ...cell, borderLeft: "none" }} />
+            <DataCell label={<span className={styles.cellLabel}>NOTES</span>} value={<span data-testid="cell-notes">{p.notes}</span>} style={cell} />
+            <DataCell label={<span className={styles.cellLabel}>BEST</span>} value={<span data-testid="cell-best">{p.best ? `${(p.best.accuracy * 100).toFixed(1)}%` : "—"}</span>} style={cell} />
           </Panel>
           <LadderMark song={p.id} />
           {next && (

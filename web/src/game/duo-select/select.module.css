@@ -196,3 +196,8 @@
     animation: none;
   }
 }
+
+/* The focused song's stat labels scale with the panel: 16 px at 1280, 24 px at 1920 (#1033, visual-direction.md). */
+.cellLabel {
+  font-size: clamp(16px, 1.25vw, 24px);
+}

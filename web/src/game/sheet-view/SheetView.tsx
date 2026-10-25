@@ -91,6 +91,7 @@ export function SheetView() {
   const [state, setState] = useState<State>({ phase: "loading" });
   const [zoom, setZoom] = useState(1);
   const [rendered, setRendered] = useState(false);
+  const [bars, setBars] = useState(0); // the engraved score's, for its accessible name
   const scoreRef = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLElement>(null);
   const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
@@ -209,6 +210,7 @@ export function SheetView() {
       if (!live) return;
       osmd.Zoom = loadZoom();
       osmd.render();
+      setBars(osmd.Sheet.SourceMeasures.length);
       osmdRef.current = osmd;
       shownRef.current = chart;
       attach(osmd, chart);
@@ -321,7 +323,8 @@ export function SheetView() {
       </header>
       <div className={styles.score}>
         <Panel paper style={{ padding: "1.5rem clamp(0.75rem, 2vw, 1.5rem)" }}>
-          <div ref={scoreRef} />
+          {/* OSMD rebuilds its <svg> on every render, so the name sits on the host: a screen reader hears one image (#954). */}
+          <div ref={scoreRef} role="img" aria-label={chart && bars ? `${chart.title}: the score, ${bars} bars` : "The score"} />
         </Panel>
       </div>
     </main>

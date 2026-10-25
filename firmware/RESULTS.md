@@ -6,13 +6,15 @@ Evidence for `led-strip`, filled in as `TEST-PLAN.md` runs. Empty cells are not 
 
 | | |
 |---|---|
-| Date | 2026-10-24 (board only); strips: not yet |
+| Date | 2026-10-24 (board only); 2026-10-25 (strip 1 on the DGX-660) |
 | Board | AITRIP ESP-WROOM-32, 30-pin, USB-C, CP2102 USB-serial |
 | Port (macOS) | `/dev/cu.usbserial-0001`; no driver install needed |
 | Firmware | `led-strip` at `c723641` |
 | Toolchain | arduino-cli from Arduino IDE 2, esp32 core 2.0.17, FastLED 3.9.4, board `esp32:esp32:esp32` (ESP32 Dev Module) |
-| Strips | 2× BTF-LIGHTING WS2812B 144/m, 1 m, white PCB, IP30: not connected yet |
-| PSU | BTF-LIGHTING 5 V 6 A, 5.5×2.1 mm barrel: not connected yet |
+| Strips | 2× BTF-LIGHTING WS2812B 144/m, 1 m, IP30 (label `HD-5V-WS2812E-144L`). Strip 1 connected; strip 2 not yet |
+| PSU | BTF-LIGHTING 5 V 6 A, 5.5×2.1 mm barrel, into BTF's barrel-to-screw-terminal adapter |
+| Wiring (strip 1) | BTF pigtail clicked into the strip's input plug (`V+ D G`). Pigtail's loose red → adapter +, loose white → adapter −. Pigtail's other plug: D (green) → ESP32 D18, G (white) → ESP32 GND, V+ (red) empty. ESP32 powered by USB only. No series resistor, no capacitor, no level shifter |
+| ESP32 on the breadboard | DevKit V1 is too wide for the half-size breadboard: with both pin rows in, no hole is free beside any pin. Only the D18/GND row goes in (outer column), the other row hangs off the edge |
 
 ## 1. Flash and first light
 
@@ -20,8 +22,8 @@ Evidence for `led-strip`, filled in as `TEST-PLAN.md` runs. Empty cells are not 
 |---|---|
 | Compile | Pass: 297,081 bytes flash (22%), 26,224 bytes RAM (8%) |
 | Upload | Pass, first try, no BOOT button needed |
-| Boot test (A0 red, C8 blue for 1 s) | |
-| Color order is GRB | |
+| Boot test (A0 red, C8 blue for 1 s) | A0 red: pass (Sharan, by eye, after EN reset). C8 blue: not visible, it falls on strip 2 |
+| Color order is GRB | Pass: raw LEDs 0, 1, 2 sent red, green, blue showed red, green, blue (Sharan) |
 
 ## 2. Board-only protocol checks (no strip connected)
 
@@ -45,9 +47,16 @@ Notes:
 
 | Check | Result |
 |---|---|
-| Connect LED board → "ready" | |
+| Connect LED board → "ready" | Pass (Chrome, 2026-10-25) |
+| Piano connected, keys light the strip | Pass: keys played on the DGX-660 light the strip (Sharan). Not yet calibrated, so on-key placement is unchecked |
+| Guide hint shows | Pass: the next key's hint breathes blue near middle C (Sharan) |
 | Raw LED 0 and last both green | |
 | All keys dim white, no tint | |
+
+Notes:
+- Two Chrome tabs can't share the board: a second tab's connect fails with `Failed to open serial port` until the
+  first tab closes. The app's built-in browser pane lists no serial ports at all; use desktop Chrome.
+- Bumping the breadboard pulled the ESP32's USB-C cable out once; the strip went dark until it was back in.
 
 ## 3. Calibrate on the piano
 

@@ -51,8 +51,9 @@ editing `/play`), then `scenes` (fever, full combo and every rank on demand, for
 `fever-gauge` (fever on every song). Then the results panels that grade what competitors don't: `dynamics` and
 `evenness` (with `timing-feedback`: timing direction, evenness and dynamics, `mission.md`), `take-graph`,
 `weak-bars` and `records` (best grades and a local top 5; no online leaderboard). After those: `difficulty`,
-`hand-colors`, `note-labels`, `calibration` and `hand-mode`. `main` freezes Sun Oct 25 5:00 PM ET; whatever hasn't
-landed by then lands after the awards.
+`hand-colors`, `note-labels`, `calibration` and `hand-mode`. From Sun Oct 25 4:00 PM ET only fixes, reverts and
+docs merge, and from 5:00 PM ET (the Devpost submission) nothing merges (`specs/milestones.toml`, #744); whatever
+hasn't landed by then lands after the awards.
 
 ## Encore
 Milestone **encore**, after `showcase`: the rest of the overnight batch, by dependency and by what the stage demo

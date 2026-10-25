@@ -109,6 +109,38 @@ export interface NoteState {
 
 const WHITE = "255,255,255";
 
+// Per frame, every note used to build three or four gradients and its color strings. Both are cached instead: the
+// gradients by size, built from 0 and drawn under a translate; the colors by hand (perf runs in the PR).
+const gradients = new WeakMap<CanvasRenderingContext2D, Map<string, CanvasGradient>>();
+function gradient(ctx: CanvasRenderingContext2D, key: string, x1: number, y1: number, stops: [number, string][]): CanvasGradient {
+  let byKey = gradients.get(ctx);
+  if (!byKey) gradients.set(ctx, (byKey = new Map()));
+  let g = byKey.get(key);
+  if (!g) {
+    g = ctx.createLinearGradient(0, 0, x1, y1);
+    for (const [at, color] of stops) g.addColorStop(at, color);
+    byKey.set(key, g);
+  }
+  return g;
+}
+const palettes = new Map<string, { body: string; black: string; rim: string; heat: string; heat0: string; burn: string }>();
+function palette(hand: string) {
+  let p = palettes.get(hand);
+  if (!p) {
+    const heat = mix(rgb(hand), [255, 255, 255], 0.6);
+    p = {
+      body: css(bodyColor(hand, false)),
+      black: css(bodyColor(hand, true)),
+      rim: css(rimColor(hand)),
+      heat: css(heat, 0.9),
+      heat0: css(heat, 0),
+      burn: css(mix(rgb(hand), [255, 255, 255], 0.9)),
+    };
+    palettes.set(hand, p);
+  }
+  return p;
+}
+
 export function drawNote(ctx: CanvasRenderingContext2D, L: Projection & { judgmentLineY: number }, pill: Pill, s: NoteState, nowMs: number, cache: SpriteCache): void {
   const x0 = pill.x;
   const x1 = pill.x + pill.width;
@@ -148,9 +180,9 @@ export function drawNote(ctx: CanvasRenderingContext2D, L: Projection & { judgme
     path();
     ctx.fill();
   }
-  const body = bodyColor(s.hand, s.isBlack);
+  const colors = palette(s.hand);
   ctx.globalAlpha = b;
-  ctx.fillStyle = css(body);
+  ctx.fillStyle = s.isBlack ? colors.black : colors.body;
   path();
   ctx.fill();
 
@@ -161,20 +193,27 @@ export function drawNote(ctx: CanvasRenderingContext2D, L: Projection & { judgme
   const cx1 = L.project(x1, bottom);
   const left = Math.min(cx0, L.project(x0, top)) - 1; // the clip's bounding box, for the full-width layers
   const span = Math.max(cx1, L.project(x1, top)) + 1 - left;
-  const core = ctx.createLinearGradient(cx0, 0, cx1, 0);
-  core.addColorStop(0.5 - m.coreShare / 2, `rgba(${WHITE},0)`);
-  core.addColorStop(0.5, `rgba(${WHITE},${m.coreWhite})`);
-  core.addColorStop(0.5 + m.coreShare / 2, `rgba(${WHITE},0)`);
-  ctx.fillStyle = core;
-  ctx.fillRect(left, top, span, h);
+  const cw = Math.max(1, Math.round(cx1 - cx0));
+  ctx.fillStyle = gradient(ctx, `core ${cw}`, cw, 0, [
+    [0, `rgba(0,0,0,${m.edgeShade})`],
+    [0.5 - m.coreShare / 2, `rgba(${WHITE},0)`],
+    [0.5, `rgba(${WHITE},${m.coreWhite})`],
+    [0.5 + m.coreShare / 2, `rgba(${WHITE},0)`],
+    [1, `rgba(0,0,0,${m.edgeShade})`],
+  ]);
+  ctx.translate(cx0, 0);
+  ctx.fillRect(left - cx0, top, span, h);
+  ctx.translate(-cx0, 0);
 
   // The soft falloff into the trailing end.
-  const fall = Math.min(m.falloffPx, h / 2);
-  const fade = ctx.createLinearGradient(0, top, 0, top + fall);
-  fade.addColorStop(0, `rgba(0,0,0,${m.falloffAlpha})`);
-  fade.addColorStop(1, "rgba(0,0,0,0)");
-  ctx.fillStyle = fade;
-  ctx.fillRect(left, top, span, fall);
+  const fall = Math.max(1, Math.round(Math.min(m.falloffPx, h / 2)));
+  ctx.fillStyle = gradient(ctx, `fall ${fall}`, 0, fall, [
+    [0, `rgba(0,0,0,${m.falloffAlpha})`],
+    [1, "rgba(0,0,0,0)"],
+  ]);
+  ctx.translate(0, top);
+  ctx.fillRect(left, 0, span, fall);
+  ctx.translate(0, -top);
 
   // A long note's energy: faint bands, one spacing per beat, moving toward the line. Off under reduced motion and on
   // dense passages.
@@ -187,11 +226,13 @@ export function drawNote(ctx: CanvasRenderingContext2D, L: Projection & { judgme
   }
 
   // The white-hot head, soft rather than a hard line.
-  const head = ctx.createLinearGradient(0, bottom - s.headPx, 0, bottom);
-  head.addColorStop(0, `rgba(${WHITE},0)`);
-  head.addColorStop(1, `rgba(${WHITE},1)`);
-  ctx.fillStyle = head;
-  ctx.fillRect(left, bottom - s.headPx, span, s.headPx);
+  ctx.fillStyle = gradient(ctx, `head ${s.headPx}`, 0, s.headPx, [
+    [0, `rgba(${WHITE},0)`],
+    [1, `rgba(${WHITE},1)`],
+  ]);
+  ctx.translate(0, bottom - s.headPx);
+  ctx.fillRect(left, 0, span, s.headPx);
+  ctx.translate(0, s.headPx - bottom);
 
   // Ignition: white heat over the whole rod in its last emissionMs.
   const e = s.held ? 0 : emission(s.msToHit, s.reduced);
@@ -203,7 +244,7 @@ export function drawNote(ctx: CanvasRenderingContext2D, L: Projection & { judgme
 
   // The rim, its inner half kept by the clip, never under 3:1 against the field; then the specular top edge.
   ctx.globalAlpha = Math.max(b, rimFloor(s.hand, s.field));
-  ctx.strokeStyle = css(rimColor(s.hand));
+  ctx.strokeStyle = colors.rim;
   ctx.lineWidth = 2;
   path();
   ctx.stroke();
@@ -215,8 +256,17 @@ export function drawNote(ctx: CanvasRenderingContext2D, L: Projection & { judgme
 
   // Held: a burn line at the hit line, white with the hand's color under it, handing off to the key's own light.
   if (s.held) {
-    ctx.fillStyle = css(mix(rgb(s.hand), [255, 255, 255], 0.7));
-    ctx.fillRect(L.project(x0, bottom), bottom - m.burnPx, L.project(x1, bottom) - L.project(x0, bottom), m.burnPx);
+    const bx = L.project(x0, bottom);
+    const bw = L.project(x1, bottom) - bx;
+    ctx.fillStyle = gradient(ctx, `heat ${s.hand}`, 0, m.burnGlowPx, [
+      [0, colors.heat0],
+      [1, colors.heat],
+    ]);
+    ctx.translate(0, bottom - m.burnGlowPx);
+    ctx.fillRect(bx, 0, bw, m.burnGlowPx);
+    ctx.translate(0, m.burnGlowPx - bottom);
+    ctx.fillStyle = colors.burn;
+    ctx.fillRect(bx, bottom - m.burnPx, bw, m.burnPx);
   }
 }
 
@@ -226,12 +276,16 @@ export interface LeadingEnd {
   x1: number;
   y: number; // the leading end
   body: [number, number, number]; // its body color at its approach brightness
+  hand: "L" | "R";
 }
 
 // A faint hairline across the leading ends of each chord, never brighter than its dimmest note (bar-lines' calm rule).
+// Within one hand: a chord across both hands drew a long line over empty field, read as a stray bar line (look round 2).
 export function drawChordHairlines(ctx: CanvasRenderingContext2D, L: Projection, ends: LeadingEnd[], field: string, pixelRatio: number): void {
-  for (const g of chordGroups(ends.map((e) => e.startMs))) {
-    const notes = g.map((i) => ends[i]);
+  for (const hand of ["L", "R"]) {
+    const mine = ends.filter((e) => e.hand === hand);
+    for (const g of chordGroups(mine.map((e) => e.startMs))) {
+    const notes = g.map((i) => mine[i]);
     const dimmest = notes.reduce((a, n) => (n.body.reduce((p, v) => p + v, 0) < a.body.reduce((p, v) => p + v, 0) ? n : a));
     const a = hairlineAlpha(dimmest.body, field);
     if (a <= 0) continue;
@@ -240,5 +294,6 @@ export function drawChordHairlines(ctx: CanvasRenderingContext2D, L: Projection,
     const to = Math.max(...notes.map((n) => L.project(n.x1, y)));
     ctx.fillStyle = `rgba(${WHITE},${a})`;
     ctx.fillRect(from, y - edgePx(pixelRatio), to - from, edgePx(pixelRatio));
+    }
   }
 }

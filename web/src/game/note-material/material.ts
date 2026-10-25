@@ -5,8 +5,9 @@
 export const materialSettings = {
   emissionMs: 300, // the ignition: white heat ramps in over a note's last 300 ms (bloom starts earlier, at glowMs)
   emissionWhite: 0.42, // white over the body at the line, at full emission
-  coreWhite: 0.3, // the emissive core: the body's center mixes this much white, the edges keep the pure hand color
-  coreShare: 0.38, // of the pill's width, the core's bright band
+  coreWhite: 0.16, // the emissive core: the body's center mixes this much white, the edges keep the pure hand color
+  coreShare: 0.7, // of the pill's width, the core's soft band: a glow across the rod, not a stripe
+  edgeShade: 0.18, // black at the rod's two long sides, so it reads round (a cylinder), not flat
   falloffPx: 36, // the trailing end darkens over this many px (or half the note, if shorter)
   falloffAlpha: 0.32, // black at the very trailing edge
   edgeAlpha: 0.3, // the specular top edge: white, one device pixel
@@ -16,7 +17,8 @@ export const materialSettings = {
   textureAlpha: 0.025, // the energy texture on long notes: 2.5% white, inside the spec's 2–3%
   textureBands: 4, // bands per beat; one band spacing scrolls past each beat
   longBeats: 1, // a note this long or longer carries the texture
-  burnPx: 3, // the burn line at the hit line while held
+  burnPx: 4, // the burn line at the hit line while held
+  burnGlowPx: 26, // the heat rising from it into the held note, white-hot at the line
   hairlineShare: 0.6, // the chord hairline's luminance, as a share of the dimmest note's (bar-lines' calm rule)
   lodTexture: 48, // notes on screen past this: no texture
   lodBloom: 96, // past this: no bloom either

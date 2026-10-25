@@ -32,7 +32,7 @@ const recorder = () => {
       k in o
         ? o[k]
         : (...a: unknown[]) => {
-            if (k === "createLinearGradient") return { addColorStop() {} };
+            if (k === "createLinearGradient") return calls.push("createLinearGradient"), { addColorStop() {} };
             const style = k === "stroke" ? o.strokeStyle : o.fillStyle;
             calls.push(`${String(k)} ${String(style)} ${o.globalAlpha} ${a.filter((v) => typeof v === "number").join(",")}`);
           },
@@ -150,9 +150,15 @@ describe("chords", () => {
   it("draws one hairline per chord", () => {
     const { ctx, calls } = recorder();
     const body = mix([0, 0, 0], rgb(handR), 0.5);
-    const end = (startMs: number, x0: number) => ({ startMs, x0, x1: x0 + 20, y: 300, body });
+    const end = (startMs: number, x0: number, hand: "L" | "R" = "R") => ({ startMs, x0, x1: x0 + 20, y: 300, body, hand });
     drawChordHairlines(ctx, L, [end(0, 0), end(0, 40), end(500, 80)], bg, 1);
     expect(calls).toHaveLength(1);
+  });
+  it("joins only one hand's chord, never across both hands", () => {
+    const { ctx, calls } = recorder();
+    const body = mix([0, 0, 0], rgb(handR), 0.5);
+    drawChordHairlines(ctx, L, [{ startMs: 0, x0: 0, x1: 20, y: 300, body, hand: "L" }, { startMs: 0, x0: 300, x1: 320, y: 300, body, hand: "R" }], bg, 1);
+    expect(calls).toHaveLength(0);
   });
 });
 
@@ -172,6 +178,15 @@ describe("the bloom sprites", () => {
     };
     expect(draws(1000)).toBe(0);
     expect(draws(200)).toBe(1);
+  });
+});
+
+describe("per-frame cost", () => {
+  it("builds each gradient once per size, not once per note per frame", () => {
+    const { ctx, calls } = recorder();
+    const cache = surfaces().cache;
+    for (let f = 0; f < 120; f++) drawNote(ctx, L, pill, note({ msToHit: 1000 - f, held: f > 60, bottom: f > 60 ? 600 : 500 }), f * 16, cache);
+    expect(calls.filter((c) => c.startsWith("createLinearGradient")).length).toBeLessThanOrEqual(5);
   });
 });
 

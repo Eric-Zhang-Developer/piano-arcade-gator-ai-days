@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import type { Chart, GamePlugin } from "../../contracts";
 import { experiments, flagged, xFrame, type Experiment } from ".";
-import { ExperimentsGallery, groupsOf } from "./Gallery";
+import { ExperimentsGallery, galleryOrder, groupsOf } from "./Gallery";
 
 const web = new URL("../../../", import.meta.url);
 const chart = { id: "c", title: "C", composer: "-", source: "-", bpm: 120, beatsPerBar: 4, notes: [] } as unknown as Chart;
@@ -108,8 +108,11 @@ describe("the frame (experiments)", () => {
 describe("the gallery (experiments)", () => {
   const links = (html: string) => [...html.matchAll(/<a [^>]*href="([^"]+)"/g)].map((m) => m[1].replace(/&amp;/g, "&"));
 
+  // In the gallery's reading order (lab-gallery: needs-nothing first within a group), each entry exactly once.
   it("renders one link per registry entry", () => {
-    expect(links(renderToStaticMarkup(<ExperimentsGallery />))).toEqual(experiments.map((x) => x.href));
+    const html = renderToStaticMarkup(<ExperimentsGallery />);
+    expect(links(html)).toEqual(galleryOrder(experiments).map((x) => x.href));
+    expect([...links(html)].sort()).toEqual(experiments.map((x) => x.href).sort());
   });
 
   it("groups a long registry in the order groups first appear, one link each", () => {

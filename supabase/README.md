@@ -35,6 +35,18 @@ own session, so it can read that player's rows and nothing else. Auth: anonymous
 | `SUPABASE_SECRET_KEY` | server only | Project Settings > API Keys: `sb_secret_...`. Never in a `NEXT_PUBLIC_` variable. |
 | `SUPABASE_DB_URL` | `supabase/push.sh` only | Connect > Direct > Session pooler URI, with the database password filled in: `postgresql://postgres.umswmcehegvggcfcjdfy:<password>@aws-0-us-east-1.pooler.supabase.com:5432/postgres`. Not the direct `db.<ref>.supabase.co` one: it's IPv6-only and refused on most networks. |
 
+## Deploying (Vercel)
+The Vercel project is Eric's (#792). It needs, once:
+1. **Environment variables** (Production and Preview): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
+   `SUPABASE_SECRET_KEY` (Sensitive). Never `SUPABASE_DB_URL`. Values are shared privately, never in GitHub.
+2. **The repo connected**, Root Directory `web`, so every merge to `main` deploys itself.
+3. **A redeploy without the build cache** after changing the `NEXT_PUBLIC_` values: they're baked in at build time.
+4. **Sign-in on the new address:** Supabase → Authentication → URL Configuration → Redirect URLs gets
+   `https://<site>/auth/callback`; the Google OAuth client gets `https://<site>` as a JavaScript origin.
+
+Check it: `/api/health` shows `main`'s commit; `POST /api/takes` with no login answers **401** (503 means the keys are
+missing); then `node supabase/tests/every-song.mjs https://<site>` and `node supabase/tests/login-e2e.mjs https://<site>`.
+
 ## Test everything (5 minutes)
 With the app running locally (`pnpm -C web dev`), from the repo root:
 1. `node supabase/tests/migrations.mjs`: every migration on a throwaway database, and the safety rules.

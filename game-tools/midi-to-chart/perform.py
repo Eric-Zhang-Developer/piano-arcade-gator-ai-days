@@ -248,7 +248,7 @@ def ly_voice(text, name, unfold=False, marks=(), trace=None):
                     j = len(text[j:]) - len(text[j:].lstrip()) + j
                     j = music(j + 1)
                     state["scale"] /= f
-                elif w in ("grace", "acciaccatura", "appoggiatura", "afterGrace"):
+                elif w in ("grace", "acciaccatura", "appoggiatura", "afterGrace", "slashedGrace"):
                     t, scale = state["t"], state["scale"]
                     state["scale"] = Fraction(0)  # graces take no time
                     j = len(text[j:]) - len(text[j:].lstrip()) + j
@@ -544,6 +544,7 @@ def self_test():
     # The Fantaisie-Impromptu: a staff calls its parts by name, and `pd` stands for \sustainDown.
     ly = "pd = \\sustainDown\npart = \\relative c'' { c4\\p\\pd d-> }\nup = { r1 \\part e4\\f }"
     assert ly_voice(ly, "up")[1] == [(4, "p"), (4, "down"), (5, "accent"), (6, "f")], ly_voice(ly, "up")[1]
+    assert ly_voice(r"v = { c4 \slashedGrace d8 e4-> \slashedGrace{f16[ g]} a4\f }", "v")[1] == [(1, "accent"), (2, "f")]
     assert ly_voice(r"v = { c1 \octaveCheck c e4-> }", "v")[1] == [(4, "accent")]  # Rachmaninoff's: a check, not a note
     assert ly_voice(r"v = { \partial 8 c\( d4-> }", "v")[1] == [(Fraction(1, 2), "accent")]  # its lower's pickup: an eighth
     # Wild Horseman: the dynamics line is written once beside a volta (pickup, 2 bars, 2 alternatives of a bar); unfolded,

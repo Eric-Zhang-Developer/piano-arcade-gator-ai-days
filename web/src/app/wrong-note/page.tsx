@@ -4,7 +4,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Chart } from "../../contracts";
-import { Brackets, Button, MonoLabel, kitButton } from "../../game/duo-tokens";
+import { Brackets, Button, MonoLabel, kitButton, kitChip } from "../../game/duo-tokens";
 import { PIANO_NAME } from "../../game/laptop-sound";
 import { melody } from "../../game/simon";
 import { newSet, roundMessages, score, sendAhead, step, wrongNoteSettings, type WrongNoteEvent, type WrongNoteSet } from "../../game/wrong-note";
@@ -153,7 +153,7 @@ function WrongNote() {
         <h1 className={styles.mark}>Spot the wrong note</h1>
         <nav className={styles.songs} aria-label="Songs">
           {SONGS.map(([id, name]) => (
-            <a key={id} href={`/wrong-note?song=${id}${shift === 1 ? "&shift=1" : ""}`} aria-current={id === song ? "page" : undefined}>
+            <a key={id} href={`/wrong-note?song=${id}${shift === 1 ? "&shift=1" : ""}`} aria-current={id === song ? "page" : undefined} {...kitChip(id === song)}>
               {name}
             </a>
           ))}
@@ -209,19 +209,19 @@ function WrongNote() {
               Play {SONGS[0][1]} instead
             </a>
           ) : !set || set.phase === "done" ? (
-            <Button style={big} onClick={start} disabled={!tune.length} aria-keyshortcuts="Space Enter" data-testid="start">
-              {set ? "Again · Space" : "Start · Space"}
+            <Button style={big} onClick={start} disabled={!tune.length} title={`${set ? "Again" : "Start"} (Space)`} aria-keyshortcuts="Space Enter" data-testid="start">
+              {set ? "Again" : "Start"}
             </Button>
           ) : (
             <>
               {set.phase === "ask" && (
-                <Button kind="secondary" style={big} onClick={() => dispatch({ type: "replay" })} aria-keyshortcuts="R" data-testid="replay">
-                  Replay · R
+                <Button kind="secondary" style={big} onClick={() => dispatch({ type: "replay" })} title="Replay (R)" aria-keyshortcuts="R" data-testid="replay">
+                  Replay
                 </Button>
               )}
               {set.phase === "reveal" && (
-                <Button style={big} onClick={() => dispatch({ type: "next" })} aria-keyshortcuts="Space Enter" data-testid="next">
-                  {set.index + 1 < set.rounds.length ? "Next · Space" : "Score · Space"}
+                <Button style={big} onClick={() => dispatch({ type: "next" })} title={`${set.index + 1 < set.rounds.length ? "Next" : "Score"} (Space)`} aria-keyshortcuts="Space Enter" data-testid="next">
+                  {set.index + 1 < set.rounds.length ? "Next" : "Score"}
                 </Button>
               )}
             </>
@@ -230,9 +230,8 @@ function WrongNote() {
       </section>
 
       <footer className={styles.foot}>
-        <MonoLabel style={{ fontSize: "inherit" }}>
-          seed {set?.seed ?? seed0} · shift {shift} · {outName === null ? "looking for the piano" : outName ? `on ${outName}` : "no piano output: nothing will sound"}
-        </MonoLabel>
+        {/* The seed shows in the set list below, which is what gets copied into FINDINGS.md (#1039: no debug line). */}
+        <p>{outName === null ? "Looking for the piano" : outName ? `On ${outName}` : "No piano output: nothing will sound"}</p>
         {sets.length > 0 && (
           <ol className={styles.sets} aria-label="This session's sets" data-testid="sets">
             {sets.map((s, i) => (

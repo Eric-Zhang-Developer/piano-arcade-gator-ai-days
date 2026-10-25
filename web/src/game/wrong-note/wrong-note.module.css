@@ -28,27 +28,19 @@
   letter-spacing: 0.01em;
 }
 
+/* The song picker: the kit's chips (kitChip), the song in force lit, as on /simon. */
 .songs {
   display: flex;
-  gap: 1.6em;
-  font: 600 clamp(16px, 1.25vw, 24px) / 1 var(--pa-font-display), system-ui, sans-serif;
-  font-stretch: 75%;
+  flex-wrap: wrap;
+  gap: 0.4em;
 }
 
 .songs a {
-  color: var(--pa-ink-dim);
   text-decoration: none;
-  padding-bottom: 4px;
-  border-bottom: 2px solid transparent;
 }
 
-.songs a:hover {
-  color: var(--pa-ink);
-}
-
-.songs a[aria-current] {
-  color: var(--pa-primary);
-  border-bottom-color: var(--pa-primary);
+.songs a:not([aria-current]):hover {
+  border-color: var(--pa-ink-dim) !important; /* over kitChip's inline hairline */
 }
 
 .stage {
@@ -182,11 +174,22 @@
   min-height: 48px;
 }
 
+/* As on /simon: the piano's status in small mono caps; the set list under them. */
 .foot {
   display: flex;
-  flex-direction: column;
-  gap: 0.6em;
-  font-size: clamp(12px, 0.8vw, 16px);
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.6em 2em;
+  color: var(--pa-ink-dim);
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: clamp(12px, 0.85vw, 16px);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.foot p {
+  margin: 0;
 }
 
 .sets {

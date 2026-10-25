@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Saira } from "next/font/google";
-import { CaptureMode } from "../game/capture-mode";
+import { CaptureMode, CaptureScript } from "../game/capture-mode";
 import { GameBoundary } from "../game/crash-guard/boundary";
 import { PhoneGuard } from "../game/phone-guard";
 import { DemoReset } from "../game/demo-reset";
@@ -33,7 +33,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${saira.variable} ${mono.variable}`}>
+    <html lang="en" className={`${saira.variable} ${mono.variable}`} suppressHydrationWarning>
+      {/* ?capture=1 set before the first paint, so a recording's first frames are clean too (video-shots) */}
+      <head><CaptureScript /></head>
       <body>
         {/* crash-guard: a render error shows a card with a way back; only the page, so the keys outside keep working */}
         <GameBoundary>{children}</GameBoundary>

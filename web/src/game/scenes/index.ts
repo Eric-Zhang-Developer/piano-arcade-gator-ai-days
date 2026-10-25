@@ -242,7 +242,7 @@ export function scenes(): GamePlugin {
       pedal = null;
       const song = params.get("song") ?? "";
       const token = ++load;
-      if (bot && song.startsWith("local/"))
+      if (bot && song)
         void loadPedal(song).then((p) => {
           if (token !== load || !p) return;
           pedal = p;

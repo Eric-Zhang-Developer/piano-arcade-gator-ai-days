@@ -52,11 +52,11 @@ describe("bots on Twinkle, judged by the real judge", () => {
     expect(events.some((e) => e.type === "fullCombo")).toBe(true);
   });
 
-  it("late gives all GREAT with a +40 ms mean", () => {
+  it("late gives all GREAT with a +60 ms mean", () => {
     const { results } = judge(twinkle, "late");
     expect(results.counts.GREAT).toBe(twinkle.notes.length);
     const offsets = results.judgments.map((j) => j.offsetMs!);
-    expect(offsets.reduce((a, b) => a + b, 0) / offsets.length).toBe(40);
+    expect(offsets.reduce((a, b) => a + b, 0) / offsets.length).toBe(60);
   });
 
   it.each(["a", "b", "c", "d"] as const)("rank-%s lands rank %s", (r) => {

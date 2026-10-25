@@ -1,7 +1,14 @@
-// The sustain pedal for a local song's autoplay (spec: golden-demo). A sidecar next to the chart,
-// songs/local/<id>/pedal.json: { "pedal": [[down, up], …] }, each pair in beats on the chart clock. The bot sends it to
-// the piano as CC64 on the same queue as its notes. Local-only, like the recording (decision 003, amended).
+// The sustain pedal for a song's autoplay (specs: golden-demo, demo-performance). A sidecar next to the chart,
+// songs/<id>/pedal.json: { "pedal": [[down, up], …] }, each pair in beats on the chart clock. The bot sends it to the
+// piano as CC64 on the same queue as its notes.
+import library from "./library.json";
+
 export type Pedal = [number, number][];
+
+// The library songs that have one. A local song is simply looked for; a library song only when it's listed here, so
+// the rest cost no request and log no 404 (browser checks fail on console errors). The library test keeps this list
+// and the files in step.
+export const PEDAL_SONGS: readonly string[] = library.songs;
 
 // Valid: down < up, pairs in order and not overlapping (a re-pedal may put a down on the last up). Anything else: null.
 export function parsePedal(raw: unknown): Pedal | null {
@@ -19,6 +26,7 @@ export function parsePedal(raw: unknown): Pedal | null {
 
 // No file: no pedal, quietly. A file that doesn't parse: no pedal, and one warning.
 export async function loadPedal(song: string): Promise<Pedal | null> {
+  if (!song.startsWith("local/") && !PEDAL_SONGS.includes(song)) return null;
   const res = await fetch(`/songs/${song}/pedal.json`).catch(() => null);
   if (!res?.ok) return null;
   const pedal = parsePedal(await res.json().catch(() => null));

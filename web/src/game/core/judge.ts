@@ -1,7 +1,7 @@
 // Judging, exactly mission.md's rule. Pure: no React, no clock. Live play and judgeTake share this one class.
 import type { Chart, ChartNote, GameEvent, Judgment, NoteJudgment, Rank, Results, Take } from "../../contracts";
 import { type Gauge, emptyGauge, reduceGauge } from "../fever-gauge/gauge";
-import { GOOD_MS, GOOD_WEIGHT, GREAT_MS, NEAR_MISS_MS, PERFECT_MS, msPerBeat } from "./settings";
+import { GOOD_MS, GOOD_WEIGHT, GREAT_MS, GREAT_WEIGHT, NEAR_MISS_MS, PERFECT_MS, msPerBeat } from "./settings";
 
 export function noteTimeMs(chart: Chart, note: ChartNote): number {
   return note.beat * msPerBeat(chart.bpm);
@@ -9,10 +9,11 @@ export function noteTimeMs(chart: Chart, note: ChartNote): number {
 
 const isMilestone = (n: number) => n === 25 || n === 50 || (n >= 100 && n % 100 === 0);
 
-function rankFor(accuracy: number): Rank {
+// A full combo (no MISS, no WRONG) ranks at least B: nothing a listener heard went wrong (mission.md).
+export function rankFor(accuracy: number, fullCombo = false): Rank {
   if (accuracy >= 0.95) return "S";
   if (accuracy >= 0.9) return "A";
-  if (accuracy >= 0.8) return "B";
+  if (accuracy >= 0.8 || fullCombo) return "B";
   if (accuracy >= 0.7) return "C";
   return "D";
 }
@@ -99,7 +100,7 @@ export class Judge {
     const judgments = this.judgments as NoteJudgment[];
     const counts: Results["counts"] = { PERFECT: 0, GREAT: 0, GOOD: 0, MISS: 0, extra: this.extras.length, wrong: this.wrong.length };
     for (const j of judgments) counts[j.judgment] = (counts[j.judgment] ?? 0) + 1;
-    const scored = counts.PERFECT + 0.5 * counts.GREAT + GOOD_WEIGHT * (counts.GOOD ?? 0);
+    const scored = counts.PERFECT + GREAT_WEIGHT * counts.GREAT + GOOD_WEIGHT * (counts.GOOD ?? 0);
     const accuracy = judgments.length ? scored / (judgments.length + this.wrong.length) : 0;
     this.results = {
       chartId: this.chart.id,
@@ -109,7 +110,7 @@ export class Judge {
       counts,
       accuracy,
       maxCombo: this.maxCombo,
-      rank: rankFor(accuracy),
+      rank: rankFor(accuracy, judgments.length > 0 && counts.MISS === 0 && this.wrong.length === 0),
     };
     if (this.scored && counts.MISS === 0 && this.wrong.length === 0) this.onEvent({ type: "fullCombo", atMs });
     this.onEvent({ type: "songEnd", results: this.results, atMs });

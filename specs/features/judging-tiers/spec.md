@@ -14,7 +14,7 @@ a wrong key at once. Eric's rule: punish wrong notes and outright misses; be gen
 Decision `judging-tiers-punish-what-sounds-wrong.md`; the rule itself is in `mission.md`.
 
 ## Requirements
-- **Tiers** (`mission.md`): PERFECT ≤ 25 ms, GREAT ≤ 50 ms, GOOD ≤ `GOOD_MS` (100 ms, a setting in
+- **Tiers** (`mission.md`): PERFECT ≤ 40 ms, GREAT ≤ 80 ms, GOOD ≤ `GOOD_MS` (120 ms, a setting in
   `web/src/game/core/settings.ts`), each bound counting as the better tier. A note with no matching key within
   `GOOD_MS` is a MISS. Matching is unchanged otherwise: nearest unmatched note of the same pitch, one-to-one.
 - **WRONG notes:** an extra (a press that matches no note) is WRONG unless a note of the same pitch is within
@@ -23,8 +23,8 @@ Decision `judging-tiers-punish-what-sounds-wrong.md`; the rule itself is in `mis
   `Results.wrong`, and counts in `counts.wrong`.
 - **Combo:** PERFECT, GREAT and GOOD continue it; MISS and WRONG reset it. Fever ends at the next MISS or WRONG.
   `fullCombo` needs no MISS and no WRONG.
-- **Accuracy** = (PERFECT + 0.5 × GREAT + 0.25 × GOOD) / (notes + WRONG). Rank thresholds unchanged. The GOOD weight is
-  a named constant.
+- **Accuracy** = (PERFECT + 0.8 × GREAT + 0.5 × GOOD) / (notes + WRONG). Rank thresholds unchanged, except a full
+  combo (no MISS, no WRONG) ranks at least B. Both weights are named constants (decision `judging-windows-wider.md`).
 - **Live labels** (highway): GOOD gets its own color. GREAT and GOOD show which way and how far, as "EARLY −38 ms" /
   "LATE +72 ms"; PERFECT shows the signed ms as before. A WRONG note shows "WRONG" in a clearly different color. A GOOD
   note is consumed like any hit.
@@ -38,15 +38,17 @@ Decision `judging-tiers-punish-what-sounds-wrong.md`; the rule itself is in `mis
 - `pnpm -C web test`, the synthetic players against Twinkle:
   - Perfect: all PERFECT, accuracy 100%, rank S, max combo = notes.
   - Skipper (drops notes 3 and 10): exactly 2 MISS, 0 WRONG, 0 extras.
-  - Late40: all GREAT.
-  - Late80: all GOOD, accuracy 25%, rank D, max combo = notes (GOOD keeps the combo).
-  - Boundary: +25 → PERFECT, −50 → GREAT, +51 → GOOD, +100 → GOOD, +101 → MISS plus an extra that is not WRONG.
+  - Late60: all GREAT, accuracy 80%.
+  - Late100: all GOOD, accuracy 50%, rank B (the full-combo floor), max combo = notes (GOOD keeps the combo).
+  - Late100 with one note skipped: no full combo, so rank D.
+  - Eric's mix (18 PERFECT, 18 GREAT, 6 GOOD of 42, no miss): accuracy 84.3%, rank B.
+  - Boundary: +40 → PERFECT, −80 → GREAT, +81 → GOOD, +120 → GOOD, +121 → MISS plus an extra that is not WRONG.
   - Wrong pitch: one note a semitone off at 0 ms → that note MISS, 1 WRONG, accuracy 41/43, and the combo breaks there.
   - Wrong then right: a wrong key 30 ms before a note, then the right key on time → the note is PERFECT, 1 WRONG, and
     the combo resets at the wrong key.
   - Count-in press: a key 1000 ms before the first note → an extra, not WRONG.
   - Fever: a WRONG note during fever emits `feverEnd`.
-  - Timing summary: a press at +120 ms is a near miss; at +80 ms it's a GOOD hit, not a near miss.
+  - Timing summary: a press at +130 ms is a near miss; at +100 ms it's a GOOD hit, not a near miss.
 - `[verify].command` passes.
 - On the piano (Eric): play twice; record scores and how the new tiers felt in `findings.md`.
 

@@ -4,7 +4,7 @@ import { noteTimeMs } from "../core/judge";
 import { LATENCY_MAX, LATENCY_MIN, NEAR_MISS_MS } from "../core/settings";
 
 // A near miss: a MISS note with a same-pitch press within NEAR_MISS_MS (150 ms, osu!'s outermost window at OD 5).
-// Since judging-tiers, a press within GOOD_MS (100 ms) is a GOOD hit, so near misses lie between 100 and 150 ms.
+// Since judging-tiers, a press within GOOD_MS (120 ms) is a GOOD hit, so near misses lie between 120 and 150 ms.
 export const MIN_TIMED = 3; // fewer timed presses: no numbers
 export const MIN_TIMED_FOR_SUGGESTION = 10;
 export const SUGGEST_FROM_MS = 10; // |mean| at least this before suggesting a latency change

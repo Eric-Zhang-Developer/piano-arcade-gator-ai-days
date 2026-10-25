@@ -1,4 +1,4 @@
-// Headless proof of the WARNING card: Moonlight (Lv 14) shows it in the count-in's first bar and drops it after;
+// Headless proof of the WARNING card: Moonlight (Lv 15) shows it in the count-in's first bar and drops it after;
 // Twinkle shows it only with ?warn=1. Screenshots of each. ?beat=off keeps the laptop click out of it.
 // Usage: node web/src/game/difficulty/verify-warning.mjs --out <dir>
 import { spawn } from "node:child_process";
@@ -55,7 +55,7 @@ try {
   }
   const fail = [];
   for (const [name, query, want] of [
-    ["moonlight", "song=moonlight-3", { level: 14, show: true }],
+    ["moonlight", "song=moonlight-3", { level: 15, show: true }],
     ["twinkle", "song=twinkle", { level: 1, show: false }],
     ["twinkle-warn", "song=twinkle&warn=1", { level: 1, show: true }],
   ]) {
@@ -76,7 +76,7 @@ try {
     await page.close();
   }
   if (fail.length) throw new Error(fail.join("; "));
-  say(`verify-warning: pass, Moonlight Lv 14 warns, Twinkle Lv 1 doesn't unless ?warn=1 (evidence: ${out})`);
+  say(`verify-warning: pass, Moonlight Lv 15 warns, Twinkle Lv 1 doesn't unless ?warn=1 (evidence: ${out})`);
 } catch (e) {
   failed = true;
   console.error(`verify-warning: FAIL: ${e.message}`);

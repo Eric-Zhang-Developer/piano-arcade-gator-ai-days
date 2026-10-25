@@ -5,11 +5,12 @@ import { useEffect, useRef, useState } from "react";
 import type { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import type { Chart } from "../../contracts";
 import { validateChart } from "../../contracts";
-import { hudSettings } from "../hud";
+import { Panel } from "../duo-tokens";
 import { loadReview, reviewLine, type SheetReview } from "../sheet-review/review";
 import { chartToMusicXml } from "../sheet-xml";
-import { cyan, ink } from "../ui-tokens";
+import { paperInk as ink, primary } from "../ui-tokens"; // the score is ink on paper (sheet-paper), never inverted
 import { follow, type Follower } from "./follow";
+import { paperJudgmentColors } from "./paper-colors";
 import { SHEET_CHANNEL, type Judgment, type SheetMessage } from "./plugin";
 import styles from "./sheet-view.module.css";
 
@@ -20,7 +21,7 @@ const ZOOM_MIN = 0.5;
 const ZOOM_MAX = 2.5;
 const ZOOM_STEP = 0.1;
 const JUDGMENTS: Judgment[] = ["PERFECT", "GREAT", "GOOD", "MISS"];
-const COLORS = hudSettings.judgmentColors; // the HUD's, so a notehead means what the counter means
+const COLORS = paperJudgmentColors; // the HUD's hues, darkened for the paper, so a notehead means what the counter means
 
 // For headless checks: where the cursor is, and how many noteheads are painted per judgment (not judgments heard).
 interface SheetHook {
@@ -190,9 +191,11 @@ export function SheetView() {
         drawPartNames: false,
         defaultColorMusic: ink,
         backend: "svg",
-        cursorsOptions: [{ type: CursorType.Standard, color: cyan, alpha: 0.35, follow: false }],
+        cursorsOptions: [{ type: CursorType.Standard, color: primary, alpha: 0.35, follow: false }],
       });
-      // The page's padding sets the edges, so the score lines up with the title; the left keeps room for the brace.
+      osmd.EngravingRules.StaffLineColor = ink; // unset, OSMD draws the staff and ledger lines black, not the paper's ink
+      osmd.EngravingRules.LedgerLineColorDefault = ink;
+      // The paper's padding sets the edges; the left keeps room for the brace.
       osmd.EngravingRules.PageLeftMargin = 2;
       osmd.EngravingRules.PageRightMargin = 1; // at 0 the last barline of a system clips
       await osmd.load(chartToMusicXml(chart, song ?? chart));
@@ -310,7 +313,11 @@ export function SheetView() {
           </button>
         </div>
       </header>
-      <div ref={scoreRef} className={styles.score} />
+      <div className={styles.score}>
+        <Panel paper style={{ padding: "1.5rem clamp(0.75rem, 2vw, 1.5rem)" }}>
+          <div ref={scoreRef} />
+        </Panel>
+      </div>
     </main>
   );
 }

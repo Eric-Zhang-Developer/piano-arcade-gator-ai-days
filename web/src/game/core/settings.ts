@@ -1,10 +1,12 @@
 // Every tuning number lives here (decision 000, D1). Judging windows are mission.md rules, not tuning.
 
-export const PERFECT_MS = 25;
-export const GREAT_MS = 50;
-export const GOOD_MS = 100; // judging-tiers: GOOD keeps the combo; MISS only past this
+export const PERFECT_MS = 40;
+export const GREAT_MS = 80;
+export const GOOD_MS = 120; // judging-tiers: GOOD keeps the combo; MISS only past this
 export const NEAR_MISS_MS = 150; // a same-pitch press this close to a note is that note's timing, never WRONG
-export const GOOD_WEIGHT = 0.25; // accuracy = (PERFECT + 0.5 × GREAT + GOOD_WEIGHT × GOOD) / (notes + WRONG)
+// accuracy = (PERFECT + GREAT_WEIGHT × GREAT + GOOD_WEIGHT × GOOD) / (notes + WRONG) (decision judging-windows-wider)
+export const GREAT_WEIGHT = 0.8;
+export const GOOD_WEIGHT = 0.5;
 export const KEYS_VELOCITY = 80;
 
 export const settings = {

@@ -11,14 +11,15 @@ import { readTakeMidi } from "../take-midi";
 export const scenesSettings = {
   seed: 118,
   restrikeGapMs: 20, // a held key lets go this long before its own pitch strikes again, so the piano re-articulates
-  lateMs: 40, // `late`: every note GREAT, late
-  offsets: { PERFECT: 0, GREAT: 40, GOOD: 75 }, // a bot's offset for each judgment, sign seeded
+  lateMs: 60, // `late`: every note GREAT, late
+  offsets: { PERFECT: 0, GREAT: 60, GOOD: 100 }, // a bot's offset for each judgment, sign seeded
   sloppy: { GREAT: 0.2, GOOD: 0.15, MISS: 0.1, wrong: 3 }, // fractions of notes; `wrong` is a count
-  // Each rank bot's mix lands mid-band on Twinkle: accuracy = (PERFECT + 0.5 GREAT + 0.25 GOOD) / (notes + WRONG).
+  // Each rank bot's mix lands mid-band on Twinkle: accuracy = (PERFECT + 0.8 GREAT + 0.5 GOOD) / (notes + WRONG).
+  // A, a full combo, needs no MISS; B and below need one, or the full-combo floor would lift them to B.
   ranks: {
-    "rank-a": { GREAT: 0.16 }, // 1 - 0.5 × 0.16 ≈ 0.92
-    "rank-b": { GREAT: 0.1, MISS: 0.1 }, // ≈ 0.85
-    "rank-c": { GREAT: 0.1, MISS: 0.2 }, // ≈ 0.75
+    "rank-a": { GREAT: 0.375 }, // 1 - 0.2 × 0.375 ≈ 0.92
+    "rank-b": { GREAT: 0.25, MISS: 0.1 }, // ≈ 0.85
+    "rank-c": { GREAT: 0.25, MISS: 0.2 }, // ≈ 0.75
     "rank-d": { GREAT: 0.1, MISS: 0.4 }, // ≈ 0.55
   } as Record<string, Partial<Record<"GREAT" | "GOOD" | "MISS", number>>>,
   feverExtra: 10, // `fever` repeats the chart until it holds the fever gauge's size plus this many notes
@@ -242,7 +243,7 @@ export function scenes(): GamePlugin {
       pedal = null;
       const song = params.get("song") ?? "";
       const token = ++load;
-      if (bot && song.startsWith("local/"))
+      if (bot && song)
         void loadPedal(song).then((p) => {
           if (token !== load || !p) return;
           pedal = p;

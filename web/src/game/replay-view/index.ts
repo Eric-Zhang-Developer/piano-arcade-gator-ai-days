@@ -42,6 +42,11 @@ export function highwayAt(chart: Chart, take: Take, results: Results, t: number)
   return { nowMs: t, noteState, pressed, latest, countInBeat: null };
 }
 
+// The presses the game called LATE: a hit past PERFECT, after its note (the highway's "LATE +n" label). The replay
+// rings them in red, so the slip a take is watched for stands out (#1093). Indices into take.events.
+export const latePresses = (results: Results) =>
+  new Set(results.judgments.flatMap((j) => (j.eventIndex !== null && j.judgment !== "PERFECT" && j.judgment !== "MISS" && (j.offsetMs ?? 0) > 0 ? [j.eventIndex] : [])));
+
 export function replayView(): GamePlugin {
   return {
     id: "replay-view",

@@ -27,6 +27,15 @@ OLD, NEW = "2026-10-24T15:50:25Z", "2026-10-24T15:51:24Z"
 
 
 class Rollup(unittest.TestCase):
+    def test_an_unexpanded_matrix_name_is_ignored_when_its_workflow_ran(self):
+        # A title edit cancels the first run before its matrix expands; GitHub keeps that job as
+        # "browser (${{ matrix.shard }})" failed, forever (#726, #811).
+        stale = run("browser (${{ matrix.shard }})", "COMPLETED", "FAILURE", OLD, OLD)
+        self.assertEqual(code(stale, run("ci", "COMPLETED", "SUCCESS", NEW, NEW), run("browser (1)", "COMPLETED", "SUCCESS", NEW, NEW)), 0)
+
+    def test_an_unexpanded_matrix_name_alone_still_counts(self):
+        self.assertEqual(code(run("ci", "COMPLETED", "SUCCESS", NEW, NEW), run("browser (${{ matrix.shard }})", "COMPLETED", "FAILURE", OLD, OLD)), 7)
+
     def test_no_checks_yet_waits(self):
         # Right after a PR is marked ready, GitHub has attached no checks yet; #745 merged then, before its CI ran.
         self.assertEqual(code(), 8)

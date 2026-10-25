@@ -1,5 +1,7 @@
-/* The experiments gallery on /lab: the Lab's own type and colours (it inherits the Lab's width-scaled font size), with
-   each experiment a filled button, a tone step above the ground. Primary for the target and focus; no hype pink. */
+/* The On trial gallery on /lab (spec: lab-gallery): a wall of hung plates, each a poster over a wall label, in the
+   Lab's width-scaled type and the Duo kit (zero radius, hairlines, primary for the target and focus; no hype pink).
+   The one loud mark is the DGX tag: a solid primary block on the plate's corner, so the experiments that need the
+   piano read in one sweep. Small text never goes under 12 px. */
 .gallery {
   margin-top: 1.4em;
   scroll-margin-top: 3em; /* "On trial ↓" lands below the fixed nav bar */
@@ -7,8 +9,9 @@
 
 .head {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 1.2em;
+  gap: 0.4em 1.2em;
   padding-bottom: 0.5em;
   border-bottom: 1px solid var(--pa-line);
 }
@@ -25,94 +28,294 @@
   color: var(--pa-ink-dim);
 }
 
-/* The Lab's own columns: the groups' unequal lengths balance on their own, and a group may run on into the next
-   column, so one big group doesn't leave two columns half empty. A card never splits. */
-.groups {
-  margin-top: 0.9em;
-  columns: 3;
-  column-gap: 2.2em;
+.tally {
+  display: flex;
+  align-items: baseline;
+  gap: 1em;
+  margin-left: auto;
 }
 
-.group {
-  margin-bottom: 0.9em;
-}
-
-.groupTitle {
-  margin: 0 0 0.4em;
-  break-after: avoid;
-  font: 500 0.75em/1.2 var(--pa-font-data), ui-monospace, monospace;
-  letter-spacing: 0.14em;
+.count {
+  font: 500 max(12px, 0.75em) / 1 var(--pa-font-data), ui-monospace, monospace;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--pa-ink-dim);
 }
 
-.grid {
+.copy,
+.vote {
+  border: 1px solid var(--pa-line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--pa-ink);
+  font: 700 max(12px, 0.72em) / 1 var(--pa-font-data), ui-monospace, monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease-out,
+    border-color 150ms ease-out,
+    color 150ms ease-out;
+}
+
+.copy {
+  padding: 0.7em 1.1em;
+}
+
+.copy:hover,
+.vote:hover {
+  border-color: var(--pa-primary);
+}
+
+.copy:focus-visible,
+.vote:focus-visible,
+.plate:focus-visible,
+.note input:focus-visible {
+  outline: 2px solid var(--pa-primary);
+  outline-offset: 2px;
+}
+
+.said {
+  margin: 0.4em 0 0;
+  min-height: 1.2em;
+  font-size: max(12px, 0.8em);
+  color: var(--pa-ink-dim);
+}
+
+.fallback {
+  display: block;
+  width: 100%;
+  margin-top: 0.4em;
+  padding: 0.6em;
+  border: 1px solid var(--pa-line);
+  border-radius: 0;
+  background: var(--pa-panel);
+  color: var(--pa-ink);
+  font: 400 max(12px, 0.8em) / 1.4 var(--pa-font-data), ui-monospace, monospace;
+}
+
+/* One unbroken wall, four plates a row at 1280 and at 1920 (the em grows with the width); narrower screens wrap.
+   The group sections and lists dissolve into it, so their headings read to a screen reader but leave no gaps. */
+.groups {
   display: grid;
-  gap: 0.45em;
-  margin: 0;
-  padding: 0;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16em), 1fr));
+  gap: 1.1em 0.9em;
+  margin-top: 0.9em;
+}
+
+.group,
+.grid {
+  display: contents;
+}
+
+.grid {
   list-style: none;
 }
 
-.grid > li {
-  display: flex;
-  break-inside: avoid;
-}
-
-/* The Lab entry's shape, filled: name and target on the first row, the line under them. */
-.button {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-content: start;
-  align-items: baseline;
-  column-gap: 1em;
-  row-gap: 0.15em;
-  flex: 1;
-  padding: 0.55em 0.75em 0.6em;
-  background: var(--pa-panel);
-  color: inherit;
-  text-decoration: none;
-  outline: 2px solid transparent;
-  transition:
-    background-color 150ms ease-out,
-    outline-color 150ms ease-out,
-    transform 150ms ease-out;
-}
-
-.button:hover {
-  background: color-mix(in srgb, var(--pa-panel), var(--pa-primary) 14%);
-}
-
-.button:focus-visible {
-  outline-color: var(--pa-primary);
-}
-
-.button:active {
-  transform: translateY(1px);
-}
-
-.name {
-  font: 800 1.05em/1.2 var(--pa-font-display), system-ui, sans-serif;
-}
-
-.line {
-  grid-column: 1 / -1;
-  color: var(--pa-ink);
-}
-
-.meta {
-  grid-column: 2;
-  grid-row: 1;
-  color: var(--pa-primary);
-  font-size: 0.85em;
+.groupTitle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
   white-space: nowrap;
 }
 
+.card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--pa-line);
+  background: var(--pa-panel);
+  transition: border-color 150ms ease-out;
+}
+
+.card[data-verdict="keep"],
+.card[data-verdict="note"] {
+  border-color: var(--pa-primary);
+}
+
+.card:has(.plate:hover) {
+  border-color: color-mix(in srgb, var(--pa-primary) 60%, var(--pa-line));
+}
+
+.plate {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.frame {
+  position: relative;
+  display: none;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--pa-bg);
+  border-bottom: 1px solid var(--pa-line);
+}
+
+.frame[data-poster] {
+  display: block;
+}
+
+.poster {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.86;
+  transition:
+    opacity 200ms ease-out,
+    transform 300ms ease-out,
+    filter 200ms ease-out;
+}
+
+.plate:hover .poster,
+.plate:focus-visible .poster {
+  opacity: 1;
+  transform: scale(1.03);
+}
+
+.card[data-verdict="cut"] .poster {
+  opacity: 0.32;
+  filter: grayscale(1);
+}
+
+.dgx {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.35em 0.6em;
+  background: var(--pa-primary);
+  color: var(--pa-bg);
+  font: 800 max(12px, 0.8em) / 1 var(--pa-font-display), system-ui, sans-serif;
+  letter-spacing: 0.1em;
+}
+
+.stamp {
+  position: absolute;
+  left: 0.6em;
+  bottom: 0.6em;
+  padding: 0.3em 0.6em;
+  border: 2px solid currentColor;
+  background: color-mix(in srgb, var(--pa-bg) 80%, transparent);
+  color: var(--pa-primary);
+  font: 800 1.05em/1 var(--pa-font-display), system-ui, sans-serif;
+  letter-spacing: 0.14em;
+}
+
+.card[data-verdict="cut"] .stamp {
+  color: var(--pa-ink);
+}
+
+.label {
+  display: grid;
+  gap: 0.2em;
+  padding: 0.7em 0.8em 0.5em;
+}
+
+.no {
+  font: 500 max(12px, 0.72em) / 1.2 var(--pa-font-data), ui-monospace, monospace;
+  letter-spacing: 0.04em; /* not uppercased: x=<name> is a flag, typed as shown */
+  color: var(--pa-ink-dim);
+}
+
+.name {
+  font: 800 1.15em/1.15 var(--pa-font-display), system-ui, sans-serif;
+}
+
+.plate:hover .name {
+  color: var(--pa-primary);
+}
+
+.line {
+  color: var(--pa-ink);
+  font-size: 0.92em;
+  line-height: 1.35;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+  margin: 0;
+  padding: 0.2em 0.8em 0.6em;
+}
+
+.chip {
+  padding: 0.3em 0.55em;
+  border: 1px solid var(--pa-line);
+  font: 600 max(12px, 0.68em) / 1 var(--pa-font-data), ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pa-ink-dim);
+}
+
+.chip[data-need="dgx"],
+.chip[data-need="camera"],
+.chip[data-need="mic"] {
+  border-color: var(--pa-primary);
+  color: var(--pa-primary);
+}
+
+/* The verdict sits at the card's foot, the same height on every card in a row. */
+.verdict {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  margin-top: auto;
+  border-top: 1px solid var(--pa-line);
+}
+
+.vote {
+  padding: 0.75em 0.4em;
+  border-width: 0 1px 0 0;
+}
+
+.vote:last-child {
+  border-right-width: 0;
+}
+
+.vote[aria-pressed="true"] {
+  background: var(--pa-primary);
+  color: var(--pa-bg);
+}
+
+.vote[aria-pressed="true"][data-v="cut"] {
+  background: var(--pa-ink);
+}
+
+.note {
+  display: grid;
+  gap: 0.3em;
+  padding: 0.5em 0.8em 0.7em;
+  border-top: 1px solid var(--pa-line);
+}
+
+.note label {
+  font: 500 max(12px, 0.7em) / 1.2 var(--pa-font-data), ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pa-ink-dim);
+}
+
+.note input {
+  padding: 0.45em 0.55em;
+  border: 1px solid var(--pa-line);
+  border-radius: 0;
+  background: var(--pa-bg);
+  color: var(--pa-ink);
+  font: inherit;
+  font-size: max(14px, 0.9em);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .button {
+  .card,
+  .poster,
+  .copy,
+  .vote {
     transition: none;
   }
-  .button:active {
+  .plate:hover .poster,
+  .plate:focus-visible .poster {
     transform: none;
   }
 }

@@ -18,9 +18,9 @@ export const SPAN_DAYS = 83;
 /** A whole-song take is played only below this many notes; longer songs are practiced a few bars at a time. */
 const FULL_SONG_MAX_NOTES = 180;
 /** A bar-range drill aims for about this many notes. */
-const DRILL_NOTES: readonly [number, number] = [16, 56];
-/** Sittings kept per learner, the newest: a lapsed learner played a few times, an active one more. The ranges keep the
- * whole cohort near 200k judged notes. */
+const DRILL_NOTES: readonly [number, number] = [26, 88];
+/** Sittings kept per learner, the newest: a lapsed learner played a few times, an active one more. With the drill size
+ * above, the whole cohort comes to about 220k judged notes, under the 250k the load is meant to stay within. */
 const SITTINGS = { lapsed: [3, 8], active: [8, 16] } as const;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -144,6 +144,9 @@ function play(
     events.push(press(n.pitch, n.velocity, at + traits.bias[n.hand] * (1.3 - q) + normal(r) * spread, n.duration * msPerBeat * 0.85));
     if (r() < 0.06 * (1 - q)) events.push(press(n.pitch + (r() < 0.5 ? -2 : 2), n.velocity, at + normal(r) * spread, 0.25 * msPerBeat));
   }
+  // A take someone finished has at least one key in it, even when every note missed.
+  const first = chart.notes[0];
+  if (!events.length) events.push(press(first.pitch, first.velocity, noteTimeMs(chart, first) + spread * 3, first.duration * msPerBeat));
   return events.sort((a, b) => a.timeMs - b.timeMs);
 
   // Laptop keys always send 80; a piano follows the score's dynamics, less evenly the less sure the learner is.
@@ -186,7 +189,7 @@ export function synthesize(learner: SyntheticLearner, sources: readonly ChartSou
       const n = played.get(chart.id) ?? 0;
       played.set(chart.id, n + 1);
 
-      const drill = chart.notes.length > FULL_SONG_MAX_NOTES || r() < 0.3;
+      const drill = chart.notes.length > FULL_SONG_MAX_NOTES || r() < 0.2;
       const bars = drill ? drillBars(chart, r) : null;
       const part = bars ? excerpt(chart, bars) : { chart, shift: 0 };
       // Where the learner starts on this song: their hands, and what they know of the nodes the song needs.

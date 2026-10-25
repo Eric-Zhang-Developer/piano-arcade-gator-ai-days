@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { validateChart, type Chart } from "../../contracts";
 import { judgeTake } from "../../game/core/judge";
@@ -27,13 +27,15 @@ import {
 import { flushOutbox, signOutAfterSaving } from "../../data/save-plugin";
 import { AccountChip } from "../auth/AccountChip";
 import { useSession } from "../../data/useSession";
+import { inputName, LearnerSwitch, useLearners } from "./LearnerSwitch";
 import { AccuracyChart, HandsPanel, JudgmentBar, panel, panelTitle, PracticeCalendar, SongsTable, StatTile, tableStyle, td, th } from "./panels";
 
 // The player's profile: headline numbers, accuracy over time, a practice calendar, every note's judgment, both
 // hands, each song, and every session (when, how long, how it went). ?song=<id> narrows it all to one song and adds
-// the bars to practice. From the account when signed in; from this browser's takes otherwise.
+// the bars to practice. From the account when signed in; from this browser's takes otherwise. ?as=synthetic-042 shows
+// one of the 200 synthetic learners instead, from the server, without touching the signed-in session.
 
-type Source = "account" | "device";
+type Source = "account" | "device" | "synthetic";
 interface ProfileData {
   sessions: SessionRow[];
   hands: HandStatRow[];
@@ -95,16 +97,49 @@ export default function ProgressPageWithParams() {
 }
 
 function ProgressPage() {
-  const song = useSearchParams().get("song");
-  const [data, setData] = useState<ProfileData | null>(null);
+  const params = useSearchParams();
+  const song = params.get("song");
+  const as = params.get("as");
+  const router = useRouter();
+  const learners = useLearners();
+  const learner = as ? learners?.find((l) => l.id === as) : undefined;
+  // Every link on the page keeps the learner being shown.
+  const progressHref = (songId?: string) => {
+    const q = new URLSearchParams({ ...(songId && { song: songId }), ...(as && { as }) }).toString();
+    return q ? `/progress?${q}` : "/progress";
+  };
+  // Whose data it is, so switching learners shows "Loading…" instead of the last one's numbers under a new name.
+  const [loaded, setLoaded] = useState<{ as: string | null; data: ProfileData } | null>(null);
+  const data = loaded && loaded.as === as ? loaded.data : null;
   const [source, setSource] = useState<Source>("device");
   const session = useSession();
   const player = session === undefined ? undefined : (session?.user_id ?? null);
   const [note, setNote] = useState("");
 
   useEffect(() => {
-    if (player === undefined) return; // still checking who's playing
     let live = true;
+    if (as) {
+      // A synthetic learner, read by the server. Never this browser's takes, and nothing here touches the session.
+      (async () => {
+        const q = `as=${encodeURIComponent(as)}${song ? `&song=${encodeURIComponent(song)}` : ""}`;
+        try {
+          const [prof, prog] = await Promise.all([fetch(`/api/progress?view=profile&${q}`), song ? fetch(`/api/progress?${q}`) : Promise.resolve(null)]);
+          if (!prof.ok || (prog && !prog.ok)) throw new Error(String(prof.status));
+          const p = (await prof.json()) as { sessions: SessionRow[]; hands: HandStatRow[] };
+          const bars = prog ? ((await prog.json()) as { bars: BarTrendRow[] }).bars : [];
+          if (!live) return;
+          setLoaded({ as, data: { sessions: p.sessions, hands: p.hands, bars } });
+          setSource("synthetic");
+          setNote("");
+        } catch {
+          if (live) setNote(`${as}'s progress didn't load. Refresh to try again, or go back to your progress.`);
+        }
+      })();
+      return () => {
+        live = false;
+      };
+    }
+    if (player === undefined) return; // still checking who's playing
     (async () => {
       await flushOutbox().catch(() => 0);
       const s = await getSession();
@@ -121,7 +156,7 @@ function ProgressPage() {
             const p = (await prof.json()) as { sessions: SessionRow[]; hands: HandStatRow[] };
             const bars = prog ? ((await prog.json()) as { bars: BarTrendRow[] }).bars : [];
             if (live) {
-              setData({ sessions: p.sessions, hands: p.hands, bars });
+              setLoaded({ as: null, data: { sessions: p.sessions, hands: p.hands, bars } });
               setSource("account");
               setNote("");
             }
@@ -135,15 +170,16 @@ function ProgressPage() {
       }
       const local = await localData(song);
       if (!live) return;
-      setData(local);
+      setLoaded({ as: null, data: local });
       setSource("device");
     })();
     return () => {
       live = false;
     };
-  }, [song, player]); // ?song= changes in place when a song or "all songs" is clicked; sign-in or out reloads
+  }, [song, player, as]); // ?song= and ?as= change in place when a song, "all songs" or a learner is picked; sign-in or out reloads
 
   const google = Boolean(session && !session.is_anonymous);
+  const mine = !as;
   const sessions = data?.sessions ?? null;
   const total = sessions ? sessionSummary(sessions) : null;
   const mix = data ? judgmentMix(data.hands) : null;
@@ -161,15 +197,25 @@ function ProgressPage() {
   return (
     <main style={page}>
       <AccountChip />
-      <Link href={song ? "/progress" : "/"} style={back}>
+      <Link href={song ? progressHref() : "/"} style={back}>
         {song ? "← All songs" : "← Menu"}
       </Link>
+      {learners && (
+        <LearnerSwitch learners={learners} as={as} onPick={(id) => router.push(id ? `/progress?as=${encodeURIComponent(id)}` : "/progress")} />
+      )}
       <header style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "4px 16px", margin: "10px 0 2px" }}>
-        <h1 style={title}>{song ? (songTitle ?? song) : google ? "Your profile" : "Your practice"}</h1>
+        <h1 style={title}>{song ? (songTitle ?? song) : as ? as : google ? "Your profile" : "Your practice"}</h1>
         {last && !song && <span style={{ color: "var(--pa-ink-dim)" }}>last played {when(last.created_at)}</span>}
       </header>
       <p style={{ color: "var(--pa-ink-dim)", margin: "0 0 4px", minHeight: "1.6em" }}>
-        {session === undefined ? null : google ? (
+        {as ? (
+          learner && (
+            <>
+              Started as {learner.level.toLowerCase()} · plays on {inputName(learner.input)}
+              {learner.goals.length > 0 && ` · wants to play ${learner.goals.join(", ")}`}
+            </>
+          )
+        ) : session === undefined ? null : google ? (
           <>
             Signed in with Google{session?.email ? ` as ${session.email}` : ""} · saved to your account
             <button style={plain} onClick={() => void signOutAfterSaving()} data-testid="progress-signout">
@@ -195,7 +241,8 @@ function ProgressPage() {
 
       {!data && <p>Loading…</p>}
 
-      {sessions && sessions.length === 0 && (
+      {sessions && sessions.length === 0 && as && <p data-testid="no-takes">No takes are loaded for {as}.</p>}
+      {sessions && sessions.length === 0 && mine && (
         <p data-testid="no-takes">
           No sessions yet.{" "}
           <Link href="/" style={{ color: "var(--pa-cyan)" }}>
@@ -222,8 +269,8 @@ function ProgressPage() {
             <PracticeCalendar days={days} />
           </div>
           <div style={twoUp}>
-            <JudgmentBar mix={mix} />
-            <HandsPanel hands={hands} />
+            <JudgmentBar mix={mix} mine={mine} />
+            <HandsPanel hands={hands} mine={mine} />
           </div>
 
           {song ? (
@@ -244,13 +291,15 @@ function ProgressPage() {
                   ))}
                 </ul>
               )}
-              <Link href={`/play?song=${encodeURIComponent(song)}`} style={playButton}>
-                Play {songTitle ?? "it"} again
-              </Link>
+              {mine && (
+                <Link href={`/play?song=${encodeURIComponent(song)}`} style={playButton}>
+                  Play {songTitle ?? "it"} again
+                </Link>
+              )}
             </section>
           ) : (
             <div style={{ marginTop: 16 }}>
-              <SongsTable songs={songs} />
+              <SongsTable songs={songs} mine={mine} songHref={progressHref} />
             </div>
           )}
 
@@ -273,7 +322,7 @@ function ProgressPage() {
                       <td style={td}>{when(r.created_at)}</td>
                       {!song && (
                         <td style={td}>
-                          <Link href={`/progress?song=${encodeURIComponent(r.song_id)}`} style={{ color: "var(--pa-cyan)", textDecoration: "none" }}>
+                          <Link href={progressHref(r.song_id)} style={{ color: "var(--pa-cyan)", textDecoration: "none" }}>
                             {r.title}
                           </Link>
                         </td>

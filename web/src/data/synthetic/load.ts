@@ -6,12 +6,16 @@
 //   --now <iso> places the takes relative to this time instead of now
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { format } from "node:util";
 import { buildCohort, toLearnerGoalsRow, toLearningAttemptRows, type SyntheticLearner } from "../../learn/frontend/mastery/sim";
 import { curriculumCharts } from "./charts";
 import { synthesize, type SyntheticRows } from "./generate";
 import { rosterEntry } from "./roster";
 
 const webDir = path.resolve(import.meta.dirname, "../../..");
+
+/** What the script reports, on stdout. */
+const say = (...parts: unknown[]) => process.stdout.write(`${format(...parts)}\n`);
 
 type Learner = { learner: SyntheticLearner; rows: SyntheticRows };
 type Env = { url: string; key: string };
@@ -118,7 +122,7 @@ async function load(env: Env, cohort: readonly Learner[]) {
   const rows = tables(cohort);
   const ids = cohort.map(({ learner }) => learner.playerId);
   await inParallel(cohort, 6, ({ learner }) => ensureAuthUser(env, learner));
-  console.log("auth users: 200 present");
+  say("auth users: 200 present");
   await upsert(env, "players", rows.players, "id", 200);
   await upsert(env, "songs", rows.songs, "id", 100);
   // A rerun replaces each learner's takes and attempts outright, so the database always holds exactly this run's rows.
@@ -130,12 +134,12 @@ async function load(env: Env, cohort: readonly Learner[]) {
   await upsert(env, "note_judgments", rows.note_judgments, "take_id,note_id", 2500);
   await upsert(env, "learning_attempts", rows.learning_attempts, "id", 1000);
   await upsert(env, "learner_goals", rows.learner_goals, "player_id", 200);
-  console.log("live now:", await live(env, ids));
+  say("live now:", await live(env, ids));
 }
 
 async function undo(env: Env, cohort: readonly Learner[]) {
   const ids = cohort.map(({ learner }) => learner.playerId);
-  console.log("live before:", await live(env, ids));
+  say("live before:", await live(env, ids));
   let deleted = 0;
   await inParallel(cohort, 6, async ({ learner }) => {
     const found = await call(env, `/auth/v1/admin/users/${learner.playerId}`);
@@ -145,8 +149,8 @@ async function undo(env: Env, cohort: readonly Learner[]) {
     await call(env, `/auth/v1/admin/users/${learner.playerId}`, { method: "DELETE" });
     deleted++;
   });
-  console.log(`deleted ${deleted} synthetic auth users`);
-  console.log("live after:", await live(env, ids));
+  say(`deleted ${deleted} synthetic auth users`);
+  say("live after:", await live(env, ids));
 }
 
 export async function main(args: readonly string[]) {
@@ -162,13 +166,13 @@ export async function main(args: readonly string[]) {
     const file = path.join(import.meta.dirname, "roster.json");
     const entries = cohort.map(({ learner, rows }) => JSON.stringify(rosterEntry(learner, rows, sources)));
     writeFileSync(file, `[\n${entries.join(",\n")}\n]\n`); // one learner per line, so a change reads as a diff
-    console.log(`wrote ${path.relative(webDir, file)}: ${cohort.length} learners`);
+    say(`wrote ${path.relative(webDir, file)}: ${cohort.length} learners`);
     return;
   }
   if (flag("--dry-run")) {
     for (const [table, rows] of Object.entries(tables(cohort)))
-      console.log(`${table.padEnd(18)} ${String(rows.length).padStart(7)} rows  ${(JSON.stringify(rows).length / 1e6).toFixed(1).padStart(6)} MB`);
-    console.log(`auth users         ${String(cohort.length).padStart(7)}`);
+      say(`${table.padEnd(18)} ${String(rows.length).padStart(7)} rows  ${(JSON.stringify(rows).length / 1e6).toFixed(1).padStart(6)} MB`);
+    say(`auth users         ${String(cohort.length).padStart(7)}`);
     return;
   }
   const env = readEnv();

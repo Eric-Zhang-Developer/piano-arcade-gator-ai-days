@@ -4,6 +4,7 @@ import { isBlack } from "../../core/highway";
 import { apply, homography, invert, type H, type Pt } from "./homography";
 import { bedQuads, BED_CORNERS, keySettings, mapQuad, meanLuma, samplePoints } from "./keys";
 import { pressDelays, summarize, type Sample } from "./latency";
+import { containFit, laneDepth, noteSpan, overlaySettings, parseLog } from "./overlay";
 
 // A seeded generator, so the "random" points are the same every run.
 const rng = (seed: number) => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32);
@@ -85,7 +86,8 @@ describe("key quads", () => {
     expect(pq[0]).toEqual(apply(TRUE, q[0]));
     const at = samplePoints(TRUE, q, 1920, 1080);
     expect(at.length).toBe(25);
-    for (const i of at) expect(i).toBeGreaterThanOrEqual(0), expect(i).toBeLessThan(1920 * 1080);
+    expect(Math.min(...at)).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...at)).toBeLessThan(1920 * 1080);
   });
 
   it("meanLuma reads the sampled pixels' brightness", () => {
@@ -128,5 +130,41 @@ describe("latency", () => {
     const frames = series(presses.slice(0, 1), [100]).map((f, i) => ({ t: f.t, b: f.t > 1500 ? 180 + (i % 2) * 5 : f.b }));
     expect(pressDelays(frames, [1000, 5000])).toEqual([expect.any(Number), null]);
     expect(summarize([null, null], 16)).toBeNull();
+  });
+});
+
+describe("overlay geometry", () => {
+  it("lanes stop short of the horizon, where the map's denominator would reach 0", () => {
+    const d = laneDepth(TRUE);
+    for (const u of [0, 0.5, 1]) expect(TRUE[6] * u + TRUE[7] * -d + TRUE[8]).toBeGreaterThan(0);
+    expect(laneDepth([1, 0, 0, 0, 1, 0, 0, 0, 1])).toBe(overlaySettings.maxDepth); // no perspective: the full length
+  });
+
+  it("a note enters leadMs early at the far end, lands on the back edge at its time, and leaves after its tail", () => {
+    const { leadMs } = overlaySettings;
+    expect(noteSpan(0, leadMs + 1, 100, 2)).toBeNull();
+    const entering = noteSpan(0, leadMs - 100, 500, 2)!;
+    expect(entering[0]).toBe(-2); // the tail is still past the far end: clipped there
+    expect(noteSpan(1000, 1000, 400, 2)![1]).toBe(0);
+    const held = noteSpan(1200, 1000, 400, 2)!; // 200 ms into a 400 ms note: its tail is still coming in
+    expect(held[1]).toBe(0);
+    expect(held[0]).toBeCloseTo((-200 / leadMs) * 2, 9);
+    expect(noteSpan(1500, 1000, 400, 2)).toBeNull();
+  });
+
+  it("containFit centers the picture at its scale", () => {
+    const g = containFit(1920, 1080, 1280, 720);
+    expect([g.scale, g.dx, g.dy].map((v) => Math.round(v * 1e9) / 1e9)).toEqual([0.666666667, 0, 0]);
+    const f = containFit(1920, 1080, 1000, 1000);
+    expect(f.dx).toBeCloseTo(0, 9);
+    expect(f.dy).toBeCloseTo((1000 - 1080 * f.scale) / 2, 9);
+  });
+
+  it("parseLog reads the recorder's notes, in time order, and skips anything malformed", () => {
+    expect(parseLog({ notes: [{ t: 20, type: "off", pitch: 60 }, { t: 10, type: "on", pitch: 60, velocity: 90 }, { t: "x" }] })).toEqual([
+      { t: 10, type: "on", pitch: 60, velocity: 90 },
+      { t: 20, type: "off", pitch: 60, velocity: 64 },
+    ]);
+    expect(parseLog(null)).toEqual([]);
   });
 });

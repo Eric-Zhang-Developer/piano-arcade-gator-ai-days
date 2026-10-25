@@ -63,8 +63,8 @@ export function homography(src: Pt[], dst: Pt[]): H {
   const rows: number[][] = [], rhs: number[] = [];
   s.forEach(([x, y], i) => {
     const [u, v] = d[i];
-    rows.push([x, y, 1, 0, 0, 0, -u * x, -u * y]), rhs.push(u);
-    rows.push([0, 0, 0, x, y, 1, -v * x, -v * y]), rhs.push(v);
+    rows.push([x, y, 1, 0, 0, 0, -u * x, -u * y], [0, 0, 0, x, y, 1, -v * x, -v * y]);
+    rhs.push(u, v);
   });
   const AtA = Array.from({ length: 8 }, (_, i) => Array.from({ length: 8 }, (_, j) => rows.reduce((t, r) => t + r[i] * r[j], 0)));
   const Atb = Array.from({ length: 8 }, (_, i) => rows.reduce((t, r, k) => t + r[i] * rhs[k], 0));

@@ -16,7 +16,11 @@ export interface Sample {
 export function pressDelays(frames: Sample[], pressesMs: number[], s = latencySettings): (number | null)[] {
   return pressesMs.map((at) => {
     let sum = 0, n = 0;
-    for (const f of frames) if (f.t >= at - s.baselineMs && f.t < at) (sum += f.b), n++;
+    for (const f of frames)
+      if (f.t >= at - s.baselineMs && f.t < at) {
+        sum += f.b;
+        n++;
+      }
     if (!n) return null;
     const base = sum / n;
     const hit = frames.find((f) => f.t >= at && f.t <= at + s.searchMs && Math.abs(f.b - base) > s.threshold);

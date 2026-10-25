@@ -12,7 +12,7 @@ function walk(path: string): string[] {
   if (statSync(path).isFile()) return /\.tsx?$/.test(path) && !/\.test\.tsx?$/.test(path) ? [path] : [];
   return readdirSync(path).flatMap((f) => walk(join(path, f)));
 }
-const files = ["game", "app/page.tsx", "app/play", "app/sheet"].flatMap((p) => walk(join(src, p)));
+const files = ["game", "app/page.tsx", "app/play", "app/sheet", "app/simon"].flatMap((p) => walk(join(src, p)));
 
 const HANDLES = /addEventListener\(\s*["']keydown["']|onKeyDown|["']keydown["']/;
 // `e.key === "x"`, `code !== "KeyZ"`, `k === "Enter"`, and `e.key.toLowerCase() !== "f"`.
@@ -25,7 +25,7 @@ describe("help overlay's drift test", () => {
   const handlers = files.filter((f) => HANDLES.test(readFileSync(f, "utf8"))).map((f) => relative(src, f));
 
   it("finds the key handlers on main", () => {
-    for (const f of ["game/records/initials.ts", "game/sheet-view/SheetView.tsx", "game/core/input.ts", "game/laptop-octaves/index.tsx", "game/replay-view/overlay.tsx", "game/select-layout/index.tsx", "game/song-preview/index.tsx", "app/play/page.tsx"])
+    for (const f of ["game/records/initials.ts", "game/sheet-view/SheetView.tsx", "game/core/input.ts", "game/laptop-octaves/index.tsx", "game/replay-view/overlay.tsx", "game/select-layout/index.tsx", "game/song-preview/index.tsx", "app/play/page.tsx", "app/simon/page.tsx"])
       expect(handlers, f).toContain(f);
   });
 

@@ -43,19 +43,6 @@
 }
 
 /* Monospace caps, the verbs dim and the keys in ink. */
-.hint {
-  margin: 0;
-  font-family: var(--pa-font-data), ui-monospace, monospace;
-  font-size: clamp(13px, 0.95vw, 18px);
-  letter-spacing: 0.12em;
-  color: var(--pa-ink-dim);
-}
-
-.hint b {
-  font-weight: 500;
-  color: var(--pa-ink);
-}
-
 /* The left column: the focused song, then the footer pushed to the bottom. All in flow, so nothing in it can overlap;
    a tall song pushes the footer down rather than under it. */
 .left {

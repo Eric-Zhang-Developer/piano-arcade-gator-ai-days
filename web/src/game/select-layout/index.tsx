@@ -22,6 +22,7 @@ import type { Song } from "../song-select/load";
 import { goToStage } from "./go-to-stage";
 import styles from "./select-layout.module.css";
 import { APP_NAME } from "../app-name";
+import { HelpLink } from "../help-overlay";
 
 // footer: the left column's last row, in flow under the focused song (the Options button, first-run's link). Outside the
 // per-song section, so it isn't remounted on every ↑/↓.
@@ -110,9 +111,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
     <main className={styles.screen}>
       <header className={styles.top}>
         <h1 className={styles.wordmark}>{APP_NAME}</h1>
-        <p className={styles.hint}>
-          <b>↑↓</b> SELECT · <b>ENTER</b> PLAY · <b>P</b> PRACTICE · <b>L</b> LEARN · <b>W</b> WATCH · <b>E</b> EASY
-        </p>
+        <HelpLink />
       </header>
       <div className={styles.left}>
         {song && (

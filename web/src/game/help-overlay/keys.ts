@@ -89,6 +89,13 @@ export const helpGroups: HelpGroup[] = [
     ],
   },
   {
+    screen: "Simon says",
+    lines: [
+      { keys: ["Space"], what: "start a run, or again after one; Enter too", source: ["app/simon/page.tsx"], match: ["Space", "Enter"] },
+      { keys: ["A–;"], what: "play the phrase back on the laptop keys", source: ["app/simon/page.tsx"], match: ["Semicolon"] },
+    ],
+  },
+  {
     screen: "Anywhere",
     lines: [
       { keys: ["?"], what: "this card; Esc closes it", source: ["game/help-overlay/index.tsx"], match: ["?", "Escape"] },

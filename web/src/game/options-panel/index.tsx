@@ -240,8 +240,8 @@ export function OptionsDrawer({ recording = false }: { recording?: boolean }) {
 
   return (
     <>
-      <button type="button" className={styles.open} onClick={open} data-capture-hide data-testid="options-open">
-        Options <kbd className={styles.kbd}>O</kbd>
+      <button type="button" className={styles.open} onClick={open} title="Options (O)" aria-keyshortcuts="O" data-capture-hide data-testid="options-open">
+        Options
       </button>
       <dialog ref={ref} className={styles.drawer} onKeyDown={onKeyDown} aria-labelledby="options-title" data-testid="options">
         <header className={styles.head}>

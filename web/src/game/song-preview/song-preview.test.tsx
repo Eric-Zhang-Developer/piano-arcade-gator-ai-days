@@ -44,9 +44,10 @@ it("stopping cancels the queue and sends All Notes Off on channel 1", () => {
   expect(sent.at(-1)).toEqual([0xb0, 123, 0]);
 });
 
-it("the panel keeps the status line, and leaves best, LEARN and PRACTICE to the select's panel (duo-select)", () => {
+it("the panel keeps the status line, blank before previews arm, and leaves best, LEARN and PRACTICE to the select's panel (duo-select)", () => {
   const html = renderToStaticMarkup(<SongPreview id="fur-elise" />);
-  expect(html).toContain("Press any key for previews");
+  expect(html).toMatch(/data-testid="preview-status"[^>]*>\u00a0<\/p>/); // mouse-first: no "Press any key" line
+  expect(html).not.toContain("Press any key");
   for (const gone of ["preview-best", "preview-learn", "preview-practice", "preview-nps"]) expect(html).not.toContain(gone);
 });
 

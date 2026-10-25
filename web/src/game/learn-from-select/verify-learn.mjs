@@ -70,10 +70,19 @@ async function home() {
 }
 await home();
 const ids = await page.locator("ol a").evaluateAll((as) => as.map((a) => new URL(a.href).searchParams.get("song")));
-// The hint names L, beside W and E. duo-select restyles it in its own words and case, so the check reads the keys,
-// not one exact string.
-const hint = (await page.locator("main header p").textContent()).replace(/\s+/g, " ").trim();
-check(/\bL learn\b/i.test(hint) && /\bW watch\b/i.test(hint) && /\bE easy\b/i.test(hint), `the hint names L learn, W watch and E easy: "${hint}"`);
+// L, W and E are listed on the ? card, behind the select's "Controls" link (mouse-first): one line each, its key alone
+// in the chip and the word in the line, so the check reads the keys, not one exact string.
+await page.getByTestId("help-link").click();
+await page.getByTestId("help").waitFor({ timeout: 10_000 });
+const lines = await page
+  .getByTestId("help")
+  .locator("dl > div")
+  .evaluateAll((ds) => ds.map((d) => [[...d.querySelectorAll("kbd")].map((k) => k.textContent).join(" "), d.querySelector("dd")?.textContent ?? ""]));
+const listed = (k, w) => lines.some(([keys, what]) => keys === k && w.test(what));
+check(listed("L", /learn/i) && listed("W", /watch/i) && listed("E", /easy/i), `the ? card names L learn, W watch and E easy`);
+await page.keyboard.press("Escape");
+await page.waitForFunction(() => !document.querySelector("dialog[open]"), null, { timeout: 10_000 });
+await page.locator("ol a").first().focus();
 
 // 1. ↓ then L: the second song in wait mode.
 await page.keyboard.press("ArrowDown");

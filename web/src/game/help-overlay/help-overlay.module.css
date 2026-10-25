@@ -137,3 +137,45 @@
   font: 700 0.8em / 1.4 system-ui, sans-serif;
   text-align: center;
 }
+
+/* HelpLink (mouse-first): data face, ink-dim, the ? in a hairline square; it lights only when pointed at. */
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  margin: 0;
+  padding: 0.2em 0;
+  border: 0;
+  background: none;
+  color: var(--pa-ink-dim);
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: clamp(12px, 0.8vw, 16px);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 120ms ease-out;
+}
+
+.linkMark {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5em;
+  height: 1.5em;
+  border: 1px solid var(--pa-line);
+  transition: border-color 120ms ease-out;
+}
+
+.link:hover,
+.link:focus-visible {
+  color: var(--pa-ink);
+}
+
+.link:hover .linkMark,
+.link:focus-visible .linkMark {
+  border-color: var(--pa-primary);
+}
+
+.link:focus-visible {
+  outline: 1px solid var(--pa-primary);
+  outline-offset: 3px;
+}

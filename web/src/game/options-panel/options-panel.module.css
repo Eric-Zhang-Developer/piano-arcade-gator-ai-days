@@ -17,16 +17,6 @@
   cursor: pointer;
 }
 
-.kbd {
-  min-width: 1.4em;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: rgb(242 242 245 / 0.12);
-  font: 700 1em system-ui, sans-serif;
-  font-style: normal;
-  text-align: center;
-}
-
 .drawer {
   --size: clamp(16px, 2.222vh, 24px);
   position: fixed;

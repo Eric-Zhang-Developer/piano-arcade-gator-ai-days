@@ -1,4 +1,4 @@
-// Headless proof of song preview (spec: song-preview, the Chrome steps). On /: nothing sounds before a key press; ↓
+// Headless proof of song preview (spec: song-preview, the Chrome steps). On /?midi=off: nothing sounds before a key press; ↓
 // shows the panel and plays the opening as tones; ↓ again stops it and starts the next; PRACTICE 70% opens bar-loop.
 // Then with a stand-in "Portable Grand" MIDI output: the opening goes to the piano on channel 1, and moving on sends
 // All Notes Off, and L (learn-from-select) does the same on its way to wait mode.
@@ -85,10 +85,10 @@ const instrument = (piano) => {
   };
 };
 
-async function open(page) {
+async function open(page, path = "/") {
   for (let i = 0; ; i++) {
     try {
-      await page.goto(`${base}/`);
+      await page.goto(`${base}${path}`);
       break;
     } catch (e) {
       if (i > 60) throw e;
@@ -110,7 +110,9 @@ const errors = [];
 let page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
 page.on("pageerror", (e) => errors.push(e.message));
 await page.addInitScript(instrument, false);
-await open(page);
+// ?midi=off: no piano at all. Without it, laptop-sound's virtual "Portable Grand" stands in and the opening plays
+// through it instead of tones (spec: laptop-sound).
+await open(page, "/?midi=off");
 await page.waitForTimeout(1500);
 check((await page.getByTestId("preview-status").textContent()) === "Press any key for previews", "before a key press the panel says 'Press any key for previews'");
 check((await page.evaluate(() => window.__tones + window.__uiTones + window.__midiAsked)) === 0, "nothing plays and no MIDI is asked for on page load");

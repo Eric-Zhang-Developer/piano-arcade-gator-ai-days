@@ -167,6 +167,9 @@ cut = []
 name = "extras"
 ship = ""
 features = [
+  "laptop-sound",
+  "flow-mode",
+  "lab",
   "level-forge",
   "veritas",
   "veritas-polish",

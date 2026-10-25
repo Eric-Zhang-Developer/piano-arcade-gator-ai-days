@@ -1,0 +1,12 @@
+Please use your image generation tool to create exactly one image from the art brief below. Save it in the current directory as 05-score-is-art-results.png (PNG). Don't create, edit or delete any other file. When you're done, reply with just the saved file's path. Thank you!
+
+Art brief:
+Context: Piano Arcade is a Japanese-style arcade rhythm game played on a real 88-key digital piano in Chrome. Notes fall toward the keys, every note is judged to the millisecond (PERFECT, GREAT, GOOD, MISS), and a learning side tells you what to practice. The image is a high-fidelity UI design mockup of one screen, shown flat and straight-on as a 1920x1080 browser screenshot (16:9, no browser chrome, no device frame, no hands, no people). It should look like a shipped, award-quality game interface: crisp vector edges, generous spacing, a clear visual hierarchy, and only a little text, set large and spelled exactly as given. Avoid generic AI-art clichés: no lens flares, no random glowing particles everywhere, no chrome 80s lettering, no pixel art.
+
+Screen: the results screen after a take, direction "the score is the art" (classical engraving glowing on black, arcade numerals).
+
+Layout: pure black with a faint warm gold glow behind the rank. Left: a huge rank letter "A" stamped in gold (#ffe27a), with the song title "Minuet in G" in an elegant serif and "Petzold" in small sans below. Center-right: a tally in big upright scoreboard numerals: "PERFECT 96", "GREAT 22", "GOOD 6", "MISS 4", each with its color (gold, white, blue #7cb7ff, dusty rose #c98a9a), then "ACCURACY 91.2%" and "MAX COMBO 87".
+
+The signature panel across the bottom: a wide strip of the piece's real engraved sheet music (four bars, glowing white staff and noteheads on black), where each notehead is colored by how it was played: gold for perfect, white for great, blue for good, rose for miss, and two bars softly highlighted with the label "Practice bars 9–10". Next to it a small, clean chart labeled "Timing: 12 ms early on average".
+
+Bottom right: two buttons, "RETRY" (primary) and "SONGS" (secondary). Mood: a concert program that is also a high-score screen. Calm, celebratory, premium.

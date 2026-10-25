@@ -128,6 +128,12 @@
   gap: 0.4rem;
 }
 
+.count {
+  margin-left: 0.15rem;
+  color: var(--pa-ink);
+  font-variant-numeric: tabular-nums;
+}
+
 .swatch {
   width: 0.7rem;
   height: 0.55rem;

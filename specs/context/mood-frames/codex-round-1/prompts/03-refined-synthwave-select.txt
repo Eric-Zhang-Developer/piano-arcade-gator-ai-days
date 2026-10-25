@@ -1,0 +1,18 @@
+Please use your image generation tool to create exactly one image from the art brief below. Save it in the current directory as 03-refined-synthwave-select.png (PNG). Don't create, edit or delete any other file. When you're done, reply with just the saved file's path. Thank you!
+
+Art brief:
+Context: Piano Arcade is a Japanese-style arcade rhythm game played on a real 88-key digital piano in Chrome. Notes fall toward the keys, every note is judged to the millisecond (PERFECT, GREAT, GOOD, MISS), and a learning side tells you what to practice. The image is a high-fidelity UI design mockup of one screen, shown flat and straight-on as a 1920x1080 browser screenshot (16:9, no browser chrome, no device frame, no hands, no people). It should look like a shipped, award-quality game interface: crisp vector edges, generous spacing, a clear visual hierarchy, and only a little text, set large and spelled exactly as given. Avoid generic AI-art clichés: no lens flares, no random glowing particles everywhere, no chrome 80s lettering, no pixel art.
+
+Screen: the music select menu, direction "refined synthwave arcade": a disciplined, modern take on a Japanese arcade rhythm game menu (think SEGA maimai/CHUNITHM or Beatmania IIDX song select), with restraint.
+
+Layout: deep night-sky background (#0b0220) fading to black, with a single large synthwave sun (gradient #ffe66b to #ff3fa4, with horizontal stripe cutouts) set low and fully visible on the left behind the focused song, and a faint magenta perspective grid floor along the bottom only. Left third: the focused song. Right two thirds: a vertical carousel of 6 song cards with the focused card pulled forward and slightly larger, a cyan (#27e1ff) focus glow.
+
+Each song's jacket is a bold abstract graphic: geometric shapes and gradients unique to each song, like album art; no text inside the jacket.
+
+Type: titles in a bold, upright (not italic) geometric sans-serif, white; composers small and 60% white; numbers in a heavy condensed sans like a scoreboard.
+
+Focused song panel (left): large jacket, title "Minuet in G", composer "Petzold", "LEVEL 3", "128 NOTES", one big primary button "PLAY" and a smaller "LEARN".
+
+List cards (right), top to bottom: "Twinkle, Twinkle", "Minuet in G" (focused), "Für Elise", "Clair de lune", "Gymnopédie No. 1", "Prelude in E minor", each with a short composer line and a level number.
+
+Top left: logo "PIANO ARCADE". Mood: neon, energetic, but clean and readable, with plenty of black space.

@@ -70,6 +70,21 @@ describe("holdClock", () => {
   });
 });
 
+describe("holdClock's held time (#592)", () => {
+  it("reads exactly the held note's time, with a zero where (at + zero) - zero rounds past it", () => {
+    const bars = { ...chart, bpm: 66, notes: [{ id: "a", pitch: 69, beat: 12, duration: 1, hand: "R" }] } as Chart;
+    const at = (12 * 60000) / 66; // Für Elise's bar 9, where the left hand's A2 starts with your A4
+    const zero = 1002.96; // found by search: (at + zero) - zero is at + 1.8e-12
+    expect(at + zero - zero).toBeGreaterThan(at);
+    const clock = holdClock(bars, new Judge(bars).noteState);
+    clock.seek(0, zero);
+    clock.update(zero + at + 40); // the frame after the note reached the line
+    expect(clock.holding).toBe(true);
+    expect(clock.now(zero + at + 40)).toBe(at);
+    expect(clock.now(zero + at + 4000)).toBe(at);
+  });
+});
+
 describe("barStep (rewind)", () => {
   const twinkle = Array.from({ length: 12 }, (_, i) => i * 2400); // 12 bars of 2400 ms at 100 bpm
   it("← goes to the bar before, → to the next; bar 1 stays, the last bar has no →", () => {

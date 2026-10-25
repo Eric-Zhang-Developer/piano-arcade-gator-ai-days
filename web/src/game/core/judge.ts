@@ -44,6 +44,10 @@ export class Judge {
 
   press(pitch: number, timeMs: number, eventIndex: number): void {
     if (this.results) return;
+    // First every note this press is past the reach of, as judgeTake does. The frame's sweep can land after the next
+    // press on a slow page, and a MISS counted after a later hit made max combo depend on frame timing (#586). Only the
+    // order changes, no window. Unscored (wait mode) never sweeps: nothing is a MISS there.
+    if (this.scored) this.advance(timeMs);
     let best = -1;
     for (const i of this.byTime) {
       if (this.judgments[i] || this.chart.notes[i].pitch !== pitch) continue;

@@ -85,7 +85,8 @@ describe("synthetic players on Twinkle", () => {
     const judge = new Judge(chart, (e) => events.push(e));
     const t = noteTimeMs(chart, chart.notes[4]);
     judge.press(chart.notes[4].pitch + 1, t, 0);
-    expect(events.map((e) => e.type)).toEqual(["extra", "wrongNote"]);
+    // notes 1–4 were never pressed: the press misses them first (#586), then it's an extra and a WRONG note
+    expect(events.map((e) => e.type)).toEqual(["noteMiss", "noteMiss", "noteMiss", "noteMiss", "extra", "wrongNote"]);
   });
 
   it("Wrong then right: a wrong key 30 ms early, then the right key on time: PERFECT, 1 WRONG, combo reset", () => {
@@ -169,6 +170,30 @@ describe("live judging", () => {
     const r = judgeTake(c, { chartId: "synth", startedAt: new Date(0).toISOString(), latencyOffsetMs: 0,
       inputDevice: "test", events: [{ pitch: 60, velocity: 80, timeMs: 45, offTimeMs: null }] });
     expect(r.judgments.map((j) => j.judgment)).toEqual(["MISS", "PERFECT"]);
+  });
+});
+
+describe("a press first misses what it's past (#586)", () => {
+  // Every note hit on time but the 11th, with no frame sweeping in between: a slow page's frames come after the presses.
+  const k = 10;
+  const run = (opts?: { scored?: boolean }) => {
+    const events: GameEvent[] = [];
+    const judge = new Judge(chart, (e) => events.push(e), opts);
+    play((i) => (i === k ? null : 0)).events.forEach((e, i) => judge.press(e.pitch, e.timeMs, i));
+    return { events, judge };
+  };
+
+  it("the MISS comes before the next hit, so max combo is the same however late the sweep", () => {
+    const { events, judge } = run();
+    const types = events.filter((e) => e.type === "noteHit" || e.type === "noteMiss").map((e) => e.type);
+    expect(types.indexOf("noteMiss")).toBe(k);
+    expect(judge.finish(1e9).maxCombo).toBe(Math.max(k, chart.notes.length - k - 1));
+  });
+
+  it("unscored (wait mode) leaves it unjudged until the end", () => {
+    const { events, judge } = run({ scored: false });
+    expect(events.some((e) => e.type === "noteMiss")).toBe(false);
+    expect(judge.finish(1e9).counts.MISS).toBe(1);
   });
 });
 

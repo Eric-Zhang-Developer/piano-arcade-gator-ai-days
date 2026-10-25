@@ -6,6 +6,7 @@ import { msPerBeat } from "../core/settings";
 import { loopChart } from "../bar-loop";
 import { isWaitMode } from "../wait-mode";
 import { isFlowMode } from "../flow-mode/clock";
+import { savedNumber } from "../laptop-sound/volume";
 
 export const audioTrackSettings = {
   fadeOutS: 0.25, // after songEnd: a short fade, then silence
@@ -79,38 +80,6 @@ export function skipReason(params: URLSearchParams): string | null {
   if (isWaitMode(params)) return "wait mode (the clock holds at each note; the record can't)";
   if (isFlowMode(params)) return "flow mode (the clock follows the player; the record can't)";
   return null;
-}
-
-// A number saved per browser, for the options panel's rows: read once, clamped when set, out-of-range or unreadable
-// saved values read as the default, and listeners told of each change (useSyncExternalStore's subscribe).
-function savedNumber(key: string, fallback: number, min: number, max: number) {
-  let value: number | null = null;
-  const listeners = new Set<() => void>();
-  const load = (): number => {
-    try {
-      const raw = localStorage.getItem(key);
-      const v = Number(raw);
-      return raw !== null && v >= min && v <= max ? v : fallback;
-    } catch {
-      return fallback;
-    }
-  };
-  return {
-    get: (): number => (value ??= load()),
-    set(v: number): void {
-      value = Math.min(max, Math.max(min, v));
-      try {
-        localStorage.setItem(key, String(value));
-      } catch {
-        // private mode: it holds for this page only
-      }
-      listeners.forEach((f) => f());
-    },
-    subscribe(f: () => void): () => void {
-      listeners.add(f);
-      return () => listeners.delete(f);
-    },
-  };
 }
 
 // "Recording volume", 0–1: the recording's own level, apart from the effects mute and the piano volume. Each take

@@ -68,3 +68,9 @@ Sources whose licenses ask for credit. Each chart's `source` field names its sou
   [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Changes: repeats, dynamics, tempo, doubling,
   transposition, re-voicing and the other transforms in `spikes/twinkle-13/transform.py`; the source's notes aren't
   edited. Every file in `out/` is shared under the same license ([SOURCE.md](spikes/twinkle-13/SOURCE.md)).
+- **WebGL Fluid Simulation** (Pavel Dobryakov), `web/src/game/x/wet-paint/vendor/fluid.js`: vendored from
+  <https://github.com/PavelDoGreat/WebGL-Fluid-Simulation>, `script.js` at commit
+  `a2d292931f19d9b3b9f564e23e6c32729d2121c3`, licensed [MIT](https://opensource.org/license/mit), Copyright (c) 2017
+  Pavel Dobryakov; the license header is kept in the file. Changes: the promo, analytics, GUI, screenshot, bloom,
+  sunrays, input and render-loop code removed, and a dried-pigment layer added
+  ([decision](specs/decisions/wet-paint-vendor.md)).

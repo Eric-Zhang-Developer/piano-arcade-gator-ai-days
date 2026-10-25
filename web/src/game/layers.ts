@@ -40,6 +40,7 @@ import { simPlugin } from "./sim/plugin";
 import { tempoCurve } from "./tempo-curve";
 import { weakBars } from "./weak-bars";
 import { feverStage } from "./stage";
+import { highwayField } from "./highway-field";
 import { takeGraph } from "./take-graph";
 import { duoResults, duoTutor } from "./duo-results";
 import { cabinet } from "./cabinet/plugin";
@@ -105,6 +106,7 @@ export const plugins: GamePlugin[] = [
   pianoVoice(), // the chart's GM voice on the DGX for the take (and its replay), then grand piano again
   takeMidi(), // results panel: Download MIDI, the take as a .mid file
   feverStage(), // three.js stage behind the highway (background hook only, no 2D layer)
+  highwayField(), // follows fever for the highway field's haze (events only; the field draws in highway.ts)
   tempoCurve(), // results panel: a rubato score beside the strict one
   weakBars(), // results panel: accuracy per phrase, and a link to loop the weakest
   evenness(), // results panel: how even each hand's runs were

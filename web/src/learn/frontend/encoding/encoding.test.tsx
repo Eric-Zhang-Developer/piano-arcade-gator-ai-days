@@ -76,3 +76,15 @@ describe('the encoding styles', () => {
     expect(css).toMatch(/\.paper \{[^}]*color-scheme:light/);
   });
 });
+
+describe('the score for a screen reader (#945)', () => {
+  it('names each phrase and its bars, never the note it ends on', async () => {
+    const { EncodingScore } = await import('./EncodingScore');
+    const { PhraseScore } = await import('../Score');
+    const labels = [renderToStaticMarkup(<EncodingScore />), renderToStaticMarkup(<><PhraseScore phrase={1} /><PhraseScore phrase={2} /></>)]
+      .flatMap(html => [...html.matchAll(/role="img" aria-label="([^"]*)"/g)].map(m => m[1]));
+    expect(labels).toContain('Phrase 1, bars 1 to 2');
+    expect(labels).toContain('Phrase 2, bars 3 to 4');
+    expect(labels.filter(l => /ending|\b[A-G]\b/.test(l))).toEqual([]);
+  });
+});

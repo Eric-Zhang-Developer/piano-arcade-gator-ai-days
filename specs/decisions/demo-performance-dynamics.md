@@ -2,7 +2,7 @@
 
 **Context.** The bot plays `note.velocity ?? KEYS_VELOCITY` (80). The spec asks for velocities from each score's
 dynamic marks with one mapping for the library, never from memory or a recording. The song packs' converter already
-writes velocities where a source's MIDI renders them (decided on #181). Findings: batch 1 on #815, batch 2 on #816, batch 3 on #818, batch 4 on #819.
+writes velocities where a source's MIDI renders them (decided on #181). Findings: batch 1 on #815, batch 2 on #816, batch 3 on #818, batch 4 on #819, batch 6 on #1102.
 
 **Options.** (A) golden-demo's ladder for printed marks; (B) whatever each MIDI export renders, which differs by
 typesetter and is flat for most of these sources.
@@ -53,6 +53,16 @@ themes too), and it doesn't read `fz` or a marcato.
 - alla-turca (A, A, B+A′, B+A′): p in A with accents at 7 (R) and 9, 11, 13 (both hands); mp in B with right-hand accents
   each bar; p in A′, a *cresc.* into an fz, p again, an accent: 49–80.
 - minute-waltz (bars 1–20): no level mark, so mf; an accent on the first note, then six one-step hairpins: 64–96.
+
+**Batch 6** (#1102). All hand-read `--marks`, checked against the chart's notes at each beat. `dynamics` lays a
+dynamics line kept outside a `\repeat volta` (Wild Horseman) straight over the unfolded MIDI, which moves B's marks onto
+A's second pass. It also misplaces accents inside `\voiceOne << >>` blocks (Happy Farmer).
+- happy-farmer (the pickup and bars 1–20): f, restated at bars 4, 10 and 16; accents on both hands' melody notes in
+  bars 9, 10, 15 and 16: 96, the accents 112.
+- wild-horseman (A twice, then B): mf at the pickup; sf on the downbeats of bars 2, 3, 6 and 7 in both passes of A,
+  and of bars 10, 11 and 14 in B: 80, the sf notes 96.
+- old-french-song (the pickup and bars 1–16): p, then pp on bar 8's last eighth: 49, then 33.
+- minuet-g-minor, musette-d: no marks, no velocity (80).
 
 A single level reads as "This score marks no dynamics" in the dynamics grade (it needs two levels), as before.
 

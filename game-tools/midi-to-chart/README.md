@@ -129,3 +129,14 @@ S=../../web/public/songs
   --midi source/moonlight3.mid --bars 1-8
 for s in gymnopedie-1 clair-de-lune maple-leaf-rag; do .venv/bin/python perform.py pedal $S/$s/chart.json --harmony; done
 ```
+Batch 6 (#1102), with song-pack-5's sources (`specs/decisions/song-pack-5-sources.md`). The marks are hand-read:
+`dynamics` lays Wild Horseman's dynamics line, which sits outside its `\repeat volta`, over the unfolded MIDI, and
+it misplaces Happy Farmer's accents inside its `\voiceOne << >>` blocks.
+```bash
+S=../../web/public/songs
+.venv/bin/python perform.py velocity $S/happy-farmer/chart.json --marks "RL@7/2=f,RL@36!,RL@40!,RL@60!,RL@64!"
+.venv/bin/python perform.py velocity $S/wild-horseman/chart.json \
+  --marks "RL@5/2=mf,RL@6!,RL@9!,RL@18!,RL@21!,RL@30!,RL@33!,RL@42!,RL@45!,RL@54!,RL@57!,RL@66!"
+.venv/bin/python perform.py velocity $S/old-french-song/chart.json --marks "RL@3/2=p,RL@35/2=pp"
+for s in happy-farmer old-french-song minuet-g-minor musette-d; do .venv/bin/python perform.py pedal $S/$s/chart.json --harmony; done
+```

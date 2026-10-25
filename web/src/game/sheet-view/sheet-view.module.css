@@ -96,7 +96,7 @@
 }
 
 .score {
-  padding: 0.5rem clamp(1rem, 4vw, 3rem) 4rem; /* the header's inline padding */
+  padding: 1.5rem clamp(1rem, 4vw, 3rem) 4rem; /* the header's inline padding; the paper stands clear of its rule */
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -2,6 +2,7 @@ import { join } from "node:path";
 import { AccountChip } from "@/app/auth/AccountChip";
 import { BuildStamp } from "@/game/build-stamp";
 import { FirstRunLink } from "@/game/first-run";
+import { LabLink } from "@/game/lab/LabLink";
 import { OptionsDrawer } from "@/game/options-panel";
 import { MusicSelect } from "@/game/select-layout";
 import { loadSongs } from "@/game/song-select/load";
@@ -15,13 +16,14 @@ export default function Home() {
     <>
       {/* The left column's footer, in flow under the focused song: options-panel's drawer (latency with Calibrate,
           effects, labels; setup, so ?capture=1 hides its button), then first-run's "First time?" link, and F, which
-          open the guided Twinkle. */}
+          open the guided Twinkle, then lab's "Lab" link, and X, which open /lab. */}
       <MusicSelect
         songs={songs}
         footer={
           <>
             <OptionsDrawer />
             <FirstRunLink />
+            <LabLink />
           </>
         }
       />

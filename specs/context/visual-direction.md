@@ -21,7 +21,8 @@ rounded notes, a white-hot flare where a note meets the line. It's calm, because
 they're calm. The arcade heritage lives in the big numbers, the rank stamp and the energy of the moments, never in
 clutter.
 
-**Retired as the brand:** the synthwave sun, the grid floor, magenta chrome, and italic everywhere. Fever may keep a
+**Retired as the brand:** the synthwave sun, the grid floor, magenta *chrome* (pink returns as hype, for moments
+only), and italic everywhere. Fever may keep a
 short stage moment as a reward (see Motion).
 
 **Calm center, loud edges, loud moments.** Loudness lives at the screen's edges and in short moments (fever, full
@@ -45,7 +46,8 @@ canvas code.
 | `--pa-line` | `--pa-ink-dim` at about 25% | 1px hairlines and frames | |
 | `--pa-ink` / `--pa-ink-dim` | `#E2E6F0` / `#7D8496` | Text | |
 | `--pa-paper` / `--pa-paper-ink` | warm off-white / black ink (exact values: the sheet-paper feature picks and logs them) | The paper panel sheet music sits on (below) | Anything but notation |
-| `--pa-magenta`, `--pa-cyan` | retired as chrome | Their uses move to `--pa-primary` / `--pa-secondary`; the names go once nothing reads them | New uses |
+| `--pa-hype` (alias `--pa-magenta`) | `#ff2fd0` (hype pink, unchanged) | **Hype: the arcade's big moments only,** game lane only (below) | Notes, lanes, keys, the hit line, buttons, focus, panels, judgments, `/learn` |
+| `--pa-cyan` | retired as chrome | Its uses move to `--pa-primary`; the name goes once nothing reads it | New uses |
 | `--pa-sun`, `--pa-sky` | unchanged values | Fever's short stage moment only | Any screen's base, the brand |
 | Tier colors | x1 `#e8e8ec`, x2 `#ff9f43`, x3 `#8ee05e`, x4 `#c47cff` | The multiplier (the HUD's, from Guitar Hero) | |
 
@@ -57,6 +59,11 @@ canvas code.
   `--pa-hand-l` and `--pa-miss`, and adds `--pa-primary`, `--pa-secondary`, `--pa-line` and the paper pair. GOOD, the
   tier colors and the rest keep their values. The TypeScript mirror (`ui-tokens`) and the hand colors that drive the
   notes and the LED strip change with them.
+- **Hype pink is the third color, for moments** (Eric, 2026-10-25: "I love this pink. Let's add it… just for tiny
+  moments, like hype"). Its uses, about five, and no more: the stage card's ARE YOU READY rules (as now), fever
+  starting, full combo, NEW RECORD, the rank reveal, combo milestone flashes on the combo bracket (50, 100, …), and
+  the cold open's title card if there is one. If it spreads past these, it stops meaning "moment". The playfield stays
+  two-color, one per hand. **Game lane only:** `/learn` stays two-color.
 - **Judgment colors are news:** gold, red and grey appear only for judgments and moments, never as interface chrome.
   The resting screen is black, blue and purple. Acid yellow is rejected outright.
 - **Hand colors on chrome are allowed now** (Duo makes the hands the brand), but a button never looks like a note:
@@ -108,7 +115,7 @@ picker, where nobody reads it. The details of the sheet player are Eric's or And
 ## Do and don't
 - **Do:** black playfield; rounded note pills sized to their key (narrower on black keys); a white-hot full-width hit
   line; judgments and combo off the lanes; sharp interface corners; one loud thing at a time.
-- **Don't:** red notes; gold, red or grey as chrome; a third brand color (no yellow, no cyan, no magenta); rounded
+- **Don't:** red notes; gold, red or grey as chrome; a fourth color (no yellow, no cyan); hype pink outside its moments; rounded
   buttons or panels; notation inverted to light-on-dark; neon soup (everything glowing); the synthwave sun or grid
   floor as a base; italic everywhere; recolor every note in fever (Guitar Hero's star-power mistake hides the hands);
   strong perspective on the highway; glitch effects; pixel art; images of other games or artists' covers on jackets;

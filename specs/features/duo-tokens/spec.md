@@ -56,7 +56,9 @@ screen repaints at once.
   - `--pa-hand-r` = `--pa-primary` = `#2B9BFF`, `--pa-hand-l` = `--pa-secondary` = `#A07CFF`;
   - `--pa-miss` `#8A8F98`;
   - `--pa-line` = ink-dim at about 25% alpha;
-  - `--pa-magenta` and `--pa-cyan` stay defined but alias `--pa-primary` and `--pa-secondary`, so old readers repaint
+  - `--pa-hype` `#ff2fd0` is added, and `--pa-magenta` stays `#ff2fd0` as its alias (hype pink, Eric 2026-10-25:
+    moments only, see visual-direction.md). Any `--pa-magenta` reader that isn't one of the hype moments moves to
+    `--pa-primary`. `--pa-cyan` aliases `--pa-primary`, so old readers repaint
     instead of breaking;
   - GOOD, gold, WRONG, flare, the sun and sky colors, and the tier colors are **unchanged**.
 - **Paper:** `--pa-paper` (warm off-white) and `--pa-paper-ink` (near-black). The worker picks the exact values with

@@ -1,6 +1,6 @@
 // Headless proof of the retrieval test (spec: theory-screens, slice V3). Its own `next dev`. At 1280×720 on
 // /learn/review/theory: answer question 1 right (Correct, no ✕), question 2 wrong (✕, and the chosen option's
-// explanation in its own row, to the right of the option), and check the look: square, upright, no gradient,
+// explanation in its own row, to the right of the option, the only option left), and check the look: square, upright, no gradient,
 // nothing under 16px, no reference beside the question. Then ?node=pitch-grand-staff: only that node's questions, each
 // Check appended to the device's attempts, ending on Test done and the way back to the map. Usage: node web/src/learn/frontend/retrieval/verify-retrieval.mjs --out <dir>
 import { spawn } from "node:child_process";
@@ -97,6 +97,7 @@ try {
   check(beside?.verdict === "wrong" && beside.label === "5", `the explanation sits in the chosen option's row (${JSON.stringify(beside)})`);
   check(Boolean(beside?.right && beside.sameBand), "the explanation is beside the answer, to its right");
   check((await page.getByText("The tonic is scale degree 1").count()) === 0, "the right answer's explanation is not given away");
+  check((await page.locator("input[type=radio]").count()) === 1, "after Check only the picked option stays");
 
   const look = await page.evaluate(() => {
     const radius = (el) => (el ? getComputedStyle(el).borderRadius : "missing");

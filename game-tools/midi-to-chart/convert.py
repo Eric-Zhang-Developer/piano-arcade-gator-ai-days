@@ -119,11 +119,23 @@ def convert(mid, rh, lh=None, bars=(1, 1), by_channel=False, rh_voice="all", lh_
     for lo, hi in segments:
         for hand, which, voice in hands:
             inside = [n for n in notes_of(mid, which, by_channel) if lo <= n[0] < hi]
-            # Notation MIDI plays a grace note as a sliver just before its main note: off the grid and under 1/8 beat.
-            grace = [n for n in inside if not on_grid(n[0], tpb) and (n[1] - n[0]) * 8 <= tpb]
-            for on, _, p, _, _ in grace:
-                log.append(f"grace note skipped: {hand} pitch {p} before beat {snap(on - lo) + shift}")
-            inside = outer_voice([n for n in inside if n not in grace], voice)
+            # Notation MIDI plays a grace note just before its main note: off the grid, with the hand's next onset on
+            # the grid at most 1/4 beat later. LilyPond lets it sound past that onset. One that stops within 1/4 beat
+            # of it is skipped; one held longer is tied into its main note (\grace { f'~ } f2., or an acciaccatura on
+            # the main note's own pitch), so it is that note, starting on the onset.
+            grid = sorted(n[0] for n in inside if on_grid(n[0], tpb))
+            grace, tied = [], []
+            for n in inside:
+                main = next((t for t in grid if t > n[0]), None)
+                if on_grid(n[0], tpb) or main is None or (main - n[0]) * 4 > tpb:
+                    continue
+                (grace if (n[1] - main) * 4 <= tpb else tied).append((n, main))
+            for (on, _, p, _, _), main in grace:
+                log.append(f"grace note skipped: {hand} pitch {p} before beat {snap(main - lo) + shift}")
+            for (on, _, p, _, _), main in tied:
+                log.append(f"grace note tied into its main note: {hand} pitch {p} starts on beat {snap(main - lo) + shift}")
+            moved = {n: (main,) + n[1:] for n, main in tied}
+            inside = outer_voice([moved.get(n, n) for n in inside if n not in [g for g, _ in grace]], voice)
             # Onsets must sit on the grid; releases are snapped, since engravers' MIDI shortens some by a tick.
             off_grid = [n for n in inside if not on_grid(n[0], tpb)]
             if off_grid:
@@ -255,6 +267,20 @@ def self_test():
     notes, _, log = convert(tt, rh=0, bars=(1, 1))
     assert [(n["pitch"], n["beat"], n["duration"]) for n in notes] == [(74, 0, 0.25), (71, 0.25, 0.125), (72, 0.375, 0.125), (74, 0.5, 0.25)], notes
     assert not any("grace" in line for line in log), log
+    # LilyPond's grace group before a beat (Traumerei, bar 2: \grace { bes16 f'~ } f2.): B-flat 50 ticks early and
+    # held just past the beat, F 25 ticks early and tied on. B-flat goes; F is the main note, from the beat.
+    gr = mido.MidiFile(ticks_per_beat=384)
+    g1, g2 = mido.MidiTrack(), mido.MidiTrack()
+    gr.tracks += [g1, g2]
+    play(g1, [(0, 384, 57), (384, 384, 62)])
+    g3 = mido.MidiTrack()
+    play(g2, [(384 - 50, 96, 46)])
+    play(g3, [(384 - 25, 1177, 53)])
+    staff = mido.MidiFile(ticks_per_beat=384)
+    staff.tracks.append(mido.merge_tracks([g1, g2, g3]))
+    notes, _, log = convert(staff, rh=0, bars=(1, 1))
+    assert [(n["pitch"], n["beat"], n["duration"]) for n in notes] == [(57, 0, 1), (53, 1, 3), (62, 1, 1)], notes
+    assert any("skipped: R pitch 46" in line for line in log) and any("tied into its main note: R pitch 53" in line for line in log), log
     # Spans write out a volta repeat: body (C D), first ending (D), body again (C), second ending (E).
     sp = mido.MidiFile(ticks_per_beat=480)
     sp.tracks.append(mido.MidiTrack())

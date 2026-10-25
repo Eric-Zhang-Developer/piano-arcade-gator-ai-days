@@ -44,7 +44,8 @@ The `...` are `--id --title --composer --catalog --source -o`, as in each chart'
 
 ## What it refuses
 - A file whose notes in the chosen bars start off the 1/12- and 1/8-beat grids (16ths, triplets, 32nds): that's a performance, not notation. It says how
-  many notes did. (A grace note, an off-grid sliver under 1/8 beat, is skipped and logged instead.)
+  many notes did. (A grace note is skipped and logged instead: an off-grid onset at most 1/4 beat before the hand's next
+  onset on the grid, stopping within 1/4 beat of it. One held longer is tied into its main note and starts on that onset.)
 - A hand with no notes in the bar range.
 
 ## What it changes, and says so on stderr

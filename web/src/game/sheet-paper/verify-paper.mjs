@@ -93,7 +93,7 @@ const READ = ([paper, paperInk]) => {
   };
   const same = (a, b) => !!a && !!b && a.every((v, k) => Math.abs(v - b[k]) <= 1);
   const panel = document.querySelector("[data-paper]");
-  const staff = document.querySelector(".vf-stave path, .vf-stave line, .vf-stave rect");
+  const staff = document.querySelector(".vf-measure > path[stroke]"); // VexFlow draws a stave's lines straight into OSMD's measure group
   const staffColor = staff && rgb(staff.getAttribute("stroke") ?? getComputedStyle(staff).stroke);
   const filtered = [...document.querySelectorAll("*")].filter((el) => getComputedStyle(el).filter !== "none").map((el) => el.tagName.toLowerCase() + (el.className?.baseVal ?? el.className ? `.${el.className?.baseVal ?? el.className}` : ""));
   const heads = [...document.querySelectorAll(".vf-notehead path, .vf-notehead")].filter((el) => el.tagName.toLowerCase() === "path");

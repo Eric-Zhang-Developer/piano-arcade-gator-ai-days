@@ -125,9 +125,11 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
             level={song.level}
             notes={song.noteCount}
             best={bestOf(song.id)}
-            playHref={playHref(song.id)}
-            practiceHref={practiceHref}
-            onPlay={onPlay}
+            onPlay={() => {
+              uiSound("confirm");
+              goToStage(playHref(song.id), router);
+            }}
+            onPractice={practiceHref ? () => router.push(practiceHref) : null}
           >
             <LevelToggle normal={song.level} chart={chart?.id === song.id ? chart.chart : null} />
             <SongPreview id={song.id} />

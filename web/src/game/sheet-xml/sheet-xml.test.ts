@@ -341,6 +341,16 @@ describe("engraving", () => {
     expect(xml).not.toContain("<tie ");
   });
 
+  it("six notes a sixth of a beat apart print as triplet 16ths in two 3s, under one beam (the Pathétique, bar 8)", () => {
+    const notes = [0, 1, 2, 3, 4, 5].map((i) => ({ id: `s${i}`, pitch: 60 + i, beat: i / 6, duration: 1 / 6, hand: "R" as const }));
+    const c = synthetic({ notes });
+    expect(placeNotes(c).map((p) => [p.onset, p.end])).toEqual([0, 2, 4, 6, 8, 10].map((o) => [o, o + 2]));
+    const xml = chartToMusicXml(c);
+    expect((xml.match(/<time-modification>/g) ?? []).length).toBe(6);
+    expect((xml.match(/<tuplet type="start"\/>/g) ?? []).length).toBe(2);
+    expect([...xml.matchAll(/<beam number="1">(\w+)<\/beam>/g)].map((m) => m[1]).join(" ")).toBe("begin continue continue continue continue end");
+  });
+
   it("a moonlight-1 triplet comes back as three triplet eighths in one beat", () => {
     const moon = byId("moonlight-1");
     const beat = moon.notes.find((n) => n.hand === "R" && Math.abs(n.beat % 1 - 1 / 3) < 0.01)!.beat;

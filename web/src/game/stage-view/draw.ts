@@ -86,6 +86,21 @@ function hill(ctx: CanvasRenderingContext2D, w: number, h: number, live: boolean
   ctx.fillStyle = face;
   ctx.fill();
 
+  // The crest catches the light: a glow behind it (the stage's one light, a choice) and a lit horizon along it, so the
+  // hill reads in a still frame and notes visibly tip over it.
+  const [cx, cy, crestHalf] = [w / 2, top * h, (fieldWidth(top / S) * w) / 2];
+  const light = ctx.createRadialGradient(cx, cy, 0, cx, cy, crestHalf * 1.4);
+  light.addColorStop(0, live ? "rgba(43, 155, 255, 0.16)" : "rgba(43, 155, 255, 0.08)");
+  light.addColorStop(1, "rgba(43, 155, 255, 0)");
+  ctx.fillStyle = light;
+  ctx.fillRect(0, 0, w, cy + crestHalf * 1.4);
+  const horizon = ctx.createLinearGradient(cx - crestHalf, 0, cx + crestHalf, 0);
+  horizon.addColorStop(0, "rgba(226, 230, 240, 0)");
+  horizon.addColorStop(0.5, live ? "rgba(226, 230, 240, 0.7)" : "rgba(226, 230, 240, 0.35)");
+  horizon.addColorStop(1, "rgba(226, 230, 240, 0)");
+  ctx.fillStyle = horizon;
+  ctx.fillRect(cx - crestHalf, cy - Math.max(1, h / 720), 2 * crestHalf, Math.max(2, h / 360));
+
   ctx.strokeStyle = line;
   ctx.lineWidth = Math.max(1, h / 720);
   ctx.globalAlpha = live ? 1 : 0.6;
@@ -174,9 +189,14 @@ function hits(ctx: CanvasRenderingContext2D, w: number, h: number, s: StageState
         const g = ctx.createLinearGradient(0, barY, 0, barY - ph);
         g.addColorStop(0, color);
         g.addColorStop(1, "rgba(0, 0, 0, 0)");
-        ctx.globalAlpha = pa * 0.8;
+        ctx.globalAlpha = pa;
         ctx.fillStyle = g;
         ctx.fillRect(x - pw / 2, barY - ph, pw, ph);
+        const core = ctx.createLinearGradient(0, barY, 0, barY - ph);
+        core.addColorStop(0, flare);
+        core.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = core; // a white core a third as wide: from across a room the pillar is light, not a tint
+        ctx.fillRect(x - pw / 6, barY - ph, pw / 3, ph);
       }
       const ba = age < stageFx.burstBrightMs ? 1 : fade(age - stageFx.burstBrightMs, stageFx.burstMs - stageFx.burstBrightMs);
       if (ba > 0) {
@@ -184,7 +204,7 @@ function hits(ctx: CanvasRenderingContext2D, w: number, h: number, s: StageState
         const r = ((stageFx.ring[0] + (stageFx.ring[1] - stageFx.ring[0]) * k) * w) / 2;
         ctx.globalAlpha = ba;
         ctx.strokeStyle = color;
-        ctx.lineWidth = Math.max(2, h / 360);
+        ctx.lineWidth = Math.max(3, h / 240);
         ctx.beginPath();
         ctx.arc(x, barY, r, 0, Math.PI * 2);
         ctx.stroke();
@@ -221,6 +241,7 @@ function hits(ctx: CanvasRenderingContext2D, w: number, h: number, s: StageState
 // The combo, top centre, and a milestone's ghost swelling out of it.
 function combo(ctx: CanvasRenderingContext2D, w: number, h: number, s: StageState, now: number) {
   if (!s.chart || s.ended) return;
+  if (s.fullCombo && now - s.fullCombo.atMs >= stageFx.bannerAt[0]) return; // the field gives way to the banner
   const px = Math.round((stageFx.comboH * h) / 0.72);
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -240,7 +261,7 @@ function combo(ctx: CanvasRenderingContext2D, w: number, h: number, s: StageStat
   ctx.font = canvasFonts.numeral(px);
   ctx.fillText(String(s.combo), w / 2, stageFx.comboY * h);
   ctx.fillStyle = inkDim;
-  ctx.font = canvasFonts.data(Math.round(h / 54));
+  ctx.font = canvasFonts.data(Math.round(h / 36));
   ctx.fillText("COMBO", w / 2, stageFx.labelY * h);
 }
 
@@ -251,8 +272,8 @@ function finale(ctx: CanvasRenderingContext2D, w: number, h: number, age: number
     const [y0, y1] = [stageFx.washY[0] * h, stageFx.washY[1] * h];
     const g = ctx.createLinearGradient(0, y0, 0, y1);
     g.addColorStop(0, "rgba(43, 155, 255, 0)");
-    g.addColorStop(0.75, "rgba(226, 230, 240, 0.55)");
-    g.addColorStop(1, "rgba(43, 155, 255, 0.2)");
+    g.addColorStop(0.75, "rgba(226, 230, 240, 0.9)");
+    g.addColorStop(1, "rgba(43, 155, 255, 0.5)");
     ctx.globalCompositeOperation = "lighter";
     ctx.globalAlpha = Math.max(0, a);
     ctx.fillStyle = g;

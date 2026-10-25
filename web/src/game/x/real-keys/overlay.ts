@@ -8,6 +8,7 @@ export const overlaySettings = {
   maxDepth: 2.5, // the lane's length beyond the back edge, in bed depths
   horizonShare: 0.7, // never past this share of the way to the map's horizon, where the picture flips
   noteAlpha: 0.72,
+  gapMs: 90, // a note's tail is drawn this much short, so Twinkle's repeated notes read as separate blocks
   glowAlpha: 0.42,
   wrongMs: 220, // a wrong key's red tint
   wrongAlpha: 0.45,

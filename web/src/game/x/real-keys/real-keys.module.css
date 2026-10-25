@@ -2,6 +2,7 @@
    radius, condensed labels, mono data, primary hairlines). */
 
 .page {
+  --rail-w: clamp(280px, 21vw, 400px);
   position: fixed;
   inset: 0;
   background: var(--pa-bg);
@@ -12,6 +13,12 @@
 .stage {
   position: absolute;
   inset: 0;
+}
+
+/* With the setup rail showing, the picture and the HUD sit beside it, not under it: the key bed's left end stays in
+   view. Capture mode hides the rail, and the picture goes full bleed. */
+.page:has(.rail) .stage {
+  left: calc(var(--rail-w) + 2.4rem);
 }
 
 .stage[data-step="corners"] {
@@ -78,7 +85,7 @@
   top: 1.2rem;
   left: 1.2rem;
   bottom: 1.2rem;
-  width: clamp(280px, 21vw, 400px);
+  width: var(--rail-w);
   display: flex;
   flex-direction: column;
   gap: 1.1rem;

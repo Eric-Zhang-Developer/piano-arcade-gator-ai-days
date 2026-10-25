@@ -273,10 +273,12 @@ export function RealKeys() {
   // The latency step's answer, once its presses are in and the frames after the last one have arrived.
   const finishLatency = useCallback(() => {
     const L = live.current;
-    const frameMs = clipMode ? 1000 / 30 : 1000 / 60;
+    // The frame period the picture actually had: the median gap between its frames (60 fps when there are too few).
+    const f = L.latency.frames, gaps = f.slice(1).map((x, i) => x.t - f[i].t).filter((d) => d > 0).sort((a, b) => a - b);
+    const frameMs = gaps.length ? gaps[gaps.length >> 1] : 1000 / 60;
     const s = summarize(pressDelays(L.latency.frames, L.latency.presses), frameMs);
     if (s) updateCal({ ...L.cal, delayMs: Math.round(s.medianMs), latency: s });
-  }, [clipMode, updateCal]);
+  }, [updateCal]);
   const resetLatency = () => {
     live.current.latency = { pitch: null, presses: [], frames: [] };
     setPresses(0);
@@ -475,7 +477,7 @@ export function RealKeys() {
         ctx.globalAlpha = overlaySettings.noteAlpha;
         for (const n of chart.notes) {
           const at = noteTimeMs(chart, n);
-          const span = noteSpan(chartNow, at, n.duration * mpb, depth);
+          const span = noteSpan(chartNow, at, Math.max(mpb / 4, n.duration * mpb - overlaySettings.gapMs), depth);
           const k = L.bed.get(n.pitch);
           if (!span || !k) continue;
           const [u0, u1] = [k[0][0], k[1][0]];

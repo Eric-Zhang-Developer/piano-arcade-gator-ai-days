@@ -1,7 +1,8 @@
 import { existsSync, readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { doneSlots } from "./done";
-import { GITHUB_URL, LAB_PAGES, SLOTS, hideNav, isCurrent } from "./slots";
+import { experiments } from "../x";
+import { EXPERIMENT_PAGES, GITHUB_URL, LAB_PAGES, SLOTS, hideNav, isCurrent } from "./slots";
 
 const repo = new URL("../../../../", import.meta.url).pathname;
 const changes = `${repo}changes`;
@@ -54,5 +55,13 @@ describe("nav bar slots", () => {
     expect(LAB_PAGES).not.toContain("/");
     expect([isCurrent(lab, "/learn"), isCurrent(lab, "/"), isCurrent(lab, "/progress")]).toEqual([false, false, false]);
     expect(SLOTS.filter((s) => isCurrent(s, "/simon")).map((s) => s.label)).toEqual(["Lab"]);
+  });
+
+  it("marks Lab current on every experiment's page no other slot owns, /conduct and /highlight among them (#1130)", () => {
+    const lab = SLOTS.find((s) => s.path === "/lab")!;
+    const pages = [...new Set(experiments.map((x) => new URL(x.href, "http://lab").pathname))];
+    expect([...EXPERIMENT_PAGES].sort()).toEqual([...pages].sort()); // the list in slots.ts is the registry's
+    for (const p of [...pages.filter((p) => !SLOTS.some((s) => s.path !== "/lab" && isCurrent(s, p))), "/conduct", "/highlight"])
+      expect(isCurrent(lab, p), p).toBe(true);
   });
 });

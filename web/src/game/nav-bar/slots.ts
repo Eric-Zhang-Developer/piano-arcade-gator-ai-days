@@ -29,9 +29,14 @@ export const hideNav = (pathname: string, capture: boolean) =>
 const under = (path: string, pathname: string) => pathname === path || pathname.startsWith(`${path}/`);
 const ownSlot = (slot: Slot, pathname: string) => (slot.path === "/" ? pathname === "/" : under(slot.path, pathname));
 
-// The pages you reach from the Lab that no other slot owns (/simon, /wrong-note, /sim, …): Lab is current there (#1043).
-// Read from the Lab's own list, so a new entry lights Lab without an edit here.
-export const LAB_PAGES = [...new Set(labEntries.map((e) => new URL(e.href, "http://lab").pathname))].filter(
+// The experiments' own pages: the pathnames of x/index.ts's experiments[].href. Listed, not imported, because the
+// registry imports every experiment and would put them all in the nav bar on every page (4.5 KB to 206 KB minified;
+// decision lab-pages-a11y-nav). nav-bar.test.ts fails when an experiment's page is missing here.
+export const EXPERIMENT_PAGES = ["/play", "/conduct", "/highlight", "/real-keys", "/composers-hands", "/sonata", "/paint", "/speak"];
+
+// The pages you reach from the Lab that no other slot owns (/simon, /wrong-note, /conduct, …): Lab is current there
+// (#1043, #1130). Read from the Lab's own list, so a new entry lights Lab without an edit here.
+export const LAB_PAGES = [...new Set([...labEntries.map((e) => new URL(e.href, "http://lab").pathname), ...EXPERIMENT_PAGES])].filter(
   (p) => !SLOTS.some((s) => s.path !== "/lab" && ownSlot(s, p)),
 );
 

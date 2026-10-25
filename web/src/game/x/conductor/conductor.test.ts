@@ -255,7 +255,10 @@ describe("what /conduct announces (lab-pages-a11y, #1129)", () => {
         if (c.state === "running") cut = false;
       }
       if (t === 3008) c.hold(t); // the beats stopped: Session holds the same way
-      if (t === 7008) (c.cut(t), (cut = true)); // a fist
+      if (t === 7008) {
+        c.cut(t); // a fist
+        cut = true;
+      }
       const state = cut && c.state === "prep" ? "cut" : c.state; // as Session.state reads it
       lines.push(renderToStaticMarkup(createElement(StateLine, { cam: "on", state })));
     }

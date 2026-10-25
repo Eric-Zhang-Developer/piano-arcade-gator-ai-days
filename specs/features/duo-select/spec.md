@@ -2,7 +2,7 @@
 name: "Duo select: piano-roll thumbnails, one PLAY plus PRACTICE, and a Next-for-you strip"
 depends_on: ["duo-tokens", "select-layout", "song-jacket", "song-preview", "adaptive-chunks"]
 owns: ["specs/features/duo-select/", "changes/duo-select.md", "web/src/game/duo-select/", "specs/decisions/duo-select-"]
-assignee: "eric"
+assignee: "eric-agent-4"
 ---
 
 # Duo select

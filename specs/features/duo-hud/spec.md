@@ -2,7 +2,7 @@
 name: "Duo HUD: the bracketed combo, a white-hot hit line and motion juice on the playfield"
 depends_on: ["duo-tokens", "hud", "core-loop", "juice-visual", "bar-lines"]
 owns: ["specs/features/duo-hud/", "changes/duo-hud.md", "web/src/game/duo-hud/", "specs/decisions/duo-hud-"]
-assignee: "eric"
+assignee: "eric-agent-1"
 ---
 
 # Duo HUD
@@ -10,6 +10,13 @@ assignee: "eric"
 Issue #647. The playfield in the Duo look (`specs/context/visual-direction.md`, frame `F-duo-2-playfield.jpg`).
 **The cold open is shot on this screen:** a black room, the LED strip, Eric plays, the combo climbs. So it ships
 first among the screens.
+
+**Interactive (Eric, 2026-10-25: "agreed do that").** Eric drives eric-agent-1 directly on this gameplay-screen
+overhaul. eric-agent-1 commits on its branch and **does not merge on its own**: Eric gives each merge go, which is an
+exception to AGENTS.md's loop step 6 for this feature only. Eric's direction in that session overrides this spec's
+layout details. The Duo rules in visual-direction.md and the kit still hold. Build on the Duo kit from duo-tokens as
+it lands, not alongside it. The black-key lane shading and the non-fever stage are already removed by their own
+`fix:` PR.
 
 ## What exists (origin/main, 2026-10-25)
 - **The HUD band** is `web/src/game/hud/index.ts:119-131` (hud). From left to right: the song card at 0–28%,

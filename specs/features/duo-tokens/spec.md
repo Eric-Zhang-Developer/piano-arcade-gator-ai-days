@@ -33,8 +33,8 @@ screen repaints at once.
    - load the fonts in `layout.tsx`;
    - update the test.
 2. **`fix(hand-colors)`:** R `#2B9BFF`, L `#A07CFF`; `core/settings.ts` `noteColor`; the two tests that pin the old hex.
-3. **`fix(fever-stage)`:** the stage draws only during fever, as a short moment. Otherwise the playfield base is plain
-   `--pa-bg`.
+3. *(Done separately: Eric's removal PR takes the stage off normal play and the black-key lane shading off /play.
+   Rebase on it. No stage work is left here, except that `<SelectStage/>` comes off the select in duo-select.)*
 4. **`feat(duo-tokens)`, the Duo kit** (Eric, 2026-10-25: "add the shared Duo kit to #645 and have select, HUD and
    results use it"), in `web/src/game/duo-tokens/`. These are the pieces duo-select, duo-hud and duo-results share, so
    there's one bracket style, not three:

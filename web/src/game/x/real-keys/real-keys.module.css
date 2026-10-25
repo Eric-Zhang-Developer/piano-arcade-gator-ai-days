@@ -1,0 +1,241 @@
+/* Real Keys (spec: real-keys): the camera full bleed, a broadcast booth's rail over its left edge (Duo kit: zero
+   radius, condensed labels, mono data, primary hairlines). */
+
+.page {
+  --rail-w: clamp(280px, 21vw, 400px);
+  position: fixed;
+  inset: 0;
+  background: var(--pa-bg);
+  color: var(--pa-ink);
+  overflow: hidden;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+}
+
+/* With the setup rail showing, the picture and the HUD sit beside it, not under it: the key bed's left end stays in
+   view. Capture mode hides the rail, and the picture goes full bleed. */
+.page:has(.rail) .stage {
+  left: calc(var(--rail-w) + 2.4rem);
+}
+
+.stage[data-step="corners"] {
+  cursor: crosshair;
+}
+
+.video,
+.overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.video {
+  object-fit: contain;
+  background: var(--pa-bg);
+}
+
+.empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 0.8rem;
+  text-align: center;
+  /* a faint key-bed grid where the picture will be: something to aim the camera at */
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(100% / 52 - 1px), var(--pa-line) calc(100% / 52 - 1px) calc(100% / 52))
+      center 62% / 70% 22% no-repeat;
+}
+
+.empty p {
+  margin: 0;
+  color: var(--pa-ink-dim);
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: clamp(12px, 0.85vw, 16px);
+}
+
+.live {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.35em 0.7em;
+  border: 1px solid var(--pa-line);
+  background: color-mix(in srgb, var(--pa-bg) 70%, transparent);
+  font: 700 clamp(11px, 0.7vw, 14px) / 1 var(--pa-font-data), ui-monospace, monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.dot {
+  width: 0.6em;
+  height: 0.6em;
+  background: var(--pa-primary);
+  box-shadow: 0 0 0.6em var(--pa-primary);
+}
+
+.rail {
+  position: absolute;
+  top: 1.2rem;
+  left: 1.2rem;
+  bottom: 1.2rem;
+  width: var(--rail-w);
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--pa-line);
+  border-left: 2px solid var(--pa-primary);
+  background: color-mix(in srgb, var(--pa-panel) 88%, transparent);
+  backdrop-filter: blur(6px);
+  font-size: clamp(13px, 0.85vw, 16px);
+  overflow-y: auto;
+}
+
+.head {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.title {
+  font: italic 900 clamp(26px, 2vw, 40px) / 1 var(--pa-font-display), system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.steps button {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.num {
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  color: var(--pa-ink-dim);
+  margin-right: 0.6em;
+}
+
+.body {
+  display: grid;
+  gap: 0.9rem;
+  align-content: start;
+  flex: 1;
+  border-top: 1px solid var(--pa-line);
+  padding-top: 1rem;
+}
+
+.prompt {
+  margin: 0;
+  font: 600 1.15em / 1.35 var(--pa-font-display), system-ui, sans-serif;
+}
+
+.prompt b {
+  color: var(--pa-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.note {
+  margin: 0;
+  color: var(--pa-ink-dim);
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: 0.85em;
+  line-height: 1.45;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.select,
+.file {
+  appearance: none;
+  border: 1px solid var(--pa-line);
+  border-radius: 0;
+  background: var(--pa-bg);
+  color: var(--pa-ink);
+  font: 500 0.95em / 1.2 var(--pa-font-data), ui-monospace, monospace;
+  padding: 0.55em 0.7em;
+  min-height: 44px;
+}
+
+.select:focus-visible,
+.file:focus-visible {
+  outline: 2px solid var(--pa-primary);
+  outline-offset: 2px;
+}
+
+.file::file-selector-button {
+  appearance: none;
+  border: 1px solid var(--pa-primary);
+  border-radius: 0;
+  background: transparent;
+  color: var(--pa-primary);
+  font: 700 0.85em / 1 var(--pa-font-data), ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.5em 0.8em;
+  margin-right: 0.8em;
+  cursor: pointer;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.data {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.4rem 1rem;
+  margin: 0;
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+}
+
+.data dt {
+  color: var(--pa-ink-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.8em;
+  align-self: center;
+}
+
+.data dd {
+  margin: 0;
+  font-size: 1.15em;
+  font-variant-numeric: tabular-nums;
+}
+
+.foot {
+  display: grid;
+  gap: 0.6rem;
+  border-top: 1px solid var(--pa-line);
+  padding-top: 0.9rem;
+}
+
+.link {
+  color: var(--pa-primary);
+  margin-left: 0.5em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail {
+    backdrop-filter: none;
+  }
+}

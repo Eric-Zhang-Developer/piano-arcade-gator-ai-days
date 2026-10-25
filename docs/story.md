@@ -122,7 +122,7 @@ file on `main` with a check in it, not a claim in a chat.
 
 ### Material for the video
 
-- `/how`, once merged, draws merges per hour and who did what, from the same data ([how-it-works spec](../specs/features/how-it-works/spec.md)).
+- `/how` isn't on `main`. Its [spec](../specs/features/how-it-works/spec.md) plans a page that draws merges per hour and who did what, from the same data; its PRs ([#443], [#460]) are open.
 - `/operator` is the live board of features and PRs.
 - Beat: "Eric goes to bed soon" as the reason for a night shift of agents.
 
@@ -349,6 +349,39 @@ done yet.
 
 - Beat: 53 canvases, 436 megapixels a frame, then 25 and 117, then 3 and 9.4.
 
+## Chapter 12: One look, forty songs
+
+Readers: judges · team · postmortem
+
+*Sunday 2026-10-25, 03:15 to 08:02. Evidence: [the select incident](incidents/2026-10-25-duo-select-split.md),
+[#738], [#859], [#701], [#754], [#1052], the song-pack done notes ([3](../changes/song-pack-3.md) to
+[8](../changes/song-pack-8.md)).*
+
+**Twelve PRs for one screen.** The Duo music select reached the screen at 03:24 ([#714]). It took twelve PRs, and
+nothing visible changed for 2 h 22 min after the first one opened. Four of them only edited other features' checks,
+because ownership was per feature ([incident](incidents/2026-10-25-duo-select-split.md)). At 03:52, [#738] made it
+one PR per screen, with ownership open within a person's lane. The start screen then landed as one PR ([#763],
+04:20). By 06:40 the results, `/operator`, `/attract`, `/calibrate`, `/sheet`, `/veritas`, `/simon` and `/sim` were
+in the Duo look too ([#767], [#803], [#805], [#813], [#725], [#924], [#961], [#982]).
+
+**10 songs to 40.** Six packs of five pieces, each charted from a cited score, took the library from 10 charts to
+40 between 03:52 and 07:22 ([#745], [#764], [#968] with [#1004], [#986], [#1005], [#1002]; the count is in [#1052]).
+
+**A clean take ranked D.** Eric's no-miss Twinkle take (18 PERFECT, 18 GREAT, 6 GOOD) ranked D at 67.9%. [#846]
+widened the windows to 40, 80 and 120 ms, and [#859] reweighted the tiers: the same take is 84.3%, a B, and any full
+combo now ranks at least B.
+
+**Red, out loud.** [#701] (03:47) stopped a red scheduled browser run from freezing merges: it files a `ci-red`
+issue, and fixes go forward. [#754] has collected those runs since. One run failed 12 checks, and the review agent
+traced most of them to checks that hadn't followed intended changes, such as the new judging windows. The fixes were
+to the checks ([#1024], [#1029], [#1032], [#1053]). [#754] was still open when this was written.
+
+### Material for the video
+
+- The select at 40 songs, with Find and sort ([#965]).
+- Beat: the no-miss Twinkle take, D at 67.9% under the old windows, B at 84.3% under the new.
+- Beat: twelve PRs for one screen, then a rule of one PR per screen.
+
 ## Timeline
 
 | When (EDT) | What | Evidence |
@@ -378,6 +411,26 @@ done yet.
 | Sun 01:28 | The product is Étude | [#669] |
 | Sun 02:35 | 53 canvases down to 25 on `/play` | [#678] |
 | Sun 03:15 | 25 canvases down to 3: one shared overlay | [#684] |
+| Sun 03:24 | The music select in the Duo look, after twelve PRs for one screen | [#714], [#734], [#736], [#751] |
+| Sun 03:47 | A red scheduled browser run files `ci-red` instead of freezing merges | [#701], [#754] |
+| Sun 03:50 | The deadline is Eric's: `feat` merges freeze at 4 PM ET, by CI | [#744], [#752] |
+| Sun 03:51 | Nav bar: the top-level pages, reachable from each other | [#716], [#741] |
+| Sun 03:52 | One PR per screen, ownership open within a lane | [#738] |
+| Sun 03:58 | The results screen in the Duo look | [#710], [#762], [#767] |
+| Sun 04:13 | Library at 20 songs: song-pack-3 and -4 | [#745], [#764] |
+| Sun 04:20–04:37 | Start screen, `/operator` and `/attract` in the Duo look | [#763], [#803], [#805] |
+| Sun 04:23 | Hit particles: a bloom, dust and wisps on every hit | [#773] |
+| Sun 05:05 | Mouse-first: every action has a button | [#796] |
+| Sun 05:34 | Golden's autoplay pedals, plays dynamics, on the chart's clock | [#836], [#840], [#843] |
+| Sun 05:47 | Judging windows 40/80/120 ms; a full combo ranks at least B | [#846], [#859] |
+| Sun 05:52 | Learn, Flow and Perform as one ladder | [#841] |
+| Sun 05:57–06:30 | Four spikes: spot the wrong note, score following, snap a score, a mascot | [#867], [#861], [#902], [#908] |
+| Sun 06:22–06:40 | The Duo kit on `/play`'s loading screens, not-found, `/veritas`, `/simon` and `/sim` | [#934], [#937], [#924], [#961], [#982] |
+| Sun 06:34 | README for judges and a Devpost draft | [#960] |
+| Sun 06:38 | Every library song's demo plays its printed dynamics | [#976] |
+| Sun 06:45 | Find and sort on the music select | [#928], [#965] |
+| Sun 07:22 | Library at 40 songs: song-pack-5 to -8 | [#968], [#1004], [#986], [#1005], [#1002], [#1052] |
+| Sun 07:34 | Learning attempts and goals saved to Supabase | [#1059] |
 
 [#1]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/1
 [#5]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/5
@@ -403,6 +456,8 @@ done yet.
 [#433]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/433
 [#434]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/434
 [#436]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/436
+[#443]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/443
+[#460]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/460
 [#467]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/467
 [#471]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/471
 [#514]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/514
@@ -435,6 +490,60 @@ done yet.
 [#672]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/672
 [#678]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/678
 [#684]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/684
+[#701]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/701
+[#710]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/710
+[#714]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/714
+[#716]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/716
+[#725]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/725
+[#726]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/726
+[#734]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/734
+[#736]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/736
+[#738]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/738
+[#741]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/741
+[#744]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/744
+[#745]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/745
+[#751]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/751
+[#752]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/752
+[#754]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/754
+[#762]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/762
+[#763]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/763
+[#764]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/764
+[#767]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/767
+[#773]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/773
+[#796]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/796
+[#803]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/803
+[#805]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/805
+[#813]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/813
+[#836]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/836
+[#840]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/840
+[#841]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/841
+[#843]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/843
+[#846]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/846
+[#859]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/859
+[#861]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/861
+[#867]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/867
+[#902]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/902
+[#908]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/908
+[#924]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/924
+[#928]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/928
+[#934]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/934
+[#937]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/937
+[#960]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/960
+[#961]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/961
+[#965]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/965
+[#968]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/968
+[#976]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/976
+[#982]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/982
+[#986]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/986
+[#1002]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/1002
+[#1004]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/1004
+[#1005]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/1005
+[#1024]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/1024
+[#1029]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/1029
+[#1032]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/1032
+[#1052]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/1052
+[#1053]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/1053
+[#1059]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/1059
 [`254891c`]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/commit/254891c
 [`2ca2c03`]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/commit/2ca2c03
 [`2e8f182`]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/commit/2e8f182

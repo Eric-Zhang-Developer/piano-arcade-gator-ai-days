@@ -3,7 +3,7 @@ import type { Chart, Take } from "../../contracts";
 import { judgeTake, noteTimeMs } from "../core/judge";
 import { GOOD_MS } from "../core/settings";
 import { pianoOutSettings } from "../piano-out";
-import { highwayAt, replayChartTime, replaySpan, replayView } from ".";
+import { highwayAt, latePresses, replayChartTime, replaySpan, replayView } from ".";
 
 // 4/4 at 120 bpm (500 ms a beat, 2 s a bar): C D E F on beats 0–3.
 const chart: Chart = {
@@ -54,6 +54,14 @@ describe("the highway at a chart time", () => {
 
   it("shows the latest judgment, with its offset", () => {
     expect(highwayAt(chart, take, results, 600).latest).toMatchObject({ judgment: "GREAT", atMs: 560 });
+  });
+});
+
+describe("the slip", () => {
+  it("marks only the presses the game called LATE: past PERFECT and after the note", () => {
+    expect([...latePresses(results)]).toEqual([1]); // D, 60 ms late (GREAT); C and F on time, E missed
+    const early = judgeTake(chart, { ...take, events: [{ ...take.events[0], timeMs: -60 }] });
+    expect(latePresses(early).size).toBe(0); // EARLY isn't a slip here
   });
 });
 

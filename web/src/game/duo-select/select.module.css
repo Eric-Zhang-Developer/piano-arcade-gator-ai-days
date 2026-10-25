@@ -2,6 +2,7 @@
    are the Duo kit's (duo-tokens); this only sizes and places them. */
 
 .panel {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -9,9 +10,10 @@
 }
 
 .roll {
-  /* Fixed, so nothing in the panel shrinks (song-options' check). It was 20vh before LEARN and WATCH (mouse-first),
-     and 17vh before the play-modes mark, which it pays for. Short screens take it lower (below). */
-  flex: none;
+  /* Never under this, so nothing in the panel shrinks (song-options' check). It was 20vh before LEARN and WATCH
+     (mouse-first), and 17vh before the play-modes mark, which it pays for. Short screens take it lower (below). It
+     grows into whatever the column has left above the footer, so there's no dead band under the panel (main-page). */
+  flex: 1 0 auto;
   height: min(14vh, 300px);
   border: 1px solid var(--pa-line);
   background: var(--pa-bg);
@@ -114,28 +116,35 @@
   justify-self: end;
 }
 
-/* One song in the list: a small roll, the title over its composer, and its level. */
+/* One song in the list, on one line (main-page): a small roll, the title then its composer, and its level. Sized in vh,
+   so 1920×1080 shows more rows rather than bigger ones: 12 or more there, and at 1280×720. */
 .row {
   display: grid;
-  grid-template-columns: minmax(0, 34%) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 15%) minmax(0, 1fr) auto;
   align-items: center;
-  gap: 1.4vw;
-  padding: 1vh 1.4vw 1vh 1vh;
+  gap: 1.2vw;
+  padding: 0.5vh 1.2vw 0.5vh 0.5vh;
 }
 
 .rowRoll {
-  height: clamp(44px, 7.4vh, 80px);
+  height: 3.2vh;
   border: 1px solid var(--pa-line);
   background: var(--pa-bg);
 }
 
 .rowText {
   min-width: 0;
+  line-height: 1.2;
+  display: flex;
+  align-items: baseline;
+  gap: 0.9em;
 }
 
+/* The title keeps its whole width, up to the line; the composer takes what's left, and goes first. */
 .rowTitle {
-  margin-bottom: 0.4vh;
-  font-size: clamp(18px, 1.6vw, 31px);
+  flex: none;
+  max-width: 100%;
+  font-size: clamp(17px, 2.5vh, 28px);
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -144,13 +153,14 @@
 
 .rowLevel {
   white-space: nowrap;
+  line-height: 1;
 }
 
 .rowLevel b {
   font-family: var(--pa-font-display), system-ui, sans-serif;
   font-stretch: 75%;
   font-weight: 700;
-  font-size: clamp(24px, 1.9vw, 36px);
+  font-size: clamp(20px, 3vh, 32px);
   font-variant-numeric: tabular-nums;
 }
 
@@ -195,4 +205,9 @@
   .panel {
     animation: none;
   }
+}
+
+/* The focused song's stat labels scale with the panel: 16 px at 1280, 24 px at 1920 (#1033, visual-direction.md). */
+.cellLabel {
+  font-size: clamp(16px, 1.25vw, 24px);
 }

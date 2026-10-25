@@ -181,6 +181,8 @@ features = [
   "results-landing", # Eric, 2026-10-25 (#959): one deep polish pass on the 3 s from the last note to the rank
   "count-in", # Eric, 2026-10-25 (#1006): one deep polish pass on the 8 beats before the first note, a #856 hero moment
   "miss-moment", # Eric, 2026-10-25 (#1038): one deep polish pass on a miss, quiet and readable, a #856 hero moment
+  "take-graph-pass", # Eric, 2026-10-25 (#1083): one deep polish pass on the take graph, read in 5 s, a #856 hero item
+  "highway-field", # Eric, 2026-10-25 (#1114): one deep polish pass on the highway's dark field, a #856 hero item
   "laptop-sound",
   "flow-mode",
   "duo-tokens",
@@ -238,6 +240,8 @@ features = ["simon-says-spike", "restyle-spike", "score-follow-spike", "wrong-no
   "hum-level-spike", # Eric's spike idea (#522): a tune hummed to a click becomes a local level, scored by forge diff
   "jam-mode-spike", # Eric's spike idea (#520): the DGX's drums and bass follow the chords a player holds
   "real-keys", # Eric, 2026-10-25 (#1017): wow feeder; the notes fall onto live video of the real DGX keys
+  "composers-hands", # Eric, 2026-10-25 (#1069): wow feeder; the composer's own piano roll on the DGX, then a duet
+  "wet-paint", # Eric, 2026-10-25 (#1106): wow feeder; free play where every note blooms as paint, wet under the pedal
 ]
 cut = []
 

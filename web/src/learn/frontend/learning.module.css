@@ -99,15 +99,10 @@
 .phrase[data-playing=true] { background:rgb(39 225 255 / .06); outline:1px solid rgb(39 225 255 / .4); outline-offset:8px; }
 .phrase[data-playing=true] figcaption { color:var(--pa-cyan); }
 
-.topbar { height:var(--learn-header-height); flex:none; display:flex; align-items:center; gap:48px; padding:0 32px; border-bottom:1px solid var(--learn-border); background:var(--pa-bg); }
-.brand { font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-weight:900; font-size:24px; line-height:1; letter-spacing:-.02em; text-transform:uppercase; }
-.topbar nav { display:flex; align-self:stretch; gap:12px; }
-.topbar nav a { display:flex; align-items:center; padding:0 18px; border-bottom:2px solid transparent; font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-weight:800; font-size:16px; letter-spacing:.04em; text-transform:uppercase; }
-.topbar nav a:hover { background:rgb(242 242 245 / .05); }
-.topbar nav a[aria-current] { color:var(--pa-cyan); border-bottom-color:var(--pa-cyan); }
-.honest { margin:0 0 0 auto; color:var(--learn-muted); font-size:14px; }
-.arcade { font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-weight:800; font-size:16px; letter-spacing:.04em; text-transform:uppercase; }
-.arcade:hover { color:var(--learn-accent); }
+/* The page starts below the site's fixed nav band (nav-bar.module.css), the only bar over /learn: the screens size to
+   100dvh minus this height. */
+.app { --learn-header-height:max(min(4vh,2.25vw),24px); }
+.main { padding-top:var(--learn-header-height); }
 .landing { min-height:calc(100dvh - var(--learn-header-height)); max-width:1080px; margin:0 auto; padding:68px 56px 40px; }
 .landingIntro { margin-bottom:52px; }
 .landingIntro h1 { margin:0 0 16px; font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-weight:900; font-size:40px; line-height:1.05; letter-spacing:-.01em; text-transform:uppercase; }
@@ -127,7 +122,7 @@
 .sessionNote { display:block; color:var(--learn-muted); font-size:12px; margin-top:10px; }
 .landingNote { max-width:72ch; margin:56px 0 0; font-size:12px; color:var(--learn-muted); }
 .main { background:linear-gradient(180deg,var(--pa-bg),var(--pa-sky)); }
-@media (max-width:1300px) { .landing { padding-top:52px; } .topbar { gap:36px; } }
+@media (max-width:1300px) { .landing { padding-top:52px; } }
 
 .graphHome { margin:0 auto; padding:0 24px; }
 

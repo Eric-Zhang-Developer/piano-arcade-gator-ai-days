@@ -17,6 +17,15 @@ export const soundSettings = {
   fanfareAfterHitMs: 150, // a full combo's fanfare follows the rank hit
   missLevel: 0.05, // the miss cue's: 21.1 dB under the laptop piano's C4 (0.15 was 12.6; miss-moment wants 18 or more). The milestone voices' levels are milestone-sfx's
   missGapMs: 120, // miss-moment: in a run of misses, at most one cue per this
+  breakMin: 20, // a miss that ends a combo this long deflates instead of the miss cue (#1396)
+  settleAfterHitMs: 600, // the results' settle chord follows the rank hit
+};
+
+// The mix under a live DGX (#1396, decision milestone-sfx-mix-pass): every effect goes through one bus and a gentle
+// compressor, so stacked layers never spike over the piano in the room.
+export const mixSettings = {
+  busGain: 0.7, // −3.1 dB on every effect, on top of the player's Effects volume
+  compressor: { threshold: -20, knee: 12, ratio: 4, attack: 0.003, release: 0.25 },
 };
 
 // The last miss cue's chart time, so a run of misses makes at most one cue per missGapMs (miss-moment). One per take.
@@ -147,13 +156,25 @@ export function scheduler(o: SchedulerOptions): (e: GameEvent, audioAtZero: numb
   const clear = clearWatch(o.notes);
   const gate = missGate();
   let clearMs: number | null = null; // the clear card's moment: a combo step on the same note gives way to it
+  let fullCombo = false; // the clear card said FULL COMBO or ALL PERFECT: its sequence owns the end, so no drumroll
+  let combo = 0;
   return (e, audioAtZero) => {
     if (o.wait && (e.type === "songEnd" || e.type === "fullCombo")) return []; // the judge sends no fullCombo in wait mode today
+    if (e.type === "songStart") fullCombo = false;
     const kind = clear(e);
     if (kind) clearMs = e.atMs;
+    if (kind && kind !== "CLEAR") fullCombo = true;
     if (e.type === "comboMilestone" && e.atMs === clearMs) return [];
-    const atMs: { sound: Voice | "miss"; ms: number }[] = soundsFor([e], 0, o.missCue(), gate).map((s) => ({ sound: s.sound, ms: s.startTime * 1000 }));
+    const broke = (e.type === "noteMiss" || e.type === "wrongNote") && combo >= soundSettings.breakMin && o.missCue();
+    if (e.type === "combo") combo = e.count;
+    else if (e.type === "noteMiss" || e.type === "wrongNote") combo = 0;
+    let atMs: { sound: Voice | "miss"; ms: number }[] = soundsFor([e], 0, o.missCue(), gate).map((s) => ({ sound: s.sound, ms: s.startTime * 1000 }));
+    // NOSTALGIA's FULL COMBO sequence replaces the fanfare, and the room stays quiet under it: no drumroll.
+    atMs = atMs.filter((s) => s.sound !== "fanfare" && !(s.sound === "drumroll" && fullCombo));
+    if (broke) atMs = [...atMs.filter((s) => s.sound !== "miss"), { sound: "comboBreak", ms: e.atMs }];
+    if (e.type === "songStart") atMs.push({ sound: "start", ms: e.atMs });
     if (kind && !o.wait) atMs.push({ sound: CLEAR_VOICE[kind], ms: e.atMs });
+    if (e.type === "songEnd") atMs.push({ sound: "settle", ms: e.atMs + stampImpactMs() + soundSettings.settleAfterHitMs });
     if (e.type === "songEnd" && o.newRecord()) atMs.push({ sound: "newRecord", ms: e.atMs + newRecordImpactMs() });
     return atMs.map(({ sound, ms }) => ({
       sound,
@@ -199,13 +220,23 @@ export function eventSounds(): GamePlugin {
         try {
           audio ??= new AudioContext(); // songStart comes from the Start press, so Chrome lets audio start
           void audio.resume().catch(() => {});
-          master ??= audio.createGain();
-          master.connect(audio.destination);
+          if (!master) {
+            const c = mixSettings.compressor;
+            const comp = audio.createDynamicsCompressor();
+            comp.threshold.value = c.threshold;
+            comp.knee.value = c.knee;
+            comp.ratio.value = c.ratio;
+            comp.attack.value = c.attack;
+            comp.release.value = c.release;
+            const bus = audio.createGain();
+            bus.gain.value = mixSettings.busGain;
+            master = audio.createGain();
+            master.connect(bus).connect(comp).connect(audio.destination);
+          }
           master.gain.value = gainFor(getPrefs());
         } catch {
           audio = null;
         }
-        return;
       }
       if (!audio || !master) {
         next(e, 0); // keeps the clear card's count

@@ -112,6 +112,14 @@ def ly_voice(text, name, unfold=False, marks=(), trace=None):
     if not start:
         raise SystemExit(f"no voice {name!r}")
     i = text.index("{", start.end())
+    alias, called = {}, {}  # the score's variables: `pd = \sustainDown` stands for its command; music is read where called
+    music_value = re.compile(r"(?:\\(?:relative|fixed)\s+[a-g](?:is|es|s)*[',]*\s*|\\transpose\s+\S+\s+\S+\s*)?\{")
+    for m in re.finditer(r"^\s*([a-zA-Z]+)\s*=\s*", text, re.M):
+        a = re.compile(r"\\([a-zA-Z]+)[ \t]*$", re.M).match(text, m.end())
+        if a:
+            alias[m.group(1)] = a.group(1)
+        elif v := music_value.match(text, m.end()):  # not a header's string or a \markup or \override value
+            called[m.group(1)] = v.end() - 1
     notes, out = [], []
     state = {"t": Fraction(0), "onset": Fraction(0), "dur": Fraction(1), "scale": Fraction(1), "tied": False}
 
@@ -199,6 +207,7 @@ def ly_voice(text, name, unfold=False, marks=(), trace=None):
             if c == "\\":
                 m = re.compile(r"\\([a-zA-Z]+|.)").match(text, j)
                 w, j = m.group(1), m.end()
+                w = alias.get(w, w)
                 if w in ("<", ">", "!") or w in DYNAMICS or w in PEDAL or w in marks:
                     out.append((state["onset"], PEDAL.get(w, w)))
                 elif w == "repeat":
@@ -249,6 +258,8 @@ def ly_voice(text, name, unfold=False, marks=(), trace=None):
                         m = NOTE.match(text, j)
                         j = length(m.end())[1] if m else j
                     state["scale"], state["t"] = scale, t
+                elif w in called and w != name:  # a variable's music, as if written here
+                    music(called[w] + 1)
                 elif w in ("markup", "mark", "bar", "clef", "set", "override", "once", "tempo", "key", "time", "partial",
                            "relative", "transpose", "change", "context", "new", "unset", "revert", "tweak"):
                     if w == "markup":
@@ -529,6 +540,9 @@ def self_test():
     # Happy Farmer: a << >> with no \\ holds simultaneous voices, a \context header's words included; a \\ still splits.
     ly = r'v = { c4 << { d4-> e-> } \context Voice = "1" { \voiceOne f2\sf } >> g4-> << { a4 } \\ { b8-> c } >> d4-> }'
     assert ly_voice(ly, "v")[1] == [(1, "accent"), (2, "accent"), (1, "sf"), (3, "accent"), (4, "accent"), (5, "accent")]
+    # The Fantaisie-Impromptu: a staff calls its parts by name, and `pd` stands for \sustainDown.
+    ly = "pd = \\sustainDown\npart = \\relative c'' { c4\\p\\pd d-> }\nup = { r1 \\part e4\\f }"
+    assert ly_voice(ly, "up")[1] == [(4, "p"), (4, "down"), (5, "accent"), (6, "f")], ly_voice(ly, "up")[1]
     assert ly_voice(r"v = { \partial 8 c\( d4-> }", "v")[1] == [(Fraction(1, 2), "accent")]  # its lower's pickup: an eighth
     # Wild Horseman: the dynamics line is written once beside a volta (pickup, 2 bars, 2 alternatives of a bar); unfolded,
     # the body's marks land in both passes and the alternatives' and the coda's after them.

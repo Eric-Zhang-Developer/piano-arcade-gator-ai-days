@@ -181,6 +181,7 @@ features = [
   "duo-select",
   "duo-results",
   "sheet-paper",
+  "sheet-engraving", # Eric, 2026-10-25 (#827): clef changes, 8va, beamed eighths and a readable zoom on /sheet; after sheet-paper, same worker
   "lab",
   "nav-bar",
   "hit-particles", # Eric, 2026-10-25 (#750): a priority, so ahead of duo-start

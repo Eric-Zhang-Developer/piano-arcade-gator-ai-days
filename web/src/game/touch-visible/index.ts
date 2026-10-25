@@ -17,7 +17,6 @@ export const ringSettings = {
 
 const touches = new Map<string, Touch>();
 // The energy of a hit by its noteId, once noteHit has passed this plugin (it's mounted before the visuals).
-// ponytail: juice's gpu.hit call (juice/index.ts, held by #761) passes touchFor(id)?.energy and .wispOnly once #761 frees it.
 export const touchFor = (noteId: string): Touch | undefined => touches.get(noteId);
 
 let motionQuery: MediaQueryList | undefined;

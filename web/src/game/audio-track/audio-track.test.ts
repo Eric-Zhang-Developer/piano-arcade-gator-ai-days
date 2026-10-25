@@ -8,8 +8,14 @@ import {
   RECORDING_OFFSET_MAX,
   setRecordingOffset, loopWindow, parseSidecar, segmentsFrom, setRecordingVolume,
   skipReason,
+  recordingLevelAt,
+  stopMusic,
   subscribeRecordingVolume,
+  tailNow,
 } from ".";
+import { countInBeats } from "../count-in";
+import { levelEnvelope } from "../milestone-sfx";
+import { clickDrift, makeFixture } from "../record-seams";
 
 // 120 bpm, 4/4: a beat is 500 ms, a bar 2000 ms. Eight bars, one note a bar.
 const chart: Chart = {
@@ -120,6 +126,138 @@ describe("Recording offset (golden-demo, part 6)", () => {
     } finally {
       setRecordingOffset(0);
       vi.unstubAllGlobals();
+    }
+  });
+});
+
+// record-seams: the tail under the results, on a fixture rendered at test time (no audio committed).
+describe("the tail under the results (record-seams)", () => {
+  const RATE = 8000;
+  const fx = makeFixture({ sampleRate: RATE, bpm: 120, offsetMs: 4000, songMs: 40_000 });
+  const fxBuffer = { duration: fx.durationMs / 1000, sampleRate: RATE, length: fx.samples.length, numberOfChannels: 1, getChannelData: () => fx.samples };
+  const levels = levelEnvelope(fxBuffer);
+  const levelOf = (chartMs: number) => levels[Math.floor((chartMs + fx.offsetMs) / 100)];
+
+  // A context that records what each run's bus was told; disconnecting the bus is the instant silence.
+  function setup(sidecarOffsetMs = fx.offsetMs) {
+    setRecordingVolume(1); // the bus's level is the take level, so the tail's points read as gains
+    const buses: { off: boolean; calls: string[] }[] = [];
+    const loc = { pathname: "/play", origin: "http://localhost" };
+    vi.stubGlobal("window", {
+      addEventListener() {},
+      location: loc,
+      setInterval: (f: () => void, ms: number) => setInterval(f, ms),
+      clearInterval: (id: number) => clearInterval(id),
+      setTimeout: (f: () => void, ms: number) => setTimeout(f, ms),
+    });
+    vi.stubGlobal("fetch", async () => ({ ok: true, json: async () => ({ src: "fx.wav", offsetMs: sidecarOffsetMs }), arrayBuffer: async () => new ArrayBuffer(8) }));
+    vi.stubGlobal(
+      "AudioContext",
+      class {
+        state = "running";
+        currentTime = 0;
+        destination = {};
+        decodeAudioData = async () => fxBuffer;
+        resume = async () => {};
+        createGain() {
+          const bus = { off: false, calls: [] as string[] };
+          buses.push(bus);
+          const rec = (name: string) => (v: number) => void bus.calls.push(`${name} ${v.toFixed(4)}`);
+          return {
+            gain: { value: 1, setValueAtTime: rec("set"), linearRampToValueAtTime: rec("linear"), exponentialRampToValueAtTime: rec("exp"), cancelScheduledValues() {} },
+            connect() {},
+            disconnect: () => void (bus.off = true),
+          };
+        }
+        createBufferSource() {
+          return { connect() {}, start() {}, stop() {} };
+        }
+      },
+    );
+    return { buses, loc };
+  }
+  const results = {} as never;
+
+  async function toResults(endMs = 16_500) {
+    const env = setup();
+    const p = audioTrack();
+    p.transformChart!(chart, q("song=local/t"));
+    await vi.waitFor(() => expect(window.__pianoArcadeAudio?.loaded).toBe(true));
+    p.onEvent!({ type: "songStart", atMs: -4000 });
+    p.onEvent!({ type: "songEnd", atMs: endMs, results });
+    return { p, ...env };
+  }
+
+  it("plays on, ducked 6 dB, and reports that level until it ends; the tag says the bar", async () => {
+    try {
+      const { buses } = await toResults();
+      const bus = buses.at(-1)!;
+      expect(bus.off).toBe(false);
+      expect(bus.calls[0]).toBe("set 1.0000");
+      expect(bus.calls.at(-1)).toBe("set 0.0000"); // on the bar line
+      expect(tailNow()).toMatchObject({ kind: "fade", bar: 12 }); // songEnd at 16.5 s, in bar 9: the fade runs 18–22 s, to the line that starts bar 12
+      expect(recordingLevelAt(17_000)! - levelOf(17_000)).toBeCloseTo(-6.02, 1);
+      expect(recordingLevelAt(20_000)!).toBeLessThan(levelOf(20_000) - 6.02 - 20); // halfway down the fade
+      expect(recordingLevelAt(20_000)!).toBeGreaterThan(levelOf(20_000) - 6.02 - 40);
+      expect(recordingLevelAt(20_001)).not.toBeNull();
+      expect(recordingLevelAt(20_000 + 9999)).toBeNull(); // past the tail
+      expect(audioTrack().resultsPanel).toBeDefined();
+    } finally {
+      stopMusic();
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("Stop music, Retry and leaving /play silence the tail at once", async () => {
+    try {
+      let { buses } = await toResults();
+      stopMusic();
+      expect([buses.at(-1)!.off, tailNow(), recordingLevelAt(17_000)]).toEqual([true, null, null]);
+
+      const r = await toResults();
+      r.p.transformChart!(chart, q("song=local/t")); // Retry
+      expect([r.buses.at(-1)!.off, tailNow()]).toEqual([true, null]);
+
+      const l = await toResults();
+      buses = l.buses;
+      l.loc.pathname = "/";
+      await new Promise((ok) => setTimeout(ok, 300)); // the 250 ms watch
+      expect([buses.at(-1)!.off, tailNow()]).toEqual([true, null]);
+    } finally {
+      stopMusic();
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("a quit mid-song is silent at once and leaves no tail", async () => {
+    try {
+      const { buses } = setup();
+      const p = audioTrack();
+      p.transformChart!(chart, q("song=local/t"));
+      await vi.waitFor(() => expect(window.__pianoArcadeAudio?.loaded).toBe(true));
+      p.onEvent!({ type: "songStart", atMs: -4000 });
+      p.onEvent!({ type: "quit", atMs: 5000 });
+      expect([buses.at(-1)!.off, tailNow()]).toEqual([true, null]);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("the count-in clicks land on the recording's intro beats within 5 ms, through the Recording offset", async () => {
+    for (const r of [0, 100, -100]) {
+      // The sidecar is r off, and the player's Recording offset puts it back.
+      setup(fx.offsetMs - r);
+      setRecordingOffset(r);
+      try {
+        audioTrack().transformChart!(chart, q("song=local/t"));
+        await vi.waitFor(() => expect(window.__pianoArcadeAudio?.loaded).toBe(true));
+        const clicks = countInBeats(chart).map((b) => b.atMs);
+        expect(clicks).toHaveLength(8);
+        expect(clickDrift(clicks, window.__pianoArcadeAudio!.fileTimeAt(0), fx.beatsMs)).toBeLessThanOrEqual(5);
+      } finally {
+        setRecordingOffset(0);
+        vi.unstubAllGlobals();
+      }
     }
   });
 });

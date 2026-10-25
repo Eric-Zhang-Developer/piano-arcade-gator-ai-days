@@ -1,0 +1,57 @@
+/* The section chips and headers (spec: main-page), in the Duo kit's chip and mono label, spaced in vh like the rows,
+   so the list keeps its share of the screen at 720 and 1080. */
+
+.strip {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2vw;
+  margin-bottom: 1.2vh;
+}
+
+.chips {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6vh 0.4vw;
+}
+
+.place {
+  display: block;
+  padding-top: 0.3em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.place b {
+  color: var(--pa-ink);
+}
+
+/* A section's first line: its label in the display face, its count after it. A snap point, so a chip's scroll and a
+   scrolled list rest on a header rather than under it. */
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8em;
+  margin: 0;
+  padding: 1vh 0 0.6vh;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-stretch: 75%;
+  font-weight: 700;
+  font-size: clamp(18px, 2.6vh, 28px);
+  line-height: 1.1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pa-ink);
+  scroll-snap-align: start;
+}
+
+/* The wordmark's slanted bar, smaller: a section starts where the primary does. */
+.header::before {
+  content: "";
+  align-self: center;
+  width: 0.22em;
+  height: 0.7em;
+  background: var(--pa-primary);
+  transform: skewX(-18deg);
+}

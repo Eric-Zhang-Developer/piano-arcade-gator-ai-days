@@ -2,8 +2,8 @@
 """Notation MIDI -> Piano Arcade chart JSON (spec: song-pack-1).
 
 Takes a right-hand and an optional left-hand track (or channel), a bar range and a bpm; writes beats and durations in
-quarter notes from beat 0 of the first chosen bar. Refuses a performance (notes off a 1/12-beat grid) and an empty
-hand. Everything it changed (unisons merged, same-pitch overlaps trimmed) goes to stderr for the done note.
+quarter notes from beat 0 of the first chosen bar. Refuses a performance (notes off the 1/12- and 1/8-beat grids)
+and an empty hand. Everything it changed (unisons merged, same-pitch overlaps trimmed) goes to stderr for the done note.
 
   python3 convert.py song.mid --rh 1 --lh 2 --bars 1-16 --bpm 80 --id ode-to-joy --title ... -o chart.json
   python3 convert.py --self-test
@@ -15,7 +15,13 @@ from fractions import Fraction
 
 import mido
 
-GRID = 12  # steps per quarter note: covers 16ths and triplets
+GRID = 24  # steps per quarter note for releases and output: 16ths, triplets and 32nds
+
+
+def on_grid(tick, tpb):
+    """An onset notation can write: on the 1/12-beat grid (16ths, triplets) or the 1/8-beat one (32nds). A grace note's
+    sliver lands between them."""
+    return (tick * 12) % tpb == 0 or (tick * 8) % tpb == 0
 
 
 class Refused(Exception):
@@ -114,14 +120,14 @@ def convert(mid, rh, lh=None, bars=(1, 1), by_channel=False, rh_voice="all", lh_
         for hand, which, voice in hands:
             inside = [n for n in notes_of(mid, which, by_channel) if lo <= n[0] < hi]
             # Notation MIDI plays a grace note as a sliver just before its main note: off the grid and under 1/8 beat.
-            grace = [n for n in inside if (n[0] * GRID) % tpb and (n[1] - n[0]) * 8 <= tpb]
+            grace = [n for n in inside if not on_grid(n[0], tpb) and (n[1] - n[0]) * 8 <= tpb]
             for on, _, p, _, _ in grace:
                 log.append(f"grace note skipped: {hand} pitch {p} before beat {snap(on - lo) + shift}")
             inside = outer_voice([n for n in inside if n not in grace], voice)
             # Onsets must sit on the grid; releases are snapped, since engravers' MIDI shortens some by a tick.
-            off_grid = [n for n in inside if (n[0] * GRID) % tpb]
+            off_grid = [n for n in inside if not on_grid(n[0], tpb)]
             if off_grid:
-                raise Refused(f"{len(off_grid)} of {len(inside)} {hand} notes start off the 1/{GRID}-beat grid: a performance, not notation")
+                raise Refused(f"{len(off_grid)} of {len(inside)} {hand} notes start off the 1/12- and 1/8-beat grids: a performance, not notation")
             snapped = 0
             for on, off, p, velocity, volume in inside:
                 beat = Fraction(on - lo, tpb)
@@ -173,7 +179,7 @@ def convert(mid, rh, lh=None, bars=(1, 1), by_channel=False, rh_voice="all", lh_
 
 
 def num(f):
-    """An exact Fraction as JSON: an int when whole, else a float rounded past any 1/12 step."""
+    """An exact Fraction as JSON: an int when whole, else a float rounded past any 1/24 step."""
     return int(f) if f.denominator == 1 else round(float(f), 6)
 
 
@@ -213,7 +219,7 @@ def self_test():
     perf = mido.MidiFile(ticks_per_beat=480)
     perf.tracks.append(mido.MidiTrack())
     play(perf.tracks[0], [(0, 470, 60), (483, 470, 62)])
-    for args, needle in [((perf, 0, None, (1, 1)), "off the 1/12-beat grid"), ((mid, 1, None, (5, 5)), "no notes")]:
+    for args, needle in [((perf, 0, None, (1, 1)), "off the 1/12- and 1/8-beat grids"), ((mid, 1, None, (5, 5)), "no notes")]:
         try:
             convert(*args)
             raise AssertionError(f"should refuse: {needle}")
@@ -241,6 +247,14 @@ def self_test():
     notes, bpb, log = convert(pk, rh=0, bars=(1, 3), pickup=1)
     assert bpb == 4 and [(n["pitch"], n["beat"], n["duration"]) for n in notes] == [(67, 3, 1), (72, 8, round(1 / 3, 6))], notes
     assert any("grace" in line for line in log) and any("snapped" in line for line in log), log
+    # 32nd notes (Bach's Invention No. 1, bar 6: D16 B32 C32 D16), each a tick short as engravers' MIDI writes them:
+    # on the 1/8-beat grid, so all four stay; none is taken for a grace note.
+    tt = mido.MidiFile(ticks_per_beat=480)
+    tt.tracks.append(mido.MidiTrack())
+    play(tt.tracks[0], [(0, 119, 74), (120, 59, 71), (180, 59, 72), (240, 119, 74)])
+    notes, _, log = convert(tt, rh=0, bars=(1, 1))
+    assert [(n["pitch"], n["beat"], n["duration"]) for n in notes] == [(74, 0, 0.25), (71, 0.25, 0.125), (72, 0.375, 0.125), (74, 0.5, 0.25)], notes
+    assert not any("grace" in line for line in log), log
     # Spans write out a volta repeat: body (C D), first ending (D), body again (C), second ending (E).
     sp = mido.MidiFile(ticks_per_beat=480)
     sp.tracks.append(mido.MidiTrack())

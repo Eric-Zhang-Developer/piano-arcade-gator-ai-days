@@ -365,7 +365,7 @@ int main() {
   CHECK(countLit() == 0, "demo: then dark again: %d", countLit());
   std::printf("demo: a press lit %d LEDs with its ripple, everything else stayed dark\n", simpleLit);
   // The ripple: a press of the right hand's blue lights its key with no white flash, ripples out about seven keys
-  // each way, cooler (more green, toward cyan) than the key and never whiter, and it's gone by 700 ms.
+  // each way, cooler (more green, toward cyan) than the key and never whiter, and it's gone by 800 ms.
   Serial.feed({0x90, 60, 21, 77, 127}); pump(150);
   auto mine = litFor(60);
   int keyMid = mine[mine.size() / 2], reach = 0, whiter = 0;
@@ -375,16 +375,18 @@ int main() {
     reach = std::max(reach, std::abs(i - keyMid));
     if (leds[i].r > key.r) whiter++;
   }
-  CRGB edge = leds[keyMid + 3];
-  pump(550);
+  int crestAt = keyMid + 3;  // the wavefront: the brightest LED out past the key
+  for (int i = keyMid + 3; i < activeLeds && i < keyMid + 40; i++) if (leds[i].b > leds[crestAt].b) crestAt = i;
+  CRGB edge = leds[crestAt];
+  pump(650);
   int afterRipple = countLit();
-  std::printf("demo ripple: key (%d,%d,%d), reaches %d LEDs at 150 ms, edge (%d,%d,%d); %d lit at 700 ms (the key alone is %zu)\n",
+  std::printf("demo ripple: key (%d,%d,%d), reaches %d LEDs at 150 ms, edge (%d,%d,%d); %d lit at 800 ms (the key alone is %zu)\n",
               key.r, key.g, key.b, reach, edge.r, edge.g, edge.b, afterRipple, mine.size());
   CHECK(key == applyGamma_video(CRGB(42, 154, 255), DEMO_GAMMA), "demo: the key is its color, deepened for the LEDs, no white flash: %d %d %d", key.r, key.g, key.b);
-  CHECK(reach >= 8 && reach <= 22, "demo: a ripple several keys each way: %d LEDs", reach);
+  CHECK(reach >= 10 && reach <= 18, "demo: the first firmware's ripple, travelling at 0.09 LEDs/ms: %d LEDs at 150 ms", reach);
   CHECK(whiter == 0, "demo: no LED whiter than the key: %d", whiter);
   CHECK(edge && edge.g * key.b > key.g * edge.b, "demo: the ripple cools toward cyan: %d %d %d", edge.r, edge.g, edge.b);
-  CHECK(afterRipple == (int)mine.size(), "demo: the ripple is over by 700 ms: %d lit", afterRipple);
+  CHECK(afterRipple == (int)mine.size(), "demo: the ripple is over by 800 ms: %d lit", afterRipple);
   Serial.feed({0x80, 60}); pump(600);
   // The crash: two keys 14 LEDs apart, pressed together, send crests that meet in the middle, and the middle flares
   // brighter than one ripple alone makes it (green: one ripple already fills the blue).
@@ -422,12 +424,17 @@ int main() {
   Serial.feed({0x80, 60}); pump(1500);
   // The hello: the first clear after the board starts (the website's, on connecting) crashes two ripples in the middle.
   helloDue = true;
-  Serial.feed({0xF0}); pump(250);
-  int helloLit = countLit();
-  CRGB helloMid = leds[activeLeds / 2];
+  Serial.feed({0xF0});
+  int helloLit = 0;
+  CRGB helloMid;
+  for (int t = 0; t < 250; t += 5) {  // the two wavefronts meet in the middle at about 110 ms
+    pump(5);
+    helloLit = std::max(helloLit, countLit());
+    if (leds[activeLeds / 2].b > helloMid.b) helloMid = leds[activeLeds / 2];
+  }
   pump(800);
-  std::printf("demo hello: %d LEDs lit at 250 ms, the middle (%d,%d,%d); then %d\n", helloLit, helloMid.r, helloMid.g, helloMid.b, countLit());
-  CHECK(helloLit > 20 && helloMid && !helloDue && countLit() == 0, "demo: a hello crash on the first clear: %d lit", helloLit);
+  std::printf("demo hello: up to %d LEDs lit, the middle at its brightest (%d,%d,%d); then %d\n", helloLit, helloMid.r, helloMid.g, helloMid.b, countLit());
+  CHECK(helloLit >= 8 && helloMid && !helloDue && countLit() == 0, "demo: a hello crash on the first clear: %d lit", helloLit);
   Serial.feed({0xF0}); pump(250);
   CHECK(countLit() == 0, "demo: only the first clear says hello: %d lit", countLit());
   Serial.feed({0xF0}); defaults(); pump(5); stopShows();

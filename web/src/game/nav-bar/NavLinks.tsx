@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MonoLabel } from "../duo-tokens";
 import { GITHUB_URL, hideNav, isCurrent, type Slot } from "./slots";
 import styles from "./nav-bar.module.css";
 
@@ -23,14 +22,12 @@ export function NavLinks({ slots }: { slots: Slot[] }) {
             aria-current={current ? "page" : undefined}
             data-testid={`nav-${s.slug}`}
           >
-            <MonoLabel dim={!current} style={current ? { fontSize: "inherit", color: "var(--pa-primary)" } : { fontSize: "inherit" }}>
-              {s.label}
-            </MonoLabel>
+            <span className={styles.label}>{s.label}</span>
           </Link>
         );
       })}
       <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className={`${styles.slot} ${styles.repo}`} data-testid="nav-github">
-        <MonoLabel dim style={{ fontSize: "inherit" }}>GitHub ↗</MonoLabel>
+        <span className={styles.label}>GitHub ↗</span>
       </a>
     </nav>
   );

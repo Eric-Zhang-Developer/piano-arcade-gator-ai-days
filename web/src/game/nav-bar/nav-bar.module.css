@@ -10,33 +10,44 @@
   display: flex;
   align-items: stretch;
   gap: 0.4em;
-  font-size: clamp(13px, 1.9vh, 20px); /* ~14px at 720, 20px at 1080: readable on video, inside the 4vh band */
+  font-size: clamp(16px, 2.5vh, 27px); /* 18px at 720, 27px at 1080: the condensed face reads on video, in the 4vh band */
+}
+
+/* Saira condensed, sentence case: the song titles' face, so the bar reads as pages and not as the select's mono key
+   hints right below it. Color lives here, not inline, so hover and current can change it. */
+.label {
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-stretch: 75%;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--pa-ink-dim);
 }
 
 .slot {
   display: flex;
   align-items: center;
-  padding: 0 0.8em;
+  padding: 0 0.7em;
+  margin-bottom: 3px; /* the current underline stops short of the wordmark row */
   border-bottom: 2px solid transparent;
   border-radius: 0;
   text-decoration: none;
   white-space: nowrap;
 }
 
-.slot:hover {
-  border-bottom-color: var(--pa-line);
-}
-
-.slot:not([aria-current="page"]):hover > span {
-  color: var(--pa-ink) !important; /* MonoLabel's ink is inline; hover lifts a dim label to full ink */
-}
-
-.repo {
-  margin-left: 1.2em; /* the repo is off-site: set apart from the pages */
+.slot:hover .label {
+  color: var(--pa-ink);
 }
 
 .slot[aria-current="page"] {
   border-bottom-color: var(--pa-primary);
+}
+
+.slot[aria-current="page"] .label {
+  color: var(--pa-primary);
+}
+
+.repo {
+  margin-left: 1.2em; /* the repo is off-site: set apart from the pages */
 }
 
 .slot:focus-visible {

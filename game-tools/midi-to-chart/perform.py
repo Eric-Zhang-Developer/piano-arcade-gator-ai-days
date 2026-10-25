@@ -261,10 +261,11 @@ def ly_voice(text, name, unfold=False, marks=(), trace=None):
                 elif w in called and w != name:  # a variable's music, as if written here
                     music(called[w] + 1)
                 elif w in ("markup", "mark", "bar", "clef", "set", "override", "once", "tempo", "key", "time", "partial",
-                           "relative", "transpose", "change", "context", "new", "unset", "revert", "tweak"):
+                           "relative", "transpose", "change", "context", "new", "unset", "revert", "tweak",
+                           "octaveCheck"):
                     if w == "markup":
                         j = skip_markup(j)
-                    elif w in ("bar", "clef", "change"):
+                    elif w in ("bar", "clef", "change", "octaveCheck"):  # one word; \octaveCheck's pitch takes no time
                         j = skip_arg(j)
                         if w == "change":
                             j = skip_arg(skip_arg(j))  # Staff = "name"
@@ -543,6 +544,7 @@ def self_test():
     # The Fantaisie-Impromptu: a staff calls its parts by name, and `pd` stands for \sustainDown.
     ly = "pd = \\sustainDown\npart = \\relative c'' { c4\\p\\pd d-> }\nup = { r1 \\part e4\\f }"
     assert ly_voice(ly, "up")[1] == [(4, "p"), (4, "down"), (5, "accent"), (6, "f")], ly_voice(ly, "up")[1]
+    assert ly_voice(r"v = { c1 \octaveCheck c e4-> }", "v")[1] == [(4, "accent")]  # Rachmaninoff's: a check, not a note
     assert ly_voice(r"v = { \partial 8 c\( d4-> }", "v")[1] == [(Fraction(1, 2), "accent")]  # its lower's pickup: an eighth
     # Wild Horseman: the dynamics line is written once beside a volta (pickup, 2 bars, 2 alternatives of a bar); unfolded,
     # the body's marks land in both passes and the alternatives' and the coda's after them.

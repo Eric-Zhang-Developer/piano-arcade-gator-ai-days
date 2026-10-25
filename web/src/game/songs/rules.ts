@@ -1,6 +1,5 @@
 // The library's rules for one chart (spec: chart-lint), shared by the library test and level-forge's check, so a
 // forged chart meets exactly the rules a committed one does.
-import { basename, dirname } from "node:path";
 import type { Chart, Take } from "../../contracts";
 import { validateChart } from "../../contracts";
 import { judgeTake, noteTimeMs } from "../core/judge";
@@ -19,12 +18,12 @@ export function onsetSpans(chart: Chart) {
 }
 
 // Every rule a chart breaks, by name; empty when it follows them all. path is the chart's path under songs/, for the
-// folder-matches-id rule.
+// folder-matches-id rule. No node:path, so a page can run it too (name-theme lints the charts it makes).
 export function chartProblems(path: string, chart: Chart): string[] {
   const valid = validateChart(chart);
   if (valid.length) return valid.map((p) => `validateChart: ${p}`);
   const p: string[] = [];
-  const folder = basename(dirname(path));
+  const folder = path.split("/").at(-2) ?? ".";
   if (folder !== chart.id) p.push(`id: "${chart.id}" but its folder is "${folder}"`);
   chart.notes.forEach((n, i) => {
     if (i && n.beat < chart.notes[i - 1].beat) p.push(`time order: ${n.id} (beat ${n.beat}) comes before ${chart.notes[i - 1].id}`);

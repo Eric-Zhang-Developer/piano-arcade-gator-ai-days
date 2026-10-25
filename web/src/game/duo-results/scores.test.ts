@@ -40,7 +40,7 @@ describe("barScores", () => {
     const t = take(chart);
     const cells = barScores(chart, t.take, t.results);
     expect(cells).toHaveLength(12);
-    expect(cells[2]).toEqual({ from: 3, to: 3, notes: 0, accuracy: null });
+    expect(cells[2]).toEqual({ from: 3, to: 3, notes: 0, accuracy: null, misses: 0 });
     expect(cells.filter((c) => c.accuracy === 1)).toHaveLength(11);
   });
 });
@@ -52,7 +52,7 @@ describe("weakestRun", () => {
   });
 
   it("stops at 4 bars, at a clean bar and at an empty bar; null when every bar is clean", () => {
-    const cell = (from: number, accuracy: number | null) => ({ from, to: from, notes: accuracy === null ? 0 : 4, accuracy });
+    const cell = (from: number, accuracy: number | null) => ({ from, to: from, notes: accuracy === null ? 0 : 4, accuracy, misses: 0 });
     expect(weakestRun([1, 0.5, 0.4, 0.3, 0.2, 0.6, 0.7].map((a, i) => cell(i + 1, a)))).toEqual({ from: 2, to: 5 });
     expect(weakestRun([0.9, 1, 0.2, 0.5, 0.96].map((a, i) => cell(i + 1, a)))).toEqual({ from: 3, to: 4 });
     expect(weakestRun([0.5, null, 0.2, 1].map((a, i) => cell(i + 1, a)))).toEqual({ from: 3, to: 3 });
@@ -87,10 +87,14 @@ describe("tutorLine", () => {
 
   it("else the run's accuracy, then the loop line", () => {
     expect(tutorLine({ run, accuracy: 0.425, drift: { L: 20, R: null } })).toEqual([
-      "Bars 9–12 were your weakest: 43% of notes right.",
+      "Bars 9–12 were your weakest: 43% accuracy.",
       "Let's loop just those bars at 70%, then play it through.",
     ]);
-    expect(tutorLine({ run: { from: 4, to: 4 }, accuracy: 0.5, drift: { L: null, R: null } })[0]).toBe("Bar 4 was your weakest: 50% of notes right.");
+    expect(tutorLine({ run: { from: 4, to: 4 }, accuracy: 0.5, drift: { L: null, R: null } })[0]).toBe("Bar 4 was your weakest: 50% accuracy.");
+    // every note hit, only timing: the line says so instead of implying notes were wrong (Eric's full combo, 2026-10-25)
+    expect(tutorLine({ run: { from: 4, to: 7 }, accuracy: 0.54, drift: { L: null, R: null }, misses: 0 })[0]).toBe(
+      "Bars 4–7 were your weakest: 54% accuracy, every note hit but off the beat.",
+    );
   });
 
   it("a clean take", () => {
@@ -138,7 +142,7 @@ describe("the panels", () => {
     const tutor = html(duoTutor(), ctx(furElise, missed, "song=fur-elise&hands=R&bot=perfect"))!;
     expect(tutor).toContain("PRACTICE BARS 9–12");
     expect(tutor).toContain('data-href="/play?song=fur-elise&amp;hands=R&amp;from=9&amp;to=12&amp;tempo=70"');
-    expect(tutor).toContain("Bars 9–12 were your weakest: 0% of notes right.");
+    expect(tutor).toContain("Bars 9–12 were your weakest: 0% accuracy.");
   });
 
   it("the histogram's bars hold every timed note", () => {

@@ -25,17 +25,23 @@ beside the list shows its level, notes per second, best grade and a PRACTICE 70%
   BEST, and PRACTICE as adaptive practice), and this row keeps the opening, Hands and Speed, the source and the
   status line. The panel and Chrome steps below that name notes per second, best or PRACTICE 70% are duo-select's
   to check now (decision `duo-select-controls`).
-- **The opening:** the chart's first 2 bars at its own tempo, capped at 8 s. It plays on the piano when connected:
+- **The opening:** the chart's first 5 s from its first note, at its own tempo, for every song; a note still held at 5 s
+  is cut there (Eric, 2026-10-25, on the DGX: "I may want to make each one maybe 5 seconds"). It plays on the piano when connected:
   find the output by `name` "Portable Grand", channel 1, with the chart's velocities when present and 80 otherwise.
   Without a piano, it plays as quiet Web Audio tones.
-- **Stopping:** when the highlight moves, on Enter, on `pagehide` and when the opening ends, the preview cancels its
-  queue and sends All Notes Off on channel 1, so no note hangs.
+- **Stopping:** when the highlight moves, on Enter, on `pagehide` and when the opening ends, the preview stops, lifts
+  every key it pressed and sends All Notes Off on channel 1, so no note hangs and no note of it sounds afterwards. The
+  piano is handed each note only about 60 ms before it's due, never the whole opening: a timestamped Web MIDI message
+  can't be taken back (Chrome has no `MIDIOutput.clear()`), so a queued opening kept playing over the next song's
+  (Eric, 2026-10-25: "they don't cancel if you go to another one, so they all mash together").
 - **Silent until a gesture:** nothing plays before the first key press or click on the page (Chrome's autoplay
   rule). Until then the panel says "Press any key for previews". Nothing ever plays on page load.
 - **Look:** keep to the current look, and to `specs/context/visual-direction.md` once that file exists.
 
 ## Validation
-- `pnpm -C web test`: the opening holds exactly the notes that start in bars 1–2, cut at 8 s. The PRACTICE URL for
+- `pnpm -C web test`: the opening holds exactly the notes that start in its first 5 s, cut at 5 s. Against a stand-in
+  piano that plays each message at its timestamp, a preview stopped after 1 s leaves no key down and sounds no note-on
+  later than 100 ms after the stop; left alone, every note arrives stamped with its own time. The PRACTICE URL for
   Twinkle is `/play?song=twinkle&from=1&to=12&tempo=70&passes=1`. Stopping cancels the queue and sends All Notes Off.
   A song never played shows a blank best grade.
 - `verify.py --slug song-preview` passes. Its first step still opens Twinkle from `/`.

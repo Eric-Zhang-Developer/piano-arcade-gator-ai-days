@@ -29,7 +29,7 @@ first among the screens.
 1. **`fix(hud)`:** the band becomes two bracketed clusters:
    - **top left:** the song tag (the title in monospace caps, `BAR n / N`, a thin progress line in `--pa-primary`);
    - **top right:** the combo cluster (a big condensed combo numeral, `COMBO`, then `ACC` and `SCORE` in monospace).
-   - Corner brackets come from a small shared drawer in `web/src/game/duo-hud/brackets.ts`. The PERFECT/GREAT/GOOD and
+   - Corner brackets come from the Duo kit's `drawBrackets` (duo-tokens). The PERFECT/GREAT/GOOD and
      MISS/WRONG counters move into the combo cluster as one small monospace line, or drop if the cluster gets crowded
      (log it).
 2. **`fix(core-loop)`:**
@@ -45,6 +45,9 @@ first among the screens.
 5. **`feat(duo-hud)`:** `verify-hud.mjs`, the screenshots, the done note.
 
 ## Requirements
+- **Use the Duo kit** (`web/src/game/duo-tokens/`, from duo-tokens, #645) for every bracket, panel, data cell and
+  label, through its canvas twins (`drawBrackets`, `drawPanel`, the font strings). Don't draw your own. If the kit
+  lacks something, add it to the kit through a `fix(duo-tokens)`, not locally.
 - **The center doesn't move:** lanes and notes stay calm. Effects rise above the hit line and never cover a note due
   within 500 ms (juice-visual's rule).
 - **`BAR n / N`:**
@@ -60,8 +63,8 @@ first among the screens.
 
 ## Validation
 1. `pnpm -C web exec vitest run --passWithNoTests src/game/duo-hud src/game/hud`: the bar readout's `n / N` on Twinkle
-   and Für Elise matches bar-lines' bar starts (first bar, a middle bar, the last bar), and the brackets drawer
-   draws four corners inside its box.
+   and Für Elise matches bar-lines' bar starts (first bar, a middle bar, the last bar), and the clusters use the kit's
+   `drawBrackets`, with no local bracket code.
 2. Headless, once, under `verify.lock`:
    `python3 .agents/scripts/verify.py --slug duo-hud --worktree . --cmd "node {worktree}/web/src/game/duo-hud/verify-hud.mjs --out {out}"`.
    It plays `/play?song=fur-elise&bot=perfect&input=test` and prints `verify-hud: pass` or names each failed step:

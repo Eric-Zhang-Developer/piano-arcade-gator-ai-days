@@ -35,6 +35,9 @@ Eric called today's select "unfit to show". It's the video's first screen after 
 3. **`feat(duo-select)`, part 2:** `verify-select.mjs`, the screenshots, the done note.
 
 ## Requirements
+- **Use the Duo kit** (`web/src/game/duo-tokens/`, from duo-tokens, #645) for every panel, bracket, button, data
+  cell and monospace label. Don't draw your own frames, buttons or cells. If the kit lacks something, add it to the kit
+  through a `fix(duo-tokens)`, not locally.
 - **The piano roll is drawn from the chart,** never an image. It's a glowing thumbnail where nobody reads notation,
   which visual-direction.md allows. Right hand in `--pa-primary`, left in `--pa-secondary`. Draw each one once per song
   and cache it, not every frame.

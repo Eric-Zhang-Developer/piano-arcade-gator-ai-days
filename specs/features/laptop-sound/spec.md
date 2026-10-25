@@ -20,8 +20,9 @@ and `/sim` pages. So this feature doesn't touch them. It makes a "Portable Grand
    `requestMIDIAccess` wrapper and their tests. Not installed anywhere yet.
 2. **`fix(core-loop)`:**
    - `web/src/app/layout.tsx` imports the install module (below).
-   - `keysDevice` in `web/src/game/core/input.ts` calls laptop-sound's `laptopKey(type, pitch, velocity)` in its key
-     handler, right after the `keyMap` lookup.
+   - `/play`'s input handler (`onInput` in `web/src/app/play/page.tsx`) calls laptop-sound's
+     `laptopKey(type, pitch, velocity)` for laptop-key events. It runs inside the key event, after laptop-octaves'
+     Z/X shift, so the note heard is the note judged (`specs/decisions/laptop-sound-key-pitch.md`).
    - `midiDevice`'s status reads `Piano: laptop sound` when the virtual output is active.
 3. **`fix(options-panel)`:** a "Piano volume" slider beside "Effects volume".
 4. **`feat(laptop-sound)`, part 2:** `verify-laptop.mjs`, the done note.
@@ -62,9 +63,9 @@ and `/sim` pages. So this feature doesn't touch them. It makes a "Portable Grand
   sounds and nothing throws.
 
 **Laptop key presses**
-- In laptop mode (the virtual output active), a laptop key sounds from `keysDevice`'s own key event, not the frame
-  loop. The target is under ~15 ms from key to sound. With the DGX connected, laptop keys stay silent, so there's
-  no double sound.
+- In laptop mode (the virtual output active), a laptop key sounds from its own key event (through `/play`'s input
+  handler), not the frame loop. The target is under ~15 ms from key to sound. With the DGX connected, laptop keys
+  stay silent, so there's no double sound.
 - The key's release ends the note, through the same voice and pedal rules.
 
 **Volume**

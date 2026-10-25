@@ -21,7 +21,7 @@ const legend: readonly Colour[] = ['unknown', 'in-progress', 'mastered'];
 const titles = new Map(curriculum.nodes.map(node => [node.id, node.title]));
 type Loaded = { learner: string; attempts: readonly Attempt[]; goals: Goals };
 const store = remoteStore();
-/** How far the graph sits below centre when there is room, so it clears the companion in the top-left corner. */
+/** How far the graph sits below centre when there is room, so it clears the companion and the ink's perch in the top-left corner. */
 const companionLift = 120;
 /** Room kept clear along the bottom of the map for the colour legend, so no node or caption sits under it. */
 const legendBand = 56;
@@ -38,7 +38,9 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
   const [viewport, setViewport] = useState({ ...mapSize });
   const [flightCaptions, setFlightCaptions] = useState<AnchoredLabel[]>([]);
   const [loaded, setLoaded] = useState<Loaded | null>(null);
-  const [answer, setAnswer] = useState<{ for: Loaded; result: NextResult } | null>(null);
+  // The last plan stays on screen while a fresh one loads: the map re-reads the student when it is shown again after
+  // an offline blip, and blanking the next activity for the whole planning call left the student with nothing to press.
+  const [next, setNext] = useState<NextResult | null>(null);
   useEffect(() => {
     const element = stage.current; if (!element) return;
     const observer = new ResizeObserver(([entry]) => setViewport({width:Math.round(entry.contentRect.width),height:Math.round(entry.contentRect.height)}));
@@ -54,13 +56,12 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
   useEffect(() => {
     if (!loaded) return;
     const controller = new AbortController();
-    fetchNext(fetch, { attempts: [...loaded.attempts], goals: loaded.goals }, curriculum, AbortSignal.any([controller.signal, AbortSignal.timeout(nextPatience)])).then(result => { if (!controller.signal.aborted) setAnswer({ for: loaded, result }); });
+    fetchNext(fetch, { attempts: [...loaded.attempts], goals: loaded.goals }, curriculum, AbortSignal.any([controller.signal, AbortSignal.timeout(nextPatience)])).then(result => { if (!controller.signal.aborted) setNext(result); });
     return () => controller.abort();
   }, [loaded]);
   const world = useMemo(() => layoutCurriculum(curriculum), []);
   const colours = useMemo(() => paint(curriculum, loaded?.attempts ?? []), [loaded]);
   const counts = tally(colours);
-  const next = answer && answer.for === loaded ? answer.result : null;
   const session = next?.ok ? next.session : null;
   const first = session?.activities[0] ?? null;
   const recommendedId = first?.nodeId ?? null;
@@ -80,11 +81,11 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
   const backbone = world.relationships.filter(edge => pointById.has(edge.from) && pointById.has(edge.to));
   function enterActivity(event: MouseEvent<HTMLButtonElement>) {
     if (!first) return guide.onStart();
-    const element = stage.current, pet = frame.current?.querySelector<HTMLImageElement>('[data-gator-perch]');
+    const element = stage.current, perch = frame.current?.querySelector<HTMLElement>('[data-tutor-perch]');
     const target = projected.find(point => point.node.id === first.nodeId);
     const href = activityHref(first);
-    if (!element || !pet || !target || active) return;
-    const bounds = element.getBoundingClientRect(), source = pet.getBoundingClientRect();
+    if (!element || !perch || !target || active) return;
+    const bounds = element.getBoundingClientRect(), source = perch.getBoundingClientRect();
     setFlightCaptions(anchorLabels(restingLabels, projected));
     if (!begin({ source: {x:source.left+source.width/2-bounds.left,y:source.top+source.height/2-bounds.top}, target:{x:target.screenX,y:target.screenY}, bounds:{left:bounds.left,top:bounds.top,width:bounds.width,height:bounds.height}, href:href.split('?')[0],title:titles.get(first.nodeId) ?? first.nodeId }, event.timeStamp, () => router.push(href))) router.push(href);
   }
@@ -94,7 +95,7 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
     <div className={styles.body}>
       <div ref={frame} className={styles.mapStage} data-entering={!!active} data-camera-scale={camera.scale} data-camera-x={camera.x} data-camera-y={camera.y}>
         <div ref={stage} className={styles.mapField}>
-        <svg className={styles.map} viewBox={`0 0 ${viewport.width} ${viewport.height}`} role="group" aria-label={`Your learning map: ${counts.mastered} mastered, ${counts['in-progress']} in progress, ${counts.unknown} not yet.`}>
+        <svg className={styles.map} data-ink-open viewBox={`0 0 ${viewport.width} ${viewport.height}`} role="group" aria-label={`Your learning map: ${counts.mastered} mastered, ${counts['in-progress']} in progress, ${counts.unknown} not yet.`}>
           <defs><marker id={`${uid}-arrow`} markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1L7 4L1 7Z" className={styles.arrowhead}/></marker></defs>
           <g aria-hidden="true">{points.map(point => {
             const parent = point.node.parentId ? pointById.get(point.node.parentId) : null;
@@ -102,7 +103,7 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
           })}{backbone.map(edge => <path key={`${edge.from}-${edge.to}`} className={styles.backbone} d={curve(pointById.get(edge.from)!, pointById.get(edge.to)!, backbone.some(other => other.from === edge.to && other.to === edge.from))} markerEnd={`url(#${uid}-arrow)`}/>)}</g>
           {points.filter(point => visible.has(point.node.id)).map(point => {
             const root = point.depth === 0, colour = colours.get(point.node.id) ?? 'unknown', radius = dotRadius(point.depth, painted.has(point.node.id));
-            return <g key={point.node.id} role="img" data-skill={point.node.id} aria-label={`${point.node.title}, ${root ? 'region' : colourWords[colour]}${point.node.id === recommendedId ? ', next activity' : ''}`} className={styles.node} data-state={root ? 'root' : colour} data-preview={preview.has(point.node.id)}>
+            return <g key={point.node.id} role="img" data-skill={point.node.id} data-ink-quiet aria-label={`${point.node.title}, ${root ? 'region' : colourWords[colour]}${point.node.id === recommendedId ? ', next activity' : ''}`} className={styles.node} data-state={root ? 'root' : colour} data-preview={preview.has(point.node.id)}>
               <title>{point.node.title}</title>{point.node.id === recommendedId && <circle cx={point.screenX} cy={point.screenY} r={radius+7} className={styles.recommended}/>}
               <circle cx={point.screenX} cy={point.screenY} r={radius} className={styles.dot}/>
             </g>;

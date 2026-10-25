@@ -158,7 +158,6 @@ features = [
   "first-run",
   "landing",
   "account",
-  "menu-test",
 ]
 cut = []
 

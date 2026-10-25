@@ -13,6 +13,11 @@ const ABRSM = "https://www.abrsm.org/sites/default/files/2024-06/Piano%202025%20
 
 export const reviewedLevels: Record<string, { old: number; level: number; grade?: Grade; note?: string }> = {
   "twinkle": { old: 1, level: 1, note: "No grade: a tune under any grade. Looked at RCM and ABRSM (rcmusic.com, abrsm.org)." },
+  "hot-cross-buns": { old: 1, level: 1, note: "no published grade: a nursery tune" },
+  "mary-lamb": { old: 1, level: 1, note: "no published grade: a nursery tune" },
+  "london-bridge": { old: 1, level: 1, note: "no published grade: a nursery tune" },
+  "jingle-bells": { old: 2, level: 2, note: "no published grade: a nursery tune" },
+  "frere-jacques-solo": { old: 1, level: 1, note: "no published grade: a nursery tune" },
   "minuet-g": { old: 2, level: 2, grade: { scale: "henle", value: 1, url: HN("Notebook-for-Anna-Magdalena-Bach/HN-349") }, note: "RCM Level 3." },
   "clair-de-lune": { old: 3, level: 8, grade: { scale: "henle", value: 5, url: HN("en/Clair-de-lune/HN-391") }, note: "The chart is the opening only (79 notes at 60 BPM), so 2 below the grade." },
   "ode-to-joy": { old: 3, level: 3, note: "No grade: a hymn-tune setting. Looked at henle.de, RCM Piano Syllabus 2022, ABRSM 2023-26 practical grades." },

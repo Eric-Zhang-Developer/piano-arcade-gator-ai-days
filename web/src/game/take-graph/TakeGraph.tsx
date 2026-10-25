@@ -62,14 +62,21 @@ export function TakeGraph({ chart, take, results, windows = judgeWindows }: { ch
   useEffect(() => {
     const el = box.current;
     if (!el || drawn) return;
-    if (reducedMotion()) return setDrawn(true);
+    if (reducedMotion() || typeof IntersectionObserver === "undefined") return setDrawn(true);
+    // An observer that never reports (a page not being rendered) mustn't keep the marks hidden: draw after 2 s.
+    let heard = false;
     const io = new IntersectionObserver(([e]) => {
+      heard = true;
       if (!e.isIntersecting) return;
       io.disconnect();
       setDrawn(true);
     }, { threshold: 0.25 });
     io.observe(el);
-    return () => io.disconnect();
+    const fallback = setTimeout(() => heard || setDrawn(true), 2000);
+    return () => {
+      io.disconnect();
+      clearTimeout(fallback);
+    };
   }, [drawn, table]);
 
   const plotW = width - M.left - M.right;

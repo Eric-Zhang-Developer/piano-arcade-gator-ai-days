@@ -125,11 +125,14 @@ function RecordingOffsetRow() {
           value={offset}
           onChange={(e) => setRecordingOffset(Number(e.target.value))}
         />
-        <output className={styles.value}>
-          {offset > 0 ? "+" : ""}
-          {offset} ms
+        <output className={styles.value} data-testid="opt-recording-offset-value">
+          {offset > 0 ? "+" : offset < 0 ? "\u2212" : ""}
+          {Math.abs(offset)} ms
         </output>
       </div>
+      {/* Which way it moves, in the label row's right slot (Latency's Calibrate link sits there), so the value cell
+          keeps every row's width and the tracks line up. */}
+      {offset !== 0 && <span className={styles.hint}>{offset > 0 ? "Plays early" : "Plays late"}</span>}
     </div>
   );
 }
@@ -331,7 +334,7 @@ export function OptionsDrawer({
           }}
         />
         {children && <div className={styles.extra}>{children}</div>}
-        <p className={styles.note}>{onLatency ? "Labels apply when you press Start." : "Latency and labels apply from the next song."}</p>
+        <p className={styles.note}>{onLatency ? "Labels apply when you press Start." : `Latency, labels${recording ? " and the recording" : ""} apply from the next song.`}</p>
       </dialog>
     </>
   );

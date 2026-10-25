@@ -36,7 +36,9 @@ test("Recording offset shows only with a recording, after Recording volume, at 0
   expect(html).toMatch(/id="opt-recording-offset"[^>]*min="-300"[^>]*max="300"[^>]*value="0"/);
   expect(html.indexOf("Recording volume")).toBeLessThan(html.indexOf("Recording offset"));
   expect(html.indexOf("Recording offset")).toBeLessThan(html.indexOf("Mute"));
+  expect(html).not.toMatch(/Plays (early|late)/); // no direction to name at 0
 });
+
 
 test("row movement stops at the ends", () => {
   expect(rowStep(0, -1, 5)).toBe(0);

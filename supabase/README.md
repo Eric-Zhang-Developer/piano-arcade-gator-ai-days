@@ -13,7 +13,10 @@ run locally, and a take that can't be saved waits in the browser's outbox. Owner
 | `coach_feedback` | table | what the coach said and the exact numbers it was checked against | that player |
 | `bar_trends` | view | per bar over a player's last 5 takes of a song: notes, misses, mean offset, spread | that player |
 | `take_history` | view | one row per take, for the progress chart | that player |
-| `save_take(take, notes)` | function | saves a take and its notes in one transaction; answers `saved`, `duplicate` or `conflict` | server only |
+| `session_history` | view | every take with its song title, when and how long it was played: the profile page | that player |
+| `hand_stats` | view | per song and hand: notes by judgment, mean timing, spread, velocity: the profile's hands panel | that player |
+| `save_take(take, notes)` | function | saves a take and its notes in one transaction; answers `saved`, `duplicate`, `conflict`, or `limited` (over 20 new takes in 5 minutes for that player: the browser keeps it and resends) | server only |
+| `cleanup_stale_guests(days = 30)` | function | deletes guest accounts with no sign-in and no take in `days` (at least 7); Google accounts are never touched. Nightly at 04:17 UTC via `pg_cron` where available | server only |
 | `merge_player(from, to)` | function | moves an anonymous device's takes and coach notes into a Google account (`/auth/merge`) | server only |
 | `rls_auto_enable` | Supabase's own | turns RLS on for new tables automatically; not ours, leave it | nobody |
 
@@ -39,7 +42,8 @@ through `/api/takes`, checks the stored rows and `/api/progress`, and deletes wh
 A finished take of a committed song, played by a person, on the chart as committed. Not saved: test input, bots
 (`?bot=`), the fake piano (`?midi=sim`), versus, wait mode, local songs, and any take whose chart a plugin changed
 (bar-loop, one hand, chunk practice, another tempo): the server re-judges against the committed chart, so those scores
-would be wrong. The rule lives in `web/src/data/save-plugin.ts` (`unsavableReason`, `sameChart`).
+would be wrong. The rule lives in `web/src/data/save-plugin.ts` (`unsavableReason`, `sameChart`). The results screen says which it was:
+"Saved to your account ✓", "Saved as a guest ✓", "Not saved yet: …" (kept, sent later) or "Not saved: …" (`SaveStatus.tsx`).
 
 ## Adding something (a column, a table, a view, seed rows)
 1. **Make the file:** `npx -y supabase@2.122.0 migration new <what_it_does>` creates

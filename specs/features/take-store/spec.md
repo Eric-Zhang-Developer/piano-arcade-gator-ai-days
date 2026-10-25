@@ -20,7 +20,10 @@ The game never waits on any of this. Judging, rendering, sound and LEDs stay loc
    pure mapping from `Take` + `Results` to rows.
 3. `POST /api/takes`: re-judge, save. `GET /api/progress`: history and per-bar trends.
 4. Anonymous Supabase Auth on first save; "Keep my progress" links Google to the same user.
-5. `/progress`: accuracy and timing per take, and the weakest bars.
+5. `/progress`: the player's profile: every session across songs (when, how long, rank, accuracy, hits), totals, and
+   for one song the weakest bars. The account chip's name opens it. Headline numbers (sessions, time, notes and hit
+   rate, best rank and combo, day streak), accuracy over time, a 12-week practice calendar, every note's judgment, and
+   each hand's hit rate and timing (`hand_stats`). Real counts only: a panel with no data says so.
 
 ## Requirements
 **Data** (`supabase/migrations/`, Postgres on the Supabase free tier):
@@ -36,6 +39,9 @@ The game never waits on any of this. Judging, rendering, sound and LEDs stay loc
   within ±1000. Judgment and rank are any upper-case name, so a judgment or rank the contract adds later saves with
   no migration. A take the database still refuses is kept in the outbox and resent later, never dropped.
 - `save_take(take, notes)` writes a take and its notes in one transaction and does nothing on a retry of the same id.
+  At most 20 new takes per player in 5 minutes (`limited`, answered 429; the browser keeps the take and resends).
+- Guests with no sign-in and no take in 30 days are deleted (`cleanup_stale_guests`, nightly where `pg_cron` exists);
+  Google accounts are never deleted by it.
 - Only takes the server can re-judge are saved: a person playing a committed song on the chart as committed. Not test
   input, bots, the fake piano, versus, wait mode, local songs (decision 003), or a chart a plugin changed (loops, one
   hand, chunks, tempo), checked by comparing the played chart with the committed file.

@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { existsSync, mkdtempSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -81,7 +81,7 @@ describe("runChecks", () => {
       `if (existsSync(${JSON.stringify(marker)})) process.exit(0);\n` +
       `writeFileSync(${JSON.stringify(marker)}, "");\nprocess.exit(1);\n`,
   );
-  const run = (names) => runChecks(dir, names, join(dir, "out"));
+  const run = (names, shardLabel) => runChecks(dir, names, join(dir, "out"), shardLabel);
 
   it("reports a pass on the rerun as flaky, and the shard exits 0", async () => {
     const rows = await run(["pass.mjs", "flaky.mjs"]);
@@ -115,6 +115,13 @@ describe("runChecks", () => {
     const rows = await run(["pass.mjs", "fail.mjs"]);
     expect(rows.map((r) => r.result)).toEqual(["pass", "FAIL"]);
     expect(exitCode(rows)).toBe(1);
+  });
+
+  it("keeps the shard and its rows in results.json in --out (veritas reads them)", async () => {
+    const rows = await run(["pass.mjs", "fail.mjs"], "3/8");
+    const kept = JSON.parse(readFileSync(join(dir, "out", "results.json"), "utf8"));
+    expect(kept).toEqual({ shard: "3/8", rows });
+    expect(Object.keys(kept.rows[0])).toEqual(["check", "result", "seconds"]);
   });
 });
 

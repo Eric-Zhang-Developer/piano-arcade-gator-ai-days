@@ -3,11 +3,32 @@
 // the raw key events (wrapInput) and the clock (songStart). The play screen emits songStart in the same tick it
 // sets chart time 0, so the rebuilt times match the judged ones to well under a millisecond, and the server
 // re-judges from this Take anyway.
+import { createElement } from "react";
 import type { Chart, GamePlugin, InputDevice, InputKind, Take } from "../contracts";
 import { loadLatencyOffset } from "../game/core/settings";
 import { ensureSession } from "./auth";
 import { isConfigured } from "./config";
 import { enqueue, flush, type OutboxItem, type SendResult } from "./outbox";
+import { SaveStatusLine } from "./SaveStatus";
+
+/** What happened to the take that just ended, for the results screen. */
+export type SaveStatus =
+  | { state: "checking" } // comparing the played chart with the committed one
+  | { state: "sending" }
+  | { state: "saved" }
+  | { state: "waiting"; why: string } // kept on this device, sent later
+  | { state: "skipped"; why: string }; // never saved, and why
+
+export interface StatusStore {
+  get(): SaveStatus | null;
+  subscribe(listener: () => void): () => void;
+}
+
+// The outbox reports each take's send here, so the plugin can tell the player about the one they just played.
+type SendEvent = { id: string; result: SendResult } | { id: string; done: true };
+const sendListeners = new Set<(e: SendEvent) => void>();
+/** Exported for tests; the outbox calls it through flushOutbox and queueAndSend. */
+export const report = (e: SendEvent) => sendListeners.forEach((l) => l(e));
 
 export interface TakeSink {
   (id: string, take: Take): void;
@@ -29,6 +50,7 @@ export function unsavableReason(params: URLSearchParams): string | null {
   if (params.get("midi") === "sim") return "the fake piano played it";
   if (params.has("versus")) return "two players shared the take";
   if (params.get("mode") === "wait") return "wait mode: nothing is judged in time";
+  if (params.get("level") === "easy") return "Easy level: only the full chart counts";
   return null;
 }
 
@@ -49,9 +71,30 @@ interface Recording {
   events: Take["events"];
 }
 
-export function createSavePlugin(sink: TakeSink, loadChart: LoadChart = loadCommittedChart): GamePlugin {
+export function createSavePlugin(sink: TakeSink, loadChart: LoadChart = loadCommittedChart): GamePlugin & { status: StatusStore } {
   let chart: Chart | null = null;
   let skip: string | null = null;
+  let status: SaveStatus | null = null;
+  let current: string | null = null; // the id of the take the results screen is showing
+  const listeners = new Set<() => void>();
+  const setStatus = (s: SaveStatus | null) => {
+    status = s;
+    listeners.forEach((l) => l());
+  };
+  const store: StatusStore = {
+    get: () => status,
+    subscribe: (l) => {
+      listeners.add(l);
+      return () => listeners.delete(l);
+    },
+  };
+  sendListeners.add((e) => {
+    if (e.id !== current || status?.state !== "sending") return;
+    if ("done" in e) return setStatus({ state: "waiting", why: "offline or the server is busy: it sends next time" });
+    if (e.result === "ok") setStatus({ state: "saved" });
+    else if (e.result === "later") setStatus({ state: "waiting", why: "kept on this device; it sends again in a few minutes" });
+    else if (e.result === "drop") setStatus({ state: "skipped", why: "the server refused this take" });
+  });
   let rec: Recording | null = null;
 
   const record = (kind: InputKind, type: "on" | "off", pitch: number, velocity: number, perfMs: number) => {
@@ -68,10 +111,14 @@ export function createSavePlugin(sink: TakeSink, loadChart: LoadChart = loadComm
 
   return {
     id: "take-store",
+    status: store,
     transformChart(c, params) {
       chart = c;
       skip = unsavableReason(params);
       return c;
+    },
+    resultsPanel() {
+      return isConfigured() ? createElement(SaveStatusLine, { store }) : null;
     },
     wrapInput(input: InputDevice): InputDevice {
       return {
@@ -86,12 +133,18 @@ export function createSavePlugin(sink: TakeSink, loadChart: LoadChart = loadComm
     },
     onEvent(e) {
       if (e.type === "songStart") {
+        current = null;
+        setStatus(null);
         rec = { zeroPerf: performance.now() - e.atMs, latency: loadLatencyOffset(), startedAt: new Date().toISOString(), kind: null, events: [] };
       } else if (e.type === "songEnd" && rec && chart) {
         const r = rec;
         const played = chart;
         rec = null;
-        if (skip || r.kind === "test" || r.events.length === 0) return;
+        if (skip || r.kind === "test" || r.events.length === 0) {
+          setStatus({ state: "skipped", why: skip ?? (r.kind === "test" ? "test input" : "no notes were played") });
+          return;
+        }
+        setStatus({ state: "checking" });
         const take: Take = {
           chartId: played.id,
           startedAt: r.startedAt,
@@ -102,11 +155,26 @@ export function createSavePlugin(sink: TakeSink, loadChart: LoadChart = loadComm
         // Drills and variants (bar-loop, hand-mode, chunk practice, tempo) play a changed chart the server can't
         // rebuild: only a take of the committed chart is saved, so stored scores always match what was played.
         void loadChart(played.id).then((committed) => {
-          if (committed && sameChart(committed, played)) sink(crypto.randomUUID(), take);
+          if (!committed) return setStatus({ state: "waiting", why: "couldn't check the song's chart (offline?)" });
+          if (!sameChart(committed, played))
+            return setStatus({ state: "skipped", why: "the chart was changed (a loop, one hand, chunks or another tempo)" });
+          current = crypto.randomUUID();
+          setStatus({ state: "sending" });
+          sink(current, take);
         });
       }
     },
   };
+}
+
+/** What the outbox does with a take, given /api/takes' answer. */
+export function sendResultFor(status: number): SendResult {
+  if (status >= 200 && status < 300) return "ok";
+  // 424: the database refused a take the game accepted (resend after a migration). 429: saving too fast (0008's
+  // limit). Either way the take is fine: keep it and move on to the next one.
+  if (status === 424 || status === 429) return "later";
+  if ([400, 409, 413, 422].includes(status)) return "drop"; // the take itself is bad: resending won't help
+  return "retry"; // offline, 401 (session expired), 5xx, or not configured on the server
 }
 
 /** POST one take; maps the answer to what the outbox should do with it. */
@@ -117,15 +185,12 @@ export async function sendTake(item: OutboxItem): Promise<SendResult> {
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
     body: JSON.stringify({ id: item.id, take: item.take }),
   });
-  if (res.ok) return "ok";
-  if (res.status === 424) return "later"; // the database refused a take the game accepted: resend after a migration
-  if ([400, 409, 413, 422].includes(res.status)) return "drop"; // the take itself is bad: resending won't help
-  return "retry"; // offline, 401 (session expired), 5xx, or not configured on the server
+  return sendResultFor(res.status);
 }
 
 export function flushOutbox(): Promise<number> {
   if (!isConfigured()) return Promise.resolve(0);
-  return flush(localStorage, sendTake);
+  return flush(localStorage, sendTake, (id, result) => report({ id, result }));
 }
 
 /** The default sink: queue locally, then try to send in the background. Never throws into the game. */
@@ -135,5 +200,5 @@ export const queueAndSend: TakeSink = (id, take) => {
   } catch {
     return;
   }
-  setTimeout(() => void flushOutbox().catch(() => {}), 0);
+  setTimeout(() => void flushOutbox().catch(() => 0).then(() => report({ id, done: true })), 0);
 };

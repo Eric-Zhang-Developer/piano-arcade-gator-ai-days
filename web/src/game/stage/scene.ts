@@ -9,7 +9,7 @@ const STARS = 220;
 const STAR_Z = -130;
 
 export interface Scene {
-  render(f: Frame, l: Look, phase?: number): void; // phase: the old grid's; nothing reads it now
+  render(f: Frame, l: Look): void;
   dispose(): void;
 }
 

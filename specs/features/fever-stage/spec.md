@@ -65,10 +65,9 @@ glow in fever: juice-visual at the highway's edges, the stage behind.
 
 ## Validation
 - `pnpm -C web test`, Vitest, no WebGL:
-  - The stage state is a pure reducer over `GameEvent`s, tested on a fixed event list: tier steps with the combo
-    (same tier as `tierFor` at 0, 10, 20 and 30), fever on and off, the dip on a miss and a WRONG ending in about
-    300 ms, the speed back to tier 1 on a combo break, one burst on `fullCombo`.
-  - The grid offset at `nowMs` is a pure function: at whole beats it's a whole number of lines, at any BPM.
+  - The stage state is a pure reducer over `GameEvent`s, tested on a fixed event list: fever on and off, and the dip
+    on a miss and a WRONG ending in about 300 ms. ~~Tier steps, the speed back to tier 1, one burst on `fullCombo`;
+    the grid offset as a pure function~~: retired with the grid and the sun (#743); the state that drove them is gone.
   - The frame-budget guard: a scripted list of frame times trips it at a mean over 20 ms across 1 s, not on one
     slow frame.
   - The off switches: `?stage=off` and the storage key both make `background` return `null`.

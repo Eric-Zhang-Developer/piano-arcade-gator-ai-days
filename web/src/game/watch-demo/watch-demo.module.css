@@ -15,17 +15,17 @@
 
 .tag {
   color: var(--pa-cyan);
-  font: italic 900 1em var(--pa-font-display), system-ui, sans-serif;
+  font: 900 1em var(--pa-font-display), system-ui, sans-serif;
   letter-spacing: 0.04em;
 }
 
 .button {
   padding: 0.35em 1em;
   border: none;
-  border-radius: 6px;
+  border-radius: 0;
   background: var(--pa-cyan);
   color: var(--pa-bg);
-  font: italic 800 1em var(--pa-font-display), system-ui, sans-serif;
+  font: 800 1em var(--pa-font-display), system-ui, sans-serif;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   cursor: pointer;

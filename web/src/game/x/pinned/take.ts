@@ -19,6 +19,18 @@ export function demoTake(chart: Chart): Saved {
   return { chart, take: { chartId: chart.id, startedAt: "2026-10-25T00:00:00.000Z", latencyOffsetMs: 0, inputDevice: "test", events }, scripted: true };
 }
 
+// The scripted take, fetched. A failed fetch, a bad status or a body that isn't a chart is a line to show, not a
+// wait: the page said "…" forever with every control off (#1329).
+export async function loadDemo(get: typeof fetch = fetch): Promise<{ saved: Saved } | { error: string }> {
+  const error = "The demo song didn't load. Reload the page to try again.";
+  try {
+    const r = await get(`/songs/${DEMO_SONG}/chart.json`);
+    return r.ok ? { saved: demoTake(await r.json()) } : { error };
+  } catch {
+    return { error };
+  }
+}
+
 export function saveLast(s: Saved): void {
   try {
     sessionStorage.setItem(LAST_KEY, JSON.stringify(s));

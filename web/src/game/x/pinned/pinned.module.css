@@ -90,6 +90,15 @@
   font-weight: 700;
 }
 
+/* The failed load (#1329): the data face at the cells' label size, in full ink, marked by the kit's blue rule. */
+.failed {
+  margin: 0;
+  padding-left: 0.8em;
+  border-left: 2px solid var(--pa-primary);
+  font: 600 clamp(14px, 1vw, 20px) / 1.4 var(--pa-font-data), ui-monospace, monospace;
+  color: var(--pa-ink);
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;

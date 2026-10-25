@@ -7,7 +7,7 @@ import { getPrefs } from "../../sound";
 import { hz, pinTake } from "./cylinder";
 import { makeMusicBox, type MusicBox } from "./scene";
 import { model, writeStl } from "./stl";
-import { DEMO_SONG, demoTake, loadLast, type Saved } from "./take";
+import { loadDemo, loadLast, type Saved } from "./take";
 import { renderTooth, voiceSettings } from "./voice";
 import styles from "./pinned.module.css";
 
@@ -22,6 +22,7 @@ export function Pinned() {
   const turnRef = useRef(0);
   // The take: the one /play saved, else (below) a scripted perfect run of the demo song. Client-only page.
   const [saved, setSaved] = useState<Saved | null>(() => (new URLSearchParams(location.search).get("take") === "last" ? loadLast() : null));
+  const [failed, setFailed] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const [macro, setMacro] = useState(false);
   const [noGl] = useState(() => !document.createElement("canvas").getContext("webgl2"));
@@ -31,9 +32,7 @@ export function Pinned() {
   useEffect(() => {
     if (saved) return;
     let live = true;
-    void fetch(`/songs/${DEMO_SONG}/chart.json`)
-      .then((r) => r.json())
-      .then((chart) => live && setSaved(demoTake(chart)));
+    void loadDemo().then((r) => live && ("saved" in r ? setSaved(r.saved) : setFailed(r.error)));
     return () => void (live = false);
   }, [saved]);
 
@@ -122,6 +121,7 @@ export function Pinned() {
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
 
+  const waiting = failed ? "—" : "…"; // nothing is coming once the load failed
   return (
     <main className={styles.page} data-testid="pinned">
       <canvas ref={canvasRef} className={styles.canvas} data-testid="pinned-canvas" aria-label="Your take as a brass music-box cylinder above a steel comb" />
@@ -132,21 +132,22 @@ export function Pinned() {
         <dl className={styles.data}>
           <div>
             <dt>Song</dt>
-            <dd data-testid="pinned-song">{saved?.chart.title ?? "…"}</dd>
+            <dd data-testid="pinned-song">{saved?.chart.title ?? waiting}</dd>
           </div>
           <div>
             <dt>Length</dt>
-            <dd>{pinned ? clock(pinned.lengthMs) : "…"}</dd>
+            <dd>{pinned ? clock(pinned.lengthMs) : waiting}</dd>
           </div>
           <div>
             <dt>Pins</dt>
-            <dd>{pinned?.pins.length ?? "…"}</dd>
+            <dd>{pinned?.pins.length ?? waiting}</dd>
           </div>
           <div>
             <dt>Teeth</dt>
-            <dd>{pinned?.teeth.length ?? "…"}</dd>
+            <dd>{pinned?.teeth.length ?? waiting}</dd>
           </div>
         </dl>
+        <LoadError error={failed} />
         {saved?.scripted && <MonoLabel>A scripted take, a perfect run. Pin your own from the results with Pinned on in the Lab.</MonoLabel>}
         <div className={styles.actions}>
           <Toggles playing={playing} macro={macro} onCrank={crank} onMacro={toggleMacro} crankOff={!pinned} macroOff={!pinned || noGl} />
@@ -190,3 +191,11 @@ function Swap({ on, off, onLabel }: { on: boolean; off: string; onLabel: string 
     </span>
   );
 }
+
+// The demo chart's failed load, said once in the rail (#1329): ink, not a judgment colour, which stays off chrome.
+export const LoadError = ({ error }: { error: string | null }) =>
+  error ? (
+    <p className={styles.failed} role="alert" data-testid="pinned-failed">
+      {error}
+    </p>
+  ) : null;

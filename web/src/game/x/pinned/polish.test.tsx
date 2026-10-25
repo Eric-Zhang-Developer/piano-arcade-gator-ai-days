@@ -5,7 +5,8 @@ import { describe, expect, it } from "vitest";
 import { metadata } from "../../../app/musicbox/layout";
 import { APP_NAME } from "../../app-name";
 import { crankAudio } from "./crank-audio";
-import { Toggles } from "./Pinned";
+import { LoadError, Toggles } from "./Pinned";
+import { loadDemo } from "./take";
 
 describe("the tab title (#1198)", () => {
   it("names the page", () => {
@@ -53,5 +54,21 @@ describe("the toggles (#1200)", () => {
       const fonts = [...text.matchAll(/font(?:-size|Size)?\s*:\s*[^;]*?(\d+(?:\.\d+)?)px/g)].map((m) => Number(m[1]));
       expect(fonts.filter((n) => n < 12), f).toEqual([]);
     }
+  });
+});
+
+describe("a failed demo load (#1329)", () => {
+  it("is an error, whether the fetch rejects, the status is bad or the body isn't a chart", async () => {
+    const fails = [
+      () => Promise.reject(new TypeError("Failed to fetch")),
+      () => Promise.resolve(new Response("nope", { status: 404 })),
+      () => Promise.resolve(new Response("{not json", { status: 200 })),
+    ];
+    for (const get of fails) expect(await loadDemo(get as typeof fetch)).toEqual({ error: expect.stringContaining("didn't load") });
+  });
+
+  it("renders as an alert line, and nothing while there's no error", () => {
+    expect(renderToStaticMarkup(<LoadError error="The demo song didn't load." />)).toMatch(/^<p[^>]*role="alert"[^>]*>The demo song didn&#x27;t load.<\/p>$/);
+    expect(renderToStaticMarkup(<LoadError error={null} />)).toBe("");
   });
 });

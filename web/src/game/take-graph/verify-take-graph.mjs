@@ -86,8 +86,15 @@ try {
   const width = await sloppy.graph.evaluate((el) => el.getBoundingClientRect().width);
   const height = await sloppy.graph.evaluate((el) => el.getBoundingClientRect().height);
   if (width < 880) fail.push(`graph is ${width} px wide at 1280×720, want 900`);
-  // duo-details (#839) spans the graph across its Details card, so it scales with the width; results-layout's 240 px
-  // cap was the old first screen's. What still matters: the whole graph fits on one 720 px screen.
+  // duo-details (#839) spans the graph across its Details card, so its height follows the card's width: results-layout's
+  // 240 px cap was the old first screen's. Now the plot keeps its own proportions exactly (scaled, never stretched)
+  // and the whole graph fits on one 720 px screen.
+  const plot = await sloppy.graph.locator("svg").first().evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    const v = el.viewBox.baseVal;
+    return { w: r.width, h: r.height, want: (r.width * v.height) / v.width };
+  });
+  if (Math.abs(plot.h - plot.want) > 1) fail.push(`the plot is ${plot.h} px tall at ${plot.w} px wide, want ${plot.want.toFixed(1)}: stretched`);
   if (height > 720) fail.push(`graph is ${height} px tall, more than the 720 px screen`);
   // With the graph added the results screen is taller than 720 px: scrolled to the top, the rank must be on screen.
   const top = await sloppy.page.getByTestId("results").evaluate((el) => {

@@ -109,7 +109,7 @@
   grid-template-columns: 8.6em 1fr;
   gap: 0.8em;
   align-items: baseline;
-  padding: 0.18em 0;
+  padding: 0.1em 0; /* tight enough that every line fits at 1280×720 without scrolling */
 }
 
 .keys {

@@ -97,7 +97,8 @@ export class FlowJudge {
     if (this.results) return;
     const at = this.clock.front;
     const free = (flowSettings.freeBeats * this.mpb) / this.clock.rate;
-    if (!this.clock.holding || this.clock.heldMs <= free || at === this.lostAt) return;
+    // Before the first note is played there's no song to fall out of, so waiting there is never a slip.
+    if (this.prev === null || !this.clock.holding || this.clock.heldMs <= free || at === this.lostAt) return;
     this.lostAt = at;
     this.lost++;
     this.slips++;

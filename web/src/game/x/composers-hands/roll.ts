@@ -174,14 +174,14 @@ export function secondsChart(roll: Roll, splits: number[], meta: { id: string; t
     bpm: 60,
     beatsPerBar: Math.ceil(end / 1000) + 1,
     notes: roll.notes
-      .filter((n) => n.pitch >= 21 && n.pitch <= 108)
       .map((n, i) => ({
-        id: `r${i}`,
+        id: `r${i}`, // the roll note's index, so a judgment finds its roll note
         pitch: n.pitch,
         beat: n.onMs / 1000,
         duration: Math.max(0.05, (n.offMs - n.onMs) / 1000),
         hand: handOf(n, splits),
         velocity: Math.min(127, Math.max(1, n.velocity)),
-      })),
+      }))
+      .filter((n) => n.pitch >= 21 && n.pitch <= 108),
   };
 }

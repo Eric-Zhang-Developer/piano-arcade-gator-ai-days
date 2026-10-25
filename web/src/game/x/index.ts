@@ -4,6 +4,7 @@
 import { createElement, Fragment, type ReactNode } from "react";
 import type { GamePlugin } from "../../contracts";
 import { createGuard, type Guard } from "../crash-guard";
+import { composersHands } from "./composers-hands";
 import { conductor } from "./conductor";
 import { realKeys } from "./real-keys";
 import { highlightReel } from "./highlight-reel";
@@ -26,6 +27,7 @@ export const experiments: Experiment[] = [
   conductor,
   realKeys, // #1017: its own page, /real-keys; on /play only a start-panel link to it
   highlightReel, // a take becomes a 15-second broadcast replay video (#913, spike)
+  composersHands,
 ];
 
 // The names a take's ?x= turns on.

@@ -6,6 +6,7 @@ export interface Seq {
   pitch: number;
   ms: number; // roll time, or chart time
   bar?: number; // the chart's bar, 1-based
+  i?: number; // the note's index before sequence() sorted it
 }
 
 export interface Section {

@@ -3,6 +3,7 @@ import { validateChart } from "../../../contracts";
 import { noteTimeMs } from "../../core/judge";
 import { echoGuard, playbackBetween, splitHands } from "../../hand-mode/hands";
 import { dtw, sections, sequence, timeMap, type Seq } from "./align";
+import { sendsBetween, testRoll } from "./rolls";
 import { handOf, parseMidi, rollSettings, secondsChart, splitPoints, spoolRate, unspool, type Roll, type RollNote } from "./roll";
 
 // Synthetic rolls only: the real ones stay local (specs/decisions/composers-hands-rolls-local.md).
@@ -143,5 +144,30 @@ describe("the alignment", () => {
     const map = timeMap(played, chart, dtw(played, chart));
     expect(map.length).toBeGreaterThan(80);
     expect(map.every((q, i) => i === 0 || q.p >= map[i - 1].p)).toBe(true);
+  });
+});
+
+describe("the sends", () => {
+  it("his notes go out on channel 1 at roll times, a release before a repeat at the same time, with the pedal", () => {
+    const notes = [note(48, 0, 500), note(48, 500, 900), note(72, 250, 400)];
+    const sends = sendsBetween(notes, [{ atMs: 0, down: true }, { atMs: 900, down: false }], 0, 1000);
+    expect(sends.map((x) => [x.bytes.join(" "), x.atMs])).toEqual([
+      ["176 64 127", 0],
+      ["144 48 70", 0],
+      ["144 72 70", 250],
+      ["128 72 0", 400],
+      ["128 48 0", 500],
+      ["144 48 70", 500],
+      ["176 64 0", 900],
+      ["128 48 0", 900],
+    ]);
+    expect(sends.every((x) => (x.bytes[0] & 0x0f) === 0)).toBe(true);
+    expect(sendsBetween(notes, [], 250, 500).map((x) => x.atMs)).toEqual([250, 400]); // [from, to)
+  });
+
+  it("the test roll is our chart at its own tempo", () => {
+    const chart = { id: "t", title: "T", composer: "T", source: "s", bpm: 120, beatsPerBar: 4, notes: [{ id: "a", pitch: 60, beat: 1, duration: 0.5, hand: "R" as const }] };
+    expect(testRoll(chart).notes).toEqual([{ pitch: 60, onMs: 500, offMs: 750, velocity: 80 }]);
+    expect(testRoll(chart).dynamics).toBe(false);
   });
 });

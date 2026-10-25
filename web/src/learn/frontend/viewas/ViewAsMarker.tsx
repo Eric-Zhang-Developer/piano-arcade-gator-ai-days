@@ -12,7 +12,7 @@ export function ViewAsMarker() {
   const id = useSyncExternalStore(unchanging, viewingAs, () => null);
   if (!id) return null;
   return <aside className={styles.marker} aria-label="Viewing as a synthetic learner">
-    <span>Viewing as <b>{id}</b></span>
+    <span><span className={styles.label}>Viewing as</span> <b>{id}</b></span>
     <button type="button" className={styles.exit} onClick={exitViewAs}>Exit</button>
   </aside>;
 }

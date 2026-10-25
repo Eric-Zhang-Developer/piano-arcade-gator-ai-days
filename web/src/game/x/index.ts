@@ -20,6 +20,7 @@ import { speakingPiano } from "./speaking-piano";
 import { wetPaint } from "./wet-paint";
 import { uiSoundsAb } from "./ui-sounds-ab";
 import { recordFollowsX } from "./record-follows";
+import { harmonyMap } from "./harmony-map";
 
 export interface Experiment {
   name: string; // its folder and its flag: ?x=<name>, comma-separated for several
@@ -48,6 +49,7 @@ export const experiments: Experiment[] = [
   handPalette, // #1127: the hand and judgment colors three ways, with a colour-blind simulation
   uiSoundsAb, // #1167: the menu sounds, old against new
   recordFollowsX, // #1261: a recording stretches to follow you in Learn and Flow, and holds when you stop
+  harmonyMap, // #1299: its own pages, /harmony and /harmony/all; chords as triangles on the Tonnetz
 ];
 
 // The names a take's ?x= turns on.

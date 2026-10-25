@@ -30,6 +30,7 @@ export const labels: Record<string, Label> = {
   "ui-sounds-ab": { kind: "polish", needs: [], poster: "/lab/ui-sounds-ab.webp" },
   inside: { kind: "wow", needs: [], poster: "/lab/inside.webp" },
   "record-follows": { kind: "wow", needs: [], poster: "/lab/record-follows.webp" },
+  "harmony-map": { kind: "wow", needs: [], poster: "/lab/harmony-map.webp" },
 };
 
 export type Labeled = Experiment & Label;

@@ -1,0 +1,8 @@
+## What shipped
+`/harmony?song=<id>`: a song's constellation on Euler's Tonnetz (triads as triangles sized by time, moves weighted by traversals, home in gold, P/L/R marked, SVG and PNG downloads) beside a live panel lit by MIDI with its pedal or laptop keys; `/harmony/all`, the atlas of every select song at one scale; `?x=harmony-map` draws the live panel on /play in the empty lanes beside the song's. Lineage, from sources read: Euler, *Tentamen novae theoriae musicae* (1739, E33; https://scholarlycommons.pacific.edu/euler-works/33/, https://en.wikipedia.org/wiki/Tonnetz); Riemann's triadic transformations (1880s) and his network in *Grosse Kompositionslehre* I (1902; https://europeanmusictheory.eu/the-tonnetz-in-19th-century-germany/); Cohn, "Introduction to Neo-Riemannian Theory", *JMT* 42/2 (1998), doi:10.2307/843871 (P, L, R as in https://en.wikipedia.org/wiki/Neo-Riemannian_theory). The namer is jam-mode's.
+## Where it lives
+`web/src/game/x/harmony-map/`, `web/src/app/harmony/`, `specs/decisions/harmony-map-*.md`, a Lab poster.
+## How to check it
+`pnpm -C web exec vitest run src/game/x/harmony-map` (14 pass). Perf at 1920×1080, 10-note chords with the pedal: per-frame work p95 0.2 ms, 3 runs. Read test: a fresh subagent named the minor-key and the simplest of three unlabeled constellations, 2 of 2. Browser: not verified locally; covered by main's scheduled full run. Not seen by Eric.
+## Gaps
+On /play a live player's pedal doesn't reach the panel (core input drops CC). Triads only: sevenths light nodes. Melody-only charts (Twinkle, the Minuet) draw no triangle. Perf was measured with rAF from a MessageChannel stub (hidden pane); GPU raster isn't in it.

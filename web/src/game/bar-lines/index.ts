@@ -56,7 +56,7 @@ export function drawBarLabels(ctx: CanvasRenderingContext2D, L: Layout, lines: B
   const px = Math.round((s.labelPx * L.height) / 720);
   ctx.save();
   ctx.fillStyle = ink;
-  ctx.font = `italic 700 ${px}px ${labelFont()}`;
+  ctx.font = `700 ${px}px ${labelFont()}`;
   ctx.textBaseline = "bottom";
   ctx.globalAlpha = s.labelAlpha;
   for (const b of lines) {

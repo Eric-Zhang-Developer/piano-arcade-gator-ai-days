@@ -33,9 +33,8 @@
 }
 
 .rank {
-  font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-stretch: 75%;
-  font-weight: 800;
+  font-family: var(--pa-font-moment), var(--pa-font-display), system-ui, sans-serif; /* type-moments */
+  font-weight: 900;
   font-size: clamp(110px, 25vh, 300px);
   line-height: 0.8;
   color: var(--pa-gold);
@@ -51,9 +50,8 @@
 
 .song {
   margin: 0;
-  font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-stretch: 75%;
-  font-weight: 700;
+  font-family: var(--pa-font-moment), var(--pa-font-display), system-ui, sans-serif; /* type-moments: the page's H1 */
+  font-weight: 900;
   font-size: clamp(28px, 3.2vw, 64px);
   line-height: 1;
   color: var(--pa-ink);

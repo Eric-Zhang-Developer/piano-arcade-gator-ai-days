@@ -21,11 +21,11 @@
   border-bottom: 1px solid var(--pa-line);
 }
 
-/* Duo (frame F-duo-1): upright, wide-tracked caps after a slanted bar in the primary. */
+/* Duo (frame F-duo-1): wide-tracked caps in the moment face after a slanted bar in the primary. */
 .wordmark {
   margin: 0;
-  font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-weight: 700;
+  font-family: var(--pa-font-moment), var(--pa-font-display), system-ui, sans-serif; /* type-moments */
+  font-weight: 900;
   font-size: clamp(28px, 2.4vw, 46px);
   line-height: 1;
   letter-spacing: 0.08em;

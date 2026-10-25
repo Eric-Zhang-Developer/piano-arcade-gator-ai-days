@@ -21,6 +21,9 @@ const saira = Saira({
   variable: "--pa-font-display",
 });
 
+// The moment face (type-moments): real Saira italic 800–900, only for H1s and big moments, as --pa-font-moment.
+const moment = Saira({ subsets: ["latin"], style: "italic", weight: ["800", "900"], display: "swap", variable: "--pa-font-moment" });
+
 // Duo's data face: labels, levels, bar numbers, ms and hints, in small monospace caps.
 const mono = JetBrains_Mono({
   subsets: ["latin"],
@@ -35,7 +38,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${saira.variable} ${mono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${saira.variable} ${moment.variable} ${mono.variable}`} suppressHydrationWarning>
       {/* ?capture=1 set before the first paint, so a recording's first frames are clean too (video-shots) */}
       <head><CaptureScript /></head>
       <body>

@@ -134,8 +134,8 @@ export function drawCard(ctx: Ctx, m: CardModel, display = "system-ui, sans-seri
   ctx.fillStyle = grad;
   ctx.fillRect(J.x, J.y, J.s, J.s);
   // The CSS line box ends 10% below the square; its baseline sits about a fifth of the font size above that.
-  // Italic only here: the jacket is SongJacket's artwork (its .word is italic), so the card shows the same sleeve.
-  text(m.jacket.word, J.x - J.s * 0.04, J.y + J.s * (1.1 - 0.56 * 0.2), `italic ${face(900, Math.round(J.s * 0.56))}`, m.jacket.text);
+  // The jacket is SongJacket's artwork, upright like its .word, so the card shows the same sleeve.
+  text(m.jacket.word, J.x - J.s * 0.04, J.y + J.s * (1.1 - 0.56 * 0.2), face(900, Math.round(J.s * 0.56)), m.jacket.text);
   ctx.restore();
 
   // The right column, on the jacket's top and bottom edges: the song, then the rank with its numbers beside it, then

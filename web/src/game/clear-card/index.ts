@@ -42,7 +42,7 @@ export function clearCard(): GamePlugin {
   let display = clearSettings.font;
   if (typeof document !== "undefined")
     void whenDisplayFontReady().then(() => {
-      const family = getComputedStyle(document.documentElement).getPropertyValue("--pa-font-display").trim();
+      const family = getComputedStyle(document.documentElement).getPropertyValue("--pa-font-moment").trim();
       if (family) display = `${family}, ${clearSettings.font}`;
     });
   const publish = () => {
@@ -87,7 +87,7 @@ export function clearCard(): GamePlugin {
       ctx.fillRect(0, band, f.width, f.height - band);
 
       let size = Math.max(24, (f.judgmentLineY - band) * s.sizeOfPlayfield);
-      ctx.font = `900 ${size}px ${display}`; // upright, the kit's display type (no italic in the Duo look)
+      ctx.font = `900 ${size}px ${display}`; // the moment face, real italic (type-moments)
       const w = ctx.measureText(card.kind).width;
       if (w > f.width * s.maxWidth) size *= (f.width * s.maxWidth) / w;
       const color = card.kind === "CLEAR" ? ink : gold;

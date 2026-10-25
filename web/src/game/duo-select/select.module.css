@@ -26,8 +26,8 @@
 .title {
   flex: none;
   margin: 2.2vh 0 0.8vh;
-  font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-weight: 700;
+  font-family: var(--pa-font-moment), var(--pa-font-display), system-ui, sans-serif; /* type-moments */
+  font-weight: 900;
   font-size: clamp(32px, 3.4vw, 64px);
   line-height: 1.02;
   text-wrap: balance;

@@ -44,6 +44,12 @@ input {
   font: inherit;
 }
 
+/* type-moments: each page's H1 in the moment face, real Saira italic (layout.tsx). /learn keeps its own type. */
+html:not(:has(#learning-content)) h1 {
+  font-family: var(--pa-font-moment), var(--pa-font-display), system-ui, sans-serif;
+  font-weight: 900;
+}
+
 /* Duo: zero corner radius on every interface element (visual-direction.md). !important, so it beats the components'
    own rules and inline styles. /learn keeps its own radii: its shell always renders main#learning-content, and a page
    holding that is skipped (decision duo-tokens-radius). Canvas shapes aren't CSS and stay as drawn. */

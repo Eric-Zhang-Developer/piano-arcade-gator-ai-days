@@ -17,7 +17,9 @@
   - **Look.** A) keep Eric's current italic Saira roles; B) Duo now, inside `/learn`. **B** (Andres): the values live
     in `web/src/learn/frontend/duo/` and the `--learn-*` aliases, and swap to Eric's shared kit when `duo-tokens`
     lands. Saira is upright, never italic, per `visual-direction.md`. Repointing the aliases restyles the existing
-    `/learn` screens too; that is intended.
+    `/learn` screens too; that is intended. 2026-10-25: swapped. `duo-tokens` landed (#655, #694), so `Panel`,
+    `Brackets`, `Button`, `MonoLabel` and `DataCell` now come from `web/src/game/duo-tokens/`; `/learn` keeps only
+    `DuoScope`, `Mark` and the `--learn-*` aliases. Undo: restore the four copies from #702.
   - **Publishing.** Per `AGENTS.md`: PRs, squash-merged after green CI (Andres). No orchestrator or integration
     branch: each slice ships as its own `fix(learning-ui)` PR, and the next batch starts once the one before it has
     merged (Andres, 2026-10-25).

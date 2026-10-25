@@ -10,6 +10,7 @@ import { ghost } from "./ghost";
 import { keyPreview } from "./key-preview";
 import { handMode } from "./hand-mode";
 import { hud } from "./hud";
+import { missMoment } from "./miss-moment";
 import { firstRun } from "./first-run";
 import { waitHud } from "./wait-hud";
 import { warningCard } from "./difficulty";
@@ -78,6 +79,7 @@ export const plugins: GamePlugin[] = [
   juiceVisual(), // under the HUD: wisps and flares never cover the score
   handColors(), // the L/R legend during the count-in, two-hand charts only
   hud(), // before beat-track, so beat-track's status line draws over the HUD's top panel
+  missMoment(), // after hud(): a miss's quiet look, and a broken combo's digits dropping over the HUD's band
   firstRun(), // ?firstrun=1: its text cues draw over the HUD's layer, between the band and the 1 s mark
   waitHud(), // wait mode: LEARN and note n / N in the HUD's band, where the counters and score were
   watchDemo(), // ?demo=1 (W on the select): after scenes, and over the HUD band, where its DEMO badge draws; back to / after the results

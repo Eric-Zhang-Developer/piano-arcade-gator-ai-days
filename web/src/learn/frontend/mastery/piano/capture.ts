@@ -35,14 +35,16 @@ export function parseMidi(data: ArrayLike<number>, timeMs: number): PianoEvent |
  */
 export async function listenToPiano(onEvent: (e: PianoEvent) => void, onStatus: (s: PianoStatus) => void): Promise<() => void> {
   if (new URLSearchParams(window.location.search).has('sim')) {
-    window.__masteryMidi = {
-      push: (m) => {
+    const hook = {
+      push: (m: RawMidi) => {
         const e = parseMidi(m.data, m.timeMs ?? performance.now());
         if (e) onEvent(e);
       },
     };
+    window.__masteryMidi = hook;
     onStatus({ state: 'piano', name: 'Simulated piano' });
-    return () => { delete window.__masteryMidi; };
+    // A late stop from an earlier listener (React mounts effects twice in dev) must not remove a newer hook.
+    return () => { if (window.__masteryMidi === hook) delete window.__masteryMidi; };
   }
   if (!navigator.requestMIDIAccess) {
     onStatus({ state: 'no-piano', reason: 'This browser cannot hear a piano. Open the page in Chrome.' });

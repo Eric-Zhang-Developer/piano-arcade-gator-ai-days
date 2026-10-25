@@ -19,6 +19,7 @@ import { screenShake } from "./screen-shake";
 import { speakingPiano } from "./speaking-piano";
 import { wetPaint } from "./wet-paint";
 import { uiSoundsAb } from "./ui-sounds-ab";
+import { recordFollowsX } from "./record-follows";
 
 export interface Experiment {
   name: string; // its folder and its flag: ?x=<name>, comma-separated for several
@@ -46,6 +47,7 @@ export const experiments: Experiment[] = [
   inside, // #1226: its own page, /inside; a grand's action moved live by the DGX
   handPalette, // #1127: the hand and judgment colors three ways, with a colour-blind simulation
   uiSoundsAb, // #1167: the menu sounds, old against new
+  recordFollowsX, // #1261: a recording stretches to follow you in Learn and Flow, and holds when you stop
 ];
 
 // The names a take's ?x= turns on.

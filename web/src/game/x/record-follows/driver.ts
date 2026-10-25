@@ -58,10 +58,6 @@ export function recordDriver(chart: Chart, map: BeatMap, onsetBeats: readonly nu
       pos += rate * dtSec;
       return { rate, frozen, cmd };
     },
-    // The audio's own position, when it reports one: the conductor follows what's really playing.
-    sync(sec: number) {
-      pos = sec;
-    },
     get pos() {
       return pos;
     },

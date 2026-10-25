@@ -1,6 +1,7 @@
 // Find's reflow (spec: select-motion, 5): rows that stay glide from where they were to where they are, rows that arrive
 // fade in, rows that leave just go. Measure before the state changes, play after the commit. Each keystroke measures
-// the rows mid-glide (a rect includes the running transform) and starts again from there, so typing never waits.
+// the rows mid-glide (a rect includes the running translate) and starts again from there, so typing never waits. It
+// animates translate, not transform, so it composes with the focus bar's own transform.
 
 export const flipSettings = { ms: 180, arriveMs: 120, omega: 40 }; // ω 40: under 1% left at 180 ms
 
@@ -47,7 +48,7 @@ export function play(before: Map<string, Rect>, els: FlipEl[]) {
   const byKey = new Map(els.map((el) => [keyOf(el), el]));
   const { moves, arrivals } = invert(before, measure(els));
   for (const { key, dx, dy } of moves)
-    byKey.get(key)!.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration: flipSettings.ms, easing: springEasing, id: ID });
+    byKey.get(key)!.animate([{ translate: `${dx}px ${dy}px` }, { translate: "0 0" }], { duration: flipSettings.ms, easing: springEasing, id: ID });
   for (const key of arrivals) byKey.get(key)!.animate([{ opacity: 0 }, { opacity: 1 }], { duration: flipSettings.arriveMs, easing: "ease-out", id: ID });
   return { moves: moves.length, arrivals: arrivals.length };
 }

@@ -21,11 +21,16 @@ export function FocusBar({ place }: { place: FocusMotion["setBar"] }) {
 // typed key is a discrete event, so React runs it before the browser paints.
 export function useReflow(root: RefObject<HTMLElement | null>, dep: unknown) {
   const before = useRef<{ at: number; rects: ReturnType<typeof measure> } | null>(null);
-  const rows = () => [...(root.current?.querySelectorAll<HTMLElement>("ol a[data-testid]") ?? [])];
+  // The bar glides with them: follow() has already cut it to its row.
+  const rows = () => [...(root.current?.querySelectorAll<HTMLElement>("ol a[data-testid], [data-testid=focus-bar]") ?? [])];
   useEffect(() => {
     const b = before.current;
     before.current = null;
     if (!b) return;
+    // The bar marks the focused row, so it starts where that row was, not where the old focus was.
+    const focus = root.current?.querySelector("[data-focused]")?.closest("a")?.dataset.testid;
+    const from = focus ? b.rects.get(focus) : undefined;
+    if (from) b.rects.set("focus-bar", from);
     const n = play(b.rects, rows());
     if (record)
       Promise.all(document.getAnimations().flatMap((a) => (a.id === "select-flip" ? [a.finished] : [])))

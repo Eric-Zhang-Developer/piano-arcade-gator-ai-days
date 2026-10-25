@@ -154,8 +154,8 @@ export function focusMotion(deps: Deps = browser) {
       listeners.forEach((l) => l(last!, false));
     },
 
-    // After a render moved focus without moveFocus (Find, a sort, the first paint): the bar follows, silently. With
-    // nothing shown it hides.
+    // After a render moved focus without moveFocus (Find, a sort, the first paint, a resize): the bar cuts to its row,
+    // silently, since the rows moved under it; Find's reflow then glides it with them. With nothing shown it hides.
     follow() {
       const row = list?.querySelector("[data-focused]")?.closest<HTMLElement>("a");
       if (!row) {
@@ -163,8 +163,8 @@ export function focusMotion(deps: Deps = browser) {
         return;
       }
       if (barS && barS.target === row.offsetTop && bar?.style.opacity === "1") return;
-      aim(row, barS?.omega ?? BASE_OMEGA, deps.still());
-      go(deps.still());
+      aim(row, barS?.omega ?? BASE_OMEGA, true);
+      go(true);
     },
 
     // Key-up: a held key's run is over, so the panel settles once; the next press starts at the base stiffness.

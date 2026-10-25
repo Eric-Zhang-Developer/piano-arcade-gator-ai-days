@@ -173,7 +173,7 @@ describe("FLIP", () => {
     const c = el("c", 0); // and c is new
     const out = play(before, [a, b, c] as FlipEl[]);
     expect(out).toEqual({ moves: 1, arrivals: 1 });
-    expect(a.animate).toHaveBeenCalledWith([{ transform: "translate(0px, -120px)" }, { transform: "none" }], expect.objectContaining({ duration: flipSettings.ms }));
+    expect(a.animate).toHaveBeenCalledWith([{ translate: "0px -120px" }, { translate: "0 0" }], expect.objectContaining({ duration: flipSettings.ms }));
     expect(b.animate).not.toHaveBeenCalled(); // didn't move
     expect(c.animate).toHaveBeenCalledWith([{ opacity: 0 }, { opacity: 1 }], expect.anything());
   });

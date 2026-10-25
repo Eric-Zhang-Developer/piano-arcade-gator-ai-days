@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Chart, Frame, GameEvent, InputDevice, InputEvent, Results, Take } from "../../contracts";
 import { validateChart } from "../../contracts";
+import { APP_NAME } from "../../game/app-name";
 import { plugins } from "../../game/layers";
 import { barLines } from "../../game/bar-lines";
 import { coreGuard, createGuard } from "../../game/crash-guard";
@@ -101,6 +102,7 @@ export default function Play() {
         keysRef.current = staticRange(raw as Chart); // hands=, loops and practice keep the whole song's keyboard
         chartRef.current = plugins.reduce((c, p) => p.transformChart?.(c, params) ?? c, raw as Chart);
         setLoaded({ chart: chartRef.current, params });
+        document.title = `${(raw as Chart).title} · ${APP_NAME}`; // the tab names the song (#953)
         setLatency(latencyRef.current);
         setIsTest(params.get("input") === "test");
         setPhase("ready");
@@ -471,9 +473,14 @@ export default function Play() {
 
   return (
     <main style={{ position: "fixed", inset: 0, overflow: "hidden" }}>
-      <div ref={backgroundRef} style={canvasStyle} />
-      <canvas ref={highwayRef} style={canvasStyle} />
-      <canvas ref={overlayRef} style={canvasStyle} />
+      {/* The take is drawn, so the drawing is hidden from screen readers; the status line says what it shows. */}
+      <div ref={backgroundRef} style={canvasStyle} aria-hidden />
+      <canvas ref={highwayRef} style={canvasStyle} aria-hidden />
+      <canvas ref={overlayRef} style={canvasStyle} aria-hidden />
+      <p role="status" style={srOnly}>
+        {phase === "playing" ? `${loaded?.chart.title ?? "The song"}: playing` : ""}
+        {phase === "results" && results ? `${loaded?.chart.title ?? "The song"}: rank ${results.rank}, ${(results.accuracy * 100).toFixed(1)}%` : ""}
+      </p>
 
       {/* mouse-first: Esc and ← → as buttons in the corner, while playing only; ?capture=1 hides them. Pressing one
           keeps focus where it was, so a later Space or Enter doesn't press it again. ?input=test never pauses. */}
@@ -578,6 +585,8 @@ function TimingPanel({ timing, latency, onLatency }: { timing: TimingSummary; la
 }
 
 const canvasStyle: React.CSSProperties = { position: "absolute", inset: 0, width: "100%", height: "100%" };
+// Read by screen readers, not drawn: the usual visually hidden box.
+const srOnly: React.CSSProperties = { position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap", margin: -1 };
 // The error screen's line, in the kit's display type (upright, condensed).
 const stateTitle: React.CSSProperties = {
   margin: 0,

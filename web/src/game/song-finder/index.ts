@@ -76,3 +76,12 @@ export function writeSort(mode: SortMode, storage: Store = browserStorage()): vo
     // the choice just won't survive a reload
   }
 }
+
+// What the finder's live region says (#1035): nothing until the player types or sorts, then the count shown, or the
+// no-match line.
+export function announcement(touched: boolean, query: string, shown: number, total: number): string {
+  const q = query.trim();
+  if (!touched) return "";
+  if (!q) return `${total} songs`;
+  return shown ? `${shown} of ${total} songs` : `No song matches ${q}`;
+}

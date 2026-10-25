@@ -19,7 +19,8 @@ const paperButton = { background: undefined, color: undefined, border: undefined
 
 function Staff({ phrase }: { phrase: Phrase }) {
   const notes = phraseNotes(phrase);
-  const bars = phrase === 1 ? '1 to 2, ending on G' : '3 to 4, ending on C';
+  // Bars only: naming the last note would read questions 1 and 3's answers to a screen reader (#945).
+  const bars = phrase === 1 ? '1 to 2' : '3 to 4';
   return <svg viewBox="0 0 660 155" role="img" aria-label={`Phrase ${phrase}, bars ${bars}`}>
     {[0, 1, 2, 3, 4].map(i => <line key={i} x1="20" x2="640" y1={50 + i * 12} y2={50 + i * 12} stroke="currentColor" strokeWidth=".7" />)}
     <text x="22" y="90" fontSize="49" fontFamily="serif" fill="currentColor">𝄞</text>

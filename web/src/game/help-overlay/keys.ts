@@ -41,9 +41,9 @@ const INITIALS = "typing your initials";
 export const helpGroups: HelpGroup[] = [
   {
     screen: "Music select",
-    files: [SELECT, "game/duo-select/Select.tsx", SONG_OPTIONS, "game/easy-charts/level.tsx", "game/first-run/index.tsx", OPTIONS, "game/lab/LabLink.tsx"],
+    files: [SELECT, "game/song-finder/Finder.tsx", "game/duo-select/Select.tsx", SONG_OPTIONS, "game/easy-charts/level.tsx", "game/first-run/index.tsx", OPTIONS, "game/lab/LabLink.tsx"],
     lines: [
-      { keys: ["↑", "↓"], what: "choose a song", source: [SELECT], match: ["ArrowUp", "ArrowDown"], control: "Songs" },
+      { keys: ["↑", "↓"], what: "choose a song", source: [SELECT, "game/song-finder/Finder.tsx"], match: ["ArrowUp", "ArrowDown"], control: "Songs" },
       { keys: ["Enter"], what: "Perform: on the beat, ranked", control: "PLAY" },
       { keys: ["L"], what: "Learn: the song waits for each note", source: [SELECT], control: "LEARN" },
       { keys: ["P"], what: "practice it in Flow: narrows onto the bars you miss", source: [SELECT], match: ["p"], control: "PRACTICE" },

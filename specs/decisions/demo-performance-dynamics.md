@@ -2,7 +2,7 @@
 
 **Context.** The bot plays `note.velocity ?? KEYS_VELOCITY` (80). The spec asks for velocities from each score's
 dynamic marks with one mapping for the library, never from memory or a recording. The song packs' converter already
-writes velocities where a source's MIDI renders them (decided on #181). Findings: batch 1 on #815, batch 2 on #816, batch 3 on #818, batch 4 on #819.
+writes velocities where a source's MIDI renders them (decided on #181). Findings: batch 1 on #815, batch 2 on #816, batch 3 on #818, batch 4 on #819, batch 6 on #1102, batch 7 on #1103.
 
 **Options.** (A) golden-demo's ladder for printed marks; (B) whatever each MIDI export renders, which differs by
 typesetter and is flat for most of these sources.
@@ -53,6 +53,27 @@ themes too), and it doesn't read `fz` or a marcato.
 - alla-turca (A, A, B+A′, B+A′): p in A with accents at 7 (R) and 9, 11, 13 (both hands); mp in B with right-hand accents
   each bar; p in A′, a *cresc.* into an fz, p again, an accent: 49–80.
 - minute-waltz (bars 1–20): no level mark, so mf; an accent on the first note, then six one-step hairpins: 64–96.
+
+**Batch 6** (#1102). All hand-read `--marks`, checked against the chart's notes at each beat. `dynamics` lays a
+dynamics line kept outside a `\repeat volta` (Wild Horseman) straight over the unfolded MIDI, which moves B's marks onto
+A's second pass. It also misplaces accents inside `\voiceOne << >>` blocks (Happy Farmer).
+- happy-farmer (the pickup and bars 1–20): f, restated at bars 4, 10 and 16; accents on both hands' melody notes in
+  bars 9, 10, 15 and 16: 96, the accents 112.
+- wild-horseman (A twice, then B): mf at the pickup; sf on the downbeats of bars 2, 3, 6 and 7 in both passes of A,
+  and of bars 10, 11 and 14 in B: 80, the sf notes 96.
+- old-french-song (the pickup and bars 1–16): p, then pp on bar 8's last eighth: 49, then 33.
+- minuet-g-minor, musette-d: no marks, no velocity (80).
+
+**Batch 7** (#1103):
+- chopin-prelude-7 (the pickup and bars 1–16): p, a crescendo from bar 11 into bar 12, then no mark to the end:
+  49–65. `dynamics` read it; its MIDI velocities (69–98) are replaced.
+- traumerei (the pickup and bars 1–8, twice): p, and two crescendo hairpins (bar 1 into 2, bar 5 into 6) with no
+  diminuendo: 49 swelling to 81. The repeat returns to bar 1's p, which is printed on the tail of the tied F that
+  strikes at the downbeat, so the mark sits on that note: each pass is 49–81. Hand-read, because `dynamics` refuses
+  4 notes by the uncharted grace notes.
+- mozart-331-theme (bars 1–8, twice): p; sf on both hands' last eighth of bar 7, then p; the volta repeats them: 49,
+  the sf chords 65. Hand-read (inline staves the reader can't name); its MIDI velocities (69/127) are replaced.
+- brahms-waltz-15, invention-1: no marks, no velocity (80).
 
 A single level reads as "This score marks no dynamics" in the dynamics grade (it needs two levels), as before.
 

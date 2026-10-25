@@ -27,6 +27,10 @@
   gap: 1.5rem;
   /* The top 4vh is the nav bar's band (nav-bar, fixed over every page): the title starts under it, as / does (#882). */
   padding: calc(4vh + 0.75rem) clamp(1rem, 4vw, 3rem) 1rem;
+  /* The header's small text and its controls scale like the title: 16 px and 40 px at 1280, 24 px and 50 px at 1920,
+     so the legend that explains the noteheads reads from the bench (#1044). */
+  --head-text: clamp(1rem, 1.25vw, 1.5rem);
+  --head-ctl: clamp(2.5rem, 2.6vw, 3.25rem);
   background: var(--pa-bg);
   border-bottom: 1px solid color-mix(in srgb, var(--pa-primary) 45%, transparent);
 }
@@ -41,20 +45,21 @@
   margin: 0;
   font-family: var(--pa-font-display), system-ui, sans-serif;
   font-weight: 800;
-  font-size: clamp(1.5rem, 2.6vw, 2.5rem);
+  /* 1.9vw: a long title (Moonlight's 50 characters) keeps one line at 1280, so the sticky head stays one band. */
+  font-size: clamp(1.25rem, 1.9vw, 2.5rem);
   line-height: 1.05;
   letter-spacing: 0.01em;
 }
 
 .composer {
   margin: 0.3rem 0 0;
-  font-size: 1rem;
+  font-size: var(--head-text);
   color: var(--pa-ink);
 }
 
 .note {
   margin: 0.2rem 0 0;
-  font-size: 0.875rem;
+  font-size: var(--head-text);
   color: var(--pa-ink-dim);
 }
 
@@ -66,13 +71,13 @@
 }
 
 .zoom button {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: var(--head-ctl);
+  height: var(--head-ctl);
   border: 1px solid var(--pa-ink-dim);
   border-radius: 0; /* Duo: square controls */
   background: transparent;
   color: var(--pa-ink);
-  font-size: 1.25rem;
+  font-size: calc(var(--head-ctl) / 2);
   line-height: 1;
   cursor: pointer;
   transition: border-color 150ms ease-out, background-color 150ms ease-out;
@@ -94,7 +99,8 @@
 }
 
 .zoom output {
-  min-width: 3.5rem;
+  min-width: 3.5em;
+  font-size: var(--head-text);
   text-align: center;
   font-family: var(--pa-font-display), system-ui, sans-serif;
   font-weight: 700;
@@ -117,13 +123,13 @@
   display: flex;
   gap: 0.4rem 1.1rem;
   align-items: center;
-  min-height: 2.5rem; /* the zoom buttons' height: both sit on the header's bottom, so their centers line up */
+  min-height: var(--head-ctl); /* the zoom buttons' height: both sit on the header's bottom, so their centers line up */
   margin: 0 0 0 auto;
   padding: 0;
   list-style: none;
   font-family: var(--pa-font-display), system-ui, sans-serif;
   font-weight: 700;
-  font-size: 0.875rem;
+  font-size: var(--head-text);
   letter-spacing: 0.04em;
 }
 
@@ -140,8 +146,8 @@
 }
 
 .swatch {
-  width: 0.7rem;
-  height: 0.55rem;
+  width: 0.7em;
+  height: 0.55em;
   border-radius: 50%;
   transform: rotate(-20deg); /* a notehead's tilt */
 }

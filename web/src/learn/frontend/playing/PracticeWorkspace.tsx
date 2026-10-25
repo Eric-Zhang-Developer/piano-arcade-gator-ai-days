@@ -27,13 +27,14 @@ export function PracticeWorkspace() {
     catch { dispatch({ type: 'error', message: 'The preview could not start. Try again.' }); }
   }
   function stop() { playback.stop(); setDemo(false); dispatch({ type: 'stop' }); }
-  const instruction = state.busy ? ['Play the opening', 'Follow the score through both bars.']
-    : state.stage === 'feedback' ? ['Let the last G ring', 'Example feedback: the ending was cut short. Hold the G in bar 2 for two full beats.']
+  // #946: the take is a sample learner's, never the player's: nothing is heard, so nothing here describes their playing.
+  const instruction = state.busy ? ['An example take', 'Follow the score while a sample learner plays both bars. Nothing you play is heard.']
+    : state.stage === 'feedback' ? ['Let the last G ring', 'In that example take the ending was cut short. Hold the G in bar 2 for two full beats.']
     : state.stage === 'drill' ? ['Give G two full beats', 'Play the opening two bars on your piano. Count “one, two” on the final G.']
-    : state.stage === 'fade' ? state.hints ? ['Read from the staff', 'The next preview removes note names. Keep the score in view.'] : state.tempo < targetTempo ? ['Bring it up to tempo', `The next preview runs at ${targetTempo} bpm.`] : ['Keep the ending steady', 'Play both bars once more.']
+    : state.stage === 'fade' ? state.hints ? ['Read from the staff', 'The next example removes note names. Keep the score in view.'] : state.tempo < targetTempo ? ['Bring it up to tempo', `The next example runs at ${targetTempo} bpm.`] : ['Keep the ending steady', 'Play both bars once more.']
     : state.stage === 'complete' ? ['Connect the whole melody', 'The practice example is complete. Return to your learning map.']
     : ['Give the ending room', 'Play the opening two bars. Hold the final G for two full beats.'];
-  const takeLabel = state.stage === 'fade' ? state.hints ? 'Preview without note names' : state.tempo < targetTempo ? `Preview at ${targetTempo} bpm` : 'Start preview take' : 'Start preview take';
+  const takeLabel = state.stage === 'fade' ? state.hints ? 'Example without note names' : state.tempo < targetTempo ? `Example at ${targetTempo} bpm` : 'See an example take' : 'See an example take';
   return <section className={styles.workspace} aria-label="Guided practice">
     <div className={styles.stage} aria-busy={locked}>
       <header className={styles.header}><div><h1>{music.title}</h1><p>Opening two bars · right hand</p></div><span className={styles.preview}>Interactive demo</span></header>
@@ -49,10 +50,10 @@ export function PracticeWorkspace() {
         {state.stage === 'drill' && <p className={styles.repetitions}>{state.repetitions} of 4 repetitions</p>}
         {demo && <p role="status">Playing the opening…</p>}
         {state.error && <p role="alert" className={styles.error}>{state.error}</p>}
-        <details className={styles.details}><summary>About this preview{state.takes > 0 ? ` · ${state.takes} example ${state.takes === 1 ? 'take' : 'takes'}` : ''}</summary><p>No piano input is recorded or graded. Preview takes show a scripted practice flow, including example feedback and one step of support removal at a time. Repetitions are self-reported. The score stays available throughout.</p></details>
+        <details className={styles.details}><summary>About these examples{state.takes > 0 ? ` · ${state.takes} example ${state.takes === 1 ? 'take' : 'takes'}` : ''}</summary><p>No piano input is recorded or graded. Example takes show a scripted practice flow, including feedback on the example and one step of support removal at a time. Repetitions are self-reported. The score stays available throughout.</p></details>
       </div>
       <div className={styles.actions}>
-        {locked ? <button type="button" className={styles.secondary} onClick={stop}>Stop {demo ? 'demo' : 'preview'}</button>
+        {locked ? <button type="button" className={styles.secondary} onClick={stop}>Stop {demo ? 'demo' : 'example'}</button>
           : state.stage === 'feedback' ? <button type="button" className={styles.primary} onClick={() => dispatch({ type: 'drill' })}>Practise the held note</button>
           : state.stage === 'drill' ? <button type="button" className={styles.primary} onClick={() => dispatch({ type: 'repeat' })}>I played it</button>
           : state.stage === 'complete' ? <Link className={styles.primary} href="/learn">Back to map</Link>

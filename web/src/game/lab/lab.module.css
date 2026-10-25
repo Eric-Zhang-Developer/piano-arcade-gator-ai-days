@@ -36,7 +36,11 @@
   margin-left: auto;
 }
 
+/* At least 24 px tall at every width (#1042): the text alone is 22 px at 1280 and 19 px at 1024. */
 .back {
+  display: inline-flex;
+  align-items: center;
+  min-height: max(24px, 1.75em);
   margin-left: auto;
   color: var(--pa-ink-dim);
   text-decoration: none;
@@ -122,8 +126,7 @@
   grid-column: 2;
   grid-row: 1;
   color: var(--pa-primary);
-  font-size: 0.85em;
-  white-space: nowrap;
+  white-space: nowrap; /* the base size, like the description: it's the one thing on the card you click (#1042) */
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -133,7 +136,11 @@
 }
 
 /* LabLink, in the select's footer row after first-run's link: the same quiet look. */
+/* 24 px tall for the target size (#951); no side padding, the 1280 footer row has ~2 px to spare. */
 .footerLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   color: var(--pa-ink-dim);
   font: clamp(13px, 1.6vh, 18px) system-ui, sans-serif;
   text-decoration: none;

@@ -24,19 +24,20 @@ pnpm dev            # http://localhost:3000: the song select
 
 | Route | What it is |
 |---|---|
-| `/` | Song select: every chart under `web/public/songs/`, easiest first. Click a song, or ↑/↓ and Enter, then PLAY, PRACTICE, LEARN or WATCH. |
+| `/` | Song select: every chart under `web/public/songs/`, easiest first, or sorted by composer or recently played. Find filters by title, composer or catalog. Click a song, or ↑/↓ and Enter, then PLAY, PRACTICE, LEARN or WATCH. |
 | `/play?song=<id>` | The game. Plug a MIDI piano in over USB and Chrome asks for MIDI access. With no piano, the home row plays the white keys (`A` through `;`), the row above plays the black keys between them, and Z / X move them an octave. |
 | `/play?midi=sim` | The game on a virtual DGX-660 instead of real MIDI. |
 | `/sim` | The piano simulator: the game, a virtual keyboard, a raw MIDI log, fault buttons (stall, unplug, jitter, stuck note) and a bot that plays the song perfectly. `/sim?record` records a real piano into a test fixture. |
 | `/learn` | The learning side (the nav's **Learn**) and its activities. It runs on an authored sample learner and isn't connected to your takes or an account yet ([#874](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/874)). |
 | `/sheet?song=<id>` | The chart's score as sheet music, following the take while `/play` runs. |
+| `/stage` | The live take on NOSTALGIA's hill, for people watching on a second display. `/play`'s start screen opens it. |
 | `/calibrate` | Tap along to 12 clicks to measure your latency offset. |
 | `/progress` | Your saved takes over time. |
 | `/lab` | Experimental and hidden features, each with one link. |
 | `/veritas` | The judge on trial: test players plant known mistakes in real songs, and the game's judge has to find exactly those. |
 
 The nav bar links `/`, `/learn`, `/lab` and `/progress` (and `/operator` on the dev server). The other pages in
-`web/src/app/` are spikes (`/simon`, `/wrong-note`), the kiosk loop (`/cabinet`, `/attract`), sign-in
+`web/src/app/` are spikes (`/simon`, `/wrong-note`, `/conduct`), the kiosk loop (`/cabinet`, `/attract`), sign-in
 (`/auth/login`) and `/operator`, the agents' status board.
 
 Web MIDI works in Chrome only. Laptop keys always work, so the game is playable with the piano unplugged. Contributors
@@ -78,7 +79,7 @@ Never commit `web/.env.local`, and never put a secret in a `NEXT_PUBLIC_` name.
                canvas highway (one lane per key)   drum beat out to the piano (MIDI out)
 ```
 
-- **Charts** are JSON files in `web/public/songs/<id>/chart.json`, each citing its source score: 20 songs.
+- **Charts** are JSON files in `web/public/songs/<id>/chart.json`, each citing its source score: 40 songs (`git ls-files 'web/public/songs/*/chart.json' | wc -l`).
 - **Judging** (`web/src/game/core/judge.ts`) is a pure function of the chart and the key presses, after the
   latency offset: PERFECT within 40 ms, GREAT within 80 ms, GOOD within 120 ms (`web/src/game/core/settings.ts`),
   MISS when no key of the same pitch arrives in time. A key press that matches no note is an extra, never a MISS;
@@ -101,7 +102,7 @@ Stack: Next.js (App Router) and TypeScript, pnpm, Vitest, Playwright. Details: [
 |---|---|
 | `web/src/game/` | Game lane: clock, input, judging, highway (`core/`), beat track, timing feedback, piano simulator |
 | `web/src/contracts/` | Frozen shared formats |
-| `web/src/app/` | Next.js routes: 23 pages, listed under [Run it](#run-it) |
+| `web/src/app/` | Next.js routes: 25 pages, listed under [Run it](#run-it) |
 | `web/public/songs/` | One folder per chart |
 | `web/e2e/verify.mjs` | Starts the app, plays Twinkle headless as the perfect player, fails unless every note is PERFECT |
 | `specs/` | The source of truth: mission, tech stack, roadmap, milestones, one folder per feature, decisions, playtest findings |
@@ -110,11 +111,13 @@ Stack: Next.js (App Router) and TypeScript, pnpm, Vitest, Playwright. Details: [
 | `docs/judges.md` | The project against the judging criteria, each claim linked to its evidence |
 | `docs/devpost.md` | The Devpost submission draft, with its open items marked |
 | `docs/story.md` | How it got built, one chapter per milestone |
+| [`CREDITS.md`](CREDITS.md) | Every committed third-party file whose license asks for credit: its source, license and what we changed |
 
 ## Checks
 
 ```bash
 pnpm -C web lint && pnpm -C web typecheck && pnpm -C web test && pnpm -C web build
+pnpm -C web exec playwright install chromium            # once per clone: verify drives Playwright's Chromium
 pnpm -C web verify --out /tmp/piano-arcade-evidence     # headless end-to-end run, saves a results screenshot
 ```
 

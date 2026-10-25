@@ -20,10 +20,11 @@ declare global {
 // eslint-disable-next-line @next/next/no-location-assign-relative-destination
 const goHome = () => location.assign("/");
 
-// cabinet's AutoStart, copied (3 lines, not exported there): Start clicks itself once the start screen mounts.
+// cabinet's AutoStart, copied (3 lines, not exported there): Start clicks itself once the start screen mounts. By its
+// test id: the start screen has other buttons before it since duo-start (#763), and the first one isn't Start.
 function AutoStart() {
   useEffect(() => {
-    document.querySelector<HTMLButtonElement>("main button")?.click();
+    document.querySelector<HTMLButtonElement>("[data-testid=start]")?.click();
   }, []);
   return null;
 }

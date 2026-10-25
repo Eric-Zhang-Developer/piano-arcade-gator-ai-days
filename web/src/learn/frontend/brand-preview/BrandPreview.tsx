@@ -1,6 +1,5 @@
 'use client';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent } from 'react';
 import { LearningSessionsProvider, isSessionComplete, useLearningSessions } from '../LearningSessions';
 import { TheoryWorkspace } from '../TheoryWorkspace';
@@ -26,7 +25,7 @@ function Keymark(){return <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M
 export function BrandPreview() {
   const [replay,setReplay]=useState(0),[sources,setSources]=useState(false);
   return <section className={styles.study} aria-label="Brand direction review">
-    <div className={styles.review}><div><strong>Proposed preview</strong><span>Authored demo · Sample learner · Local session</span></div><button type="button" aria-expanded={sources} onClick={()=>setSources(v=>!v)}>{sources?'Close references':'References & application'}</button><button type="button" onClick={()=>setReplay(n=>n+1)}>Replay from home</button><Link href="/learn">Prior UI ↗</Link></div>
+    <div className={styles.review}><div><strong>Proposed preview</strong><span>Authored demo · Sample learner · Local session</span></div><button type="button" aria-expanded={sources} onClick={()=>setSources(v=>!v)}>{sources?'Close references':'References & application'}</button><button type="button" onClick={()=>setReplay(n=>n+1)}>Replay from home</button></div>
     {sources&&<aside className={styles.sources} aria-label="Reference and application"><header><h2>Borrow the useful behavior.</h2><button type="button" onClick={()=>setSources(false)}>Close references</button></header><p>Official public interfaces inspected in Chrome. Banking, insurance, booking and filing flows were not completed. Waze’s initial public planner was inspected; no route was submitted. Emotional effects are design inferences.</p><div className={styles.sourceGrid}>{references.map(source=><article key={source.name}><h3><a href={source.url} target="_blank" rel="noreferrer">{source.name} ↗</a></h3><p><b>Observed:</b> {source.observed}</p><p><b>Applied:</b> {source.applied}</p></article>)}</div><p>One original working system: open sans typography, a piano-key foot shape, restrained cobalt actions, ink and warm white, plus the selected upright alligator. No brand assets, marketing-page compositions or guarantees were copied. Authored demo sessions are isolated from the current product.</p></aside>}
     <div className={styles.student} inert={sources || undefined} aria-hidden={sources || undefined}><LearningSessionsProvider key={replay}><BrandFlow/></LearningSessionsProvider></div>
   </section>;

@@ -62,6 +62,7 @@ const row: CSSProperties = { display: "flex", flexWrap: "wrap", alignItems: "cen
 const group: CSSProperties = { display: "inline-flex", alignItems: "center", gap: "0.25em" };
 const label: CSSProperties = { marginRight: "0.15em", whiteSpace: "nowrap", fontSize: "clamp(12px, 0.8vw, 16px)", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--pa-ink-dim)" };
 const half: CSSProperties = {
+  minHeight: 24, // WCAG 2.2's target size: the chips were 23 px at 720 (#951)
   padding: "0.2em 0.4em",
   borderRadius: 0,
   border: "1px solid var(--pa-line)",

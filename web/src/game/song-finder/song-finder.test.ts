@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { fileURLToPath } from "node:url";
 import { loadSongs, type Song } from "../song-select/load";
-import { filterSongs, LAST_PLAYED_KEY, markPlayed, readLastPlayed, readSort, sortSongs, surname, writeSort } from ".";
+import { announcement, filterSongs, LAST_PLAYED_KEY, markPlayed, readLastPlayed, readSort, sortSongs, surname, writeSort } from ".";
 
 const song = (id: string, title: string, composer: string, level: number, catalog?: string): Song => ({ id, title, composer, level, catalog, noteCount: 1, roll: [] as unknown as Song["roll"] });
 const ids = (songs: Song[]) => songs.map((s) => s.id);
@@ -113,5 +113,14 @@ describe("the sort choice", () => {
     expect(readSort(s)).toBe("level");
     expect(readSort(blocked)).toBe("level");
     expect(() => writeSort("composer", blocked)).not.toThrow();
+  });
+});
+
+describe("the live region's line", () => {
+  it("says nothing before the player types or sorts, then the count, or the no-match line", () => {
+    expect(announcement(false, "", 31, 31)).toBe("");
+    expect(announcement(true, "chopin", 3, 31)).toBe("3 of 31 songs");
+    expect(announcement(true, "  zzqx ", 0, 31)).toBe("No song matches zzqx");
+    expect(announcement(true, "", 31, 31)).toBe("31 songs");
   });
 });

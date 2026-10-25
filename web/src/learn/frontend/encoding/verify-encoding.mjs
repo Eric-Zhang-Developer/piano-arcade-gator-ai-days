@@ -1,10 +1,11 @@
 // Headless proof of the encoding sandbox at /learn/understand (spec: theory-screens, V1). Its own `next dev`. At 1280×720:
 // - a wrong answer is judged wrong and, after a reload, is still on record (progress is kept on this device);
-// - every gate answered through to the end shows complete and all three gates passed on the strip, never before;
-// - with ?node=pitch-grand-staff: the node's own questions, Next's keywords to explore, and every Check appended to
-//   the device's attempts, a revealed one marked so it isn't counted;
-// - the chat replies, or says plainly it isn't connected;
-// - no page errors, and the Gates, Score and Reference files render on screen.
+// - every gate answered through to the end shows complete, never before, with every right answer on record;
+// - one column, no files: a question shows only the phrase it asks about, with Listen, and Help starts closed;
+// - with ?node=pitch-grand-staff: the node's own questions, why it matters and where to read under Help, and every
+//   Check appended to the device's attempts, a revealed one marked so it isn't counted;
+// - the chat, under Help, replies or says plainly it isn't connected;
+// - no page errors.
 // Keeps the screenshots. Usage: node web/src/learn/frontend/encoding/verify-encoding.mjs --out <dir>
 import { spawn } from "node:child_process";
 import { mkdirSync } from "node:fs";
@@ -97,6 +98,10 @@ const answer = async (choice) => {
   return page.locator("[data-result]").getAttribute("data-result");
 };
 const next = () => page.getByRole("button", { name: "Next", exact: true }).click();
+const help = page.getByRole("button", { name: "Help", exact: true });
+const openHelp = async () => {
+  if ((await help.getAttribute("aria-expanded")) !== "true") await help.click();
+};
 
 await page.goto(url);
 await page.evaluate((key) => localStorage.removeItem(key), PROGRESS_KEY);
@@ -105,6 +110,9 @@ await page.reload();
 // A miss is judged wrong and moves the gate on.
 const first = await current();
 check(first === "home/tonic", `opens on the first question (${first})`);
+check((await page.getByRole("tab").count()) === 0, "no files: the question is the screen");
+check((await page.locator("figure[data-phrase]").count()) === 0, "a question about no phrase shows no score");
+check((await help.getAttribute("aria-expanded")) === "false" && !(await page.locator("#chat-input").isVisible()), "Help starts closed, the tutor inside it");
 check((await answer("g")) === "wrong", "a wrong answer is judged wrong");
 // The queue shows the miss comes back, so no line says it (decision "Agent drives").
 check((await page.getByText("This question comes back later.").count()) === 0, "no line says the miss comes back");
@@ -116,8 +124,7 @@ const afterMiss = await current();
 await page.reload();
 check((await storedAttempts()) === 1, "the miss is saved on this device");
 check((await current()) === afterMiss, `a reload resumes on the same question (${afterMiss})`);
-const passedGates = () => page.locator('ol[aria-label="Gates"] li[data-state="passed"]').count();
-check((await passedGates()) === 0, "no gate has passed yet");
+check((await page.locator("[data-complete]").count()) === 0, "nothing is complete yet");
 
 // Stop goes back to /learn; coming back keeps progress.
 await page.getByRole("link", { name: "Stop" }).click();
@@ -125,20 +132,19 @@ await page.waitForURL(`${base}/learn`);
 await page.goto(url);
 check((await storedAttempts()) === 1 && (await current()) === afterMiss, "Stop keeps progress");
 
-// The Score and Reference files.
-await page.getByRole("tab", { name: "Score" }).click();
-check((await page.locator("figure[data-phrase]").count()) === 2, "Score shows both phrases on paper");
-check((await page.getByRole("button", { name: "Listen" }).count()) === 2, "each phrase has Listen");
-await page.screenshot({ path: join(out, "encoding-score.png") });
-await page.getByRole("tab", { name: "Reference" }).click();
-check(await page.getByRole("heading", { name: "Reference" }).isVisible(), "Reference opens");
-await page.getByRole("tab", { name: "Gates" }).click();
-
-// Answer every gate through; complete shows only at the end.
+// Answer every gate through; complete shows only at the end. A phrase question shows its phrase, alone, on paper.
 let completeEarly = false;
+let sawPhrase = false;
 for (let i = 0; i < 40; i++) {
   if (await page.locator("[data-complete]").count()) break;
   const key = await current();
+  if (key === "endings/phrase-1-end") {
+    sawPhrase = true;
+    const phrases = await page.locator("figure[data-phrase]").evaluateAll((fs) => fs.map((f) => f.dataset.phrase));
+    check(phrases.join() === "1", `phrase 1's question shows phrase 1 only (${phrases.join() || "none"})`);
+    check((await page.getByRole("button", { name: "Listen" }).count()) === 1, "the phrase has Listen");
+    await page.screenshot({ path: join(out, "encoding-score.png") });
+  }
   const choice = ANSWERS[key];
   if (!choice) {
     check(false, `knows the answer to ${key}`);
@@ -150,9 +156,13 @@ for (let i = 0; i < 40; i++) {
 }
 check(!completeEarly, "complete shows only after the last Next");
 check(await page.locator('[data-complete="true"]').isVisible(), "every gate passed shows complete");
-check((await passedGates()) === 3, "the strip shows all three gates passed");
+check(sawPhrase, "phrase 1's question came up");
+const right = await page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? '{"attempts":[]}').attempts, PROGRESS_KEY);
+const unanswered = Object.entries(ANSWERS).filter(([k, c]) => !right.some((a) => `${a.gateId}/${a.questionId}` === k && a.choiceId === c));
+check(unanswered.length === 0, `every question's right answer is on record${unanswered.length ? ` (missing ${unanswered.map(([k]) => k).join(", ")})` : ""}`);
 
-// The chat replies, or says it isn't connected.
+// The chat, under Help, replies or says it isn't connected.
+await openHelp();
 await page.locator("#chat-input").fill("Why is C home?");
 await page.getByRole("button", { name: "Send", exact: true }).click();
 const tutor = page.locator('[data-role="tutor"]');
@@ -163,7 +173,7 @@ const statusText = replied ? "" : await status.innerText();
 check(replied > 0 || statusText.includes("isn’t connected"), `the chat ${replied ? "replies" : `says: ${statusText}`}`);
 await page.screenshot({ path: join(out, "encoding-complete.png") });
 
-// One node, as Next sends it: the node's questions, its keywords, and each Check appended to the device.
+// One node, as Next sends it: the node's questions, why it matters, and each Check appended to the device.
 const NODE_ANSWERS = { "pitch-grand-staff-1": "g", "pitch-grand-staff-2": "ledger" };
 const NODE_MISSES = { "pitch-grand-staff-1": "e", "pitch-grand-staff-2": "treble-bottom" };
 const ATTEMPTS_KEY = "pianoArcade.mastery.attempts.v1";
@@ -176,8 +186,9 @@ await page.goto(`${base}/learn/understand?node=pitch-grand-staff`);
 await page.evaluate((key) => localStorage.removeItem(key), ATTEMPTS_KEY);
 await page.reload();
 check((await page.locator('[data-mode="node"]').count()) === 1, "?node= opens the node's sandbox");
-await page.locator('aside[aria-label="To explore"] li[data-node]').first().waitFor({ timeout: 10_000 });
-check((await page.locator('aside[aria-label="To explore"] li[data-node]').count()) >= 1, "Next's keywords show to explore");
+await prompt.waitFor();
+await openHelp();
+check((await page.locator('#help-panel a[href^="http"]').count()) >= 1, "Help says where to read about the node");
 const missed = await nodeQuestion();
 check((await answer(NODE_MISSES[missed])) === "wrong", `a miss on ${missed} is judged wrong`);
 await page.waitForFunction((key) => JSON.parse(localStorage.getItem(key) ?? "[]").length === 1, ATTEMPTS_KEY);
@@ -185,6 +196,7 @@ const [miss] = await nodeAttempts();
 check(miss.itemId === missed && miss.correct === false && miss.cold === true && miss.learnerId === "local", `the miss is appended cold for the local learner (${JSON.stringify(miss)})`);
 await next();
 const revealedId = await nodeQuestion();
+await openHelp();
 await page.getByRole("button", { name: "Show answer", exact: true }).click();
 check((await page.locator("[data-result]").getAttribute("data-result")) === "revealed", "Show answer reveals it");
 await next();

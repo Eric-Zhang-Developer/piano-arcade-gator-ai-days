@@ -1,9 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { Button, DuoScope, Mark } from '../duo';
-import type { Node } from '../mastery/schema';
 import {
   type Attempt,
   type ChatMessage,
@@ -19,18 +18,15 @@ import {
   choiceById,
   choices,
   emptyProgress,
-  exploreNodes,
   findQuestion,
   gateProgress,
   isCorrect,
   loadProgress,
-  nodesToExplore,
   openGate,
   parseChatResponse,
   progressReducer,
   recordAnswer,
   saveProgress,
-  sources,
   theoryGates,
   theoryTitle,
 } from '../theory';
@@ -61,23 +57,20 @@ export function chatOutcome(r: ChatResponse | null): ChatOutcome {
   return { kind: 'not-connected' };
 }
 
-type Tab = 'score' | 'reference' | 'gates';
-const tabs: readonly { id: Tab; label: string }[] = [
-  { id: 'score', label: 'Score' },
-  { id: 'reference', label: 'Reference' },
-  { id: 'gates', label: 'Gates' },
-];
-
 /** The question just judged, held on screen until Next even though progress has moved on. */
 type Judged = { gate: Gate; question: ClosedQuestion; round: number; choiceId?: string };
+
+// A failed save is said with the verdict that caused it, so it never adds a line of its own beside the question.
+const unsavedTwinkle = 'Progress isn’t saved on this device.';
+const unsavedNode = 'Answers aren’t being saved on this device.';
 
 // The kit button's inline colours would beat any class, so they are cleared and .solid / .outline own every state.
 const owned = { background: undefined, color: undefined, border: undefined, cursor: undefined, fontSize: 16 };
 
 /**
- * Without a node, the Twinkle sandbox: three gates, the score, the reference and the tutor. With a node, only that
- * node's items as one gate, with Next's keywords for it beside them as the things to explore; every checked answer is
- * appended to the device's attempts. A null node has no theory items.
+ * Without a node, the Twinkle sandbox: its three gates one question at a time, the phrase each asks about, and the tutor
+ * behind Help. With a node, only that node's items as one gate, with why the node matters and where to read about it
+ * behind Help; every checked answer is appended to the device's attempts. A null node has no theory items.
  */
 export function EncodingSandbox({ node }: { node?: NodeScreen | null } = {}) {
   if (node === null) return <NoQuestions />;
@@ -117,24 +110,12 @@ function useGates(gates: readonly Gate[], attempts: readonly Attempt[], dispatch
 function TwinkleSandbox() {
   const progress = useSyncExternalStore(subscribe, readProgress, () => emptyProgress);
   const [saveFailed, setSaveFailed] = useState(false);
-  const [tab, setTab] = useState<Tab>('gates');
-  const tabRefs = useRef<Partial<Record<Tab, HTMLButtonElement | null>>>({});
 
   const attempts = progress.attempts;
   const dispatch = (e: ProgressEvent) => setSaveFailed(!record(e));
   const { shown, complete, question } = useGates(theoryGates, attempts, dispatch);
   const lastGate = theoryGates[theoryGates.length - 1];
   const focus = shown ? { gateId: shown.gate.id, questionId: shown.question.id } : { gateId: lastGate?.id ?? '' };
-
-  const onTabKey = (e: KeyboardEvent<HTMLButtonElement>) => {
-    const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
-    if (!step) return;
-    e.preventDefault();
-    const i = tabs.findIndex(t => t.id === tab);
-    const to = tabs[(i + step + tabs.length) % tabs.length].id;
-    setTab(to);
-    tabRefs.current[to]?.focus();
-  };
 
   return <DuoScope className={s.sandbox}>
     <header className={s.head}>
@@ -143,55 +124,22 @@ function TwinkleSandbox() {
     </header>
 
     <section className={s.work} aria-label="Workspace">
-      <div className={s.tabs} role="tablist" aria-label="Files">
-        {tabs.map(t => <button
-          key={t.id}
-          ref={el => { tabRefs.current[t.id] = el; }}
-          type="button"
-          role="tab"
-          id={`tab-${t.id}`}
-          aria-selected={tab === t.id}
-          aria-controls={tab === t.id ? `panel-${t.id}` : undefined} /* only the selected panel is rendered (#1278) */
-          tabIndex={tab === t.id ? 0 : -1}
-          className={s.tab}
-          data-tab={t.id}
-          onClick={() => setTab(t.id)}
-          onKeyDown={onTabKey}
-        >{t.label}</button>)}
-      </div>
-      <div className={s.panel} role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} tabIndex={0}>
-        {tab === 'score' && <EncodingScore focus={shown?.question.phrase} />}
-        {tab === 'reference' && <Reference />}
-        {tab === 'gates' && <>
-          <ol className={s.strip} aria-label="Gates">
-            {theoryGates.map((g, i) => {
-              const p = gateProgress(g, attempts);
-              const state = p.status === 'passed' ? 'passed' : g.id === shown?.gate.id ? 'current' : 'open';
-              return <li key={g.id} data-state={state} data-gate={g.id} aria-current={state === 'current' ? 'step' : undefined}>
-                <span className={s.stripMeta}>
-                  <span>Gate {i + 1}</span>
-                  <span>{p.status === 'passed' ? 'Passed' : `${p.passed}/${p.total}`}</span>
-                </span>
-                <span className={s.stripTitle}>{g.title}</span>
-              </li>;
-            })}
-          </ol>
-          {question && <Question {...question} />}
-          {complete && <div className={s.done} data-complete="true">
-            <h2>All three gates passed</h2>
-          </div>}
-          {saveFailed && <p className={s.saveFailed} role="status">Progress isn&apos;t saved on this device.</p>}
-        </>}
-      </div>
+      <EncodingScore focus={shown?.question.phrase} />
+      {question && <Question {...question} unsaved={saveFailed ? unsavedTwinkle : undefined} />}
+      {complete && <div className={s.done} data-complete="true">
+        <h2>All three gates passed</h2>
+        {saveFailed && <p className={s.saveFailed} role="status">{unsavedTwinkle}</p>}
+      </div>}
+      <Help onReveal={question && !question.judged ? question.onReveal : undefined}>
+        <Chat focus={focus} attempts={attempts} />
+      </Help>
     </section>
-
-    <Chat focus={focus} attempts={attempts} />
   </DuoScope>;
 }
 
 /**
- * One node's work and nothing to navigate to: Next chose the node, so there are no tabs, gate strip, score or tutor.
- * The round lives in memory; what lasts is the attempts each Check appends to the device.
+ * One node's work and nothing to choose: Next chose the node, so there is no score or tutor, only its questions and,
+ * behind Help, why it matters. The round lives in memory; what lasts is the attempts each Check appends to the device.
  */
 function NodeSandbox({ node }: { node: NodeScreen }) {
   const gates = useMemo(() => [node.gate], [node]);
@@ -209,6 +157,7 @@ function NodeSandbox({ node }: { node: NodeScreen }) {
       .then(kept => { if (!kept) setSaveFailed(true); });
   };
   const { complete, question } = useGates(gates, progress.attempts, dispatch);
+  const about = node.around.nodes.find(n => n.id === node.gate.id);
 
   return <DuoScope className={s.sandbox} data-mode="node">
     <header className={s.head}>
@@ -217,44 +166,37 @@ function NodeSandbox({ node }: { node: NodeScreen }) {
     </header>
 
     <section className={s.work} aria-label="Workspace">
-      <div className={s.panel}>
-        {question && <Question {...question} />}
-        {complete && <div className={s.done} data-complete="true">
-          <h2>All questions passed</h2>
-          <Link href="/learn" className={s.backLink}>Back to map</Link>
+      {question && <Question {...question} unsaved={saveFailed ? unsavedNode : undefined} />}
+      {complete && <div className={s.done} data-complete="true">
+        <h2>All questions passed</h2>
+        {saveFailed && <p className={s.saveFailed} role="status">{unsavedNode}</p>}
+        <Link href="/learn" className={s.backLink}>Back to map</Link>
+      </div>}
+      {question && <Help onReveal={question.judged ? undefined : question.onReveal}>
+        {about && <div className={s.about}>
+          <p>{about.whyImportant}</p>
+          {about.sources.length > 0 && <ul className={s.sources}>
+            {about.sources.map(src => <li key={src.url}><a href={src.url} target="_blank" rel="noreferrer">{src.title}</a></li>)}
+          </ul>}
         </div>}
-        {saveFailed && <p className={s.saveFailed} role="status">Answers aren&apos;t being saved on this device.</p>}
-      </div>
+      </Help>}
     </section>
-
-    <Explore node={node} />
   </DuoScope>;
 }
 
-/** Next's keywords for the node, each with why it matters and where to read about it. */
-function Explore({ node }: { node: NodeScreen }) {
-  const [nodes, setNodes] = useState<readonly Node[]>([]);
-  useEffect(() => {
-    let alive = true;
-    // Unreadable attempts still leave the graph: the keywords as if nothing had been tried.
-    void nodesToExplore(node)
-      .catch(() => exploreNodes(node.around, node.gate.id, []))
-      .then(found => { if (alive) setNodes(found); });
-    return () => { alive = false; };
-  }, [node]);
-
-  return <aside className={s.explore} aria-label="To explore">
-    <h2 className={s.chatHead}>To explore</h2>
-    <ul className={s.keywords}>
-      {nodes.map(n => <li key={n.id} data-node={n.id}>
-        <h3>{n.title}</h3>
-        <p>{n.whyImportant}</p>
-        {n.sources.length > 0 && <ul className={s.sources}>
-          {n.sources.map(src => <li key={src.url}><a href={src.url} target="_blank" rel="noreferrer">{src.title}</a></li>)}
-        </ul>}
-      </li>)}
-    </ul>
-  </aside>;
+/**
+ * Everything that isn't the question, closed until asked for: Show answer while a question is open, then what the
+ * screen offers beside it. The panel stays in the DOM when closed, so the tutor's conversation survives a close.
+ */
+function Help({ onReveal, children }: { onReveal?: () => void; children?: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return <div className={s.help}>
+    <button type="button" className={s.helpToggle} aria-expanded={open} aria-controls="help-panel" onClick={() => setOpen(o => !o)}>Help</button>
+    <div id="help-panel" className={s.helpPanel} hidden={!open}>
+      {onReveal && <Button kind="secondary" className={s.outline} style={owned} onClick={onReveal}>Show answer</Button>}
+      {children}
+    </div>
+  </div>;
 }
 
 function NoQuestions() {
@@ -264,8 +206,9 @@ function NoQuestions() {
   </DuoScope>;
 }
 
-function Question({ shown, judged, selected, promptRef, onSelect, onCheck, onReveal, onNext }: {
+function Question({ shown, judged, selected, promptRef, unsaved, onSelect, onCheck, onNext }: {
   shown: Judged;
+  unsaved?: string;
   judged: Judged | null;
   selected: string | null;
   promptRef: React.RefObject<HTMLParagraphElement | null>;
@@ -279,55 +222,31 @@ function Question({ shown, judged, selected, promptRef, onSelect, onCheck, onRev
   const right = picked !== undefined && isCorrect(question, picked.id);
   return <>
     <p ref={promptRef} className={s.prompt} tabIndex={-1} data-gate={gate.id} data-question={question.id}>{question.prompt}</p>
-    <fieldset className={s.choices} disabled={!!judged}>
-      <legend className={s.srOnly}>Answer</legend>
-      {choices(question, round).map(c => <label key={c.id} className={s.choice}>
-        <input
-          type="radio"
-          name="answer"
-          value={c.id}
-          data-choice={c.id}
-          checked={(judged ? judged.choiceId : selected) === c.id}
-          onChange={() => onSelect(c.id)}
-        />
-        <span>{c.text}</span>
-      </label>)}
-    </fieldset>
     {judged
       ? <>
+        {/* The choices give way to the verdict, which names the answer it judged so nothing is lost with them. */}
         <div className={s.feedback} role="status" data-result={picked ? (right ? 'correct' : 'wrong') : 'revealed'}>
           {picked
-            ? <><p><Mark kind={right ? 'correct' : 'wrong'} /></p><p>{picked.explanation}</p></>
+            ? <><p><Mark kind={right ? 'correct' : 'wrong'} /></p><p>Your answer: {picked.text}. {picked.explanation}</p></>
             : <><p>The answer is {question.answer.text}.</p><p>{question.answer.explanation}</p></>}
+          {unsaved && <p className={s.unsaved}>{unsaved}</p>}
         </div>
         <div className={s.actions}>
           <Button kind="primary" className={s.solid} style={owned} onClick={onNext} autoFocus>Next</Button>
         </div>
       </>
-      : <div className={s.actions}>
-        <Button kind="primary" className={s.solid} style={owned} disabled={!selected} onClick={onCheck}>Check</Button>
-        <Button kind="secondary" className={s.outline} style={owned} onClick={onReveal}>Show answer</Button>
-      </div>}
-  </>;
-}
-
-function Reference() {
-  return <>
-    <h2>Reference</h2>
-    <dl className={s.facts}>
-      <dt>C major</dt>
-      <dd>C D E F G A B C. The scale starts and ends on C, scale degree 1.</dd>
-      <dt>Degrees</dt>
-      <dd>1 tonic (home) · 3 mediant · 4 subdominant · 5 dominant · 6 submediant</dd>
-      <dt>Treble staff</dt>
-      <dd>Bottom line E, bottom space F, second line G (the clef curls around it), middle line B. A C this low sits on a ledger line below the staff.</dd>
-      <dt>Cadences</dt>
-      <dd>Authentic: V to I at the end of a phrase. Half: the phrase ends on V. The chords show which; the melody alone doesn&apos;t.</dd>
-    </dl>
-    <h2>Sources</h2>
-    <ul className={s.sources}>
-      {sources.map(src => <li key={src.url}><a href={src.url} target="_blank" rel="noreferrer">{src.title}</a></li>)}
-    </ul>
+      : <>
+        <fieldset className={s.choices}>
+          <legend className={s.srOnly}>Answer</legend>
+          {choices(question, round).map(c => <label key={c.id} className={s.choice}>
+            <input type="radio" name="answer" value={c.id} data-choice={c.id} checked={selected === c.id} onChange={() => onSelect(c.id)} />
+            <span>{c.text}</span>
+          </label>)}
+        </fieldset>
+        <div className={s.actions}>
+          <Button kind="primary" className={s.solid} style={owned} disabled={!selected} onClick={onCheck}>Check</Button>
+        </div>
+      </>}
   </>;
 }
 
@@ -375,7 +294,6 @@ function Chat({ focus, attempts }: { focus: { gateId: string; questionId?: strin
   };
 
   return <aside className={s.chat} aria-label="Tutor chat">
-    <h2 className={s.chatHead}>Tutor chat</h2>
     <div ref={log} className={s.log} role="log" aria-live="polite">
       {messages.map((m, i) => <div key={i} className={s.message} data-role={m.role}>
         <span className={s.who}>{m.role === 'student' ? 'You' : 'Tutor'}</span>

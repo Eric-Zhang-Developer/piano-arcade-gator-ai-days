@@ -168,15 +168,15 @@ await page.eval(async () => {
 await open('play-through');
 await page.eval(async () => {
   const { assert, text, until, click, recover } = window.learningOfflineTest;
-  await click('Start preview take');
+  await click('See an example take');
   assert(text().includes('Get ready'), 'Count-in did not start');
   await recover();
-  assert(text().includes('Start preview take'), 'Count-in was not cancelled');
-  await click('Start preview take');
+  assert(text().includes('See an example take'), 'Count-in was not cancelled');
+  await click('See an example take');
   await until(() => text().includes('Playing through'), 'Play-through did not start');
   await recover();
-  assert(text().includes('Start preview take'), 'Active play-through was not cancelled');
-  await click('Start preview take');
+  assert(text().includes('See an example take'), 'Active play-through was not cancelled');
+  await click('See an example take');
 });
 await page.wait(32000);
 await page.eval(async () => {
@@ -184,7 +184,7 @@ await page.eval(async () => {
   await until(() => text().includes('Play-through complete'), 'Play-through could not finish after recovery');
   await recover();
   assert(text().includes('Play-through complete'), 'Completed play-through result reset');
-  await click('Play again');
-  assert(text().includes('Start preview take'), 'Play again no longer resets completed result');
+  await click('See it again');
+  assert(text().includes('See an example take'), 'See it again no longer resets completed result');
   delete navigator.onLine;
 });

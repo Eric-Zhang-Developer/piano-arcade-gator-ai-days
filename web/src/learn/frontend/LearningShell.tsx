@@ -33,7 +33,7 @@ function LearningChrome({ children }: { children: React.ReactNode }) {
       <Link href="/learn" onClick={cancel} className={styles.brand} aria-label="Piano Arcade learning home">Piano Arcade</Link>
       {pathname !== '/learn' && <nav aria-label="Learning navigation"><Link href="/learn" onClick={cancel}>Back to map</Link></nav>}
       {/* #944: plain words for what a judge needs to know, and the way back in view; no second learning home */}
-      <p className={styles.honest}>Sample learner · nothing is saved</p>
+      <p className={styles.honest}>Sample learner · no account</p>
       <Link href="/" onClick={cancel} className={styles.arcade}>Back to arcade</Link>
     </header></>}
     <div className={styles.main}>

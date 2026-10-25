@@ -24,6 +24,7 @@ export function beamGroups(meter: Meter): number[] {
 
 interface Chord {
   ids: string[];
+  top: number; // its highest pitch
   onset: number;
   end: number;
   voice: number;
@@ -35,11 +36,12 @@ function voices(placed: Placed[], staff: 1 | 2): Chord[] {
   const groups = new Map<string, Chord>();
   for (const p of placed.filter((x) => x.staff === staff)) {
     const k = `${p.onset}:${p.end}`;
-    const c = groups.get(k) ?? { ids: [], onset: p.onset, end: p.end, voice: 0 };
+    const c = groups.get(k) ?? { ids: [], top: p.pitch, onset: p.onset, end: p.end, voice: 0 };
     c.ids.push(p.id);
+    c.top = Math.max(c.top, p.pitch);
     groups.set(k, c);
   }
-  const chords = [...groups.values()].sort((a, b) => a.onset - b.onset || a.end - b.end);
+  const chords = [...groups.values()].sort((a, b) => a.onset - b.onset || b.top - a.top || a.end - b.end);
   const ends: number[] = [];
   for (const c of chords) {
     let v = ends.findIndex((e) => e <= c.onset);

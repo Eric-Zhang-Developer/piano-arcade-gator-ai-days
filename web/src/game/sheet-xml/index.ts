@@ -155,7 +155,8 @@ interface Chord {
 }
 
 // One staff's notes as chords (same onset and end), each in the first free voice: 1–4 for the right hand, 5–8 for
-// the left. A chord that starts while another is sounding takes the next voice.
+// the left. A chord that starts while another is sounding takes the next voice. Of chords that start together, the
+// higher takes the lower voice number, so a melody over an accompaniment gets voice 1 and its stems up.
 function voices(placed: Placed[], staff: 1 | 2): Chord[] {
   const groups = new Map<string, Chord>();
   for (const p of placed.filter((x) => x.staff === staff)) {
@@ -164,7 +165,8 @@ function voices(placed: Placed[], staff: 1 | 2): Chord[] {
     c.pitches.push(p.pitch);
     groups.set(k, c);
   }
-  const chords = [...groups.values()].sort((a, b) => a.onset - b.onset || a.end - b.end);
+  const top = (c: Chord) => Math.max(...c.pitches);
+  const chords = [...groups.values()].sort((a, b) => a.onset - b.onset || top(b) - top(a) || a.end - b.end);
   const ends: number[] = []; // per voice, where its last chord ends
   const base = staff === 1 ? 1 : 5;
   for (const c of chords) {

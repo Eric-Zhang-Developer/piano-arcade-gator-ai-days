@@ -8,6 +8,7 @@ import { composersHands } from "./composers-hands";
 import { conductor } from "./conductor";
 import { handPalette } from "./hand-palette";
 import { realKeys } from "./real-keys";
+import { round } from "./round";
 import { highlightReel } from "./highlight-reel";
 import { sample } from "./sample";
 import { screenShake } from "./screen-shake";
@@ -32,6 +33,7 @@ export const experiments: Experiment[] = [
   composersHands,
   wetPaint, // #1106: its own page, /paint
   handPalette, // #1127: the hand and judgment colors three ways, with a colour-blind simulation
+  round, // #1123: play a round once, the DGX plays it back as voices 2–4
 ];
 
 // The names a take's ?x= turns on.

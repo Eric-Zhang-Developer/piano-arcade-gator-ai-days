@@ -2,7 +2,7 @@
 // the tutor's template line and "next for you". Pure; every number comes from the take.
 import type { Chart, Hand, Results, Take } from "../../contracts";
 import { passAccuracy } from "../bar-loop";
-import { msPerBeat } from "../core/settings";
+import { GOOD_MS, msPerBeat } from "../core/settings";
 import { practiceReason } from "../records/store";
 import { MIN_TIMED } from "../timing";
 import { inMode, playMode, withMode, type PlayMode } from "../play-modes/modes";
@@ -13,7 +13,7 @@ export const duoResultsSettings = {
   driftMs: 20, // a hand's mean offset in the run past this names that hand
   practiceTempo: 70, // percent, for PRACTICE BARS X–Y
   binMs: 10,
-  rangeMs: 100, // the histogram spans −rangeMs to +rangeMs; offsets past it land in the end bins
+  rangeMs: GOOD_MS, // the histogram spans the judge's GOOD window, −rangeMs to +rangeMs; anything past it lands in the end bins
 };
 
 export interface BarCell {

@@ -8,6 +8,7 @@ import { phrases, practiceUrl, scorePhrases, weakBars, weakest } from ".";
 const twinkle: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
 const barMs = twinkle.beatsPerBar * msPerBeat(twinkle.bpm);
 const params = new URLSearchParams("song=twinkle");
+const wait = new URLSearchParams("song=twinkle&mode=wait");
 
 // Every note PERFECT except `judge(note) ` says otherwise; `wrongAt` are WRONG presses at those chart times.
 function take(judge: (beat: number) => Judgment = () => "PERFECT", wrongAt: number[] = []): { take: Take; results: Results } {
@@ -42,9 +43,9 @@ describe("weak bars on Twinkle", () => {
     expect(s.map((p) => p.accuracy < 1)).toEqual([false, true, false, false, false, false]);
   });
 
-  it("a perfect take gives No weak bars and no button", () => {
+  it("a perfect wait take gives No weak bars and no button", () => {
     expect(weakest(scores(take()))).toBeNull();
-    const html = panel(take());
+    const html = panel(take(), wait);
     expect(html).toContain("No weak bars");
     expect(html).not.toContain("weak-bars-practice");
   });
@@ -58,7 +59,15 @@ describe("weak bars on Twinkle", () => {
   it("keeps hands, drops everything else, and a bar-loop take renders nothing", () => {
     const p = new URLSearchParams("song=twinkle&hands=R&bot=rank-c&midi=sim");
     expect(practiceUrl(twinkle, p, { from: 5, to: 6, noteIds: [] })).toBe("/play?song=twinkle&hands=R&from=5&to=6&tempo=80");
-    expect(panel(take((b) => (b === 0 ? "MISS" : "PERFECT")))).toContain("Practice bars 1–2 at 80%");
+    expect(panel(take((b) => (b === 0 ? "MISS" : "PERFECT")), wait)).toContain("Practice bars 1–2 at 80%");
     expect(panel(take((b) => (b === 0 ? "MISS" : "PERFECT")), new URLSearchParams("song=twinkle&from=1&to=2"))).toBe("");
+  });
+
+  it("a scored take shows each phrase's number but no button and no weakest mark: the tutor's is the one prescription (#1026)", () => {
+    const html = panel(take((beat) => (beat >= 16 && beat < 24 && beat % 2 ? "MISS" : "PERFECT")));
+    expect(html).toContain("weak-bars-cell");
+    expect(html).not.toContain("weak-bars-practice");
+    expect(html).not.toContain("data-weakest");
+    expect(html).not.toContain("No weak bars");
   });
 });

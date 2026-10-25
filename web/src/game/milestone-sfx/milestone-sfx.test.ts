@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GameEvent, Results } from "../../contracts";
 import { stampImpactMs } from "../rank-stamp";
+import { landingSettings } from "../results-landing/timeline";
 import { eventSounds, savePrefs, scheduler, soundSettings, type SchedulerOptions } from "../sound";
 import { comboLift, playVoice, voiceSettings, type Voice } from "./voices";
 import { clearWatch, levelEnvelope, loudnessGain, loudnessSettings, newRecordImpactMs } from ".";
@@ -37,17 +38,36 @@ describe("never per hit", () => {
   it("300 hits schedule sounds only at the milestones", () => {
     const got = run(take(), { newRecord: () => true }).map((s) => `${s.sound}@${s.ms}`);
     expect(got).toEqual([
+      "start@-2000", // the Start press (#1396)
       "stinger@6250",
       "stinger@12500",
       "sweep@15000",
       "stinger@25000",
       "stinger@50000",
       "allPerfect@75000", // the clear card, on the last note; the 300 step on that note gives way to it
-      `fanfare@${76000 + stampImpactMs() + soundSettings.fanfareAfterHitMs}`,
-      "drumroll@76000",
+      // NOSTALGIA's FULL COMBO sequence is the fanfare, and the room stays quiet under it: no fanfare, no drumroll
       `rankHit@${76000 + stampImpactMs()}`,
+      `tutorPop@${76000 + stampImpactMs() + landingSettings.afterGapMs}`,
+      `settle@${76000 + stampImpactMs() + soundSettings.settleAfterHitMs}`,
       `newRecord@${76000 + newRecordImpactMs()}`,
     ]);
+  });
+
+  it("a plain CLEAR keeps the drumroll before the rank hit", () => {
+    const ev = take().map((e) => (e.type === "noteHit" && e.noteId === "n10" ? ({ type: "noteMiss", noteId: "n10", pitch: 60, atMs: e.atMs } as GameEvent) : e));
+    const got = run(ev, { missCue: () => false }).map((s) => s.sound);
+    expect(got).toContain("clear");
+    expect(got).toContain("drumroll");
+  });
+
+  it("a miss that ends a long combo deflates instead of the miss cue; a short one keeps the cue", () => {
+    const at = (n: number) => n * 100;
+    const ev: GameEvent[] = [];
+    for (let i = 1; i <= soundSettings.breakMin; i++) ev.push({ type: "combo", count: i, atMs: at(i) });
+    ev.push({ type: "noteMiss", noteId: "a", pitch: 60, atMs: at(30) }, { type: "combo", count: 1, atMs: at(40) });
+    ev.push({ type: "wrongNote", pitch: 61, atMs: at(50) }, { type: "noteMiss", noteId: "b", pitch: 60, atMs: at(60) });
+    expect(run(ev).map((s) => `${s.sound}@${s.ms}`)).toEqual(["comboBreak@3000", "miss@6000"]);
+    expect(run(ev, { missCue: () => false })).toEqual([]); // the miss-cue setting turns both off
   });
 
   it("a combo step carries its count, and higher steps start higher", () => {

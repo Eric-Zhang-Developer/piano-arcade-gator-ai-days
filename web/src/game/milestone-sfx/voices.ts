@@ -4,7 +4,7 @@
 import type { ClearVoice } from ".";
 import { stampImpactMs } from "../rank-stamp";
 
-export type Voice = "stinger" | "sweep" | "fanfare" | "drumroll" | "rankHit" | ClearVoice | "newRecord";
+export type Voice = "stinger" | "sweep" | "fanfare" | "drumroll" | "rankHit" | ClearVoice | "newRecord" | "start" | "comboBreak" | "settle" | "tutorPop";
 
 export const voiceSettings = {
   levels: {
@@ -17,9 +17,16 @@ export const voiceSettings = {
     fullComboCard: 0.18,
     allPerfect: 0.18,
     newRecord: 0.18,
+    start: 0.12,
+    comboBreak: 0.1,
+    settle: 0.08,
+    tutorPop: 0.1,
   } satisfies Record<Voice, number>,
   attackS: 0.005, // fast enough to read as a hit, slow enough not to click
   feverPeakS: 0.2, // fever-moment's edge flash peaks at 200 ms: the riser lands its chord there
+  // NOSTALGIA's FULL COMBO, measured (specs/context/nostalgia-stage-findings.md, Audio): a click, five music-box tones
+  // (1.4–2.1 kHz), then a tremolo chord, in s after the click. The wipe's transient closes it.
+  fullCombo: { tonesS: [0.16, 0.66, 1.13, 1.58, 2.13], tones: [17, 21, 19, 24, 21], chordS: 2.78, chordLenS: 1.17, wipeS: 4.05 },
 };
 
 const C5 = 523.25;
@@ -111,6 +118,12 @@ function bell(ctx: AudioContext, out: AudioNode, n: number, t: number, len: numb
   osc(ctx, out, "sine", semis(n) * 5.4, t, len * 0.25, L * 0.12);
 }
 
+// A music-box tine: a pure sine with a quiet third partial, a hard pluck and a ring.
+function musicBox(ctx: AudioContext, out: AudioNode, n: number, t: number, L: number) {
+  osc(ctx, out, "sine", semis(n), t, 0.9, L);
+  osc(ctx, out, "sine", semis(n) * 3, t, 0.25, L * 0.18);
+}
+
 // How far up a combo step's arpeggio starts: 25 at the root, then a step higher each milestone, up to a fifth.
 export const comboLift = (count: number) =>
   count < 50 ? 0 : count < 100 ? 2 : Math.min(7, 2 + Math.floor(count / 100));
@@ -148,6 +161,7 @@ export function playVoice(ctx: AudioContext, out: AudioNode, v: Voice, t: number
     case "rankHit": {
       // a kick, a crash and a low open fifth under the stamp
       osc(ctx, out, "sine", 150, t, 0.5, L).frequency.exponentialRampToValueAtTime(45, t + 0.4);
+      osc(ctx, out, "sine", 70, t, 0.35, L * 0.8).frequency.exponentialRampToValueAtTime(38, t + 0.3); // the thud's sub
       noise(ctx, out, t, 0.7, L * 0.45, "highpass", 3000);
       noise(ctx, out, t, 0.12, L * 0.5, "lowpass", 600);
       osc(ctx, out, "triangle", semis(-24), t, 0.9, L * 0.4);
@@ -163,12 +177,43 @@ export function playVoice(ctx: AudioContext, out: AudioNode, v: Voice, t: number
       chord(ctx, out, [5, 9, 12], t, 0.2, L);
       chord(ctx, out, [0, 4, 7], t + 0.16, 0.8, L);
       return;
-    case "fullComboCard": // the cadence brighter: a quick arpeggio up into the octave chord
-    case "allPerfect":
-      [0, 4, 7, 12, 16].forEach((s, i) => osc(ctx, out, "square", semis(s), t + i * 0.04, 0.12, L * 0.25, 0, 3000));
-      chord(ctx, out, [0, 4, 7, 12], t + 0.2, 1.0, L);
-      noise(ctx, out, t, 0.05, L * 0.4, "highpass", 5000);
-      if (v === "allPerfect") [24, 28, 31, 36].forEach((s, i) => bell(ctx, out, s, t + 0.2 + i * 0.07, 1.2, L * 0.35)); // a sparkle on top
+    case "fullComboCard": // NOSTALGIA's sequence: a click, five music-box tones, a tremolo chord, the wipe
+    case "allPerfect": {
+      const fc = voiceSettings.fullCombo;
+      noise(ctx, out, t, 0.02, L * 0.6, "highpass", 4000);
+      fc.tonesS.forEach((at, i) => musicBox(ctx, out, fc.tones[i], t + at, L * 0.8));
+      const lfo = ctx.createOscillator(); // the tremolo: 7 Hz on the chord's level
+      const depth = ctx.createGain();
+      const bus = ctx.createGain();
+      lfo.frequency.value = 7;
+      depth.gain.value = 0.45;
+      bus.gain.value = 0.55;
+      lfo.connect(depth).connect(bus.gain);
+      bus.connect(out);
+      lfo.start(t + fc.chordS);
+      lfo.stop(t + fc.chordS + fc.chordLenS + 0.1);
+      chord(ctx, bus, v === "allPerfect" ? [0, 4, 7, 11, 14] : [0, 4, 7, 12], t + fc.chordS, fc.chordLenS, L);
+      noise(ctx, out, t + fc.wipeS, 0.3, L * 0.4, "bandpass", 2500);
+      if (v === "allPerfect") [24, 28, 31, 36].forEach((s, i) => bell(ctx, out, s, t + fc.chordS + i * 0.07, 1.2, L * 0.3)); // a sparkle on top
+      return;
+    }
+    case "start": // the Start press: an airy whoosh up and a soft tick as the take begins
+      noise(ctx, out, t, 0.35, L, "bandpass", 900, true).frequency.exponentialRampToValueAtTime(5000, t + 0.35);
+      osc(ctx, out, "sine", semis(12), t + 0.33, 0.25, L * 0.5);
+      return;
+    case "comboBreak": // a deflate: a soft tone sagging a fifth, low-passed so it never reads as a note
+      osc(ctx, out, "triangle", semis(-12), t, 0.4, L, 0, 1200).frequency.exponentialRampToValueAtTime(semis(-19), t + 0.35);
+      noise(ctx, out, t, 0.25, L * 0.3, "lowpass", 700);
+      return;
+    case "tutorPop": // the gator tutor arriving: a round bubble pop, rising, with a tiny bright blip after
+      osc(ctx, out, "sine", semis(0), t, 0.12, L).frequency.exponentialRampToValueAtTime(semis(14), t + 0.06);
+      osc(ctx, out, "sine", semis(19), t + 0.07, 0.1, L * 0.4);
+      return;
+    case "settle": // the results settling in: a low warm add9 chord, swelling then fading
+      for (const n of [-24, -17, -12, -10]) {
+        const o = osc(ctx, out, "sine", semis(n), t, 1.6, L / 2);
+        o.detune.value = n === -10 ? 4 : 0;
+      }
       return;
     case "newRecord": // two bell strikes and a sparkle as the stamp hits
       bell(ctx, out, 12, t, 0.9, L);

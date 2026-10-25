@@ -1,0 +1,141 @@
+/* /speak: the keyboard on its side down the roll's left edge, the stand beside it, the words under the roll. Type
+   scales with the width (16 px at 1280, 24 px at 1920), as /conduct and /lab. */
+.page {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 2.4em 2.5em 1.6em;
+  background: var(--pa-bg);
+  color: var(--pa-ink);
+  font: 400 clamp(14px, 1.25vw, 28px) / 1.35 system-ui, sans-serif;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2em;
+}
+
+.title {
+  margin: 0;
+  font: 800 2.2em/1 var(--pa-font-display), system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.sub {
+  margin: 0;
+  color: var(--pa-ink-dim);
+}
+
+.back {
+  margin-left: auto;
+  color: var(--pa-ink-dim);
+  text-decoration: none;
+}
+
+.back:hover,
+.back:focus-visible {
+  color: var(--pa-ink);
+}
+
+.stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 15em;
+  gap: 1.6em;
+  flex: 1;
+  min-height: 0;
+  margin-top: 1.2em;
+}
+
+.roll {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.canvas {
+  display: block;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  border: 1px solid var(--pa-line);
+}
+
+.subtitle {
+  margin: 0.5em 0 0;
+  min-height: 1.2em;
+  font: 800 2.6em/1.15 var(--pa-font-display), system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.dim {
+  color: var(--pa-ink-dim);
+  font-weight: 600;
+  font-size: 0.5em;
+}
+
+.stand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75em;
+  min-height: 0;
+}
+
+.presets {
+  display: grid;
+  gap: 0.5em;
+}
+
+.mic {
+  font: 700 1.05em/1 var(--pa-font-data), ui-monospace, monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 1.4em 1em;
+  border: 1px solid var(--pa-primary);
+  border-radius: 0;
+  background: transparent;
+  color: var(--pa-primary);
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+
+.mic:hover {
+  background: color-mix(in srgb, var(--pa-primary) 10%, transparent);
+}
+
+.mic:focus-visible {
+  outline: 2px solid var(--pa-primary);
+  outline-offset: 3px;
+}
+
+.mic[data-live] {
+  background: var(--pa-primary);
+  color: var(--pa-bg);
+}
+
+.mic:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.caps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0.4em 0;
+}
+
+.note {
+  margin: 0;
+  color: var(--pa-gold);
+}
+
+.small {
+  margin: auto 0 0;
+  padding: 0.8em 1em;
+  border: 1px solid var(--pa-line);
+  color: var(--pa-ink-dim);
+  font-size: 0.85em;
+}

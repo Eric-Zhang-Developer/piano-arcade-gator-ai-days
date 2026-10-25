@@ -15,7 +15,7 @@ export const beatSettings = {
   lookaheadMs: 300, // beats are queued this far ahead; stopping leaves at most this much queued
   noteLengthMs: 50,
   stickVelocity: 70,
-  kickVelocity: 80,
+  kickVelocity: 48, // Eric 2026-10-25: kick and snare were too loud, at 60% of 80 now; the hat stays
   hatVelocity: 50,
   clickVolume: 0.3, // laptop fallback, 0–1
   clickAccentHz: 1760,
@@ -25,18 +25,19 @@ export const beatSettings = {
 };
 
 // ?beat=<style>: one bar of hits at beat offsets, for a bar of `beatsPerBar` (null: any meter, one cycle per bar).
-// A chart whose bar isn't a whole number of the pattern's plays the default. Starting points, to be tuned by ear.
+// A chart whose bar isn't a whole number of the pattern's plays the default. Starting points, to be tuned by ear: the
+// kick, snare and clap are at 60% of their first values (Eric, 2026-10-25), the hats as they were.
 type Pattern = { beatsPerBar: number | null; hits: { at: number; note: number; velocity: number }[] };
 const eighths = (n: number, velocity: number) => Array.from({ length: n * 2 }, (_, i) => ({ at: i / 2, note: HI_HAT, velocity }));
 export const beatPatterns: Record<string, Pattern> = {
   ragtime: {
     beatsPerBar: 2,
-    hits: [{ at: 0, note: KICK, velocity: 80 }, { at: 1, note: SNARE, velocity: 70 }, ...eighths(2, 45)],
+    hits: [{ at: 0, note: KICK, velocity: 48 }, { at: 1, note: SNARE, velocity: 42 }, ...eighths(2, 45)],
   },
   waltz: {
     beatsPerBar: 3,
     hits: [
-      { at: 0, note: KICK, velocity: 80 },
+      { at: 0, note: KICK, velocity: 48 },
       { at: 1, note: HI_HAT, velocity: 50 },
       { at: 2, note: HI_HAT, velocity: 50 },
     ],
@@ -44,8 +45,8 @@ export const beatPatterns: Record<string, Pattern> = {
   trap: {
     beatsPerBar: 4,
     hits: [
-      { at: 0, note: KICK, velocity: 85 },
-      { at: 2, note: CLAP, velocity: 75 },
+      { at: 0, note: KICK, velocity: 51 },
+      { at: 2, note: CLAP, velocity: 45 },
       ...Array.from({ length: 16 }, (_, i) => ({ at: i / 4, note: HI_HAT, velocity: i % 4 ? 35 : 50 })),
     ],
   },

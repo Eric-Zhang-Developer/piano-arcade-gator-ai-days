@@ -3,10 +3,10 @@
 // A still hand holds a fermata, a fist cuts off. Everything is logged in memory for the spec's (b) and (c).
 import type { Chart } from "../../../contracts";
 import type { Pedal } from "../../pedal";
-import { allNotesOff } from "../../piano-out";
+import { silence as letGo } from "../composers-hands/rolls";
 import { beatDetector, isFist } from "./beats";
 import { clockSettings, conductorClock, type ClockState } from "./clock";
-import { scheduler, scoreEvents, velocityFactor } from "./schedule";
+import { scheduler, scheduleSettings, scoreEvents, velocityFactor } from "./schedule";
 import { sampleOf, type Frame, type Point } from "./tracker";
 
 export const sessionSettings = {
@@ -63,9 +63,7 @@ export function createSession(chart: Chart, pedal: Pedal | null, out: Output | n
     if (kind === 0x90 || kind === 0x80) pending.push({ at, pitch: data[1], on: kind === 0x90 });
   };
   const silence = (now: number) => {
-    out?.clear?.(); // drop what's queued in the window
-    for (const m of allNotesOff(now)) out?.send(m.bytes, m.atMs);
-    out?.send([0xb0, 64, 0], now);
+    letGo(out, now, scheduleSettings.lookaheadMs); // now and again after the window: Chrome can't drop what it holds
     sounding.clear();
     pending.length = 0;
   };

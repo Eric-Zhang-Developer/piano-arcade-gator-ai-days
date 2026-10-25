@@ -71,12 +71,26 @@ export const AHEAD_MS = 150; // the scheduler queues this far ahead, timestamped
 export type Out = { send(data: number[], timestamp?: number): void; clear?(): void; name?: string | null };
 
 // Every stop (#1206): the button, the end, unmount and pagehide. Drop what's queued where the port can, then All Notes
-// Off and the pedal up now and again AHEAD_MS later, since note-ons and pedal-downs may be queued that far ahead.
-export function silence(out: Out | null, now: number) {
+// Off and the pedal up now and again aheadMs later, since note-ons and pedal-downs may be queued that far ahead. The
+// other DGX pages pass their own scheduler's lookahead (#1311, #1312).
+export function silence(out: Out | null, now: number, aheadMs = AHEAD_MS) {
   if (!out) return;
   if (typeof out.clear === "function") out.clear();
-  for (const at of [now, now + AHEAD_MS]) {
+  for (const at of [now, now + aheadMs]) {
     for (const m of allNotesOff(at)) out.send(m.bytes, m.atMs);
     out.send([0xb0, 64, 0], at);
   }
+}
+
+// One run at a time (#1314): a play claims its run before its first await, and the claim goes stale at the next claim
+// or cancel(), so a double click, Stop or leaving mid-await can't start a scheduler that no Stop can reach.
+export function runGuard() {
+  let n = 0;
+  return {
+    claim: () => {
+      const me = ++n;
+      return () => me === n;
+    },
+    cancel: () => void n++,
+  };
 }

@@ -1,11 +1,12 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Chart } from "../../../contracts";
 import { ErrorLine, StateLine, TrackerStatus, trackerLine, type Cam } from "./announce";
 import { beatDetector, isFist, type Sample } from "./beats";
 import { clockSettings, conductorClock } from "./clock";
 import { scheduler, scheduleSettings, scoreEvents, velocityFactor } from "./schedule";
+import { createSession } from "./session";
 
 // Feeds the clock beats and reads its position on a 5 ms grid; returns position samples.
 function drive(clock: ReturnType<typeof conductorClock>, beats: number[], until: number) {
@@ -267,5 +268,36 @@ describe("what /conduct announces (lab-pages-a11y, #1129)", () => {
     expect(texts).toEqual(["Waiting for two beats", "Following your tempo", "Held. Beat again to go on", "Cut off"]);
     expect(lines.length).toBeGreaterThan(600);
     expect(changes).toBe(5); // prep → running → held → running → cut → running
+  });
+});
+
+describe("Stop lets the piano go (#1312)", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+  it("the last CC64 is 0, stamped at or after the last pedal-down and note-on", () => {
+    vi.useFakeTimers();
+    let t = 0;
+    vi.spyOn(performance, "now").mockImplementation(() => t);
+    const sent: { bytes: number[]; at: number }[] = [];
+    const chart = { id: "t", bpm: 120, notes: Array.from({ length: 256 }, (_, k) => ({ pitch: 60 + (k % 8), beat: k / 8, duration: 0.125, velocity: 80 })) } as unknown as Chart;
+    const s = createSession(chart, [[0, 32]], { send: (bytes, at = t) => sent.push({ bytes, at }) });
+    // A note every eighth of a beat (62.5 ms), so some are always queued inside the 100 ms window when Stop comes.
+    // An open hand whose wrist strokes down and up every 500 ms (120 bpm), hand size 0.1, at 30 fps.
+    const hand = (y: number) => Array.from({ length: 21 }, (_, i) => ({ x: 0.5, y: [8, 12, 16, 20].includes(i) ? y - 0.2 : [5, 9, 13, 17].includes(i) ? y - 0.1 : y }));
+    for (; t < 4000; t += 1000 / 30) {
+      const ph = (t % 500) / 500;
+      const y = 0.4 + 0.2 * (ph < 0.3 ? Math.sin((ph / 0.3) * (Math.PI / 2)) : Math.cos(((ph - 0.3) / 0.7) * (Math.PI / 2)));
+      s.frame({ ms: t, mediaMs: t, landmarks: hand(y) });
+      vi.advanceTimersByTime(1000 / 30);
+    }
+    s.stop();
+    const at = (pred: (b: number[]) => boolean) => sent.filter((m) => pred(m.bytes)).map((m) => m.at);
+    const ons = at((b) => (b[0] & 0xf0) === 0x90);
+    expect(ons.length).toBeGreaterThan(0); // it was conducting
+    const pedal = sent.filter((m) => (m.bytes[0] & 0xf0) === 0xb0 && m.bytes[1] === 64);
+    expect(pedal.at(-1)!.bytes[2]).toBe(0);
+    expect(pedal.at(-1)!.at).toBeGreaterThanOrEqual(Math.max(...ons, ...pedal.filter((m) => m.bytes[2] > 0).map((m) => m.at)));
   });
 });

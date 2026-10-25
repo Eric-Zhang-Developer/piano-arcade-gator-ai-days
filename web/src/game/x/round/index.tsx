@@ -57,10 +57,12 @@ function roundPlugin(): GamePlugin {
     }
   };
 
+  // Chrome's MIDIOutput has no clear(), and echoes are queued up to the lookahead ahead: silence now and again after it.
   const quiet = () => {
     if (!entry || !output) return;
     (output as MIDIOutput & { clear?(): void }).clear?.();
-    for (const b of silence(entry.voices)) output.send(b);
+    const now = performance.now();
+    for (const at of [now, now + roundSettings.lookaheadMs]) for (const b of silence(entry.voices)) output.send(b, at);
   };
   const stop = () => {
     if (ticker) clearInterval(ticker);

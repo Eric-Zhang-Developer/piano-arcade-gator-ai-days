@@ -1,12 +1,12 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { validateChart } from "../../../contracts";
 import { noteTimeMs } from "../../core/judge";
 import { echoGuard, playbackBetween, splitHands } from "../../hand-mode/hands";
 import { dtw, sections, sequence, timeMap, type Seq } from "./align";
 import { StatusLine } from "./ComposersHands";
-import { AHEAD_MS, sendsBetween, silence, testRoll, type Out } from "./rolls";
+import { AHEAD_MS, runGuard, sendsBetween, silence, testRoll, type Out } from "./rolls";
 import { handOf, parseMidi, rollSettings, secondsChart, splitPoints, spoolRate, unspool, type Roll, type RollNote } from "./roll";
 
 // Synthetic rolls only: the real ones stay local (specs/decisions/composers-hands-rolls-local.md).
@@ -208,5 +208,50 @@ describe("the status line", () => {
   it("sits in a polite status region", () => {
     const html = renderToStaticMarkup(createElement(StatusLine, { text: "No piano output: the highway plays silent" }));
     expect(html).toMatch(/<p[^>]*role="status"[^>]*aria-live="polite"[^>]*>No piano output: the highway plays silent<\/p>/);
+  });
+});
+
+// The shape of play() on /composers-hands, /inside and /speak: stop what runs, claim, await, check, then schedule.
+describe("one run at a time (#1314)", () => {
+  afterEach(() => vi.useRealTimers());
+  const page = () => {
+    const runs = runGuard();
+    const running = new Set<ReturnType<typeof setInterval>>();
+    let stopRun = () => {};
+    const stop = () => (runs.cancel(), stopRun());
+    const play = async () => {
+      stopRun();
+      const current = runs.claim();
+      await new Promise((r) => setTimeout(r, 50)); // the chart fetch, or MIDI access
+      if (!current()) return;
+      const timer = setInterval(() => {}, 25);
+      running.add(timer);
+      stopRun = () => {
+        clearInterval(timer);
+        running.delete(timer);
+        stopRun = () => {};
+      };
+    };
+    return { running, play, stop };
+  };
+
+  it("two rapid plays give one interval, and Stop leaves none", async () => {
+    vi.useFakeTimers();
+    const p = page();
+    void p.play();
+    void p.play();
+    await vi.advanceTimersByTimeAsync(60);
+    expect(p.running.size).toBe(1);
+    p.stop();
+    expect(p.running.size).toBe(0);
+  });
+
+  it("Stop, pagehide or unmount mid-await starts nothing", async () => {
+    vi.useFakeTimers();
+    const p = page();
+    void p.play();
+    p.stop();
+    await vi.advanceTimersByTimeAsync(60);
+    expect(p.running.size).toBe(0);
   });
 });

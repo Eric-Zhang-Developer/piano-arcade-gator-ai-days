@@ -77,7 +77,25 @@ describe("playback", () => {
     expect(tail[16]).toEqual([0xb0, 64, 0]);
   });
 
-  it("Stop clears the queue and silences now; leaving the page stops it", () => {
+  it("Stop mid-phrase: every note-on has a later note-off or All Notes Off on its channel (#1311)", () => {
+    vi.useFakeTimers();
+    let t = 0;
+    const sent: { bytes: number[]; at: number }[] = [];
+    const long: PlayFrame[] = Array.from({ length: 40 }, (_, k) => ({ tMs: k * 83, strikes: [[60 + (k % 12), 90]] }));
+    const p = play({ send: (bytes, at = t) => sent.push({ bytes, at }) }, phraseMessages(long, 83, 120, { velCap: 100, n: 14 }), () => t);
+    for (; t < 1000; t += 25) vi.advanceTimersByTime(25);
+    p.stop();
+    const ons = sent.filter((m) => (m.bytes[0] & 0xf0) === 0x90);
+    expect(ons.length).toBeGreaterThan(0);
+    for (const on of ons) {
+      const ch = on.bytes[0] & 0x0f;
+      const off = (m: (typeof sent)[number]) =>
+        m.at >= on.at && ((m.bytes[0] === (0x80 | ch) && m.bytes[1] === on.bytes[1]) || (m.bytes[0] === (0xb0 | ch) && m.bytes[1] === 123));
+      expect(sent.some(off), `note-on ${on.bytes[1]} at ${on.at}`).toBe(true);
+    }
+  });
+
+  it("Stop clears the queue and silences now and after the lookahead; leaving the page stops it", () => {
     vi.useFakeTimers();
     const sent: number[][] = [];
     let cleared = false;
@@ -87,7 +105,7 @@ describe("playback", () => {
     page.dispatchEvent(new Event("pagehide"));
     off();
     expect(cleared).toBe(true);
-    expect(sent.filter((b) => b[1] === 123)).toHaveLength(16);
+    expect(sent.filter((b) => b[1] === 123)).toHaveLength(32);
     expect(sent.at(-1)).toEqual([0xb0, 64, 0]);
   });
 });

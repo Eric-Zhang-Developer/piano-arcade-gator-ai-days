@@ -81,7 +81,8 @@
 <header class="lede">
   <h1>Pick <i>one</i> gator</h1>
   <p>Six character sheets from codex, then pose sets for the worker's top two. <b>Say a sheet in chat</b>, or set
-    <code>sheet: sheet-NN.png</code> in <code>spikes/mascot/PICK.md</code>. This page saves nothing.</p>
+    <code>sheet: sheet-NN.png</code> in <code>spikes/mascot/PICK.md</code>. This page saves nothing.<br>
+    <b>Worker's pick: sheet-06.</b> Every pose has a candidate passing every check, and it still reads at HUD size.</p>
 </header>
 
 <h2>Sheets <small id="sheet-count"></small></h2>
@@ -158,8 +159,12 @@
       d.style.backgroundImage = set ? `url("out/sets/${set.sheet}/${set.name}/sprite.png")` : "";
     }
   }
-  for (const s of tops) document.getElementById("switch").append(el("button", { value: s, onclick: () => show(s) }, s));
-  if (tops.length) show(tops[0]);
+  // A pose counts when at least one of its candidates passes every frame.
+  const posesPassing = (sheet) => POSES.filter((pose) => M.sets.some((s) => s.sheet === sheet && s.pose === pose &&
+    C[`${sheet}/${s.name}`]?.pass === C[`${sheet}/${s.name}`]?.of && C[`${sheet}/${s.name}`]?.of)).length;
+  for (const s of tops)
+    document.getElementById("switch").append(el("button", { value: s, onclick: () => show(s) }, `${s} · ${posesPassing(s)}/6 poses pass`));
+  if (tops.length) show([...tops].sort((a, b) => posesPassing(b) - posesPassing(a))[0]);
 </script>
 </body>
 </html>

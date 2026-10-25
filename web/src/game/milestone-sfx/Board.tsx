@@ -15,6 +15,7 @@ export const PADS: Pad[] = [
   { sound: "start", name: "Start", when: "the Start press", lenS: 0.8 },
   { sound: "stinger", name: "Combo step", when: "25, 50, then every 100", lenS: 0.8 },
   { sound: "sweep", name: "Fever", when: "fever ignites, on the beat", lenS: 1.2 },
+  { sound: "sweepBlue", name: "Blue fever", when: "the gauge fills again in fever, on the beat", lenS: 1.2 },
   { sound: "miss", name: "Miss", when: "a miss in a short combo", lenS: 0.5 },
   { sound: "comboBreak", name: "Combo break", when: "a miss ends a combo of 20 or more", lenS: 0.7 },
   { sound: "clear", name: "Clear", when: "the last note, with misses", lenS: 1.2 },

@@ -26,9 +26,15 @@ export const lookSettings = {
   waveMs: 520, // the ignition's shock front climbs the field in this
 };
 
-const AMBER = "255, 176, 46"; // fever-gauge's #ffb02e, fever's one color
-const HOT = "255, 232, 178"; // the same amber near white: the flames' core and the line's centre
-const EMBER = "255, 122, 34"; // embers cool toward this as they rise
+type RGB = readonly [number, number, number];
+const AMBER: RGB = [255, 176, 46]; // fever-gauge's #ffb02e, fever's one color
+const HOT: RGB = [255, 232, 178]; // the same amber near white: the flames' core and the line's centre
+const EMBER: RGB = [255, 122, 34]; // embers cool toward this as they rise
+// Blue Fever: --pa-primary's #2b9bff, a hotter, whiter core, and a deeper blue the embers cool to.
+const BLUE: RGB = [43, 155, 255];
+const BLUE_HOT: RGB = [214, 240, 255];
+const BLUE_EMBER: RGB = [70, 104, 255];
+const mix = (a: RGB, b: RGB, k: number): string => a.map((v, i) => Math.round(v + (b[i] - v) * k)).join(", ");
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const easeOut = (u: number) => 1 - (1 - u) ** 3;
@@ -141,6 +147,14 @@ export function fireLook() {
         }
       }
 
+      // Blue Fever over one beat, from the base up (reduced motion: at once). b0 is the base's share, b1 the tips'.
+      const blue = still ? Math.ceil(arc.blue) : arc.blue;
+      const b0 = clamp01(blue * 1.6);
+      const b1 = clamp01(blue * 1.6 - 0.6);
+      const amber = mix(AMBER, BLUE, b0);
+      const hot = mix(HOT, BLUE_HOT, b0);
+      const ember = mix(EMBER, BLUE_EMBER, b1);
+      const tipAmber = mix(AMBER, BLUE, b1);
       const flames = flameScale(arc, still);
       const warm = arc.phase === "build" ? arc.progress * 0.3 : arc.heat; // the build-up warms the line before the drop
       if (flames <= 0 && warm <= 0 && embers.length === 0) return;
@@ -152,18 +166,18 @@ export function fireLook() {
       if (warm > 0) {
         const pulse = still ? 0.75 : 0.55 + 0.45 * (1 - (lit ? arc.beat : 1)) ** 2;
         const haze = ctx.createLinearGradient(0, line, 0, line * 0.55);
-        haze.addColorStop(0, `rgba(${AMBER}, ${lookSettings.hazeAlpha * warm * pulse})`);
-        haze.addColorStop(1, `rgba(${AMBER}, 0)`);
+        haze.addColorStop(0, `rgba(${amber}, ${lookSettings.hazeAlpha * warm * pulse})`);
+        haze.addColorStop(1, `rgba(${amber}, 0)`);
         ctx.fillStyle = haze;
         ctx.fillRect(0, line * 0.55, f.width, line * 0.45);
         // The hot line: a glow standing on it, and a thin white-hot core.
         const g = lookSettings.lineGlowPx;
         const glow = ctx.createLinearGradient(0, line, 0, line - g);
-        glow.addColorStop(0, `rgba(${AMBER}, ${lookSettings.lineAlpha * warm * pulse})`);
-        glow.addColorStop(1, `rgba(${AMBER}, 0)`);
+        glow.addColorStop(0, `rgba(${amber}, ${lookSettings.lineAlpha * warm * pulse})`);
+        glow.addColorStop(1, `rgba(${amber}, 0)`);
         ctx.fillStyle = glow;
         ctx.fillRect(0, line - g, f.width, g);
-        ctx.fillStyle = `rgba(${HOT}, ${0.7 * warm * pulse})`;
+        ctx.fillStyle = `rgba(${hot}, ${0.7 * warm * pulse})`;
         ctx.fillRect(0, line - 1.5, f.width, 3);
       }
 
@@ -177,8 +191,8 @@ export function fireLook() {
           // The light the fire throws: a soft pool at its foot, so the walls glow instead of sitting on the black.
           const x0 = side ? f.width : 0;
           const pool = ctx.createRadialGradient(x0, line, 0, x0, line, w * 2.4);
-          pool.addColorStop(0, `rgba(${AMBER}, ${0.32 * a})`);
-          pool.addColorStop(1, `rgba(${AMBER}, 0)`);
+          pool.addColorStop(0, `rgba(${amber}, ${0.32 * a})`);
+          pool.addColorStop(1, `rgba(${amber}, 0)`);
           ctx.fillStyle = pool;
           ctx.fillRect(side ? f.width - w * 2.4 : 0, line - w * 2.4, w * 2.4, w * 2.4);
           for (let j = 0; j < lookSettings.tongues; j++) {
@@ -192,23 +206,26 @@ export function fireLook() {
             const sway = calm(t * 1.1 + j, seed + 5) * bw * lookSettings.sway;
             const shimmer = 1 - lookSettings.shimmer * (0.5 - 0.5 * calm(t * 2.3 + j * 2, seed + 9));
             const rise = 1 + lookSettings.coreDrift * calm(t * 0.9 + j, seed + 3);
-            drawTongue(ctx, side ? f.width - cx : cx, line, side ? -sway : sway, bw, tall, AMBER, EMBER, lookSettings.flameAlpha * a * shimmer);
-            if (j < 3) drawTongue(ctx, side ? f.width - cx : cx, line, side ? -sway * 0.6 : sway * 0.6, bw * 0.45, tall * 0.5 * rise, HOT, AMBER, lookSettings.coreAlpha * a * shimmer);
+            drawTongue(ctx, side ? f.width - cx : cx, line, side ? -sway : sway, bw, tall, amber, ember, lookSettings.flameAlpha * a * shimmer);
+            if (j < 3) drawTongue(ctx, side ? f.width - cx : cx, line, side ? -sway * 0.6 : sway * 0.6, bw * 0.45, tall * 0.5 * rise, hot, tipAmber, lookSettings.coreAlpha * a * shimmer);
           }
         }
       }
 
-      // The ignition's shock front: one bright band climbing from the line to the top on the drop.
-      if (!still && arc.igniteAtMs !== null && arc.phase === "ignite") {
-        const u = (f.nowMs - arc.igniteAtMs) / lookSettings.waveMs;
+      // The shock front: one bright band climbing from the line to the top on the drop, and again, blue, on the
+      // upgrade beat. Reduced motion: none.
+      const waveAt = arc.blueAtMs !== null && f.nowMs >= arc.blueAtMs ? arc.blueAtMs : arc.phase === "ignite" ? arc.igniteAtMs : null;
+      if (!still && waveAt !== null && (arc.phase === "ignite" || arc.phase === "sustain")) {
+        const u = (f.nowMs - waveAt) / lookSettings.waveMs;
         if (u >= 0 && u < 1) {
           const y = line * (1 - easeOut(u));
           const a = (1 - u) ** 1.5;
           const trail = Math.min(140, line - y);
           const band = ctx.createLinearGradient(0, y, 0, y + trail);
-          band.addColorStop(0, `rgba(${HOT}, ${0.55 * a})`);
-          band.addColorStop(0.15, `rgba(${AMBER}, ${0.3 * a})`);
-          band.addColorStop(1, `rgba(${AMBER}, 0)`);
+          const [front, body] = waveAt === arc.blueAtMs ? [BLUE_HOT.join(", "), BLUE.join(", ")] : [hot, amber];
+          band.addColorStop(0, `rgba(${front}, ${0.55 * a})`);
+          band.addColorStop(0.15, `rgba(${body}, ${0.3 * a})`);
+          band.addColorStop(1, `rgba(${body}, 0)`);
           ctx.fillStyle = band;
           ctx.fillRect(0, y, f.width, trail);
         }
@@ -219,7 +236,7 @@ export function fireLook() {
         const k = e.age / e.life;
         const a = (1 - k) * (0.6 + 0.4 * flicker(t * 9, e.seed));
         if (a <= 0.02) continue;
-        ctx.fillStyle = `rgba(${k < 0.3 ? HOT : k < 0.6 ? AMBER : EMBER}, ${a})`;
+        ctx.fillStyle = `rgba(${k < 0.3 ? hot : k < 0.6 ? amber : ember}, ${a})`;
         const sz = e.size * (1 - k * 0.5);
         ctx.fillRect(e.x - sz / 2, e.y - sz, sz, sz * 2); // a short streak, taller than wide: it rises
       }

@@ -9,10 +9,10 @@ import { stampImpactMs } from "../rank-stamp";
 import { showsMoment } from "../record-moment/timing";
 import { takeOutcome } from "../records";
 import { isWaitMode } from "../wait-mode";
-import { ignitionFor } from "../fever-arc";
+import { blueIgnitionFor, ignitionFor } from "../fever-arc";
 import { landingSettings } from "../results-landing/timeline";
 
-export type Sound = "stinger" | "sweep" | "fanfare" | "drumroll" | "rankHit" | "miss";
+export type Sound = "stinger" | "sweep" | "sweepBlue" | "fanfare" | "drumroll" | "rankHit" | "miss";
 
 export const soundSettings = {
   fanfareAfterHitMs: 150, // a full combo's fanfare follows the rank hit
@@ -105,6 +105,10 @@ export function soundsFor(events: GameEvent[], audioAtZero: number, missCue = tr
     switch (e.type) {
       case "comboMilestone":
         return [{ sound: "stinger", startTime: at(e.atMs) }];
+      case "noteHit": {
+        const blue = blueIgnitionFor(e); // the hit that filled the gauge a second time in fever: Blue Fever's riser
+        return blue === null ? [] : [{ sound: "sweepBlue", startTime: at(blue) }];
+      }
       case "feverStart":
         return [{ sound: "sweep", startTime: at(ignitionFor(e.atMs)) }]; // on fever-arc's ignition beat, with the flash
       case "noteMiss": {

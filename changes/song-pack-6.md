@@ -21,9 +21,10 @@ Five Easy-medium to Medium songs, from Mutopia notation MIDI. Every source, lice
 - `specs/decisions/song-pack-6-sources.md`
 - Converter fixes: #999 (32nd notes, merged) and #1012 (LilyPond grace groups, for Träumerei).
 - The Invention's CC BY-SA credit goes in `CREDITS.md` through a separate `docs:` PR.
+- `web/src/game/song-jacket/index.ts`: three new ids re-roll their generated jacket, which otherwise matched another song's angle and first color (minute-waltz, mozart-545-1, nocturne-op9-2).
 
 ## How to check it
-`pnpm -C web exec vitest run src/game/songs/library.test.ts src/game/sheet-xml/sheet-xml.test.ts`: 210 passed. A
+Every test that reads `public/songs` (54 files, among them the library, sheet-xml and song-jacket tests): 936 passed. A
 Perfect player on the game's `Judge` gives each of the five all PERFECT. `/play?song=<id>`: not verified locally;
 covered by main's scheduled full run.
 

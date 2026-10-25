@@ -50,6 +50,7 @@ const line: CSSProperties = {
   whiteSpace: "nowrap",
   textOverflow: "ellipsis",
   fontSize: "clamp(13px, 0.85vw, 17px)",
+  lineHeight: "24px", // a 24 px tall target, the line's own height (#951)
   color: "var(--pa-ink-dim)",
   textDecoration: "none",
 };

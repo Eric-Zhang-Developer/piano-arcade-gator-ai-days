@@ -109,12 +109,12 @@ The game opens the port at 115200, waits for the line that starts `PAL1 leds=`, 
 - nothing extra for wrong keys: the game sends `0x80` for every released key but `0x90` only for judged notes, so a
   release of a key that never lit flashes it red (setting 8, on by default; only while a song is live, so not in the
   count-in). It shows on release, since the board never hears the press;
-- three modes (setting 15): **calm** (0, the default, for learning and normal play: hint build-up, wrong-key red, and
-  brightness-only glows for the count-in, fever, pause, the end and idle); **demo** (1: calm plus the ripple on every
-  press, with no red and no hint left lit while paused); **demo simple** (2: only the key light and the ripple, and only
-  after a press: no hints before a note, no red, no song shows). A miss never ripples. **The BOOT button on the ESP32
-  steps through them** and saves it (a soft white glow means calm, comets mean demo, one blue ripple means demo simple);
-  the tester's and the playground's Mode menus and the game's pause menu do the same;
+- two modes (setting 15): **calm** (0, the default, for learning and normal play: hint build-up, wrong-key red, and
+  brightness-only glows for the count-in, fever, pause, the end and idle); **demo** (1: every key pressed on the piano
+  lights with its ripple, and nothing else: no hints, no red, no song shows; the website sends each press, on any
+  page). A game hit on a key already held only recolors it, and a miss never ripples. **The BOOT button on the ESP32
+  flips between them** and saves it (a soft white glow means calm, one blue ripple means demo); the tester's and the
+  playground's Mode menus and the website's lights button do the same;
 - nothing extra for the shows (setting 9): `0xF0` with no song live starts the count-in: a charge bar, cyan from the
   bass end and pink from the treble end, filling in 8 steps (one per count-in beat) to meet in the middle at the first
   hint, which launches a burst from that key. The bar's length is learned: each launch remembers how long its

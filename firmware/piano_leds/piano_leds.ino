@@ -38,10 +38,9 @@
 //   12 jointIndex          first LED of the second strip (144 for two 1 m strips)
 //   13 jointGap x16        extra space at the joint, in 1/16 LED pitch (6.94 mm at 144/m)
 //   14 reverse 0/1         strip runs right to left (DIN at the treble end)
-//   15 demo 0-2            the mode: 0 calm (the default: hint build-up, wrong-key red, soft glows for the
-//                          count-in, fever, pause, the end and idle), 1 demo (calm plus the ripple on every press,
-//                          no red, no hint while paused), 2 demo simple (only the key light and the ripple, after
-//                          a press). The board's BOOT button steps through them and saves it
+//   15 demo 0/1            the mode: 0 calm (the default: hint build-up, wrong-key red, soft glows for the
+//                          count-in, fever, pause, the end and idle), 1 demo (every key pressed on the piano lights
+//                          with its ripple, and nothing else; the website sends those presses). BOOT flips it
 //   20 save                write settings to flash (survive power off)
 //   21 defaults            reset settings to the compiled defaults (not saved until 20)
 
@@ -123,11 +122,10 @@ Key keys[128];
 Ripple ripples[MAX_RIPPLES];
 int nextRipple = 0;
 Settings cfg;
-// The modes (setting 15); see "The three modes" by demoExtras.
+// The modes (setting 15); see "The two modes" by demoExtras.
 #define MODE_CALM 0
 #define MODE_DEMO 1
-#define MODE_DEMO_SIMPLE 2
-inline bool demoSimple() { return cfg.demo == MODE_DEMO_SIMPLE; }
+inline bool demoSimple() { return cfg.demo != MODE_CALM; }  // demo is only the press light and its ripple
 inline bool showsOn() { return cfg.shows && !demoSimple(); }
 Preferences prefs;
 
@@ -240,7 +238,7 @@ void setParam(uint8_t param, uint16_t v) {
     case 7: cfg.hintRampMs = v; break;
     case 8: cfg.wrongRed = v ? 1 : 0; break;
     case 9: cfg.shows = v ? 1 : 0; if (!cfg.shows) stopShows(); break;
-    case 15: cfg.demo = min<uint16_t>(v, MODE_DEMO_SIMPLE); if (demoSimple()) stopShows(); break;
+    case 15: cfg.demo = v ? MODE_DEMO : MODE_CALM; if (demoSimple()) stopShows(); break;
     case 10: cfg.calLow = v / 16.0f; break;
     case 11: cfg.calHigh = v / 16.0f; break;
     case 12: cfg.jointIndex = min<uint16_t>(v, NUM_LEDS); break;
@@ -339,10 +337,11 @@ void burst(float pos, CRGB color, int count, float speed) {
 #define DEMO_EXTRAS 0
 inline bool demoExtras() { return DEMO_EXTRAS && cfg.demo; }
 
-// The three modes (setting 15). Calm (0): everything as designed. Demo (1): calm plus the ripple on every press,
-// with no red (wrong keys and misses stay dark) and no hint while paused. Demo simple (2): only the key light and
-// the ripple, and only after a press: no hints before a note, no red, and none of the song shows.
-inline bool hintsShown() { return !demoSimple() && !(cfg.demo == MODE_DEMO && showMode == SHOW_PAUSE); }
+// The two modes (setting 15). Calm (0): everything as designed. Demo (1): whenever a piano key goes down it lights,
+// with its ripple; that's all. No hints before a note, no red, none of the song shows. The website sends a key on
+// for every press in demo, on any page; when the game then reports the hit on that held key, it just takes the
+// hit's color (no second ripple). Older pages sent 2 for the same thing, so 2 is demo too.
+inline bool hintsShown() { return !demoSimple(); }
 CRGB scale8Color(CRGB c, uint8_t v) { c.nscale8_video(v); return c; }
 
 // A bloom: a soft glow that spreads from pos to `reach` LEDs either side and fades out, brightest in the middle.
@@ -725,10 +724,15 @@ void runMessage(const uint8_t *m) {
     case 0x90: {
       Key &k = keys[m[1]];
       uint8_t j = judgedFrom(m);
-      // A miss is the game lighting a key nobody pressed. The demo modes keep it dark (no red) and only the
-      // gauge hears it.
-      if (j == J_MISS && cfg.demo != MODE_CALM) {
+      // A miss is the game lighting a key nobody pressed. Demo keeps it dark (no red) and only the gauge hears it.
+      if (j == J_MISS && demoSimple()) {
         if (songLive) feverHit(m[1], j);
+        break;
+      }
+      // Demo: the website already lit this key on its press; the game's hit for it only recolors it.
+      if (demoSimple() && k.held && k.level > 0) {
+        k.color = CRGB(scale7(m[2]), scale7(m[3]), scale7(m[4]));
+        if (songLive && j) feverHit(m[1], j);
         break;
       }
       k.color = CRGB(scale7(m[2]), scale7(m[3]), scale7(m[4]));
@@ -976,17 +980,12 @@ void checkBootButton(uint32_t now) {
   bootWas = down;
   bootChangedAt = now;
   if (!down) return;  // act on the press, not the release
-  cfg.demo = (cfg.demo + 1) % (MODE_DEMO_SIMPLE + 1);  // calm, demo, demo simple, calm...
+  cfg.demo = cfg.demo == MODE_CALM ? MODE_DEMO : MODE_CALM;
   if (demoSimple()) stopShows();
   saveSettings();
   printHello();  // the tester shows the new mode
   float mid = (activeLeds - 1) / 2.0f;
-  if (cfg.demo == MODE_DEMO) {  // demo: comets in the UI colors out both ways
-    for (int k = 0; k < 6; k++) {
-      spark(mid, 0.22f + k * 0.03f, uiColor(k), 900);
-      spark(mid, -(0.22f + k * 0.03f), uiColor(k + 1), 900);
-    }
-  } else if (demoSimple()) {  // demo simple: one ripple from the middle, the only thing it does
+  if (demoSimple()) {  // demo: one ripple from the middle, the only thing it does
     ripples[nextRipple] = {mid, UI_BLUE, millis(), true};
     nextRipple = (nextRipple + 1) % MAX_RIPPLES;
   } else {  // calm: a soft white glow

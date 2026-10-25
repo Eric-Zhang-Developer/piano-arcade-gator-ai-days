@@ -13,6 +13,13 @@ Sources whose licenses ask for credit. Each chart's `source` field names its sou
   public-domain melody is unclear to us, so it's credited here. Changes: the melody converted to a chart
   ([decision](specs/decisions/core-loop-chart-source.md)).
 
+- **Frère Jacques** and **Row, Row, Row Your Boat** (traditional rounds), `web/public/songs/rounds/`: the notes were
+  transcribed from the LilyPond in Wikipedia's articles, "Frère Jacques" revision 1366602658
+  (<https://en.wikipedia.org/w/index.php?title=Fr%C3%A8re_Jacques&oldid=1366602658>) and "Row, Row, Row Your Boat"
+  revision 1363214856 (<https://en.wikipedia.org/w/index.php?title=Row,_Row,_Row_Your_Boat&oldid=1363214856>), whose
+  text is licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The melodies are public domain;
+  as with Twinkle, they're credited because the license may reach the transcription. Changes: each melody converted
+  to a chart ([decision](specs/decisions/round-entries.md)).
 - **Nocturne in E-flat major, Op. 9 No. 2** (Frédéric Chopin), `web/public/songs/nocturne-op9-2/`: charted from
   Mutopia Project piece 1590 (<https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1590>), licensed
   [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). Changes: an excerpt (pickup and bars 1–8) converted

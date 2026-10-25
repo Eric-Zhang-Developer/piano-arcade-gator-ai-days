@@ -1,7 +1,6 @@
-/* Synthwave bookkeeping: purple-to-black sky, neon magenta and cyan, a perspective grid, CRT scanlines.
+/* Bookkeeping on a dark field: neon magenta and cyan, CRT scanlines. No sun, sky or grid (Eric retired them, #728).
    Every text color here is at least 4.5:1 on the panel background; state also carries a glyph or a word. */
 .root {
-  --sky: #1b0038;
   --panel: rgba(13, 0, 28, 0.9);
   --ink: #f4ecff;
   --dim: #c9b8e6;
@@ -16,26 +15,7 @@
   color: var(--ink);
   font-family: var(--op-body), ui-monospace, monospace;
   font-size: 15px;
-  background: linear-gradient(180deg, var(--sky) 0%, #0a0016 55%, #000 100%);
-}
-
-/* the horizon grid */
-.root::before {
-  content: "";
-  position: fixed;
-  left: -50%;
-  right: -50%;
-  bottom: 0;
-  height: 42vh;
-  background-image:
-    linear-gradient(rgba(255, 90, 217, 0.4) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 90, 217, 0.4) 1px, transparent 1px);
-  background-size: 64px 64px;
-  transform: perspective(320px) rotateX(62deg);
-  transform-origin: bottom;
-  mask-image: linear-gradient(to top, #000 10%, transparent);
-  animation: grid 3s linear infinite;
-  pointer-events: none;
+  background: #06020c;
 }
 
 /* scanlines */
@@ -48,12 +28,6 @@
   z-index: 2;
 }
 
-@keyframes grid {
-  to {
-    background-position: 0 64px;
-  }
-}
-
 @keyframes pulse {
   50% {
     opacity: 0.55;
@@ -61,7 +35,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .root::before,
   .root * {
     animation: none !important;
     transition: none !important;

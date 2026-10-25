@@ -61,7 +61,7 @@ A research subagent read these sources; its findings are summarized here, and it
 - **The level** is each clap's RMS over its first 20 ms against the bed's RMS over the span of the notes.
 - **The match window:** a found onset counts if it's within ±30 ms of a true clap, each matched once. That's tighter
   than the papers' 50 ms and near Böck's ±25 ms.
-- `make-fixtures.mts` writes the first 4 s of each level as WAVs, with the true clap times beside them, into
+- `make-fixtures.mjs` writes the first 4 s of each level as WAVs, with the true clap times beside them, into
   `fixtures/`. The WAVs stay out of git; vitest builds the same mixes in memory, so CI needs no WAV.
 
 ## Results (`pnpm -C web exec vitest run src/game/x/crowd`)

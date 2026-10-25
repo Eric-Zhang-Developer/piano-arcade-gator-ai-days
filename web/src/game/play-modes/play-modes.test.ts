@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { Chart } from "../../contracts";
-import { Judge } from "../core/judge";
+import { Judge, rankFor } from "../core/judge";
 import { msPerBeat } from "../core/settings";
 import { adaptUrl, songPhrases, start } from "../adaptive-chunks/next";
 import { stepUrl } from "../chunk-practice/chunks";
@@ -129,6 +129,7 @@ describe("Flow is honest about tempo", () => {
     expect(at89.rank).toBe("B");
     expect(flowTake(0.9, 5).results.rank).toBe("S");
     expect(flowRank("C", 50)).toBe("C"); // the cap only lowers
+    expect(flowRank(rankFor(0.5, true), 60)).toBe("B"); // core's full-combo floor and the cap meet at B
   });
 
   it("a Perform take's rank is unchanged", () => {

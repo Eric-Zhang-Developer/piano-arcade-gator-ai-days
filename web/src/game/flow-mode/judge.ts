@@ -1,9 +1,10 @@
 // Flow mode's judge (spec: flow-mode): it scores what a listener hears (wrong notes, skipped notes, stopping) and forgives
 // what they don't (tempo drift, dynamics). Same shape as core's Judge and the same Results, so the page and the results
 // panels take either. Pure: no React. It owns its clock, since the clock waits on the notes this judge marks.
-import type { Chart, GameEvent, Judgment, NoteJudgment, Rank, Results } from "../../contracts";
+import type { Chart, GameEvent, Judgment, NoteJudgment, Results } from "../../contracts";
 import { type Gauge, emptyGauge, reduceGauge } from "../fever-gauge/gauge";
-import { GOOD_WEIGHT, msPerBeat } from "../core/settings";
+import { rankFor } from "../core/judge";
+import { GOOD_WEIGHT, GREAT_WEIGHT, msPerBeat } from "../core/settings";
 import type { HandsSetting } from "../hand-mode/hands";
 import { flowRank, heldTempo } from "../play-modes/modes";
 import { flowClock, flowSettings, onsetsOf, type FlowClock, type Onset } from "./clock";
@@ -11,15 +12,6 @@ import { flowClock, flowSettings, onsetsOf, type FlowClock, type Onset } from ".
 const LOOKAHEAD = 4; // onsets after the front that a press may skip ahead to
 
 const isMilestone = (n: number) => n === 25 || n === 50 || (n >= 100 && n % 100 === 0);
-
-// ponytail: core/judge.ts's rankFor, copied since it isn't exported; export it from core and import it if one changes.
-function rankFor(accuracy: number): Rank {
-  if (accuracy >= 0.95) return "S";
-  if (accuracy >= 0.9) return "A";
-  if (accuracy >= 0.8) return "B";
-  if (accuracy >= 0.7) return "C";
-  return "D";
-}
 
 export class FlowJudge {
   readonly noteState = new Map<string, Judgment>();
@@ -138,7 +130,7 @@ export class FlowJudge {
     const judgments = this.judgments as NoteJudgment[];
     const counts: Results["counts"] = { PERFECT: 0, GREAT: 0, GOOD: 0, MISS: 0, extra: this.extras.length, wrong: this.wrong.length };
     for (const j of judgments) counts[j.judgment] = (counts[j.judgment] ?? 0) + 1;
-    const scored = counts.PERFECT + 0.5 * counts.GREAT + GOOD_WEIGHT * (counts.GOOD ?? 0);
+    const scored = counts.PERFECT + GREAT_WEIGHT * counts.GREAT + GOOD_WEIGHT * (counts.GOOD ?? 0);
     const accuracy = judgments.length ? scored / (judgments.length + this.wrong.length) : 0;
     this.results = {
       chartId: this.chart.id,
@@ -148,7 +140,8 @@ export class FlowJudge {
       counts,
       accuracy,
       maxCombo: this.maxCombo,
-      rank: flowRank(rankFor(accuracy), this.heldTempo), // below 90% held, B at best (decision: play-modes-flow-rank)
+      // core's rank (a full combo at least B), then below 90% held, B at best (decision: play-modes-flow-rank)
+      rank: flowRank(rankFor(accuracy, counts.MISS === 0 && this.wrong.length === 0), this.heldTempo),
     };
     if (this.scored && counts.MISS === 0 && this.wrong.length === 0) this.onEvent({ type: "fullCombo", atMs });
     this.onEvent({ type: "songEnd", results: this.results, atMs });

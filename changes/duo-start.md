@@ -11,6 +11,6 @@
 ## How to check it
 Not verified locally (no-local-checks rule): the start-screen browser checks run in main's scheduled full suite. This PR updates verify-options, verify-reset, verify-labels, verify-leds, verify-ui-sounds, verify-rewind and verify-capture for the drawer and the dropped hints. Validation 1 (vitest duo-start plus the touched features) passes. In the dev server: Start begins the count-in, and a latency or label set in the drawer is used by the take.
 ## Gaps
-- **Validation 4, Eric's look at this version, not done yet.**
+- Validation 4, Eric's look: done. He approved #763 to merge on 2026-10-25 ("Looks good").
 - The updated browser checks haven't run yet; CI's browser job is their first run.
 - The rewind and laptop-octaves specs still describe start-screen hints that no longer show.

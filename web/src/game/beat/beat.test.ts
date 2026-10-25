@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { afterEach, expect, test, vi } from "vitest";
 import type { Chart, Frame } from "../../contracts";
 import { settings } from "../core/settings";
-import { beatHits, beatTrack, endBeat } from "./index";
+import { beatHits, beatOn, beatTrack, endBeat } from "./index";
 
 const chart: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
 const mpb = 60000 / chart.bpm;
@@ -179,4 +179,15 @@ test("consecutive windows return every styled hit exactly once", () => {
   const windows: ReturnType<typeof beatHits> = [];
   for (let t = -count * 1000 - 7; t < 12000; t += 300) windows.push(...beatHits(c, t, t + 300, count, "trap"));
   expect(windows).toEqual(whole);
+});
+
+test("a song with its own recording has no beat by default; ?beat=<style> still forces one (#789)", () => {
+  const q = (s: string) => new URLSearchParams(s);
+  expect(beatOn(q("song=twinkle"), false)).toBe(true);
+  expect(beatOn(q("song=local/golden-hard"), true)).toBe(false);
+  expect(beatOn(q("song=local/golden-hard&beat=rock"), true)).toBe(true);
+  expect(beatOn(q("song=local/golden-hard&beat=off"), true)).toBe(false);
+  expect(beatOn(q("beat=off"), false)).toBe(false);
+  expect(beatOn(q("mode=wait"), false)).toBe(false);
+  expect(beatOn(q("mode=flow&beat=rock"), false)).toBe(false);
 });

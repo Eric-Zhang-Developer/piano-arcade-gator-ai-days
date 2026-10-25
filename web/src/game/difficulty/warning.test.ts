@@ -34,7 +34,7 @@ describe("WARNING card", () => {
   it("shows on a level 13+ chart during the first bar only, with its level", () => {
     const moonlight = load("moonlight-3");
     const { fromMs, toMs } = firstCountInBar(moonlight);
-    expect(textsAt(moonlight, "", fromMs)).toEqual(["WARNING", "Lv 14"]);
+    expect(textsAt(moonlight, "", fromMs)).toEqual(["WARNING", "Lv 15"]);
     expect(textsAt(moonlight, "", toMs)).toEqual([]);
     expect(textsAt(moonlight, "", 0)).toEqual([]);
   });

@@ -1,5 +1,5 @@
-// The attempts route against a mocked session and a mocked PostgREST: saving, listing, goals, validation, and the
-// two ways the store can be unavailable (no server key, tables not migrated yet).
+// The attempts route against a mocked session and a mocked PostgREST: saving through Sharan's functions (#1225),
+// listing, goals, validation, and the two ways the store can be unavailable (no server key, not migrated yet).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Attempt } from '../../../../learn/frontend/mastery/schema';
 import { GET, POST } from './route';
@@ -8,7 +8,6 @@ vi.mock('../../../../data/server', async importOriginal => ({
   ...(await importOriginal<typeof import('../../../../data/server')>()),
   isServerConfigured: vi.fn(() => true),
   userFromToken: vi.fn(async (token: string | null) => (token === 'good' ? { id: 'player-1', isAnonymous: true } : null)),
-  ensurePlayer: vi.fn(async () => {}),
 }));
 const server = await import('../../../../data/server');
 
@@ -68,40 +67,48 @@ afterEach(() => {
 });
 
 describe('POST /learn/api/attempts', () => {
-  it('inserts the attempt for the session player, whatever learnerId the body claims', async () => {
-    fetchMock().mockResolvedValue(Response.json([row], { status: 201 }));
+  it('saves the attempt through save_learning_attempt for the session player, whatever learnerId the body claims', async () => {
+    fetchMock().mockResolvedValue(Response.json('saved'));
     const res = await POST(request('POST', { attempt }));
 
     expect(res.status).toBe(201);
     expect(await res.json()).toEqual({ status: 'saved' });
-    expect(server.ensurePlayer).toHaveBeenCalledWith('player-1');
-    const [insert] = calls();
-    expect(insert.url).toContain('/rest/v1/learning_attempts?on_conflict=id');
-    expect(insert.init?.headers).toMatchObject({ apikey: 'secret' });
-    expect(JSON.parse(insert.init?.body as string)).toEqual(row);
+    const [save] = calls();
+    expect(save.url).toContain('/rest/v1/rpc/save_learning_attempt');
+    expect(save.init?.method).toBe('POST');
+    expect(save.init?.headers).toMatchObject({ apikey: 'secret' });
+    expect(JSON.parse(save.init?.body as string)).toEqual({ p: row });
+    expect(calls()).toHaveLength(1);
   });
 
-  it('treats a retry of a saved id as saved, and another player id as a conflict', async () => {
-    fetchMock().mockResolvedValueOnce(Response.json([])).mockResolvedValueOnce(Response.json([{ id: ID }]));
-    expect((await POST(request('POST', { attempt }))).status).toBe(201);
-
-    fetchMock().mockResolvedValueOnce(Response.json([])).mockResolvedValueOnce(Response.json([]));
+  it.each([
+    ['duplicate', 200, { status: 'saved' }],
+    ['conflict', 409, { status: 'error' }],
+    ['limited', 429, { status: 'limited' }],
+  ] as const)('answers %s with %i', async (outcome, status, body) => {
+    fetchMock().mockResolvedValue(Response.json(outcome));
     const res = await POST(request('POST', { attempt }));
-    expect(res.status).toBe(409);
-    expect(await res.json()).toMatchObject({ status: 'error' });
+    expect(res.status).toBe(status);
+    expect(await res.json()).toMatchObject(body);
   });
 
-  it('replaces the goals', async () => {
-    fetchMock().mockResolvedValue(new Response(null, { status: 201 }));
+  it('answers 502 on an answer the function never gives', async () => {
+    fetchMock().mockResolvedValue(Response.json('maybe'));
+    expect((await POST(request('POST', { attempt }))).status).toBe(502);
+  });
+
+  it('replaces the goals through set_learner_goals', async () => {
+    fetchMock().mockResolvedValue(Response.json(['ode-to-joy', 'minuet-in-g']));
     const res = await POST(request('POST', { goals: { songIds: ['ode-to-joy', 'minuet-in-g'] } }));
 
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ status: 'saved' });
-    const [upsert] = calls();
-    expect(upsert.url).toContain('/rest/v1/learner_goals?on_conflict=player_id');
-    expect(JSON.parse(upsert.init?.body as string)).toMatchObject({
-      player_id: 'player-1',
-      song_ids: ['ode-to-joy', 'minuet-in-g'],
+    const [set] = calls();
+    expect(set.url).toContain('/rest/v1/rpc/set_learner_goals');
+    expect(set.init?.method).toBe('POST');
+    expect(JSON.parse(set.init?.body as string)).toEqual({
+      p_player: 'player-1',
+      p_song_ids: ['ode-to-joy', 'minuet-in-g'],
     });
   });
 
@@ -169,6 +176,15 @@ describe('when the store is unavailable', () => {
   it.each([['GET'], ['POST']] as const)('%s answers 503 not-ready before the tables exist', async method => {
     fetchMock().mockImplementation(async () => missingTable());
     const res = await (method === 'GET' ? GET(request('GET')) : POST(request('POST', { attempt })));
+    expect(res.status).toBe(503);
+    expect(await res.json()).toEqual({ status: 'not-ready' });
+  });
+
+  it('POST answers 503 not-ready before the save function exists', async () => {
+    fetchMock().mockResolvedValue(
+      new Response(JSON.stringify({ code: 'PGRST202', message: 'Could not find the function' }), { status: 404 }),
+    );
+    const res = await POST(request('POST', { attempt }));
     expect(res.status).toBe(503);
     expect(await res.json()).toEqual({ status: 'not-ready' });
   });

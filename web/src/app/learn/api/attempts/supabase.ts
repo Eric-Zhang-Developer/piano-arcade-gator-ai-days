@@ -1,5 +1,6 @@
 // The two learning tables over PostgREST, with the server's secret key. Server-only: never import from the browser.
-// The tables are Sharan's (issue #753); until they exist PostgREST answers "no such table", which reads as NotReady.
+// Writes go through Sharan's functions (issue #1225), reads select the tables. Until the migration lands PostgREST
+// answers "no such table" or "no such function", which reads as NotReady.
 import type { Attempt, Goals } from '../../../../learn/frontend/mastery/schema';
 import { supabaseUrl } from '../../../../data/config';
 import { SupabaseError } from '../../../../data/server';
@@ -73,19 +74,22 @@ const fromRow = (r: AttemptRow): unknown => ({
 
 const eq = (v: string) => `eq.${encodeURIComponent(v)}`;
 
+/** What `save_learning_attempt` answers (0009): `limited` is over 300 new attempts in 5 minutes for this player. */
+export type SaveOutcome = 'saved' | 'duplicate' | 'conflict' | 'limited';
+const OUTCOMES: readonly string[] = ['saved', 'duplicate', 'conflict', 'limited'] satisfies SaveOutcome[];
+
 /**
- * Appends one attempt. A retry of an id this player already saved changes nothing; an id another player owns is
- * refused as a conflict.
+ * Appends one attempt in one call, with the limit and the owner check in the database. A retry of an id this player
+ * already saved is a duplicate; an id another player owns is a conflict.
  */
-export async function insertAttempt(attempt: Attempt, playerId: string): Promise<'saved' | 'conflict'> {
-  const res = await rest('/rest/v1/learning_attempts?on_conflict=id', {
+export async function saveAttempt(attempt: Attempt, playerId: string): Promise<SaveOutcome> {
+  const res = await rest('/rest/v1/rpc/save_learning_attempt', {
     method: 'POST',
-    headers: { Prefer: 'resolution=ignore-duplicates,return=representation' },
-    body: JSON.stringify(toRow(attempt, playerId)),
+    body: JSON.stringify({ p: toRow(attempt, playerId) }),
   });
-  if (((await res.json()) as unknown[]).length) return 'saved';
-  const mine = await rest(`/rest/v1/learning_attempts?id=${eq(attempt.id)}&player_id=${eq(playerId)}&select=id`);
-  return ((await mine.json()) as unknown[]).length ? 'saved' : 'conflict';
+  const outcome: unknown = await res.json();
+  if (typeof outcome === 'string' && OUTCOMES.includes(outcome)) return outcome as SaveOutcome;
+  throw new SupabaseError(502, `save_learning_attempt: unexpected answer ${JSON.stringify(outcome)}`);
 }
 
 export async function listAttempts(playerId: string, limit: number): Promise<unknown[]> {
@@ -100,9 +104,8 @@ export async function readGoals(playerId: string): Promise<unknown> {
 }
 
 export async function writeGoals(playerId: string, goals: Goals): Promise<void> {
-  await rest('/rest/v1/learner_goals?on_conflict=player_id', {
+  await rest('/rest/v1/rpc/set_learner_goals', {
     method: 'POST',
-    headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
-    body: JSON.stringify({ player_id: playerId, song_ids: goals.songIds, updated_at: new Date().toISOString() }),
+    body: JSON.stringify({ p_player: playerId, p_song_ids: goals.songIds }),
   });
 }

@@ -1,14 +1,15 @@
 // GET and POST /learn/api/attempts: the signed-in player's learning attempts and goal songs, kept in Supabase with
 // the server's secret key. The browser never writes Supabase itself. Without the key the route answers 503
-// not-configured; before the tables exist (issue #753), 503 not-ready. The device store keeps everything either way.
-import { ensurePlayer, isServerConfigured, SupabaseError, userFromToken } from '../../../../data/server';
+// not-configured; before the tables exist (issue #753), 503 not-ready; over the save limit, 429 limited. The device
+// store keeps everything either way.
+import { isServerConfigured, SupabaseError, userFromToken } from '../../../../data/server';
 import { parseAttempt } from '../../../../learn/frontend/mastery/engine';
 import {
   ATTEMPT_LIMITS as LIMITS,
   type AttemptsResponse,
 } from '../../../../learn/frontend/mastery/remote/protocol';
 import type { Attempt, Goals } from '../../../../learn/frontend/mastery/schema';
-import { insertAttempt, listAttempts, NotReady, readGoals, writeGoals } from './supabase';
+import { listAttempts, NotReady, readGoals, saveAttempt, type SaveOutcome, writeGoals } from './supabase';
 
 const FUTURE_SLACK_MS = 5 * 60_000; // a device clock a little ahead is fine; an attempt from next week isn't
 
@@ -79,7 +80,6 @@ export async function POST(request: Request) {
     const goals = parseGoals(body.goals);
     if (!goals) return failure(400, `goals must be at most ${LIMITS.goalSongs} distinct song ids`);
     try {
-      await ensurePlayer(playerId);
       await writeGoals(playerId, goals);
     } catch (e) {
       return storeFailure(e, 'save');
@@ -92,13 +92,14 @@ export async function POST(request: Request) {
   const attempt = { ...parsed, learnerId: playerId };
   const problem = problemWith(attempt);
   if (problem) return failure(400, problem);
-  let outcome: Awaited<ReturnType<typeof insertAttempt>>;
+  let outcome: SaveOutcome;
   try {
-    await ensurePlayer(playerId);
-    outcome = await insertAttempt(attempt, playerId);
+    outcome = await saveAttempt(attempt, playerId);
   } catch (e) {
     return storeFailure(e, 'save');
   }
   if (outcome === 'conflict') return failure(409, 'that attempt id belongs to someone else');
-  return send({ status: 'saved' }, 201);
+  // Like the take route: the device keeps the attempt and sends it again the next time it reads.
+  if (outcome === 'limited') return send({ status: 'limited' }, 429);
+  return send({ status: 'saved' }, outcome === 'saved' ? 201 : 200);
 }

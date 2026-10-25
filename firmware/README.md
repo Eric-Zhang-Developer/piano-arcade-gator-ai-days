@@ -8,6 +8,7 @@ and releases stuck keys if the browser goes quiet.
 |---|---|
 | `piano_leds/piano_leds.ino` | The firmware. The protocol is documented at the top of the file. |
 | `tester.html` | Chrome page: connect board and piano, hour-0 tests, calibration, free play, guide-lights demo. Works without the game. |
+| `playground.html` | Chrome page to play the strip with no piano: on-screen keys, computer-keyboard keys (A W S E D F ...), color, brightness, ripple and fade, and five effects (rainbow wave, sparkle, chase, ripple rain, breathe). |
 | `hosttest/run.sh` | Builds the sketch on a laptop against FastLED's stub and checks mapping, protocol, fades, settings and the watchdog. |
 | `platformio.ini` | Optional PlatformIO build instead of the Arduino IDE. |
 | `TEST-PLAN.md` | **Hardware day:** the step-by-step run with pass lines and what's still unproven. |

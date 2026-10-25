@@ -182,6 +182,7 @@ features = [
   "count-in", # Eric, 2026-10-25 (#1006): one deep polish pass on the 8 beats before the first note, a #856 hero moment
   "miss-moment", # Eric, 2026-10-25 (#1038): one deep polish pass on a miss, quiet and readable, a #856 hero moment
   "take-graph-pass", # Eric, 2026-10-25 (#1083): one deep polish pass on the take graph, read in 5 s, a #856 hero item
+  "highway-field", # Eric, 2026-10-25 (#1114): one deep polish pass on the highway's dark field, a #856 hero item
   "laptop-sound",
   "flow-mode",
   "duo-tokens",

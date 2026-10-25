@@ -32,21 +32,23 @@ void main() {
   if (age < 0.0 || age > life) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); gl_PointSize = 0.0; return; }
   float t = age / life;
   float ease = 1.0 - pow(1.0 - t, 2.2); // quick off the key, slowing as it rises
-  float y = position.y - uRise * ease * mix(mix(0.2, 1.0, sqrt(h(2.0))), mix(0.55, 1.0, h(2.0)), wisp);
+  float y = position.y - uRise * ease * mix(mix(0.06, 1.0, pow(h(2.0), 3.0)), mix(0.3, 0.8, h(2.0)), wisp); // most dust stays low, a cloud on the key
   float sway = sin(age * mix(0.0012, 0.0035, h(4.0)) + h(5.0) * 6.2832) * mix(12.0, 26.0, wisp);
-  float x = position.x + ((h(3.0) - 0.5) * mix(130.0, 90.0, wisp) + sway) * ease;
-  float lift = clamp((uLine - y) / (uView.y * 0.2), 0.0, 1.0); // dim near the line, brighter as it rises
+  float x = position.x + ((h(3.0) - 0.5) * mix(120.0, 90.0, wisp) + sway) * ease;
+  float lift = clamp((uLine - y) / 40.0, 0.0, 1.0); // dim on the line, full 40 px above it
   float fade = min(1.0, age / mix(70.0, 140.0, wisp)) * pow(1.0 - t, mix(1.6, 1.3, wisp));
   float twinkle = mix(0.5 + 0.5 * sin(age * mix(0.008, 0.03, h(6.0)) + h(7.0) * 40.0), 1.0, wisp);
-  float white = mix(h(8.0) > 0.55 ? 0.85 : 0.2, 0.75, wisp); // a white core among the note's hue
-  vColor = vec4(mix(aColor, vec3(1.0), white), aParams.z * fade * twinkle * mix(0.15, 1.0, lift) * mix(1.0, 0.7, wisp));
+  float puff = (1.0 - wisp) * step(0.75, h(13.0)); // one speck in four is a faint soft puff: the clouds' haze
+  float white = mix(h(8.0) > 0.7 ? 0.8 : 0.3, 0.85, wisp); // a white core among the note's hue
+  vColor = vec4(mix(aColor, vec3(1.0), white), aParams.z * fade * twinkle * mix(0.35, 1.0, lift) * mix(1.0, 0.95, wisp) * mix(1.0, 0.3, puff));
   vWisp = wisp;
   vAngle = h(9.0) * 6.2832 + age * mix(-0.003, 0.003, h(10.0));
-  gl_PointSize = mix(h(11.0) > 0.97 ? 3.0 : mix(1.0, 2.2, h(12.0)), mix(40.0, 80.0, h(11.0)), wisp);
+  gl_PointSize = mix(mix(h(11.0) > 0.97 ? 3.0 : mix(1.2, 2.6, h(12.0)), mix(5.0, 9.0, h(12.0)), puff), mix(30.0, 60.0, h(11.0)), wisp);
   gl_Position = vec4(x / uView.x * 2.0 - 1.0, 1.0 - y / uView.y * 2.0, 0.0, 1.0);
 }`;
 
-// Dust is a soft dot; a wisp is a crescent (a disc minus a slightly offset disc), tapered to two tips, turning.
+// Dust is a soft dot. A wisp is a sickle: a shallow arc of one disc minus a larger disc set below it, thickest in the
+// middle (12% of the sprite) and tapering to tips at the sprite's sides, turning.
 const fragment = /* glsl */ `
 varying vec4 vColor;
 varying float vWisp;
@@ -57,7 +59,7 @@ void main() {
   if (vWisp > 0.5) {
     float c = cos(vAngle), s = sin(vAngle);
     p = mat2(c, s, -s, c) * p;
-    a = smoothstep(0.46, 0.40, length(p)) * smoothstep(0.34, 0.41, length(p - vec2(0.08, 0.0)));
+    a = smoothstep(0.61, 0.59, length(p - vec2(0.0, 0.4))) * smoothstep(1.251, 1.271, length(p - vec2(0.0, 1.181)));
   } else a = exp(-dot(p, p) * 10.0);
   gl_FragColor = vec4(vColor.rgb, vColor.a * a);
 }`;

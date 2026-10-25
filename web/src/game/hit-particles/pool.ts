@@ -5,10 +5,10 @@ export const hitParticleSettings = {
   slots: 16384, // spec: a fixed pool of ~16k
   capPerSec: 6000, // spawns written in any 1 s window, at most (decision hit-particles-spawn)
   burstShare: 0.2, // of the cap, spendable at once: a chord's hit; the rest refills evenly over the second
-  dust: { PERFECT: 140, GREAT: 90, GOOD: 50 }, // specks per hit
-  wisps: { PERFECT: 4, GREAT: 3, GOOD: 2 }, // crescents per hit
+  dust: { PERFECT: 300, GREAT: 200, GOOD: 110 }, // specks per hit
+  wisps: { PERFECT: 1, GREAT: 0.6, GOOD: 0.4 }, // crescents per hit, on average (fractions round at random)
   bright: { PERFECT: 1, GREAT: 0.8, GOOD: 0.6 },
-  streamPerSec: 420, // specks per second from each held hit key
+  streamPerSec: 600, // specks per second from each held hit key
   reducedMotion: 0.25, // of every spawn under prefers-reduced-motion
   governor: {
     slowMs: 20, // a smoothed frame time above this is slow (under 50 fps)

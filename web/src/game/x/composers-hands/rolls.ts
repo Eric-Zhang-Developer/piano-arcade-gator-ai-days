@@ -81,3 +81,16 @@ export function silence(out: Out | null, now: number, aheadMs = AHEAD_MS) {
     out.send([0xb0, 64, 0], at);
   }
 }
+
+// One run at a time (#1314): a play claims its run before its first await, and the claim goes stale at the next claim
+// or cancel(), so a double click, Stop or leaving mid-await can't start a scheduler that no Stop can reach.
+export function runGuard() {
+  let n = 0;
+  return {
+    claim: () => {
+      const me = ++n;
+      return () => me === n;
+    },
+    cancel: () => void n++,
+  };
+}

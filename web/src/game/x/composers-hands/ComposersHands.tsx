@@ -19,7 +19,7 @@ import { fitCurve, tempoCurveSettings } from "../../tempo-curve";
 import { handL, handR, inkDim } from "../../ui-tokens";
 import { dtw, sequence } from "./align";
 import { parseMidi, rollSettings, secondsChart, splitPoints, type Roll } from "./roll";
-import { AHEAD_MS, ROLLS, sendsBetween, silence, testRoll, type Out } from "./rolls";
+import { AHEAD_MS, ROLLS, runGuard, sendsBetween, silence, testRoll, type Out } from "./rolls";
 import css from "./composers-hands.module.css";
 
 type Mode = "listen" | "duet" | "compare";
@@ -126,15 +126,18 @@ export function ComposersHands() {
     }
   };
 
-  const stop = useCallback(() => stopRef.current(), []);
+  const runs = useRef(runGuard()).current;
+  const stop = useCallback(() => (runs.cancel(), stopRef.current()), [runs]);
 
   const play = useCallback(
     async (m: "listen" | "duet") => {
       if (!roll || !seconds) return;
       stopRef.current();
+      const current = runs.claim();
       setResults(null);
       setMode(m);
       const out = await pianoOutput();
+      if (!current()) return;
       setStatus(out ? `Piano: ${out.name ?? "MIDI out"}` : "No piano output: the highway plays silent");
       const startPerf = performance.now() + LEAD_MS;
       const endMs = roll.notes.reduce((e, n) => Math.max(e, n.offMs), 0);
@@ -224,18 +227,17 @@ export function ComposersHands() {
       };
       setPlaying(true);
     },
-    [roll, seconds, splits, his],
+    [roll, seconds, splits, his, runs],
   );
 
   // Unmount and pagehide stop it too, so closing the tab mid-roll leaves no note or pedal down.
   useEffect(() => {
-    const leave = () => stopRef.current();
-    addEventListener("pagehide", leave);
+    addEventListener("pagehide", stop);
     return () => {
-      removeEventListener("pagehide", leave);
-      leave();
+      removeEventListener("pagehide", stop);
+      stop();
     };
-  }, []);
+  }, [stop]);
 
   // At rest the stage shows the roll's opening, as it will fall, rather than an empty field.
   useEffect(() => {

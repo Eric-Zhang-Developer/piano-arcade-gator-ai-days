@@ -13,7 +13,7 @@ import { echoGuard } from "../../hand-mode/hands";
 import { PIANO_NAME } from "../../laptop-sound";
 import { loadPedal } from "../../pedal";
 import { createSimMidiAccess, installSim } from "../../sim/fake";
-import { AHEAD_MS, silence, type Out } from "../composers-hands/rolls";
+import { AHEAD_MS, runGuard, silence, type Out } from "../composers-hands/rolls";
 import { KeyAction, Rail, ring, snap, type Phase, type Pose } from "./action";
 import { SOURCE } from "./geometry";
 import { makeInside, type InsideScene, type View } from "./scene";
@@ -199,14 +199,18 @@ export function Inside() {
     if (window.__inside) window.__inside.view = view;
   }, [view]);
 
-  const stop = useCallback(() => stopRef.current(), []);
+  const runs = useRef(runGuard()).current;
+  const stop = useCallback(() => (runs.cancel(), stopRef.current()), [runs]);
 
   const play = useCallback(async () => {
     stopRef.current();
+    const current = runs.claim();
     const res = await fetch(`/songs/${SONG}/chart.json`);
+    if (!current()) return;
     if (!res.ok) return setInput("Moonlight's chart didn't load.");
     const chart: Chart = await res.json();
     const sched = schedule(chart, await loadPedal(SONG));
+    if (!current()) return;
     const piano = out.current;
     if (!piano) setInput("No piano output: the action plays silent");
     const start = performance.now() + LEAD_MS;
@@ -243,17 +247,16 @@ export function Inside() {
     };
     setPlaying(true);
     if (window.__inside) window.__inside.playing = true;
-  }, [press, release]);
+  }, [press, release, runs]);
 
   // Stop on unmount and pagehide, so leaving mid-piece leaves no note or pedal down.
   useEffect(() => {
-    const leave = () => stopRef.current();
-    addEventListener("pagehide", leave);
+    addEventListener("pagehide", stop);
     return () => {
-      removeEventListener("pagehide", leave);
-      leave();
+      removeEventListener("pagehide", stop);
+      stop();
     };
-  }, []);
+  }, [stop]);
 
   return (
     <main className={css.screen} data-testid="inside-page">

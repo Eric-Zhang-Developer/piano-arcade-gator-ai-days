@@ -11,6 +11,7 @@ import { bg, ink, inkDim, line, panel, primary, secondary } from "../../ui-token
 import { analysisDefaults, analyze, HIGH_KEY, LOW_KEY } from "./analysis";
 import { micHold, type Take } from "./mic";
 import { phraseMessages, play, playbackSettings, silenceOnPagehide, type Output, type Player, type PlayFrame } from "./playback";
+import { runGuard } from "../composers-hands/rolls";
 import hello from "./presets/hello-judges.json";
 import thanks from "./presets/thank-you.json";
 import welcome from "./presets/welcome.json";
@@ -192,10 +193,12 @@ export function Speak() {
     phaseRef.current = phase;
   }, [phase]);
 
+  const runs = useRef(runGuard()).current;
   const stop = useCallback(() => {
+    runs.cancel();
     player.current?.stop();
     player.current = null;
-  }, []);
+  }, [runs]);
 
   useEffect(() => silenceOnPagehide(window, stop), [stop]);
 
@@ -228,9 +231,10 @@ export function Speak() {
   const speak = useCallback(
     async (p: Phrase) => {
       stop();
+      const current = runs.claim();
       setPhrase(p);
       const out = await pianoOutput();
-      if (!alive.current) return;
+      if (!alive.current || !current()) return;
       setOutName(out ? (out.name ?? PIANO_NAME) : null);
       if (!out) {
         setNote({ text: "No piano output: plug in the DGX, or open this page with laptop sound on.", alert: true });
@@ -247,7 +251,7 @@ export function Speak() {
       if (player.current === pl) player.current = null;
       setPhase("done");
     },
-    [stop],
+    [stop, runs],
   );
 
   // Hold to speak: the mic opens on the first press (the browser asks then), and the take ends on release or at 3 s.

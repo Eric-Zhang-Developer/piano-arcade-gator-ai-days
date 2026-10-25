@@ -124,7 +124,7 @@ describe("a pause mid-echo (#1310)", () => {
     vi.stubGlobal("navigator", { requestMIDIAccess: async () => ({ outputs: new Map([["o", piano]]), inputs: new Map([["i", input]]) }) });
     vi.stubGlobal("window", { addEventListener() {}, removeEventListener() {} });
     const plugin = round.plugin();
-    plugin.transformChart!(chart("frere-jacques"));
+    plugin.transformChart!(chart("frere-jacques"), new URLSearchParams());
     await vi.runAllTimersAsync(); // connect()
     let press: (e: InputEvent) => void = () => {};
     plugin.wrapInput!({ kind: "midi", start: (on) => void (press = on), stop() {} }).start(() => {});

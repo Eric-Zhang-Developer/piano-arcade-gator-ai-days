@@ -75,6 +75,10 @@ export function summary(phrases: Phrase[]): string {
 export function dynamics(): GamePlugin {
   return {
     id: "dynamics",
-    resultsPanel: ({ chart, take, results }) => createElement(DynamicsPanel, { report: gradeDynamics(chart, take, results) }),
+    // A message (no dynamics marked, or laptop keys) is nothing to show: no card (duo-details).
+    resultsPanel: ({ chart, take, results }) => {
+      const report = gradeDynamics(chart, take, results);
+      return report.kind === "message" ? null : createElement(DynamicsPanel, { report });
+    },
   };
 }

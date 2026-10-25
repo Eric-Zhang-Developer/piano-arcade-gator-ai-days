@@ -199,57 +199,97 @@
   color: var(--pa-ink-dim);
 }
 
-/* Details: every other panel, a card each, in layers.ts order. */
+/* Details (duo-details): the take's readout under the ceremony. Two numbered groups, How I played as bracketed cards
+   in two columns, Do something as one row of the kit's buttons. */
 .details {
-  width: min(1200px, 94vw);
+  width: min(1760px, 94vw); /* the ceremony's width: one left edge from the rank down to the last card */
   margin: 0 auto;
-  padding: 4vh 0 8vh;
+  padding: 5vh 0 10vh;
   border-top: 1px solid var(--pa-line);
+  text-align: left;
 }
 
-.detailsName,
-.cardName {
-  font-family: var(--pa-font-data), ui-monospace, monospace;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+.groupHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 20px;
+}
+
+.groupName {
+  margin: 0;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-stretch: 75%;
+  font-weight: 800;
+  font-size: clamp(28px, 2.2vw, 44px);
+  line-height: 1;
   text-transform: uppercase;
-}
-
-.detailsName {
-  margin: 0 0 16px;
-  color: var(--pa-ink-dim);
+  color: var(--pa-ink);
 }
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 0 16px; /* each slot carries a 16 px top margin */
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-flow: row dense; /* a half card after the full-width graph fills the hole a hidden panel leaves */
+  gap: 16px;
 }
 
-@media (min-width: 1280px) {
+/* play-slots gives each slot a 16 px top margin; the grid's gap spaces the cards instead */
+.grid > *,
+.doingRow > * {
+  margin-top: 0 !important;
+}
+
+@media (min-width: 1100px) {
   .grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); /* a wide panel can't push the page sideways */
+  }
+
+  .grid > :has([data-wide]) {
+    grid-column: 1 / -1;
   }
 }
 
 .card {
   height: 100%;
   box-sizing: border-box;
-  padding: 14px 20px 18px;
-  background: var(--pa-panel);
-  border: 1px solid var(--pa-line);
-  border-radius: 0;
-}
-
-.cardName {
-  margin: 0 0 10px;
-  color: var(--pa-primary);
-}
-
-.settings {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-top: 24px;
+  padding: 16px 22px 22px;
+  font-size: clamp(17px, 1vw, 21px); /* the readouts: a size up from body, and up again at 1920 for the video */
+}
+
+/* the panel's name: condensed caps on a hairline, the way the kit labels a band */
+.cardName {
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--pa-line);
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-stretch: 75%;
+  font-weight: 700;
+  font-size: clamp(20px, 1.3vw, 26px);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pa-ink);
+}
+
+.doing {
+  margin-top: 44px;
+}
+
+.doing .groupName {
+  margin-bottom: 20px;
+}
+
+.doingRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.doingRow:empty,
+.doing:has(.doingRow:empty) {
+  display: none;
 }

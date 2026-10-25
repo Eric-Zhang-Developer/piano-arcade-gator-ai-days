@@ -45,6 +45,7 @@ export function records(): GamePlugin {
           : { kind: "blocked" };
       current = outcome;
     },
-    resultsPanel: () => (outcome ? createElement(RecordsPanel, { outcome }) : null),
+    // Practice, bot and blocked takes aren't stored, and say nothing worth a card (duo-details).
+    resultsPanel: () => (outcome?.kind === "recorded" ? createElement(RecordsPanel, { outcome }) : null),
   };
 }

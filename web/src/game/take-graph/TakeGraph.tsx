@@ -5,8 +5,9 @@ import { useState } from "react";
 import type { Chart, Results, Take } from "../../contracts";
 import { GOOD_MS, GREAT_MS, PERFECT_MS } from "../core/settings";
 import { handColor } from "../hand-colors";
+import { Button } from "../duo-tokens";
 import { hudSettings } from "../hud";
-import { bg, gold, ink, inkDim } from "../ui-tokens";
+import { gold, ink, inkDim } from "../ui-tokens";
 import { describePoint, graphPoints, sensesVelocity, wrongMarks, type GraphPoint } from "./graph";
 
 const W = 900;
@@ -34,20 +35,16 @@ export function TakeGraph({ chart, take, results }: { chart: Chart; take: Take; 
   );
 
   return (
-    // An explicit width: the results screen centers its panels at their own width, so 100% would shrink to fit.
-    // A solid background, so the highway's keys don't show through the results overlay.
-    <section
-      data-testid="take-graph"
-      style={{ width: `min(${W}px, 92vw)`, margin: "0 auto", padding: "8px 12px", boxSizing: "border-box", background: bg, borderRadius: 8, color: ink, fontSize: 14, textAlign: "left" }}
-    >
+    // The card's full width: duo-details spans it across the grid, on the card's solid panel.
+    <section data-testid="take-graph" style={{ width: "100%", boxSizing: "border-box", color: ink, fontSize: 14, textAlign: "left" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
         <span style={{ color: inkDim }}>
           Timing per note · <span style={{ color: handColor("R") }}>●</span> right hand{" "}
           <span style={{ color: handColor("L") }}>■</span> left hand{velocity ? " · line: velocity" : " · laptop keys sense no velocity"}
         </span>
-        <button type="button" onClick={() => setTable((t) => !t)} aria-pressed={table}>
+        <Button kind="secondary" type="button" onClick={() => setTable((t) => !t)} aria-pressed={table} style={{ padding: "6px 12px" }}>
           {table ? "Show as graph" : "Show as table"}
-        </button>
+        </Button>
       </div>
       {table ? (
         <table data-testid="take-graph-table" style={{ width: "100%", borderCollapse: "collapse", marginTop: 8 }}>

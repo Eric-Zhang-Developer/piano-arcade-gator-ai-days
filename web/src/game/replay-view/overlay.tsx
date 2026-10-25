@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Chart, Results, Take } from "../../contracts";
 import { drawHighway, makeLayout } from "../core/highway";
 import { settings } from "../core/settings";
+import { Button } from "../duo-tokens";
 import { getReplayState, pianoOutSettings, startReplay, stopReplay } from "../piano-out";
 import { highwayAt, replayChartTime, replaySpan } from ".";
 
@@ -22,9 +23,9 @@ export function ReplayButton(props: Props) {
   const close = useCallback(() => setOpen(false), []); // stable, so a re-render of the results doesn't restart the replay
   return (
     <>
-      <button data-testid="watch-replay" onClick={() => setOpen(true)} style={buttonStyle}>
+      <Button kind="secondary" data-testid="watch-replay" onClick={() => setOpen(true)}>
         Watch replay
-      </button>
+      </Button>
       {open && <ReplayOverlay {...props} onClose={close} />}
     </>
   );
@@ -111,19 +112,9 @@ function ReplayOverlay({ chart, take, results, onClose }: Props & { onClose(): v
       <div style={{ position: "absolute", top: 16, left: 0, right: 0, textAlign: "center", fontSize: 16, color: "rgba(255,255,255,0.8)" }}>
         Replay{sound ? " on the piano" : ": no piano connected, so it's silent"} · Esc to stop
       </div>
-      <button data-testid="replay-stop" onClick={onClose} style={{ ...buttonStyle, position: "absolute", top: 12, right: 16 }}>
+      <Button kind="secondary" data-testid="replay-stop" onClick={onClose} style={{ position: "absolute", top: 12, right: 16 }}>
         Stop
-      </button>
+      </Button>
     </div>
   );
 }
-
-const buttonStyle: React.CSSProperties = {
-  padding: "8px 24px",
-  fontSize: 16,
-  borderRadius: 8,
-  border: "none",
-  background: "#ddd",
-  color: "#000",
-  cursor: "pointer",
-};

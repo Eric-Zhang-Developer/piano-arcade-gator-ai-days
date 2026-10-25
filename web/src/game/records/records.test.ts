@@ -114,7 +114,7 @@ describe("the plugin", () => {
   it("records nothing for a practice take", () => {
     const { p, store } = play("bot=perfect");
     expect(store.has(RECORDS_KEY)).toBe(false);
-    expect(p.resultsPanel!({} as never)).not.toBeNull(); // the panel says why
+    expect(p.resultsPanel!({} as never)).toBeNull(); // and shows no card: nothing to say (duo-details)
   });
 });
 

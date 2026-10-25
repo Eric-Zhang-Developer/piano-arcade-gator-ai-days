@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
-import type { Chart } from "../../../contracts";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import type { Chart, InputEvent } from "../../../contracts";
 import { echoes, echoFilter, entryFor, programChanges, roundSettings, silence, type Played } from "./echo";
+import { round } from ".";
 
 const chart = (id: string): Chart => JSON.parse(readFileSync(new URL(`../../../../public/songs/rounds/${id}/chart.json`, import.meta.url), "utf8"));
 
@@ -104,5 +105,49 @@ describe("no feedback", () => {
     const f = echoFilter();
     f.sent(65, 80, 3000);
     expect(f.drop("on", 65, 80, 3000)).toBe(false);
+  });
+});
+
+describe("a pause mid-echo (#1310)", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+  it("ends each voice's channel on CC123, stamped at or after every echo it queued", async () => {
+    vi.useFakeTimers();
+    let t = 1000;
+    vi.spyOn(performance, "now").mockImplementation(() => t);
+    const sent: { bytes: number[]; at: number }[] = [];
+    const piano = { name: "Portable Grand", send: (bytes: number[], at = t) => sent.push({ bytes, at }) };
+    const input = { name: "Portable Grand", addEventListener() {} };
+    vi.stubGlobal("navigator", { requestMIDIAccess: async () => ({ outputs: new Map([["o", piano]]), inputs: new Map([["i", input]]) }) });
+    vi.stubGlobal("window", { addEventListener() {}, removeEventListener() {} });
+    const plugin = round.plugin();
+    plugin.transformChart!(chart("frere-jacques"));
+    await vi.runAllTimersAsync(); // connect()
+    let press: (e: InputEvent) => void = () => {};
+    plugin.wrapInput!({ kind: "midi", start: (on) => void (press = on), stop() {} }).start(() => {});
+    plugin.onEvent!({ type: "songStart", atMs: 0 });
+    // A note every 100 ms for 6 s, so voice 2's echoes (one entry later) are being queued when the pause comes.
+    for (let i = 0; i < 60; i++) {
+      press({ type: "on", pitch: 60 + (i % 5), velocity: 80, timeMs: t });
+      t += 50;
+      vi.advanceTimersByTime(50);
+      press({ type: "off", pitch: 60 + (i % 5), velocity: 0, timeMs: t });
+      t += 50;
+      vi.advanceTimersByTime(50);
+    }
+    const { intervalMs } = entryFor(chart("frere-jacques"))!;
+    for (; t < 1000 + intervalMs + 1000; t += 20) vi.advanceTimersByTime(20);
+    plugin.onEvent!({ type: "pause", atMs: t - 1000 });
+    for (const ch of [1, 2, 3]) {
+      const mine = sent.filter((m) => (m.bytes[0] & 0x0f) === ch);
+      const ons = mine.filter((m) => (m.bytes[0] & 0xf0) === 0x90);
+      if (ch === 1) expect(ons.length).toBeGreaterThan(0); // voice 2 was sounding
+      const last = mine.at(-1)!;
+      expect(last.bytes).toEqual([0xb0 | ch, 123, 0]);
+      expect(last.at).toBeGreaterThanOrEqual(Math.max(...ons.map((m) => m.at), 0));
+    }
   });
 });

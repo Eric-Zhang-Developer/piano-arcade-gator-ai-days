@@ -63,6 +63,9 @@ try {
   await page.waitForFunction(() => window.__pianoArcade?.ready === true, null, { timeout: 60_000 });
   const chart = await page.evaluate(() => window.__pianoArcade.chart);
   const mpb = 60000 / chart.bpm;
+  // Press only once the song has started: flow's clock holds at the first note after the count-in. A press during the
+  // count-in comes before songStart, so the band never hears it (the first local run's failure).
+  await page.waitForFunction(() => window.__pianoArcadeFlow?.holding === true, null, { timeout: 30_000 });
 
   // Every onset at 80% tempo, the first one now; the press times, in performance.now().
   const onsets = [...new Set(chart.notes.map((n) => n.beat))].sort((a, b) => a - b);
@@ -100,7 +103,11 @@ try {
   const asyncs = presses.map((p) => hats.reduce((best, h) => (Math.abs(h - p) < Math.abs(best) ? h - p : best), Infinity));
   const abs = asyncs.map(Math.abs).sort((a, b) => a - b);
   const median = abs[Math.floor(abs.length / 2)];
-  if (!(median <= 50)) fail.push(`median hi-hat asynchrony ${median?.toFixed(1)} ms, want ≤ 50`);
+  // How many presses landed where the script meant them (gap within 10% of its own): a loaded machine delays the page's
+  // timers, and a late press isn't the steady player. Reported, not excluded: the median is over every press.
+  const intended = onsets.map((b, k) => (k ? ((b - onsets[k - 1]) * mpb) / 0.8 : 0));
+  const onScript = presses.filter((p, k) => k === 0 || Math.abs(p - presses[k - 1] - intended[k]) <= 0.1 * intended[k]).length;
+  if (!(median <= 50)) fail.push(`median hi-hat asynchrony ${median?.toFixed(1)} ms, want ≤ 50 (${onScript}/${presses.length} presses on script)`);
   const last = Math.max(...ons.map((s) => sent.indexOf(s)));
   for (const ch of [0xb1, 0xb9]) {
     const ano = sent.findIndex((s, i) => i > last && s.data[0] === ch && s.data[1] === 123);
@@ -109,7 +116,7 @@ try {
   fail.push(...errors);
   writeFileSync(join(out, "follow.json"), JSON.stringify({ presses, asyncs, sent: band }, null, 1));
   if (fail.length) throw new Error(fail.join("; "));
-  say(`verify-follow: pass, ${ons.length} band notes on channels ${chans.join(" and ")}, hi-hat asynchrony median ${median.toFixed(1)} ms over ${abs.length} presses (max ${abs[abs.length - 1].toFixed(1)}), All Notes Off on both after the song (evidence: ${out})`);
+  say(`verify-follow: pass, ${ons.length} band notes on channels ${chans.join(" and ")}, hi-hat asynchrony median ${median.toFixed(1)} ms over ${abs.length} presses (max ${abs[abs.length - 1].toFixed(1)}; ${onScript} on script), All Notes Off on both after the song (evidence: ${out})`);
 } catch (e) {
   failed = true;
   console.error(`verify-follow: FAIL: ${e.message}`);

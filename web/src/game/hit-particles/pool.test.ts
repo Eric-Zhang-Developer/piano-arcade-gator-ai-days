@@ -6,7 +6,7 @@ const white = [1, 1, 1];
 
 describe("pool", () => {
   it("is one fixed buffer: the same array, the same size, after any number of spawns", () => {
-    const pool = particlePool(64, () => Infinity as never);
+    const pool = particlePool(64, (n) => n);
     const data = pool.data;
     expect(data.length).toBe(64 * FLOATS);
     for (let i = 0; i < 64; i++) expect(data[i * FLOATS + 2]).toBe(DEAD); // every slot starts dead

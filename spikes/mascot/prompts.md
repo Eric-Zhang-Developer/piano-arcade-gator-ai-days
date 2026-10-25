@@ -266,3 +266,73 @@ Framing: every frame the same scale and the same crop as the reference's three-q
 Background: fully transparent PNG (alpha), no ground shadow.
 Must NOT resemble the University of Florida's Albert mascot: no orange, no jersey, no letters.
 ```
+
+## strips/sheet-06/happy-1.png
+- reference: sheet-06.png
+- result: saved, 57s
+
+```
+Use your image generation tool to create ONE image and save it as strips/sheet-06/happy-1.png (a path relative to the current directory). Do nothing else: no code, no other files. The attached image is the character reference: keep this exact character (head shape, eyes, snout, proportions, colors, bow tie).
+
+The image: a horizontal strip of 3 animation frames of this same character, left to right, three-quarter view facing right, for a stop-motion loop. Frame 1: warm smile, hands together at the chest. Frame 2: eyes closed in happy arcs, a small hop with feet slightly lifted. Frame 3: back down, open happy smile, a modest pleased look, not shouting.
+Style: exactly as the reference: flat vector, monoline dark ink outline of the same even weight, exactly 4 flat colors: muted sage green skin (#6f8f5e), cream belly and snout underside (#efe6cf), near-black ink (#16130f) for outline and eyes, the small bright blue bow tie (#2b9bff). No gradients, no shading, no shine, no texture, no text, no frame numbers, no borders.
+Framing: every frame the same scale and the same crop as the reference's three-quarter view, the bottom of every figure on one shared baseline, clear empty space between frames so they never touch.
+Background: fully transparent PNG (alpha), no ground shadow.
+Must NOT resemble the University of Florida's Albert mascot: no orange, no jersey, no letters.
+```
+
+## strips/sheet-01/happy-2.png
+- reference: sheet-01.png
+- result: saved, 55s
+
+```
+Use your image generation tool to create ONE image and save it as strips/sheet-01/happy-2.png (a path relative to the current directory). Do nothing else: no code, no other files. The attached image is the character reference: keep this exact character (head shape, eyes, snout, proportions, colors, bow tie).
+
+The image: a horizontal strip of 3 animation frames of this same character, left to right, three-quarter view facing right, for a stop-motion loop. Frame 1: warm smile, hands together at the chest. Frame 2: eyes closed in happy arcs, a small hop with feet slightly lifted. Frame 3: back down, open happy smile, a modest pleased look, not shouting.
+Style: exactly as the reference: flat vector, monoline dark ink outline of the same even weight, exactly 4 flat colors: muted sage green skin (#6f8f5e), cream belly and snout underside (#efe6cf), near-black ink (#16130f) for outline and eyes, the small bright blue bow tie (#2b9bff). No gradients, no shading, no shine, no texture, no text, no frame numbers, no borders.
+Framing: every frame the same scale and the same crop as the reference's three-quarter view, the bottom of every figure on one shared baseline, clear empty space between frames so they never touch.
+Background: fully transparent PNG (alpha), no ground shadow.
+Must NOT resemble the University of Florida's Albert mascot: no orange, no jersey, no letters.
+```
+
+## strips/sheet-01/happy-3.png
+- reference: sheet-01.png
+- result: saved, 70s
+
+```
+Use your image generation tool to create ONE image and save it as strips/sheet-01/happy-3.png (a path relative to the current directory). Do nothing else: no code, no other files. The attached image is the character reference: keep this exact character (head shape, eyes, snout, proportions, colors, bow tie).
+
+The image: a horizontal strip of 3 animation frames of this same character, left to right, three-quarter view facing right, for a stop-motion loop. Frame 1: warm smile, hands together at the chest. Frame 2: eyes closed in happy arcs, a small hop with feet slightly lifted. Frame 3: back down, open happy smile, a modest pleased look, not shouting.
+Style: exactly as the reference: flat vector, monoline dark ink outline of the same even weight, exactly 4 flat colors: muted sage green skin (#6f8f5e), cream belly and snout underside (#efe6cf), near-black ink (#16130f) for outline and eyes, the small bright blue bow tie (#2b9bff). No gradients, no shading, no shine, no texture, no text, no frame numbers, no borders.
+Framing: every frame the same scale and the same crop as the reference's three-quarter view, the bottom of every figure on one shared baseline, clear empty space between frames so they never touch.
+Background: fully transparent PNG (alpha), no ground shadow.
+Must NOT resemble the University of Florida's Albert mascot: no orange, no jersey, no letters.
+```
+
+## strips/sheet-01/oops-1.png
+- reference: sheet-01.png
+- result: saved, 52s
+
+```
+Use your image generation tool to create ONE image and save it as strips/sheet-01/oops-1.png (a path relative to the current directory). Do nothing else: no code, no other files. The attached image is the character reference: keep this exact character (head shape, eyes, snout, proportions, colors, bow tie).
+
+The image: a horizontal strip of 3 animation frames of this same character, left to right, three-quarter view facing right, for a stop-motion loop. Frame 1: a small wince: eyes squeezed shut, teeth gritted, shoulders up. Frame 2: eyes opening, shoulders coming down. Frame 3: a kind shrug with both palms up and a gentle half smile, reassuring, never mocking.
+Style: exactly as the reference: flat vector, monoline dark ink outline of the same even weight, exactly 4 flat colors: muted sage green skin (#6f8f5e), cream belly and snout underside (#efe6cf), near-black ink (#16130f) for outline and eyes, the small bright blue bow tie (#2b9bff). No gradients, no shading, no shine, no texture, no text, no frame numbers, no borders.
+Framing: every frame the same scale and the same crop as the reference's three-quarter view, the bottom of every figure on one shared baseline, clear empty space between frames so they never touch.
+Background: fully transparent PNG (alpha), no ground shadow.
+Must NOT resemble the University of Florida's Albert mascot: no orange, no jersey, no letters.
+```
+
+## strips/sheet-06/happy-2.png
+- reference: sheet-06.png
+- result: saved, 57s
+
+```
+Use your image generation tool to create ONE image and save it as strips/sheet-06/happy-2.png (a path relative to the current directory). Do nothing else: no code, no other files. The attached image is the character reference: keep this exact character (head shape, eyes, snout, proportions, colors, bow tie).
+
+The image: a horizontal strip of 3 animation frames of this same character, left to right, three-quarter view facing right, for a stop-motion loop. Frame 1: warm smile, hands together at the chest. Frame 2: eyes closed in happy arcs, a small hop with feet slightly lifted. Frame 3: back down, open happy smile, a modest pleased look, not shouting.
+Style: exactly as the reference: flat vector, monoline dark ink outline of the same even weight, exactly 4 flat colors: muted sage green skin (#6f8f5e), cream belly and snout underside (#efe6cf), near-black ink (#16130f) for outline and eyes, the small bright blue bow tie (#2b9bff). No gradients, no shading, no shine, no texture, no text, no frame numbers, no borders.
+Framing: every frame the same scale and the same crop as the reference's three-quarter view, the bottom of every figure on one shared baseline, clear empty space between frames so they never touch.
+Background: fully transparent PNG (alpha), no ground shadow.
+Must NOT resemble the University of Florida's Albert mascot: no orange, no jersey, no letters.
+```

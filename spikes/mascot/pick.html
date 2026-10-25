@@ -40,8 +40,9 @@
     background: var(--pa-panel); border: 1px solid var(--pa-line); padding: 8px 14px; cursor: pointer; }
   .switch button[aria-pressed="true"] { color: var(--pa-ink); border-color: var(--pa-primary); }
   .switch button:focus-visible { outline: 2px solid var(--pa-primary); outline-offset: 2px; }
-  .poses { display: grid; grid-template-columns: 150px repeat(3, 1fr); border-top: 1px solid var(--pa-line); }
+  .poses { display: grid; grid-template-columns: 150px 1fr; border-top: 1px solid var(--pa-line); }
   .poses > * { border-bottom: 1px solid var(--pa-line); padding: 12px 0; }
+  .cands { display: grid; grid-template-columns: repeat(3, 1fr); row-gap: 12px; }
   .pose-name { font: 800 34px/1 var(--display); font-stretch: 75%; text-transform: uppercase; display: flex; align-items: center; }
   .cand { display: grid; grid-template-columns: 168px 1fr; gap: 12px; align-items: center; padding-right: 12px; }
   .sprite { width: 168px; height: 168px; background-size: 300% 100%; background-repeat: no-repeat;
@@ -142,12 +143,15 @@
     const grid = document.getElementById("poses");
     grid.replaceChildren();
     for (const pose of POSES) {
-      grid.append(el("div", { className: "pose-name" }, pose));
-      for (const n of [1, 2, 3]) {
+      // Candidates 1-3 always show (a missing one says so); a prompt-fix round adds 4 and up.
+      const made = M.sets.filter((s) => s.sheet === sheet && s.pose === pose).map((s) => +s.name.split("-").pop());
+      const row = el("div", { className: "cands" });
+      for (const n of [...new Set([1, 2, 3, ...made])].sort((a, b) => a - b)) {
         const set = M.sets.find((s) => s.sheet === sheet && s.name === `${pose}-${n}`);
-        grid.append(el("div", { className: "cand" }, sprite(set, pose),
-          el("div", {}, el("span", { className: "label" }, `${pose}-${n}`), verdict(`${sheet}/${pose}-${n}`))));
+        row.append(el("div", { className: "cand" }, sprite(set, pose),
+          el("div", {}, el("span", { className: "label" }, `${pose}-${n}${n > 3 ? " · fix round" : ""}`), verdict(`${sheet}/${pose}-${n}`))));
       }
+      grid.append(el("div", { className: "pose-name" }, pose), row);
     }
     for (const d of document.querySelectorAll("[data-ctx]")) {
       const set = M.sets.find((s) => s.sheet === sheet && s.pose === d.dataset.ctx && s.frames);

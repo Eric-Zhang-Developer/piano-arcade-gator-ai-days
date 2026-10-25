@@ -3,6 +3,7 @@
 // Without it: /sheet and /play?input=test share one browser context, a take is played Perfect as e2e/verify.mjs plays
 // it, and the sheet's cursor must rise while every note's notehead ends up painted PERFECT.
 // Usage: node web/src/game/sheet-view/verify-sheet.mjs --out <dir> [--static] [--songs id,id]
+// CI runs verify-sheet-a/-b/-c.mjs, this file's follow run split by song (#673); run this one by hand for all seven.
 import { spawn } from "node:child_process";
 import { mkdirSync, readdirSync, existsSync, writeFileSync } from "node:fs";
 import { createServer } from "node:net";

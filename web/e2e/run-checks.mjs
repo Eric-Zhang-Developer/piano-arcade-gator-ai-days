@@ -7,7 +7,7 @@
 // --base <ref>: verify.mjs plus the checks nearest each file changed since <ref>, or every check when shared code
 // changed. --all (or no --base): every check.
 import { execFileSync, spawn } from "node:child_process";
-import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -62,10 +62,27 @@ export function selectChecks(checks, changed) {
   return checks.filter((c) => picked.has(c));
 }
 
-/** Shard i of n (1-based): the entries whose index mod n is i - 1. */
-export function shard(checks, i, n) {
+// Each check's seconds on CI (main's full run 40164489468, 2026-10-25), to balance the shards; a check not in the
+// table counts DEFAULT_SECONDS, about the median. Refresh it from a full run's logs when a shard nears the job's 20 min.
+export const SECONDS = JSON.parse(readFileSync(new URL("./run-checks.seconds.json", import.meta.url), "utf8"));
+export const DEFAULT_SECONDS = 90;
+
+/**
+ * Shard i of n (1-based), balanced by time: longest check first, each onto the shard with the fewest seconds so far
+ * (the lower shard on a tie). Round-robin by index put 17 of the 84 minutes in one shard, past the 20 min job (#673).
+ * Every runner computes the same split from the same list. A shard keeps the list's order.
+ */
+export function shard(checks, i, n, seconds = SECONDS) {
   if (!(Number.isInteger(i) && Number.isInteger(n) && n >= 1 && i >= 1 && i <= n)) throw new Error(`bad shard ${i}/${n}`);
-  return checks.filter((_, k) => k % n === i - 1);
+  const cost = (c) => seconds[c] ?? DEFAULT_SECONDS;
+  const load = new Array(n).fill(0);
+  const owner = new Map();
+  for (const c of [...checks].sort((a, b) => cost(b) - cost(a) || (a < b ? -1 : 1))) {
+    const k = load.indexOf(Math.min(...load));
+    load[k] += cost(c);
+    owner.set(c, k);
+  }
+  return checks.filter((c) => owner.get(c) === i - 1);
 }
 
 // One check in its own process group, so a server it leaves behind (on a timeout, say) is stopped too. Its output

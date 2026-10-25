@@ -34,13 +34,14 @@ export function makeScene(el: HTMLElement, opacity: number): Scene | null {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 300);
-  camera.position.set(0, 2.2, 0);
+  camera.position.set(0, 0, 0);
 
-  // Stars: short vertical segments; in fever they stretch into streaks.
+  // Stars: short vertical segments across the whole view (there's no horizon to sit above now); in fever they stretch
+  // into streaks. At STAR_Z the view is about 150 units tall and 270 wide at 16:9.
   const starPos = new Float32Array(STARS * 6);
   for (let i = 0; i < STARS; i++) {
     const x = (Math.random() - 0.5) * 320;
-    const y = 12 + Math.random() * 90;
+    const y = (Math.random() - 0.5) * 170;
     starPos.set([x, y, STAR_Z, x, y + 0.3, STAR_Z], i * 6);
   }
   const starGeo = new THREE.BufferGeometry().setAttribute("position", new THREE.BufferAttribute(starPos, 3));
@@ -55,7 +56,6 @@ export function makeScene(el: HTMLElement, opacity: number): Scene | null {
         size = `${f.width}x${f.height}`;
         renderer.setSize(f.width, f.height);
         camera.aspect = f.width / f.height;
-        camera.setViewOffset(f.width, f.height, 0, f.height / 6, f.width, f.height);
         camera.updateProjectionMatrix();
       }
       const len = 0.3 + S.starStreak * l.heat;

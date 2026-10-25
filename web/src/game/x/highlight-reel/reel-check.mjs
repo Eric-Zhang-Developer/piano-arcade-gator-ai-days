@@ -88,10 +88,22 @@ export async function runReelCheck({ out, bars, label }) {
   };
 
   // Renders the page's reel and saves the WebM; returns the hook's numbers.
-  async function render(page, name) {
+  // keys: start it from the keyboard and check where focus goes (lab-pages-a11y, #1143).
+  async function render(page, name, keys = false) {
     await page.waitForFunction(() => window.__highlightReel?.state === "ready", null, { timeout: 120_000 });
-    await page.getByTestId("highlight-render").click();
+    const focused = () => page.evaluate(() => document.activeElement?.getAttribute("data-testid") ?? document.activeElement?.tagName);
+    if (keys) {
+      await page.getByTestId("highlight-render").focus();
+      await page.keyboard.press("Enter");
+      await page.waitForFunction(() => window.__highlightReel?.state !== "ready", null, { timeout: 10_000 });
+      const f = await focused();
+      check(0, f === "highlight-render", `${name}: while it records, focus stays on Render (${f})`);
+    } else await page.getByTestId("highlight-render").click();
     await page.waitForFunction(() => ["done", "error"].includes(window.__highlightReel?.state), null, { timeout: 120_000 });
+    if (keys) {
+      const moved = await page.waitForFunction(() => document.activeElement?.getAttribute("data-testid") === "highlight-save", null, { timeout: 5_000 }).then(() => true, () => false);
+      check(0, moved, `${name}: when the reel is done, focus moves to Save video (${await focused()})`);
+    }
     const hook = await page.evaluate(() => {
       const h = window.__highlightReel;
       return { state: h.state, edl: h.edl, bestRun: h.bestRun, expected: h.expectedOnsetsMs, framesRequested: h.framesRequested, framesLate: h.framesLate, drawMs: h.drawMs, audioHash: h.audioHash, mimeType: h.mimeType, blobBytes: h.blobBytes };
@@ -207,7 +219,7 @@ export async function runReelCheck({ out, bars, label }) {
     {
       const page = await newPage();
       await page.goto(base + first.url);
-      const r = await render(page, "twinkle-rank-b-again");
+      const r = await render(page, "twinkle-rank-b-again", true);
       const hashes = await page.evaluate(() => Array.from({ length: 30 }, (_, k) => window.__highlightReel.frameHash(k * 30)));
       const same = hashes.filter((h, k) => h === first.hashes[k]).length;
       check(6, r.audioHash === first.audioHash && same === 30, `repeatable: audioHash ${r.audioHash === first.audioHash ? "same" : "DIFFERENT"}, ${same}/30 frame hashes same`);

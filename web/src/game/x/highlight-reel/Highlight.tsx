@@ -13,9 +13,8 @@ import { hashBytes, reel, reelSize } from "./draw";
 import { encode } from "./encode";
 import { detectOnsets } from "./onsets";
 import styles from "./highlight.module.css";
+import { focusSave, ReelStatus, renderLock, type State } from "./status";
 import { botTake, FALLBACK, isBot, loadLast, type Saved } from "./take";
-
-type State = "loading" | "ready" | "rendering" | "done" | "no-reel" | "error";
 
 declare global {
   interface Window {
@@ -102,6 +101,10 @@ export function Highlight() {
   const [frame, setFrame] = useState(0);
   const [video, setVideo] = useState<{ url: string; bytes: number; late: number } | null>(null);
   const blobRef = useRef<Blob | null>(null);
+  const saveLink = useRef<HTMLAnchorElement>(null);
+  const renderHasFocus = useRef(false);
+  const renderHadFocus = useRef(false); // read as the reel finishes, before Render unmounts (and maybe blurs)
+  const prevState = useRef<State>("loading");
 
   useEffect(() => {
     takeFor(new URLSearchParams(params.toString()))
@@ -118,6 +121,11 @@ export function Highlight() {
   const edl = useMemo(() => (saved ? cut(saved.chart, saved.take, saved.results) : null), [saved]);
   const drawer = useMemo(() => (saved && edl ? reel(saved.chart, saved.take, saved.results, edl) : null), [saved, edl]);
   const state: State = phase ?? (!saved ? "loading" : edl ? "ready" : "no-reel");
+
+  useEffect(() => {
+    if (focusSave(prevState.current, state, renderHadFocus.current)) saveLink.current?.focus();
+    prevState.current = state;
+  }, [state]);
 
   // The test hook, rebuilt as the take arrives; render() fills in the encode's numbers.
   useEffect(() => {
@@ -160,7 +168,7 @@ export function Highlight() {
   }, [drawer, state]);
 
   const render = async () => {
-    if (!saved || !edl || !drawer || !monitor.current) return;
+    if (state !== "ready" || !saved || !edl || !drawer || !monitor.current) return;
     const hook = window.__highlightReel!;
     const ctx = monitor.current.getContext("2d")!;
     setPhase("rendering");
@@ -173,6 +181,7 @@ export function Highlight() {
       Object.assign(hook, { framesRequested: out.framesRequested, framesLate: out.framesLate, drawMs: out.drawMs, blobBytes: out.blob.size, mimeType: out.mimeType, state: "done" });
       setVideo({ url: URL.createObjectURL(out.blob), bytes: out.blob.size, late: out.framesLate });
       setFrame(S.frames);
+      renderHadFocus.current = renderHasFocus.current;
       setPhase("done");
     } catch (e) {
       setError((e as Error).message);
@@ -226,19 +235,15 @@ export function Highlight() {
             </div>
           </Panel>
           {state === "done" && video ? (
-            <a href={video.url} download={`${chart?.id ?? "take"}-highlight.webm`} {...kitButton("primary")} data-testid="highlight-save">
+            <a ref={saveLink} href={video.url} download={`${chart?.id ?? "take"}-highlight.webm`} {...kitButton("primary")} data-testid="highlight-save">
               Save video
             </a>
           ) : (
-            <Button onClick={render} disabled={state !== "ready"} data-testid="highlight-render">
+            <Button onClick={render} onFocus={() => (renderHasFocus.current = true)} onBlur={() => (renderHasFocus.current = false)} {...renderLock(state)} data-testid="highlight-render">
               {state === "rendering" ? `Recording ${(frame / S.fps).toFixed(1)} s` : "Render reel"}
             </Button>
           )}
-          <p className={styles.small}>
-            {state === "done" && video
-              ? `${(video.bytes / 1e6).toFixed(1)} MB WebM · ${video.late} late frames`
-              : "Plays the reel once in real time to record it: 15 seconds."}
-          </p>
+          <ReelStatus state={state} video={video} />
         </aside>
       </div>
       {edl && (

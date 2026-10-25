@@ -13,6 +13,7 @@ import { realKeys } from "./real-keys";
 import { round } from "./round";
 import { pinned } from "./pinned";
 import { highlightReel } from "./highlight-reel";
+import { inside } from "./inside";
 import { sample } from "./sample";
 import { screenShake } from "./screen-shake";
 import { speakingPiano } from "./speaking-piano";
@@ -42,6 +43,7 @@ export const experiments: Experiment[] = [
   speakingPiano, // #1153: its own page, /speak; a spike that ends in findings
   pinned, // #1171: your take as a brass music-box cylinder, at /musicbox
   nameTheme, // #1190: its own page, /name; a name becomes a theme the DGX plays and a level
+  inside, // #1226: its own page, /inside; a grand's action moved live by the DGX
   handPalette, // #1127: the hand and judgment colors three ways, with a colour-blind simulation
   uiSoundsAb, // #1167: the menu sounds, old against new
 ];

@@ -68,6 +68,8 @@ Ahead of them, on his word: `level-forge` phase 1 (a local agent session makes a
 no API spend), then `veritas` (`/veritas`: the judge catching planted mistakes, live) and `veritas-polish`.
 Last, on his word (#601): `adaptive-chunks`, chunk practice that shrinks onto the bars you miss and grows back as
 you prove them. Cut if it isn't done by Sunday noon.
+First in the queue, on his word (#612): `laptop-sound`, the laptop plays the game's piano part and your key presses
+when no piano is connected. Cut if it isn't done by Sunday noon.
 
 ## Spikes
 Milestone **spikes**, after `extras`: `simon-says-spike`, then `restyle-spike`. About 3 hours each, findings whatever

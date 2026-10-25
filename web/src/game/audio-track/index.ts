@@ -192,6 +192,18 @@ export function audioTrack(): GamePlugin {
     }, audioTrackSettings.watchMs);
   };
 
+  // A demo (bot=…&demo=1) never clicks Start, so Chrome keeps a new context suspended: the first press or click
+  // anywhere resumes it. Anything play() scheduled while it was suspended was mapped on a stopped clock, so once it
+  // runs the recording restarts at the chart's time now.
+  const wakeable = (ctx: AudioContext) => {
+    const wake = () => void ctx.resume().catch(() => {});
+    for (const type of ["pointerdown", "keydown"]) window.addEventListener(type, wake, { once: true, capture: true });
+    ctx.onstatechange = () => {
+      if (ctx.state === "running" && anchor) play(anchor.atMs + performance.now() - anchor.perf);
+    };
+    return ctx;
+  };
+
   const sounding = () => {
     if (!audio || !bus) return null;
     const t = audio.currentTime;
@@ -216,7 +228,7 @@ export function audioTrack(): GamePlugin {
       const token = ++load;
       const dir = `/songs/${song}/`;
       try {
-        audio ??= new AudioContext();
+        audio ??= wakeable(new AudioContext());
       } catch {
         return c; // no Web Audio: the take plays without the recording
       }

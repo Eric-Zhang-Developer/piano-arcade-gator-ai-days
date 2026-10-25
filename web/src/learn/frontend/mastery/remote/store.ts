@@ -1,6 +1,8 @@
 import { getSession } from '../../../../data/auth';
 import { type AttemptStore, deviceStore } from '../engine';
 import type { Attempt } from '../schema';
+import { isSyntheticId } from '../sim';
+import { syntheticStore } from '../../viewas/store';
 import { ATTEMPTS_ROUTE, type AttemptsRequest, type AttemptsResponse } from './protocol';
 
 /** Who the route will store attempts for: the take store's Supabase session (anonymous or Google). */
@@ -23,7 +25,8 @@ const byTime = (a: Attempt, b: Attempt) => Date.parse(a.at) - Date.parse(b.at) |
  * Attempts and goals in Supabase through `/learn/api/attempts`, with the device store underneath. Every write lands
  * on the device first, so nothing is lost while the route is unconfigured, not ready (#753) or offline; reads use
  * the server when it answers and the device otherwise. Only the session's own learner id goes to the server.
- * When the server answers, attempts it hasn't seen yet (kept while it was away) are sent along.
+ * When the server answers, attempts it hasn't seen yet (kept while it was away) are sent along. A synthetic learner's
+ * attempts and goals never touch the server or the device: they come from the simulation and this tab.
  */
 export function remoteStore(options: RemoteStoreOptions = {}): AttemptStore {
   const session = options.session ?? takeStoreSession;
@@ -51,7 +54,7 @@ export function remoteStore(options: RemoteStoreOptions = {}): AttemptStore {
     return reply?.status === 'ok' ? reply : null;
   };
 
-  return {
+  const store: AttemptStore = {
     async append(attempt) {
       const kept = await fallback.append(attempt);
       const reply = await call(attempt.learnerId, { attempt });
@@ -74,5 +77,11 @@ export function remoteStore(options: RemoteStoreOptions = {}): AttemptStore {
       const reply = await call(learnerId, { goals });
       return kept || reply?.status === 'saved';
     },
+  };
+  return {
+    append: attempt => (isSyntheticId(attempt.learnerId) ? syntheticStore : store).append(attempt),
+    list: learnerId => (isSyntheticId(learnerId) ? syntheticStore : store).list(learnerId),
+    getGoals: learnerId => (isSyntheticId(learnerId) ? syntheticStore : store).getGoals(learnerId),
+    setGoals: (learnerId, goals) => (isSyntheticId(learnerId) ? syntheticStore : store).setGoals(learnerId, goals),
   };
 }

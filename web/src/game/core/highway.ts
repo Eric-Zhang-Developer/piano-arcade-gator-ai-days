@@ -158,16 +158,14 @@ function bar(ctx: CanvasRenderingContext2D, L: Layout, x0: number, x1: number, y
   if (fill) ctx.fill();
 }
 
-// key-polish: the notes' body and glow, the keys' release, the felt under the line.
+// key-polish: the notes' body and glow, and the keys' release.
 export const notePolish = {
   glowMs: 400, // a note starts to glow this long before it lands
   glowPx: 18, // its glow at the line
   heldGlow: 0.35, // of glowPx, on a held note: a long one is a column, and a full glow down it reads as neon
   lift: 0.18, // white over a note's leading end, fading to none at its tail
-  edge: "rgba(255,255,255,0.28)", // the fine light down a note's left edge
+  rim: "rgba(255,255,255,0.3)", // the fine light around a note's edge
   releaseMs: 140, // a released key's light fades over this; none under reduced motion
-  felt: "#140c22",
-  feltPx: 3,
 };
 
 // Which keys were lit last frame, so a released key's light can fade instead of cut. Per canvas.
@@ -252,7 +250,7 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
     ctx.shadowBlur = 0;
     if (state !== "MISS") {
       // Inside the pill: a body that lifts toward its leading end (a long note reads as one sustained stroke), a fine
-      // light down its left edge, and the white-hot head, soft rather than a hard line.
+      // light rim, and the white-hot head, soft rather than a hard line.
       ctx.save();
       ctx.clip();
       const lift = ctx.createLinearGradient(0, top, 0, yBottom);
@@ -260,8 +258,9 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
       lift.addColorStop(1, `rgba(255,255,255,${notePolish.lift})`);
       ctx.fillStyle = lift;
       ctx.fillRect(0, top, L.width, yBottom - top);
-      ctx.fillStyle = notePolish.edge;
-      ctx.fillRect(L.project(x1, (top + yBottom) / 2) + 1, top, 1.25, yBottom - top);
+      ctx.strokeStyle = notePolish.rim; // the clip keeps the inner half: a fine light rim, as on glass
+      ctx.lineWidth = 2;
+      ctx.stroke();
       const headPx = settings.noteHeadPx * 1.6;
       const head = ctx.createLinearGradient(0, yBottom - 1 - headPx, 0, yBottom - 1);
       head.addColorStop(0, "rgba(255,255,255,0)");
@@ -306,15 +305,12 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
     path.forEach((p, i) => (i ? ctx.lineTo(p.x, line + p.dy) : ctx.moveTo(p.x, line + p.dy)));
   };
   ctx.save();
-  // The felt strip the keys tuck under, then the keybed's soft shadow on the key tops, so the white line reads
-  // against white keys (key-polish).
-  ctx.fillStyle = notePolish.felt;
-  ctx.fillRect(0, line, L.width, notePolish.feltPx);
-  const shade = ctx.createLinearGradient(0, line + notePolish.feltPx, 0, line + notePolish.feltPx + 10);
-  shade.addColorStop(0, "rgba(0,0,0,0.55)");
+  // The keybed's soft shadow on the key tops, so the white line reads against white keys.
+  const shade = ctx.createLinearGradient(0, line, 0, line + 10);
+  shade.addColorStop(0, "rgba(0,0,0,0.6)");
   shade.addColorStop(1, "rgba(0,0,0,0)");
   ctx.fillStyle = shade;
-  ctx.fillRect(0, line + notePolish.feltPx, L.width, 10);
+  ctx.fillRect(0, line, L.width, 10);
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
   trace();

@@ -57,14 +57,41 @@ keys keep the real key's shape, no neon soup.
   88 keys; we draw note names (note-labels). Logged as a decision if kept.
 - Chords: no extra shape; same-beat notes already align. Revisit only if a round shows them reading as noise.
 
+## What the look loop kept and dropped
+Written before the first code commit as the directions above; this section records how they came out (rounds in the
+PR's Design section).
+
+**Kept**
+- Ivory whites with a 1 px gap, a lit left bevel and a front lip; black keys with a top face, a front face, a gloss
+  stripe and a cast shadow on the whites (round 2 made the lip, shadow and gradient strong enough to read at 1920).
+- Key travel as a static offset: a pressed key's lip or face shrinks to 40 % and its top is shaded by its neighbours.
+- The pressed light poured from the line: exactly the hand color over the top 30 % (so the color stays exact, as
+  key-skin's test asks), fading to 14 % at the near end, with a 10 px white-hot band and a spill onto the neighbours'
+  tops. The old full-height shadow-blur glow is gone. Release fades over 140 ms; under reduced motion it cuts.
+- Notes: a white lift toward the leading end (a long note reads as one stroke), a fine inner rim, a soft 10 px head,
+  and a glow in the hand's color over the last 400 ms. A held note's remainder stays drawn, pinned at the line, while
+  its key is held; its glow is a third of a landing note's (round 2: a full glow down a held column read as neon).
+- #749's 2 px corners, carried here because this PR redraws the notes (spec).
+
+**Dropped**
+- **The felt strip:** a 3 px strip under the line is hidden by the line itself; the keybed shadow does the job.
+- **Velocity:** `ChartNote.velocity` is absent from the library's charts, and the press's velocity doesn't reach the
+  draw code (`HighwayState` has none, and `Frame` is frozen). Putting it into brightness would also blur the rule that
+  brightness says time to hit. Dropped, per the spec.
+- **An inner core line on long notes:** the lift already makes long notes read as sustained.
+- **A chord shape:** same-beat notes land in one row with their blooms; no round showed chords reading as noise.
+- **PianiCast's slim bars:** `key-polish-note-width.md`.
+- **No growing-glow switch for reduced motion:** the glow follows the note's position, which still moves under reduced
+  motion; it's not a pulse.
+
 ## Guard rails
 - hit-particles' bloom stays the brightest thing at the line; the key light must not add a second bloom there (cap
   the white-hot part at a few px, no additive blend).
-- #747's hit line: 2 px white-hot with the purple-to-blue glow. The felt strip sits under it, not over it.
+- #747's hit line: 2 px white-hot with the purple-to-blue glow. Nothing in this pass draws over it.
 - Upcoming notes always legible: no glow on notes more than ~400 ms out; the far-dim rule stays.
 - Perf: gradients cached per key width/colour (no new gradient per key per frame where a cached one will do);
   `perf.mjs` p95 ≤ 6 ms at 1920 on maple-leaf-rag in fever, before and after.
-- Reduced motion: no release fade, no growing glow animation (static brightness only), no travel.
+- Reduced motion: no release fade, no hit-line motion; the static look stays.
 
 ## Shots per round
 Maple Leaf Rag (dense, fever) and Clair de Lune (slow, long notes) at 1280×720 and 1920×1080, plus reduced motion;

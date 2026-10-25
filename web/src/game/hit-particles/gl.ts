@@ -7,7 +7,8 @@ import { DUST, FLOATS, WISP, governor, hitParticleSettings as S, particlePool, t
 import { feverHeat } from "../fever-arc";
 
 export interface HitParticles {
-  hit(x: number, width: number, y: number, judgment: Judgment, color: string): void;
+  // energy (touch-visible, 0.25–1) scales the dust and the brightness; wispOnly, the softest hits, is one wisp, no dust
+  hit(x: number, width: number, y: number, judgment: Judgment, color: string, energy?: number, wispOnly?: boolean): void;
   hold(x: number, width: number, y: number, color: string, dtMs: number): void; // a held hit key's stream
   draw(ctx: CanvasRenderingContext2D, f: Frame, dtMs: number): void;
   reset(): void;
@@ -199,9 +200,10 @@ export function hitParticles(): HitParticles | null {
   };
 
   return {
-    hit(x, width, y, judgment, color) {
-      spawn(DUST, S.dust[judgment], x, width, y, color, S.bright[judgment]);
-      spawn(WISP, S.wisps[judgment], x, width, y, color, S.bright[judgment]);
+    hit(x, width, y, judgment, color, energy = 1, wispOnly = false) {
+      const bright = S.bright[judgment] * energy;
+      spawn(DUST, wispOnly ? 0 : S.dust[judgment] * energy, x, width, y, color, bright);
+      spawn(WISP, wispOnly ? 1 : S.wisps[judgment], x, width, y, color, bright);
     },
     hold(x, width, y, color, dtMs) {
       spawn(DUST, (S.streamPerSec * dtMs) / 1000, x, width, y, color, 0.8);

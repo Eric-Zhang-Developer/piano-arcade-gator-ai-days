@@ -153,3 +153,9 @@ test("the timing text and latency button stay reachable, as the first card in th
   expect(details.indexOf("12 ms late")).toBeLessThan(details.indexOf("TOP 5"));
   expect(render({ scored: false, timing: <p>12 ms late</p> })).not.toContain("12 ms late");
 });
+
+test("Watch sits in the results' actions, the perfect-bot demo of this song, and not on the demo itself (select-calm, #1411)", () => {
+  const html = render({ params: new URLSearchParams("song=twinkle") });
+  expect(html).toContain('<a data-testid="results-watch" href="/play?song=twinkle&amp;bot=perfect&amp;audible=1&amp;demo=1">Watch</a>');
+  expect(render({ params: new URLSearchParams("song=twinkle&bot=perfect&demo=1") })).not.toContain("results-watch");
+});

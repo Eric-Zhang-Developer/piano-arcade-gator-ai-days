@@ -37,8 +37,11 @@ hold it until it does. Split only at a real seam, and say why.
 **Performance:**
 - The CPU writes spawns only: a fixed GPU pool (**~16k**) where a shader computes each particle's position and fade
   from (origin, spawn time, seed). Nothing is allocated mid-song.
-- Reuse the existing three.js renderer (fever-stage) instead of adding a second WebGL context. Soft sprites with
-  additive blending; no blur or full-screen bloom pass. The particle layer renders at DPR 1.
+- **Its own WebGL canvas above the highway** (Eric, 2026-10-25, "agreed"), so the dust is drawn over the falling
+  notes and under the HUD, with or without the stage. To keep a single WebGL context, fever-stage (mostly stars after
+  #728) may be dropped or folded into this layer: the worker decides which and logs it. An offscreen renderer blitted
+  into the highway canvas inside `juice.draw()` also meets this. Soft sprites with additive blending; no blur or
+  full-screen bloom pass. The particle layer renders at DPR 1.
 - Cap spawns per second. A governor halves spawning when frames run slow and recovers slowly; it **never freezes**
   the layer (fever-stage's freeze guard froze the stage in 3 of 12 runs, `changes/perf-budget.md`).
 - Gate: `web/src/game/perf-budget/perf.mjs` with particles on, p95 frame work **≤ 6 ms** at 1920×1080 (main today:
@@ -50,8 +53,8 @@ hold it until it does. Split only at a real seam, and say why.
 for the opposite.
 
 **Open in #750, decided by the worker and logged** (`specs/decisions/hit-particles-*.md`), not invented here:
-- How the dust is drawn *over* the falling notes while reusing fever-stage's renderer, whose canvas sits *behind* the
-  highway and today only draws (and only shows, at opacity = fever heat) during fever.
+- Whether fever-stage is dropped or folded into the particle layer, and how the layer sits above the highway (its own
+  DOM canvas, or an offscreen renderer blitted in `juice.draw()`).
 - What happens with `?stage=off`, `localStorage["pianoArcade.stage"]="off"` or no WebGL.
 - What becomes of juice-visual's 300-particle cap, 1.5 s wisps and 500 ms clear zone.
 - The spawn cap's number, the governor's slow-frame threshold and recovery rate, and reduced motion's fraction.

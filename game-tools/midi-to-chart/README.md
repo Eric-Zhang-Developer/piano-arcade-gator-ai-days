@@ -54,3 +54,25 @@ The `...` are `--id --title --composer --catalog --source -o`, as in each chart'
 - A release off the grid (engravers' MIDI shortens some by a tick) is snapped to it.
 
 Grace notes and ornaments come through as whatever the MIDI file wrote; check them against the score by hand.
+
+## Demo performance: `perform.py` (spec: demo-performance)
+Writes a chart's `pedal.json` and sets velocities from its cited score, without touching notes. A library song's
+`pedal.json` must also be listed in `web/src/game/pedal/library.json`; the pedal test checks they agree.
+```bash
+.venv/bin/python perform.py pedal <chart.json> --midi song.mid --pickup Q --bars a-b   # the MIDI export's CC64
+.venv/bin/python perform.py pedal <chart.json> --ly song.ly --context <name> --spans ... --start-beat B  # a LilyPond pedal line
+.venv/bin/python perform.py pedal <chart.json> --harmony   # no Ped. marks: the per-harmony rule
+.venv/bin/python perform.py velocity <chart.json> --mark pp   # one printed mark over the whole excerpt
+.venv/bin/python perform.py --self-test
+```
+Batch 1 (#815), with the song pack's sources plus `fur_Elise_WoO59.ly`
+(`https://www.mutopiaproject.org/ftp/BeethovenLv/WoO59/fur_Elise_WoO59/fur_Elise_WoO59.ly`):
+```bash
+.venv/bin/python perform.py pedal ../../web/public/songs/chopin-prelude-4/chart.json --midi source/Chop-28-4a.mid --pickup 1 --bars 1-13
+.venv/bin/python perform.py pedal ../../web/public/songs/fur-elise/chart.json --ly source/fur_Elise_WoO59.ly --context pedalOne \
+  --spans 0-12,0-11,12-13.5,13.5-33,33-34.5,13.5-33,34.5-35.25 --start-beat 1
+.venv/bin/python perform.py pedal ../../web/public/songs/ode-to-joy/chart.json --harmony
+.venv/bin/python perform.py pedal ../../web/public/songs/moonlight-1/chart.json --harmony
+.venv/bin/python perform.py velocity ../../web/public/songs/fur-elise/chart.json --mark pp
+.venv/bin/python perform.py velocity ../../web/public/songs/moonlight-1/chart.json --mark pp
+```

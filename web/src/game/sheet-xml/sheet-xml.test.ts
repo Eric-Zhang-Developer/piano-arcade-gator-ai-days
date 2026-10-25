@@ -295,6 +295,14 @@ it("a fifth voice in one hand throws, naming the note", () => {
   expect(() => chartToMusicXml(synthetic({ notes }))).toThrow(/fifth voice .* v4/);
 });
 
+// The Lab's charts open in /sheet too (its Sheet music link), so each one prints (#1330).
+const labCharts: Chart[] = LAB_ONLY.flatMap((dir) =>
+  readdirSync(new URL(`${dir}/`, songs)).map((d) => JSON.parse(readFileSync(new URL(`${dir}/${d}/chart.json`, songs), "utf8"))),
+);
+it.each(labCharts.map((c) => [c.id, c] as const))("the Lab's %s prints", (_, c) => {
+  expect(() => chartToMusicXml(c)).not.toThrow();
+});
+
 it("the charts stay within the writer's 4 voices a hand, and some use 2 or more", () => {
   const most = charts.map((c) => Math.max(0, ...[...chartToMusicXml(c).matchAll(/<voice>(\d)<\/voice>/g)].map((m) => ((Number(m[1]) - 1) % 4) + 1)));
   expect(Math.max(...most)).toBeLessThanOrEqual(4); // Chopin's Op. 28 No. 7 holds a note under two moving voices (#986)

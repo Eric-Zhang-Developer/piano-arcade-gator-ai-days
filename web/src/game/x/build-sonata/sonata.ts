@@ -78,6 +78,7 @@ export const BEATS = 176; // where the last commit lands, before its final chord
 const GRID = 0.25; // onsets on sixteenths; a hand plays one note per slot
 const ACTIVITY = 0.75; // the warp: 75% by commit count (busy hours get room), 25% by the clock
 export const VELOCITY_CAP = 110;
+export const VOICES = 4; // a hand's voices on the sheet (sheet-xml's limit)
 
 // I–V–vi–IV in C, a chord a bar; red main is vi; the end is V–I.
 type Chord = "I" | "V" | "vi" | "IV";
@@ -169,6 +170,20 @@ export function buildSonata(snap: Snapshot): { chart: Chart; pedal: [number, num
   for (let i = 0; i < notes.length; i++) {
     const next = notes.slice(i + 1).find((m) => m.pitch === notes[i].pitch);
     if (next) notes[i].duration = Math.min(notes[i].duration, next.beat - notes[i].beat);
+  }
+  // The sheet engraves at most 4 voices a hand (sheet-xml), and each note here has its own onset, so each sounding
+  // note is a voice: one that would be a fifth cuts the soonest-ending one short at its start (#1330).
+  for (const hand of ["R", "L"] as const) {
+    const sounding: SonataNote[] = [];
+    for (const m of notes.filter((x) => x.hand === hand)) {
+      for (let j = sounding.length - 1; j >= 0; j--) if (sounding[j].beat + sounding[j].duration <= m.beat) sounding.splice(j, 1);
+      if (sounding.length >= VOICES) {
+        sounding.sort((a, b) => a.beat + a.duration - (b.beat + b.duration));
+        const cut = sounding.shift()!;
+        cut.duration = m.beat - cut.beat;
+      }
+      sounding.push(m);
+    }
   }
   const end = Math.max(...notes.map((m) => m.beat + m.duration));
   const pedal: [number, number][] = [[(lastBar - 1) * 4 + 0.12, lastBar * 4 - 0.04], [lastBar * 4 + 0.12, end]];

@@ -22,6 +22,8 @@
 .sandbox .tab:hover { color:var(--learn-text); }
 .sandbox .tab[aria-selected=true] { color:var(--learn-text); box-shadow:inset 0 -2px 0 var(--learn-accent); }
 .panel { overflow-y:auto; padding:32px; min-height:0; }
+/* One reading column on wide screens: the gate strip, score and facts share its edge instead of spanning the void. */
+.panel > * { max-width:880px; }
 .panel:focus-visible { outline-offset:-2px; }
 .panel h2 { margin:0 0 16px; font-size:20px; line-height:1.3; }
 
@@ -89,7 +91,7 @@
 .sheet { display:grid; gap:24px; }
 .paper { margin:0; background:var(--learn-paper); color:var(--learn-paper-text); color-scheme:light; padding:16px 24px 20px; border:1px solid var(--learn-border); }
 .paper[data-focus=true] { box-shadow:inset 4px 0 0 var(--learn-accent); }
-.paper svg { display:block; width:100%; max-width:660px; height:auto; }
+.paper svg { display:block; width:100%; height:auto; }
 .paperBar { display:flex; align-items:center; gap:16px; margin-bottom:8px; }
 .paperTitle { flex:1; font-family:var(--learn-font-data); font-size:16px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; }
 .playing { display:inline-flex; align-items:center; gap:8px; font-family:var(--learn-font-data); font-size:16px; letter-spacing:.08em; text-transform:uppercase; }

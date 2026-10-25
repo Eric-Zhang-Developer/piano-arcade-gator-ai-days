@@ -27,7 +27,8 @@ function Staff({ phrase }: { phrase: Phrase }) {
     <text x="63" y="92" fontSize="20" fill="currentColor">4</text>
     {[0, 1, 2].map(i => <line key={i} x1={90 + i * 275} x2={90 + i * 275} y1="50" y2="98" stroke="currentColor" />)}
     {notes.map(n => {
-      const x = 110 + n.beat * 65;
+      // Each bar's first note sits clear of the bar line before it, as bar 1's does after the clef line.
+      const x = 110 + n.beat * 65 + Math.floor(n.beat / 4) * 15;
       const y = 98 - pitchSteps[n.pitch] * 6;
       return <g key={n.id}>
         {n.pitch === 60 && <line x1={x - 11} x2={x + 11} y1={110} y2={110} stroke="currentColor" />}

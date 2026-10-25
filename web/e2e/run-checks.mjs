@@ -38,7 +38,7 @@ export const KNOWN_RED = {
   "web/src/game/results-landing/verify-landing.mjs": 754, // `results` of undefined: drift since #978 (PR run 40194634606)
   "web/src/game/sheet-beams/verify-beams.mjs": 1053, // the paper's darker hues (#730)
   "web/src/game/song-finder/verify-finder.mjs": 754, // focus on BODY after the reload (#1074 and #1124 runs)
-  "web/src/game/song-options/verify-options.mjs": 754, // hands-R times out after a take, under repro
+  "web/src/game/song-options/verify-options.mjs": 1066, // a focus before hydration is lost (the check races song-finder)
   "web/src/game/take-graph/verify-take-graph.mjs": 1032, // the +60 ms late bot (#859), the graph across its card (#839)
   "web/src/game/wait-mode/verify-wait.mjs": 1034, // the Flow rung read mid-take (#841)
   "web/src/game/watch-demo/verify-watch.mjs": 1100, // AutoStart clicks the first button, not Start, since #763

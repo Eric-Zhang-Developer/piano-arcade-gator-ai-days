@@ -1,6 +1,7 @@
 // Wait HUD (spec: wait-hud): in wait mode the HUD band says LEARN and which note you're on, where plain mode shows
 // the counters and the score. hud draws the band and song card; this draws into it, and nothing in plain mode.
 import type { Frame, GameEvent, GamePlugin } from "../../contracts";
+import { noteTimeMs } from "../core/judge";
 import { hudLayout, hudSettings } from "../hud";
 import { cyan, whenDisplayFontReady } from "../ui-tokens";
 import { isWaitMode } from "../wait-mode";
@@ -8,6 +9,8 @@ import { isWaitMode } from "../wait-mode";
 export interface WaitHudState {
   N: number; // notes in the chart the judge gets (after hand-mode and bar-loop)
   hits: number;
+  times?: readonly number[]; // each note's chart time, for a rewind's recount
+  pausedAt?: number; // the last pause's chart time
 }
 
 // The note you're on: the next one to play, or the last once every note is hit.
@@ -16,6 +19,9 @@ export const noteOn = (s: WaitHudState) => Math.min(s.N, s.hits + 1);
 export function reduceWaitHud(s: WaitHudState, e: GameEvent): WaitHudState {
   if (e.type === "songStart") return { ...s, hits: 0 };
   if (e.type === "noteHit") return { ...s, hits: s.hits + 1 }; // a chord's notes count one each
+  if (e.type === "pause") return { ...s, pausedAt: e.atMs };
+  // A resume somewhere else is a rewind (wait mode's ← →): every note before its bar start counts as played.
+  if (e.type === "resume" && s.times && e.atMs !== s.pausedAt) return { ...s, hits: s.times.filter((t) => t < e.atMs - 1e-6).length };
   return s; // a WRONG, an extra or anything else changes nothing
 }
 
@@ -74,7 +80,7 @@ export function waitHud(): GamePlugin {
     id: "wait-hud",
     transformChart(chart, params) {
       wait = isWaitMode(params);
-      state = { N: chart.notes.length, hits: 0 };
+      state = { N: chart.notes.length, hits: 0, times: chart.notes.map((n) => noteTimeMs(chart, n)) };
       publish();
       return chart;
     },

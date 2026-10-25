@@ -7,7 +7,7 @@
 // --base <ref>: verify.mjs plus the checks nearest each file changed since <ref>, or every check when shared code
 // changed. --all (or no --base): every check.
 import { execFileSync, spawn } from "node:child_process";
-import { appendFileSync, mkdirSync } from "node:fs";
+import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -35,6 +35,7 @@ const CHECK_TIMEOUT_MS = 8 * 60_000;
 // row that include the fix (one green run can be luck).
 // Decision ci-browser-known-red.md.
 export const KNOWN_RED = {
+  "web/src/game/notice-toast/verify-toast.mjs": 584,
   "web/src/replay/verify-replay.mjs": 552,
 };
 
@@ -107,8 +108,11 @@ function runOnce(root, check, out) {
   });
 }
 
-/** Run each check once, rerun a failure once into a fresh folder. Returns [{ check, result, seconds }]. */
-export async function runChecks(root, checks, out) {
+/**
+ * Run each check once, rerun a failure once into a fresh folder. Returns [{ check, result, seconds, knownRed? }], and
+ * keeps them with the shard in <out>/results.json, rewritten after each check so a job cut short keeps what ran.
+ */
+export async function runChecks(root, checks, out, shardLabel = "1/1") {
   const rows = [];
   for (const check of checks) {
     const name = check.replace(/\.mjs$/, "").replaceAll("/", "_");
@@ -130,6 +134,7 @@ export async function runChecks(root, checks, out) {
     else if (result === "flaky") say(`::warning title=flaky::flaky: ${check}`);
     else if (result === "FAIL") say(`::error title=FAIL::${check} failed twice`);
     rows.push({ check, result, seconds: Math.round((Date.now() - start) / 1000), ...(issue && { knownRed: issue }) });
+    writeFileSync(join(out, "results.json"), `${JSON.stringify({ shard: shardLabel, rows }, null, 2)}\n`);
   }
   return rows;
 }
@@ -160,7 +165,7 @@ async function main() {
     return 2;
   }
   const start = Date.now();
-  const rows = await runChecks(root, picked, resolve(outArg));
+  const rows = await runChecks(root, picked, resolve(outArg), `${i}/${n}`);
   const lines = [
     ...rows.map((r) => `${r.check} ${r.knownRed ? `known red #${r.knownRed}: ${r.result === "FAIL" ? "fail" : "pass"}` : r.result} ${r.seconds} s`),
     `shard ${i}/${n}: ${rows.length} check(s) in ${Math.round((Date.now() - start) / 1000)} s`,

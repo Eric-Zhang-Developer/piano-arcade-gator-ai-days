@@ -7,7 +7,8 @@
 - **Display:** full screen from a button between takes. No controls show during a take, and with no take it shows
   a quiet waiting state.
 - **Plumbing:** it reads sheet-view's channel, which now also carries the judge's combo, milestones and full combo.
-- **The way in:** "Stage view ↗" on `/play`'s start screen. The nav bar doesn't cover `/stage`.
+- **The way in:** "Stage view ↗" on `/play`'s start screen. The nav bar doesn't cover `/stage`, so its waiting
+  state links back to the songs; its tab reads "Stage · Étude" and STAGE is its h1 (#1036, #1037).
 
 ## Where it lives
 - The page: `web/src/game/stage-view/` (`lane.ts`, `state.ts`, `draw.ts`, `StageView.tsx`, `plugin.tsx`) and
@@ -32,6 +33,6 @@
   channel. The button's click wasn't seen locally.
 - **Not seen by Eric** on a second display.
 - **Silent:** `/stage` plays no sound.
-- **No full-screen key yet:** a key needs a line on help-overlay's card, and #965 has `keys.ts` open. The button
-  covers it meanwhile.
+- **No full-screen key yet:** a key needs a line on help-overlay's card, and #965 has `keys.ts` open. Without a
+  mouse, Tab to the button and press Enter, or use the browser's own full screen (F11; Ctrl+Cmd+F on a Mac).
 - **Lab entry** comes after this note lands, per the spec.

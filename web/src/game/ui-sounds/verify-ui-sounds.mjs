@@ -71,7 +71,9 @@ const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 for (let i = 0; ; i++) {
   try {
-    await page.goto(`${base}/`);
+    // ?midi=off: no piano at all. Without it, laptop-sound's virtual "Portable Grand" plays song-preview's openings,
+    // starting each note's oscillators as it sounds, so they land inside a key's 100 ms window (spec: laptop-sound).
+    await page.goto(`${base}/?midi=off`);
     break;
   } catch (e) {
     if (i > 60) throw e;

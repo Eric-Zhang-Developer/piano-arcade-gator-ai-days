@@ -120,7 +120,7 @@ export function ByBar({ cells, per, run }: Pick<DuoTake, "cells" | "per" | "run"
   );
 }
 
-// Every hit's offset in 10 ms bins from −100 to +100 ms, a dashed zero line, and the mean as the caption.
+// Every hit's offset in 10 ms bins across the GOOD window (±rangeMs), a dashed zero line, and the mean as the caption.
 export function Timing({ timing }: Pick<DuoTake, "timing">) {
   const { bins, meanMs } = timing;
   const top = Math.max(1, ...bins);

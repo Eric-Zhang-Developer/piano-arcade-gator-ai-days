@@ -44,6 +44,9 @@ export function duoTake(chart: Chart, take: Take, results: Results, params: URLS
 }
 type DuoTake = NonNullable<ReturnType<typeof duoTake>>;
 
+// Labels scale with the window, so they stay legible at 1920 wide (visual-direction.md: readable on video).
+const label = "clamp(12px, 0.8vw, 17px)";
+const axis = "clamp(10px, 0.65vw, 14px)";
 const span = (r: { from: number; to: number }) => (r.from === r.to ? `BAR ${r.from}` : `BARS ${r.from}–${r.to}`);
 const head: CSSProperties = { display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 };
 const frame: CSSProperties = { boxSizing: "border-box", height: "100%", padding: "14px 18px 12px", textAlign: "left" };
@@ -57,7 +60,7 @@ export function ByBar({ cells, per, run }: Pick<DuoTake, "cells" | "per" | "run"
     <Panel style={frame}>
       <div data-testid="duo-by-bar" style={{ display: "flex", flexDirection: "column", gap: 10, height: "100%" }}>
         <div style={head}>
-          <MonoLabel>BY BAR{per > 1 ? ` · ${per} BARS A CELL` : ""}</MonoLabel>
+          <MonoLabel style={{ fontSize: label }}>BY BAR{per > 1 ? ` · ${per} BARS A CELL` : ""}</MonoLabel>
         </div>
         <div
           style={{
@@ -65,7 +68,7 @@ export function ByBar({ cells, per, run }: Pick<DuoTake, "cells" | "per" | "run"
             minHeight: 56,
             display: "grid",
             gridTemplateColumns: `repeat(${cells.length}, minmax(0, 1fr))`,
-            gridTemplateRows: "18px 1fr",
+            gridTemplateRows: "clamp(18px, 1.3vw, 26px) 1fr",
             columnGap: 3,
           }}
         >
@@ -93,11 +96,14 @@ export function ByBar({ cells, per, run }: Pick<DuoTake, "cells" | "per" | "run"
             </div>
           ))}
           {run && (
-            <Brackets
-              style={{ gridRow: "1 / 3", gridColumn: `${at(run.from)} / ${at(run.to) + 1}`, padding: 0, margin: "0 -4px -4px" }}
-            >
-              <span data-testid="duo-run" data-from={run.from} data-to={run.to} style={{ display: "block", textAlign: "center" }}>
-                <MonoLabel dim={false} style={{ color: "var(--pa-primary)", fontSize: 11, whiteSpace: "nowrap" }}>
+            <Brackets style={{ gridRow: 2, gridColumn: `${at(run.from)} / ${at(run.to) + 1}`, padding: 0, margin: -4 }}>
+              <span
+                data-testid="duo-run"
+                data-from={run.from}
+                data-to={run.to}
+                style={{ position: "absolute", bottom: "100%", left: "50%", transform: "translateX(-50%)", marginBottom: 6 }}
+              >
+                <MonoLabel dim={false} style={{ color: "var(--pa-primary)", fontSize: axis, whiteSpace: "nowrap" }}>
                   {span(run)}
                 </MonoLabel>
               </span>
@@ -105,8 +111,8 @@ export function ByBar({ cells, per, run }: Pick<DuoTake, "cells" | "per" | "run"
           )}
         </div>
         <div style={head}>
-          <MonoLabel style={{ fontSize: 10 }}>BAR 1</MonoLabel>
-          <MonoLabel style={{ fontSize: 10 }}>BAR {cells.at(-1)?.to}</MonoLabel>
+          <MonoLabel style={{ fontSize: axis }}>BAR 1</MonoLabel>
+          <MonoLabel style={{ fontSize: axis }}>BAR {cells.at(-1)?.to}</MonoLabel>
         </div>
       </div>
     </Panel>
@@ -121,10 +127,10 @@ export function Timing({ timing }: Pick<DuoTake, "timing">) {
   return (
     <Panel style={frame}>
       <div data-testid="duo-timing" style={{ display: "flex", flexDirection: "column", gap: 10, height: "100%" }}>
-        <MonoLabel>
+        <MonoLabel style={{ fontSize: label }}>
           TIMING · <span data-testid="duo-timing-caption">{timingCaption(meanMs)}</span>
         </MonoLabel>
-        <svg viewBox="0 0 100 50" preserveAspectRatio="none" style={{ flex: 1, minHeight: 56, width: "100%" }} aria-hidden>
+        <svg viewBox="0 0 100 50" preserveAspectRatio="none" style={{ flex: "1 1 0", minHeight: 56, height: 0, width: "100%" }} aria-hidden>
           <line x1="0" x2="100" y1="49.5" y2="49.5" stroke="var(--pa-line)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
           {bins.map((n, i) => (
             <rect key={i} data-testid="duo-bin" data-count={n} x={i * w + w * 0.15} width={w * 0.7} y={50 - (n / top) * 46} height={(n / top) * 46} fill="var(--pa-primary)" />
@@ -132,9 +138,9 @@ export function Timing({ timing }: Pick<DuoTake, "timing">) {
           <line x1="50" x2="50" y1="0" y2="50" stroke="var(--pa-ink-dim)" strokeWidth="1" strokeDasharray="3 3" vectorEffect="non-scaling-stroke" />
         </svg>
         <div style={head}>
-          <MonoLabel style={{ fontSize: 10 }}>−{duoResultsSettings.rangeMs} MS EARLY</MonoLabel>
-          <MonoLabel style={{ fontSize: 10 }}>0</MonoLabel>
-          <MonoLabel style={{ fontSize: 10 }}>LATE +{duoResultsSettings.rangeMs} MS</MonoLabel>
+          <MonoLabel style={{ fontSize: axis }}>−{duoResultsSettings.rangeMs} MS EARLY</MonoLabel>
+          <MonoLabel style={{ fontSize: axis }}>0</MonoLabel>
+          <MonoLabel style={{ fontSize: axis }}>LATE +{duoResultsSettings.rangeMs} MS</MonoLabel>
         </div>
       </div>
     </Panel>
@@ -159,9 +165,9 @@ export function Tutor({ d, chart, params }: { d: DuoTake; chart: Chart; params: 
   return (
     <div data-testid="duo-tutor" style={{ display: "flex", alignItems: "center", gap: 20, textAlign: "left" }}>
       {/* eslint-disable-next-line @next/next/no-img-element -- a fixed 240 px avatar from public/, nothing to optimize */}
-      <img src={duoPanelSettings.gator} alt="The tutor, a gator" width={72} height={72} style={{ flexShrink: 0 }} />
+      <img src={duoPanelSettings.gator} alt="The tutor, a gator" width={72} height={72} style={{ flexShrink: 0, width: "clamp(72px, 5.5vw, 120px)", height: "auto" }} />
       <div style={{ alignSelf: "stretch", width: 1, background: "var(--pa-secondary)" }} />
-      <div style={{ flex: 1, minWidth: 0, fontSize: "clamp(16px, 1.25vw, 28px)", lineHeight: 1.35 }}>
+      <div style={{ flex: 1, minWidth: 0, fontSize: "clamp(16px, 1.25vw, 28px)", lineHeight: 1.35, textWrap: "pretty" }}>
         <p data-testid="duo-tutor-line" style={{ margin: 0, color: "var(--pa-ink)" }}>
           {lines[0]}
         </p>
@@ -176,7 +182,7 @@ export function Tutor({ d, chart, params }: { d: DuoTake; chart: Chart; params: 
 
 function Bands({ d }: { d: DuoTake }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.7fr) minmax(0, 1fr)", gap: 16, minHeight: "clamp(130px, 22vh, 240px)" }}>
+    <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.7fr) minmax(0, 1fr)", gap: 16, height: "clamp(150px, 27vh, 320px)" }}>
       <ByBar cells={d.cells} per={d.per} run={d.run} />
       <Timing timing={d.timing} />
     </div>

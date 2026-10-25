@@ -28,6 +28,22 @@ export const mixSettings = {
   compressor: { threshold: -20, knee: 12, ratio: 4, attack: 0.003, release: 0.25 },
 };
 
+// The effects' way out: a gain (the Effects volume) into the bus and the compressor. The Lab's sound board uses it too.
+export function mixInto(ctx: AudioContext): GainNode {
+  const c = mixSettings.compressor;
+  const comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = c.threshold;
+  comp.knee.value = c.knee;
+  comp.ratio.value = c.ratio;
+  comp.attack.value = c.attack;
+  comp.release.value = c.release;
+  const bus = ctx.createGain();
+  bus.gain.value = mixSettings.busGain;
+  const head = ctx.createGain();
+  head.connect(bus).connect(comp).connect(ctx.destination);
+  return head;
+}
+
 // The last miss cue's chart time, so a run of misses makes at most one cue per missGapMs (miss-moment). One per take.
 export type MissGate = { lastMissMs: number };
 export const missGate = (): MissGate => ({ lastMissMs: -Infinity });
@@ -220,19 +236,7 @@ export function eventSounds(): GamePlugin {
         try {
           audio ??= new AudioContext(); // songStart comes from the Start press, so Chrome lets audio start
           void audio.resume().catch(() => {});
-          if (!master) {
-            const c = mixSettings.compressor;
-            const comp = audio.createDynamicsCompressor();
-            comp.threshold.value = c.threshold;
-            comp.knee.value = c.knee;
-            comp.ratio.value = c.ratio;
-            comp.attack.value = c.attack;
-            comp.release.value = c.release;
-            const bus = audio.createGain();
-            bus.gain.value = mixSettings.busGain;
-            master = audio.createGain();
-            master.connect(bus).connect(comp).connect(audio.destination);
-          }
+          master ??= mixInto(audio);
           master.gain.value = gainFor(getPrefs());
         } catch {
           audio = null;

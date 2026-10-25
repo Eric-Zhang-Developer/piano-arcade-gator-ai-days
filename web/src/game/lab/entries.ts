@@ -160,6 +160,13 @@ export const labGroups: LabGroup[] = [
         href: "/calibrate",
         open: "/calibrate",
       },
+      {
+        slug: "milestone-sfx",
+        name: "Sound board",
+        description: "every milestone sound on one page, one button each and Play all, through the game's mix and your Effects volume",
+        href: "/lab/sounds",
+        open: "/lab/sounds",
+      },
     ],
   },
   {

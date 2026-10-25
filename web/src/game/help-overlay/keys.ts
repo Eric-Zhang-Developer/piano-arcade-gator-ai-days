@@ -36,6 +36,7 @@ export const helpGroups: HelpGroup[] = [
       { keys: ["↑", "↓"], what: "choose a song", source: [SELECT], match: ["ArrowUp", "ArrowDown"] },
       { keys: ["Enter"], what: "play it" },
       { keys: ["L"], what: "learn it: the song waits for each note", source: [SELECT] },
+      { keys: ["P"], what: "practice it: narrows onto the bars you miss", source: [SELECT], match: ["p"] },
       { keys: ["W"], what: "watch it: the perfect bot plays it", source: [SELECT] }, // through watch-demo's isWatchKey (#580)
       { keys: ["H"], what: "Hands: both, right or left", source: [SONG_OPTIONS], match: ["h"] },
       { keys: ["←", "→"], what: "Speed: slower or faster", source: [SONG_OPTIONS], match: ["ArrowLeft", "ArrowRight"] },

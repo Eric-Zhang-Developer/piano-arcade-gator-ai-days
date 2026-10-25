@@ -10,6 +10,7 @@ const charts: Chart[] = readdirSync(songs)
   .filter((d) => d !== "local")
   .map((d) => JSON.parse(readFileSync(new URL(`${d}/chart.json`, songs), "utf8")));
 const byId = (id: string) => charts.find((c) => c.id === id)!;
+const S = DIVISIONS / 4; // a 16th
 
 // ---------- a small tag reader (no dependency) ----------
 
@@ -67,9 +68,9 @@ function readBack(xml: string) {
   let barLen = 0;
   measures.forEach((m, b) => {
     const attrs = kid(m, "attributes");
-    if (attrs) {
+    const t = attrs && kid(attrs, "time"); // a later bar's attributes are only a clef change
+    if (attrs && t) {
       divisions = num(kid(attrs, "divisions"));
-      const t = kid(attrs, "time")!;
       barLen = (divisions * 4 * num(kid(t, "beats"))) / num(kid(t, "beat-type"));
     }
     const start = b === 0 && m.attrs.implicit === "yes" ? barLen - firstVoiceLength(m) : b * barLen;
@@ -231,7 +232,7 @@ describe("fixed cases", () => {
     const c = synthetic({ notes: [{ id: "a", pitch: 60, beat: 3.5, duration: 1.25, hand: "R" }] });
     const xml = chartToMusicXml(c);
     expect((xml.match(/<tie type="start"\/>/g) ?? []).length).toBeGreaterThan(0);
-    expect(readBack(xml).notes).toEqual([{ staff: 1, onset: 14, end: 19, pitch: 60 }]);
+    expect(readBack(xml).notes).toEqual([{ staff: 1, onset: 14 * S, end: 19 * S, pitch: 60 }]);
   });
 
   it("a title with & < > is escaped and well formed", () => {
@@ -252,11 +253,11 @@ describe("pickups (sheet-pickups)", () => {
     ["fur-elise", 2],
     ["maple-leaf-rag", 2],
     ["nocturne-op9-2", 2],
-  ] as const)("%s prints its pickup as an implicit bar 0 of %i divisions, then bar 1", (id, len) => {
+  ] as const)("%s prints its pickup as an implicit bar 0 of %i 16ths, then bar 1", (id, sixteenths) => {
     const [zero, one] = firstBars(byId(id));
-    expect(zero).toEqual({ number: "0", implicit: "yes", len });
+    expect(zero).toEqual({ number: "0", implicit: "yes", len: sixteenths * S });
     expect(one).toMatchObject({ number: "1", implicit: undefined });
-    expect(pickupBeats(byId(id)) * DIVISIONS).toBe(len);
+    expect(pickupBeats(byId(id)) * DIVISIONS).toBe(sixteenths * S);
   });
 
   it("every other chart opens on bar 1, as before", () => {
@@ -278,7 +279,7 @@ describe("pickups (sheet-pickups)", () => {
   it("Für Elise's left hand alone (?hands=L) keeps bar 0", () => {
     const song = byId("fur-elise");
     const left = { ...song, notes: song.notes.filter((n) => n.hand === "L") };
-    expect(firstBars(left, song)[0]).toEqual({ number: "0", implicit: "yes", len: 2 });
+    expect(firstBars(left, song)[0]).toEqual({ number: "0", implicit: "yes", len: 2 * S });
   });
 
   it("a part of the song with a note before the pickup (a loop shifted to beat 0) has no bar 0", () => {

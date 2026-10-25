@@ -1,7 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Chart, Judgment } from "../../contracts";
 import { drawHighway, makeLayout, notePolish, type HighwayState } from "./highway";
 import { settings } from "./settings";
+import { SpriteCache, css, rgb } from "../note-material";
 
 // key-polish's draw math in the highway: a released key's light fades, a held note feeds into its key, and a note
 // glows as it nears the line.
@@ -52,7 +53,7 @@ describe("a held note (key-polish)", () => {
   const noteFills = (s: Partial<HighwayState>) => {
     const { ctx, fills } = recorder();
     drawHighway(ctx, L, chart, state({ noteState: hit, ...s }));
-    return solid(fills, settings.noteColor).length;
+    return solid(fills, css(rgb(settings.noteColor))).length; // note-material fills the body as rgba(), the same color
   };
 
   it("feeds into its key while the key is held, and is consumed once it's let go or over", () => {
@@ -63,15 +64,40 @@ describe("a held note (key-polish)", () => {
 });
 
 describe("a note's glow near the line (key-polish)", () => {
-  const blur = (nowMs: number) => {
-    const { ctx, fills } = recorder();
+  // note-material draws the glow as a pre-blurred sprite under the body, at an alpha that grows toward the line, in
+  // place of a per-note shadowBlur. node has no canvas, so a stub surface stands in for the sprite.
+  const get = SpriteCache.prototype.get; // the real one, taken before any spy wraps it
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+  // Every property, call and write accepted: other layers build their own offscreen caches through the same stub.
+  const anything: unknown = new Proxy(function () {}, { get: () => anything, apply: () => anything, set: () => true });
+  const bloom = (nowMs: number) => {
+    vi.stubGlobal("OffscreenCanvas", class {
+      constructor(public width: number, public height: number) {}
+      getContext = () => anything; // a sprite that draws nothing: only its draw onto the highway is counted
+    });
+    // only the bloom's own sprites count: other layers draw offscreen caches too
+    const sprites = new Set<unknown>();
+    vi.spyOn(SpriteCache.prototype, "get").mockImplementation(function (this: SpriteCache, ...a) {
+      const made = get.apply(this, a);
+      sprites.add(made);
+      return made;
+    });
+    const alphas: number[] = [];
+    const t: Record<string | symbol, unknown> = { globalAlpha: 1 };
+    const ctx = new Proxy(t, {
+      get: (o, k) => (k in o ? o[k] : k === "drawImage" ? (img: unknown) => sprites.has(img) && alphas.push(Number(o.globalAlpha)) : () => ({ width: 0, addColorStop() {} })),
+      set: (o, k, v) => ((o[k] = v), true),
+    }) as unknown as CanvasRenderingContext2D;
     drawHighway(ctx, L, chart, state({ nowMs }));
-    return Math.max(...solid(fills, settings.noteColor).map((f) => Number(f.split(" ")[1])));
+    return Math.max(0, ...alphas);
   };
 
-  it("is none until glowMs out, then grows to glowPx at the line", () => {
-    expect(blur(-notePolish.glowMs - 100)).toBe(0);
-    expect(blur(-notePolish.glowMs / 2)).toBeCloseTo(notePolish.glowPx / 2, 5);
-    expect(blur(0)).toBe(notePolish.glowPx);
+  it("is none until glowMs out, then grows to full at the line", () => {
+    expect(bloom(-notePolish.glowMs - 100)).toBe(0);
+    expect(bloom(-notePolish.glowMs / 2)).toBeCloseTo(bloom(0) / 2, 5);
+    expect(bloom(0)).toBeCloseTo(0.9, 5); // the sprite's full alpha (note-material)
   });
 });

@@ -8,8 +8,9 @@ import { meterLayout } from "../fever-gauge";
 import { whiteIndex as whiteIndexOf, type Range } from "../highway-zoom";
 import { drawBlackKey, drawWhiteKey } from "../key-skin";
 import { brightness, pillRect } from "../note-pills";
+import { SpriteCache, bodyColor, drawChordHairlines, drawNote, lod, materialSettings, mix, type LeadingEnd } from "../note-material";
 import { canvasFonts, kitSettings } from "../duo-tokens";
-import { flare, gold, good, ink, miss, primary, secondary, wrong } from "../ui-tokens";
+import { bg, flare, gold, good, ink, miss, primary, secondary, wrong } from "../ui-tokens";
 import { staticRange, type KeyRange } from "./range";
 import { msPerBeat, settings } from "./settings";
 
@@ -130,23 +131,8 @@ export function makeLayout(
   };
 }
 
-// A rounded quad from x-range [x0, x1] (at the line) between yTop and yBottom, through the perspective. Fills it
-// unless fill is false (the path is left for a clip).
-function bar(ctx: CanvasRenderingContext2D, L: Layout, x0: number, x1: number, yTop: number, yBottom: number, radius = 6, fill = true) {
-  const r = Math.min(radius, (x1 - x0) / 3, (yBottom - yTop) / 2);
-  const tl = L.project(x0, yTop), tr = L.project(x1, yTop);
-  const bl = L.project(x0, yBottom), br = L.project(x1, yBottom);
-  ctx.beginPath();
-  ctx.moveTo((tl + tr) / 2, yTop);
-  ctx.arcTo(tr, yTop, br, yBottom, r);
-  ctx.arcTo(br, yBottom, bl, yBottom, r);
-  ctx.arcTo(bl, yBottom, tl, yTop, r);
-  ctx.arcTo(tl, yTop, tr, yTop, r);
-  ctx.closePath();
-  if (fill) ctx.fill();
-}
-
 // key-polish: the notes' body and glow, and the keys' release.
+const sprites = new SpriteCache(); // note-material's bloom, shared by every canvas
 export const notePolish = {
   glowMs: 400, // a note starts to glow this long before it lands
   glowPx: 18, // its glow at the line
@@ -202,6 +188,9 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
   ctx.beginPath();
   ctx.rect(0, 0, L.width, line);
   ctx.clip();
+  // note-material: the visible notes first, so the level of detail knows how dense the screen is and chords share a
+  // hairline; then each note's material in one drawNote call.
+  const shown: { n: (typeof chart.notes)[number]; state: Judgment | undefined; held: boolean; startMs: number; top: number; bottom: number }[] = [];
   for (const n of chart.notes) {
     const state = s.noteState.get(n.id);
     const startMs = n.beat * beatMs;
@@ -212,53 +201,28 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
     const yBottom = held ? line : line - (startMs - s.nowMs) * pxPerMs;
     const yTop = line - (endMs - s.nowMs) * pxPerMs;
     if (yBottom < 0 || yTop > line) continue;
-    // A pill sized to its key (note-pills), dim far from the line and full brightness at it. Dimmed by alpha over a
-    // black underlay, so the hand's color stays exact and a background layer never shows through a far note.
-    const pill = pillRect(L.keyX(n.pitch), L.isBlack(n.pitch));
-    const x1 = pill.x;
-    const x2 = pill.x + pill.width;
     const top = held ? yTop + settings.noteGapPx : Math.min(yTop + settings.noteGapPx, yBottom - settings.noteHeadPx * 2);
     if (top >= yBottom - 2) continue; // a held note's last sliver
-    const toHit = startMs - s.nowMs;
-    const b = state === "MISS" || held ? 1 : brightness(toHit, settings.lookaheadMs);
-    if (b < 1) {
-      ctx.fillStyle = "#000";
-      bar(ctx, L, x1, x2, top, yBottom - 1, pill.radius);
-      ctx.globalAlpha = b;
-    }
-    const hue = state === "MISS" ? settings.missColor : color(n.hand);
-    ctx.fillStyle = hue;
-    // The next notes to land glow in their hand's color, more as they near the line (key-polish).
-    const near = state === "MISS" ? 0 : held ? notePolish.heldGlow : 1 - Math.min(1, Math.max(0, toHit) / notePolish.glowMs);
-    if (near > 0) {
-      ctx.shadowColor = hue;
-      ctx.shadowBlur = notePolish.glowPx * near;
-    }
-    bar(ctx, L, x1, x2, top, yBottom - 1, pill.radius);
-    ctx.shadowBlur = 0;
-    if (state !== "MISS") {
-      // Inside the pill: a body that lifts toward its leading end (a long note reads as one sustained stroke), a fine
-      // light rim, and the white-hot head, soft rather than a hard line.
-      ctx.save();
-      ctx.clip();
-      const lift = ctx.createLinearGradient(0, top, 0, yBottom);
-      lift.addColorStop(0, "rgba(255,255,255,0)");
-      lift.addColorStop(1, `rgba(255,255,255,${notePolish.lift})`);
-      ctx.fillStyle = lift;
-      ctx.fillRect(0, top, L.width, yBottom - top);
-      ctx.strokeStyle = notePolish.rim; // the clip keeps the inner half: a fine light rim, as on glass
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      const headPx = settings.noteHeadPx * 1.6;
-      const head = ctx.createLinearGradient(0, yBottom - 1 - headPx, 0, yBottom - 1);
-      head.addColorStop(0, "rgba(255,255,255,0)");
-      head.addColorStop(1, settings.noteHeadColor);
-      ctx.fillStyle = head;
-      ctx.fillRect(0, yBottom - 1 - headPx, L.width, headPx);
-      ctx.restore();
-    }
-    ctx.globalAlpha = 1;
+    shown.push({ n, state, held, startMs, top, bottom: yBottom - 1 });
   }
+  const detail = lod(shown.length);
+  const ratio = ctx.getTransform?.().a || 1;
+  const reduced = reducedMotion();
+  const ends: LeadingEnd[] = [];
+  for (const { n, state, held, startMs, top, bottom } of shown) {
+    const pill = pillRect(L.keyX(n.pitch), L.isBlack(n.pitch)); // a pill sized to its key (note-pills)
+    const toHit = startMs - s.nowMs;
+    const b = held ? 1 : brightness(toHit, settings.lookaheadMs);
+    const hand = color(n.hand);
+    const isBlack = L.isBlack(n.pitch);
+    drawNote(ctx, L, pill, {
+      top, bottom, hand, isBlack, brightness: b, msToHit: toHit, held, miss: state === "MISS", missColor: settings.missColor,
+      long: n.duration >= materialSettings.longBeats, beatMs, pxPerMs, headPx: settings.noteHeadPx * 1.6,
+      glowMs: notePolish.glowMs, heldGlow: notePolish.heldGlow, field: bg, pixelRatio: ratio, detail, reduced,
+    }, s.nowMs, sprites);
+    if (!held && state !== "MISS") ends.push({ startMs, x0: pill.x, x1: pill.x + pill.width, y: bottom, body: mix([0, 0, 0], bodyColor(hand, isBlack), b), hand: n.hand });
+  }
+  drawChordHairlines(ctx, L, ends, bg, ratio);
   ctx.restore();
 
   // Keyboard (key-skin): whites, pressed whites (so their glow lies over their neighbours), then blacks on top. Its

@@ -40,7 +40,9 @@ import { demoReset } from "./demo-reset";
 import { versus } from "./versus";
 import { takeMidi } from "./take-midi";
 import { waitMode } from "./wait-mode/plugin";
+import { rewind } from "./rewind";
 import { waitHint } from "./wait-hint";
+import { scoreCard } from "./score-card";
 import { sheetView } from "./sheet-view/plugin";
 import { leds } from "./leds";
 import { createSavePlugin, queueAndSend } from "../data/save-plugin";
@@ -50,6 +52,7 @@ import { crashGuard } from "./crash-guard";
 // own canvas above the highway, forwards every GameEvent, and applies transformChart and wrapInput in this order.
 export const plugins: GamePlugin[] = [
   easyCharts(), // ?level=easy: first, so every later plugin (chunks, loops, hands, bots, the judge) sees the Easy chart
+  scoreCard(), // results panel: Save card, the take as a PNG; before bar-loop, so it keeps the song's own title
   chunkPractice(), // before bar-loop, so it sees the whole chart to cut into chunks (returns it unchanged)
   barLoop(), // first: every later plugin (the sim's bot included) sees the looped chart
   handMode(), // ?hands=R|L: before scenes and the sim, so their bots and the judge get only the played hand
@@ -71,6 +74,7 @@ export const plugins: GamePlugin[] = [
   beatTrack(),
   midiWatchdog(), // reconnects a piano that goes silent mid-song
   waitMode(), // start panel: Learn it first; results panel after a wait-mode take: Play it judged, on top
+  rewind(), // wait mode's start panel: ← → back or ahead a bar, under wait mode's line
   records(), // results panel: initials and the top 5, first under the score (a NEW RECORD take's entry is record-moment's)
   recordMoment(), // results panel: NEW RECORD stamps after the rank, with the high-score entry; after records, which sets the outcome
   dynamics(), // results panel: how loud you played against the score, above "Replay on piano"

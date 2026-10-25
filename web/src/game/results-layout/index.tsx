@@ -11,9 +11,10 @@ import styles from "./results-layout.module.css";
 
 export const resultsLayoutSettings = {
   featured: ["record-moment", "take-graph"], // panels in the first view, under the counts (record-moment: NEW RECORD takes only)
-  practiceFeatured: ["chunk-practice"], // a practice=1 take: chunk practice's way on in place of the graph (#294)
+  practiceFeatured: ["chunk-practice"], // a practice=1 or =adapt take: chunk practice's way on in place of the graph (#294)
   newRecordFeatured: ["record-moment"], // a NEW RECORD take: the moment alone; at 1280×720 the graph pushed Retry off
   // the first view, so it moves to the details for that take (spec: record-moment, First view)
+  demoFeatured: ["watch-demo"], // a demo=1 take: its way back to the songs, so its focused button scrolls nothing
   actions: ["piano-out", "wait-mode"], // panels that are buttons: they join Retry and Songs
   names: { "take-midi": "MIDI", "replay-view": "Replay", "weak-bars": "Phrases", "tempo-curve": "Tempo" } as Record<string, string>,
 };
@@ -24,13 +25,16 @@ export function panelName(id: string): string {
   return name[0].toUpperCase() + name.slice(1);
 }
 
-// The first view's panels for this take: on a chunk-practice step, Next or "Learn again" with the rank.
+// The first view's panels for this take: on a chunk-practice step (the fixed walk, or adaptive-chunks'), its way on
+// with the rank.
 export const featuredFor = (params: URLSearchParams, newRecord = false) =>
-  params.get("practice") === "1"
+  ["1", "adapt"].includes(params.get("practice") ?? "")
     ? resultsLayoutSettings.practiceFeatured
-    : newRecord
-      ? resultsLayoutSettings.newRecordFeatured
-      : resultsLayoutSettings.featured;
+    : params.get("demo") === "1"
+      ? resultsLayoutSettings.demoFeatured
+      : newRecord
+        ? resultsLayoutSettings.newRecordFeatured
+        : resultsLayoutSettings.featured;
 
 export function countRows(results: Results): { label: string; id: string; value: number; tone: string }[] {
   const { counts } = results;

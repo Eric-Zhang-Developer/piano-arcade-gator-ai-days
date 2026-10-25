@@ -20,7 +20,7 @@ import { Slots } from "../../game/play-slots/ui";
 import { PauseMenu } from "../../game/pause-skin";
 import { ResultsLayout } from "../../game/results-layout";
 import { emptyHud, reduceHud } from "../../game/hud";
-import { holdClock, isWaitMode } from "../../game/wait-mode";
+import { barStep, holdClock, isWaitMode } from "../../game/wait-mode";
 import {
   GOOD_MS,
   LATENCY_MAX,
@@ -235,6 +235,15 @@ export default function Play() {
     let mode: PauseMode = "playing";
     let countdownUntil = 0; // wall time the resume countdown ends
     let shownCount = 0;
+    // Held keys end at a pause: their releases arrive while paused, where input is ignored.
+    const endHeld = (at: number) => {
+      for (const pitch of hw.pressed) {
+        const ev = take.events.findLast((x) => x.pitch === pitch && x.offTimeMs === null);
+        if (ev) ev.offTimeMs = at - latencyRef.current;
+      }
+      hw.pressed.clear();
+      hw.pressedHand!.clear();
+    };
     // Pause, Resume, Retry and Quit (play-slots). Esc and the menu's buttons both come here.
     const act = (a: PauseAction) => {
       const next = nextPause(mode, a);
@@ -244,13 +253,7 @@ export default function Play() {
         pauses.pause(perf);
         const at = clock.now(perf);
         emit({ type: "pause", atMs: at });
-        // Held keys end at the pause: their releases arrive while paused, where input is ignored.
-        for (const pitch of hw.pressed) {
-          const ev = take.events.findLast((x) => x.pitch === pitch && x.offTimeMs === null);
-          if (ev) ev.offTimeMs = at - latencyRef.current;
-        }
-        hw.pressed.clear();
-        hw.pressedHand!.clear();
+        endHeld(at);
       }
       if (next === "countdown") {
         countdownUntil = perf + chart.beatsPerBar * mpb;
@@ -275,6 +278,26 @@ export default function Play() {
       act("esc");
     };
     if (!test) window.addEventListener("keydown", onKey); // ?input=test never pauses
+    // rewind (wait mode): ← back to the bar before, → ahead to the next bar, while playing past the count-in. A pause and
+    // a resume at the bar start around it, so plugins re-anchor (the resume's atMs is the target). Works with input=test.
+    const rewind = (dir: -1 | 1) => {
+      const perf = performance.now();
+      const at = clock.now(perf);
+      if (!wait || mode !== "playing" || done || at < 0) return;
+      const target = barStep(hw.barLines?.map((b) => b.atMs) ?? [], at, dir);
+      if (target === null) return;
+      emit({ type: "pause", atMs: at });
+      endHeld(at);
+      if (dir < 0) judge.rewind(target);
+      wait.seek(target, pauses.now(perf));
+      emit({ type: "resume", atMs: target });
+    };
+    const onArrow = (e: KeyboardEvent) => {
+      if ((e.key !== "ArrowLeft" && e.key !== "ArrowRight") || e.repeat || e.shiftKey || e.ctrlKey || e.metaKey || e.altKey || !wait) return;
+      e.preventDefault();
+      rewind(e.key === "ArrowLeft" ? -1 : 1);
+    };
+    window.addEventListener("keydown", onArrow);
     // After the take, the background keeps animating behind the results screen until the next take or unmount.
     const idle = () => {
       if (background) guard.run(bgId, "background", () => background.frame({ ...layout!, nowMs: clock.now(performance.now()) }));
@@ -334,6 +357,7 @@ export default function Play() {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
       window.removeEventListener("keydown", onKey);
+      window.removeEventListener("keydown", onArrow);
       for (const d of devices) d.stop();
     }
     stopRef.current = () => {

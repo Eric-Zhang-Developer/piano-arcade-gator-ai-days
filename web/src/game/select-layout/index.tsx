@@ -16,6 +16,7 @@ import { SongJacket } from "../song-jacket/SongJacket";
 import { SelectStage } from "../select-stage";
 import { isLearnKey, learnUrl, SongPreview } from "../song-preview";
 import { useSongOptions, withOptions } from "../song-options";
+import { isWatchKey, watchUrl } from "../watch-demo/demo";
 import { uiSound } from "../ui-sounds";
 import type { Song } from "../song-select/load";
 import { goToStage } from "./go-to-stage";
@@ -62,6 +63,10 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
       e.preventDefault();
       return router.push(withOptions(withLevel(learnUrl(song.id), level), options[song.id]));
     }
+    if (isWatchKey(e) && song) {
+      e.preventDefault();
+      return router.push(watchUrl(song.id)); // watch-demo: the Normal chart, whatever the level (its spec's default)
+    }
     const step = e.key === "ArrowDown" ? 1 : e.key === "ArrowUp" ? -1 : 0;
     if (!step) return;
     e.preventDefault();
@@ -88,7 +93,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
       <header className={styles.top}>
         <h1 className={styles.wordmark}>Piano Arcade</h1>
         <p className={styles.hint}>
-          <b>↑ ↓</b> choose · <b>Enter</b> play · <b>L</b> learn · <b>E</b> easy
+          <b>↑ ↓</b> choose · <b>Enter</b> play · <b>L</b> learn · <b>W</b> watch · <b>E</b> easy
         </p>
       </header>
       <div className={styles.left}>

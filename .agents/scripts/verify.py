@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Run the project's verifier, so an agent sees its own change running instead of a person checking it by hand.
 
-  verify.py --slug map-data [--worktree PATH]
+  verify.py --slug map-data [--worktree PATH] [--cmd "<command>"]
 
 Runs [verify].command from .agents/config.toml in the worktree, shows its output, then prints one result line. Put
 that line under `## How to check it` in the done note:
@@ -11,6 +11,13 @@ that line under `## How to check it` in the done note:
 Placeholders: {slug}, {worktree}, and {out}, a fresh evidence folder for this run (screenshots, responses, logs)
 outside the repo's files, kept after the run. Everything the command started is stopped when it ends or times out
 ([verify].timeout seconds), so a server it launched can't leak into the next run.
+--cmd runs a feature check instead of [verify].command, with the same placeholders, timeout, cleanup and evidence.
+One headless check at a time per machine: every run first takes <git common dir>/verify.lock (a directory: mkdir
+takes it, rmdir frees it, the same lock as the shell loop `until mkdir "$L"; do ...; done`). The holder writes its pid
+to verify.lock/pid. While another run holds it, this one prints `verify: waiting for another check`; the wait doesn't
+count toward the timeout. A lock is taken over only when its pid is dead, or when it has no pid (a shell holder) and is
+older than LOCK_STALE_S. A live holder is never robbed, however long it runs: a hung check ends at its own timeout.
+(A shell loop's stale `rmdir "$L"` fails on a lock with a pid in it, so it can't rob verify.py either.)
 Exit codes: 0 pass or not set up, 1 fail, timeout or a broken command template, 2 usage.
 """
 
@@ -19,6 +26,8 @@ import shlex
 import signal
 import subprocess
 import sys
+import time
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -31,22 +40,81 @@ def evidence_dir(root: Path, slug: str) -> Path:
     return heartbeat_dir(root).parent / "agent-evidence" / slug / stamp
 
 
+LOCK_STALE_S = 600
+
+
+def holder_gone(lock: Path) -> bool:
+    """Whether the lock's holder has died without freeing it; see the module doc."""
+    try:
+        pid = int((lock / "pid").read_text())
+    except FileNotFoundError:
+        return time.time() - lock.stat().st_mtime > LOCK_STALE_S
+    except ValueError:
+        return False  # being written
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return True
+    except PermissionError:
+        pass  # alive, another user's
+    return False
+
+
+def free(lock: Path) -> None:
+    (lock / "pid").unlink(missing_ok=True)
+    lock.rmdir()
+
+
+@contextmanager
+def machine_lock(root: Path):
+    """Hold <git common dir>/verify.lock while the body runs; see the module doc."""
+    lock = heartbeat_dir(root).parent / "verify.lock"
+    waiting = False
+    while True:
+        try:
+            lock.mkdir()
+            (lock / "pid").write_text(str(os.getpid()))
+            break
+        except FileExistsError:
+            try:
+                if holder_gone(lock):
+                    free(lock)
+                    continue
+            except FileNotFoundError:
+                continue  # freed between mkdir and stat
+            except OSError:
+                pass  # another waiter took it over first
+            if not waiting:
+                print("verify: waiting for another check", flush=True)
+                waiting = True
+            time.sleep(5)
+    try:
+        yield
+    finally:
+        try:
+            free(lock)
+        except FileNotFoundError:
+            pass
+
+
 def run(command: str, cwd: Path, timeout: float) -> int | None:
     """Exit code, or None on timeout. The command gets its own process group, which is stopped afterwards."""
     posix = hasattr(os, "killpg")
     p = subprocess.Popen(command, shell=True, cwd=cwd, start_new_session=posix)
+    rc = None
     try:
         rc = p.wait(timeout=timeout)
     except subprocess.TimeoutExpired:
-        rc = None
-    if posix:  # stop anything it left running in the background (a dev server, a browser)
-        try:
-            os.killpg(p.pid, signal.SIGTERM)
-        except (ProcessLookupError, PermissionError):
-            pass
-    elif rc is None:
-        p.kill()
-    p.wait()
+        pass
+    finally:  # also when verify.py itself is stopped (SIGTERM, Ctrl-C)
+        if posix:  # stop anything it left running in the background (a dev server, a browser)
+            try:
+                os.killpg(p.pid, signal.SIGTERM)
+            except (ProcessLookupError, PermissionError):
+                pass
+        elif rc is None:
+            p.kill()
+        p.wait()
     return rc
 
 
@@ -54,13 +122,14 @@ def main(argv=None) -> int:
     ap = parser(__doc__)
     ap.add_argument("--slug", required=True, help="the feature being verified")
     ap.add_argument("--worktree", help="where to run it (default: the repo root)")
+    ap.add_argument("--cmd", help="a feature check to run instead of [verify].command (same placeholders)")
     args = ap.parse_args(argv)
     if err := slug_error(args.slug):
         print(f"verify: --slug {args.slug!r}: {err}")
         return 2
     root = root_from(args)
     cfg = load_config(root)["verify"]
-    template = str(cfg["command"]).strip()
+    template = (args.cmd or str(cfg["command"])).strip()
     if not template:
         print("verify: not set up ([verify].command is empty); the done note says `not verified`")
         return 0
@@ -77,7 +146,9 @@ def main(argv=None) -> int:
     sha = git(worktree, "rev-parse", "--short", "HEAD", check=False).strip() or "unknown commit"
     dirty = " (uncommitted changes)" if git(worktree, "status", "--porcelain", check=False).strip() else ""
     sys.stdout.flush()
-    rc = run(command, worktree, float(cfg["timeout"]))
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(143))  # so a SIGTERM still frees the lock
+    with machine_lock(root):
+        rc = run(command, worktree, float(cfg["timeout"]))
     result = "pass" if rc == 0 else f"FAIL (timed out after {cfg['timeout']}s)" if rc is None else f"FAIL (exit {rc})"
     kept = f" (evidence: {out})" if out else ""
     print(f"verify: `{command}` {result} at {sha}{dirty}{kept}")

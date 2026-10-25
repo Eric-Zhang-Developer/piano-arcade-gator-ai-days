@@ -23,8 +23,9 @@
 - **No fixed background:** the sky's top-edge glow scrolls with the page. A fixed background repaints on every
   scroll frame, a likely stutter in a capture.
 
-**Not yet judged.** Screenshots and taste v2's step-8 review come after the planner's quiet window (2026-10-24).
-Pass 2 happens only if that review leaves a top-three problem.
+**Judged below.** Screenshots and taste v2's step-8 review ran after the planner's quiet window (2026-10-24).
+Round 2's fixes stayed inside pass 1 (#607). **No pass 2:** the one remaining visible problem needs markup (#610),
+which a `style(veritas)` pass can't fix.
 
 **How to undo:** revert #607. The CSS before it is main's `veritas.module.css` at c6d5db0.
 

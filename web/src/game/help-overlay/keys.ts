@@ -154,5 +154,6 @@ export const unlisted: Record<string, string> = {
   "game/laptop-sound/index.ts": "starts the laptop's audio on the first key or pointer press; its notes are the laptop keys' lines: not a control",
   "game/ui-sounds/index.ts": "notes the page's first key or pointer press, after which UI sounds may play: not a control",
   "game/x/wet-paint/WetPaint.tsx": "/paint's own page, outside the game's card: its hint line says Space is the pedal; Z / X are laptop-octaves' shift",
+  "game/video-shots/Title.tsx": "the video's title card starts its motif on the laptop voice at the first key or pointer press: not a control",
   "game/x/speaking-piano/Speak.tsx": "/speak's own page, outside the game's card: Space or Enter held on its Hold to speak button records, as the pointer does",
 };

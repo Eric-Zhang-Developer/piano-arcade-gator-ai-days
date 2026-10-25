@@ -123,7 +123,7 @@ export const labGroups: LabGroup[] = [
       {
         slug: "piano-sim",
         name: "Piano sim",
-        description: '/sim shows the game, a virtual keyboard, a raw MIDI log, fault buttons, "Watch the bot"',
+        description: 'the game, a virtual keyboard, a raw MIDI log, fault buttons, "Watch the bot"',
         href: "/sim",
         open: "/sim",
       },

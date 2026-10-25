@@ -4,10 +4,11 @@ import type { Chart, ChartNote, Hand } from "../../contracts";
 import { keyMap } from "../core/input";
 import { difficulty } from "../difficulty/difficulty";
 import { easyChart, easyCharts, withLevel } from ".";
+import { LAB_ONLY } from "../song-select/load";
 
 const songsDir = new URL("../../../public/songs/", import.meta.url);
 const ids = readdirSync(songsDir, { withFileTypes: true })
-  .filter((d) => d.isDirectory() && d.name !== "local")
+  .filter((d) => d.isDirectory() && d.name !== "local" && !LAB_ONLY.includes(d.name))
   .map((d) => d.name);
 const song = (id: string): Chart => JSON.parse(readFileSync(new URL(`${id}/chart.json`, songsDir), "utf8"));
 const chart = (bpm: number, notes: [number, number, Hand?][]): Chart => ({

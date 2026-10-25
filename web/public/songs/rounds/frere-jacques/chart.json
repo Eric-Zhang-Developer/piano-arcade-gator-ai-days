@@ -1,0 +1,235 @@
+{
+ "id": "frere-jacques",
+ "title": "Frère Jacques",
+ "composer": "Traditional",
+ "catalog": "Round in four voices",
+ "source": "Wikipedia, \"Frère Jacques\" (https://en.wikipedia.org/w/index.php?title=Fr%C3%A8re_Jacques&oldid=1366602658), the article's LilyPond score, read 2026-10-25, CC BY-SA 4.0. Its MIDI score stacks the four 2-bar phrases (first to fourth) as the round's four voices; this chart is the melody, the phrases in order, each twice, in F major at the score's own tempo 4=102.",
+ "bpm": 102,
+ "beatsPerBar": 4,
+ "notes": [
+  {
+   "id": "n1",
+   "pitch": 65,
+   "beat": 0.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n2",
+   "pitch": 67,
+   "beat": 1.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n3",
+   "pitch": 69,
+   "beat": 2.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n4",
+   "pitch": 65,
+   "beat": 3.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n5",
+   "pitch": 65,
+   "beat": 4.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n6",
+   "pitch": 67,
+   "beat": 5.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n7",
+   "pitch": 69,
+   "beat": 6.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n8",
+   "pitch": 65,
+   "beat": 7.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n9",
+   "pitch": 69,
+   "beat": 8.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n10",
+   "pitch": 70,
+   "beat": 9.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n11",
+   "pitch": 72,
+   "beat": 10.0,
+   "duration": 2,
+   "hand": "R"
+  },
+  {
+   "id": "n12",
+   "pitch": 69,
+   "beat": 12.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n13",
+   "pitch": 70,
+   "beat": 13.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n14",
+   "pitch": 72,
+   "beat": 14.0,
+   "duration": 2,
+   "hand": "R"
+  },
+  {
+   "id": "n15",
+   "pitch": 72,
+   "beat": 16.0,
+   "duration": 0.5,
+   "hand": "R"
+  },
+  {
+   "id": "n16",
+   "pitch": 74,
+   "beat": 16.5,
+   "duration": 0.5,
+   "hand": "R"
+  },
+  {
+   "id": "n17",
+   "pitch": 72,
+   "beat": 17.0,
+   "duration": 0.5,
+   "hand": "R"
+  },
+  {
+   "id": "n18",
+   "pitch": 70,
+   "beat": 17.5,
+   "duration": 0.5,
+   "hand": "R"
+  },
+  {
+   "id": "n19",
+   "pitch": 69,
+   "beat": 18.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n20",
+   "pitch": 65,
+   "beat": 19.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n21",
+   "pitch": 72,
+   "beat": 20.0,
+   "duration": 0.5,
+   "hand": "R"
+  },
+  {
+   "id": "n22",
+   "pitch": 74,
+   "beat": 20.5,
+   "duration": 0.5,
+   "hand": "R"
+  },
+  {
+   "id": "n23",
+   "pitch": 72,
+   "beat": 21.0,
+   "duration": 0.5,
+   "hand": "R"
+  },
+  {
+   "id": "n24",
+   "pitch": 70,
+   "beat": 21.5,
+   "duration": 0.5,
+   "hand": "R"
+  },
+  {
+   "id": "n25",
+   "pitch": 69,
+   "beat": 22.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n26",
+   "pitch": 65,
+   "beat": 23.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n27",
+   "pitch": 65,
+   "beat": 24.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n28",
+   "pitch": 60,
+   "beat": 25.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n29",
+   "pitch": 65,
+   "beat": 26.0,
+   "duration": 2,
+   "hand": "R"
+  },
+  {
+   "id": "n30",
+   "pitch": 65,
+   "beat": 28.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n31",
+   "pitch": 60,
+   "beat": 29.0,
+   "duration": 1,
+   "hand": "R"
+  },
+  {
+   "id": "n32",
+   "pitch": 65,
+   "beat": 30.0,
+   "duration": 2,
+   "hand": "R"
+  }
+ ]
+}

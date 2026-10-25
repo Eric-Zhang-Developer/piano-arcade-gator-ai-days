@@ -64,14 +64,17 @@ choir aahs, picked by ear and logged). Only voice 1, you, is judged.
      from the pitch: strings, then flute or vibes, then choir aahs, as General MIDI numbers;
    - **the scheduler** sends only what falls inside the lookahead window (as beat-track does), so a Stop or a pause
      cancels what hasn't gone out yet.
-2. **The feedback trap:** the DGX echoes received MIDI back out (#429, cabinet: "verify-cabinet sees 0 piano echoes
-   from attract mode"). Core's `midiDevice` passes note-ons from every channel and carries no channel, so:
+2. **The feedback trap:** the piano-midi spike measured no echo at the DGX's default settings
+   (`spikes/piano-midi/RESULTS.md` R7; #429 is a headless CI check, not the piano). A changed panel setting could
+   still echo, and core's `midiDevice` passes note-ons from every channel and carries no channel, so guard anyway:
    - **channel filter:** the experiment opens its own read-only listener on the same MIDI input. `wrapInput` drops a
      note-on whose pitch and `timeStamp` match a message the listener saw on channels 2–16. The player's keyboard is
      channel 1; log it if the DGX sends on another;
-   - **echo guard:** hand-mode's `echoGuard` also drops a same-pitch note-on within a few ms of a scheduled echo
-     send. Keep the window to a few ms, not hand-mode's 30: a round puts the same pitch in two voices on
-     purpose, so a real press can land near an echo. Log the window;
+   - **echo guard, off by default:** hand-mode's `echoGuard` can also drop a note-on of the same pitch and velocity
+     within a few ms of a scheduled echo send, for a piano that echoes on channel 1. It ships off
+     (`echoWindowMs: 0`): R7 saw no echo, and a round puts one pitch in two voices at once, so a perfect press lands
+     on its own echo, and laptop keys and bots play one velocity (on `/sim` the bot lost 6 of 32 presses). Turn it
+     on (a few ms, not hand-mode's 30) if Eric's run shows a channel-1 echo. Log the window;
    - **echoes are never judged.** The log counts echoes received and dropped.
 3. **The ending:**
    - after your last note, voices 2, 3 and 4 finish their copies in turn, so they drop out one at a time. The results
@@ -107,8 +110,9 @@ a `docs:` PR if the source is CC.
 
 **(c) No feedback:**
 - **unit test:** a synthetic echo (same pitch, the same `timeStamp` on channel 2) fed through the input filter is
-  dropped, and the echo guard drops a channel-1 copy within its window. A real press of the same pitch outside the
-  window is kept and judged;
+  dropped, and the echo guard, when on, drops a channel-1 copy within its window. A real press of the same pitch
+  outside the window, or in exact unison at its own velocity, is kept and judged; with the guard off (the default) a
+  unison press is always judged;
 - **live, Eric at the DGX:** a round with 0 echoes judged as input, the log's echoes received and dropped counts.
   This is a morning-page item.
 

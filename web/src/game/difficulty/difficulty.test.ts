@@ -3,11 +3,12 @@ import { sep } from "node:path";
 import { describe, expect, it } from "vitest";
 import type { Chart } from "../../contracts";
 import { difficulty } from "./difficulty";
+import { LAB_ONLY } from "../song-select/load";
 
 const songsDir = new URL("../../../public/songs/", import.meta.url);
 const charts = new Map<string, Chart>(
   readdirSync(songsDir, { recursive: true, encoding: "utf8" })
-    .filter((f) => f.split(sep).pop() === "chart.json")
+    .filter((f) => f.split(sep).pop() === "chart.json" && !LAB_ONLY.includes(f.split(sep)[0]))
     .map((f) => [f.split(sep).slice(0, -1).join("/"), JSON.parse(readFileSync(new URL(f, songsDir), "utf8"))]),
 );
 const level = (id: string) => difficulty(charts.get(id)!).level;

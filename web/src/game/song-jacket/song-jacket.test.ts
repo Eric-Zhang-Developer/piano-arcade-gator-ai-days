@@ -2,10 +2,11 @@ import { readdirSync, readFileSync } from "node:fs";
 import { sep } from "node:path";
 import { expect, test } from "vitest";
 import { jacketColors, jacketFor } from ".";
+import { LAB_ONLY } from "../song-select/load";
 
 const root = new URL("../../../public/songs", import.meta.url).pathname;
 const songs = readdirSync(root, { recursive: true, encoding: "utf8" })
-  .filter((f) => f.split(sep).pop() === "chart.json")
+  .filter((f) => f.split(sep).pop() === "chart.json" && !LAB_ONLY.includes(f.split(sep)[0]))
   .map((f) => JSON.parse(readFileSync(`${root}/${f}`, "utf8")) as { id: string; title: string; composer: string });
 
 test("the library has songs to check", () => {

@@ -5,6 +5,7 @@ import { paperJudgmentColors } from "../sheet-view/paper-colors";
 import { DIVISIONS as XML_DIVISIONS, keyAndMeter, placeNotes, type Placed } from "../sheet-xml";
 import { paper, paperInk } from "../ui-tokens";
 import { beamGroups, beamJudgment, DIVISIONS, shouldBeam } from ".";
+import { LAB_ONLY } from "../song-select/load";
 
 const songs = new URL("../../../public/songs/", import.meta.url);
 const load = (id: string): Chart => JSON.parse(readFileSync(new URL(`${id}/chart.json`, songs), "utf8"));
@@ -98,7 +99,7 @@ test("the beam color rule: all PERFECT is PERFECT; PERFECT with GREAT, or with o
 });
 
 test("every committed chart: each beam has 2+ chords, all eighths or shorter, in one staff and one beat group", () => {
-  const ids = readdirSync(songs, { withFileTypes: true }).filter((d) => d.isDirectory() && d.name !== "local" && d.name !== "requests").map((d) => d.name);
+  const ids = readdirSync(songs, { withFileTypes: true }).filter((d) => d.isDirectory() && d.name !== "local" && d.name !== "requests" && !LAB_ONLY.includes(d.name)).map((d) => d.name);
   const counts: string[] = [];
   for (const id of ids.sort()) {
     const chart = load(id);

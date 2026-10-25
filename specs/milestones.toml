@@ -251,7 +251,6 @@ features = [
   "results-polish", # polish sweep 3 (#1244-#1247): PRACTICE BARS a link, Watch replay a kit dialog, initials heard
   "record-follows", # Eric, 2026-10-25 (#1261): wow feeder; the real recording stretches to follow the player, an experiment
   "record-seams", # Eric, 2026-10-25 (#1269): the recording's seams, an L-cut outro on a bar line and a J-cut intro, a #856 hero item
-  "full-run-reds", # polish refill 4 (#1177, #1270): the count-in's beat 1 on its frame, verify-landing's click step runs
   "full-run-reds", # polish refill 4 (#1177, #1270, #1284, #1285): count-in beat 1, verify-landing, UI-sound spies, /learn radii
   "select-reload", # polish refill 4 (#1271, #1272): after a reload the panel's song has focus and its BEST shows
   "replay-keys", # polish refill 4 (#419): the replay shows the take's keyboard for hands= and bar-loop takes

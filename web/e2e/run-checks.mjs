@@ -44,7 +44,7 @@ export function selectChecks(checks, changed) {
   return full ? checks : checks.filter((c) => c === MAIN_CHECK);
 }
 
-// Each check's seconds on CI (main's full run 40164489468, 2026-10-25), to balance the shards; a check not in the
+// Each check's seconds on CI (main's full run 40174538738, 2026-10-25), to balance the shards; a check not in the
 // table counts DEFAULT_SECONDS, about the median. Refresh it from a full run's logs when a shard nears the job's 20 min.
 export const SECONDS = JSON.parse(readFileSync(new URL("./run-checks.seconds.json", import.meta.url), "utf8"));
 export const DEFAULT_SECONDS = 90;

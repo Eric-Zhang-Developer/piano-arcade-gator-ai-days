@@ -35,3 +35,12 @@ Sources whose licenses ask for credit. Each chart's `source` field names its sou
   Philippe Hézaine after the Peters edition, licensed [CC BY-SA 2.5](https://creativecommons.org/licenses/by-sa/2.5/).
   Changes: an excerpt (pickup and bars 1–16, the A section's repeat written out) converted to a chart; the chart is
   shared under the same license.
+- **Consolation No. 3, S. 172** (Franz Liszt), `web/public/songs/liszt-consolation-3/`: charted from Mutopia Project
+  piece 1647 (<https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1647>), typeset by Ryan Prince after the
+  Breitkopf & Härtel first edition (1850), licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
+  Changes: an excerpt (bars 1–18) converted to a chart.
+- **Prelude in C-sharp minor, Op. 3 No. 2** (Sergei Rachmaninoff), `web/public/songs/rachmaninoff-prelude-cs/`:
+  charted from Mutopia Project piece 2033 (<https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2033>), typeset by
+  Petro Kostandy after Bosworth & Co. (1896) and Universal Edition (1910), licensed
+  [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Changes: an excerpt (pickup and bars 1–13, the
+  Lento) converted to a chart; the chart is shared under the same license.

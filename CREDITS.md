@@ -81,3 +81,8 @@ Sources whose licenses ask for credit. Each chart's `source` field names its sou
   Pavel Dobryakov; the license header is kept in the file. Changes: the promo, analytics, GUI, screenshot, bloom,
   sunrays, input and render-loop code removed, and a dried-pigment layer added
   ([decision](specs/decisions/wet-paint-vendor.md)).
+- **Chopin, Ballade No. 1, Op. 23, coda** (`chopin-ballade-coda`): from Mutopia Project piece 1959
+  (<https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1959>), typeset by Javier Ruiz-Alma after Klindworth (Bote &
+  Bock, n.d. [1880]), licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Changes: bars 208–264
+  converted to a chart; off-grid run notes and one rolled-chord note dropped
+  ([decision](specs/decisions/song-pack-10-sources.md)).

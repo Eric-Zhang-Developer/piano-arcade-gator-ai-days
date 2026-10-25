@@ -1,7 +1,7 @@
 ---
 name: "Song pack 10: very hard songs, the Ballade No. 1 coda, the C-sharp minor Nocturne, Nocturne Op. 48 No. 1, and one or two more"
 depends_on: ["song-pack-1", "level-review"]
-owns: ["web/public/songs/chopin-ballade-1-coda/", "web/public/songs/chopin-nocturne-cs-posth/", "web/public/songs/chopin-nocturne-48-1/", "web/public/songs/chopin-ballade-4-coda/", "web/public/songs/chopin-etude-10-1/", "web/public/songs/chopin-black-key/", "specs/features/song-pack-10/", "changes/song-pack-10.md", "specs/decisions/song-pack-10-"]
+owns: ["web/public/songs/chopin-ballade-coda/", "web/public/songs/chopin-nocturne-cs-posth/", "web/public/songs/chopin-nocturne-48-1/", "web/public/songs/chopin-op10-1/", "web/public/songs/chopin-etude-10-5/", "specs/features/song-pack-10/", "changes/song-pack-10.md", "specs/decisions/song-pack-10-"]
 assignee: "eric"
 ---
 

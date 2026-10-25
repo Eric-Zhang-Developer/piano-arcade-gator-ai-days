@@ -113,7 +113,7 @@
 .content[data-reduced=true] { animation:none; }
 @media (prefers-reduced-motion:reduce) { .content[data-guided-reveal=true] { animation:none; } }
 
-.tutorHeading { display:flex; align-items:center; gap:14px; }
-.tutorHeading img { width:56px; height:56px; flex:none; }
+.lessonFocus:has(.tutorPerch) { position:relative; }
+.tutorPerch { position:absolute; top:24px; right:24px; width:56px; height:56px; pointer-events:none; }
 
 .content h1[tabindex="-1"]:focus { outline:none; }

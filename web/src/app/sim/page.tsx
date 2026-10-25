@@ -153,7 +153,11 @@ function SimPage() {
   return (
     <main style={{ display: "grid", gridTemplateColumns: "minmax(0, 2fr) minmax(320px, 1fr)", gap: 16, padding: "calc(4vh + 8px) 16px 16px", height: "100vh", boxSizing: "border-box" }}>
       <section style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0 }}>
-        <iframe key={gameKey} title="game" src={`/play?midi=sim&simId=${simId}`} style={{ flex: 1, border: "1px solid var(--pa-line)", minHeight: 0 }} />
+        <iframe
+          key={gameKey}
+          data-testid="sim-game"
+          title={`${chart?.title ?? "The game"}, played from the virtual piano`}
+          src={`/play?midi=sim&simId=${simId}`} style={{ flex: 1, border: "1px solid var(--pa-line)", minHeight: 0 }} />
         <div aria-label="virtual keyboard" style={{ display: "flex", gap: 2, height: 96 }}>
           {keys.map((p) => (
             <button
@@ -186,6 +190,7 @@ function SimPage() {
       </section>
 
       <aside style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: 0 }}>
+        <h1 style={h1}>Piano sim</h1>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           <button
             {...btn}
@@ -354,3 +359,5 @@ function Record() {
 
 const btn = kitChip(false); // the Duo kit's small hairline control, spread as className and style
 const h2: React.CSSProperties = { margin: 0, fontSize: 16 };
+// The page's name, in the kit's display face like /lab's and /simon's titles (#1045).
+const h1: React.CSSProperties = { margin: 0, font: "800 clamp(28px, 2.4vw, 44px)/1 var(--pa-font-display), system-ui, sans-serif", letterSpacing: "0.02em", textTransform: "uppercase" };

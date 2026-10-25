@@ -146,7 +146,7 @@ try {
   await page.goto(`${base}/sim`);
   await page.waitForFunction(() => [...document.querySelectorAll("button")].some((b) => b.textContent === "Watch the bot" && !b.disabled), null, { timeout: 60_000 });
   await page.getByRole("button", { name: "Watch the bot" }).click();
-  const game = page.frameLocator('iframe[title="game"]');
+  const game = page.frameLocator('iframe[data-testid="sim-game"]');
   await page.waitForTimeout(5000); // into the song
   await page.getByRole("button", { name: "Unplug" }).click();
   const unplugged = game.locator('[data-testid="toast"]', { hasText: "Piano disconnected" });

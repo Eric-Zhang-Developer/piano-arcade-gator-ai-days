@@ -60,7 +60,7 @@ try {
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto(url);
   await page.getByRole("button", { name: "Watch the bot" }).click({ timeout: 60_000 });
-  const game = page.frameLocator('iframe[title="game"]');
+  const game = page.frameLocator('iframe[data-testid="sim-game"]');
   await game.getByTestId("watch-replay").click({ timeout: 120_000 });
   const frame = page.frames().find((f) => f.url().includes("/play"));
   await frame.waitForFunction(() => (window.__replayView?.crossings.length ?? 0) >= 10, null, { timeout: 30_000 });

@@ -123,7 +123,7 @@ async function main() {
     const simFrom = consoleLines.length; // /sim's own page errors and console.errors, as verify-sim.mjs checked
     await page.goto(`${base}/sim`);
     await page.getByRole("button", { name: "Watch the bot" }).click({ timeout: 60_000 }); // enabled once the game is ready
-    const game = page.frameLocator('iframe[title="game"]');
+    const game = page.frameLocator('iframe[data-testid="sim-game"]');
     await game.locator('[data-testid="results"]').waitFor({ timeout: lastBeat * msPerBeat + 30_000 });
     const sim = {};
     for (const k of ["PERFECT", "GREAT", "MISS", "extra"]) {

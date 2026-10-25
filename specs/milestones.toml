@@ -7,7 +7,9 @@
 # final   the last milestone: from `report_before`, only fixes, reverts, docs and `allow`; at ship, nothing merges.
 # The bootstrap feature always merges before any other feature.
 #
-# No deadlines on purpose (decision 001, row 15): start is empty, so ship, freeze and report times are off.
+# No deadlines on purpose (decision 001, row 15): start is empty, so "+H:MM" times are off and the milestones with
+# ship = "" have no deadline. The one exception is Eric's (2026-10-25): submission ships at the Devpost deadline,
+# an absolute time that needs no start. From 4:00 PM ET only fixes, reverts and docs merge; from 5:00 PM, nothing.
 start = ""
 
 [[milestone]]
@@ -208,7 +210,8 @@ cut = []
 
 [[milestone]]
 name = "submission"
-ship = ""
+ship = "2026-10-25T17:00:00-04:00"
+report_before = "1:00"
 final = true
 features = ["bar-loop", "piano-out", "operator-replay", "take-store"]
 cut = []

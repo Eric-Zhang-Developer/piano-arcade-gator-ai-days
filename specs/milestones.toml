@@ -220,7 +220,9 @@ cut = []
 [[milestone]]
 name = "spikes"
 ship = ""
-features = ["simon-says-spike", "restyle-spike", "score-follow-spike", "wrong-note-spike", "snap-score-spike"]
+features = ["simon-says-spike", "restyle-spike", "score-follow-spike", "wrong-note-spike", "snap-score-spike",
+  "mascot-spike", # Eric, 2026-10-25 (#903): "I like those 4 alright lets do a spike"
+]
 cut = []
 
 [[milestone]]

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Chart, Results } from "../../contracts";
-import { demoReset, isResetKey } from ".";
+import { demoReset, isResetKey, reset } from ".";
 
 const key = (k: Partial<KeyboardEvent>) => ({ key: "Escape", shiftKey: true, ctrlKey: false, metaKey: false, altKey: false, repeat: false, ...k });
 
@@ -55,5 +55,23 @@ describe("the idle return", () => {
     p.onEvent!({ type: "songStart", atMs: 0 });
     vi.advanceTimersByTime(10_000);
     expect(onIdle).toHaveBeenCalledOnce();
+  });
+});
+
+describe("the reset lets go of the pedal (#1313)", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+  it("sends pedal up now and again after the repeat, as well as All Notes Off", async () => {
+    const sent: { bytes: number[]; at?: number }[] = [];
+    const piano = { send: (bytes: number[], at?: number) => sent.push({ bytes, at }) };
+    vi.stubGlobal("navigator", { requestMIDIAccess: async () => ({ outputs: new Map([["dgx", piano]]) }) });
+    vi.stubGlobal("window", { location: { assign: vi.fn() } });
+    vi.spyOn(performance, "now").mockReturnValue(1000);
+    await reset();
+    expect(sent.filter((m) => m.bytes.join() === "176,64,0").map((m) => m.at)).toEqual([1000, 1250]);
+    expect(sent.filter((m) => m.bytes[1] === 123)).toHaveLength(32);
+    expect(window.location.assign).toHaveBeenCalledWith("/");
   });
 });

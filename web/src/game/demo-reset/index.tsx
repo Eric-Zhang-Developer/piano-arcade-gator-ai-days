@@ -1,14 +1,15 @@
 "use client";
 // Demo reset (spec: demo-reset): Shift+Esc anywhere, or 60 s with no input on a plain take's results, sends All Notes
-// Off to the piano and loads / fresh. localStorage and sessionStorage are kept (latency, records, capture mode).
+// Off and pedal up to the piano and loads / fresh. localStorage and sessionStorage are kept (latency, records, capture mode).
 import { useEffect } from "react";
 import type { GamePlugin } from "../../contracts";
 import { whenIdle } from "../cabinet/idle";
-import { allNotesOff, getReplayState } from "../piano-out";
+import { getReplayState } from "../piano-out";
+import { silence } from "../x/composers-hands/rolls";
 
 export const resetSettings = {
   idleSeconds: 60, // on a plain take's results; ?idle=<s> shortens it for a check
-  repeatMs: 250, // All Notes Off again this far ahead, after sends already queued (beat-track's)
+  repeatMs: 250, // All Notes Off and pedal up again this far ahead, after sends already queued (beat-track's)
   midiWaitMs: 500, // a MIDI permission prompt can't hold the reset
   skip: ["/cabinet", "/attract", "/operator", "/sheet"], // pages where the combo does nothing
 };
@@ -23,11 +24,8 @@ export async function reset(): Promise<void> {
       navigator.requestMIDIAccess?.(),
       new Promise<undefined>((r) => setTimeout(r, resetSettings.midiWaitMs)),
     ]);
-    const later = performance.now() + resetSettings.repeatMs;
-    for (const o of access?.outputs.values() ?? []) {
-      for (const m of allNotesOff(0)) o.send(m.bytes);
-      for (const m of allNotesOff(later)) o.send(m.bytes, m.atMs);
-    }
+    // The pedal too (#1313): a bot demo leaves it down, and a reload can't reach the page that pressed it.
+    for (const o of access?.outputs.values() ?? []) silence(o, performance.now(), resetSettings.repeatMs);
   } catch {
     // no MIDI, or access refused: nothing to silence
   }

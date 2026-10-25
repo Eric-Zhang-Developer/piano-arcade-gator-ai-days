@@ -28,7 +28,9 @@ function EndCard() {
       <div className={styles.line} style={timing("end", "line")} aria-hidden />
       <div className={styles.links} style={timing("end", "words")}>
         <p className={styles.endTagline}>{TAGLINE}</p>
-        <p className={`${styles.live} ${styles.lead}`} data-testid="end-lead">{lead}</p>
+        <p className={`${styles.live} ${styles.lead}`} style={{ "--chars": lead.length } as CSSProperties} data-testid="end-lead">
+          {lead}
+        </p>
         {second && <p className={`${styles.repo} ${styles.second}`} data-testid="end-repo">{second}</p>}
         {line && <p className={styles.facts} data-testid="end-facts">{line}</p>}
       </div>

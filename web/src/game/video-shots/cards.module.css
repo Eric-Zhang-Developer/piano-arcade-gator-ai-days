@@ -138,7 +138,9 @@
   opacity: 1;
   animation: land 160ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
+/* Flush with the É's stem ink (0.06em in from its box at 40vh), not the box. */
 .title + .tagline {
+  left: calc(8.6vw + 2.2vh);
   opacity: 0;
   animation: none;
 }
@@ -218,8 +220,10 @@
   /* A URL a viewer types reads on one line, never broken at a hyphen. */
   white-space: nowrap;
 }
+/* 6vh, or smaller to fit one line: the box is 78.4vw and Saira's bold averages 0.502em a character on the repo URL,
+   so the 58-character repo fits at 2.69vw (52 px at 1920, x-height 26 px; decision video-cards-end). */
 .lead {
-  font-size: 6vh;
+  font-size: min(6vh, calc(78.4vw / (var(--chars, 1) * 0.51)));
   color: var(--pa-ink);
 }
 .second {

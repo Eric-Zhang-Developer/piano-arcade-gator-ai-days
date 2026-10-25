@@ -26,7 +26,7 @@ const measureOnly = process.argv.includes("--measure-only");
 // from this script's --measure-only run in a worktree of that commit: 33,334 pixels over 122 notes.
 const BASELINE = Number(arg("--baseline") ?? 273.2);
 const say = (s) => process.stdout.write(`${s}\n`);
-const INK = "#f2f2f5"; // ui-tokens' ink, unjudged music
+const INK = "#e2e6f0"; // ui-tokens' ink, unjudged music (Duo, duo-tokens)
 const BG = "#000000"; // ui-tokens' bg, the page
 const GOLD = "#ffe27a"; // PERFECT, hudSettings.judgmentColors
 

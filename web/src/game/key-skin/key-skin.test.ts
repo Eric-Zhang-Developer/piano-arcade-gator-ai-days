@@ -42,8 +42,8 @@ describe("drawing", () => {
   it("a pressed key fills with exactly its light", () => {
     for (const draw of [drawWhiteKey, drawBlackKey]) {
       const { ctx, fills } = recorder();
-      draw(ctx, r, "#6aa8ff");
-      expect(fills).toContain("#6aa8ff");
+      draw(ctx, r, "#a07cff");
+      expect(fills).toContain("#a07cff");
     }
   });
 
@@ -51,7 +51,7 @@ describe("drawing", () => {
     for (const draw of [drawWhiteKey, drawBlackKey]) {
       const { ctx, fills } = recorder();
       draw(ctx, r, null);
-      expect(fills).not.toContain("#6aa8ff");
+      expect(fills).not.toContain("#a07cff");
       expect(fills).not.toContain("#ffffff");
     }
   });

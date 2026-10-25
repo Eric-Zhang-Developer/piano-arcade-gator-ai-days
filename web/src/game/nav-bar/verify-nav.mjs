@@ -2,7 +2,7 @@
 // 1. / shows the bar with Play current, in the kit's inks, clear of the wordmark and the build stamp.
 // 2. Each slot's link answers 200 with no page error, and that page marks its own slot current.
 // 3. /play?song=twinkle, /cabinet and /?capture=1 show no bar. /operator (Status) shows it, Status current.
-// Also: the GitHub link opens the repo in a new tab.
+// Also: the GitHub link opens the repo in a new tab, from a mark in the bottom-right corner.
 // 4. nav-1280.png and nav-1920.png of /.
 // Usage: node web/src/game/nav-bar/verify-nav.mjs --out <dir>
 import { spawn } from "node:child_process";
@@ -98,8 +98,14 @@ try {
       return [...document.querySelectorAll('[data-testid="nav-bar"] a')].map((a) => getComputedStyle(a.firstElementChild).color === (a.getAttribute("aria-current") ? primary : dim));
     });
     check(inks.length > 0 && inks.every(Boolean), `${w}×${h} /: each label is dim ink, the current one primary (${inks})`);
-    const repo = await page.$eval('[data-testid="nav-github"]', (a) => [a.href, a.target, a.rel].join(" ")).catch(() => "missing");
-    check(repo === "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days _blank noopener noreferrer", `${w}×${h} /: the GitHub link opens the repo in a new tab (${repo})`);
+    const repo = await page.$eval('[data-testid="nav-github"]', (a) => [a.href, a.target, a.rel, a.getAttribute("aria-label")].join(" ")).catch(() => "missing");
+    check(repo === "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days _blank noopener noreferrer GitHub repository", `${w}×${h} /: the GitHub link opens the repo in a new tab, labeled (${repo})`);
+    // Off the link row, a mark in the bottom-right corner (Eric, 2026-10-25).
+    const corner = await page.$eval('[data-testid="nav-github"]', (a) => {
+      const b = a.getBoundingClientRect();
+      return { inBar: !!a.closest('[data-testid="nav-bar"]'), right: innerWidth - b.right, bottom: innerHeight - b.bottom, svg: !!a.querySelector("svg") };
+    }).catch(() => null);
+    check(corner && !corner.inBar && corner.svg && corner.right < 40 && corner.bottom < 100, `${w}×${h} /: the GitHub mark sits in the bottom-right corner, not the row (${JSON.stringify(corner)})`);
     hrefs = await page.$$eval('[data-testid="nav-bar"] a[data-testid^="nav-"]:not([data-testid="nav-github"])', (as) => as.map((a) => a.getAttribute("href")));
     await page.screenshot({ path: join(out, `nav-${w}.png`) });
     await page.close();

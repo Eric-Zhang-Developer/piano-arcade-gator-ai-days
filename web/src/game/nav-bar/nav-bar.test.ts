@@ -20,8 +20,9 @@ describe("nav bar slots", () => {
     expect(doneSlots(changes, true).some((s) => s.path === "/operator")).toBe(false);
   });
 
-  it("links the repo", () => {
+  it("links the repo, from the corner mark and not as a slot in the row", () => {
     expect(GITHUB_URL).toBe("https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days");
+    expect(SLOTS.some((s) => /github/i.test(`${s.label} ${s.path}`))).toBe(false);
   });
 
   it("every done slot's path is a page under web/src/app/", () => {

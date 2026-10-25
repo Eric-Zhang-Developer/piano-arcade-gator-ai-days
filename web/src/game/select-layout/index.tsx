@@ -31,7 +31,7 @@ import { FocusBar, motionList, useFocusMotion } from "../select-motion";
 
 // footer: the left column's last row, in flow under the focused song (the Options button, first-run's link). Outside the
 // per-song section, so it isn't remounted on every ↑/↓.
-export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNode }) {
+export function MusicSelect({ songs, footer, corner }: { songs: Song[]; footer?: ReactNode; corner?: ReactNode }) {
   const [focusedId, setFocusedId] = useState<string>(); // song-finder: the focused song, by id, so it survives a sort
   const best = useBestGrades();
   const options = useSongOptions();
@@ -142,7 +142,10 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
     <main className={styles.screen}>
       <header className={styles.top}>
         <h1 className={styles.wordmark}>{APP_NAME}</h1>
-        <HelpLink />
+        <div className={styles.corner}>
+          {corner}
+          <HelpLink />
+        </div>
       </header>
       <div className={styles.left}>
         {song && (

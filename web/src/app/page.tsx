@@ -20,8 +20,10 @@ export default function Home() {
       {/* The left column's footer, in flow under the focused song: options-panel's drawer (latency with Calibrate,
           effects, labels; setup, so ?capture=1 hides its button), then first-run's "First time?" link, and F, which
           open the guided Twinkle, then lab's "Lab" link, and X, which open /lab. */}
+      {/* build-stamp: the commit this page was built from and its age, so a stale checkout shows; in the top band's corner */}
       <MusicSelect
         songs={songs}
+        corner={<BuildStamp />}
         footer={
           <>
             <OptionsDrawer recording={recording} />
@@ -32,8 +34,6 @@ export default function Home() {
       />
       {/* take-store: who's playing (Sign in, or the Google player with Profile, History and Sign out), bottom right */}
       <AccountChip />
-      {/* build-stamp: the commit this page was built from and its age, so a stale checkout shows */}
-      <BuildStamp />
     </>
   );
 }

@@ -46,9 +46,13 @@ A nav link to a half-done Lab looks worse than none.
 
   How it's built appears once #443 and #460 merge and `changes/how-it-works.md` lands. That needs no change to the bar:
   the test reads the folder.
-- **A GitHub link at the right end** (Eric, 2026-10-25, via the planner: he couldn't find status or the repo from `/`):
-  `https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days`, opened in a new tab with
-  `rel="noopener noreferrer"`.
+- **A GitHub mark in the bottom-right corner** (Eric, 2026-10-25, via the planner: he couldn't find status or the repo
+  from `/`; then "The nav bar is so ugly", so it left the row): a small inline GitHub icon, `aria-label="GitHub
+  repository"`, linking `https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days` in a new tab with
+  `rel="noopener noreferrer"`. It's off-site, so it isn't a slot in the row.
+- **One top band** (the same pass): the links share `/`'s wordmark baseline, at the wordmark's size, and the band's
+  right end holds the build stamp, Controls and the Lights button with set gaps and no overlap
+  (`specs/decisions/nav-bar-top-band.md`).
 - **Login at the right.** Move the login link that `/` already shows into the bar. Reuse its component and its
   signed-in behavior; don't write a second copy. If it can't move without changing another lane's folder, leave it
   where it is and log why in `specs/decisions/nav-bar-login.md`.
@@ -70,7 +74,7 @@ A nav link to a half-done Lab looks worse than none.
 1. `pnpm -C web exec vitest run --passWithNoTests src/game/nav-bar`:
    - every slot's slug has a `changes/<slug>.md` (the test reads the folder), and no done slot is missing;
    - every slot's path is a page under `web/src/app/`;
-  - Status links to `/operator` and is left out of a production build; the GitHub link is the repo's URL;
+  - Status links to `/operator` and is left out of a production build; the GitHub link is the repo's URL and no slot;
    - the hide rule returns true for `/play`, `/cabinet`, `/attract` and capture mode, and false for `/`, `/learn`,
      `/lab`, `/progress` and `/operator`.
 2. Headless, once, under `verify.lock`:

@@ -1,26 +1,31 @@
-# mascot: the default gator and the seven others
+# mascot: the default gator
 
-**Context.** Spec `mascot` (#1371) leaves the shapes, line weight, palette mapping, poses and the tutor's pick to
-the worker. Eric: "I want a chibi gator, but I want to be incredibly minimalistic."
+**Context.** Spec `mascot` (#1371) leaves the shapes, palette and poses to the worker. Eric asked for "a chibi
+gator, but incredibly minimalistic". He then rejected round 1 (`shots/round1-rejected-1280.png`: eight geometric
+icons with jaws and teeth) and said "It has to be fucking cute."
 
-**Options.** Eight directions were drawn by hand (`specs/features/mascot/shots/directions-1280.png`):
-- A, the flat pebble: four flat shapes, with the eyes and mouth cut out by a mask and one ink tooth;
-- B, two hands: blue head, violet body;
-- C, monoline in ink;
-- D, a 16×16 pixel sprite;
-- E, the head only, inside the kit's brackets;
-- F, a monoline head;
-- G, blue with gold teeth;
-- H, chomp, an open geometric jaw.
+**Options, round 2** (`shots/kawaii-1280.png`), all hand-drawn SVGs, since the spec bans image generation:
+- A, the green loaf;
+- B, the loaf in blue;
+- C, a sticker with an ink outline;
+- D, a happy pose;
+- E, a nap pose;
+- F, peekaboo.
 
-**Choice: A.** Its proportions are the most chibi, it reads at 28 px (the select row) and in one colour, and it uses
-only `--pa-primary` and `--pa-ink`.
-- The cut-outs are a `<mask>`, not dark paint, so on any field the holes show the field.
-- The viewBox is cropped to the art (`2 5 43 43`), so it fills the tutor's 72–120 px slot.
-- There's one pose. Nothing on screen moves the gator yet, so idle and tutor poses would be scope with no screen.
+**Choice: A, the green loaf.** It's kawaii chibi:
+- the round head is about two thirds of the height, on a bean body with stubby feet;
+- big glossy eyes, blush and a tiny smile, with no teeth;
+- a long flat snout with a nostril bump and a bumpy tail make it a gator, not a frog or a dino.
 
-**The others ship as files,** `web/public/mascot/b-*.svg` … `h-*.svg`, under the same palette test. Lab entries are
-cut by the spec.
+Every colour is a ui-tokens value:
+- the body is `tierX3` green;
+- the eyes and mouth are `bg`;
+- the highlights are `flare`;
+- the blush is `hype` at 45%.
 
-**How to undo or swap.** Copy another variant over `web/public/learning/companion-gator.svg` and
-`web/public/mascot/a-flat.svg`, then update the equality line in `duo-results/mascot.test.ts`. Or `git revert` the PR: the old PNG is untouched.
+The viewBox is cropped to the art (`3.5 8.5 56 56`).
+
+**The others ship as files** in `web/public/mascot/`, under the same palette test.
+
+**How to undo or swap.** Copy another file over `web/public/learning/companion-gator.svg` and
+`web/public/mascot/a-loaf.svg`, or `git revert` the PR. The old PNG is untouched.

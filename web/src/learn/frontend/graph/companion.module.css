@@ -2,15 +2,15 @@
 
 .pet { display:block; width:112px; height:112px; flex:none; margin-top:20px; }
 .message { min-width:0; max-width:344px; padding:5px 16px 0 0; }
-.message h2 { margin:0 0 8px; font:italic 900 28px/1.12 var(--pa-font-display),system-ui,sans-serif; text-wrap:balance; }
-.message p { margin:0 0 12px; color:var(--pa-ink-dim); font:15px/1.5 system-ui,sans-serif; }
-.companion .action { display:flex; align-items:center; gap:20px; padding:9px 20px; color:var(--pa-bg); background:var(--pa-cyan); border:0; border-radius:4px; font:italic 800 16px var(--pa-font-display),system-ui,sans-serif; cursor:pointer; }
-.companion .action:hover { background:#85edff; }
+.message h2 { margin:0 0 8px; font:700 28px/1.12 var(--pa-font-display),system-ui,sans-serif; text-wrap:balance; }
+.message p { margin:0 0 14px; color:var(--pa-ink-dim); font:16px/1.5 var(--pa-font-data),system-ui,sans-serif; }
+.companion .action { display:flex; align-items:center; gap:20px; padding:10px 20px; color:var(--pa-bg); background:var(--pa-primary); border:0; border-radius:0; font:700 16px var(--pa-font-display),system-ui,sans-serif; letter-spacing:.02em; cursor:pointer; }
+.companion .action:hover { filter:brightness(1.12); }
 .companion button:focus-visible { outline:2px solid var(--pa-primary); outline-offset:4px; }
 @media (prefers-reduced-motion:no-preference) { .pet[data-idle=true] { animation:companion-idle 6s ease-in-out infinite; } }
 @keyframes companion-idle { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-2px); } }
 @media (prefers-reduced-motion:reduce) { .pet { animation:none; transform:none; } }
-.eyebrow { display:block; margin-bottom:9px; color:var(--pa-ink-dim); font:13px/1.4 system-ui,sans-serif; }
+.eyebrow { display:block; margin-bottom:9px; color:var(--pa-ink-dim); font:16px/1.4 var(--pa-font-data),system-ui,sans-serif; }
 @media (max-width:1300px) { .companion { left:16px; top:18px; } .message h2 { font-size:26px; } }
 .companion .action:disabled { cursor:wait; }
 .companion[data-entering=true] .pet { visibility:hidden; }

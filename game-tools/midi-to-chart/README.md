@@ -43,7 +43,7 @@ Sources (public domain, Mutopia): `curl -O` each into `source/`:
 The `...` are `--id --title --composer --catalog --source -o`, as in each chart's fields.
 
 ## What it refuses
-- A file whose notes in the chosen bars start off a 1/12-beat grid: that's a performance, not notation. It says how
+- A file whose notes in the chosen bars start off the 1/12- and 1/8-beat grids (16ths, triplets, 32nds): that's a performance, not notation. It says how
   many notes did. (A grace note, an off-grid sliver under 1/8 beat, is skipped and logged instead.)
 - A hand with no notes in the bar range.
 

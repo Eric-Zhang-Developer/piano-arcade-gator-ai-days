@@ -5,10 +5,11 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { getPrefs, mixInto, playMissCue } from "../sound";
+import { uiSound, type UiSound } from "../ui-sounds";
 import styles from "../lab/lab.module.css";
 import { playVoice, type Voice } from "./voices";
 
-type Pad = { sound: Voice | "miss"; name: string; when: string; lenS: number };
+type Pad = { sound: Voice | "miss"; name: string; when: string; lenS: number } | { ui: UiSound; name: string; when: string; lenS: number };
 
 export const PADS: Pad[] = [
   { sound: "start", name: "Start", when: "the Start press", lenS: 0.8 },
@@ -23,7 +24,16 @@ export const PADS: Pad[] = [
   { sound: "rankHit", name: "Rank thud", when: "the rank stamp lands", lenS: 1.1 },
   { sound: "settle", name: "Results settle", when: "600 ms after the rank", lenS: 1.8 },
   { sound: "newRecord", name: "New record", when: "NEW RECORD stamps", lenS: 1.3 },
+  // The menu sounds (ui-sound-family), through their own player at their own level
+  { ui: "move", name: "Menu move", when: "an arrow key on a menu", lenS: 0.3 },
+  { ui: "confirm", name: "Menu confirm", when: "Enter on a menu", lenS: 0.3 },
+  { ui: "back", name: "Menu back", when: "Esc on a menu", lenS: 0.3 },
+  { ui: "sting", name: "Menu sting", when: "a song is chosen", lenS: 0.7 },
+  { ui: "tick", name: "Tick", when: "a count or a timer step", lenS: 0.2 },
+  { ui: "tickAccent", name: "Tick, accented", when: "the count's downbeat", lenS: 0.2 },
 ];
+
+const idOf = (pad: Pad) => ("ui" in pad ? `ui-${pad.ui}` : pad.sound);
 
 export function SoundBoard() {
   const out = useRef<{ ctx: AudioContext; head: GainNode } | null>(null);
@@ -41,7 +51,8 @@ export function SoundBoard() {
   };
   const play = (pad: Pad, t: number) => {
     const { ctx, head } = mix();
-    if (pad.sound === "miss") playMissCue(ctx, head, t);
+    if ("ui" in pad) uiSound(pad.ui, Math.max(0, (t - ctx.currentTime) * 1000));
+    else if (pad.sound === "miss") playMissCue(ctx, head, t);
     else playVoice(ctx, head, pad.sound, t, 1, 100);
   };
   const playAll = () => {
@@ -50,7 +61,7 @@ export function SoundBoard() {
     for (const pad of PADS) {
       play(pad, t);
       const at = t;
-      setTimeout(() => setPlaying(pad.sound), (at - ctx.currentTime) * 1000);
+      setTimeout(() => setPlaying(idOf(pad)), (at - ctx.currentTime) * 1000);
       t += pad.lenS + 0.4;
     }
     setTimeout(() => setPlaying(null), (t - ctx.currentTime) * 1000);
@@ -60,7 +71,7 @@ export function SoundBoard() {
     <main className={styles.lab}>
       <header className={styles.head}>
         <h1 className={styles.title}>Sounds</h1>
-        <p className={styles.sub}>Every milestone sound, through the game’s mix and your Effects volume. Never on a note.</p>
+        <p className={styles.sub}>Every game and menu sound at its real level, through the game’s own players. Never on a note.</p>
         <nav className={styles.links}>
           <button type="button" className={styles.back} onClick={playAll} style={{ background: "none", border: 0, font: "inherit", cursor: "pointer" }}>
             Play all ▶
@@ -72,17 +83,17 @@ export function SoundBoard() {
       </header>
       <ul className={styles.entries} style={{ columns: 3, columnGap: "2.2em", marginTop: "1em" }}>
         {PADS.map((pad) => (
-          <li key={pad.sound}>
+          <li key={idOf(pad)}>
             <button
               type="button"
               className={styles.entry}
               onClick={() => play(pad, mix().ctx.currentTime + 0.02)}
-              aria-pressed={playing === pad.sound}
+              aria-pressed={playing === idOf(pad)}
               style={{ width: "100%", textAlign: "left", background: "none", border: 0, font: "inherit", color: "inherit", cursor: "pointer" }}
             >
               <span className={styles.name}>{pad.name}</span>
               <span className={styles.desc}>{pad.when}</span>
-              <span className={styles.open}>{playing === pad.sound ? "playing" : "play ▶"}</span>
+              <span className={styles.open}>{playing === idOf(pad) ? "playing" : "play ▶"}</span>
             </button>
           </li>
         ))}

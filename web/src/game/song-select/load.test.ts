@@ -27,7 +27,8 @@ test("finds charts at any depth, sorted by level then title, and skips and repor
 
   const { songs: found, invalid } = loadSongs(dir);
   expect(found.map((s) => s.id)).toEqual(["library/bach", "twinkle"]);
-  expect(found[0]).toEqual({ id: "library/bach", title: "A Minuet", composer: "Bach", catalog: undefined, noteCount: 1, level: 1, roll: expect.objectContaining({ rows: 1 }) });
+  expect(found[0]).toEqual({ id: "library/bach", title: "A Minuet", composer: "Bach", catalog: undefined, noteCount: 1, level: 1, roll: expect.objectContaining({ rows: 1 }), key: expect.objectContaining({ tonic: expect.any(Number) }) });
+  expect(found[1].key).toEqual({ tonic: 0, mode: "major" }); // Twinkle, in C
   expect(found[0].roll.bars).toHaveLength(1);
   expect(invalid.map((i) => i.path).sort()).toEqual([join("broken", "chart.json"), join("garbled", "chart.json")]);
   expect(invalid.every((i) => i.problems.length > 0)).toBe(true);

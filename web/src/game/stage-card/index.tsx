@@ -8,7 +8,7 @@ import { PianoRoll } from "../duo-select/PianoRoll";
 import { shortComposer } from "../duo-select/Select";
 import { roll } from "../duo-select/roll";
 import { DataCell, MonoLabel, Panel } from "../duo-tokens";
-import { uiSound } from "../ui-sounds";
+import { keyOf, uiSound } from "../ui-sounds";
 import styles from "./stage-card.module.css";
 
 type Props = Pick<Chart, "id" | "title" | "composer" | "catalog"> & Partial<Pick<Chart, "notes" | "beatsPerBar">> & { level?: number };
@@ -16,7 +16,8 @@ type Props = Pick<Chart, "id" | "title" | "composer" | "catalog"> & Partial<Pick
 const lv = (n: number) => String(n).padStart(2, "0");
 
 export function StageCard({ title, composer, catalog, level, notes, beatsPerBar }: Props) {
-  useEffect(() => uiSound("sting"), []); // once per mount (ui-sounds); dropped on a direct load, before any gesture
+  // Once per mount (ui-sounds), in the song's key (ui-sound-family); dropped on a direct load, before any gesture.
+  useEffect(() => uiSound("sting", 0, { key: keyOf((notes ?? []).map((n) => n.pitch)) }), []); // eslint-disable-line react-hooks/exhaustive-deps
   const r = useMemo(() => roll({ notes: notes ?? [], beatsPerBar: beatsPerBar ?? 4 }), [notes, beatsPerBar]);
   return (
     <section className={styles.card} aria-label="Stage">

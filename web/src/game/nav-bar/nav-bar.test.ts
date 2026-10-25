@@ -34,8 +34,8 @@ describe("nav bar slots", () => {
     expect(doneSlots("/nonexistent")).toEqual([]);
   });
 
-  it("hides on /play, /stage, /cabinet, /attract and in capture mode; shows on /, /learn, /lab, /progress, /operator", () => {
-    for (const p of ["/play", "/stage", "/cabinet", "/attract", "/attract/x"]) expect(hideNav(p, false), p).toBe(true);
+  it("hides on /play, /stage, /real-keys, /cabinet, /attract and in capture mode; shows on /, /learn, /lab, /progress, /operator", () => {
+    for (const p of ["/play", "/stage", "/real-keys", "/cabinet", "/attract", "/attract/x"]) expect(hideNav(p, false), p).toBe(true);
     expect(hideNav("/", true)).toBe(true);
     expect(hideNav("/operator", true)).toBe(true);
     for (const p of ["/", "/learn", "/lab", "/progress", "/player", "/operator", "/operator/x"]) expect(hideNav(p, false), p).toBe(false);

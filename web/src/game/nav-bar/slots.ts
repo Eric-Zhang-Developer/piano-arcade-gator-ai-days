@@ -21,7 +21,7 @@ export const SLOTS: Slot[] = [
 export const GITHUB_URL = "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days";
 
 // Pages the bar never covers: the take, the audience's /stage and the kiosk loops. /operator shows it (Eric, 2026-10-25). Capture mode hides it.
-export const HIDDEN_ON = ["/play", "/stage", "/cabinet", "/attract"];
+export const HIDDEN_ON = ["/play", "/stage", "/real-keys", "/cabinet", "/attract"];
 
 export const hideNav = (pathname: string, capture: boolean) =>
   capture || HIDDEN_ON.some((p) => pathname === p || pathname.startsWith(`${p}/`));

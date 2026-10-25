@@ -1,7 +1,7 @@
 ---
 name: "Song pack 8: Liszt's Consolation No. 3, Rachmaninoff's C-sharp minor Prelude, the Pathétique's Rondo, the Revolutionary Étude and the Fantaisie-Impromptu"
 depends_on: ["song-pack-1"]
-owns: ["web/public/songs/liszt-consolation-3/", "web/public/songs/rach-prelude-cs/", "web/public/songs/pathetique-3/", "web/public/songs/revolutionary-etude/", "web/public/songs/fantaisie-impromptu/", "specs/features/song-pack-8/", "changes/song-pack-8.md", "specs/decisions/song-pack-8-"]
+owns: ["web/public/songs/liszt-consolation-3/", "web/public/songs/rachmaninoff-prelude-cs/", "web/public/songs/pathetique-3/", "web/public/songs/chopin-revolutionary/", "web/public/songs/fantaisie-impromptu/", "specs/features/song-pack-8/", "changes/song-pack-8.md", "specs/decisions/song-pack-8-"]
 assignee: "eric"
 ---
 
@@ -16,9 +16,9 @@ first. Use its converter (`game-tools/midi-to-chart/`) and rely on its library t
 | id | Piece | Target rung | Source (planner's pick; you confirm it) | Watch for |
 |---|---|---|---|---|
 | `liszt-consolation-3` | Liszt, Consolation No. 3 in D-flat, S. 172 | Medium-hard | [Mutopia 1647](https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1647), CC BY 3.0 | Wide left-hand arpeggios: report the range. |
-| `rach-prelude-cs` | Rachmaninoff, Prelude in C-sharp minor, Op. 3 No. 2 | Hard | [Mutopia 2033](https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2033), CC BY-SA 4.0 | Its tempo changes after the opening: excerpt only the part before the first change. If the excerpt is printed on three staves anywhere, hands follow the staves and stems; say where. |
+| `rachmaninoff-prelude-cs` | Rachmaninoff, Prelude in C-sharp minor, Op. 3 No. 2 | Hard | [Mutopia 2033](https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2033), CC BY-SA 4.0 | Its tempo changes after the opening: excerpt only the part before the first change. If the excerpt is printed on three staves anywhere, hands follow the staves and stems; say where. |
 | `pathetique-3` | Beethoven, Piano Sonata No. 8 "Pathétique", Op. 13, 3rd movement (Rondo) | Hard | [Mutopia 296](https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=296), Public Domain | Use the same edition as `pathetique-2` if pack 7 shipped it. Check the meter in the score. |
-| `revolutionary-etude` | Chopin, Étude in C minor, Op. 10 No. 12 ("Revolutionary") | Expert | [Mutopia 743](https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=743), Public Domain | Fast left-hand runs under right-hand chords and octaves. It may start under the marking so it's playable at all; say how far under. |
+| `chopin-revolutionary` | Chopin, Étude in C minor, Op. 10 No. 12 ("Revolutionary") | Expert | [Mutopia 743](https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=743), Public Domain | Fast left-hand runs under right-hand chords and octaves. It may start under the marking so it's playable at all; say how far under. |
 | `fantaisie-impromptu` | Chopin, Fantaisie-Impromptu, Op. 66 | Expert | [Mutopia 1693](https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1693), Public Domain | Four against three between the hands: check the converter keeps both grids exactly. The middle section has another tempo: excerpt the opening only. Under the marking as for the Étude. |
 
 ## Plan

@@ -116,3 +116,8 @@ describe('toLearningAttemptRows', () => {
     }
   });
 });
+
+it('keeps every attempt in the past, before the cohort shipped', () => {
+  const last = Math.max(...cohort.flatMap(l => l.attempts.map(a => Date.parse(a.at))));
+  expect(last).toBeLessThan(Date.parse('2026-10-25T00:00:00Z'));
+});

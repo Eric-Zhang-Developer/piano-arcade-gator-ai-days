@@ -9,8 +9,8 @@ export const COHORT_SIZE = 200;
 export const SIM_STEPS = 40;
 /** Activities in one sitting. */
 export const SITTING: Range = [3, 5];
-/** The first simulated diagnostic answer; everything after is spaced from it. */
-export const SIM_START = Date.parse('2026-09-07T17:00:00.000Z');
+/** The earliest first diagnostic answer: early enough that even a once-a-week learner's last activity is in the past. */
+export const SIM_START = Date.parse('2026-05-04T17:00:00.000Z');
 /** Seconds between two diagnostic answers, and between two activities in one sitting. */
 export const ANSWER_GAP_S: Range = [20, 90];
 export const ACTIVITY_GAP_S: Range = [120, 480];

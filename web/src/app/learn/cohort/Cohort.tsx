@@ -8,6 +8,17 @@ import styles from './cohort.module.css';
 const titles = new Map(curriculum.nodes.map(node => [node.id, shortTitle(node.title)]));
 const inputs = { midi: 'MIDI piano', keyboard: 'Laptop keys' } as const;
 
+/** The first three steps, a step repeated in a row shown once with its count. */
+function runs(learner: SyntheticLearner): { step: SyntheticLearner['steps'][number]; count: number }[] {
+  const out: { step: SyntheticLearner['steps'][number]; count: number }[] = [];
+  for (const step of learner.steps.slice(0, 3)) {
+    const last = out.at(-1);
+    if (last && last.step.nodeId === step.nodeId && last.step.activity === step.activity) last.count++;
+    else out.push({ step, count: 1 });
+  }
+  return out;
+}
+
 /** The cohort as a table: where each learner started, the planner's first three steps, and what they mastered. */
 export function Cohort({ cohort }: { cohort: readonly SyntheticLearner[] }) {
   const openings = new Set(cohort.map(l => pathOf(l))).size;
@@ -41,13 +52,14 @@ export function Cohort({ cohort }: { cohort: readonly SyntheticLearner[] }) {
           <tbody>
             {cohort.map(learner => <tr key={learner.id}>
               <th scope="row" className={styles.id}>{learner.id}</th>
-              <td>{learner.startingLevel}</td>
-              <td>{inputs[learner.input]}</td>
-              <td>{learner.goals.songIds.length ? learner.goals.songIds.map(songTitle).join(', ') : <span className={styles.none}>None</span>}</td>
+              <td className={styles.level}>{learner.startingLevel}</td>
+              <td className={styles.input}>{inputs[learner.input]}</td>
+              <td className={styles.goals}>{learner.goals.songIds.length ? learner.goals.songIds.map(songTitle).join(', ') : <span className={styles.none}>None</span>}</td>
               <td>
-                <ol className={styles.steps}>
-                  {learner.steps.slice(0, 3).map((step, i) => <li key={i}>
+                <ol className={styles.steps} aria-label="First three steps">
+                  {runs(learner).map(({ step, count }, i) => <li key={i}>
                     {activityLabel(step.activity)} <span className={styles.node}>{titles.get(step.nodeId) ?? step.nodeId}</span>
+                    {count > 1 && <span className={styles.times}> &times;{count}</span>}
                   </li>)}
                 </ol>
               </td>

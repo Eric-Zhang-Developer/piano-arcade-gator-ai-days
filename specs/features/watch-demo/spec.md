@@ -18,7 +18,8 @@ Small PRs, in this order. The done note merges last.
 1. `feat(watch-demo)`: `web/src/game/watch-demo/` holds `watchUrl(id)`, `isWatchKey(e)` and the plugin, with tests,
    plus one line in `layers.ts` after `scenes()`. No done note.
 2. `fix(select-layout)`: W in `MusicSelect`'s `onKeyDown` pushes `watchUrl(song.id)`, and the hint gains `W watch`.
-3. `fix(song-preview)`: a WATCH link beside LEARN, styled like it. W stops the opening at once, as L does.
+3. `fix(song-preview)`: W stops the opening at once, as L does. (A WATCH link beside LEARN shipped in #581 and came
+   out in #599: it wrapped the preview's row at 1280×720 and pushed the preview under the footer, #596.)
 4. `feat(watch-demo)`: `verify-watch.mjs`, screenshots and the done note.
 
 ## Requirements
@@ -51,7 +52,7 @@ Small PRs, in this order. The done note merges last.
   2. A HUD screenshot mid-take shows DEMO. The results reach 100% accuracy, and `localStorage["pianoArcade.records"]`
      is byte-for-byte what it was before step 1.
   3. "Back to songs" is `document.activeElement`. Within 10 s of the results, the URL is `/`.
-  4. Meta+W on `/` doesn't navigate. WATCH on the preview opens the same URL as W.
+  4. Meta+W on `/` doesn't navigate.
   5. Screenshots of the DEMO badge and of the results panel at 1280×720 and 1920×1080, kept in `<dir>`.
 - `verify.py --slug watch-demo` passes, plain `/play` unchanged.
 - Eric (mark it in the done note): W on Für Elise with the DGX on USB. Does it play on the piano, in time, with no

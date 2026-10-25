@@ -40,15 +40,19 @@ export function makeScene(el: HTMLElement, opacity: number): Scene | null {
   // Stars: short vertical segments across the whole view (there's no horizon to sit above now); in fever they stretch
   // into streaks. At STAR_Z the view is about 150 units tall and 270 wide at 16:9.
   const starPos = new Float32Array(STARS * 6);
+  const starY = new Float32Array(STARS); // each star's resting height; fever's updraft scrolls them up from it
   for (let i = 0; i < STARS; i++) {
     const x = (Math.random() - 0.5) * 320;
     const y = (Math.random() - 0.5) * 170;
+    starY[i] = y;
     starPos.set([x, y, STAR_Z, x, y + 0.3, STAR_Z], i * 6);
   }
   const starGeo = new THREE.BufferGeometry().setAttribute("position", new THREE.BufferAttribute(starPos, 3));
   const starMat = new THREE.LineBasicMaterial({ color: S.star });
   scene.add(new THREE.LineSegments(starGeo, starMat));
   let streak = 0.3;
+  let rise = 0;
+  let lastMs: number | null = null;
 
   let size = "";
   return {
@@ -60,9 +64,18 @@ export function makeScene(el: HTMLElement, opacity: number): Scene | null {
         camera.updateProjectionMatrix();
       }
       const len = 0.3 + S.starStreak * l.heat;
-      if (len !== streak) {
+      // Fever's updraft (#1374): the streaks rise with the fire instead of hanging still, faster as it burns hotter.
+      const dt = lastMs === null ? 0 : Math.max(0, Math.min(100, f.nowMs - lastMs));
+      lastMs = f.nowMs;
+      const lift = (dt / 1000) * S.riseSpeed * Math.min(1, l.heat);
+      if (len !== streak || lift > 0) {
         streak = len;
-        for (let i = 0; i < STARS; i++) starPos[i * 6 + 4] = starPos[i * 6 + 1] + len;
+        rise = (rise + lift) % 170;
+        for (let i = 0; i < STARS; i++) {
+          const y = ((starY[i] + rise + 85) % 170) - 85;
+          starPos[i * 6 + 1] = y;
+          starPos[i * 6 + 4] = y + len;
+        }
         starGeo.attributes.position.needsUpdate = true;
       }
       starMat.color.copy(desaturate(new THREE.Color(S.star).lerp(AMBER, l.tint ?? 0), l.dip));

@@ -4,7 +4,8 @@ import { msPerBeat } from "../core/settings";
 import { flashAt, momentSettings } from "../fever-moment";
 import { shimmerAt } from "../fever-gauge";
 import { landingSettings } from "../results-landing";
-import { type ArcState, arcAt, arcSettings, emptyArc, feverArc, ignitionFor, nextBeat, reduceArc } from ".";
+import { type Arc, type ArcState, arcAt, arcSettings, emptyArc, feverArc, ignitionFor, nextBeat, reduceArc } from ".";
+import { emberRate, flameScale, lookSettings } from "./look";
 
 const hit: GameEvent = { type: "noteHit", noteId: "n", pitch: 60, judgment: "PERFECT", offsetMs: 0, atMs: 0 };
 const run = (events: GameEvent[], s: ArcState = emptyArc(42, 120)) => events.reduce(reduceArc, s);
@@ -105,5 +106,31 @@ describe("reduced motion", () => {
     expect(shimmerAt(build, true)).toBeNull();
     expect(shimmerAt(build, false)).not.toBeNull();
     expect(flashAt(0)).toBe(0); // the flash still starts dark, then peaks fast: momentSettings.peakMs
+  });
+});
+
+describe("the look (#1374)", () => {
+  const arc = (phase: Arc["phase"], heat: number, progress = 0, beat = 0.5): Arc => ({ phase, progress, beat, igniteAtMs: 0, heat });
+
+  it("the walls stand only while fever has heat, swell on the beat, and drain with it", () => {
+    expect(flameScale(arc("idle", 0), false)).toBe(0);
+    expect(flameScale(arc("build", 0, 0.9), false)).toBe(0);
+    expect(flameScale(arc("sustain", 1, 0, 0), false)).toBeCloseTo(1 + lookSettings.beatSwell);
+    expect(flameScale(arc("sustain", 1, 0, 0.99), false)).toBeCloseTo(1, 2);
+    expect(flameScale(arc("release", 0.5), false)).toBeCloseTo(0.5);
+    expect(flameScale(arc("ignite", 1, 0.01), false)).toBeLessThan(flameScale(arc("ignite", 1, 0.5), false));
+  });
+
+  it("reduced motion: still walls with no swell or rise, and no embers", () => {
+    expect(flameScale(arc("sustain", 1, 0, 0), true)).toBe(1);
+    expect(flameScale(arc("ignite", 1, 0.01), true)).toBe(1);
+    expect(emberRate(arc("sustain", 1), true)).toBe(0);
+  });
+
+  it("embers start in the build-up's last stretch, burn in the sustain, and stop on a break", () => {
+    expect(emberRate(arc("idle", 0), false)).toBe(0);
+    expect(emberRate(arc("build", 0, 0.5), false)).toBeGreaterThan(0);
+    expect(emberRate(arc("build", 0, 0.5), false)).toBeLessThan(emberRate(arc("sustain", 1), false));
+    expect(emberRate(arc("release", 0.8), false)).toBe(0);
   });
 });

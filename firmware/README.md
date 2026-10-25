@@ -83,9 +83,11 @@ The kit's jumper wires are pin-to-pin, so each goes into a free hole in the same
 
 After the first connect, there's nothing to click. Chrome remembers the board and the piano, so opening
 `tester.html` connects both by itself, and unplugging and replugging the board reconnects it. Free play is the default:
-every key lights over itself, brighter for harder hits. A **ripple** of its color out along the strip is there but off by default.
-**Colors** switches between the two-hands palette and a rainbow by pitch. **Ripple ms** sets how long a ripple lasts
-(default 700; 0 turns it off), and **Save to board** keeps it.
+every key lights over itself, brighter for harder hits, and a **ripple** of its color runs out along the strip.
+That is **Quiet**, the default. Open the **Light mode** menu on this page or on `playground.html` and pick **Full**
+for the show: hint build-up, wrong-key red, the count-in bar, fever, the pause rainbow, the finale and idle lights.
+Full turns ripples off until **Ripple ms** is set again. **Save to board** keeps the choice across power off, so the
+game uses it too. **Colors** switches between the two-hands palette and a rainbow by pitch.
 
 The mapping spaces the 88 keys evenly by semitone, about 2 LEDs each. It assumes standard 23.5 mm white keys
 (52 × 23.5 mm = 1222 mm, which matches the DGX-660's ~1.22 m key span). At 144 LEDs/m the pitch is 6.94 mm, so an
@@ -100,23 +102,29 @@ The game opens the port at 115200, waits for the line that starts `PAL1 leds=`, 
 - `[0x90, note, r, g, b]` when a note is played (colors 0-127), `[0x80, note]` on release;
 - `[0xA0, note, r, g, b]` to show a hint ("this key is next"), with `0, 0, 0` to clear it. This is the guide-lights
   layer: light the next key before the note arrives;
+- `[0xB0, 15, 0, 0]` is **Quiet** (the default, and what a board saved before this setting still boots into):
+  key lights, a 700 ms ripple, breathing hints, and a dim rainbow only after 15 s with no bytes at all.
+  `[0xB0, 15, 1, 0]` is **Full**: it writes the settings below (ripples off, hint ramp 600 ms, wrong keys red,
+  shows on, idle lights on). Either one is a preset, not saved until `[0xB0, 20, 0, 0]`. The game does not send
+  setting 15 yet; the tester and the playground do;
 - nothing extra for ripples: with setting 6 on, every `0x90` key on starts one in its color. `[0xB0, 6, lo, hi]` sets
-  their length in ms (0 = off, the default);
+  their length in ms (quiet's default is 700; full sets 0, and 0 stays off);
 - nothing extra for the hint ramp either: a hint that turns on starts nearly dark and brightens evenly as the eye
   sees it (LED duty follows a 2.2 gamma) to twice the hint color, the full hand color for the game's half-strength
-  hints, over `hintRampMs` (setting 7, default 600, the game's `leadMs`). Then it breathes until it's cleared. A hit on
+  hints, over `hintRampMs` (setting 7; full sets 600, the game's `leadMs`; quiet leaves it at 0, so hints only breathe). Then it breathes until it's cleared. A hit on
   a key that still has a hint restarts its ramp (it's for that key's next note); a recolor doesn't;
 - nothing extra for wrong keys: the game sends `0x80` for every released key but `0x90` only for judged notes, so a
-  release of a key that never lit flashes it red (setting 8, on by default; only while a song is live, so not in the
+  release of a key that never lit flashes it red (setting 8; full turns it on, quiet leaves it off; only while a song is live, so not in the
   count-in). It shows on release, since the board never hears the press;
-- nothing extra for the shows (setting 9): `0xF0` with no song live starts the count-in: a charge bar, cyan from the
+- nothing extra for the shows (setting 9; full turns them on, quiet leaves them off): `0xF0` with no song live starts the count-in: a charge bar, cyan from the
   bass end and pink from the treble end, filling in 8 steps (one per count-in beat) to meet in the middle at the first
   hint, which launches a burst from that key. The bar's length is learned: each launch remembers how long its
   count-in took, so a replayed song lands exactly on the go. `0xF0` while a song is live (a hint came since the last
   clear) plays fireworks for 3.5 s. A key on or a raw LED stops a count-in show;
-- nothing extra for idle lights (setting 4): 8 s with no play (heartbeats, hello and pings don't count) and no song
+- nothing extra for idle lights (setting 4): in full mode, 8 s with no play (heartbeats, hello and pings don't count) and no song
   live, an aurora of cyan, violet and pink flows along the strip with a shooting star every few seconds. A key
-  released then sparkles from that key without ending it; any other message ends it at once;
+  released then sparkles from that key without ending it; any other message ends it at once. Quiet mode keeps the
+  dim rainbow, and only after 15 s with no bytes at all;
 - nothing extra for fever (drawn with setting 9, shows): the board reads each `0x90`'s color as a judgment (PERFECT
   `127 113 61`, GREAT `47 121 98`, GOOD `62 91 127`, miss `127 38 47`: the HUD colors through `rgb7`) and runs the
   game's fever gauge on them (PERFECT 1, GREAT 0.5, GOOD 0; a miss or wrong key halves it, or breaks fever). Gold
@@ -128,7 +136,8 @@ The game opens the port at 115200, waits for the line that starts `PAL1 leds=`, 
   on a note looks the same, and a song with a rest over 2 s would trigger it too
 - `[0xF2, id]` to measure: the board answers `PONG id showMicros ledsDriven` at once;
 - `[0xFE]` every second as a heartbeat. After 2.5 s of silence the board releases every held key, so a stalled
-  Chrome tab can't leave lights stuck on. After 15 s it plays a dim idle rainbow.
+  Chrome tab can't leave lights stuck on. In quiet mode, 15 s with no bytes at all plays a dim rainbow. In full
+  mode the heartbeat does not count as play, so the aurora can start while the game is still connected and idle.
 
 `tester.html` has a working client in about 40 lines of plain JS (`send`, `keyOn`, `keyOff`, `hint`, `param`).
 
@@ -140,9 +149,9 @@ The game opens the port at 115200, waits for the line that starts `PAL1 leds=`, 
   against a simulated board. Hints breathe from 35% to 100% (setting 5, default 900 ms). Only the LEDs under
   the keys get driven (~177 of 288), which cuts each frame from ~8.6 ms to ~5.3 ms
   (WS2812B data is 24 bits × 1.25 µs = 30 µs per LED; computed, not yet measured on the board).
-- **ESP32 build (2026-10-24, Mac):** compiles with no errors for ESP32 Dev Module with arduino-cli, esp32 core
-  2.0.17 and FastLED 3.9.4: 296,185 bytes of flash (22%), 26,024 bytes of RAM (7%). Core 3.3.x also needs ~6 GB of
-  disk to install; 2.0.17 is the smaller one, and the one this build used.
+- **ESP32 build (2026-10-25, Mac):** compiles with no errors for ESP32 Dev Module with arduino-cli, esp32 core
+  2.0.17 and FastLED 3.9.4: 305,813 bytes of flash (23%), 29,148 bytes of RAM (8% of 327,680). Not uploaded.
+  Core 3.3.x also needs ~6 GB of disk to install; 2.0.17 is the smaller one, and the one this build used.
 - **Not checked:** any real hardware, including an upload to a board.
 
 ## Known risks

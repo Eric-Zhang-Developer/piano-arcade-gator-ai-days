@@ -159,8 +159,11 @@ export default function AttractPage() {
   // The film starts itself, silent, once the stage is up.
   useEffect(() => {
     if (!film || !data?.ss.length || playing || k !== -1) return;
-    anchor(-1);
-    setPlaying(true);
+    const f = requestAnimationFrame(() => {
+      anchor(-1);
+      setPlaying(true);
+    });
+    return () => cancelAnimationFrame(f);
   }, [film, data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function fallBackToTone() {

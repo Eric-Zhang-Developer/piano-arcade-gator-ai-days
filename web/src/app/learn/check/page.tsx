@@ -1,6 +1,8 @@
 import { curriculum } from '@/learn/frontend/mastery/curriculum';
 import { NoPassage, PlayCheck, playingNode } from '@/learn/frontend/playing';
 
+export const metadata = { title: 'Check' };
+
 type Params = { node?: string | string[]; item?: string | string[] };
 const first = (v: string | string[] | undefined) => typeof v === 'string' ? v : v?.[0];
 

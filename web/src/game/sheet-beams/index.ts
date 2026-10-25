@@ -4,13 +4,13 @@
 import type { Judgment } from "../../contracts";
 import type { Meter, Placed } from "../sheet-xml";
 
-// sheet-xml's divisions per quarter note (a 16th is 3, an eighth triplet 4). Not imported: sheet-xml imports
+// sheet-xml's divisions per quarter note (a 32nd is 3, a 16th 6, an eighth triplet 8). Not imported: sheet-xml imports
 // shouldBeam to write <beam>. The tests check the two agree.
-export const DIVISIONS = 12;
+export const DIVISIONS = 24;
 
-// The chord lengths that print as one value of a dotted eighth or shorter: a triplet 16th, a 16th, a triplet eighth,
-// an eighth and a dotted eighth.
-const BEAMABLE = new Set([2, 3, 4, 6, 9]);
+// The chord lengths that print as one value of a dotted eighth or shorter: a 32nd, a triplet 16th, a 16th, a triplet
+// eighth, an eighth and a dotted eighth.
+const BEAMABLE = new Set([3, 4, 6, 8, 12, 18]);
 
 /** A bar's beat groups, in divisions from the barline: a quarter in n/4 and 2/2, a dotted quarter in n/8 when the eighths
  * divide by 3, else a quarter. The last group is shorter when the bar doesn't divide (5/8: 4, 4, 2). */

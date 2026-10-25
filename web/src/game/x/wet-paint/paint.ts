@@ -91,9 +91,9 @@ export interface Splat {
 export function jet(x: number, velocity: number, color: Rgb, age: number, still: boolean, s = splatSettings): Splat {
   const t = Math.max(1, Math.min(127, velocity)) / 127;
   const e = Math.exp(-age / s.burstSec);
-  const k = lerp(s.ink, t) * (s.trickle.ink + (1 - s.trickle.ink) * e);
-  const push = lerp(s.force, t) * (s.trickle.force + (1 - s.trickle.force) * e);
   const y = Math.min(s.top, s.y + age * lerp(s.climb, t));
+  const k = y >= s.top ? 0 : lerp(s.ink, t) * (s.trickle.ink + (1 - s.trickle.ink) * e); // at the top it lifts off: ink left there pools into a blot
+  const push = lerp(s.force, t) * (s.trickle.force + (1 - s.trickle.force) * e);
   return { x, y, dx: 0, dy: still ? 0 : push, color: { r: color.r * k, g: color.g * k, b: color.b * k }, radius: lerp(s.radius, t) };
 }
 

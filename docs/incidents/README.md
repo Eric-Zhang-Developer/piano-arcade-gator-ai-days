@@ -5,6 +5,7 @@ facts you can point to: a log line, an issue comment, a command's output. If the
 
 | When | Incident | Impact | Record |
 |---|---|---|---|
+| 2026-10-25 00:51–02:28+ | The Duo kit (duo-tokens, #655) sat unpushed in a worktree while its owner worked a repaint and a Golden spike behind it, during a red-CI hour; no watchdog was running | Four features (duo-hud, duo-select, duo-results, sheet-paper) blocked; 534 lines invisible to every tool for about 75 min. Nothing lost | [duo-kit-stall](2026-10-25-duo-kit-stall.md) |
 | 2026-10-24 02:38–11:45 | Eric playtested a 9-hour-old build: the main checkout's sync job skipped 17 times on a one-line local `.gitignore` edit, and the playtest server ran in a detached worktree nothing syncs | A "works great" live check covered 7 of 82 finished features; Esc "did nothing" though it had been fixed on main since 04:44. Nothing lost | [stale-playtest-build](2026-10-24-stale-playtest-build.md) |
 
 ## Adding an incident

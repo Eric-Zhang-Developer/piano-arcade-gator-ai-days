@@ -27,6 +27,9 @@ export function rgb7(hex: string, k = 1): Rgb {
 export const keyOn = (pitch: number, [r, g, b]: Rgb): Message => [0x90, pitch, r, g, b];
 export const keyOff = (pitch: number): Message => [0x80, pitch];
 export const hint = (pitch: number, [r, g, b]: Rgb): Message => [0xa0, pitch, r, g, b];
+// The board's show style (firmware setting 15): demo, where hits ripple out both ways and the moments get sparks in
+// the UI colors, or the calm default. A board older than the setting ignores it.
+export const demoMode = (on: boolean): Message => [0xb0, 15, on ? 1 : 0, 0];
 export const CLEAR: Message = [0xf0];
 export const HELLO: Message = [0xf1];
 export const HEARTBEAT: Message = [0xfe];

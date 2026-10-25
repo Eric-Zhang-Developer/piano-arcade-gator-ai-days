@@ -5,7 +5,7 @@ import { useEffect, useSyncExternalStore } from "react";
 import type { Chart, GamePlugin, InputDevice } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
 import { kitChip } from "../duo-tokens";
-import { CLEAR, hintDiff, hintsAt, judgedKey, keyOff, ledSettings, type Rgb } from "./messages";
+import { CLEAR, demoMode, hintDiff, hintsAt, judgedKey, keyOff, ledSettings, type Rgb } from "./messages";
 import { autoConnect, connect, linkState, send, subscribe, type LinkState } from "./serial";
 
 export { hintDiff, hintsAt, judgedKey, ledSettings, rgb7 } from "./messages";
@@ -61,7 +61,12 @@ export function leds(): GamePlugin {
         }),
       stop: () => device.stop(),
     }),
-    startPanel: () => <ConnectLights />,
+    startPanel: () => (
+      <>
+        <ConnectLights />
+        <DemoLights />
+      </>
+    ),
   };
 }
 
@@ -73,6 +78,58 @@ const label: Record<LinkState, string> = {
   error: "Lights: the port is busy (close the Arduino serial monitor). Try again",
   unsupported: "Lights need Chrome or Edge (Web Serial)",
 };
+
+// Demo lights: with the board on, a chip that flips the strip into demo mode (hits ripple out both ways, sparks
+// for the big moments) and back. The choice is kept in this browser and sent again whenever the board connects,
+// since a board that restarted is back in its calm default.
+const demoKey = "pa.lights.demo";
+let demoOn: boolean | null = null; // read from storage on first use
+const demoListeners = new Set<() => void>();
+const demoSnapshot = () => {
+  if (demoOn === null) {
+    try {
+      demoOn = localStorage.getItem(demoKey) === "1";
+    } catch {
+      demoOn = false; // storage blocked: start calm
+    }
+  }
+  return demoOn;
+};
+const subscribeDemo = (l: () => void) => {
+  demoListeners.add(l);
+  return () => demoListeners.delete(l);
+};
+function setDemo(on: boolean) {
+  demoOn = on;
+  try {
+    localStorage.setItem(demoKey, on ? "1" : "0");
+  } catch {
+    // storage blocked: the choice lasts this page only
+  }
+  for (const l of demoListeners) l();
+}
+
+function DemoLights() {
+  const s = useSyncExternalStore(subscribe, linkState, () => "off" as LinkState);
+  const on = useSyncExternalStore(subscribeDemo, demoSnapshot, () => false);
+  useEffect(() => {
+    if (s === "ready") send(demoMode(on));
+  }, [s, on]);
+  if (s !== "ready") return null;
+  const flip = () => setDemo(!on);
+  return (
+    <button
+      type="button"
+      data-testid="demo-lights"
+      aria-pressed={on}
+      onClick={flip}
+      className={kitChip(on).className}
+      style={{ ...kitChip(on).style, cursor: "pointer", marginLeft: 8 }}
+    >
+      {on ? "Demo lights: on" : "Demo lights: off"}
+    </button>
+  );
+}
 
 function ConnectLights() {
   const s = useSyncExternalStore(subscribe, linkState, () => "off" as LinkState);

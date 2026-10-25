@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { Chart, GameEvent } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
-import { hintDiff, hintsAt, judgedKey, rgb7, type Message, type Rgb } from "./messages";
+import { demoMode, hintDiff, hintsAt, judgedKey, rgb7, type Message, type Rgb } from "./messages";
 
 // Twinkle: one hand, 600 ms a beat; C C G G A A G (60 60 67 67 69 69 67) from 0 ms.
 const chart: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
@@ -74,5 +74,12 @@ describe("judgedKey", () => {
     expect(judgedKey({ ...at, type: "noteHit", noteId: "n", pitch: 60, judgment: "PERFECT", offsetMs: 0 })).toEqual([0x90, 60, 127, 113, 61]);
     expect(judgedKey({ ...at, type: "noteMiss", noteId: "n", pitch: 62 })).toEqual([0x90, 62, 127, 38, 47]);
     expect(judgedKey({ ...at, type: "combo", count: 3 } as GameEvent)).toBeNull();
+  });
+});
+
+describe("demoMode", () => {
+  it("sets the board's setting 15: 1 for demo, 0 for the calm default", () => {
+    expect(demoMode(true)).toEqual([0xb0, 15, 1, 0]);
+    expect(demoMode(false)).toEqual([0xb0, 15, 0, 0]);
   });
 });

@@ -74,7 +74,8 @@ it lands, not alongside it. The black-key lane shading and the non-fever stage a
    `drawBrackets`, with no local bracket code.
 2. Headless, once, under `verify.lock`:
    `python3 .agents/scripts/verify.py --slug duo-hud --worktree . --cmd "node {worktree}/web/src/game/duo-hud/verify-hud.mjs --out {out}"`.
-   It plays `/play?song=fur-elise&bot=perfect&input=test` and prints `verify-hud: pass` or names each failed step:
+   It plays `/play?song=fur-elise&bot=perfect` (Start pressed; not `&input=test`, whose test device replaces the
+   laptop keys the bot plays) and prints `verify-hud: pass` or names each failed step:
    1. The HUD test hook (`window.__pianoArcadeHud`, add it if missing) reports `bar` rising from 1 to N, and `combo`
       rising.
    2. Screenshots `hud-mid.png`, about 20 s in, at 1280×720 and 1920×1080, plus `hud-reduced.png`.

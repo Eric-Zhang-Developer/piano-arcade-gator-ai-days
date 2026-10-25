@@ -80,12 +80,23 @@ export async function saveTake(take: TakeRow, notes: NoteRow[]): Promise<"saved"
   return res.json();
 }
 
-/** The signed-in player's own rows only (RLS), for one song. */
-export async function readProgress(userToken: string, songId: string) {
+/**
+ * Whose rows a read returns: the signed-in player's, through their token (RLS), or one player's by id with the secret
+ * key and an explicit filter. Only the server picks a `playerId` (the synthetic learners), never a request.
+ */
+export type Reader = { userToken: string } | { playerId: string };
+const as = (reader: Reader) =>
+  "userToken" in reader
+    ? { init: { userToken: reader.userToken }, only: "" }
+    : { init: {}, only: `&player_id=eq.${encodeURIComponent(reader.playerId)}` };
+
+/** One player's take history and per-bar trends for one song. */
+export async function readProgress(reader: Reader, songId: string) {
   const song = encodeURIComponent(songId);
+  const { init, only } = as(reader);
   const [history, bars] = await Promise.all([
-    rest(`/rest/v1/take_history?song_id=eq.${song}&order=created_at.asc&limit=100`, { userToken }).then((r) => r.json()),
-    rest(`/rest/v1/bar_trends?song_id=eq.${song}&order=bar.asc`, { userToken }).then((r) => r.json()),
+    rest(`/rest/v1/take_history?song_id=eq.${song}${only}&order=created_at.asc&limit=100`, init).then((r) => r.json()),
+    rest(`/rest/v1/bar_trends?song_id=eq.${song}${only}&order=bar.asc`, init).then((r) => r.json()),
   ]);
   return { history, bars };
 }
@@ -101,14 +112,16 @@ export async function deleteAuthUser(id: string): Promise<void> {
   await rest(`/auth/v1/admin/users/${encodeURIComponent(id)}`, { method: "DELETE" });
 }
 
-/** Every session the signed-in player has played, newest first (RLS: their rows only), optionally for one song. */
-export async function readSessions(userToken: string, songId?: string) {
+/** Every session one player has played, newest first, optionally for one song. */
+export async function readSessions(reader: Reader, songId?: string) {
   const song = songId ? `&song_id=eq.${encodeURIComponent(songId)}` : "";
-  return rest(`/rest/v1/session_history?select=*&order=created_at.desc&limit=500${song}`, { userToken }).then((r) => r.json());
+  const { init, only } = as(reader);
+  return rest(`/rest/v1/session_history?select=*&order=created_at.desc&limit=500${song}${only}`, init).then((r) => r.json());
 }
 
-/** The signed-in player's per-hand judgments and timing, per song (RLS: their rows only). */
-export async function readHandStats(userToken: string, songId?: string) {
+/** One player's per-hand judgments and timing, per song. */
+export async function readHandStats(reader: Reader, songId?: string) {
   const song = songId ? `&song_id=eq.${encodeURIComponent(songId)}` : "";
-  return rest(`/rest/v1/hand_stats?select=*${song}`, { userToken }).then((r) => r.json());
+  const { init, only } = as(reader);
+  return rest(`/rest/v1/hand_stats?select=*${song}${only}`, init).then((r) => r.json());
 }

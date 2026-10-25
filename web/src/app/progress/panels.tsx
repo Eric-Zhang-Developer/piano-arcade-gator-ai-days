@@ -157,10 +157,10 @@ const TONES = [
 ] as const;
 
 /** Every judged note, as one stacked bar in the results screen's judgment colors, labeled, with a legend. */
-export function JudgmentBar({ mix }: { mix: { perfect: number; great: number; good: number; miss: number; notes: number } }) {
+export function JudgmentBar({ mix, mine = true }: { mix: { perfect: number; great: number; good: number; miss: number; notes: number }; mine?: boolean }) {
   return (
     <section style={panel} data-testid="judgment-mix">
-      <h2 style={panelTitle}>Every note you played</h2>
+      <h2 style={panelTitle}>{mine ? "Every note you played" : "Every note played"}</h2>
       {mix.notes === 0 ? (
         <p style={{ color: dim, margin: 0 }}>No judged notes yet.</p>
       ) : (
@@ -186,11 +186,17 @@ export function JudgmentBar({ mix }: { mix: { perfect: number; great: number; go
 }
 
 /** Left and right hand side by side: notes, hit rate, and timing in words (early / late, and how steady). */
-export function HandsPanel({ hands }: { hands: { hand: "L" | "R"; notes: number; hitRate: number | null; meanOffset: number | null; spread: number | null }[] }) {
+export function HandsPanel({
+  hands,
+  mine = true,
+}: {
+  hands: { hand: "L" | "R"; notes: number; hitRate: number | null; meanOffset: number | null; spread: number | null }[];
+  mine?: boolean;
+}) {
   const words = (off: number | null) => (off === null ? "no hits yet" : Math.abs(off) < 3 ? "right on the beat" : `${Math.abs(off)} ms ${off > 0 ? "late" : "early"} on average`);
   return (
     <section style={panel} data-testid="hands">
-      <h2 style={panelTitle}>Your hands</h2>
+      <h2 style={panelTitle}>{mine ? "Your hands" : "Hands"}</h2>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         {hands.map((h) => (
           <div key={h.hand} style={{ borderLeft: `3px solid ${h.hand === "L" ? "var(--pa-hand-l)" : "var(--pa-hand-r)"}`, paddingLeft: 12 }}>
@@ -213,10 +219,18 @@ export function HandsPanel({ hands }: { hands: { hand: "L" | "R"; notes: number;
 }
 
 /** Each song you've played: sessions, time, best rank and accuracy, and whether you're improving. */
-export function SongsTable({ songs }: { songs: ReturnType<typeof import("../../data/progress").songStats> }) {
+export function SongsTable({
+  songs,
+  mine = true,
+  songHref = (id) => `/progress?song=${encodeURIComponent(id)}`,
+}: {
+  songs: ReturnType<typeof import("../../data/progress").songStats>;
+  mine?: boolean;
+  songHref?: (songId: string) => string;
+}) {
   return (
     <section style={panel} data-testid="songs">
-      <h2 style={panelTitle}>Your songs</h2>
+      <h2 style={panelTitle}>{mine ? "Your songs" : "Songs"}</h2>
       <div style={{ overflowX: "auto" }}>
         <table style={tableStyle}>
           <thead>
@@ -226,7 +240,7 @@ export function SongsTable({ songs }: { songs: ReturnType<typeof import("../../d
             {songs.map((s) => (
               <tr key={s.song_id}>
                 <td style={td}>
-                  <Link href={`/progress?song=${encodeURIComponent(s.song_id)}`} style={{ color: "var(--pa-cyan)", textDecoration: "none" }}>{s.title}</Link>
+                  <Link href={songHref(s.song_id)} style={{ color: "var(--pa-cyan)", textDecoration: "none" }}>{s.title}</Link>
                   <div style={{ fontSize: 12, color: dim }}>{s.composer}</div>
                 </td>
                 <td style={td}>{s.sessions}</td>

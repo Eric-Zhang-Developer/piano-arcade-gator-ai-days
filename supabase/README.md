@@ -77,6 +77,22 @@ A finished take of a committed song, played by a person, on the chart as committ
 would be wrong. The rule lives in `web/src/data/save-plugin.ts` (`unsavableReason`, `sameChart`). The results screen says which it was:
 "Saved to your account ✓", "Saved as a guest ✓", "Not saved yet: …" (kept, sent later) or "Not saved: …" (`SaveStatus.tsx`).
 
+## The 200 synthetic learners
+Simulated students, not real ones, so `/progress` can show the app from different starting points ("Try a synthetic
+learner" on top of the page; `/api/progress?as=synthetic-042`). Each is a non-anonymous Auth user
+(`synthetic-042@synthetic.invalid`, `user_metadata.synthetic: true`, no password, so nobody can sign in as one) with a
+`players` row whose handle is `synthetic 042`, takes and note judgments over the last 12 weeks, learning attempts and
+goal songs. The cohort comes from the learning lane's seeded simulation (`web/src/learn/frontend/mastery/sim/`); the
+takes are real curriculum charts played with each learner's timing and misses, judged by the game's own `judgeTake`
+(`web/src/data/synthetic/`). No migration: data only. From `web/`, with `web/.env.local` holding the keys:
+- `node src/data/synthetic/run.mjs --dry-run`: no network; rows per table and their size (about 2.8k takes, 220k notes).
+- `node src/data/synthetic/run.mjs`: loads them. A rerun replaces each learner's takes with the same ones moved up to
+  today, so streaks stay live; it prints the live counts at the end.
+- `node src/data/synthetic/run.mjs --undo`: deletes exactly those 200 Auth users (only ones marked synthetic); the
+  cascades remove their rows. Prints the counts before and after.
+- `node src/data/synthetic/run.mjs --roster`: rewrites `roster.json`, the switch's list, after the generator changes
+  (a test fails until you do).
+
 ## Adding something (a column, a table, a view, seed rows)
 1. **Make the file:** `npx -y supabase@2.122.0 migration new <what_it_does>` creates
    `supabase/migrations/<timestamp>_<what_it_does>.sql`. Never edit a migration that's already live: add a new one.

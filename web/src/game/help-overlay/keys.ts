@@ -151,4 +151,5 @@ export const unlisted: Record<string, string> = {
   "game/results-landing/index.ts": "any key or click skips the results landing to its end state and does nothing else: not a control",
   "game/laptop-sound/index.ts": "starts the laptop's audio on the first key or pointer press; its notes are the laptop keys' lines: not a control",
   "game/ui-sounds/index.ts": "notes the page's first key or pointer press, after which UI sounds may play: not a control",
+  "game/x/wet-paint/WetPaint.tsx": "/paint's own page, outside the game's card: its hint line says Space is the pedal; Z / X are laptop-octaves' shift",
 };

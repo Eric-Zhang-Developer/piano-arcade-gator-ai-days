@@ -1,0 +1,11 @@
+## What shipped
+Learn, Flow and Perform are one ladder per song: `LEARN → FLOW → PERFORM` on `/play`'s start screen and results, with the current mode lit and the next step a link to the same bars. The select's panel shows the furthest step reached on each song. URLs are unchanged (`mode=wait`, `mode=flow`, none). Practice keeps your mode: PRACTICE BARS, Next for you, weak-bars, adaptive and chunk steps all stay in the take's mode, and under Flow they carry no tempo (#832). The select's PRACTICE and P open Flow. Flow's headline leads with the tempo held ("Steady at 72% of tempo · …"), and the tempo also shows beside the rank. Below 90% Flow ranks B at best, and a steady take at 85% or more is told "Try it in Perform". A first time on a hard song focuses the Flow rung.
+## Where it lives
+`web/src/game/play-modes/` (`playMode`, `withMode`, `inMode`, `heldTempo`, `flowRank`, the ladder, the test), with the mode carried through `flow-mode/` (judge, headline, graduation), `duo-results/scores.ts`, `duo-select/`, `weak-bars/`, `adaptive-chunks/next.ts`, `chunk-practice/`, `select-layout/`, `duo-start/`, `results-layout/`, `wait-mode/plugin.tsx`, `help-overlay/keys.ts`, `lab/entries.ts`, and `app/play/page.tsx` (it passes `?tempo` to the Flow judge). Decisions: `specs/decisions/play-modes-flow-rank.md`, `play-modes-choices.md`. Shots: `specs/features/play-modes/shots/`.
+## How to check it
+`pnpm -C web exec vitest run src/game/play-modes`: 12 tests pass, and the touched features' vitest passes (15 files, 155 tests). verify-wait, verify-chunks, verify-learn, verify-flow and verify-select were updated to the new strings and links: not verified locally; covered by main's scheduled full run. A Learn, a Flow (capped at 80%, and graduated at 100%) and a Perform take were played through the test hook in the dev server at 1280×720.
+## Gaps
+- **Validation 4 open:** Eric hasn't looked yet.
+- The select panel was already ~33 px over its footer at 1280×720 on main (#863). The mark's 20 px came out of the roll, so it's no worse, but it isn't fixed.
+- Sharan's `save-plugin.ts` still says "wait mode" (#862). No `/learn` link into `/play` exists yet to open Flow.
+- `tempo-curve`'s results panel threw on a Flow take that skipped its first notes ("Reduce of empty array"). It was caught by play-slots, and it's in code this PR doesn't touch.

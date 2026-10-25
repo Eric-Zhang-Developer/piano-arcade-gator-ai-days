@@ -58,7 +58,7 @@ export function Ladder({ params, at, focus }: { params: URLSearchParams; at: "st
               ) : (
                 <a
                   ref={m === focus ? ref : undefined}
-                  className={`${styles.rung} ${m === next ? styles.next : ""}`}
+                  className={`${styles.rung} ${m === next || m === focus ? styles.next : ""}`} // a focused step shows as the way on too
                   href={modeHref(params, m)}
                   data-testid={testId(at, now, m)}
                   title={title[m]}

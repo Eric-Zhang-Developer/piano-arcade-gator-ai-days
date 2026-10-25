@@ -9,10 +9,11 @@
 }
 
 .roll {
-  /* Fixed, so nothing in the panel shrinks (song-options' check): 17vh fits a two-line title, the 2×2 buttons
-     (mouse-first), the Hands row and the footer at 1280×720 and 1920×1080. It was 20vh before LEARN and WATCH. */
+  /* Fixed, so nothing in the panel shrinks (song-options' check). It was 20vh before LEARN and WATCH (mouse-first),
+     and 17vh before the play-modes mark, which it pays for. At 1280×720 the panel was already ~33 px over since the
+     nav bar, and is no worse with the mark: see the play-modes PR. */
   flex: none;
-  height: min(17vh, 300px);
+  height: min(14vh, 300px);
   border: 1px solid var(--pa-line);
   background: var(--pa-bg);
 }
@@ -20,7 +21,7 @@
 /* With a "Next for you" strip the panel is one row taller: the roll gives it the room, so the panel still clears the
    footer at 1280×720 (mouse-first measured 43 px over at 17vh). */
 .panel:has(.next) .roll {
-  height: min(10vh, 300px);
+  height: min(7vh, 300px);
 }
 
 .title {

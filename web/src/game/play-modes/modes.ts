@@ -27,7 +27,7 @@ export function withMode(params: URLSearchParams, mode: PlayMode): URLSearchPara
 }
 
 // A link into a mode: withMode, and under Flow no tempo, since Flow follows the player's own (decision:
-// play-modes-tempo). Learn and Perform keep theirs.
+// play-modes-choices). Learn and Perform keep theirs.
 export function inMode(params: URLSearchParams, mode: PlayMode): URLSearchParams {
   const q = withMode(params, mode);
   if (mode === "flow") q.delete("tempo");

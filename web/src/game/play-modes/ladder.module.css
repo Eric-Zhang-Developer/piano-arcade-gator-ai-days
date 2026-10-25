@@ -68,7 +68,7 @@ a.rung:focus-visible {
 /* The select's read-only mark: the same rungs, slimmer; a step not reached is dim, one reached ink, the furthest lit. */
 .mark .rung {
   color: var(--pa-ink-dim);
-  padding: 0.55vh 0.4em;
+  padding: 0.3vh 0.4em;
   font-size: clamp(11px, 0.75vw, 14px);
 }
 

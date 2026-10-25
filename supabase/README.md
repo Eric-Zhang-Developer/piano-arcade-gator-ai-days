@@ -13,7 +13,10 @@ run locally, and a take that can't be saved waits in the browser's outbox. Owner
 | `coach_feedback` | table | what the coach said and the exact numbers it was checked against | that player |
 | `bar_trends` | view | per bar over a player's last 5 takes of a song: notes, misses, mean offset, spread | that player |
 | `take_history` | view | one row per take, for the progress chart | that player |
-| `save_take(take, notes)` | function | saves a take and its notes in one transaction; answers `saved`, `duplicate` or `conflict` | server only |
+| `session_history` | view | every take with its song title, when and how long it was played: the profile page | that player |
+| `hand_stats` | view | per song and hand: notes by judgment, mean timing, spread, velocity: the profile's hands panel | that player |
+| `save_take(take, notes)` | function | saves a take and its notes in one transaction; answers `saved`, `duplicate`, `conflict`, or `limited` (over 20 new takes in 5 minutes for that player: the browser keeps it and resends) | server only |
+| `cleanup_stale_guests(days = 30)` | function | deletes guest accounts with no sign-in and no take in `days` (at least 7); Google accounts are never touched. Nightly at 04:17 UTC via `pg_cron` where available | server only |
 | `merge_player(from, to)` | function | moves an anonymous device's takes and coach notes into a Google account (`/auth/merge`) | server only |
 | `rls_auto_enable` | Supabase's own | turns RLS on for new tables automatically; not ours, leave it | nobody |
 

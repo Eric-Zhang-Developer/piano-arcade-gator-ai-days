@@ -4,6 +4,7 @@
 import { createElement, Fragment, type ReactNode } from "react";
 import type { GamePlugin } from "../../contracts";
 import { createGuard, type Guard } from "../crash-guard";
+import { buildSonataX } from "./build-sonata";
 import { composersHands } from "./composers-hands";
 import { conductor } from "./conductor";
 import { handPalette } from "./hand-palette";
@@ -33,6 +34,7 @@ export const experiments: Experiment[] = [
   composersHands,
   wetPaint, // #1106: its own page, /paint
   round, // #1123: play a round once, the DGX plays it back as voices 2–4
+  buildSonataX, // #1162: its own page, /sonata; the night as music, one note per merged PR
   handPalette, // #1127: the hand and judgment colors three ways, with a colour-blind simulation
 ];
 

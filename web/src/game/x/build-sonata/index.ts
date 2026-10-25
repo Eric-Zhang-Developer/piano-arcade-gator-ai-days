@@ -78,6 +78,6 @@ export const buildSonataX: Experiment = {
   group: "Wow",
   line: "The night the agents built Étude, as music (#1162)",
   issue: 1162,
-  href: "/sonata",
+  href: "/sonata?x=build-sonata", // x= is the registry's own rule; the page ignores it
   plugin: sonataPlugin,
 };

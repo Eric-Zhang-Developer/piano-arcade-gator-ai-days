@@ -1,9 +1,12 @@
 import { readFileSync } from "node:fs";
+import type { ReactElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import type { Chart, Judgment, Results, Take } from "../../contracts";
+import type { Chart, GamePlugin, Judgment, Results, Take } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
 import { scorePhrases } from "../weak-bars";
-import { barScores, handDrift, histogram, nextForKey, practiceBarsUrl, saveNextFor, timingCaption, tutorLine, weakestRun } from "./scores";
+import { duoResults, duoTutor } from ".";
+import { barCount, barScores, handDrift, histogram, nextForKey, practiceBarsUrl, saveNextFor, timingCaption, tutorLine, weakestRun } from "./scores";
 
 const load = (id: string): Chart => JSON.parse(readFileSync(new URL(`../../../public/songs/${id}/chart.json`, import.meta.url), "utf8"));
 const furElise = load("fur-elise");
@@ -116,5 +119,39 @@ describe("the practice URL and next for you", () => {
     expect(saveNextFor(storage, new URLSearchParams("song=fur-elise"), entry)).toBe(true);
     expect(JSON.parse(saved.get(nextForKey("fur-elise"))!)).toEqual(entry);
     expect(saveNextFor({ setItem: () => { throw new Error("blocked"); } }, new URLSearchParams("song=fur-elise"), entry)).toBe(false);
+  });
+});
+
+describe("the panels", () => {
+  const ctx = (chart: Chart, t: ReturnType<typeof take>, q = "song=" + chart.id) => ({ chart, ...t, params: new URLSearchParams(q), retry: () => {} });
+  const html = (plugin: GamePlugin, c: ReturnType<typeof ctx>) => {
+    const node = plugin.resultsPanel!(c);
+    return node === null ? null : renderToStaticMarkup(node as ReactElement);
+  };
+  const missed = take(furElise, (bar) => (bar >= 9 && bar <= 12 ? "MISS" : "PERFECT"));
+
+  it("one cell per bar, the weak run bracketed, and PRACTICE BARS on the same bars at 70%", () => {
+    const bands = html(duoResults(), ctx(furElise, missed, "song=fur-elise&hands=R&bot=perfect"))!;
+    expect(bands.match(/data-testid="duo-bar"/g)).toHaveLength(barCount(furElise));
+    expect(bands).toContain('data-testid="duo-run" data-from="9" data-to="12"');
+    expect(bands).toContain(">BARS 9–12<");
+    const tutor = html(duoTutor(), ctx(furElise, missed, "song=fur-elise&hands=R&bot=perfect"))!;
+    expect(tutor).toContain("PRACTICE BARS 9–12");
+    expect(tutor).toContain('data-href="/play?song=fur-elise&amp;hands=R&amp;from=9&amp;to=12&amp;tempo=70"');
+    expect(tutor).toContain("Bars 9–12 were your weakest: 0% of notes right.");
+  });
+
+  it("the histogram's bars hold every timed note", () => {
+    const t = take(twinkle, () => "PERFECT", (hand) => (hand === "L" ? -30 : 15));
+    const counts = [...html(duoResults(), ctx(twinkle, t))!.matchAll(/data-count="(\d+)"/g)].map((m) => Number(m[1]));
+    expect(counts.reduce((s, n) => s + n, 0)).toBe(twinkle.notes.length);
+  });
+
+  it("a clean take offers NEXT SONG, and a loop or wait take has no panels", () => {
+    expect(html(duoTutor(), ctx(twinkle, take(twinkle)))).toContain("NEXT SONG");
+    for (const q of ["song=twinkle&from=1&to=4&tempo=70", "song=twinkle&mode=wait"]) {
+      expect(html(duoResults(), ctx(twinkle, missed, q))).toBeNull();
+      expect(html(duoTutor(), ctx(twinkle, missed, q))).toBeNull();
+    }
   });
 });

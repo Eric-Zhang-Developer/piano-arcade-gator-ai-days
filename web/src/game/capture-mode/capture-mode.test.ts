@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { isCapture } from ".";
+import { CAPTURE_KEY, CAPTURE_SCRIPT, isCapture } from ".";
 
 it("?capture=1 turns it on", () => {
   expect(isCapture("?capture=1", null)).toBe(true);
@@ -14,4 +14,19 @@ it("with no param, the stored value decides", () => {
   expect(isCapture("?song=twinkle", "1")).toBe(true);
   expect(isCapture("", "0")).toBe(false);
   expect(isCapture("", null)).toBe(false); // nothing stored, or storage blocked
+});
+
+// The <head> script (video-shots) sets the flag before the first paint with isCapture's own rule, storage blocked too.
+it("the inline script agrees with isCapture, and never throws", () => {
+  const run = (search: string, stored: string | null, blocked = false) => {
+    const attrs = new Set<string>();
+    const storage = { getItem: (k: string) => { if (blocked) throw new Error("blocked"); return k === CAPTURE_KEY ? stored : null; } };
+    const document = { documentElement: { setAttribute: (name: string) => attrs.add(name) } };
+    new Function("location", "sessionStorage", "document", CAPTURE_SCRIPT)({ search }, storage, document);
+    return attrs.has("data-capture");
+  };
+  for (const search of ["?capture=1", "?capture=0", "?song=twinkle", "", "?song=twinkle&capture=1"])
+    for (const stored of ["1", "0", null]) expect(run(search, stored), `${search} ${stored}`).toBe(isCapture(search, stored));
+  expect(run("?capture=1", "0", true)).toBe(true);
+  expect(run("", "1", true)).toBe(false);
 });

@@ -1,0 +1,166 @@
+/* The video's cards (Cards.tsx), on the game's black so a cut from a card to play doesn't jump. Sized in vw/vh so
+   1920×1080 and 1280×720 show the same frame. Every part's resting style is its end state; the animations only say
+   where it comes from, so reduced motion (no animation) is the end state from the first frame. */
+.card {
+  position: fixed;
+  inset: 0;
+  background: var(--pa-bg);
+  color: var(--pa-ink);
+  overflow: hidden;
+}
+
+/* The hit line, where the game judges: 60% down, as wide as the frame. */
+.line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 60%;
+  height: 0.42vh;
+  background: var(--pa-ink);
+  transform-origin: left center;
+  animation: draw var(--dur) cubic-bezier(0.2, 0.7, 0.2, 1) var(--delay) both;
+}
+
+.stage {
+  position: absolute;
+  left: 9vw;
+  right: 9vw;
+  top: 0;
+  height: 60%;
+}
+
+/* The two hands as falling notes, resting on the line: right in blue, left in purple. */
+.note {
+  position: absolute;
+  bottom: 0;
+  width: 2.5vw;
+  height: 16vh;
+  animation: fall var(--dur) cubic-bezier(0.55, 0, 1, 0.45) var(--delay) both;
+}
+.right {
+  left: 0;
+  background: var(--pa-hand-r);
+}
+.left {
+  left: 3.6vw;
+  background: var(--pa-hand-l);
+}
+.rest {
+  animation: none;
+}
+.flash {
+  position: absolute;
+  inset: 0;
+  background: var(--pa-flare);
+  opacity: 0;
+  animation: hit var(--dur) ease-out var(--delay) both;
+}
+
+.name {
+  position: absolute;
+  left: 8.6vw;
+  bottom: -0.06em;
+  margin: 0;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 40vh;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  animation: rise var(--dur) cubic-bezier(0.2, 0.7, 0.2, 1) var(--delay) both;
+}
+.small {
+  font-size: 24vh;
+}
+
+/* One line per clause: the tagline breaks at its comma, never mid-phrase. */
+.clause {
+  display: block;
+}
+.tagline {
+  position: absolute;
+  left: 17.6vw;
+  right: 9vw;
+  top: calc(60% + 5vh);
+  margin: 0;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 5vh;
+  line-height: 1.2;
+  animation: rise var(--dur) cubic-bezier(0.2, 0.7, 0.2, 1) var(--delay) both;
+}
+
+.links {
+  position: absolute;
+  left: 17.6vw;
+  right: 4vw;
+  top: calc(60% + 5vh);
+  animation: rise var(--dur) cubic-bezier(0.2, 0.7, 0.2, 1) var(--delay) both;
+}
+/* The URL is the end card's whole job: the largest words on it after the name, in the accent. */
+.repo,
+.live {
+  margin: 0 0 2vh;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 4.4vh;
+  line-height: 1.15;
+  /* A URL a viewer types reads on one line, never broken at a hyphen. */
+  white-space: nowrap;
+}
+.repo {
+  color: var(--pa-primary);
+}
+
+@keyframes draw {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes fall {
+  from {
+    transform: translateY(-62vh);
+  }
+}
+@keyframes hit {
+  0% {
+    opacity: 0.9;
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(3vh);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .line,
+  .note,
+  .flash,
+  .name,
+  .tagline,
+  .links {
+    animation: none;
+  }
+}
+
+/* /shots with no card: the two links, for whoever records. */
+.index {
+  min-height: 100vh;
+  padding: 12vh 9vw;
+  background: var(--pa-bg);
+  color: var(--pa-ink);
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+}
+.indexTitle {
+  margin: 0 0 4vh;
+  font-size: 48px;
+  font-weight: 800;
+}
+.indexLink {
+  display: block;
+  margin-bottom: 2vh;
+  color: var(--pa-primary);
+  font-size: 32px;
+  font-weight: 600;
+}

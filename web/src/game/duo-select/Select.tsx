@@ -11,6 +11,10 @@ import { PianoRoll } from "./PianoRoll";
 import type { Roll } from "./roll";
 import styles from "./select.module.css";
 
+// The composer's name without its trailing note ("Traditional (French melody …)" → "Traditional"), for one-line
+// labels; the full attribution stays in the line's tooltip and the chart's source (#884).
+export const shortComposer = (composer: string) => composer.replace(/\s*\([^)]*\)\s*$/, "") || composer;
+
 const lv = (n: number) => String(n).padStart(2, "0");
 
 export interface FocusPanelProps {
@@ -42,8 +46,8 @@ export function FocusPanel(p: FocusPanelProps) {
           </div>
           <h2 className={styles.title}>{p.title}</h2>
           <MonoLabel style={{ fontSize: "clamp(14px, 1.1vw, 21px)" }}>
-            <span className={styles.composer}>
-              {p.composer}
+            <span className={styles.composer} title={p.composer}>
+              {shortComposer(p.composer)}
               {p.catalog && ` · ${p.catalog}`}
             </span>
           </MonoLabel>
@@ -123,7 +127,9 @@ export function SongRow({ title, composer, level, roll, focused }: { title: stri
             {title}
           </div>
           <MonoLabel style={{ fontSize: "clamp(12px, 0.9vw, 17px)" }}>
-            <span className={styles.rowComposer}>{composer}</span>
+            <span className={styles.rowComposer} title={composer}>
+              {shortComposer(composer)}
+            </span>
           </MonoLabel>
         </div>
         <div className={styles.rowLevel}>

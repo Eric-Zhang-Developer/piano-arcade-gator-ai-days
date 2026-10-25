@@ -52,13 +52,12 @@ export function withLevel(href: string, l: Level): string {
   return q ? `${path}?${q}` : path;
 }
 
-// Two chips in song-preview's LEARN / PRACTICE outline and type, stacked, each its own button (mouse-first: click the
-// level you want; E still switches); the level in force is lit in the primary blue
-// (Duo: zero radius, hairline frames), the other dimmed. Stacked so it fits beside the stats without a row of its own: a row
-// pushed the panel's last line onto the first-run link at 1280×720 (#532).
+// Two chips in song-preview's LEARN / PRACTICE outline and type, side by side, each its own button (mouse-first: click
+// the level you want; E still switches); the level in force is lit in the primary blue (Duo: zero radius, hairline
+// frames), the other dimmed. The select places them beside the song's source, under Hands and Speed (duo-select):
+// stacked in a column of their own, they narrowed Hands and Speed to a third row at 1280×720 (#863).
 const box: CSSProperties = {
   display: "inline-flex",
-  flexDirection: "column",
   alignItems: "stretch",
   gap: "0.35em",
   fontSize: "clamp(13px, 1vw, 20px)" /* song-options' chips, beside it */,

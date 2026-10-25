@@ -61,17 +61,6 @@
   background: color-mix(in srgb, var(--pa-primary) 14%, transparent); /* the kit's lit chip */
 }
 
-.hint {
-  margin: 0;
-  font-size: clamp(16px, 1.25vw, 24px);
-  color: var(--pa-ink-dim);
-}
-
-.hint b {
-  font-weight: 600;
-  color: var(--pa-ink);
-}
-
 .count {
   font-family: var(--pa-font-display), system-ui, sans-serif;
   font-weight: 800;

@@ -12,7 +12,7 @@ function walk(path: string): string[] {
   if (statSync(path).isFile()) return /\.tsx?$/.test(path) && !/\.test\.tsx?$/.test(path) ? [path] : [];
   return readdirSync(path).flatMap((f) => walk(join(path, f)));
 }
-const files = ["game", "app/page.tsx", "app/play", "app/sheet", "app/simon"].flatMap((p) => walk(join(src, p)));
+const files = ["game", "app/page.tsx", "app/play", "app/sheet", "app/simon", "app/wrong-note"].flatMap((p) => walk(join(src, p)));
 
 const HANDLES = /addEventListener\(\s*["']keydown["']|onKeyDown|["']keydown["']/;
 // `e.key === "x"`, `code !== "KeyZ"`, `k === "Enter"`, and `e.key.toLowerCase() !== "f"`.

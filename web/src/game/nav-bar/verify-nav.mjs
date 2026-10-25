@@ -1,7 +1,7 @@
 // Headless proof of the nav bar (spec: nav-bar, Validation 2). Its own `next dev`:
 // 1. / shows the bar with Play current, in the kit's inks, clear of the wordmark and the build stamp.
 // 2. Each slot's link answers 200 with no page error, and that page marks its own slot current.
-// 3. /play?song=twinkle, /cabinet and /?capture=1 show no bar (nor /operator, Status's page).
+// 3. /play?song=twinkle, /cabinet and /?capture=1 show no bar. /operator (Status) shows it, Status current.
 // Also: the GitHub link opens the repo in a new tab.
 // 4. nav-1280.png and nav-1920.png of /.
 // Usage: node web/src/game/nav-bar/verify-nav.mjs --out <dir>
@@ -114,8 +114,7 @@ try {
     await page.getByTestId("nav-bar").waitFor({ timeout: 60_000 }).catch(() => {});
     await page.waitForTimeout(1500);
     const cur = await current(page);
-    // Status opens /operator, a screen the bar stays off: there it's enough that the page loads with no bar.
-    const own = href === "/operator" ? !(await shown(page)) : cur.length === 1 && cur[0] === href;
+    const own = cur.length === 1 && cur[0] === href;
     check(res?.status() === 200 && !errs.length && own, `${href} -> ${res?.status()}, current ${JSON.stringify(cur)}${errs.length ? `, page error: ${errs[0]}` : ""}`);
     await page.screenshot({ path: join(out, `slot${href.replaceAll("/", "-") || "-home"}.png`) });
     await page.close();

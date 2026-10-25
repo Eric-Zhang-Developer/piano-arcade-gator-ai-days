@@ -86,7 +86,17 @@
   z-index: 1;
   max-width: 1180px;
   margin: 0 auto;
-  padding: 24px 32px 38vh;
+  padding: calc(4vh + 24px) 32px 38vh; /* the nav bar's 4vh band sits above the title (spec: nav-bar) */
+}
+
+/* the nav bar has no ground of its own: the sky masks the board as it scrolls under the bar */
+.page::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: 4vh;
+  background: var(--sky);
+  z-index: 3;
 }
 
 .header {

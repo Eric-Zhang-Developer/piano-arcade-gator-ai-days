@@ -34,10 +34,11 @@ describe("nav bar slots", () => {
     expect(doneSlots("/nonexistent")).toEqual([]);
   });
 
-  it("hides on /play, /cabinet, /attract, /operator and in capture mode; shows on /, /learn, /lab, /progress", () => {
-    for (const p of ["/play", "/cabinet", "/attract", "/operator", "/operator/x"]) expect(hideNav(p, false), p).toBe(true);
+  it("hides on /play, /cabinet, /attract and in capture mode; shows on /, /learn, /lab, /progress, /operator", () => {
+    for (const p of ["/play", "/cabinet", "/attract", "/attract/x"]) expect(hideNav(p, false), p).toBe(true);
     expect(hideNav("/", true)).toBe(true);
-    for (const p of ["/", "/learn", "/lab", "/progress", "/player"]) expect(hideNav(p, false), p).toBe(false);
+    expect(hideNav("/operator", true)).toBe(true);
+    for (const p of ["/", "/learn", "/lab", "/progress", "/player", "/operator", "/operator/x"]) expect(hideNav(p, false), p).toBe(false);
   });
 
   it("marks the current slot: Play only on /, others on their path and below", () => {

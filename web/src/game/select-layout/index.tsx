@@ -1,19 +1,19 @@
 "use client";
-// The music select (/): the focused song large on the left, the song cards on the right. Each card is a link, so
-// click and Enter play (the focused jacket moving into the stage card, select-to-stage); ↑/↓ move focus and keep the
-// focused card centered in the list; L learns the focused song in wait mode (learn-from-select); E switches Normal and
+// The music select (/), in the Duo look (duo-select): the focused song in a bracketed panel on the left, the song rows
+// on the right. Each row is a link, so click and Enter play (the panel's piano roll moving into the stage card,
+// select-to-stage); ↑/↓ move focus and keep the focused row centered in the list; P opens adaptive practice
+// (adaptive-chunks); L learns the focused song in wait mode (learn-from-select); W watches it; E switches Normal and
 // Easy (easy-charts), and every href and best grade follows the level. Hrefs and L also carry the song's Hands and
 // Speed (song-options).
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
 import type { Chart } from "../../contracts";
+import { adaptUrl, songPhrases, start } from "../adaptive-chunks/next";
+import { FocusPanel, SongRow } from "../duo-select/Select";
 import { LevelToggle, useLevel, withLevel } from "../easy-charts";
 import { useBestGrades } from "../records/best";
 import { recordKey } from "../records/store";
-import { SongCard } from "../song-card";
-import { SongJacket } from "../song-jacket/SongJacket";
-import { SelectStage } from "../select-stage";
 import { isLearnKey, learnUrl, SongPreview } from "../song-preview";
 import { useSongOptions, withOptions } from "../song-options";
 import { isWatchKey, watchUrl } from "../watch-demo/demo";
@@ -59,7 +59,24 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
     return () => window.removeEventListener("keydown", onKey);
   }, [level, setLevel]);
 
+  // PRACTICE: adaptive practice from the whole song (adaptive-chunks), with the song's hands and level. It needs the
+  // chart's phrases, so it waits for the focused chart.
+  const hands = song ? options[song.id]?.hands : undefined;
+  const practiceHref =
+    song && chart?.id === song.id
+      ? (() => {
+          const q = new URLSearchParams({ song: song.id });
+          if (hands && hands !== "both") q.set("hands", hands);
+          const list = songPhrases(chart.chart, q.get("hands"));
+          return list.length ? withLevel(adaptUrl(q, list, start(list)), level) : null;
+        })()
+      : null;
+
   function onKeyDown(e: KeyboardEvent<HTMLOListElement>) {
+    if (isPracticeKey(e) && practiceHref) {
+      e.preventDefault();
+      return router.push(practiceHref);
+    }
     if (isLearnKey(e) && song) {
       e.preventDefault();
       return router.push(withOptions(withLevel(learnUrl(song.id), level), options[song.id]));
@@ -88,41 +105,36 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
     goToStage(e.currentTarget.getAttribute("href")!, router);
   }
 
+  const playHref = (id: string) => withOptions(withLevel(`/play?song=${id}`, level), options[id]);
   return (
     <main className={styles.screen}>
-      <SelectStage />
       <header className={styles.top}>
         <h1 className={styles.wordmark}>{APP_NAME}</h1>
         <p className={styles.hint}>
-          <b>↑ ↓</b> choose · <b>Enter</b> play · <b>L</b> learn · <b>W</b> watch · <b>E</b> easy
+          <b>↑↓</b> SELECT · <b>ENTER</b> PLAY · <b>P</b> PRACTICE · <b>L</b> LEARN · <b>W</b> WATCH · <b>E</b> EASY
         </p>
       </header>
       <div className={styles.left}>
         {song && (
-          <section className={styles.focus} key={song.id} aria-live="polite">
-            <div className={styles.jacket} style={{ viewTransitionName: "stage-jacket" }}>
-              <SongJacket id={song.id} title={song.title} composer={song.composer} />
-            </div>
-            <h2 className={styles.title}>{song.title}</h2>
-            <p className={styles.composer}>
-              {song.composer}
-              {song.catalog && ` · ${song.catalog}`}
-            </p>
-            <div className={styles.statsRow}>
-              <dl className={styles.stats}>
-                <div className={styles.level}>
-                  <dt>Level</dt>
-                  <dd>{song.level}</dd>
-                </div>
-                <div>
-                  <dt>Notes</dt>
-                  <dd>{song.noteCount}</dd>
-                </div>
-              </dl>
-              <LevelToggle normal={song.level} chart={chart?.id === song.id ? chart.chart : null} />
-            </div>
-            <SongPreview id={song.id} best={bestOf(song.id)} />
-          </section>
+          <FocusPanel
+            key={song.id}
+            id={song.id}
+            title={song.title}
+            composer={song.composer}
+            catalog={song.catalog}
+            roll={song.roll}
+            level={song.level}
+            notes={song.noteCount}
+            best={bestOf(song.id)}
+            onPlay={() => {
+              uiSound("confirm");
+              goToStage(playHref(song.id), router);
+            }}
+            onPractice={practiceHref ? () => router.push(practiceHref) : null}
+          >
+            <LevelToggle normal={song.level} chart={chart?.id === song.id ? chart.chart : null} />
+            <SongPreview id={song.id} />
+          </FocusPanel>
         )}
         {footer && <div className={styles.footer}>{footer}</div>}
       </div>
@@ -130,7 +142,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
         {songs.map((s, i) => (
           <li key={s.id}>
             <Link
-              href={withOptions(withLevel(`/play?song=${s.id}`, level), options[s.id])}
+              href={playHref(s.id)}
               autoFocus={i === 0}
               className={styles.link}
               data-testid={`song-${s.id}`}
@@ -138,12 +150,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
               onFocus={() => setFocused(i)}
               onMouseEnter={(e) => e.currentTarget.focus({ preventScroll: true })} // hover highlights too (song-preview)
             >
-              <SongCard
-                {...s}
-                focused={i === focused}
-                jacket={<SongJacket id={s.id} title={s.title} composer={s.composer} />}
-                best={bestOf(s.id)}
-              />
+              <SongRow title={s.title} composer={s.composer} level={s.level} roll={s.roll} focused={i === focused} />
             </Link>
           </li>
         ))}
@@ -151,3 +158,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
     </main>
   );
 }
+
+// P on the select: plain p or P, no modifiers, no repeat (the laptop piano's KeyP plays only on /play).
+const isPracticeKey = (e: Pick<KeyboardEvent, "key" | "ctrlKey" | "metaKey" | "altKey" | "repeat">) =>
+  (e.key === "p" || e.key === "P") && !e.ctrlKey && !e.metaKey && !e.altKey && !e.repeat;

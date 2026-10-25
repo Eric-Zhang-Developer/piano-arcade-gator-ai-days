@@ -77,12 +77,12 @@ describe("no feedback", () => {
     expect(f.counts()).toEqual({ received: 1, filtered: 1 });
   });
 
-  it("the echo guard drops a channel-1 copy within its window of a send, and keeps a real press outside it", () => {
-    const f = echoFilter();
+  it("the echo guard, when on, drops a channel-1 copy within its window of a send, and keeps a real press outside it", () => {
+    const f = echoFilter(5);
     f.sent(67, 70, 5000);
-    expect(f.drop("on", 67, 70, 5000 + roundSettings.echoWindowMs - 1)).toBe(true);
+    expect(f.drop("on", 67, 70, 5000 + 4)).toBe(true);
     expect(f.drop("off", 67, 0, 5200)).toBe(true);
-    expect(f.drop("on", 67, 70, 5000 + roundSettings.echoWindowMs + 20)).toBe(false); // the player's own press: judged
+    expect(f.drop("on", 67, 70, 5000 + 25)).toBe(false); // the player's own press: judged
     expect(f.drop("off", 67, 0, 5400)).toBe(false);
   });
 
@@ -94,9 +94,15 @@ describe("no feedback", () => {
   });
 
   it("a press in exact unison with an echo, at its own velocity, is judged: a round makes unisons on purpose", () => {
-    const f = echoFilter();
+    const f = echoFilter(5);
     f.sent(65, 80, 3000);
     expect(f.drop("on", 65, 64, 3000)).toBe(false);
     expect(f.drop("on", 65, 80, 3000)).toBe(true); // the copy
+  });
+
+  it("off by default: a unison press at the echo's own velocity is judged", () => {
+    const f = echoFilter();
+    f.sent(65, 80, 3000);
+    expect(f.drop("on", 65, 80, 3000)).toBe(false);
   });
 });

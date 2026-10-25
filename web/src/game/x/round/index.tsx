@@ -5,8 +5,9 @@ import Link from "next/link";
 import type { Frame, GamePlugin, InputDevice } from "../../../contracts";
 import { settings } from "../../core/settings";
 import { canvasFonts, DataCell, MonoLabel, Panel } from "../../duo-tokens";
+import { meterLayout } from "../../fever-gauge";
 import { PIANO_NAME } from "../../laptop-sound";
-import { gold, ink, secondary } from "../../ui-tokens";
+import { bg, gold, ink, secondary } from "../../ui-tokens";
 import type { Experiment } from "..";
 import { saveLast } from "../highlight-reel/take";
 import { echoes, echoFilter, entryFor, programChanges, roundSettings, silence, type Played } from "./echo";
@@ -144,6 +145,11 @@ function roundPlugin(): GamePlugin {
       const calm = still();
       const ons = played.filter((p) => p.type === "on");
       ctx.save();
+      // Under the HUD and its meter, as the notes are: x plugins draw last, so clip rather than trust the order.
+      const { bar } = meterLayout(f.width, line);
+      ctx.beginPath();
+      ctx.rect(0, bar.y + bar.h, f.width, line - bar.y - bar.h);
+      ctx.clip();
       ctx.lineWidth = 2;
       for (const on of ons) {
         const off = played.find((p) => p.type === "off" && p.pitch === on.pitch && p.atMs >= on.atMs);
@@ -168,18 +174,26 @@ function roundPlugin(): GamePlugin {
           ctx.strokeRect(k.x + 3, Math.max(0, top), k.width - 6, Math.min(line, bottom) - Math.max(0, top));
         }
       }
-      // VOICE n at each entry: your first note, an entry later.
+      // VOICE n where each voice comes in: over the lane of your first note, as its copy lands on the line.
       const first = ons[0];
-      const size = Math.max(12, Math.round(f.height / 50));
+      const k = f.keyX(first.pitch);
+      const size = Math.max(14, Math.round(f.height / 40));
       ctx.font = canvasFonts.data(size);
-      ctx.textAlign = "right";
-      ctx.textBaseline = "top";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
       for (let v = 1; v < entry.voices; v++) {
         const since = f.nowMs - (first.atMs + v * entry.intervalMs);
         if (since < 0 || since > LABEL_MS) continue;
         ctx.globalAlpha = calm ? 1 : 1 - since / LABEL_MS;
+        // On a black plate, so the lanes' outlines never run through the word.
+        const text = `VOICE ${v + 1}`;
+        const w = ctx.measureText(text).width + size;
+        const x = k.x + k.width / 2;
+        const y = line - size * 0.6;
+        ctx.fillStyle = bg;
+        ctx.fillRect(x - w / 2, y - size * 1.2, w, size * 1.4);
         ctx.fillStyle = voiceColors[v - 1];
-        ctx.fillText(`VOICE ${v + 1}`, f.width - size, line * 0.3);
+        ctx.fillText(text, x, y);
       }
       ctx.restore();
     },

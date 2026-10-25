@@ -14,7 +14,10 @@ export const roundSettings = {
   // Not yet picked by ear on the DGX (decision round-voices; Eric's morning page).
   programs: [49, 74, 53],
   lookaheadMs: 300, // as beat-track: a Stop or a pause leaves at most this much already sent
-  echoWindowMs: 5, // the echo guard's window: a round puts one pitch in two voices on purpose (decision round-voices)
+  // The channel-1 echo guard's window, 0 = off. Off: the DGX sent nothing back at its defaults (spike R7), and the
+  // guard costs real presses, since a round puts one pitch in two voices at once and laptop keys and bots play one
+  // velocity (the bot lost 6 of 32). Set 5 if the DGX is seen echoing on channel 1 (decision round-voices).
+  echoWindowMs: 0,
 };
 
 export interface Played {
@@ -80,7 +83,7 @@ export function echoFilter(windowMs = roundSettings.echoWindowMs) {
     // true: drop it. Called for every input event, in order.
     drop(type: "on" | "off", pitch: number, velocity: number, timeMs: number): boolean {
       if (type === "off") return dropped.delete(pitch);
-      const echo = foreign.some((f) => f.pitch === pitch && Math.abs(f.timeStamp - timeMs) < 0.5) || guard.isEcho(key(pitch, velocity), timeMs);
+      const echo = foreign.some((f) => f.pitch === pitch && Math.abs(f.timeStamp - timeMs) < 0.5) || (windowMs > 0 && guard.isEcho(key(pitch, velocity), timeMs));
       if (echo) {
         dropped.add(pitch);
         filtered++;

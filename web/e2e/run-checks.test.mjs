@@ -3,7 +3,7 @@ import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { DEFAULT_SECONDS, KNOWN_RED, MAIN_CHECK, SECONDS, allChecks, exitCode, retriesFor, runChecks, selectChecks, shard } from "./run-checks.mjs";
+import { DEFAULT_SECONDS, KNOWN_RED, MAIN_CHECK, NOT_IN_CI, SECONDS, allChecks, exitCode, retriesFor, runChecks, selectChecks, shard } from "./run-checks.mjs";
 
 const TOAST = "web/src/game/notice-toast/verify-toast.mjs";
 const SIM = "web/src/game/sim/verify-sim.mjs";
@@ -65,10 +65,16 @@ describe("shard", () => {
     expect(shard(["x", "y"], 1, 2, {})).toEqual(["x"]); // unknown checks count DEFAULT_SECONDS each
   });
 
-  it("a full run's 8 shards each fit well inside the 20 min job, by the table (#673)", () => {
+  it("a full run's 16 shards each fit about 7 min of checks, by the table (#673, Eric's 7 min target)", () => {
     const all = allChecks(execFileSync("git", ["ls-files", "web/src", "web/e2e"], { cwd: new URL("../../", import.meta.url).pathname, encoding: "utf8" }).split("\n"));
-    const minutes = [1, 2, 3, 4, 5, 6, 7, 8].map((i) => shard(all, i, 8).reduce((s, c) => s + (SECONDS[c] ?? DEFAULT_SECONDS), 0) / 60);
-    expect(Math.max(...minutes), minutes.map((m) => m.toFixed(1)).join(" ")).toBeLessThan(14);
+    const minutes = Array.from({ length: 16 }, (_, k) => shard(all, k + 1, 16).reduce((s, c) => s + (SECONDS[c] ?? DEFAULT_SECONDS), 0) / 60);
+    expect(Math.max(...minutes), minutes.map((m) => m.toFixed(1)).join(" ")).toBeLessThan(7);
+  });
+
+  it("leaves NOT_IN_CI out of every run, and only files that exist", () => {
+    const files = [...NOT_IN_CI, "web/src/game/sheet-view/verify-sheet-a.mjs"];
+    expect(allChecks(files)).toEqual([MAIN_CHECK, "web/src/game/sheet-view/verify-sheet-a.mjs"]);
+    for (const f of NOT_IN_CI) expect(existsSync(new URL(`../../${f}`, import.meta.url)), f).toBe(true);
   });
 
   it("leaves a shard empty when there are fewer checks than shards", () => {

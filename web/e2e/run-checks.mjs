@@ -37,9 +37,13 @@ const CHECK_TIMEOUT_MS = 8 * 60_000;
 // Decision ci-browser-known-red.md.
 export const KNOWN_RED = {};
 
-/** Every check: verify.mjs first, then each verify*.mjs under web/src/, sorted. `files` are repo-relative paths. */
+// Checks CI skips because other checks cover them in smaller pieces. Each stays a whole run for people and specs.
+// verify-sheet.mjs: verify-sheet-a/-b/-c.mjs run its follow run split by song (#682), so no shard waits 7 min on it.
+export const NOT_IN_CI = ["web/src/game/sheet-view/verify-sheet.mjs"];
+
+/** Every check: verify.mjs first, then each verify*.mjs under web/src/ not in NOT_IN_CI, sorted. Repo-relative paths. */
 export function allChecks(files) {
-  const feature = files.filter((f) => f.startsWith("web/src/") && /\/verify[^/]*\.mjs$/.test(f)).sort();
+  const feature = files.filter((f) => f.startsWith("web/src/") && /\/verify[^/]*\.mjs$/.test(f) && !NOT_IN_CI.includes(f)).sort();
   return [MAIN_CHECK, ...feature];
 }
 

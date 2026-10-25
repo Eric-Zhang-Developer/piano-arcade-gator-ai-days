@@ -24,6 +24,7 @@ import { noteLabels } from "./note-labels";
 import { pianoOut } from "./piano-out";
 import { pianoVoice } from "./piano-voice";
 import { scenes } from "./scenes";
+import { scoreFollow } from "./score-follow";
 import { watchDemo } from "./watch-demo";
 import { evenness } from "./evenness";
 import { dynamics } from "./dynamics";
@@ -78,6 +79,7 @@ export const plugins: GamePlugin[] = [
   watchDemo(), // ?demo=1 (W on the select): after scenes, and over the HUD band, where its DEMO badge draws; back to / after the results
   feverMoment(), // fever's start: the edge flash and a FEVER banner over the HUD band, under beat-track's status line
   beatTrack(),
+  scoreFollow(), // ?mode=flow&band=follow|hold: a bass-and-drums band that follows you (score-follow-spike); else silent
   midiWatchdog(), // reconnects a piano that goes silent mid-song
   waitMode(), // start panel: Learn it first; results panel after a wait-mode take: Play it judged, on top
   flowMode(), // ?mode=flow: the tempo readout, the waiting note's glow, Take your time; Play in Flow; the results headline

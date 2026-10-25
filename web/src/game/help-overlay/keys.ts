@@ -118,6 +118,15 @@ export const helpGroups: HelpGroup[] = [
     ],
   },
   {
+    screen: "Spot the wrong note",
+    files: ["app/wrong-note/page.tsx"],
+    lines: [
+      { keys: ["Space"], what: "start a set, the next round, or again after one; Enter too", source: ["app/wrong-note/page.tsx"], match: ["Space", "Enter"], control: "Start" },
+      { keys: ["2–8"], what: "the note that changed", source: ["app/wrong-note/page.tsx"], control: "The phrase's 8 notes" },
+      { keys: ["R"], what: "hear the phrase again", source: ["app/wrong-note/page.tsx"], match: ["r", "R"], control: "Replay" },
+    ],
+  },
+  {
     screen: "Anywhere",
     files: ["game/help-overlay/index.tsx"],
     lines: [

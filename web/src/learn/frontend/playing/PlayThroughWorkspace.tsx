@@ -40,17 +40,18 @@ export function PlayThroughWorkspace() {
     </div>
     <aside className={styles.guide} aria-label="Play-through controls">
       <div className={styles.guideBody}>
-        {phase === 'ready' && <><h2>Play from start to finish</h2><p>Keep going through slips. Feedback comes after the last bar.</p></>}
+        {/* The take is a sample learner's, as on /learn/practice (#946): this page doesn't listen, so no feedback is about the player. */}
+        {phase === 'ready' && <><h2>Play from start to finish</h2><p>Keep going through slips. An example take shows the flow, with feedback on it after the last bar.</p></>}
         {phase === 'countin' && <><h2>Get ready</h2><p role="status" className={styles.count}>{count}</p></>}
         {phase === 'playing' && <><h2>Playing through</h2><p role="status">Bar {Math.min(12, Math.floor(Math.max(0, playback.beat) / 4) + 1)} of 12</p></>}
-        {phase === 'result' && <><h2>Play-through complete</h2><p>Example feedback: keep the long notes full length, especially at the end of each phrase.</p><details className={styles.details}><summary>What this example shows</summary><p>A scripted result for this melody with the score at {music.bpm} bpm. No performance was recorded or assessed. Playing from memory, retention after a delay and transfer to new music are untested.</p></details></>}
+        {phase === 'result' && <><h2>Play-through complete</h2><p>In that example take the long notes ran short: keep them full length, especially at the end of each phrase.</p><details className={styles.details}><summary>What this example shows</summary><p>A scripted result for this melody with the score at {music.bpm} bpm. No performance was recorded or assessed. Playing from memory, retention after a delay and transfer to new music are untested.</p></details></>}
         {error && <p role="alert" className={styles.error}>{error}</p>}
         {!running && <details className={styles.details}><summary>About this preview</summary><p>A silent playhead demonstrates a full take. You can play along on your piano; this preview does not listen. No hints or corrective coaching appear during the take.</p></details>}
       </div>
       <div className={styles.actions}>
-        {phase === 'ready' && <button type="button" className={styles.primary} onClick={begin}>Start preview take</button>}
-        {running && <button type="button" className={styles.secondary} onClick={() => { stop(); send('stop'); }}>Stop preview</button>}
-        {phase === 'result' && <><Link className={styles.primary} href="/learn">Back to map</Link><button type="button" className={styles.secondary} onClick={() => send('again')}>Play again</button></>}
+        {phase === 'ready' && <button type="button" className={styles.primary} onClick={begin}>See an example take</button>}
+        {running && <button type="button" className={styles.secondary} onClick={() => { stop(); send('stop'); }}>Stop example</button>}
+        {phase === 'result' && <><Link className={styles.primary} href="/learn">Back to map</Link><button type="button" className={styles.secondary} onClick={() => send('again')}>See it again</button></>}
       </div>
     </aside>
   </section>;

@@ -7,10 +7,10 @@ import { useEffect, useRef, useState } from "react";
 import type { Chart } from "../../../contracts";
 import { drawHighway, makeLayout } from "../../core/highway";
 import { settings } from "../../core/settings";
-import { Button, DataCell, MonoLabel } from "../../duo-tokens";
+import { Button, canvasFonts, DataCell, MonoLabel } from "../../duo-tokens";
 import { PIANO_NAME } from "../../laptop-sound";
 import { loadPedal } from "../../pedal";
-import { primary } from "../../ui-tokens";
+import { ink, inkDim, primary } from "../../ui-tokens";
 import styles from "./conduct.module.css";
 import { createSession, type Output, type Session, type SessionState } from "./session";
 import { loadLandmarker, trackVideo } from "./tracker";
@@ -23,11 +23,11 @@ const SONGS = [
 const GOLDEN = { id: "local/golden-hard", label: "Golden" }; // local and optional: listed only when it loads
 
 const STATE_LINE: Record<SessionState | "off", string> = {
-  off: "Start the camera, then give two beats to set the tempo",
-  prep: "Two beats to set the tempo. The song starts on the third",
-  running: "Following you",
+  off: "Camera off",
+  prep: "Waiting for two beats",
+  running: "Following your tempo",
   held: "Held. Beat again to go on",
-  cut: "Cut off. Two beats to start again",
+  cut: "Cut off",
   fin: "Fine",
 };
 
@@ -37,6 +37,35 @@ const loadChart = async (id: string): Promise<Chart> => {
   if (!r.ok) throw new Error(`No song called "${id}".`);
   return r.json();
 };
+
+// What the pit says while it waits for the conductor.
+const PIT_CUE: Partial<Record<SessionState | "off", [string, string]>> = {
+  off: ["Raise a hand", "Two beats set the tempo. The piano comes in on the third"],
+  prep: ["Two beats", "Strike down and up again: the low point is the beat"],
+  cut: ["Two beats", "to start again from here"],
+};
+
+// The gesture, drawn in the camera's place until it's on: a stroke down into a low point, the beat, and back up.
+function drawGesture(ctx: CanvasRenderingContext2D, w: number, h: number) {
+  ctx.clearRect(0, 0, w, h);
+  const [x0, y0, xl, yl, x1, y1] = [w * 0.32, h * 0.2, w * 0.5, h * 0.72, w * 0.68, h * 0.42];
+  ctx.lineCap = "round";
+  ctx.strokeStyle = primary;
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(x0, y0);
+  ctx.quadraticCurveTo(x0 + (xl - x0) * 0.35, yl, xl, yl);
+  ctx.quadraticCurveTo(xl + (x1 - xl) * 0.5, yl, x1, y1);
+  ctx.stroke();
+  ctx.fillStyle = ink;
+  ctx.beginPath();
+  ctx.arc(xl, yl, 9, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.font = canvasFonts.data(13);
+  ctx.textAlign = "center";
+  ctx.fillStyle = inkDim;
+  ctx.fillText("THE BEAT", xl, yl + 32);
+}
 
 const reducedMotion = () => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -107,6 +136,21 @@ export function Conduct() {
         const L = makeLayout(chart, width, height, settings.perspective);
         const nowMs = s ? s.nowMs(now) : -60000 / chart.bpm;
         drawHighway(ctx, L, chart, { nowMs, noteState: empty, pressed: s?.pressed() ?? new Set(), latest: null, countInBeat: null });
+        const cue = PIT_CUE[s?.state ?? "off"];
+        if (cue) {
+          const big = Math.round(Math.min(width / 9, height / 6));
+          const y = L.judgmentLineY * 0.42;
+          ctx.fillStyle = "rgba(3, 6, 7, 0.88)"; // the ground, so no note runs through the words
+          ctx.fillRect(0, y - big * 1.05, width, big * 1.95);
+          ctx.textAlign = "center";
+          ctx.textBaseline = "alphabetic";
+          ctx.font = canvasFonts.display(big);
+          ctx.fillStyle = ink;
+          ctx.fillText(cue[0].toUpperCase(), width / 2, y);
+          ctx.font = canvasFonts.data(Math.round(big / 4.2));
+          ctx.fillStyle = inkDim;
+          ctx.fillText(cue[1].toUpperCase(), width / 2, y + big * 0.62);
+        }
         // the pulse: a band on the hit line that fades over 200 ms; under reduced motion a flat tint for as long
         const since = now - (s?.pulseAt() ?? -Infinity);
         if (since < 200) {
@@ -119,7 +163,8 @@ export function Conduct() {
       const t = thumb.current;
       const tctx = t?.getContext("2d");
       const v = video.current;
-      if (t && tctx && v && v.readyState >= 2) {
+      if (t && tctx && (!v || v.readyState < 2)) drawGesture(tctx, t.width, t.height);
+      else if (t && tctx && v && v.readyState >= 2) {
         const [w, h] = [t.width, t.height];
         tctx.save();
         tctx.translate(w, 0);
@@ -218,12 +263,20 @@ export function Conduct() {
   };
 
   const songs = golden ? [...SONGS, GOLDEN] : SONGS;
-  const bpm = readout.bpm === null ? "—" : Math.round(readout.bpm);
+  const conducted = readout.bpm !== null;
+  const bpm = conducted ? Math.round(readout.bpm!) : (chart?.bpm ?? "");
   return (
     <main className={styles.page}>
       <header className={styles.head}>
         <h1 className={styles.title}>Conduct</h1>
         <p className={styles.sub}>{chart ? `${chart.title} · ${chart.composer}` : "Wave a hand. The piano follows."}</p>
+        <nav className={styles.songs} aria-label="Songs">
+          {songs.map((s) => (
+            <Link key={s.id} href={`/conduct?song=${s.id}${clip ? "&clip=1" : ""}`} className={styles.song} aria-current={s.id === songId ? "page" : undefined}>
+              {s.label}
+            </Link>
+          ))}
+        </nav>
         <Link href="/lab" className={styles.back}>
           Lab
         </Link>
@@ -240,14 +293,14 @@ export function Conduct() {
                 <span className={styles.dot} aria-hidden /> {clip ? "Clip" : "Camera on"}
               </MonoLabel>
             )}
-            {cam !== "on" && <MonoLabel style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", fontSize: 12 }}>{cam === "loading" ? "Loading the hand tracker…" : clip ? "No clip" : "Camera off"}</MonoLabel>}
+            {cam === "loading" && <MonoLabel style={{ position: "absolute", top: 8, left: 10, fontSize: 12 }}>Loading the hand tracker…</MonoLabel>}
           </div>
           <div className={styles.tempo}>
             <MonoLabel>Tempo</MonoLabel>
-            <span className={styles.bpm} data-testid="conduct-bpm">
+            <span className={styles.bpm} data-testid="conduct-bpm" style={conducted ? undefined : { color: "var(--pa-ink-dim)" }}>
               {bpm}
             </span>
-            <MonoLabel>{readout.ratio === null ? `BPM · chart ${chart?.bpm ?? "—"}` : `BPM · ×${readout.ratio.toFixed(2)} the chart's ${chart?.bpm}`}</MonoLabel>
+            <MonoLabel>{readout.ratio === null ? "BPM · as written" : `BPM · ×${readout.ratio.toFixed(2)} the chart's ${chart?.bpm}`}</MonoLabel>
           </div>
           <p className={styles.state} data-testid="conduct-state">
             {STATE_LINE[cam === "on" ? readout.state : "off"]}
@@ -263,26 +316,21 @@ export function Conduct() {
                 <input type="file" accept="video/*" disabled={!chart} onChange={(e) => e.target.files?.[0] && start(e.target.files[0])} />
               </label>
             ) : cam === "off" ? (
-              <Button onClick={() => start()} disabled={!chart}>
+              <Button onClick={() => start()} disabled={!chart} style={{ fontSize: "0.85em" }}>
                 Start camera
               </Button>
             ) : (
-              <Button kind="secondary" onClick={stop}>
+              <Button kind="secondary" onClick={stop} style={{ fontSize: "0.85em" }}>
                 Stop
               </Button>
             )}
-            <Button kind="secondary" onClick={copy} disabled={cam !== "on" && readout.beats === 0}>
-              {copied ? "Copied" : "Copy log"}
-            </Button>
+            {readout.beats > 0 && (
+              <Button kind="secondary" onClick={copy} style={{ fontSize: "0.85em" }}>
+                {copied ? "Copied" : "Copy log"}
+              </Button>
+            )}
           </div>
-          <p className={styles.small}>Frames stay in this browser. Nothing is recorded or saved. A fist cuts off; a still hand holds.</p>
-          <nav className={styles.songs} aria-label="Songs">
-            {songs.map((s) => (
-              <Link key={s.id} href={`/conduct?song=${s.id}${clip ? "&clip=1" : ""}`} className={styles.song} aria-current={s.id === songId ? "page" : undefined}>
-                {s.label}
-              </Link>
-            ))}
-          </nav>
+          <p className={styles.small}>A still hand holds, a fist cuts off. Frames stay in this browser; nothing is recorded.</p>
         </aside>
       </div>
     </main>

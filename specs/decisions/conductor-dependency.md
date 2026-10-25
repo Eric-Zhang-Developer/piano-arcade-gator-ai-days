@@ -20,6 +20,12 @@ adding it to the frozen `web/package.json`. The worker confirms the URLs and log
 `web/src/game/x/conductor/tracker.ts`. Next 16 builds with Turbopack, which honours `turbopackIgnore`; webpack honours
 `webpackIgnore`. With either, the browser fetches the URL itself.
 
+**Checked in the dev build (2026-10-25):**
+- The served chunk (`src_game_…js`) still has the native `import(…/vision_bundle.mjs)`.
+- Run from /conduct in the in-app browser, the same load reached a working landmarker in 8.2 s from cold, on the
+  GPU delegate.
+- `detectForVideo` on a blank frame returned 0 hands.
+
 **Options:**
 - `numHands: 1`, `runningMode: "VIDEO"` and `delegate: "GPU"`.
 - The confidences are left at the defaults (0.5).

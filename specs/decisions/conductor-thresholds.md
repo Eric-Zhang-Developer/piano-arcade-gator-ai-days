@@ -26,5 +26,11 @@ it up past 1.5× catches up slowly. That's the clamp doing what the spec asks.
 **Hold:** "a hand still for 2 beats" is read as no beat for 2 beats at the current rate, plus `holdSlackMs`. Wrist
 speed isn't checked: a hand that waves without striking also holds.
 
+**Golden:** nothing lists local songs, so the page sends a HEAD for `local/golden-hard/chart.json` and lists Golden
+only when it answers.
+- Without Golden, that's one 404 in the console per visit.
+- No browser check runs on /conduct, so it fails nothing.
+- Promotion would want a listing instead.
+
 **How to undo:** change the value in its settings object. The tests name the bars, not the values, except the clamp
 test above.

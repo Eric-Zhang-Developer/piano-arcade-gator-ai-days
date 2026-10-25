@@ -2,7 +2,9 @@
    tempo as one big numeral, and the controls. Type scales with the width (16 px at 1280, 24 px at 1920), as /lab. */
 .page {
   box-sizing: border-box;
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
   padding: 2.4em 2.5em 1.2em;
   background: var(--pa-bg);
   color: var(--pa-ink);
@@ -28,7 +30,7 @@
 }
 
 .back {
-  margin-left: auto;
+  margin-left: 1.6em;
   color: var(--pa-ink-dim);
   text-decoration: none;
 }
@@ -47,8 +49,9 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 16em;
   gap: 1.4em;
+  flex: 1;
+  min-height: 0;
   margin-top: 1em;
-  height: calc(100vh - 6.2em);
 }
 
 .highway {
@@ -61,7 +64,7 @@
 .stand {
   display: flex;
   flex-direction: column;
-  gap: 0.9em;
+  gap: 0.7em;
   min-height: 0;
 }
 
@@ -135,9 +138,8 @@
 
 .songs {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.2em 1em;
-  margin-top: auto;
+  gap: 1.1em;
+  margin-left: auto;
 }
 
 .song {

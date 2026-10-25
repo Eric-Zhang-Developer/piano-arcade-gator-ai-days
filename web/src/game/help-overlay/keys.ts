@@ -135,6 +135,7 @@ export const helpGroups: HelpGroup[] = [
 
 // Files that handle keys but need no line, and why.
 export const unlisted: Record<string, string> = {
+  "game/audio-track/index.ts": "starts a local song's recording on the first key or pointer press: not a control",
   "game/cabinet/idle.ts": "any key restarts the cabinet's idle timer: not a control",
   "game/song-preview/index.tsx": "Enter and L stop the preview as you leave the select: the select's lines cover them",
   "game/laptop-sound/index.ts": "starts the laptop's audio on the first key or pointer press; its notes are the laptop keys' lines: not a control",

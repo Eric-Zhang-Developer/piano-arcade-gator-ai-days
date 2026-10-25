@@ -4,6 +4,6 @@ On `/learn`: a map of music skills, from pitch and rhythm to phrase endings, wit
 ## Where it lives
 Start `/learn/brand-preview`; `/learn` remains Prior UI. `PRODUCT_PHILOSOPHY.md`, `PRODUCT_AND_DESIGN.md` and README explain purpose/assets/edit paths. Code lives in `web/src/learn/frontend/` (cues: `ink/cue.ts`, `playing/Passage.tsx` `useNoteCues`), its learning routes and committed `web/public/learning/` media.
 ## How to check it
-`pnpm -C web exec vitest run src/learn/frontend` passes (with `ink/cue.test.ts`). On `/learn/practice?node=pitch.find-keys&sim`, `addEventListener('etude:ink', e => console.log(e.detail))`, Start take, then `__masteryMidi.push({ data: [0x90, 30, 80] })` logs `{ kind: 'wrong' }`. Browser runs: not verified locally; covered by main's scheduled full run.
+`pnpm -C web exec vitest run src/learn/frontend` passes (with `ink/cue.test.ts`). On `/learn/practice?node=pitch.find-keys&sim`, listen for `etude:ink` on `window`, Start take, then `__masteryMidi.push({ data: [0x90, 30, 80] })` sends `{ kind: 'wrong' }`. Browser runs: not verified locally; covered by main's scheduled full run.
 ## Gaps
 `/learn/understand` (EncodingSandbox) and `/learn/review/theory` (Retrieval) send no cues yet; no `say` cue is sent, since no page line was moved into the ink. Practice and play-through show a sample learner's take (#946), so they send only `next`. `companion-gator.svg` stays: the game's select and results still load it. Authored sample learner/assignment and in-memory sessions. Desktop only; publishing code does not deploy a production service.

@@ -2,9 +2,9 @@ import { phraseNotes } from './lesson';
 import styles from './learning.module.css';
 
 const pitchSteps: Record<number, number> = {60: -2, 62: -1, 64: 0, 65: 1, 67: 2, 69: 3, 71: 4, 72: 5};
-export function PhraseScore({ phrase }: { phrase: 1 | 2 }) {
+export function PhraseScore({ phrase, active = false }: { phrase: 1 | 2; active?: boolean }) {
   const notes = phraseNotes(phrase);
-  return <figure className={styles.phrase}><figcaption>Phrase {phrase}<span>Bars {phrase === 1 ? '1–2' : '3–4'}</span></figcaption><svg viewBox="0 0 660 155" role="img" aria-label={`Phrase ${phrase}, bars ${phrase === 1 ? '1 to 2, ending on G' : '3 to 4, ending on C'}`}>
+  return <figure className={styles.phrase} data-playing={active || undefined}><figcaption>Phrase {phrase}{active && ' · Playing'}<span>Bars {phrase === 1 ? '1–2' : '3–4'}</span></figcaption><svg viewBox="0 0 660 155" role="img" aria-label={`Phrase ${phrase}, bars ${phrase === 1 ? '1 to 2, ending on G' : '3 to 4, ending on C'}`}>
     {[0, 1, 2, 3, 4].map(i => <line key={i} x1="20" x2="640" y1={50 + i * 12} y2={50 + i * 12} stroke="currentColor" strokeWidth=".7"/>)}
     <text x="22" y="90" fontSize="49" fontFamily="serif">𝄞</text><text x="63" y="66" fontSize="20">4</text><text x="63" y="92" fontSize="20">4</text>
     {[0, 1, 2].map(i => <line key={i} x1={90 + i * 275} x2={90 + i * 275} y1="50" y2="98" stroke="currentColor"/>)}

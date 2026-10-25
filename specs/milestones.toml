@@ -139,6 +139,8 @@ cut = []
 
 # judging: batch two (2026-10-24), ranked by a hackathon-coach pass: keep the live demo alive first, then what the
 # video and a judge's first two minutes show. The other 17 batch-two specs and the 3 spikes stay backlog.
+# Last two are Sharan's lane (2026-10-24): `landing` (/about, what a judge opens first), then `account` (details
+# and a handle on /auth/login; waits on #467 and a contract: PR amending mission.md Not doing).
 [[milestone]]
 name = "judging"
 ship = ""
@@ -154,6 +156,8 @@ features = [
   "song-sources",
   "easy-charts",
   "first-run",
+  "landing",
+  "account",
 ]
 cut = []
 
@@ -176,6 +180,7 @@ features = [
   "sheet-review",
   "rewind",
   "score-card",
+  "adaptive-chunks",
 ]
 cut = []
 

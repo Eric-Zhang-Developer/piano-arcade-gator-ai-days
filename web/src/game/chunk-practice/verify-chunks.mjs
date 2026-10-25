@@ -1,5 +1,5 @@
-// Headless proof of chunk practice on Twinkle, the spec's Validation steps: the start screen's "Practice in chunks"
-// opens chunk 1's learn step; a learned chunk's "Play it judged" opens the play step at 70%; a perfect play step
+// Headless proof of chunk practice on Twinkle, the spec's Validation steps: chunk 1's learn step, by its URL (the start
+// screen's "Practice in chunks" opens adaptive-chunks' start since #601; verify-adaptive checks that link); a learned chunk's "Play it judged" opens the play step at 70%; a perfect play step
 // focuses "Next: bars 5–8", a rank-D one shows "Learn bars 1–4 again" and leaves Retry focused; the last chunk leads
 // to the whole song. Screenshots of the start line and both results panels at 1280×720 and 1920×1080.
 // Usage: node web/src/game/chunk-practice/verify-chunks.mjs --out <dir>
@@ -83,17 +83,11 @@ for (const [w, h] of [
   const size = `${w}x${h}`;
   const first = w === 1280; // every check once; the larger size only for screenshots
 
-  // 1. The way in, from a plain take's start screen.
-  await goto(page, `/play?song=twinkle&${off}`);
-  await page.getByTestId("chunk-start").waitFor({ timeout: 60_000 });
-  await page.screenshot({ path: join(out, `start-plain-${size}.png`) });
-  await page.getByTestId("chunk-start").click();
+  // 1. The fixed walk's first step, by its URL: practice=1 still works (adaptive-chunks' spec).
+  await goto(page, `/play?song=twinkle&from=1&to=4&tempo=70&passes=1&mode=wait&practice=1&${off}`);
   await page.getByTestId("chunk-line").waitFor({ timeout: 60_000 });
   const line = await page.getByTestId("chunk-line").textContent();
-  if (first) {
-    check(params(page) === "song=twinkle&from=1&to=4&tempo=70&passes=1&mode=wait&practice=1", `"Practice in chunks" opens ${params(page)}`);
-    check(line === "Chunk 1 of 3 · learn", `the start screen reads "${line}"`);
-  }
+  if (first) check(line === "Chunk 1 of 3 · learn", `the start screen reads "${line}"`);
   await page.screenshot({ path: join(out, `start-learn-${size}.png`) });
 
   if (first) {

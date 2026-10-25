@@ -1,4 +1,4 @@
-/* First run: the start line in the body face, ink-dim; the link on / small and quiet, above the Options button. */
+/* First run: the start line in the body face; the link on / small and quiet, in the select's footer. */
 .start {
   max-width: 36em;
   margin: 12px auto 0;
@@ -8,10 +8,7 @@
 }
 
 .link {
-  position: fixed;
-  left: 52px; /* the Options button's column, clear of the song list */
-  bottom: calc(24px + clamp(16px, 2.222vh, 24px) * 2.4);
-  z-index: 10;
+  /* In the select's footer row (song-select), after the Options button: the row places it, so no offsets. */
   display: flex;
   align-items: center;
   gap: 8px;

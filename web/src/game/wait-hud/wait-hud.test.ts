@@ -18,6 +18,20 @@ describe("the note you're on", () => {
   });
 });
 
+describe("a rewind (rewind)", () => {
+  const times = [0, 600, 1200, 1800, 2400, 3000, 3600, 4800]; // Twinkle's first eight notes
+  const hit = (i: number): GameEvent => ({ type: "noteHit", noteId: String(i), pitch: 60, judgment: "PERFECT", offsetMs: 0, atMs: times[i] });
+  const at = (events: GameEvent[]) => noteOn(events.reduce(reduceWaitHud, { N: 42, hits: 0, times }));
+  const five = [0, 1, 2, 3, 4].map(hit);
+  it("recounts on a resume at a bar start that isn't its pause's", () => {
+    expect(at([...five, { type: "pause", atMs: 3000 }, { type: "resume", atMs: 0 }])).toBe(1);
+    expect(at([...five, { type: "pause", atMs: 2400 }, { type: "resume", atMs: 4800 }])).toBe(8);
+  });
+  it("doesn't recount on a plain pause and resume", () => {
+    expect(at([...five, { type: "pause", atMs: 3000 }, { type: "resume", atMs: 3000 }])).toBe(6);
+  });
+});
+
 describe("the plugin", () => {
   const texts = (params: string) => {
     const out: { text: string; font: string; fill: string }[] = [];

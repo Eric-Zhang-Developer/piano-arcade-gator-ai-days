@@ -27,6 +27,7 @@ interface SheetHook {
   colored: Record<Judgment, number>;
   beams: { should: number; beamed: number }; // sheet-beams: notes a score would beam, and how many OSMD did
   beamAudit: () => { judgments: (Judgment | null)[]; fill: string }[]; // each drawn beam, read when called
+  firstMeasure: { number: number; beats: number } | null; // sheet-pickups: a pickup is { number: 0, beats: its length }
 }
 declare global {
   interface Window {
@@ -97,6 +98,7 @@ export function SheetView() {
       colored,
       beams: followerRef.current?.beams ?? { should: 0, beamed: 0 },
       beamAudit: () => followerRef.current?.beamAudit(judgedRef.current) ?? [],
+      firstMeasure: followerRef.current?.firstMeasure ?? null,
     };
   };
   const paint = (id: string, j: Judgment) => {

@@ -66,6 +66,8 @@ was away, in his order: `help-overlay`, `watch-demo`, `phone-guard`, `sheet-beam
 `song-options`, `sheet-review`, `rewind`, `score-card`. `song-options` waits on `easy-charts`.
 Ahead of them, on his word: `level-forge` phase 1 (a local agent session makes a level from a public-domain source,
 no API spend), then `veritas` (`/veritas`: the judge catching planted mistakes, live) and `veritas-polish`.
+Last, on his word (#601): `adaptive-chunks`, chunk practice that shrinks onto the bars you miss and grows back as
+you prove them. Cut if it isn't done by Sunday noon.
 
 ## Spikes
 Milestone **spikes**, after `extras`: `simon-says-spike`, then `restyle-spike`. About 3 hours each, findings whatever

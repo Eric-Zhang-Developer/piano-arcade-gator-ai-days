@@ -3,7 +3,8 @@ Every finished take is saved to Supabase in the background (re-judged on the ser
 anonymous Supabase users with an optional Google link, and `/progress` shows each take plus the bars to practice.
 
 ## Where it lives
-`supabase/` (migrations, `README.md` for adding anything, `push.sh`, tests, local end-to-end stack), `web/src/data/`, `web/src/app/api/takes/`,
+`supabase/` (migrations, `README.md` for adding anything, `push.sh`, tests, local end-to-end stack); `/progress` is the
+player's profile: every session across songs (when, how long, rank, hits), totals, and per song the bars to practice, `web/src/data/`, `web/src/app/api/takes/`,
 `web/src/app/api/progress/`, `web/src/app/progress/`, `web/src/app/auth/callback/`, one line in `web/src/game/layers.ts`.
 
 ## How to check it
@@ -21,4 +22,5 @@ Google sign-in (link, sign in on another device, merge that device's takes, sign
 (`merge.test.ts`, 5/5) and `merge_player` is live (checked with two throwaway players), and Sharan signed in with Google on `/progress`
 (Oct 24 2026: one Google user in Auth). Linking an anonymous player and the second-device merge not yet tried by a person. Drills, Easy, one-hand, chunk, versus, wait-mode, bot and fake-piano takes aren't saved (the server can't re-judge them
 yet); the results screen says so, in the Details section (where /play puts plugin panels), not next to the score. Charts must live at `public/songs/<id>/chart.json`, read from disk: on Vercel that needs file tracing for
-`public/songs` (local demo is fine). No per-player rate limit on saves.
+`public/songs` (local demo is fine). Saves are limited to 20 new takes per player in 5 minutes (kept and resent, never dropped); guests idle 30 days are
+deleted nightly (`cleanup_stale_guests`).

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Saira } from "next/font/google";
 import { CaptureMode } from "../game/capture-mode";
 import { GameBoundary } from "../game/crash-guard/boundary";
+import { PhoneGuard } from "../game/phone-guard";
 import { DemoReset } from "../game/demo-reset";
 import "./globals.css";
 
@@ -27,6 +28,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <GameBoundary>{children}</GameBoundary>
         {/* ?capture=1: no cursor or setup text while the video is recorded (capture-mode) */}
         <CaptureMode />
+        {/* a phone or tablet on / or /play: a card saying it's made for a laptop or a piano (phone-guard) */}
+        <PhoneGuard />
         {/* Shift+Esc loads / clean between judges, even from crash-guard's card (demo-reset) */}
         <DemoReset />
       </body>

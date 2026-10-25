@@ -218,6 +218,7 @@ features = [
   "song-finder", # Eric, 2026-10-25 (#850): sort by level, composer or recently played, and filter, at about 40 songs
   "main-page", # Eric, 2026-10-25 (#851): "we would have to redo our main page"; the select laid out for 40 songs
   "video-shots", # Eric, 2026-10-25 (#852): visuals for the hackathon video; a shot list, two cards, capture clean
+  "screen-shake", # catalog G13 (#990): a small shake on each combo milestone, a Lab experiment, off by default
 ]
 cut = []
 
@@ -232,6 +233,8 @@ features = ["simon-says-spike", "restyle-spike", "score-follow-spike", "wrong-no
   "mascot-spike", # Eric, 2026-10-25 (#903): "I like those 4 alright lets do a spike"
   "highlight-reel", # Eric, 2026-10-25 (#913): wow feeder; a take becomes a 15 s broadcast replay WebM, an experiment
   "conductor", # Eric, 2026-10-25 (#985): wow feeder; wave a hand at the camera and the DGX follows your tempo
+  "hum-level-spike", # Eric's spike idea (#522): a tune hummed to a click becomes a local level, scored by forge diff
+  "jam-mode-spike", # Eric's spike idea (#520): the DGX's drums and bass follow the chords a player holds
 ]
 cut = []
 

@@ -322,7 +322,7 @@ lines. It is open, and its CI was failing when this was written.
 
 Readers: team · postmortem
 
-*Sunday 2026-10-25, 01:53 to 02:35. Evidence: [#678], [core-loop's done note](../changes/core-loop.md).*
+*Sunday 2026-10-25, 01:53 to 03:15. Evidence: [#678], [core-loop's done note](../changes/core-loop.md), [#684].*
 
 **The lag.** `/play` lagged on Eric's MacBook. eric-agent-2 measured before changing anything, with the perf probe
 from [#672].
@@ -335,13 +335,19 @@ used, and a plugin gets a canvas only if it draws. After: **25 canvases and 117 
 work at the 95th percentile went from about 5 ms to about 3 ms (Apple M2, headless Chromium through Metal,
 `perf.mjs --dpr 2`, 3 runs each) ([done note](../changes/core-loop.md)).
 
-**What the numbers can't say.** Headless frame intervals read 16.7 ms before and after, so they can't show
-compositing. The canvas and megapixel counts are the proxy. Eric's MacBook is the real check, and it hasn't been
+**The second step ([#684], 03:15).** Every plugin now draws onto one shared overlay, so `/play` has three canvases:
+the highway, the overlay and the stage. Measured against #678 on the same base: **25 → 3 canvases and 112 → 9.4
+megapixels** a frame at devicePixelRatio 2, with JS frame work about the same. From where it started, that's **53 → 3
+canvases and 436 → 9.4 megapixels** ([#684]'s description; #678's 117 and #684's 112 are the same step measured on
+different bases).
+
+**What the numbers can't say.** Headless frame intervals read 16.7 ms before and after both steps, so they can't
+show compositing. The canvas and megapixel counts are the proxy. Eric's MacBook is the real check, and it hasn't been
 done yet.
 
 ### Material for the video
 
-- Beat: 53 canvases, 436 megapixels a frame, then 25 and 117.
+- Beat: 53 canvases, 436 megapixels a frame, then 25 and 117, then 3 and 9.4.
 
 ## Timeline
 
@@ -371,6 +377,7 @@ done yet.
 | Sun 00:53 | First light on the piano | [#639] |
 | Sun 01:28 | The product is Étude | [#669] |
 | Sun 02:35 | 53 canvases down to 25 on `/play` | [#678] |
+| Sun 03:15 | 25 canvases down to 3: one shared overlay | [#684] |
 
 [#1]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/1
 [#5]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/5
@@ -427,6 +434,7 @@ done yet.
 [#669]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/669
 [#672]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/672
 [#678]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/678
+[#684]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/684
 [`254891c`]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/commit/254891c
 [`2ca2c03`]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/commit/2ca2c03
 [`2e8f182`]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/commit/2e8f182

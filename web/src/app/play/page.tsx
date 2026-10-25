@@ -17,7 +17,7 @@ import { laptopKey } from "../../game/laptop-sound";
 import { describeTiming, timingSummary, type TimingSummary } from "../../game/timing";
 import { SfxControls } from "../../game/sound/SfxControls";
 import { nextPause, pauseClock, type PauseAction, type PauseMode } from "../../game/play-slots";
-import { Slots } from "../../game/play-slots/ui";
+import { StartScreen } from "../../game/duo-start/StartScreen";
 import { PauseMenu } from "../../game/pause-skin";
 import { ResultsLayout } from "../../game/results-layout";
 import { emptyHud, reduceHud } from "../../game/hud";
@@ -465,16 +465,14 @@ export default function Play() {
               </Link>
             </>
           )}
-          {phase === "ready" && (
-            <>
-              <p data-capture-hide style={{ opacity: 0.7 }}>
-                Laptop keys: A S D F G H J K L ; (white) · W E T Y U O P (black)
-              </p>
-              <button style={button} onClick={start} autoFocus>
-                Start
-              </button>
-              {loaded && <Slots plugins={plugins} panel={(p) => p.startPanel?.(loaded)} />}
-            </>
+          {phase === "ready" && loaded && (
+            <StartScreen
+              plugins={plugins}
+              panel={(p) => p.startPanel?.(loaded)}
+              onStart={start}
+              hint={<p data-capture-hide>Laptop keys: A S D F G H J K L ; (white) · W E T Y U O P (black)</p>}
+              controls={controls}
+            />
           )}
           {phase === "results" && results && (
             <ResultsLayout
@@ -490,8 +488,9 @@ export default function Play() {
               settings={controls}
             />
           )}
-          {/* not while loading: the slider would show useState's 0 before the stored offset is read (#447, #478) */}
-          {phase !== "results" && phase !== "loading" && controls}
+          {/* the start screen has them in its settings panel. Not while loading: the slider would show useState's 0 before
+              the stored offset is read (#447, #478) */}
+          {phase === "error" && controls}
         </div>
       )}
     </main>

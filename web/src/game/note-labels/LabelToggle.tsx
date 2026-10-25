@@ -1,6 +1,7 @@
 "use client";
 // The start screen's labels button: each press cycles Auto, Notes, Keys and Off, and remembers the choice.
 import { useState } from "react";
+import { kitChip } from "../duo-tokens";
 import { nextSetting, type LabelSetting } from "./labels";
 
 const NAMES: Record<LabelSetting, string> = { auto: "Auto", notes: "Note names", keys: "Laptop keys", off: "Off" };
@@ -16,7 +17,7 @@ export function LabelToggle({ initial, onChange }: { initial: LabelSetting; onCh
         setSetting(next);
         onChange(next);
       }}
-      style={{ padding: "6px 14px", fontSize: 15, borderRadius: 6, border: "1px solid rgba(242,242,245,0.3)", background: "transparent", color: "inherit", cursor: "pointer" }}
+      {...kitChip(setting !== "off")}
     >
       Labels: {NAMES[setting]}
     </button>

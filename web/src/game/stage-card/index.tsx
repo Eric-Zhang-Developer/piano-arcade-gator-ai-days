@@ -1,35 +1,41 @@
-// /play's start screen as an arcade stage card (Chunithm's opening card): ARE YOU READY across the screen, then the
-// song's jacket, title, composer and level. It's a start panel, so it goes when Start unmounts the start screen.
-import { useEffect } from "react";
+// /play's start screen opens on a stage card (Chunithm's opening card), in the Duo look (duo-start): ARE YOU READY on
+// a band, then the song's piano roll, title, composer, level and note count, as on the select's focus panel. It's a
+// start panel, so it goes when Start unmounts the start screen.
+import { useEffect, useMemo } from "react";
 import type { Chart, GamePlugin } from "../../contracts";
 import { difficulty } from "../difficulty/difficulty";
-import { SongJacket } from "../song-jacket/SongJacket";
+import { PianoRoll } from "../duo-select/PianoRoll";
+import { roll } from "../duo-select/roll";
+import { DataCell, MonoLabel, Panel } from "../duo-tokens";
 import { uiSound } from "../ui-sounds";
 import styles from "./stage-card.module.css";
 
-export function StageCard({ id, title, composer, catalog, level }: Pick<Chart, "id" | "title" | "composer" | "catalog"> & { level?: number }) {
+type Props = Pick<Chart, "id" | "title" | "composer" | "catalog"> & Partial<Pick<Chart, "notes" | "beatsPerBar">> & { level?: number };
+
+const lv = (n: number) => String(n).padStart(2, "0");
+
+export function StageCard({ title, composer, catalog, level, notes, beatsPerBar }: Props) {
   useEffect(() => uiSound("sting"), []); // once per mount (ui-sounds); dropped on a direct load, before any gesture
+  const r = useMemo(() => roll({ notes: notes ?? [], beatsPerBar: beatsPerBar ?? 4 }), [notes, beatsPerBar]);
   return (
     <section className={styles.card} aria-label="Stage">
       <div className={styles.band}>
         <p className={styles.ready}>Are you ready?</p>
       </div>
-      <div className={styles.track}>
-        <div className={styles.jacket} style={{ viewTransitionName: "stage-jacket" }}>
-          <SongJacket id={id} title={title} composer={composer} />
-        </div>
-        <div className={styles.text}>
-          <h1 className={styles.title}>{title}</h1>
-          <p className={styles.composer}>
-            {composer}
-            {catalog && ` · ${catalog}`}
-          </p>
-        </div>
-        <div className={styles.level}>
-          <span className={styles.label}>Level</span>
-          <span className={styles.number}>{level ?? "—"}</span>
-        </div>
+      <div className={styles.roll} style={{ viewTransitionName: "stage-jacket" }}>
+        <PianoRoll roll={r} />
       </div>
+      <h1 className={styles.title}>{title}</h1>
+      <MonoLabel style={{ fontSize: "clamp(13px, 1vw, 19px)" }}>
+        <span className={styles.composer}>
+          {composer}
+          {catalog && ` · ${catalog}`}
+        </span>
+      </MonoLabel>
+      <Panel style={{ display: "grid", gridAutoFlow: "column", gridAutoColumns: "1fr", marginTop: "2vh" }}>
+        <DataCell label="LV" value={level === undefined ? "—" : lv(level)} style={{ borderLeft: "none" }} />
+        {notes && <DataCell label="NOTES" value={notes.length} />}
+      </Panel>
     </section>
   );
 }

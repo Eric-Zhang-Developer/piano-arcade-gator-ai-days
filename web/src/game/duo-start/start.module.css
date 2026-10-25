@@ -1,0 +1,191 @@
+/* The start screen's layout (StartScreen.tsx). Frames, buttons, chips and labels are the Duo kit's; this places them
+   and styles the native controls /play and SfxControls render (range, checkbox), which no kit piece covers. */
+
+.screen {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(20px, 2.6vw, 52px);
+  align-items: start;
+  text-align: left;
+}
+
+/* Play-slots wraps every panel in a div with an inline 16 px top margin, made for the old centered column. In these
+   groups the gaps come from the grid, so it goes. */
+.screen [data-testid^="slot-"] {
+  margin-top: 0 !important;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 1.8vh;
+  min-width: 0;
+  padding-top: calc(clamp(40px, 4.4vw, 84px) + 1.8vh + 2.2vh); /* level with the roll: stage-card's .ready size, band padding and margin */
+}
+
+.notes:empty {
+  display: none;
+}
+
+/* The play modes: secondary buttons, side by side. A mode that's on shows its line instead of its button. */
+.modes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8vw;
+}
+
+.modes > *,
+.modes a,
+.modes button {
+  width: 100%;
+}
+
+.modes a,
+.modes button {
+  box-sizing: border-box;
+  font-size: clamp(12px, 0.85vw, 16px) !important;
+  padding: 1.3vh 0.6em !important;
+  white-space: nowrap;
+}
+
+.modes p {
+  margin: 0;
+  color: var(--pa-ink-dim);
+  font-size: clamp(13px, 0.9vw, 17px);
+}
+
+/* Settings: quiet. A hairline box, dim labels, small controls, nothing in the primary's fill. */
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2vh;
+  padding: 1.6vh 1.2vw;
+  border: 1px solid var(--pa-line);
+  color: var(--pa-ink-dim);
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: clamp(12px, 0.85vw, 17px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6vh 0.8vw;
+}
+
+/* /play's latency row and SfxControls carry inline spacing for the results screen; here the panel's gap sets it. */
+.settings > label,
+.settings > div > div {
+  margin-top: 0 !important;
+  justify-content: flex-start !important;
+}
+
+.settings label {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+}
+
+.settings output {
+  color: var(--pa-ink);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.settings p {
+  margin: 0;
+  opacity: 1 !important;
+  font-size: inherit !important;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.settings input[type="range"] {
+  appearance: none;
+  flex: 1;
+  min-width: 80px;
+  height: 18px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.settings input[type="range"]::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--pa-line);
+}
+
+.settings input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 10px;
+  height: 18px;
+  margin-top: -8px;
+  border-radius: 0;
+  background: var(--pa-primary);
+}
+
+.settings input[type="range"]::-moz-range-track {
+  height: 2px;
+  background: var(--pa-line);
+}
+
+.settings input[type="range"]::-moz-range-thumb {
+  width: 10px;
+  height: 18px;
+  border: none;
+  border-radius: 0;
+  background: var(--pa-primary);
+}
+
+.settings input[type="range"]:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.settings input[type="checkbox"] {
+  appearance: none;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin: 0 0.5em 0 0;
+  vertical-align: -2px;
+  border: 1px solid var(--pa-ink-dim);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.settings input[type="checkbox"]:checked {
+  border-color: var(--pa-primary);
+  background: var(--pa-primary);
+  box-shadow: inset 0 0 0 2px var(--pa-panel);
+}
+
+.settings input:focus-visible {
+  outline: 2px solid var(--pa-ink);
+  outline-offset: 2px;
+}
+
+.hints {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6vh;
+  padding-top: 1vh;
+  border-top: 1px solid var(--pa-line);
+}
+
+.hints kbd,
+.hints b {
+  color: var(--pa-ink);
+}
+
+/* Under 900 px wide, one column: the card, then Start and the rest. */
+@media (max-width: 900px) {
+  .screen {
+    grid-template-columns: 1fr;
+  }
+  .side {
+    padding-top: 0;
+  }
+}

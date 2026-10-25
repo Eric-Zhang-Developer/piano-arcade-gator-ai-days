@@ -9,6 +9,7 @@ import { noteColorFor } from "../hand-colors";
 import { hudLayout, hudSettings } from "../hud";
 import { bg, cyan, fontDisplay, ink, inkDim, panel, whenDisplayFontReady } from "../ui-tokens";
 import { waitHintSettings } from "../wait-hint/hint";
+import { kitButton } from "../duo-tokens";
 import { flowSettings, isFlowMode } from "./clock";
 import { FlowJudge } from "./judge";
 import { headline } from "./steady";
@@ -94,7 +95,7 @@ export function flowMode(): GamePlugin {
       isFlowMode(params) ? (
         <p style={{ opacity: 0.7, margin: 0 }}>Flow: the song waits for you and follows your tempo.</p>
       ) : (
-        <a data-testid="play-flow" href={flowUrl(params)} style={link}>
+        <a data-testid="play-flow" href={flowUrl(params)} {...link}>
           Play in Flow
         </a>
       ),
@@ -195,15 +196,7 @@ function drawCalm(ctx: CanvasRenderingContext2D, f: Frame, pitches: number[], sh
   ctx.restore();
 }
 
-const link: CSSProperties = {
-  display: "inline-block",
-  padding: "8px 24px",
-  fontSize: 16,
-  borderRadius: 8,
-  background: "#ddd",
-  color: "#000",
-  textDecoration: "none",
-};
+const link = kitButton("secondary");
 
 const headlineStyle: CSSProperties = {
   margin: 0,

@@ -1,7 +1,7 @@
 // Headless proof of laptop sound (spec: laptop-sound, Validation 2), in Chromium with no MIDI devices. Starts its own
 // dev server; prints `verify-laptop: pass` and exits 0, or names each failed step and exits 1:
-// 1. /play?song=twinkle, Start -> __pianoArcadeLaptop.active, and the status line (shown again on the results
-//    screen; /play hides it mid-take) reads "Piano: laptop sound".
+// 1. /play?song=twinkle, Start -> __pianoArcadeLaptop.active, and the status line (in the results screen's Options
+//    drawer; /play hides it mid-take) reads "Piano: laptop sound".
 // 2. Mid-take, laptop keys A, S, D held -> voices rises with each press, falls to 0 after release. Prints each key's
 //    time from the key event to its voice, measured in the page.
 // 3. W on Twinkle from the select (watch-demo) -> voices sound through the song, and 0 at the end (no stuck notes).
@@ -100,8 +100,12 @@ try {
   check(counts.join(",") === "1,2,3" && after === 0, `A, S, D: voices ${counts.join(" → ")}, then ${after} after release`);
   for (const t of times) say(`     ${t.code}: key event to voice ${t.ms.toFixed(1)} ms (voices then ${t.voices})`);
 
-  // 1. Laptop sound took over with no piano; the status line says so once the take ends.
-  const status = await page.getByText("Piano: laptop sound").waitFor({ timeout: 90_000 }).then(() => true, () => false);
+  // 1. Laptop sound took over with no piano; the status line says so once the take ends, in the results screen's
+  // Options drawer (duo-details #839 moved it there).
+  await page.getByTestId("results").waitFor({ timeout: 90_000 });
+  await page.getByTestId("options-open").first().click();
+  const status = await page.getByText("Piano: laptop sound").waitFor({ timeout: 5000 }).then(() => true, () => false);
+  await page.keyboard.press("Escape");
   check(s1.active === true && status, `/play: active ${s1.active}, status line ${status ? 'reads "Piano: laptop sound"' : "missing"}`);
   await page.screenshot({ path: join(out, "results-1280x720.png") });
 

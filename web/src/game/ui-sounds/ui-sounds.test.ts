@@ -1,17 +1,31 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { UiSound } from ".";
 
-// A fake AudioContext: records oscillator starts and stops, every gain level a node is set to, and the master gain.
+// A fake AudioContext: records buffer-source starts and stops, each started buffer's peak, and the master gain.
 function fakeAudio() {
   const log = { starts: 0, stops: 0, peaks: [] as number[], masters: [] as { value: number }[] };
   class FakeContext {
     currentTime = 0;
+    sampleRate = 48000;
     destination = {};
-    createOscillator() {
-      return { type: "", frequency: { value: 0, setValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect: (n: unknown) => n, start: () => log.starts++, stop: () => log.stops++ };
+    createBuffer(_channels: number, length: number) {
+      const data = new Float32Array(length);
+      return { data, copyToChannel: (d: Float32Array) => data.set(d) };
+    }
+    createBufferSource() {
+      const src = {
+        buffer: null as { data: Float32Array } | null,
+        connect: (n: unknown) => n,
+        start: () => {
+          log.starts++;
+          log.peaks.push(src.buffer!.data.reduce((m, x) => Math.max(m, Math.abs(x)), 0));
+        },
+        stop: () => log.stops++,
+      };
+      return src;
     }
     createGain() {
-      const gain = { value: 1, setValueAtTime: (v: number) => void log.peaks.push(v), exponentialRampToValueAtTime() {} };
+      const gain = { value: 1, setValueAtTime() {}, linearRampToValueAtTime() {} };
       if (!log.masters.length) log.masters.push(gain); // the module's own gain is the first it makes
       return { gain, connect: (n: unknown) => n };
     }
@@ -42,16 +56,23 @@ const load = async (pressed = true) => {
 };
 
 describe("ui sounds", () => {
-  it("each sound starts nodes and stops every one, and no level is above the preview tone's peak", async () => {
-    const { uiSound, UI_PEAK } = await load();
+  it("each sound starts one rendered buffer, peaking at UI_LEVEL, 12 dB or more under the preview tone's peak", async () => {
+    const { uiSound, UI_PEAK, UI_LEVEL } = await load();
     expect(UI_PEAK).toBeCloseTo(0.0504, 3);
-    for (const name of ["move", "confirm", "back", "sting", "tick", "tickAccent"] as UiSound[]) {
+    expect(UI_LEVEL).toBeLessThanOrEqual(UI_PEAK * 10 ** (-12 / 20));
+    for (const [i, name] of (["move", "confirm", "back", "sting", "tick", "tickAccent"] as UiSound[]).entries()) {
       const before = audio.log.starts;
-      uiSound(name);
-      expect(audio.log.starts, name).toBeGreaterThan(before);
+      uiSound(name, i * 1000); // a second apart: no pile-up
+      expect(audio.log.starts, name).toBe(before + 1);
     }
-    expect(audio.log.stops).toBe(audio.log.starts);
-    expect(Math.max(...audio.log.peaks)).toBeLessThanOrEqual(UI_PEAK);
+    for (const p of audio.log.peaks) expect(p).toBeCloseTo(UI_LEVEL, 6);
+  });
+
+  it("a burst steals the oldest voice with a fade, never stacking past the cap", async () => {
+    const { uiSound } = await load();
+    for (let i = 0; i < 10; i++) uiSound("move"); // all at once: each inside the 60 ms gap
+    expect(audio.log.starts).toBe(10);
+    expect(audio.log.stops).toBe(9); // every earlier one faded out
   });
 
   it("follows the effects volume, and mute takes the gain to 0 at once and starts nothing more", async () => {

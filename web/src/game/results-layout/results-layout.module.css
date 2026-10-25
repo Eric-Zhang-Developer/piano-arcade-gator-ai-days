@@ -111,8 +111,13 @@
 
 /* The play-modes ladder: one slim row, as wide as the six cells' band at most, so the first view keeps Retry. */
 .ladder {
-  width: min(100%, 720px);
+  width: min(100%, max(720px, 48vw)); /* 48vw: 920 px at 1920, so the rungs keep their room at 24 px */
   align-self: center;
+}
+
+/* play-modes' ladder in this slot: its rungs are read on video like the lines above (#1030). */
+.ladder ol {
+  font-size: var(--read) !important;
 }
 
 .ladder:empty {

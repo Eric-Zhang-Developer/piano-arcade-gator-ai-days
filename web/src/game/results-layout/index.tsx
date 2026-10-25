@@ -148,7 +148,7 @@ export function ResultsLayout({
                   <span className={styles.srOnly}>, rank {results.rank}</span>
                 </h1>
               )}
-              {composer && <MonoLabel style={{ fontSize: "var(--read)", letterSpacing: "0.2em" }}>{composer}</MonoLabel>}
+              {composer && <MonoLabel style={{ fontSize: "var(--read)", letterSpacing: "0.12em" }}>{composer}</MonoLabel>}
               <p className={styles.extra}>
                 <MonoLabel>
                   Wrong <span className={styles.wrong}>✕ <Tally value={results.counts.wrong ?? 0} index={tallies - 2} of={tallies} testid="count-wrong" /></span>

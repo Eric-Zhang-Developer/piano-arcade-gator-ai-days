@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { Chart, GameEvent } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
-import { hintDiff, hintsAt, judgedKey, lightMode, rgb7, type Message, type Rgb } from "./messages";
+import { hintDiff, hintsAt, judgedKey, lightMode, pressKey, rgb7, type Message, type Rgb } from "./messages";
 
 // Twinkle: one hand, 600 ms a beat; C C G G A A G (60 60 67 67 69 69 67) from 0 ms.
 const chart: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
@@ -78,9 +78,24 @@ describe("judgedKey", () => {
 });
 
 describe("lightMode", () => {
-  it("sets the board's setting 15: 0 calm, 1 demo, 2 demo simple", () => {
+  it("sets the board's setting 15: 0 calm, 1 demo", () => {
     expect(lightMode(0)).toEqual([0xb0, 15, 0, 0]);
     expect(lightMode(1)).toEqual([0xb0, 15, 1, 0]);
-    expect(lightMode(2)).toEqual([0xb0, 15, 2, 0]);
+  });
+});
+
+describe("pressKey", () => {
+  it("lights a pressed key in its side's hand color and darkens it on release", () => {
+    const left = pressKey([0x90, 48, 100]);
+    const right = pressKey([0x91, 72, 100]);
+    expect(left?.slice(0, 2)).toEqual([0x90, 48]);
+    expect(right?.slice(0, 2)).toEqual([0x90, 72]);
+    expect(left?.slice(2)).not.toEqual(right?.slice(2));
+    expect(pressKey([0x80, 48, 0])).toEqual([0x80, 48]);
+    expect(pressKey([0x90, 48, 0])).toEqual([0x80, 48]); // a note on at velocity 0 is a release
+  });
+  it("ignores everything that isn't a key", () => {
+    expect(pressKey([0xb0, 64, 127])).toBeNull(); // the sustain pedal
+    expect(pressKey([0xfe])).toBeNull(); // active sensing
   });
 });

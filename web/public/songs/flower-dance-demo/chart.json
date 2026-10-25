@@ -2,7 +2,7 @@
  "id": "flower-dance-demo",
  "title": "Flower Dance (demo cut, bars 13–24)",
  "composer": "DJ Okawari",
- "source": "© DJ Okawari; arrangement Pianubi, modified by Syle. A 12-bar excerpt (bars 13–24), included by the project owner's decision (specs/decisions/song-pack-9-flower-dance-excerpt.md). Notes: Eric's MIDI of the Pianubi/Syle arrangement (octave, tempo map, dynamics from the score).",
+ "source": "© DJ Okawari; arrangement Pianubi, modified by Syle. A 12-bar excerpt (bars 13–24), included by the project owner's decision (https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/specs/decisions/song-pack-9-flower-dance-excerpt.md). Notes: Eric's MIDI of the Pianubi/Syle arrangement (octave, tempo map, dynamics from the score).",
  "bpm": 100,
  "beatsPerBar": 4,
  "notes": [

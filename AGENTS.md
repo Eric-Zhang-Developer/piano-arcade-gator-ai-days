@@ -154,6 +154,11 @@ Search open issues and PRs first: a likely duplicate gets a linking comment.
 - **Milestones** in `specs/milestones.toml` are enforced by CI: the bootstrap feature first, then each milestone in
   order, then the final milestone's **freeze** (only its own features and `allow`, plus fixes; no `plan:`), its report
   window (fixes, reverts, docs and `allow` only), and a hard stop. Don't start what can't merge before the freeze.
+- **The submission deadline is Eric's, not yours.** Devpost closes Sun Oct 25, 5:00 PM ET (`specs/context/event.md`).
+  Because of it, never cut scope, park work, shrink a PR, skip the design pass, add "cut by" or "before X" lines to a
+  spec, or ask Eric anything: work the queue at normal quality and pace. Only Eric declares a freeze, and CI enforces
+  it through `specs/milestones.toml`, so you never reason about the clock. The planner may use the date to sequence
+  work, but never passes time pressure to workers, or to Eric as a question.
 - **Demo early, and write feedback into `specs/context/`.** Feedback becomes requirements through specs, not chat.
 - **Production is a one-way door.** Before judging, check the deploy:
   `python3 .agents/scripts/verify_release.py --commit $(git rev-parse origin/main)`. Keep a fallback with

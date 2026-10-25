@@ -44,6 +44,8 @@ Two PRs, about an hour. fever-stage's files (`web/src/game/stage/`) don't change
 - Out of scope: cabinet's title screen (cabinet's files; it opens `/` with a full page load, so no shared context).
 
 ## Validation
+- **After duo-select (#646),** which takes the stage off the select: the check confirms `/` mounts no stage and
+  holds no live WebGL context, and stops there. The steps below hold while the select mounts the stage.
 - `pnpm -C web test`, a fake scene counting renders: moving, the driver renders every tick until a scripted slow run
   trips the budget, then stops; still, it renders once, not again at the same size, and once more at a new size.
 - `verify.py --slug select-stage` passes (its first step opens Twinkle from `/`).

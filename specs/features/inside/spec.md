@@ -119,8 +119,8 @@ The bars are the planner's, not measured thresholds.
 
 **(b) Perf:** a steady 60 fps at 1920×1080 with 10-note chords and the pedal down, in the row view and in the cutaway,
 on the worker's own dev server in the in-app browser.
-- 3 runs, with the frame-interval p95 and its spread, against perf-budget's 16.7 ms budget.
-- perf-budget's `probe.js` counts only fever frames on `/play`, so the page records rAF intervals itself, dev-only.
+- 3 runs, with the per-frame work-time p95 and its spread, against perf-budget's 16.7 ms budget.
+- perf-budget's `probe.js` counts only fever frames on `/play`, so the page times its own update and render with `performance.now()` around them, dev-only, the way `probe.js` does. Not rAF-to-rAF intervals: those are vsync-bound and read about p95 17.6 ms even on an empty page (perf-budget's spec).
 
 **(c) The design pass:** taste v2 at 1280×720 and 1920×1080 on both views, plus reduced motion.
 

@@ -1,34 +1,15 @@
-// Wait mode's panels (spec: wait-mode): "Learn it first" on the start screen, "Play it judged" after a wait-mode take.
-// Core does the hold itself (index.ts); these only move between the two modes, keeping every other param.
+// Wait mode's panel (spec: wait-mode), Learn in the UI since play-modes: its line on the start screen. The way in and
+// out ("Learn it first", "Play it judged") is the play-modes ladder now. Core does the hold itself (index.ts).
 import type { GamePlugin } from "../../contracts";
-import { kitButton } from "../duo-tokens";
+import { withMode } from "../play-modes/modes";
 import { isWaitMode } from ".";
 
-export function modeUrl(params: URLSearchParams, wait: boolean): string {
-  const q = new URLSearchParams(params);
-  if (wait) q.set("mode", "wait");
-  else q.delete("mode");
-  return `/play?${q}`;
-}
+// Into Learn or back to Perform, keeping every other param.
+export const modeUrl = (params: URLSearchParams, wait: boolean): string => `/play?${withMode(params, wait ? "learn" : "perform")}`;
 
 export function waitMode(): GamePlugin {
   return {
     id: "wait-mode",
-    startPanel: ({ params }) =>
-      isWaitMode(params) ? (
-        <p style={{ opacity: 0.7, margin: 0 }}>Wait mode: the song waits for each note. Not scored.</p>
-      ) : (
-        <a data-testid="learn-first" href={modeUrl(params, true)} {...link}>
-          Learn it first
-        </a>
-      ),
-    resultsPanel: ({ params }) =>
-      isWaitMode(params) ? (
-        <a data-testid="play-judged" href={modeUrl(params, false)} {...link}>
-          Play it judged
-        </a>
-      ) : null,
+    startPanel: ({ params }) => (isWaitMode(params) ? <p style={{ opacity: 0.7, margin: 0 }}>Learn: the song waits for each note. Not scored.</p> : null),
   };
 }
-
-const link = kitButton("secondary");

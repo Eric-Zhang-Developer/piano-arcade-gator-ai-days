@@ -124,7 +124,8 @@ await page.getByTestId("results").waitFor({ timeout: 120_000 });
 const r = await page.evaluate(() => window.__pianoArcade.results);
 check(r.counts.MISS === 0, `no MISS (${r.counts.MISS})`);
 const head = await page.getByTestId("flow-headline").textContent({ timeout: 10_000 }).catch(() => null);
-check(head !== null && head.includes("steady") && !head.includes("a bit"), `the headline says steady ("${head}")`);
+// play-modes capitalizes the word and leads with the held tempo ("Steady at 80% of tempo · …"), so case-insensitive.
+check(head !== null && /steady/i.test(head) && !/a bit/i.test(head), `the headline says steady ("${head}")`);
 check((await page.getByTestId("rank").count()) === 1, "the take is scored: the rank shows");
 await shots(page, "flow-results");
 check(errors.length === 0, `no page errors${errors.length ? `: ${errors.join(" | ")}` : ""}`);

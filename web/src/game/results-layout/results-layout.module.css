@@ -91,6 +91,7 @@
 
 /* The slots carry their own top margins; the gap spaces the ceremony instead. */
 .featured > *,
+.ladder > *,
 .tutor > *,
 .actions > * {
   margin-top: 0 !important;
@@ -103,6 +104,16 @@
 }
 
 .featured:empty {
+  display: none;
+}
+
+/* The play-modes ladder: one slim row, as wide as the six cells' band at most, so the first view keeps Retry. */
+.ladder {
+  width: min(100%, 720px);
+  align-self: center;
+}
+
+.ladder:empty {
   display: none;
 }
 

@@ -2,6 +2,7 @@
 import type { Chart } from "../../contracts";
 import { handsSetting, splitHands } from "../hand-mode/hands";
 import { lastBar } from "../song-preview/opening";
+import { inMode, playMode } from "../play-modes/modes";
 
 // Starting values, not findings: Eric tunes them on the piano.
 export const chunkSettings = { bars: 4, tempo: 70, passAccuracy: 0.85 };
@@ -26,18 +27,19 @@ export function chunksOf(chart: Chart, hands: string | null): Chunk[] {
   return out;
 }
 
-// A step's URL keeps every other param (song, hands). Learn is wait mode at the same tempo, so wait-mode's
-// "Play it judged" (which drops only `mode`) lands on the play step.
+// A step's URL keeps every other param (song, hands). Learn is the Learn mode at the same tempo, so the ladder's Flow
+// step on its results (which changes only the mode) lands on the play step. The play step is in the take's mode,
+// Flow after a Learn step (play-modes).
 export function stepUrl(params: URLSearchParams, c: Chunk, step: Step): string {
   const q = new URLSearchParams(params);
   q.set("from", String(c.from));
   q.set("to", String(c.to));
   q.set("tempo", String(chunkSettings.tempo));
   q.set("passes", "1");
-  if (step === "learn") q.set("mode", "wait");
-  else q.delete("mode");
-  q.set("practice", "1");
-  return `/play?${q}`;
+  const now = playMode(params);
+  const out = inMode(q, step === "learn" ? "learn" : now === "learn" ? "flow" : now);
+  out.set("practice", "1");
+  return `/play?${out}`;
 }
 
 export function wholeSongUrl(params: URLSearchParams): string {
@@ -49,8 +51,8 @@ export function wholeSongUrl(params: URLSearchParams): string {
   return `/play?${q}`;
 }
 
-// A plain take: the start screen offers the way in.
-export const isPlainTake = (params: URLSearchParams) => !["from", "to", "mode", "practice"].some((k) => params.has(k));
+// A plain take, Perform or Flow: the start screen offers the way in, in that mode (play-modes).
+export const isPlainTake = (params: URLSearchParams) => !["from", "to", "practice"].some((k) => params.has(k)) && playMode(params) !== "learn";
 
 // Which chunk and step this URL is, or null when it isn't a practice step (no practice=1, or bars that aren't a chunk).
 export function practiceStep(params: URLSearchParams, list: Chunk[]): { index: number; step: Step } | null {

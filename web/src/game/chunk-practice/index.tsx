@@ -8,6 +8,7 @@ import { adaptSettings, adaptState, adaptUrl, next, songPhrases, start, takeResu
 import { Strip } from "../adaptive-chunks/Strip";
 import { kitButton } from "../duo-tokens";
 import { isWaitMode } from "../wait-mode";
+import { playMode } from "../play-modes/modes";
 import { scorePhrases, type Phrase } from "../weak-bars";
 import { barsLabel, chunkSettings, chunksOf, isPlainTake, nextAfter, practiceStep, stepUrl, wholeSongUrl, type Chunk, type Step } from "./chunks";
 import styles from "./chunk-practice.module.css";
@@ -65,7 +66,7 @@ export function chunkPractice(): GamePlugin {
     },
     startPanel: ({ params }) => {
       if (adapt) return createElement(AdaptLine, { list: phraseList, state: adapt, learn: isWaitMode(params) });
-      if (at) return createElement(StepLine, { index: at.index, of: list.length, step: at.step });
+      if (at) return createElement(StepLine, { index: at.index, of: list.length, step: at.step, flow: playMode(params) === "flow" });
       if (!isPlainTake(params) || !phraseList.length) return null;
       return (
         <a data-testid="chunk-start" {...kitButton("secondary")} href={adaptUrl(params, phraseList, start(phraseList))}>
@@ -134,7 +135,7 @@ function AdaptAfter(props: { chart: Chart; params: URLSearchParams; take: Take; 
       <a ref={ref} data-testid="adapt-next" className={styles.next} href={href}>
         {text}
       </a>
-      {step === "floor" && tempo > adaptSettings.slowTempo && (
+      {step === "floor" && tempo > adaptSettings.slowTempo && playMode(params) !== "flow" && (
         <a data-testid="adapt-slower" className={styles.ghost} href={url(to, adaptSettings.slowTempo)}>
           Slower: {adaptSettings.slowTempo}%
         </a>
@@ -143,7 +144,7 @@ function AdaptAfter(props: { chart: Chart; params: URLSearchParams; take: Take; 
   );
 }
 
-function StepLine({ index, of, step }: { index: number; of: number; step: Step }) {
+function StepLine({ index, of, step, flow }: { index: number; of: number; step: Step; flow: boolean }) {
   return (
     <div className={styles.step} data-testid="chunk-step">
       <ol className={styles.pips} aria-hidden>
@@ -152,7 +153,7 @@ function StepLine({ index, of, step }: { index: number; of: number; step: Step }
         ))}
       </ol>
       <p className={styles.line} data-testid="chunk-line">
-        Chunk {index + 1} of {of} · {step === "learn" ? "learn" : `play at ${chunkSettings.tempo}%`}
+        Chunk {index + 1} of {of} · {step === "learn" ? "learn" : flow ? "play in Flow" : `play at ${chunkSettings.tempo}%`}
       </p>
     </div>
   );

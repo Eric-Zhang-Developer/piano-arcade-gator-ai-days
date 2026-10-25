@@ -2,6 +2,7 @@ import { createElement } from "react";
 import type { Chart, GamePlugin, Results, Take } from "../../contracts";
 import { passAccuracy } from "../bar-loop";
 import { msPerBeat } from "../core/settings";
+import { inMode, playMode } from "../play-modes/modes";
 
 export const weakBarsSettings = {
   phraseBars: 2, // bars per phrase, from bar 1
@@ -49,14 +50,15 @@ export function scorePhrases(chart: Chart, take: Take, results: Results): Phrase
 export const weakest = (scores: PhraseScore[]) =>
   scores.reduce<PhraseScore | null>((w, s) => (s.accuracy < 1 && (!w || s.accuracy < w.accuracy) ? s : w), null);
 
-// bar-loop on the phrase at practiceTempo, keeping only the params that pick the song.
+// bar-loop on the phrase at practiceTempo, keeping only the params that pick the song, in the take's mode (play-modes:
+// under Flow, no tempo).
 export function practiceUrl(chart: Chart, params: URLSearchParams, p: Phrase): string {
   const q = new URLSearchParams({ song: params.get("song") ?? chart.id });
   if (params.has("hands")) q.set("hands", params.get("hands")!);
   q.set("from", String(p.from));
   q.set("to", String(p.to));
   q.set("tempo", String(weakBarsSettings.practiceTempo));
-  return `/play?${q}`;
+  return `/play?${inMode(q, playMode(params))}`;
 }
 
 const label = (p: Phrase) => (p.from === p.to ? `Bar ${p.from}` : `Bars ${p.from}–${p.to}`);
@@ -110,7 +112,7 @@ export function weakBars(): GamePlugin {
                   fontWeight: 600,
                 },
               },
-              `Practice ${label(worst).toLowerCase()} at ${weakBarsSettings.practiceTempo}%`,
+              `Practice ${label(worst).toLowerCase()} ${playMode(params) === "flow" ? "in Flow" : `at ${weakBarsSettings.practiceTempo}%`}`,
             )
           : createElement("div", { style: { marginTop: 8, color: "var(--pa-ink-dim)" } }, "No weak bars"),
       );

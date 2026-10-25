@@ -5,6 +5,7 @@ import { passAccuracy } from "../bar-loop";
 import { msPerBeat } from "../core/settings";
 import { practiceReason } from "../records/store";
 import { MIN_TIMED } from "../timing";
+import { inMode, playMode, withMode, type PlayMode } from "../play-modes/modes";
 
 export const duoResultsSettings = {
   cleanAccuracy: 0.95, // a bar at or above this isn't weak; every bar clean: no weak run
@@ -99,6 +100,7 @@ export interface TutorInput {
   accuracy: number | null; // the run's
   drift: Record<Hand, number | null>; // the run's
   misses?: number; // the run's MISS and WRONG; 0 means every note was hit, only off the beat
+  flow?: boolean; // a Flow take: its practice follows the player's tempo, so it names none (play-modes)
 }
 
 const bars = (r: { from: number; to: number }) => (r.from === r.to ? `bar ${r.from}` : `bars ${r.from}–${r.to}`);
@@ -113,24 +115,25 @@ export const driftingHand = (drift: Record<Hand, number | null>): [Hand, number]
 // The template line: a drifting hand if one is past driftMs, else the run's accuracy. "Accuracy", not "notes right":
 // it's the judge's weighted score, so a run with no misses can still be the weakest (Eric's full combo read "54% of
 // notes right" with every note hit).
-export function tutorLine({ run, accuracy, drift, misses }: TutorInput): string[] {
+export function tutorLine({ run, accuracy, drift, misses, flow }: TutorInput): string[] {
   if (!run) return ["Clean take. Try it faster, or pick the next song."];
   const [hand, ms] = driftingHand(drift);
   const first =
     hand && ms !== null
       ? `Your ${hand === "L" ? "left" : "right"} hand ${ms > 0 ? "drags" : "rushes"} in ${bars(run)}, about ${Math.round(Math.abs(ms))} ms ${ms > 0 ? "late" : "early"}.`
       : `${bars(run).replace(/^b/, "B")} ${run.from === run.to ? "was" : "were"} your weakest: ${Math.round((accuracy ?? 0) * 100)}% accuracy${misses === 0 ? ", every note hit but off the beat" : ""}.`;
-  return [first, `Let's loop just those bars at ${duoResultsSettings.practiceTempo}%, then play it through.`];
+  return [first, `Let's loop just those bars ${flow ? "in Flow" : `at ${duoResultsSettings.practiceTempo}%`}, then play it through.`];
 }
 
-// bar-loop on the run at practiceTempo, keeping only the params that pick the song.
+// bar-loop on the run at practiceTempo, keeping only the params that pick the song, in the take's mode (play-modes:
+// under Flow, no tempo).
 export function practiceBarsUrl(chartId: string, params: URLSearchParams, run: { from: number; to: number }): string {
   const q = new URLSearchParams({ song: params.get("song") ?? chartId });
   if (params.has("hands")) q.set("hands", params.get("hands")!);
   q.set("from", String(run.from));
   q.set("to", String(run.to));
   q.set("tempo", String(duoResultsSettings.practiceTempo));
-  return `/play?${q}`;
+  return `/play?${inMode(q, playMode(params))}`;
 }
 
 export const nextForKey = (songId: string) => `pianoArcade.nextFor.${songId}`;
@@ -139,12 +142,15 @@ export interface NextFor {
   from: number;
   to: number;
   hand: Hand | null; // the hand the tutor named, if any
+  mode?: PlayMode; // the take's, so the select's strip practices in it too; absent is Perform
 }
 
 // "Next for you", for duo-select: only after a scored take (records' practice rule, plus demo and practice=), and
-// only with a weak run. Storage that throws saves nothing.
+// only with a weak run. A Flow take counts too: practice is something you do in your mode (play-modes). Storage that
+// throws saves nothing.
 export function saveNextFor(storage: Pick<Storage, "setItem"> | null, params: URLSearchParams, entry: NextFor | null): boolean {
-  if (!entry || !storage || practiceReason(params) || params.has("demo") || params.has("practice")) return false;
+  const scored = playMode(params) === "learn" ? params : withMode(params, "perform");
+  if (!entry || !storage || practiceReason(scored) || params.has("demo") || params.has("practice")) return false;
   try {
     storage.setItem(nextForKey(entry.song), JSON.stringify(entry));
     return true;

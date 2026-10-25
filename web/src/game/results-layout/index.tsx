@@ -14,12 +14,13 @@ import styles from "./results-layout.module.css";
 export const resultsLayoutSettings = {
   // panels in the first view, under the counts (record-moment: NEW RECORD takes only; flow-mode: its headline, Flow takes only)
   featured: ["flow-mode", "record-moment", "duo-results"], // duo-results: BY BAR and TIMING, the middle band
+  ladder: ["play-modes"], // LEARN → FLOW → PERFORM, under the rank: the next mode is one click from the take
   tutor: ["duo-tutor"], // the bottom band: the tutor's line and PRACTICE BARS X–Y, beside Retry and Songs
   practiceFeatured: ["chunk-practice"], // a practice=1 or =adapt take: chunk practice's way on in place of the graph (#294)
   newRecordFeatured: ["record-moment"], // a NEW RECORD take: the moment alone; at 1280×720 the graph pushed Retry off
   // the first view, so it moves to the details for that take (spec: record-moment, First view)
   demoFeatured: ["watch-demo"], // a demo=1 take: its way back to the songs, so its focused button scrolls nothing
-  actions: ["piano-out", "wait-mode", "sheet-review", "score-card"], // panels that are buttons: they join Retry and Songs
+  actions: ["piano-out", "sheet-review", "score-card"], // panels that are buttons: they join Retry and Songs
   names: { "take-midi": "MIDI", "replay-view": "Replay", "weak-bars": "Phrases", "tempo-curve": "Tempo" } as Record<string, string>,
 };
 
@@ -97,7 +98,7 @@ export function ResultsLayout({
   const { actions } = resultsLayoutSettings;
   const featured = featuredFor(params, newRecord);
   const only = (ids: string[]) => plugins.filter((p) => ids.includes(p.id));
-  const rest = plugins.filter((p) => ![...featured, ...actions, ...resultsLayoutSettings.tutor].includes(p.id));
+  const rest = plugins.filter((p) => ![...featured, ...actions, ...resultsLayoutSettings.tutor, ...resultsLayoutSettings.ladder].includes(p.id));
   const card = (p: GamePlugin) => {
     const node = panel(p);
     if (node === null || node === undefined) return node;
@@ -149,10 +150,13 @@ export function ResultsLayout({
           <>
             {title && <p className={styles.song}>{title}</p>}
             <h2 data-testid="unscored" className={styles.unscored}>
-              Wait mode: not scored
+              Learn: not scored
             </h2>
           </>
         )}
+        <div className={styles.ladder}>
+          <Slots plugins={only(resultsLayoutSettings.ladder)} panel={panel} />
+        </div>
         <div className={styles.featured}>
           <Slots plugins={only(featured)} panel={panel} />
         </div>

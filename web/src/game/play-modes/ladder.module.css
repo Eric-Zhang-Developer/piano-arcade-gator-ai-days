@@ -1,0 +1,98 @@
+/* The play-modes ladder: three sharp rungs joined by chevrons, the Duo kit's hairlines and mono caps. The current mode
+   is lit in primary, the next step has a primary hairline, the rest are plain links. Never a fill: Start and Retry
+   stay the screen's one primary. */
+
+.ladder {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: stretch;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: 700 clamp(12px, 0.85vw, 16px) var(--pa-font-data), ui-monospace, monospace;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* The start screen's modes row is a 2-column grid: the ladder takes the whole row. */
+.wide {
+  grid-column: 1 / -1;
+}
+
+.rung {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.6em;
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 1.1vh 0.6em;
+  border: 1px solid var(--pa-line);
+  border-radius: 0;
+  color: var(--pa-ink-dim);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.num {
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+a.rung:hover {
+  color: var(--pa-ink);
+  background: rgba(125, 132, 150, 0.12);
+}
+
+a.rung:active {
+  transform: translateY(1px);
+}
+
+a.rung:focus-visible {
+  outline: 2px solid var(--pa-ink);
+  outline-offset: 2px;
+}
+
+.next {
+  color: var(--pa-ink);
+  border-color: var(--pa-primary);
+}
+
+.next::after {
+  content: "›";
+  color: var(--pa-primary);
+}
+
+.current {
+  color: var(--pa-primary);
+  border-color: var(--pa-primary);
+  background: color-mix(in srgb, var(--pa-primary) 14%, transparent);
+}
+
+.chev {
+  align-self: center;
+  padding: 0 0.5em;
+  color: var(--pa-ink-dim);
+  opacity: 0.6;
+}
+
+/* The select's read-only mark: the same rungs, slimmer; a step reached is ink, the furthest one lit. */
+.mark .rung {
+  padding: 0.55vh 0.4em;
+  font-size: clamp(11px, 0.75vw, 14px);
+}
+
+.reached {
+  color: var(--pa-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rung {
+    transition: none;
+  }
+  a.rung:active {
+    transform: none;
+  }
+}

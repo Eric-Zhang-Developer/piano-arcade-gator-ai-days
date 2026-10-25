@@ -1,6 +1,7 @@
 // Headless proof of wait mode (spec: wait-mode, the Chrome steps): on /play?mode=wait, Twinkle's first note holds on
 // the line for 3 s until it's pressed, then the song plays on and ends with no MISS and no rank; Ode to Joy's opening
-// chord holds until both of its keys are pressed. "Play it judged" and "Learn it first" move between the two modes.
+// chord holds until both of its keys are pressed. The play-modes ladder moves between modes: after Learn its Flow step
+// (play-judged) is next and Perform one click; on a Perform start screen its Learn step (learn-first) opens Learn.
 // Usage: node web/src/game/wait-mode/verify-wait.mjs --out <dir>
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -95,18 +96,22 @@ check(r.judgments.every((j) => j.offsetMs === 0), "every note judged at offset 0
 check(await page.getByTestId("unscored").isVisible(), "the results say 'not scored'");
 check((await page.getByTestId("rank").count()) === 0 && (await page.getByTestId("timing").count()) === 0, "no rank, counts or timing panel");
 await page.screenshot({ path: join(out, "wait-results.png") });
+check((await page.getByTestId("ladder-learn").getAttribute("aria-current")) === "step", "the ladder lights Learn");
+const perform = new URL(await page.getByTestId("ladder-perform").getAttribute("href"), base);
 await page.getByTestId("play-judged").click();
 await page.waitForFunction(() => window.__pianoArcade?.ready === true, null, { timeout: 60_000 });
 const judged = new URL(page.url());
-check(!judged.searchParams.has("mode") && judged.searchParams.get("song") === "twinkle", `"Play it judged" opens ${judged.pathname}${judged.search}`);
-await page.getByTestId("results").waitFor({ timeout: 120_000 }); // nothing pressed: the normal game calls every note a MISS
-check(await page.getByTestId("rank").isVisible(), "… the normal game, with a rank");
+check(judged.searchParams.get("mode") === "flow" && judged.searchParams.get("song") === "twinkle", `the ladder's next step opens ${judged.pathname}${judged.search}`);
+check((await page.getByTestId("ladder-flow").getAttribute("aria-current")) === "step", "… Flow, lit on its ladder");
+await page.goto(perform.href);
+await page.getByTestId("results").waitFor({ timeout: 120_000 }); // nothing pressed: Perform calls every note a MISS
+check(!perform.searchParams.has("mode") && (await page.getByTestId("rank").isVisible()), `the ladder's Perform step (${perform.search}) is the normal game, with a rank`);
 
 // The start screen (no ?input=test, so it waits for Start) links into wait mode.
 await page.goto(`${base}/play?song=twinkle&hands=R`);
 await page.getByTestId("learn-first").click();
 await page.waitForURL(/mode=wait/);
-check(new URL(page.url()).search === "?song=twinkle&hands=R&mode=wait", `"Learn it first" opens ${new URL(page.url()).search}`);
+check(new URL(page.url()).search === "?song=twinkle&hands=R&mode=wait", `the ladder's Learn step opens ${new URL(page.url()).search}`);
 
 // 2. Ode to Joy opens on a chord: one key isn't enough.
 chart = await open(page, "ode-to-joy");

@@ -5,6 +5,7 @@
 import { useMemo, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import { nextForKey, type NextFor } from "../duo-results/scores";
 import { Brackets, Button, DataCell, MonoLabel, Panel } from "../duo-tokens";
+import { LadderMark } from "../play-modes";
 import { nextForText, nextForUrl, readNextFor } from "./next-for";
 import { PianoRoll } from "./PianoRoll";
 import type { Roll } from "./roll";
@@ -51,6 +52,7 @@ export function FocusPanel(p: FocusPanelProps) {
             <DataCell label="NOTES" value={<span data-testid="cell-notes">{p.notes}</span>} />
             <DataCell label="BEST" value={<span data-testid="cell-best">{p.best ? `${(p.best.accuracy * 100).toFixed(1)}%` : "—"}</span>} />
           </Panel>
+          <LadderMark song={p.id} />
           {next && (
             <a className={styles.next} href={nextForUrl(next)} data-testid="next-for-you">
               <Panel style={{ display: "flex", alignItems: "center", gap: "1.1em", padding: "0.9vh 1em" }}>

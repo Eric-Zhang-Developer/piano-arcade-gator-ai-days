@@ -4,6 +4,7 @@
 import type { Chart } from "../../contracts";
 import { handsSetting, splitHands } from "../hand-mode/hands";
 import { phrases, type Phrase, type PhraseScore } from "../weak-bars";
+import { inMode, playMode } from "../play-modes/modes";
 
 // Starting values, not findings: Eric tunes them on the piano.
 export const adaptSettings = { passAccuracy: 0.85, cleanToGrow: 2, tempo: 70, slowTempo: 50 };
@@ -73,19 +74,20 @@ export const takeResult = (accuracy: number, scores: PhraseScore[], fromBar: num
   phrases: scores.map((p) => ({ from: p.from + fromBar - 1, accuracy: p.accuracy, notes: p.noteIds.length })),
 });
 
-// A step's /play URL: bar-loop's bars, tempo and one pass, and the state. Every other param (song, hands) is kept.
+// A step's /play URL: bar-loop's bars, tempo and one pass, and the state, in the take's mode, Flow after a Learn step
+// (play-modes: under Flow, no tempo). Every other param (song, hands) is kept.
 export function adaptUrl(params: URLSearchParams, list: Phrase[], s: AdaptState, tempo = adaptSettings.tempo): string {
   const q = new URLSearchParams(params);
   q.set("from", String(list[s.from].from));
   q.set("to", String(list[s.to].to));
   q.set("tempo", String(tempo));
   q.set("passes", "1");
-  q.delete("mode");
   q.set("practice", "adapt");
   q.set("ok", String(s.ok));
   q.set("ko", String(s.ko));
   q.set("clean", String(s.clean));
-  return `/play?${q}`;
+  const m = playMode(params);
+  return `/play?${inMode(q, m === "learn" ? "flow" : m)}`;
 }
 
 const int = (v: string | null) => (v !== null && /^\d+$/.test(v) ? Number(v) : NaN);

@@ -10,6 +10,7 @@ import { realKeys } from "./real-keys";
 import { highlightReel } from "./highlight-reel";
 import { sample } from "./sample";
 import { screenShake } from "./screen-shake";
+import { wetPaint } from "./wet-paint";
 
 export interface Experiment {
   name: string; // its folder and its flag: ?x=<name>, comma-separated for several
@@ -28,6 +29,7 @@ export const experiments: Experiment[] = [
   realKeys, // #1017: its own page, /real-keys; on /play only a start-panel link to it
   highlightReel, // a take becomes a 15-second broadcast replay video (#913, spike)
   composersHands,
+  wetPaint, // #1106: its own page, /paint
 ];
 
 // The names a take's ?x= turns on.

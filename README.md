@@ -111,11 +111,13 @@ Stack: Next.js (App Router) and TypeScript, pnpm, Vitest, Playwright. Details: [
 | `docs/judges.md` | The project against the judging criteria, each claim linked to its evidence |
 | `docs/devpost.md` | The Devpost submission draft, with its open items marked |
 | `docs/story.md` | How it got built, one chapter per milestone |
+| [`CREDITS.md`](CREDITS.md) | Every committed third-party file whose license asks for credit: its source, license and what we changed |
 
 ## Checks
 
 ```bash
 pnpm -C web lint && pnpm -C web typecheck && pnpm -C web test && pnpm -C web build
+pnpm -C web exec playwright install chromium            # once per clone: verify drives Playwright's Chromium
 pnpm -C web verify --out /tmp/piano-arcade-evidence     # headless end-to-end run, saves a results screenshot
 ```
 

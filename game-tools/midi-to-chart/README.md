@@ -129,3 +129,52 @@ S=../../web/public/songs
   --midi source/moonlight3.mid --bars 1-8
 for s in gymnopedie-1 clair-de-lune maple-leaf-rag; do .venv/bin/python perform.py pedal $S/$s/chart.json --harmony; done
 ```
+Batch 6 (#1102), with song-pack-5's sources (`specs/decisions/song-pack-5-sources.md`). The marks were hand-read;
+`dynamics` now prints the same lists (`--right upper,dynamics --left lower,dynamics`, with `--unfold --spans 0-72
+--start-beat 2.5` for Wild Horseman and `--pickup 0.5 --bars 1-21` for Happy Farmer):
+```bash
+S=../../web/public/songs
+.venv/bin/python perform.py velocity $S/happy-farmer/chart.json --marks "RL@7/2=f,RL@36!,RL@40!,RL@60!,RL@64!"
+.venv/bin/python perform.py velocity $S/wild-horseman/chart.json \
+  --marks "RL@5/2=mf,RL@6!,RL@9!,RL@18!,RL@21!,RL@30!,RL@33!,RL@42!,RL@45!,RL@54!,RL@57!,RL@66!"
+.venv/bin/python perform.py velocity $S/old-french-song/chart.json --marks "RL@3/2=p,RL@35/2=pp"
+for s in happy-farmer old-french-song minuet-g-minor musette-d; do .venv/bin/python perform.py pedal $S/$s/chart.json --harmony; done
+```
+Batch 7 (#1103), with song-pack-6's sources plus `chopin_prelude_op28_no7.ly` from
+`ftp/ChopinFF/O28/Chop-28-7/Chop-28-7-lys.zip`. `dynamics` reads Chopin (`--right playRH --left playLH`); it refuses
+Träumerei (4 notes by its uncharted grace notes) and can't name K. 331's inline staves, so those two are hand-read.
+```bash
+S=../../web/public/songs
+.venv/bin/python perform.py velocity $S/chopin-prelude-7/chart.json --marks "RL@2=p,RL@33-36~+16"
+.venv/bin/python perform.py velocity $S/traumerei/chart.json \
+  --marks "RL@3=p,RL@13/2-17/2~+16,RL@45/2-49/2~+16,RL@36=p,RL@77/2-81/2~+16,RL@109/2-113/2~+16"
+.venv/bin/python perform.py velocity $S/mozart-331-theme/chart.json --marks "RL@0=p,RL@41/2!,RL@21=p,RL@24=p,RL@89/2!,RL@45=p"
+.venv/bin/python perform.py pedal $S/chopin-prelude-7/chart.json --ly source/chopin_prelude_op28_no7.ly --context playLH \
+  --midi source/Chop-28-7.mid --pickup 1 --bars 1-17
+.venv/bin/python perform.py pedal $S/traumerei/chart.json --ly source/SchumannOp15No07.ly --context pedaltr \
+  --down sustainDown --up sustainUp --spans 0-33,1-33 --start-beat 3
+for s in mozart-331-theme brahms-waltz-15; do .venv/bin/python perform.py pedal $S/$s/chart.json --harmony; done
+```
+Batch 8 (#1104), from each source's `.ly` and `.mid` on Mutopia: `ftp/ChopinFF/O28/Chop-28-20/Chop-28-20`,
+`ftp/DebussyC/L66/debussy_Arabesque_1/debussy_Arabesque_1`, `ftp/SchubertF/D780/MomentsNo3/MomentsNo3`,
+`ftp/BeethovenLv/O13/pathetique-2/pathetique-2`, and `Chop-28-15.mid` with `sec1.ly` from `Chop-28-15-lys.zip`.
+All are hand-read: `dynamics` skips the two Chopins' `\barRest` variable (it put their marks a bar or more early), refuses
+the Arabesque (3 notes restruck only in the 2.26 MIDI; without them it prints this same list) and can't parse the
+Moment musical's voice setup. Prelude 20 prints Ped. on each beat and then *simile*; its MIDI renders only the 6 literal
+pairs, so its `pedal.json` is the printed pattern carried through bar 12 (decision `demo-performance-pedal`).
+```bash
+S=../../web/public/songs
+.venv/bin/python perform.py velocity $S/chopin-prelude-20/chart.json --marks "RL@0=ff,RL@8-14~+16,RL@16=p,RL@32=pp,RL@42-47~+16,RL@48!"
+.venv/bin/python perform.py velocity $S/debussy-arabesque-1/chart.json --marks "RL@0=p,RL@9-11~+16,RL@13-15~+16,\
+RL@16-56/3~+16,RL@20=pp,RL@36-79/2~+16,RL@48-99/2~+16,RL@64=p,RL@72-76~+16,RL@76-78~-16,RL@86=p,RL@181/2-183/2~+16,\
+RL@94=p,RL@100=p,RL@113-114~+16,RL@135-422/3~+16,RL@141-431/3~-16,RL@144=p"
+.venv/bin/python perform.py velocity $S/moment-musical-3/chart.json --marks "R@6!,R@7!,R@10!,R@11!,R@22!,R@23!,R@26!,\
+R@27!,R@36!,R@37!,R@44!,R@45!,R@52!,R@53!,R@60!,R@61!"
+.venv/bin/python perform.py velocity $S/pathetique-2/chart.json --mark p
+.venv/bin/python perform.py velocity $S/raindrop-prelude/chart.json --marks "RL@0=p,RL@4-9.5~+16,RL@10-13.5~-16,\
+RL@20-25~+16,RL@25.5-29.5~-16,RL@31=p,RL@49-51~+16,RL@52-53.5~-16,RL@69-72~+16,RL@73-75~-16,RL@76=p,RL@80-85~+16,\
+RL@85-89.5~-16,RL@96-101.5~+16,RL@101.5-104~-16"
+.venv/bin/python perform.py pedal $S/raindrop-prelude/chart.json --midi source/Chop-28-15.mid --bars 1-27
+for s in debussy-arabesque-1 pathetique-2; do .venv/bin/python perform.py pedal $S/$s/chart.json --harmony; done
+python3 -c 'import json; print(json.dumps({"pedal": [[float(b), float(b + 1)] for b in range(48)]}))' > $S/chopin-prelude-20/pedal.json
+```

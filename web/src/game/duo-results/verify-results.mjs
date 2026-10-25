@@ -59,7 +59,10 @@ const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 // A prior Für Elise best no take can beat (a fixture, not a real score), so the planted take isn't a NEW RECORD. A
 // record take features record-moment alone and moves BY BAR to Details (results-layout), which isn't what this checks.
+// The goto below retries while the dev server starts, and each refused try leaves Chrome's own error page, which has
+// no storage: the seed runs there too, so it skips a document that can't hold it rather than throw a page error.
 await page.addInitScript(() => {
+  if (location.protocol !== "http:") return;
   if (localStorage.getItem("pianoArcade.records")) return;
   const fixture = { initials: "FIX", score: 1_000_000, accuracy: 1, rank: "S", maxCombo: 294, date: "2026-01-01T00:00:00.000Z" };
   localStorage.setItem("pianoArcade.records", JSON.stringify({ "fur-elise": { best: { rank: "S", accuracy: 1, score: 1_000_000, date: fixture.date }, top: [fixture] } }));

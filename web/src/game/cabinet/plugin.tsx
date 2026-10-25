@@ -13,10 +13,11 @@ const toCabinet = (m: CabinetMessage) => {
   if (window.parent !== window) window.parent.postMessage(m, window.location.origin);
 };
 
-// Clicks Start once the start screen shows, as the sim does (core has no autostart outside ?input=test).
+// Clicks Start once the start screen shows, as the sim does (core has no autostart outside ?input=test). By its test
+// id: since duo-start (#763) the start screen has other buttons before Start.
 function AutoStart() {
   useEffect(() => {
-    document.querySelector<HTMLButtonElement>("main button")?.click();
+    document.querySelector<HTMLButtonElement>("[data-testid=start]")?.click();
   }, []);
   return null;
 }

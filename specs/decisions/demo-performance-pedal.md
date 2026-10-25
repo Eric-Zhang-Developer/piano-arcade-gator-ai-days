@@ -1,7 +1,7 @@
 # demo-performance: where each song's pedal comes from
 
 **Context.** The bot sends a song's `pedal.json` as CC64 (golden-demo). The spec takes it from the score's Ped. marks
-and, for a score with none, from golden-demo's per-harmony rule, logged here. Findings: batch 1 on #815, batch 2 on #816, batch 3 on #818, batch 4 on #819.
+and, for a score with none, from golden-demo's per-harmony rule, logged here. Findings: batch 1 on #815, batch 2 on #816, batch 3 on #818, batch 4 on #819, batch 6 on #1102, batch 7 on #1103, batch 8 on #1104.
 
 **Options.** For each song, in order: (A) the score's printed Ped. marks; (B) a pedal layer in the cited source file
 that only its MIDI renders, written by the edition's typesetter; (C) the per-harmony rule, an arrangement choice.
@@ -31,6 +31,21 @@ the commands.
 | mountain-king | Mutopia 1888: none in bars 1–17 (the first Ped. is at beat 100, past the excerpt); *e sempre staccato* | **none**, as burgmuller-arabesque: the rule would hold the printed staccato |
 | alla-turca | Mutopia 108: none; staccato almost throughout | **none**, the same reason |
 | minute-waltz | Mutopia 483: a printed pedal line, rendered in its MIDI as CC64 | A, the MIDI's CC64 over bars 1–20 (16 pairs, from bar 5, where the left hand enters) |
+| happy-farmer | Mutopia 659: none | C (41 pairs), the rags' arrangement choice: its right hand's off-beat chords are written with rests between |
+| wild-horseman | Mutopia 655: none; *vif*, staccato almost throughout | **none**, as mountain-king and alla-turca |
+| old-french-song | Mutopia 2080: none | C (16 pairs) |
+| minuet-g-minor | Mutopia 76: none | C (32 pairs), as bach-prelude-c |
+| musette-d | Mutopia 79: none | C (40 pairs) |
+| chopin-prelude-7 | Mutopia 470: `\sustainOn/Off` in the left hand, one or two a bar | A, read from the left hand (10 pairs) |
+| traumerei | Mutopia 504: a pedal line, `\sustainDown/Up`, in bars 1–2 and 5–6 | A, read from it, both passes (8 pairs) |
+| mozart-331-theme | Mutopia 614: none | C (16 pairs), as mozart-545-1 |
+| brahms-waltz-15 | Mutopia 794: none | C (16 pairs) |
+| invention-1 | Mutopia 40: none; two-part counterpoint | **none**: the rule reads the left hand as harmony, and here it is one moving line; the rule would blur the counterpoint. Eric may prefer C, as bach-prelude-c. |
+| chopin-prelude-20 | Mutopia 472: `\sustainOn/Off` on each beat of bar 1 and bar 2's first, then *simile*; a Ped. at bar 12 beat 4, lifted on the final chord. Its MIDI renders only the 6 literal pairs | A, the printed pattern carried through as *simile* asks: one pair a beat, beats 0–48 (48 pairs). Taking the MIDI's 6 would leave bars 2–12 dry against the score |
+| debussy-arabesque-1 | Mutopia 1777: an empty `pedal` voice, no CC64 | C (70 pairs) |
+| moment-musical-3 | Mutopia 1023: none; a staccato left hand (marked in bars 1–2) | **none**, as alla-turca and wild-horseman: the rule would hold the staccato accompaniment. Eric may prefer C. |
+| pathetique-2 | Mutopia 295: none | C (16 pairs) |
+| raindrop-prelude | Mutopia 471: `\sustainOn/Off` macros in `sIsustain` (`sec1.ly`), rendered in its MIDI as CC64 | A, the MIDI's CC64 over bars 1–27 (47 pairs, checked against `sIsustain`) |
 
 **The rule (C)**, as golden-demo's (`specs/context/findings.md`, 2026-10-25). A harmony is the left hand's pitch
 classes struck in a half bar (a whole bar unless the bar has 4 beats). A new pair starts at a window that strikes a

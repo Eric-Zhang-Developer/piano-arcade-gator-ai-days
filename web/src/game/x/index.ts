@@ -5,6 +5,8 @@ import { createElement, Fragment, type ReactNode } from "react";
 import type { GamePlugin } from "../../contracts";
 import { createGuard, type Guard } from "../crash-guard";
 import { conductor } from "./conductor";
+import { realKeys } from "./real-keys";
+import { highlightReel } from "./highlight-reel";
 import { sample } from "./sample";
 import { screenShake } from "./screen-shake";
 
@@ -22,6 +24,8 @@ export const experiments: Experiment[] = [
   sample, // the sample that proves the frame; pruning it is the prune rule's first use
   screenShake,
   conductor,
+  realKeys, // #1017: its own page, /real-keys; on /play only a start-panel link to it
+  highlightReel, // a take becomes a 15-second broadcast replay video (#913, spike)
 ];
 
 // The names a take's ?x= turns on.

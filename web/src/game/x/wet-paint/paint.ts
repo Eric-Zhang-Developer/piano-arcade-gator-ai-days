@@ -45,8 +45,8 @@ export interface PaintParams {
 }
 
 export const pedalSettings = {
-  wet: { densityDissipation: 0.08, velocityDissipation: 0.12, curl: 28 }, // CC64 127: bleeds and mixes
-  dry: { densityDissipation: 0.9, velocityDissipation: 3, curl: 4 }, // CC64 0: blooms and stops
+  wet: { densityDissipation: 0.08, velocityDissipation: 1.2, curl: 28 }, // CC64 127: blooms, swirls, bleeds and mixes, then settles
+  dry: { densityDissipation: 0.9, velocityDissipation: 4, curl: 4 }, // CC64 0: a short bloom that stops and fades
   downAt: 64, // CC64 at or over this is "down": the MIDI spec's on/off line
 };
 
@@ -64,11 +64,16 @@ export function pedalCurve(cc: number, s = pedalSettings): PaintParams {
 // --- splats ---------------------------------------------------------------------------------------------------------
 
 export const splatSettings = {
-  y: 0.03, // notes bloom from the bottom edge
-  radius: [0.06, 0.28], // the solver's SPLAT_RADIUS units (its default 0.25), pp to ff
-  force: [400, 3200], // upward, the solver's units
-  ink: [0.3, 1], // the color's strength, pp to ff
-  feed: { ink: 0.035, radius: 0.6, force: 70 }, // a held note's ink every frame, as shares of its strike
+  y: 0.06, // a note's paint starts just above its key
+  // The solver turns a narrow push into a dome that stays or a jet that leaves the canvas (FINDINGS.md). So a held note
+  // paints like a brush: its ink source climbs from the key while it's held, and the fluid only stirs and bleeds it.
+  climb: [0.12, 0.42], // canvas heights per second the brush climbs, pp to ff
+  top: 0.94, // where it stops
+  radius: [0.014, 0.05], // the solver's SPLAT_RADIUS units (its pointer default 0.25 is a whole hand), pp to ff
+  force: [60, 220], // an upward stir per frame at the strike, the solver's units: it adds up in the velocity field
+  ink: [0.05, 0.12], // the color's strength per frame at the strike, pp to ff
+  burstSec: 0.2,
+  trickle: { ink: 0.45, force: 0 }, // what's left after the strike's burst, as shares of it: no push, or a long hold launches its paint
 };
 
 const lerp = ([a, b]: number[], t: number) => a + (b - a) * t;
@@ -82,15 +87,14 @@ export interface Splat {
   radius: number;
 }
 
-export function strike(x: number, velocity: number, color: Rgb, still: boolean, s = splatSettings): Splat {
+// A held note's brush, age seconds after its strike: where it is, how much ink and how hard it stirs.
+export function jet(x: number, velocity: number, color: Rgb, age: number, still: boolean, s = splatSettings): Splat {
   const t = Math.max(1, Math.min(127, velocity)) / 127;
-  const k = lerp(s.ink, t);
-  return { x, y: s.y, dx: 0, dy: still ? 0 : lerp(s.force, t), color: { r: color.r * k, g: color.g * k, b: color.b * k }, radius: lerp(s.radius, t) };
-}
-
-export function feed(hit: Splat, still: boolean, s = splatSettings): Splat {
-  const k = s.feed.ink;
-  return { ...hit, dy: still ? 0 : s.feed.force, radius: hit.radius * s.feed.radius, color: { r: hit.color.r * k, g: hit.color.g * k, b: hit.color.b * k } };
+  const e = Math.exp(-age / s.burstSec);
+  const k = lerp(s.ink, t) * (s.trickle.ink + (1 - s.trickle.ink) * e);
+  const push = lerp(s.force, t) * (s.trickle.force + (1 - s.trickle.force) * e);
+  const y = Math.min(s.top, s.y + age * lerp(s.climb, t));
+  return { x, y, dx: 0, dy: still ? 0 : push, color: { r: color.r * k, g: color.g * k, b: color.b * k }, radius: lerp(s.radius, t) };
 }
 
 // The fix's "over", as the vendored fixShader computes it per pixel: the live paint on top of the dried.
@@ -124,7 +128,7 @@ export interface Painter {
 // Paint dries when the pedal lifts, and, with the pedal up, when a key lifts: the dampers are down, so the note's
 // paint stops where it is. With the pedal down nothing dries; the live layer keeps flowing.
 export function createPainter(surface: Surface, opts: { xOf(pitch: number): number; colorOf(pitch: number): Rgb; still: boolean }): Painter {
-  const held = new Map<number, Splat>();
+  const held = new Map<number, { x: number; velocity: number; color: Rgb; age: number }>();
   let notes = 0;
   let cc = 0;
   let fixes = 0;
@@ -136,10 +140,10 @@ export function createPainter(surface: Surface, opts: { xOf(pitch: number): numb
   surface.params(pedalCurve(cc));
   return {
     noteOn(pitch, velocity) {
-      const s = strike(opts.xOf(pitch), velocity, opts.colorOf(pitch), opts.still);
-      held.set(pitch, s);
+      const n = { x: opts.xOf(pitch), velocity, color: opts.colorOf(pitch), age: 0 };
+      held.set(pitch, n);
       notes++;
-      surface.splat(s);
+      surface.splat(jet(n.x, n.velocity, n.color, 0, opts.still));
     },
     noteOff(pitch) {
       if (!held.delete(pitch)) return;
@@ -152,7 +156,10 @@ export function createPainter(surface: Surface, opts: { xOf(pitch: number): numb
       if (was && !down()) dry();
     },
     frame(dt) {
-      for (const s of held.values()) surface.splat(feed(s, opts.still));
+      for (const n of held.values()) {
+        n.age += dt;
+        surface.splat(jet(n.x, n.velocity, n.color, n.age, opts.still));
+      }
       surface.step(dt);
     },
     again() {

@@ -1,0 +1,224 @@
+/* Wet Paint (spec: wet-paint): a gallery wall at night. The painting takes the screen above a keyboard strip that
+   lights in each key's paint; the Duo kit's rail sits quietly on the wall; framing hangs it in a hairline mat. */
+
+.page {
+  --keys: clamp(56px, 10vh, 120px);
+  position: fixed;
+  inset: 0;
+  background: var(--pa-bg);
+  color: var(--pa-ink);
+  overflow: hidden;
+}
+
+/* Under the nav bar's band (4vh), down to the keys: the paint rises from the keys it was played on. */
+.canvas {
+  position: absolute;
+  top: 4vh;
+  left: 0;
+  right: 0;
+  bottom: var(--keys);
+  width: 100%;
+  height: calc(100% - 4vh - var(--keys));
+  display: block;
+}
+
+.noGl {
+  position: absolute;
+  inset: 40% 10% auto;
+  margin: 0;
+  text-align: center;
+  font: 600 clamp(18px, 1.6vw, 30px) / 1.3 var(--pa-font-display), system-ui, sans-serif;
+}
+
+.rail {
+  position: absolute;
+  top: calc(4vh + 1.4rem);
+  left: 2vw;
+  display: grid;
+  gap: 1.1rem;
+  justify-items: start;
+  pointer-events: none; /* the wall shows through; only the buttons take clicks */
+}
+
+.rail button {
+  pointer-events: auto;
+}
+
+/* The select's wordmark: wide-tracked caps after a slanted primary bar. */
+.mark {
+  margin: 0;
+  font: 700 clamp(28px, 2.6vw, 50px) / 1 var(--pa-font-display), system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mark::before {
+  content: "";
+  display: inline-block;
+  width: 0.22em;
+  height: 0.78em;
+  margin-right: 0.5em;
+  background: var(--pa-primary);
+  transform: skewX(-18deg);
+}
+
+.data {
+  display: flex;
+  gap: clamp(18px, 2vw, 40px);
+  margin: 0;
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+}
+
+.data dt {
+  color: var(--pa-ink-dim);
+  font-size: clamp(12px, 0.8vw, 16px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.data dd {
+  margin: 0.3em 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  font-size: clamp(16px, 1.25vw, 24px);
+  font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.of {
+  color: var(--pa-ink-dim);
+}
+
+/* CC64 as a hairline bar: it fills as the pedal goes down, primary once it's wet. */
+.meter {
+  width: 4.5em;
+  height: 0.45em;
+  border: 1px solid var(--pa-line);
+  display: block;
+}
+
+.meter span {
+  display: block;
+  height: 100%;
+  background: var(--pa-ink-dim);
+  transform-origin: left;
+  transition: transform 80ms linear;
+}
+
+/* scoped under .data: a module's selectors each need a local class */
+.data [data-wet] .meter span {
+  background: var(--pa-primary);
+}
+
+.data dd[data-wet] {
+  color: var(--pa-primary);
+}
+
+.actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.actions button {
+  font-size: clamp(14px, 1vw, 20px) !important; /* over the kit's inline 14 px */
+  padding: 0.8em 1.6em !important;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.status {
+  position: absolute;
+  top: calc(4vh + 1.4rem);
+  right: 2vw;
+  margin: 0;
+  display: grid;
+  gap: 0.5em;
+  justify-items: end;
+  color: var(--pa-ink-dim);
+  font-size: clamp(12px, 0.85vw, 16px);
+  text-align: right;
+}
+
+.hint {
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  letter-spacing: 0.04em;
+}
+
+/* The keyboard the paint is played on: white keys, black keys over the lines between, a held key in its color. */
+.keys {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--keys);
+  background: var(--pa-bg);
+  border-top: 1px solid var(--pa-line);
+}
+
+.white,
+.black {
+  position: absolute;
+  top: 0;
+  box-sizing: border-box;
+  transition: background-color 60ms linear;
+}
+
+.white {
+  height: 100%;
+  background: #d9dce3;
+  border-right: 1px solid var(--pa-bg);
+}
+
+.black {
+  height: 62%;
+  background: #16181f;
+  z-index: 1;
+}
+
+/* Framed: the wall dims, the painting hangs in its mat, the caption under it like a gallery label. */
+.gallery {
+  position: absolute;
+  inset: 4vh 0 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: clamp(14px, 2vh, 28px);
+  background: color-mix(in srgb, var(--pa-bg) 94%, transparent);
+  animation: hang 420ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.painting {
+  display: block;
+  max-width: 100%;
+  max-height: 62vh;
+}
+
+.caption {
+  margin: 0;
+  color: var(--pa-ink-dim);
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: clamp(14px, 1.1vw, 22px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+@keyframes hang {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery {
+    animation: none;
+  }
+
+  .meter span,
+  .white,
+  .black {
+    transition: none;
+  }
+}

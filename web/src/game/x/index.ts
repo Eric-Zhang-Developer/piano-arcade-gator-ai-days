@@ -8,6 +8,7 @@ import { conductor } from "./conductor";
 import { realKeys } from "./real-keys";
 import { sample } from "./sample";
 import { screenShake } from "./screen-shake";
+import { wetPaint } from "./wet-paint";
 
 export interface Experiment {
   name: string; // its folder and its flag: ?x=<name>, comma-separated for several
@@ -24,6 +25,7 @@ export const experiments: Experiment[] = [
   screenShake,
   conductor,
   realKeys, // #1017: its own page, /real-keys; on /play only a start-panel link to it
+  wetPaint, // #1106: its own page, /paint
 ];
 
 // The names a take's ?x= turns on.

@@ -1,0 +1,140 @@
+/* /highlight: an edit bay in the Duo look. The monitor dominates; the side column holds the take's numbers and the
+   one action; the timeline under it shows the reel's three segments at their true lengths, filling as it records.
+   Type scales with the width (16 px at 1280, 24 px at 1920), as /lab does. */
+.page {
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: 3.4em 2.5em 1.5em;
+  background: var(--pa-bg);
+  color: var(--pa-ink);
+  font: 400 clamp(14px, 1.25vw, 28px) / 1.35 system-ui, sans-serif;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2em;
+}
+
+.title {
+  margin: 0;
+  font: 800 2.2em/1 var(--pa-font-display), system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.sub {
+  margin: 0;
+  color: var(--pa-ink-dim);
+}
+
+.back {
+  margin-left: auto;
+  color: var(--pa-ink-dim);
+  text-decoration: none;
+}
+
+.back:hover,
+.back:focus-visible {
+  color: var(--pa-ink);
+}
+
+.note {
+  margin: 0.6em 0 0;
+  color: var(--pa-gold);
+}
+
+.bay {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 15em;
+  gap: 1.4em;
+  margin-top: 1em;
+  align-items: start;
+}
+
+.monitor {
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.screen {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9em;
+}
+
+.cells {
+  display: grid;
+  gap: 0.8em;
+}
+
+.small {
+  margin: 0;
+  color: var(--pa-ink-dim);
+  font-size: 0.85em;
+}
+
+.timeline {
+  display: flex;
+  gap: 4px;
+  margin: 1.2em 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.segment {
+  position: relative;
+  flex-basis: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  padding: 0.55em 0.75em;
+  overflow: hidden;
+  background: var(--pa-panel);
+}
+
+/* how much of the segment is recorded, left to right */
+.fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: left;
+  background: color-mix(in srgb, var(--pa-primary) 28%, transparent);
+  transition: transform 100ms linear;
+}
+
+.segment[data-kind="slow"] {
+  border-top: 3px solid var(--pa-gold);
+}
+
+.segment[data-kind="finish"] {
+  border-top: 3px solid var(--pa-primary);
+}
+
+.segment[data-kind="title"] {
+  border-top: 3px solid var(--pa-ink-dim);
+}
+
+.segName {
+  position: relative;
+  font: 800 1em/1.2 var(--pa-font-display), system-ui, sans-serif;
+  text-transform: uppercase;
+}
+
+.segLine {
+  position: relative;
+  color: var(--pa-ink-dim);
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
+}

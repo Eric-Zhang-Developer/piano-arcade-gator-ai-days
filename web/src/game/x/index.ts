@@ -6,6 +6,7 @@ import type { GamePlugin } from "../../contracts";
 import { createGuard, type Guard } from "../crash-guard";
 import { conductor } from "./conductor";
 import { realKeys } from "./real-keys";
+import { highlightReel } from "./highlight-reel";
 import { sample } from "./sample";
 import { screenShake } from "./screen-shake";
 
@@ -24,6 +25,7 @@ export const experiments: Experiment[] = [
   screenShake,
   conductor,
   realKeys, // #1017: its own page, /real-keys; on /play only a start-panel link to it
+  highlightReel, // a take becomes a 15-second broadcast replay video (#913, spike)
 ];
 
 // The names a take's ?x= turns on.

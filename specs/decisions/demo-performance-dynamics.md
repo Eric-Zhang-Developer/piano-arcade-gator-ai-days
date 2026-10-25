@@ -75,6 +75,18 @@ A's second pass. It also misplaces accents inside `\voiceOne << >>` blocks (Happ
   the sf chords 65. Hand-read (inline staves the reader can't name); its MIDI velocities (69/127) are replaced.
 - brahms-waltz-15, invention-1: no marks, no velocity (80).
 
+**Batch 8** (#1104). All hand-read `--marks` (the README says why `dynamics` can't read these five).
+- chopin-prelude-20 (bars 1–13): ff, a crescendo hairpin in bars 3–4, p at bar 5, pp at bar 9, a *cresc.* from bar 11
+  into 12, and an accent on the final chord: 33–127 (ff plus its crescendo clamps at 127).
+- debussy-arabesque-1 (bars 1–38): p, pp at bar 6, p again at bars 17, 22, 24, 26 and 37, with 12 hairpins and
+  *cresc.* spans and no accents: 33–97. Bars 3–5's three crescendos have no diminuendo between them, so the hairpin rule
+  stacks p up to 97 before the pp: that's the library's rule, not a printed f.
+- moment-musical-3 (bars 1–34): no level mark before bar 35's f, so mf; right-hand accents on both quarters of bars 4,
+  6, 12, 14, 19, 23, 27 and 31: 80, the accents 96.
+- pathetique-2 (bars 1–16): p, nothing else before bar 24's *cresc.*: every note 49.
+- raindrop-prelude (bars 1–27): p at bars 1, 8 (its fourth beat) and 20, with the swells in bars 2–4, 6–8, 13–14,
+  18–19, 21–23 and 25–27: 49–65.
+
 A single level reads as "This score marks no dynamics" in the dynamics grade (it needs two levels), as before.
 
 **How to undo.** Strip `velocity` from a chart: it plays at 80 again.

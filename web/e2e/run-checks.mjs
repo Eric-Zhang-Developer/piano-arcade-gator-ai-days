@@ -30,6 +30,7 @@ const CHECK_TIMEOUT_MS = 8 * 60_000;
 // 40187861996 and not yet fixed on main, pointing at its fix PR (or #754, the ci-red issue, where none exists yet).
 export const KNOWN_RED = {
   "web/src/game/duo-results/verify-results.mjs": 754, // a localStorage page error, under repro
+  "web/src/game/first-run/verify-first-run.mjs": 1148, // reads Start by its tag; #1100 gave it an id (main's run 40192807028)
   "web/src/game/ghost/verify-ghost.mjs": 1032, // stale after judging-tiers' +60 ms late bot (#859)
   "web/src/game/learn-from-select/verify-learn.mjs": 1025, // the ? card repeats the Learn line (#796)
   "web/src/game/records/verify-records.mjs": 754, // failed its first attempt on main too: red on any one-attempt PR

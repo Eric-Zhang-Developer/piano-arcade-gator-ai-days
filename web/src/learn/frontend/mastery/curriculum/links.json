@@ -1,1 +1,690 @@
-{ "edges": [] }
+{
+  "edges": [
+    {
+      "from": "pitch.tones-semitones",
+      "to": "keys.tones-semitones-major",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "The major scale is a fixed pattern of the tones and semitones a student first measures on the keyboard."
+    },
+    {
+      "from": "pitch.tones-semitones",
+      "to": "keys.chromatic-scale",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The chromatic scale is every semitone in a row, so it is the semitone step repeated twelve times."
+    },
+    {
+      "from": "pitch.tones-semitones",
+      "to": "keys.interval-number",
+      "relation": "contradicts",
+      "weight": 3,
+      "rationale": "An interval number counts letter names including both ends, while semitones count keys; students call C to E a 2nd because there are two tones."
+    },
+    {
+      "from": "pitch.accidentals",
+      "to": "keys.sharp-key-signatures",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A sharp key signature is a set of sharps written once at the start instead of beside every note."
+    },
+    {
+      "from": "pitch.accidentals",
+      "to": "keys.flat-key-signatures",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A flat key signature is a set of flats written once at the start instead of beside every note."
+    },
+    {
+      "from": "pitch.accidental-duration",
+      "to": "keys.sharp-key-signatures",
+      "relation": "contradicts",
+      "weight": 3,
+      "rationale": "An accidental lasts only to the bar line, but a key signature lasts the whole piece; students carry one rule into the other."
+    },
+    {
+      "from": "pitch.double-accidentals",
+      "to": "keys.double-accidentals",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Both cover double sharps and flats: pitch reads the signs, keys uses them to spell scale notes and enharmonics correctly."
+    },
+    {
+      "from": "pitch.enharmonics",
+      "to": "keys.double-accidentals",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Respelling a note enharmonically is how a double sharp or flat is named as an ordinary note."
+    },
+    {
+      "from": "pitch.enharmonics",
+      "to": "keys.chromatic-scale",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Writing the chromatic scale means choosing between enharmonic spellings of each black key."
+    },
+    {
+      "from": "pitch.enharmonics",
+      "to": "keys.augmented-diminished",
+      "relation": "contradicts",
+      "weight": 4,
+      "rationale": "C to D sharp and C to E flat sound the same, yet one is an augmented 2nd and one a minor 3rd: interval names follow spelling, not sound."
+    },
+    {
+      "from": "pitch.steps-and-skips",
+      "to": "keys.interval-number",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Counting lines and spaces between two notes gives the interval number; a step is a 2nd and a skip a 3rd."
+    },
+    {
+      "from": "pitch.read-by-intervals",
+      "to": "keys.intervals-at-keyboard",
+      "relation": "analogous",
+      "weight": 4,
+      "rationale": "Reading by interval and finding an interval at the keyboard are the same distance judgement, one from the page and one to the keys."
+    },
+    {
+      "from": "pitch.octave-equivalence",
+      "to": "keys.compound-intervals",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A compound interval is a simple interval plus an octave, which only works because octaves share a letter name."
+    },
+    {
+      "from": "pitch.clef-transcription",
+      "to": "keys.transposition-octave",
+      "relation": "contradicts",
+      "weight": 3,
+      "rationale": "Rewriting a note in another clef at the same pitch and transposing it by an octave look alike on paper; students answer one when asked the other."
+    },
+    {
+      "from": "pitch.keyboard-layout",
+      "to": "keys.black-key-scales",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "The groups of two and three black keys are the landmarks a hand finds for scales like B, D flat and F sharp major."
+    },
+    {
+      "from": "pitch.play-unusual-spellings",
+      "to": "keys.seven-accidental-keys",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "E sharp and B sharp occur in F sharp and C sharp major, and C flat and F flat in G flat and C flat major."
+    },
+    {
+      "from": "pitch.find-keys",
+      "to": "keys-major-scales-playing",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Starting any scale means finding its tonic key first."
+    },
+    {
+      "from": "pitch.five-finger-position",
+      "to": "keys.broken-tonic-triads",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "The tonic triad lies under fingers 1, 3 and 5 of a five-finger position on the tonic."
+    },
+    {
+      "from": "pitch.position-shift",
+      "to": "keys.two-octave-scales",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A two-octave scale moves the hand into a new position with each thumb-under and finger-over."
+    },
+    {
+      "from": "pitch.position-shift",
+      "to": "keys.tonic-arpeggios",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "An arpeggio spans more than a hand, so it is a chain of position shifts."
+    },
+    {
+      "from": "pitch.steps-and-skips",
+      "to": "chords.stacking-thirds",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "A root-position triad is three notes a skip apart, all on lines or all in spaces."
+    },
+    {
+      "from": "pitch.letter-names",
+      "to": "chords.chord-members",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Naming the root, third and fifth means counting alternate letter names, as in C, E and G."
+    },
+    {
+      "from": "pitch.read-bass-notes",
+      "to": "chords.inversions",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Which inversion a chord is in depends only on its lowest note, usually read in the bass staff."
+    },
+    {
+      "from": "pitch.five-finger-position",
+      "to": "chords.play-block-triads",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "A block triad on the tonic is fingers 1, 3 and 5 of a five-finger position played at once."
+    },
+    {
+      "from": "pitch.stem-direction",
+      "to": "rhythm.beaming",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "A beamed group takes one stem direction, set by the note furthest from the middle line."
+    },
+    {
+      "from": "pitch.sight-read-single-line",
+      "to": "rhythm.counting",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Sight-reading a line means counting the rhythm while reading the pitches, not one after the other."
+    },
+    {
+      "from": "pitch.read-bass-notes",
+      "to": "rhythm.play-left-hand",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Left-hand rhythm practice reads from the bass staff, so slow bass reading breaks the pulse."
+    },
+    {
+      "from": "pitch.accidentals",
+      "to": "expression.mordents",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "An accidental above or below an ornament sign alters the ornament's upper or lower note."
+    },
+    {
+      "from": "pitch.alto-clef",
+      "to": "expression.instrument-clefs",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The viola reads the alto clef, so naming instruments' clefs relies on reading it."
+    },
+    {
+      "from": "pitch.tenor-clef",
+      "to": "expression.instrument-clefs",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Cello, bassoon and trombone read the tenor clef in high passages."
+    },
+    {
+      "from": "pitch.alto-clef",
+      "to": "expression.open-short-score",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "In a string quartet's open score the viola part is written in the alto clef."
+    },
+    {
+      "from": "expression.satb-voices",
+      "to": "pitch-grand-staff",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Short score puts soprano and alto on the treble staff and tenor and bass on the bass staff of a grand staff."
+    },
+    {
+      "from": "pitch.read-treble-notes",
+      "to": "pieces.right-hand-alone",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "The right hand's part is usually on the treble staff, so practising it alone is treble reading at the keyboard."
+    },
+    {
+      "from": "pitch.read-bass-notes",
+      "to": "pieces.left-hand-alone",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "The left hand's part is usually on the bass staff, so practising it alone is bass reading at the keyboard."
+    },
+    {
+      "from": "pitch.sight-read-single-line",
+      "to": "pieces.sight-reading-at-level",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Sight-reading a piece at one's level builds on sight-reading a single line in each hand."
+    },
+    {
+      "from": "pitch.landmark-notes",
+      "to": "pieces.sight-reading-strategy",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Reading from landmark notes instead of counting up from the bottom line is a core sight-reading strategy."
+    },
+    {
+      "from": "rhythm.metronome-marks",
+      "to": "expression.metronome-marks",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Both nodes cover metronome marks: rhythm reads the beat unit and number, expression uses them to set the tempo."
+    },
+    {
+      "from": "rhythm.ties-and-slurs",
+      "to": "expression.slurs-legato",
+      "relation": "contradicts",
+      "weight": 4,
+      "rationale": "Ties and slurs are both curves; a tie joins two of the same pitch into one held note, a slur asks for legato across different pitches."
+    },
+    {
+      "from": "rhythm.play-ties",
+      "to": "expression.legato-touch",
+      "relation": "contradicts",
+      "weight": 3,
+      "rationale": "Students re-strike a tied note as if it were slurred, or hold a slurred note as if it were tied."
+    },
+    {
+      "from": "rhythm.play-held-values",
+      "to": "expression.legato-touch",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Legato needs each note held for its full value until the next one sounds."
+    },
+    {
+      "from": "rhythm.play-held-values",
+      "to": "expression.staccato-touch",
+      "relation": "contradicts",
+      "weight": 3,
+      "rationale": "Staccato shortens a note against its written value, so the habit of holding values full fights it."
+    },
+    {
+      "from": "rhythm.play-tempo-range",
+      "to": "expression.playing-at-tempo",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Playing at the marked tempo needs control of pulse at that speed, slow or fast."
+    },
+    {
+      "from": "rhythm.syncopation",
+      "to": "expression.accents-sforzando",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Syncopation moves stress off the beat, and the accent sign is how that stress is usually marked."
+    },
+    {
+      "from": "rhythm.play-syncopation",
+      "to": "expression.legato-pedalling",
+      "relation": "analogous",
+      "weight": 3,
+      "rationale": "Legato pedalling changes just after the beat, the same off-beat timing a syncopated rhythm uses."
+    },
+    {
+      "from": "expression.tempo-changes",
+      "to": "rhythm-steady-pulse",
+      "relation": "contradicts",
+      "weight": 2,
+      "rationale": "Rit. and accel. deliberately move the pulse; a student trained to hold it steady resists them, or drifts where nothing is marked."
+    },
+    {
+      "from": "expression.grace-notes",
+      "to": "rhythm.note-values",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "An acciaccatura takes almost no time while an appoggiatura takes half the main note's value, so reading them means knowing that value."
+    },
+    {
+      "from": "expression.tempo-terms",
+      "to": "rhythm.metronome-marks",
+      "relation": "analogous",
+      "weight": 3,
+      "rationale": "A tempo term and a metronome mark both say how fast, one in words and one in beats per minute."
+    },
+    {
+      "from": "rhythm.anacrusis",
+      "to": "pieces.upbeat-anacrusis",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Both cover the upbeat: rhythm counts it into the bar, pieces finds it at the start of phrases."
+    },
+    {
+      "from": "rhythm.play-anacrusis",
+      "to": "pieces.upbeat-entry",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Coming in on an upbeat in a piece is the upbeat rhythm played with the piece's count-in."
+    },
+    {
+      "from": "rhythm.play-hands-together",
+      "to": "pieces.hands-independence-rhythm",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Different rhythms in each hand are the hard case of keeping rhythm with hands together."
+    },
+    {
+      "from": "rhythm.play-left-hand",
+      "to": "pieces.left-hand-alone",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Practising the left hand alone is mostly keeping its rhythm steady without the melody to lean on."
+    },
+    {
+      "from": "rhythm.play-tempo-range",
+      "to": "pieces.building-tempo",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Building a piece up to tempo means holding the pulse as the metronome rises."
+    },
+    {
+      "from": "rhythm.counting",
+      "to": "pieces.practice-slow-tempo",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Slow practice works when the student counts the subdivisions aloud instead of letting slow notes drift."
+    },
+    {
+      "from": "rhythm.metronome-marks",
+      "to": "pieces.tempo-markings",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A piece's tempo marking often carries a metronome mark that sets the target speed."
+    },
+    {
+      "from": "keys.scale-degrees",
+      "to": "chords.roman-numerals",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "A Roman numeral names a chord by the scale degree of its root."
+    },
+    {
+      "from": "keys.interval-quality",
+      "to": "chords.triad-qualities",
+      "relation": "analogous",
+      "weight": 5,
+      "rationale": "A triad's quality is read the same way as an interval's: from the qualities of its third and fifth above the root."
+    },
+    {
+      "from": "keys.augmented-diminished",
+      "to": "chords.triad-qualities",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Diminished and augmented triads are named for their diminished or augmented fifth."
+    },
+    {
+      "from": "keys.augmented-diminished",
+      "to": "chords.seventh-resolution",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The diminished fifth between the third and seventh of V7 is what pulls it to resolve inward."
+    },
+    {
+      "from": "keys.harmonic-minor",
+      "to": "chords.diatonic-triads-minor",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "The raised seventh of the harmonic minor makes V major and VII diminished in a minor key."
+    },
+    {
+      "from": "keys.melodic-minor",
+      "to": "chords.diatonic-triads-minor",
+      "relation": "contradicts",
+      "weight": 3,
+      "rationale": "The melodic minor's raised sixth is for melody; students build minor-key chords from it instead of from the harmonic minor."
+    },
+    {
+      "from": "keys.minor-key-signatures",
+      "to": "chords.play-minor-progression",
+      "relation": "contradicts",
+      "weight": 3,
+      "rationale": "The minor key signature leaves out the raised leading note, so students play V as a minor chord."
+    },
+    {
+      "from": "keys.circle-of-fifths",
+      "to": "chords.primary-chords",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "IV and V are the keys on either side of I on the circle of fifths."
+    },
+    {
+      "from": "keys.interval-number",
+      "to": "chords.inversion-labels",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Figures like 6/3 and 6/4 are interval numbers above the bass."
+    },
+    {
+      "from": "keys.key-of-a-melody",
+      "to": "chords.harmonising-melody",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Choosing chords for a melody starts from knowing its key."
+    },
+    {
+      "from": "keys.key-of-a-melody",
+      "to": "chords-cadences",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "The cadence at the end of a melody is what confirms its key."
+    },
+    {
+      "from": "keys.tonic-arpeggios",
+      "to": "chords.play-broken-chords",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A tonic arpeggio is the tonic triad played as a broken chord across octaves."
+    },
+    {
+      "from": "keys.broken-tonic-triads",
+      "to": "chords.play-broken-chords",
+      "relation": "analogous",
+      "weight": 4,
+      "rationale": "A broken tonic triad and a broken chord on any degree use the same hand shape and motion."
+    },
+    {
+      "from": "keys.intervals-at-keyboard",
+      "to": "chords.play-block-triads",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Finding a third and a fifth above a note is how a block triad is built at the keyboard."
+    },
+    {
+      "from": "keys.transposing-at-keyboard",
+      "to": "chords.play-primary-progression",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Playing I - IV - V - I in a new key is transposing a progression at the keyboard."
+    },
+    {
+      "from": "keys.transposing-instruments",
+      "to": "expression.instrument-families",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Several orchestral instruments transpose, such as the clarinet in B flat and the horn in F."
+    },
+    {
+      "from": "keys.even-scales-at-tempo",
+      "to": "expression.velocity-control",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "An even scale needs even loudness from every finger as well as even timing."
+    },
+    {
+      "from": "keys.even-scales-at-tempo",
+      "to": "rhythm.play-semiquavers",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Scales at exam tempo are played in even sixteenth notes against the beat."
+    },
+    {
+      "from": "keys.even-scales-at-tempo",
+      "to": "pieces.building-tempo",
+      "relation": "analogous",
+      "weight": 3,
+      "rationale": "Scales and pieces reach tempo the same way: steady at a slow speed, then stepped up."
+    },
+    {
+      "from": "keys.scales-hands-together",
+      "to": "pieces.hands-coordination-together",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Hands-together scales train both hands to land each note at the same moment."
+    },
+    {
+      "from": "keys.contrary-motion",
+      "to": "pieces.hands-coordination-together",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Contrary-motion scales mirror the fingering in each hand, an easier first case of hands landing together."
+    },
+    {
+      "from": "pieces.sight-reading-strategy",
+      "to": "keys.key-of-a-melody",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "A sight-reading routine starts by finding the key from the signature and the last note."
+    },
+    {
+      "from": "chords.voice-leading",
+      "to": "expression.satb-voices",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Voice leading is written for the four SATB voices, each moving as little as possible."
+    },
+    {
+      "from": "chords.play-broken-chords",
+      "to": "expression.sustain-pedal",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Broken chords and arpeggios are held together by the pedal through one harmony."
+    },
+    {
+      "from": "expression.legato-pedalling",
+      "to": "chords.play-primary-progression",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The pedal changes on each chord change, so pedalling a progression means hearing where the harmony moves."
+    },
+    {
+      "from": "chords.play-alberti-bass",
+      "to": "expression.melody-balance",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "An Alberti bass has to sit quietly under the melody it accompanies."
+    },
+    {
+      "from": "chords.chord-and-passing-notes",
+      "to": "expression.mordents",
+      "relation": "analogous",
+      "weight": 3,
+      "rationale": "A mordent decorates a note with its upper or lower neighbour, the same shape as an auxiliary note."
+    },
+    {
+      "from": "expression.grace-notes",
+      "to": "chords.chord-and-passing-notes",
+      "relation": "analogous",
+      "weight": 3,
+      "rationale": "An appoggiatura is a note outside the chord that leans onto a chord note, like an accented passing note."
+    },
+    {
+      "from": "chords.play-waltz-bass",
+      "to": "rhythm.duple-triple-quadruple",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A waltz bass plays out triple metre: the bass on one, the chord on two and three."
+    },
+    {
+      "from": "chords.play-alberti-bass",
+      "to": "rhythm.play-left-hand",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "An Alberti bass is a steady left-hand rhythm in even quavers or semiquavers."
+    },
+    {
+      "from": "chords.chord-and-passing-notes",
+      "to": "rhythm.beat-and-division",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Passing notes usually fall between the beats, while chord notes fall on them."
+    },
+    {
+      "from": "chords.accompaniment-patterns",
+      "to": "pieces.even-accompaniment",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "An accompaniment pattern in a piece has to be played evenly so the melody can sit on it."
+    },
+    {
+      "from": "chords.play-alberti-bass",
+      "to": "pieces.even-accompaniment",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The Alberti bass is the classic pattern an even accompaniment is judged on."
+    },
+    {
+      "from": "chords.play-melody-with-chords",
+      "to": "pieces.texture-melody-accompaniment",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Playing a melody over chords is the melody-and-accompaniment texture at the keyboard."
+    },
+    {
+      "from": "chords.perfect-cadence",
+      "to": "pieces.phrases-and-cadences",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Phrases in a piece end on cadences, most clearly the perfect cadence at the end."
+    },
+    {
+      "from": "chords.imperfect-cadence",
+      "to": "pieces.binary-ternary-form",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "The first half of a binary piece often ends on an imperfect cadence, leaving the music open."
+    },
+    {
+      "from": "pieces.memory-strategies",
+      "to": "chords.chord-function",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Memorising a piece by its harmony, knowing where tonic, predominant and dominant fall, holds up better than finger memory alone."
+    },
+    {
+      "from": "expression.repeat-signs",
+      "to": "pieces.repeats-and-endings",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Following a piece's repeats and first and second endings relies on reading repeat signs."
+    },
+    {
+      "from": "expression.da-capo-dal-segno",
+      "to": "pieces.repeats-and-endings",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "D.C. and D.S. with Fine and Coda decide the order a piece is played in."
+    },
+    {
+      "from": "expression.tempo-terms",
+      "to": "pieces.tempo-markings",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "A piece's tempo marking is usually an Italian tempo term."
+    },
+    {
+      "from": "expression.phrasing",
+      "to": "pieces.phrases-and-cadences",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Shaping a phrase means knowing where it starts and the cadence it is heading to."
+    },
+    {
+      "from": "expression.melody-balance",
+      "to": "pieces.texture-melody-accompaniment",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Melody over accompaniment only reads as that texture when the melody is louder than the accompaniment."
+    },
+    {
+      "from": "expression.playing-at-tempo",
+      "to": "pieces.building-tempo",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Building up to tempo ends at playing at the marked tempo."
+    },
+    {
+      "from": "expression.velocity-control",
+      "to": "pieces.even-accompaniment",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "An even accompaniment needs even loudness as well as even timing."
+    }
+  ]
+}

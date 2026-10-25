@@ -59,7 +59,7 @@ export const labGroups: LabGroup[] = [
       {
         slug: "rewind",
         name: "Rewind",
-        description: "In wait mode, ◀ (or ←) moves back a bar and ▶ (or →) skips ahead one, from the HUD's buttons.",
+        description: "In Learn mode, ◀ (or ←) moves back a bar and ▶ (or →) skips ahead one, from the HUD's buttons.",
         href: "/play?song=twinkle&mode=wait",
         open: "Twinkle, Learn",
       },

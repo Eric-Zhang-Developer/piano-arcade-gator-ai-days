@@ -45,7 +45,7 @@ Issue: #407
 - **Selection** (`run-checks.mjs --base <ref> --shard <i>/<n> --out <dir>`, or `--all` in place of `--base`):
   - **A pull request and a push to main: the smoke check only,** `web/e2e/verify.mjs` on one shard. The exception is a
     change to the runner or the workflow (`web/e2e/` or `.github/workflows/ci.yml`), which runs every check.
-  - **The full suite** (`--all`) runs on a `schedule` at :00, :20 and :40 and by hand (`workflow_dispatch`), over at most
+  - **The full suite** (`--all`) runs on a `schedule` at :07, :27 and :47 and by hand (`workflow_dispatch`), over at most
     8 shards. A red full run files or updates one issue labeled `bug` and `ci-red`. It names the failing checks and
     the commits since the last green full run, and it doesn't freeze merges. The decision is
     `ci-browser-pr-scope.md` (Eric, 2026-10-25).

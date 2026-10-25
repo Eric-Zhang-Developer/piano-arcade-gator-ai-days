@@ -5,8 +5,9 @@ on demand, a red scheduled run files an issue instead of freezing merges, and a 
 commits."
 
 **Update, 2026-10-25 ~03:16 ET.** Eric moved the schedule to every 20 min: "do it at 0, 20, 40 ok". A full run
-on 8 shards takes ~11–13 min (estimated), so runs shouldn't overlap. GitHub can start scheduled runs late,
-especially at :00; Eric chose these minutes anyway.
+on 8 shards takes ~11–13 min (estimated), so runs shouldn't overlap. Then, because #692's `*/30` schedule never
+fired (0 schedule runs on ci.yml, and the 07:00Z slot passed with nothing), he moved it off the top of the hour:
+"tell the planner to move #719's cron off :00 to 7,27,47". GitHub's cron is best-effort, and :00 is its busiest slot.
 - Shared paths used to fan a PR out to every check. The Étude rename (#671, a one-line title change) took 16 shards.
 - Two 16-shard PRs held 32 of ~40 runners while main queued 15+ min.
 - #671's first 16-shard run waited 153–225 s per job for a runner and took 13.2 min.
@@ -19,7 +20,7 @@ especially at :00; Eric chose these minutes anyway.
 **Choice.** A.
 - **PR and push:** `web/e2e/verify.mjs` alone on one shard. A change to `web/e2e/` or `.github/workflows/ci.yml`
   still runs every check, because there the change is the checking itself.
-- **Full run:** `schedule` (`0,20,40 * * * *`) and `workflow_dispatch`, `--all`, at most 8 shards. It has its own
+- **Full run:** `schedule` (`7,27,47 * * * *`) and `workflow_dispatch`, `--all`, at most 8 shards. It has its own
   concurrency group, so it never cancels or queues a push run.
 - **No tests are deleted:** every check still runs every 20 min.
 - **The trade-off:** main can be red for up to 20 min before anyone sees it, and a PR can pass and still break a

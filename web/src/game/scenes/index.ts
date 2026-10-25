@@ -4,6 +4,7 @@ import { KEYS_VELOCITY, loadLatencyOffset, msPerBeat } from "../core/settings";
 import { gaugeSize } from "../fever-gauge/gauge";
 import { seededRandom } from "../sim/fake";
 import { toast } from "../notice-toast";
+import { loadPedal, pedalEvents, type Pedal } from "../pedal";
 import { pianoOutSettings } from "../piano-out";
 import { readTakeMidi } from "../take-midi";
 
@@ -30,7 +31,7 @@ export interface Press {
   pitch: number;
   timeMs: number; // chart clock
   holdMs: number;
-  velocity?: number; // a take's own; the scripted bots press at KEYS_VELOCITY
+  velocity?: number; // a take's own, or the chart note's; none presses at KEYS_VELOCITY
 }
 
 // ?bot=take&take=<file>: a take file under /takes/ (hero-replay). Only a plain name: nothing outside /takes/.
@@ -87,7 +88,7 @@ export function botPresses(chart: Chart, name: BotName): Press[] {
     if (j === "MISS") return;
     const sign = name === "late" ? 1 : r() < 0.5 ? -1 : 1;
     const offset = name === "late" ? s.lateMs : sign * s.offsets[j];
-    presses.push({ pitch: chart.notes[i].pitch, timeMs: times[i] + offset, holdMs: holds[i] });
+    presses.push({ pitch: chart.notes[i].pitch, timeMs: times[i] + offset, holdMs: holds[i], velocity: chart.notes[i].velocity });
   });
   if (name === "sloppy") {
     // WRONG notes: a pitch the chart never uses, between notes, so they break the combo without stealing a hit.
@@ -120,21 +121,26 @@ export function scenes(): GamePlugin {
   let pumpPerf: number | null = null; // when this frame's pump ran: just before /play read its clock
   let fromMs = -Infinity; // after a resume, only what is still ahead
   let latency = 0;
+  let pedal: Pedal | null = null; // a local song's pedal.json, once read
+  let load = 0; // which transformChart the pedal read belongs to
   // The presses and releases still to send, in time order, each at its chart time. A timer sends each on time, so a
-  // piano hears it on time; the pump sends whatever a starved timer hasn't yet (#586).
-  let queue: { atMs: number; type: InputEvent["type"]; pitch: number; velocity?: number; sent: boolean }[] = [];
+  // piano hears it on time; the pump sends whatever a starved timer hasn't yet (#586). A pedal event goes only to the
+  // piano, as CC64 with its value in `velocity`: the judge never sees it.
+  let queue: { atMs: number; type: InputEvent["type"] | "pedal"; pitch: number; velocity?: number; sent: boolean }[] = [];
   let next = 0;
   const timers: ReturnType<typeof setTimeout>[] = [];
   const cancel = () => {
     timers.forEach(clearTimeout);
     timers.length = 0;
     [queue, next] = [[], 0];
+    out?.send([0xb0, 64, 0]); // pause, quit and songEnd end with the pedal up, even mid-pair
   };
   // /play judges arrival - zero - latency, so an event's time is read from the best zero so far, when it's sent.
   const perfOf = (chartMs: number) => zeroPerf! + latency + chartMs;
   const fire = (e: (typeof queue)[number]) => {
     if (e.sent || !emit) return;
     e.sent = true;
+    if (e.type === "pedal") return void out?.send([0xb0, 64, e.velocity!]);
     const velocity = e.type === "on" ? (e.velocity ?? KEYS_VELOCITY) : 0;
     emit({ type: e.type, pitch: e.pitch, velocity, timeMs: perfOf(e.atMs) });
     out?.send([0x90, e.pitch, velocity]);
@@ -152,12 +158,21 @@ export function scenes(): GamePlugin {
     if (!bot || !chart || !emit || zeroPerf === null) return;
     if (bot === "take" && !take) return; // still reading: start() plays once it has
     latency = loadLatencyOffset();
+    const keys: typeof queue = [];
     for (const p of bot === "take" ? take! : botPresses(chart, bot)) {
-      if (p.timeMs >= fromMs) queue.push({ atMs: p.timeMs, type: "on", pitch: p.pitch, velocity: p.velocity, sent: false });
-      if (p.timeMs + p.holdMs >= fromMs) queue.push({ atMs: p.timeMs + p.holdMs, type: "off", pitch: p.pitch, sent: false });
+      if (p.timeMs >= fromMs) keys.push({ atMs: p.timeMs, type: "on", pitch: p.pitch, velocity: p.velocity, sent: false });
+      if (p.timeMs + p.holdMs >= fromMs) keys.push({ atMs: p.timeMs + p.holdMs, type: "off", pitch: p.pitch, sent: false });
     }
-    queue.sort((a, b) => a.atMs - b.atMs); // stable: a press before its own release at the same time, as the timers were
-    for (const e of queue) timers.push(setTimeout(() => fire(e), perfOf(e.atMs) - performance.now()));
+    enqueue(keys);
+    if (pedal) enqueue(pedalQueue(fromMs));
+  };
+  const pedalQueue = (from: number): typeof queue =>
+    pedalEvents(pedal!, msPerBeat(chart!.bpm), from).map((e) => ({ atMs: e.atMs, type: "pedal", pitch: 64, velocity: e.value, sent: false }));
+  // Merge events into what's still to send, each with its timer. Stable: a press before its own release at the same
+  // time, as the timers were, and a key before a pedal change at the same time, so a re-pedal catches the new chord.
+  const enqueue = (events: typeof queue) => {
+    queue = [...queue.slice(0, next), ...[...queue.slice(next), ...events].sort((a, b) => a.atMs - b.atMs)];
+    for (const e of events) timers.push(setTimeout(() => fire(e), perfOf(e.atMs) - performance.now()));
   };
 
   // bot=take: read the file once, for both devices. Refused -> a toast, and the take plays normally.
@@ -191,6 +206,16 @@ export function scenes(): GamePlugin {
         else toast(`Take "${takeFile}" isn't a file name in /takes/ (like fur-elise-20261024-1900.mid). Playing normally.`);
       } else if (name !== null && !bot) toast(`Unknown bot "${name}". Bots: ${BOTS.join(", ")}, take. Playing normally.`);
       chart = bot === "fever" ? feverChart(c) : c;
+      pedal = null;
+      const song = params.get("song") ?? "";
+      const token = ++load;
+      if (bot && song.startsWith("local/"))
+        void loadPedal(song).then((p) => {
+          if (token !== load || !p) return;
+          pedal = p;
+          // Read after the bot started: only what is still ahead, from the clock's time now.
+          if (zeroPerf !== null && emit) enqueue(pedalQueue(Math.max(fromMs, performance.now() - perfOf(0))));
+        });
       return chart;
     },
     onEvent(e) {

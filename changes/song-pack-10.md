@@ -7,5 +7,5 @@ Three very hard songs from Mutopia notation MIDI: `chopin-ballade-coda` (Ballade
 ## Gaps
 - Tempo: Ballade "Presto con fuoco", no number, MIDI 210 → 168 (80%); Black Key "Vivace ♩=116", MIDI 116 → 96 (83%); Op. 10 No. 1 "Allegro ♩=176", MIDI 176 → 120 (68%). Eric's piano pass not done.
 - The nocturnes B. 49 and Op. 48 No. 1 are not in it (#1399). Ballade No. 4's coda was dropped (14 same-pitch overlaps).
-- Levels are the formula's: `level-review`'s `reviewed.ts` isn't on main, so no rows were added.
+- Levels: rows added to `reviewed.ts` at the formula's level (no Henle, RCM or ABRSM grade read for these excerpts in the ship window).
 - Note counts weren't checked against the score bar by bar. Edits: 130 off-grid run notes and one rolled-chord note dropped in the Ballade, 9 Black Key notes moved to R; ids renamed off taken jackets (all in the decisions file).

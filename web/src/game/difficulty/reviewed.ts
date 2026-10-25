@@ -50,6 +50,9 @@ export const reviewedLevels: Record<string, { old: number; level: number; grade?
   "rachmaninoff-prelude-cs": { old: 11, level: 10, grade: { scale: "henle", value: 5, url: HN("en/Prelude-c-sharp-minor-op.-3-no.-2/HN-1211") } },
   "entertainer": { old: 12, level: 8, grade: { scale: "henle", value: 4, url: HN("us/The-Entertainer/HN-1727") } },
   "maple-leaf-rag": { old: 14, level: 8, grade: { scale: "henle", value: 4, url: HN("en/Maple-Leaf-Rag/HN-1728") } },
+  "chopin-op10-1": { old: 10, level: 10, note: "No grade read: the formula's level. Henle's Etudes (HN 124) grade the volume; no per-etude page was read in the ship window." },
+  "chopin-ballade-coda": { old: 15, level: 15, note: "No grade read for the coda alone: the formula's level. Henle grades whole ballades; none read in the ship window." },
+  "chopin-etude-10-5": { old: 15, level: 15, note: "No grade read: the formula's level. Henle's Etudes (HN 124) grade the volume; no per-etude page was read in the ship window." },
   "chopin-revolutionary": { old: 15, level: 15, grade: { scale: "henle", value: 8, url: HN("en/Etudes/HN-124") } },
   "moonlight-3": { old: 15, level: 15, note: "No grade for the Presto alone. Henle grades the whole sonata at 7 (HN 1062); RCM lists it complete at ARCT; ABRSM complete at ARSM (a diploma)." },
 };

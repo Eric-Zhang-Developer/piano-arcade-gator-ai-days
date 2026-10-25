@@ -112,6 +112,12 @@
   text-transform: uppercase;
 }
 
+/* Off until the take is pinned (or for good, after a failed load): dimmed as the Lab's other pages dim theirs. */
+.actions button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 .notes {
   position: absolute;
   right: 2vw;

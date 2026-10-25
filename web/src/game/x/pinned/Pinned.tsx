@@ -160,7 +160,7 @@ export function Pinned() {
       <p className={styles.notes}>
         <span>A music box plays every note at one strength.</span>
         <span>The STL is a model, not fitted to a commercial movement.</span>
-        <span className={styles.hint}>Drag to turn the view.</span>
+        {!failed && <span className={styles.hint}>Drag to turn the view.</span>}
       </p>
     </main>
   );

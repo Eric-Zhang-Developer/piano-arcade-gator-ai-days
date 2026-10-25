@@ -2,7 +2,7 @@
 
 **Context.** The bot plays `note.velocity ?? KEYS_VELOCITY` (80). The spec asks for velocities from each score's
 dynamic marks with one mapping for the library, never from memory or a recording. The song packs' converter already
-writes velocities where a source's MIDI renders them (decided on #181). Findings: batch 1 on #815, batch 2 on #816, batch 3 on #818.
+writes velocities where a source's MIDI renders them (decided on #181). Findings: batch 1 on #815, batch 2 on #816, batch 3 on #818, batch 4 on #819.
 
 **Options.** (A) golden-demo's ladder for printed marks; (B) whatever each MIDI export renders, which differs by
 typesetter and is flat for most of these sources.
@@ -20,7 +20,7 @@ typesetter and is flat for most of these sources.
 LilyPond source (the commands are in `game-tools/midi-to-chart/README.md`). Its rules, added here:
 - Before the first mark, mf. A hairpin (or a *cresc.* with no mark ending it) ramps one step (16) linearly over its
   span, then holds. A *cresc.* runs to the next mark, or to the end of its phrase.
-- An accent (`->`, `\accent`) or **sf** is one step (+16) on that note only.
+- An accent (`->`, `\accent`, a marcato `-^`), **sf** or **fz** is one step (+16) on that note only.
 - A mark sets its own staff, and the other staff too unless that staff has its own mark at the same beat. Written-out
   repeats repeat their marks.
 - burgmuller-arabesque: LH p at bar 1, RH p at bar 3 (both passes), *cresc.* from bar 5 to the first ending (both
@@ -41,6 +41,18 @@ then p. Text *cresc.*/*dimin.* written as markup isn't read; the hairpins under 
   crescendo at bar 9 in both passes: 49–96.
 - moonlight-3 (bars 1–8): p, and sf on the right hand's chord in bars 2, 4, 6, 7 and 8: 49, the sf chords 65.
 - clair-de-lune (bars 1–8): pp at the opening, nothing else: every note 33.
+
+**Batch 4** (#819). `dynamics` read Entertainer and Mountain King whole. The rest are `--marks` read by hand, because
+`dynamics` reads one variable per voice (Alla turca's sections are nested variables, in German note names, and Gnossienne's
+themes too), and it doesn't read `fz` or a marcato.
+- gnossienne-1 (bars 1–9): p, a falling hairpin at beats 22–25, f at beat 28: 33–96.
+- entertainer (intro and A strain): f, then the strain's echo pairs (each a short hairpin into the next level): p at 8,
+  f at 12, p at 16, f at 20, p at 24, f from 28; a marcato on the right hand's chord at beat 7: 49–112.
+- mountain-king (bars 1–17): p and an accent at 0, pp from beat 4, 23 right-hand accents: 33–65. Its MIDI's
+  `articulate.ly` velocities (62/69) are replaced.
+- alla-turca (A, A, B+A′, B+A′): p in A with accents at 7 (R) and 9, 11, 13 (both hands); mp in B with right-hand accents
+  each bar; p in A′, a *cresc.* into an fz, p again, an accent: 49–80.
+- minute-waltz (bars 1–20): no level mark, so mf; an accent on the first note, then six one-step hairpins: 64–96.
 
 A single level reads as "This score marks no dynamics" in the dynamics grade (it needs two levels), as before.
 

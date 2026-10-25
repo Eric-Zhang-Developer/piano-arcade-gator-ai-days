@@ -88,6 +88,25 @@ Batch 3 (#818), with `25EF-02.ly` and `K545-1.ly` (Mutopia 203 and 998) read by 
 RL@10-11~+16,R@12!,RL@13-14~-16,RL@16=p,RL@16-17.75~+16,RL@18-19.75~-16,RL@20-21.75~+16,RL@22-23.75~-16,\
 RL@24-25.75~+16,RL@26-27.75~-16,RL@28-29.75~+16,RL@30-31.75~-16,RL@32=p,RL@34.25-35.75~+16,RL@40=f,R@40!"
 ```
+Batch 4 (#819), from each source's `.ly` and `.mid` on Mutopia (pieces 2035, 263, 1888, 108 and 483; Alla turca's and the
+Minute Waltz's `.ly` are in their `-lys.zip`). Entertainer and Mountain King are read by `dynamics`, and the rest by hand
+(`specs/decisions/demo-performance-dynamics.md` says why). Entertainer's marcato, R@7!, is appended by hand to the list
+`dynamics` printed:
+```bash
+S=../../web/public/songs
+.venv/bin/python perform.py dynamics $S/mountain-king/chart.json --ly source/Dans_l_antre_du_roi_de_la_montagne.ly \
+  --right rightOne,rightTwo --left left --midi source/Dans_l_antre_du_roi_de_la_montagne.mid --bars 1-17
+.venv/bin/python perform.py dynamics /tmp/en.json --ly source/entertainer.ly --right top,dyn --left bottom,dyn --unfold \
+  --midi source/entertainer.mid --spans 0-38,70-71.25   # prints the list; then velocity --marks "<it>,R@7!" on the chart
+.venv/bin/python perform.py velocity $S/gnossienne-1/chart.json --marks "RL@0=p,RL@22-25~-16,RL@28=f"
+.venv/bin/python perform.py velocity $S/minute-waltz/chart.json \
+  --marks "R@0!,RL@12-24~+16,RL@24-30~-16,RL@30-36~-16,RL@42-45~+16,RL@45-48~+16,RL@48-54~-16"
+.venv/bin/python perform.py velocity $S/alla-turca/chart.json --marks "RL@1=p,RL@17=p,RL@33=mp,RL@49=p,RL@113/2=p,\
+RL@65=mp,RL@81=p,RL@177/2=p,RL@54-113/2~+16,RL@86-177/2~+16,R@8!,RL@10!,RL@12!,RL@14!,R@24!,RL@26!,RL@28!,RL@30!,\
+R@36!,R@40!,R@44!,R@48!,RL@56!,R@58!,R@68!,R@72!,R@76!,R@80!,RL@88!,R@90!"
+for s in gnossienne-1 entertainer; do .venv/bin/python perform.py pedal $S/$s/chart.json --harmony; done
+.venv/bin/python perform.py pedal $S/minute-waltz/chart.json --midi source/chopin_valse_op64_no1.mid --bars 1-20
+```
 Batch 2 (#816), from each source's `.ly` and `.mid` on Mutopia: `ftp/SatieE/gymnopedie_1/gymnopedie_1`,
 `ftp/ChopinFF/O9/chopin_nocturne_op9_n2/chopin_nocturne_op9_n2`, `ftp/JoplinS/maple/maple`,
 `ftp/DebussyC/L75/debussy_Ste_Bergamesq_Clair/debussy_Ste_Bergamesq_Clair`, and `moonlight3-a4.ly` and

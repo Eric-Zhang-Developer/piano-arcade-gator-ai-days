@@ -1,7 +1,7 @@
 # demo-performance: where each song's pedal comes from
 
 **Context.** The bot sends a song's `pedal.json` as CC64 (golden-demo). The spec takes it from the score's Ped. marks
-and, for a score with none, from golden-demo's per-harmony rule, logged here. Findings: batch 1 on #815, batch 2 on #816, batch 3 on #818.
+and, for a score with none, from golden-demo's per-harmony rule, logged here. Findings: batch 1 on #815, batch 2 on #816, batch 3 on #818, batch 4 on #819.
 
 **Options.** For each song, in order: (A) the score's printed Ped. marks; (B) a pedal layer in the cited source file
 that only its MIDI renders, written by the edition's typesetter; (C) the per-harmony rule, an arrangement choice.
@@ -26,6 +26,11 @@ the commands.
 | gymnopedie-1 | Mutopia 37: none | C (10 pairs) |
 | clair-de-lune | Mutopia 1778: an empty pedal voice; "con sordina" is the soft pedal, which the bot can't send | C (8 pairs) |
 | maple-leaf-rag | Mutopia 23: none | C (33 pairs), an arrangement choice: a rag usually pedals lightly |
+| gnossienne-1 | Mutopia 2035: none | C (9 pairs) |
+| entertainer | Mutopia 263: none | C (20 pairs), the same arrangement choice as maple-leaf-rag |
+| mountain-king | Mutopia 1888: none in bars 1–17 (the first Ped. is at beat 100, past the excerpt); *e sempre staccato* | **none**, as burgmuller-arabesque: the rule would hold the printed staccato |
+| alla-turca | Mutopia 108: none; staccato almost throughout | **none**, the same reason |
+| minute-waltz | Mutopia 483: a printed pedal line, rendered in its MIDI as CC64 | A, the MIDI's CC64 over bars 1–20 (16 pairs, from bar 5, where the left hand enters) |
 
 **The rule (C)**, as golden-demo's (`specs/context/findings.md`, 2026-10-25). A harmony is the left hand's pitch
 classes struck in a half bar (a whole bar unless the bar has 4 beats). A new pair starts at a window that strikes a

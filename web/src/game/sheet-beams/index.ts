@@ -4,17 +4,19 @@
 import type { Judgment } from "../../contracts";
 import type { Meter, Placed } from "../sheet-xml";
 
-// sheet-xml's divisions per quarter note (a 16th is 1). Not imported: sheet-xml imports shouldBeam to write <beam>.
-const DIVISIONS = 4;
+// sheet-xml's divisions per quarter note (a 16th is 3, an eighth triplet 4). Not imported: sheet-xml imports
+// shouldBeam to write <beam>. The tests check the two agree.
+export const DIVISIONS = 12;
 
-// The longest chord that prints as one value of an eighth or shorter: a dotted eighth.
-const BEAMABLE = 3;
+// The chord lengths that print as one value of a dotted eighth or shorter: a triplet 16th, a 16th, a triplet eighth,
+// an eighth and a dotted eighth.
+const BEAMABLE = new Set([2, 3, 4, 6, 9]);
 
-/** A bar's beat groups, in 16ths from the barline: a quarter in n/4 and 2/2, a dotted quarter in n/8 when the eighths
+/** A bar's beat groups, in divisions from the barline: a quarter in n/4 and 2/2, a dotted quarter in n/8 when the eighths
  * divide by 3, else a quarter. The last group is shorter when the bar doesn't divide (5/8: 4, 4, 2). */
 export function beamGroups(meter: Meter): number[] {
   const bar = (meter.beats * 4 * DIVISIONS) / meter.beatType;
-  const group = meter.beatType === 8 && meter.beats % 3 === 0 ? 6 : 4;
+  const group = meter.beatType === 8 && meter.beats % 3 === 0 ? 1.5 * DIVISIONS : DIVISIONS;
   const out: number[] = [];
   for (let at = 0; at < bar; at += group) out.push(Math.min(group, bar - at));
   return out;
@@ -22,6 +24,7 @@ export function beamGroups(meter: Meter): number[] {
 
 interface Chord {
   ids: string[];
+  top: number; // its highest pitch
   onset: number;
   end: number;
   voice: number;
@@ -33,11 +36,12 @@ function voices(placed: Placed[], staff: 1 | 2): Chord[] {
   const groups = new Map<string, Chord>();
   for (const p of placed.filter((x) => x.staff === staff)) {
     const k = `${p.onset}:${p.end}`;
-    const c = groups.get(k) ?? { ids: [], onset: p.onset, end: p.end, voice: 0 };
+    const c = groups.get(k) ?? { ids: [], top: p.pitch, onset: p.onset, end: p.end, voice: 0 };
     c.ids.push(p.id);
+    c.top = Math.max(c.top, p.pitch);
     groups.set(k, c);
   }
-  const chords = [...groups.values()].sort((a, b) => a.onset - b.onset || a.end - b.end);
+  const chords = [...groups.values()].sort((a, b) => a.onset - b.onset || b.top - a.top || a.end - b.end);
   const ends: number[] = [];
   for (const c of chords) {
     let v = ends.findIndex((e) => e <= c.onset);
@@ -54,7 +58,7 @@ export function shouldBeam(placed: Placed[], meter: Meter): string[][] {
   const sizes = beamGroups(meter);
   const bar = sizes.reduce((a, b) => a + b, 0);
   const starts = sizes.map((_, i) => sizes.slice(0, i).reduce((a, b) => a + b, 0));
-  // which beat group (counted through the whole piece) a 16th falls in
+  // which beat group (counted through the whole piece) a division falls in
   const groupOf = (t: number) => {
     const inBar = ((t % bar) + bar) % bar;
     let g = 0;
@@ -73,7 +77,7 @@ export function shouldBeam(placed: Placed[], meter: Meter): string[][] {
         run = [];
       };
       for (const c of chords) {
-        const fits = c.end - c.onset <= BEAMABLE && groupOf(c.onset) === groupOf(c.end - 1);
+        const fits = BEAMABLE.has(c.end - c.onset) && groupOf(c.onset) === groupOf(c.end - 1);
         if (!fits) {
           close();
           continue;

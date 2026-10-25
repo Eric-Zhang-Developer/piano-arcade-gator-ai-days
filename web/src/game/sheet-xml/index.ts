@@ -120,18 +120,20 @@ function snapper(notes: ChartNote[], triplets: boolean) {
   const grids = GRIDS.filter((g) => triplets || g % 3 === 0);
   const mixed = grids.filter((g) => g === 6 || g === 8); // a beat that fits no grid
   const beatOf = (t: number) => Math.floor(t + TOLERANCE);
-  const fits = (rel: number[], g: number) => rel.every((r) => Math.abs(r * DIVISIONS - g * Math.round((r * DIVISIONS) / g)) <= tolerance(g) * DIVISIONS);
+  const fits = (rel: number[], g: number, tol = tolerance(g)) => rel.every((r) => Math.abs(r * DIVISIONS - g * Math.round((r * DIVISIONS) / g)) <= tol * DIVISIONS);
+  // A grid the beat sits on exactly beats a coarser one it's only near: 7/8 is a 32nd, not a sextuplet's 5/6.
+  const pick = (rel: number[]) => grids.find((g) => fits(rel, g, 1e-6)) ?? grids.find((g) => fits(rel, g));
   const at = new Map<string, number[]>(); // staff:beat -> onsets relative to the beat
   for (const n of notes) {
     const k = `${n.hand}:${beatOf(n.beat)}`;
     at.set(k, [...(at.get(k) ?? []), n.beat - beatOf(n.beat)]);
   }
-  const grid = new Map([...at].map(([k, rel]) => [k, grids.find((g) => fits(rel, g)) ?? 0]));
+  const grid = new Map([...at].map(([k, rel]) => [k, pick(rel) ?? 0]));
   // A time on its beat's grid. An end in a beat with no onsets takes the coarsest grid it fits itself.
   return (hand: string, t: number): { at: number; step: number } => {
     const k = beatOf(t);
     const r = (t - k) * DIVISIONS;
-    const g = grid.get(`${hand}:${k}`) ?? grids.find((g) => fits([t - k], g)) ?? 0;
+    const g = grid.get(`${hand}:${k}`) ?? pick([t - k]) ?? 0;
     const near = (g: number) => g * Math.round(r / g);
     const snapped = g ? near(g) : mixed.map(near).reduce((a, b) => (Math.abs(b - r) < Math.abs(a - r) ? b : a));
     return { at: k * DIVISIONS + snapped, step: g || DIVISIONS / 4 };

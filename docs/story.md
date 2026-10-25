@@ -318,6 +318,31 @@ Readers: team
 (±31.25 ms PERFECT to ±125 ms GOOD), credit for held notes and clearer early/late feedback, 1,530 added
 lines. It is open, and its CI was failing when this was written.
 
+## Chapter 11: 53 canvases
+
+Readers: team · postmortem
+
+*Sunday 2026-10-25, 01:53 to 02:35. Evidence: [#678], [core-loop's done note](../changes/core-loop.md).*
+
+**The lag.** `/play` lagged on Eric's MacBook. eric-agent-2 measured before changing anything, with the perf probe
+from [#672].
+
+**What it found.** At devicePixelRatio 2, a Retina screen, `/play` drew **53 canvases** and composited **436
+megapixels** every frame. Every plugin got its own 2D canvas, whether it drew anything or not ([#678]).
+
+**The fix ([#678], 02:35).** The 2D canvases are capped at devicePixelRatio 1.5, the cap the WebGL stage already
+used, and a plugin gets a canvas only if it draws. After: **25 canvases and 117 megapixels** a frame, and JS frame
+work at the 95th percentile went from about 5 ms to about 3 ms (Apple M2, headless Chromium through Metal,
+`perf.mjs --dpr 2`, 3 runs each) ([done note](../changes/core-loop.md)).
+
+**What the numbers can't say.** Headless frame intervals read 16.7 ms before and after, so they can't show
+compositing. The canvas and megapixel counts are the proxy. Eric's MacBook is the real check, and it hasn't been
+done yet.
+
+### Material for the video
+
+- Beat: 53 canvases, 436 megapixels a frame, then 25 and 117.
+
 ## Timeline
 
 | When (EDT) | What | Evidence |
@@ -345,6 +370,7 @@ lines. It is open, and its CI was failing when this was written.
 | Sun 00:39 | No known-red checks left | [`cac584d`] |
 | Sun 00:53 | First light on the piano | [#639] |
 | Sun 01:28 | The product is Étude | [#669] |
+| Sun 02:35 | 53 canvases down to 25 on `/play` | [#678] |
 
 [#1]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/1
 [#5]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/5
@@ -399,6 +425,8 @@ lines. It is open, and its CI was failing when this was written.
 [#660]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/660
 [#663]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/663
 [#669]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/669
+[#672]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/672
+[#678]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/678
 [`254891c`]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/commit/254891c
 [`2ca2c03`]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/commit/2ca2c03
 [`2e8f182`]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/commit/2e8f182

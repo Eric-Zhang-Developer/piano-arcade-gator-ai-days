@@ -1,7 +1,7 @@
 import type { Attempt, Curriculum, Hand, Node, PassageNote, PlayingItem } from '../mastery/schema';
 import type { Verdict } from '../mastery/piano/score';
 
-/** Whose attempts these are. One learner per device until accounts carry the learning graph. */
+/** One learner id (student-graph decision): 'local' on every screen until accounts carry X's learnerId(). */
 export const LEARNER_ID = 'local';
 
 /** Which hands a take asks for: both, or one while practising hands separate. */

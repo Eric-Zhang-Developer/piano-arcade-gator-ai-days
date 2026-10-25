@@ -10,14 +10,13 @@ const findKeys = playingNode(curriculum, 'pitch.find-keys')!;
 const together = playingNode(curriculum, 'rhythm.play-hands-together')!;
 
 describe('practice on a node', () => {
-  it('offers its passages and the help, and a take to start', () => {
+  it('offers the help and a take to start, and no choice of what to learn', () => {
     const html = renderToStaticMarkup(<NodePractice {...findKeys} />);
     expect(html).toContain('aria-label="Node practice"');
-    expect(html).toContain('aria-label="Passages"');
-    expect(html).toContain('>Demo<');
     expect(html).toContain('>Guide keys<');
     expect(html).toContain('>Start take<');
-    expect(html).toContain('A take counts when help covers at most 30% of it.');
+    expect(html).not.toContain('aria-label="Passages"');
+    expect(html).not.toContain('href="/learn"');
   });
   it('offers hands separate only for a passage with two hands', () => {
     expect(renderToStaticMarkup(<NodePractice {...findKeys} />)).not.toContain('aria-label="Hands"');
@@ -29,7 +28,6 @@ describe('the cold play check', () => {
   it('is one take with no help', () => {
     const html = renderToStaticMarkup(<PlayCheck {...findKeys} />);
     expect(html).toContain('aria-label="Play check"');
-    expect(html).toContain('>Cold check<');
     expect(html).toContain('>Play it cold<');
     expect(html).toContain('>Start check<');
     expect(html).not.toContain('Guide keys');

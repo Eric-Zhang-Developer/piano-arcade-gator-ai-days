@@ -11,10 +11,6 @@
 .tempo { display: flex; align-items: center; gap: 12px; }
 .tempo input { width: 100px; accent-color: var(--playing-accent); cursor: pointer; }
 .tempo output { min-width: 55px; font-variant-numeric: tabular-nums; }
-.settings { position: relative; }
-.settings summary { cursor: pointer; color: var(--playing-muted); padding: 8px 0; }
-.settings label { position: absolute; right: 0; top: 100%; z-index: 2; min-width: 210px; padding: 16px; background: var(--playing-surface); border: 1px solid var(--playing-border); border-radius: 4px; }
-.settings input { accent-color: var(--playing-accent); margin-right: 8px; }
 .scoreArea { padding: 0 28px 28px; overflow: auto; min-height: 0; }
 .paper { color: var(--learn-paper-text, #29251f); background: var(--learn-paper, #f2ecdf); border-radius: 6px; padding: 22px 12px 12px; }
 .score { width: 100%; height: auto; display: block; fill: currentColor; }
@@ -36,12 +32,6 @@
 .guide .repetitions { color: var(--playing-text); margin-top: 24px; font-variant-numeric: tabular-nums; }
 .guide .count { font-family: var(--pa-font-display), system-ui, sans-serif; font-style: italic; font-weight: 900; font-size: 56px; line-height: 1.3; color: var(--playing-text); font-variant-numeric: tabular-nums; }
 .guide .error { color: var(--playing-text); border: 1px solid var(--playing-border); padding: 12px; border-radius: 8px; }
-.meta { font-variant-numeric: tabular-nums; }
-.header p.meta { margin-top: 12px; font-size: 13px; letter-spacing: .02em; }
-.tabs { flex: none; display: flex; gap: 6px; }
-.tabs button { font: inherit; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; min-width: 38px; min-height: 38px; border-radius: 4px; color: var(--playing-muted); background: transparent; border: 1px solid var(--playing-border); cursor: pointer; transition: background .16s ease-out, color .16s ease-out; }
-.tabs button:hover:not(:disabled) { color: var(--playing-text); background: var(--playing-surface); }
-.tabs button[aria-current] { color: var(--playing-bg); background: var(--playing-text); border-color: transparent; }
 .toggle, .segmented button { font: inherit; font-size: 14px; min-height: 38px; padding: 0 16px; border-radius: 999px; color: var(--playing-muted); background: transparent; border: 1px solid var(--playing-border); cursor: pointer; transition: background .16s ease-out, color .16s ease-out, border-color .16s ease-out; }
 .toggle::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; border: 1px solid currentColor; vertical-align: 1px; }
 .toggle:hover, .segmented button:hover:not(:disabled) { color: var(--playing-text); }
@@ -83,4 +73,4 @@
 .guide .note { font-size: 14px; line-height: 1.6; padding-top: 16px; border-top: 1px solid var(--playing-border); }
 .guide .note a { color: var(--playing-text); text-underline-offset: 3px; }
 @media (max-width: 1250px) { .workspace { grid-template-columns: 300px minmax(0, 1fr); min-height: 580px; } .header { flex-wrap: wrap; } }
-@media (prefers-reduced-motion: reduce) { .primary, .secondary, .tabs button, .toggle, .segmented button { transition: none; } .noteNow { filter: none; } }
+@media (prefers-reduced-motion: reduce) { .primary, .secondary, .toggle, .segmented button { transition: none; } .noteNow { filter: none; } }

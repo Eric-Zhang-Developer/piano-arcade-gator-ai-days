@@ -27,8 +27,14 @@ Feature `crowd` (#1345, PR #1361). It covers the choices the spec left open for 
 ## The spark (a tick on the hit line)
 - **The scale:** ±120 ms maps to ±12% of the width around the hit line's centre. Errors beyond that are pinned to the
   edge.
-- **The brackets:** two hairlines mark the ±60 ms on-beat bound.
-- **Each tick:** a clap is a 3 × 14 px tick in ink when on beat and ink-dim when off. It rises 14 px and fades over
-  1.2 s. Early is left, late is right.
+- **The ruler:** a hairline over that span with a centre notch, 28 px above the hit line so it clears the keys' lit
+  edge. Two inward-turned brackets in ink-dim mark the ±60 ms on-beat bound, and a ROOM label in the data face sits at
+  its left end, naming it for the meter.
+- **Each tick:** a clap is a 3 × 20 px tick in ink when on beat and ink-dim when off. It rises 14 px and fades over
+  1.2 s, easing out (1 − age²). Early is left, late is right.
+- **At other widths:** every pixel size here is set at 1280 wide and scales with the canvas, since at 1920 the fixed
+  sizes read small next to the meter, which already scales.
 - **Why ink and not the judgment colours:** the room's ticks are kept out of the player's judgment colours so they
   never read as the player's hits.
+- **The mic-on dot is sun (#ffb02e).** That's not a judgment colour (perfect is gold #ffe27a), and it reads as a live
+  mic.

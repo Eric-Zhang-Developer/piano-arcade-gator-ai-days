@@ -26,6 +26,8 @@ export const crowdUi = {
   rulerMs: 120,
   tickMs: 1200, // a tick fades over this
   tickRise: 14, // px it rises as it fades
+  rulerLift: 28, // px above the hit line, clear of the keys' lit edge
+  rulerAt: 1280, // the width the ruler's px sizes are set at
   pollMs: 250, // leaving /play is noticed this often
 };
 
@@ -181,7 +183,7 @@ export const crowd: Experiment = {
           <Button kind="secondary" disabled={now === "opening"} onClick={() => open().catch((e: Error) => setError(e.name === "NotAllowedError" ? "The mic wasn't allowed, so there's no room to hear." : "The mic didn't open."))} data-testid="crowd-mic">
             Listen to the room
           </Button>
-          <MonoLabel>The mic hears claps in memory only. Nothing is recorded or sent.</MonoLabel>
+          <MonoLabel>Mic audio stays in memory. Nothing is recorded or sent.</MonoLabel>
           {error && <p role="alert" style={{ margin: 0, color: ink }}>{error}</p>}
         </div>
       );
@@ -265,28 +267,37 @@ function drawRoom(ctx: CanvasRenderingContext2D, f: Frame, room: ReturnType<type
   }
   ctx.restore();
   if (still) return;
-  // the hit line's ruler: the ±on-beat bound as two brackets, each clap a tick that rises and fades
+  // the hit line's ruler, lifted clear of the keys' edge: a hairline over ±rulerMs with a centre notch, brackets at the
+  // ±on-beat bound, and each clap a tick that rises and fades
   const cx = f.width / 2;
   const half = f.width * u.rulerHalf;
   const px = half / u.rulerMs;
-  const ly = f.judgmentLineY;
+  const k = f.width / u.rulerAt; // the ruler's pixel sizes are set at 1280 wide and scale with the canvas
+  const ly = f.judgmentLineY - Math.round(u.rulerLift * k);
+  const n = (v: number) => Math.max(1, Math.round(v * k));
   ctx.save();
-  ctx.strokeStyle = line;
-  ctx.lineWidth = 1;
+  ctx.fillStyle = line;
+  ctx.fillRect(Math.round(cx - half), ly, Math.round(2 * half), 1);
+  ctx.fillRect(Math.round(cx), ly - n(4), 1, 2 * n(4) + 1);
+  // named for the meter it belongs to, so the ticks don't read as the player's
+  ctx.font = canvasFonts.data(n(10));
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "right";
+  ctx.fillStyle = inkDim;
+  ctx.fillText("ROOM", Math.round(cx - half) - n(8), ly);
   for (const s of [-1, 1]) {
-    const bx = cx + s * scoreSettings.onBeatMs * px;
-    ctx.beginPath();
-    ctx.moveTo(bx, ly - 10);
-    ctx.lineTo(bx, ly + 10);
-    ctx.stroke();
+    const bx = Math.round(cx + s * scoreSettings.onBeatMs * px);
+    ctx.fillRect(bx, ly - n(8), 1, 2 * n(8) + 1);
+    ctx.fillRect(s < 0 ? bx : bx - n(4), ly - n(8), n(5), 1); // the bracket's foot, turned in
+    ctx.fillRect(s < 0 ? bx : bx - n(4), ly + n(8), n(5), 1);
   }
   for (const t of room.ticks) {
     const age = (now - t.atPerf) / u.tickMs;
     if (age < 0 || age >= 1) continue;
     const tx = cx + Math.max(-half, Math.min(half, t.err * px));
-    ctx.globalAlpha = 1 - age;
+    ctx.globalAlpha = 1 - age * age;
     ctx.fillStyle = Math.abs(t.err) <= scoreSettings.onBeatMs ? ink : inkDim;
-    ctx.fillRect(Math.round(tx) - 1, ly - 18 - age * u.tickRise, 3, 14);
+    ctx.fillRect(Math.round(tx) - n(1), ly - n(10) - age * u.tickRise * k, n(3), n(20));
   }
   ctx.restore();
 }

@@ -1,7 +1,7 @@
 // Writes Crowd Mode's test mixes as WAVs for listening (decision crowd-onsets: fixtures): twinkle on the laptop voice
 // with claps on every beat at 0, −6 and −12 dB, the first few seconds of each, and the true clap times beside them.
 // The WAVs stay out of git (fixtures/.gitignore); vitest builds the same mixes in memory.
-//   node web/src/game/x/crowd/make-fixtures.mts
+//   node web/src/game/x/crowd/make-fixtures.mjs (node 23.6+: it imports mix.ts)
 import { readFileSync, writeFileSync } from "node:fs";
 import { crowdMix } from "./mix.ts";
 
@@ -9,7 +9,7 @@ const seconds = 4; // disk is tight: a few seconds is enough to hear the claps a
 const twinkle = JSON.parse(readFileSync(new URL("../../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
 const beats = Array.from({ length: 48 }, (_, i) => i);
 
-function wav(x: Float32Array, rate: number): Buffer {
+function wav(x, rate) {
   const b = Buffer.alloc(44 + x.length * 2);
   b.write("RIFF", 0);
   b.writeUInt32LE(36 + x.length * 2, 4);

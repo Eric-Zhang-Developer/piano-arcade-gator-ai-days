@@ -1,5 +1,6 @@
 'use client';
 import Image from 'next/image';
+import { APP_NAME } from '../../../game/app-name';
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent } from 'react';
 import { LearningSessionsProvider, isSessionComplete, useLearningSessions } from '../LearningSessions';
 import { TheoryWorkspace } from '../TheoryWorkspace';
@@ -67,7 +68,7 @@ function BrandFlow() {
     current.raf=requestAnimationFrame(tick);
   }
   return <div ref={flow} className={styles.flow} data-phase={phase} data-reduced={reduced} style={{'--reveal-ms':`${spec.reveal}ms`,'--dock-ms':`${spec.dock}ms`} as CSSProperties}>
-    <header className={styles.productHeader}><span className={styles.wordmark}><Keymark/>Piano Arcade</span>{phase==='activity' ? <button type="button" onClick={back}>Back to your map</button> : null}</header>
+    <header className={styles.productHeader}><span className={styles.wordmark}><Keymark/>{APP_NAME}</span>{phase==='activity' ? <button type="button" onClick={back}>Back to your map</button> : null}</header>
     {phase!=='activity' ? <div className={styles.home} data-camera-scale={camera.scale} data-camera-x={camera.x} data-camera-y={camera.y}>
       <div ref={stage} className={styles.plot}><svg className={styles.graph} viewBox={`0 0 ${size.width} ${size.height}`} role="group" aria-label="Demo mastery map. Follow the gator to the prepared skill.">
         <defs><marker id={`brand-arrow`} markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1L7 4L1 7Z" className={styles.arrowhead}/></marker></defs>

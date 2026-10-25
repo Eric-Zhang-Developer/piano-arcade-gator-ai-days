@@ -9,7 +9,6 @@
 .app button,.app textarea { border-radius:4px; }
 .app summary { cursor:pointer; }
 .main { flex:1; min-width:0; }
-.preview { display:block; font-size:11px; margin-bottom:14px; color:var(--learn-muted); }
 .content { padding:0; }
 .questionPane { display:flex; flex-direction:column; min-height:0; background:var(--learn-surface); border-right:1px solid var(--learn-border); }
 .questionBody { padding:32px 28px; overflow-y:auto; flex:1; }
@@ -17,7 +16,7 @@
 .questionBody h2:focus { outline:none; }
 .answers { display:grid; border:0; padding:0; margin:0; gap:10px; }
 .answers label { display:flex; align-items:center; gap:12px; padding:13px 16px; border:1px solid var(--learn-border); border-radius:4px; cursor:pointer; }
-.answers label:has(:checked) { background:rgb(39 225 255 / .08); border-color:var(--learn-accent); }
+.answers label:has(:checked) { background:color-mix(in srgb, var(--pa-primary) 8%, transparent); border-color:var(--learn-accent); }
 .answers label:hover { border-color:var(--learn-muted); }
 .answers input { accent-color:var(--learn-accent); margin:0; }
 .explanation { font-size:12px; color:var(--learn-muted); display:grid; gap:8px; }
@@ -48,14 +47,14 @@
 .audioControls button { display:flex; align-items:center; gap:8px; padding:8px 12px; font-size:14px; border:1px solid var(--learn-border); background:none; color:var(--learn-paper-text); }
 .audioControls button:hover { background:rgb(242 242 245 / .06); }
 .audioControls svg { width:12px; height:12px; fill:currentColor; }
-.source { font-size:11px; color:var(--learn-muted); margin-top:18px; max-width:70ch; }
+.source { font-size:12px; color:var(--learn-muted); margin-top:18px; max-width:70ch; }
 .source p { overflow-wrap:anywhere; }
 .reference { max-width:760px; margin:0 auto; padding:40px; }
 .reference h2 { font-size:32px; margin-bottom:24px; }
 .reference h3 { font-size:17px; font-weight:600; margin-top:32px; }
 .reference p { max-width:65ch; }
 .reference a { text-decoration:underline; font-size:12px; }
-.referenceNote { font-size:11px; color:var(--learn-muted); }
+.referenceNote { font-size:12px; color:var(--learn-muted); }
 .notePair { display:flex; gap:60px; margin:28px 0; font-size:12px; color:var(--learn-muted); }
 .notePair b { display:block; font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-size:42px; font-weight:800; color:var(--learn-paper-text); }
 .offline { padding:60px; max-width:650px; }
@@ -96,33 +95,14 @@
 @media (max-width:1300px) { .lessonFocus { padding:26px 24px 20px; } .lessonFocus h1 { font-size:30px; } .theoryStudio .questionBody { padding:24px; } .answerComposer { padding:18px 24px 22px; } .theoryStudio .workspaceBody { padding:24px; } .theoryStudio .paper { padding:26px; } }
 
 /* Typography roles follow Eric's panel headings, pause-menu navigation and Options controls. */
-.phrase[data-playing=true] { background:rgb(39 225 255 / .06); outline:1px solid rgb(39 225 255 / .4); outline-offset:8px; }
-.phrase[data-playing=true] figcaption { color:var(--pa-cyan); }
+.phrase[data-playing=true] { background:color-mix(in srgb, var(--pa-primary) 6%, transparent); outline:1px solid color-mix(in srgb, var(--pa-primary) 40%, transparent); outline-offset:8px; }
+.phrase[data-playing=true] figcaption { color:var(--pa-primary); }
 
 /* The page starts below the site's fixed nav band (nav-bar.module.css), the only bar over /learn: the screens size to
    100dvh minus this height. */
 .app { --learn-header-height:max(min(4vh,2.25vw),24px); }
 .main { padding-top:var(--learn-header-height); }
-.landing { min-height:calc(100dvh - var(--learn-header-height)); max-width:1080px; margin:0 auto; padding:68px 56px 40px; }
-.landingIntro { margin-bottom:52px; }
-.landingIntro h1 { margin:0 0 16px; font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-weight:900; font-size:40px; line-height:1.05; letter-spacing:-.01em; text-transform:uppercase; }
-.landingIntro p { margin:0; color:var(--learn-muted); max-width:65ch; }
-.pathways { display:grid; grid-template-columns:1fr 1fr; gap:64px; }
-.pathways section { padding-top:24px; border-top:1px solid var(--learn-border); }
-.landing h2 { font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-weight:800; font-size:24px; line-height:1.2; margin:0 0 12px; }
-.pathways p,.activityChoices p { color:var(--learn-muted); margin:0 0 24px; max-width:48ch; }
-.landingLink { display:inline-flex; align-items:center; gap:20px; padding:10px 0; color:var(--learn-text); font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-weight:800; font-size:16px; letter-spacing:.04em; text-transform:uppercase; }
-.landingLink:hover { color:var(--pa-cyan); }
-.resumeRow { display:flex; align-items:center; justify-content:space-between; gap:32px; padding-top:28px; margin-top:44px; border-top:1px solid var(--learn-border); }
-.resumeRow h2 { font-family:system-ui,sans-serif; font-style:normal; font-weight:400; font-size:18px; }
-.resumeRow p { margin:0; font-size:14px; color:var(--learn-muted); }
-.activityChoices>section { display:flex; align-items:center; justify-content:space-between; gap:48px; border-top:1px solid var(--learn-border); padding:28px 0; }
-.activityChoices p { margin:0; }
-.activityChoices a { flex:none; min-width:120px; justify-content:center; }
-.sessionNote { display:block; color:var(--learn-muted); font-size:12px; margin-top:10px; }
-.landingNote { max-width:72ch; margin:56px 0 0; font-size:12px; color:var(--learn-muted); }
 .main { background:linear-gradient(180deg,var(--pa-bg),var(--pa-sky)); }
-@media (max-width:1300px) { .landing { padding-top:52px; } }
 
 .graphHome { margin:0 auto; padding:0 24px; }
 

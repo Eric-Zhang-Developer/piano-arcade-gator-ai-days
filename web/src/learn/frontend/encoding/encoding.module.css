@@ -1,5 +1,5 @@
 /* The encoding sandbox: a code-workspace layout in the Duo look. Colours come only from the --learn-* tokens; nothing
-   is rounded, italic or under 16px. Rules under .sandbox outrank the shell's .app defaults (4px radius, magenta focus,
+   is rounded, italic or under 16px. Rules under .sandbox outrank the shell's .app defaults (4px radius, the focus ring,
    cyan selection, half-opacity disabled buttons) without touching learning.module.css. */
 .sandbox { height:calc(100dvh - var(--learn-header-height)); min-height:560px; display:grid; grid-template-columns:minmax(0,1fr) 380px; grid-template-rows:auto minmax(0,1fr); grid-template-areas:"head head" "work chat"; background:var(--learn-bg); color:var(--learn-text); }
 .sandbox :is(button,textarea,input) { border-radius:0; }

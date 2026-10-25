@@ -6,6 +6,7 @@ import type { GamePlugin } from "../../contracts";
 import { createGuard, type Guard } from "../crash-guard";
 import { composersHands } from "./composers-hands";
 import { conductor } from "./conductor";
+import { handPalette } from "./hand-palette";
 import { realKeys } from "./real-keys";
 import { highlightReel } from "./highlight-reel";
 import { sample } from "./sample";
@@ -30,6 +31,7 @@ export const experiments: Experiment[] = [
   highlightReel, // a take becomes a 15-second broadcast replay video (#913, spike)
   composersHands,
   wetPaint, // #1106: its own page, /paint
+  handPalette, // #1127: the hand and judgment colors three ways, with a colour-blind simulation
 ];
 
 // The names a take's ?x= turns on.

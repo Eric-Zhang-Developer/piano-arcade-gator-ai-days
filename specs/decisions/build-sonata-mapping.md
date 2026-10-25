@@ -5,8 +5,9 @@ the lane registers, the velocity cap, which red counts, and anything else the sp
 `web/src/game/x/build-sonata/sonata.ts`; `make-sonata.mjs` re-runs it from git.
 
 **Choices** (each the smaller, reversible option):
-- **Notes:** one per first-parent commit whose subject ends in a PR number (`(#n)`): 691 of 704 on the first snapshot.
-  The rest (the initial commit, plain merges) aren't merged PRs.
+- **Notes:** one per first-parent commit that merged a PR: a squash subject ending in `(#n)`, or the night's first few
+  `Merge pull request #n from …` commits, typed by their branch's prefix. 707 of 709 on the first snapshot; the other
+  two (the initial commit and one direct push) aren't merged PRs.
 - **Tempo and length:** 120 bpm in 4/4; the commits fill beats 0–176 and the final I rings to about 180 (90 s).
 - **The warp:** a commit's beat is 75% its rank (busy hours get room) and 25% its clock time, quantized to sixteenths.
   A hand plays one note per sixteenth; a note that would land on a taken slot moves to the next free one.
@@ -29,6 +30,8 @@ the lane registers, the velocity cap, which red counts, and anything else the sp
 - **Pedal:** only the final V–I: down 0.12 beats into each bar, up 0.04 before the next and at the end. The rest is dry,
   so passing tones don't blur.
 - **Scrub:** the names and handles in AGENTS.md's Lanes table, matched as words in any case, and anything shaped like
-  an email become the commit's lane name. No author field is read.
+  an email become the commit's lane name. The table doesn't list everyone a subject names yet, so `make-sonata.mjs`
+  adds one teammate's first name by hand, and a merge commit's branch keeps only its last segment (a branch path can
+  start with anyone's handle). No author field is read.
 
 **How to undo.** Edit the constants in `sonata.ts`, re-run `make-sonata.mjs`, and commit the snapshot and chart.

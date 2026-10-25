@@ -6,14 +6,14 @@ import type { Experiment } from "..";
 import type { Frame, GamePlugin } from "../../../contracts";
 import { msPerBeat, settings } from "../../core/settings";
 import { canvasFonts, kitButton } from "../../duo-tokens";
-import { hudLayout } from "../../hud";
+import { meterLayout } from "../../fever-gauge";
 import { buildSonata, clockAt, counterAt, type Snapshot, type SonataNote } from "./sonata";
 
 export const sonataSettings = {
-  stripPx: 30, // the counter's strip under the HUD band
+  stripPx: 30, // the counter's strip under the fever gauge
   labelPx: 12, // a riding subject's size
   labelAlpha: 0.42, // low contrast: it rides with the music, it isn't read like the HUD
-  labelGapPx: 15, // a label closer than this to the last one on its side is skipped
+  labelGapPx: 28, // a label closer than this to the last one on its side is skipped
   labelChars: 54,
 };
 
@@ -34,20 +34,23 @@ export function sonataPlugin(): GamePlugin {
       if (!notes.length) return;
       const beatMs = msPerBeat(bpm);
       const beat = f.nowMs / beatMs;
-      const top = hudLayout(f.width, f.judgmentLineY).panel.h; // under the HUD band
+      const top = meterLayout(f.width, f.judgmentLineY).bottom; // under the HUD band and the fever gauge's word
       const s = sonataSettings;
-      // The strip: how many merged PRs have sounded, of how many, and when that was.
-      ctx.fillStyle = "rgba(3, 6, 7, 0.82)";
-      ctx.fillRect(0, top, f.width, s.stripPx);
+      // The strip: how many merged PRs have sounded, of how many, and when that was. The clock follows the counter
+      // (the right end is under the pause button), and the backing stops at the text, so the judgment's word stays lit.
       ctx.textBaseline = "middle";
       ctx.textAlign = "left";
       ctx.font = canvasFonts.data(14);
-      ctx.fillStyle = "#e2e6f0";
       const count = beat < 0 ? 0 : counterAt(notes, beat);
-      ctx.fillText(`MERGED PR ${String(count).padStart(3, "0")} / ${notes.length}`, 16, top + s.stripPx / 2);
-      ctx.textAlign = "right";
+      const counter = `MERGED PR ${String(count).padStart(3, "0")} / ${notes.length}`;
+      const clock = beat < 0 ? "" : `${clockAt(notes, beat).toUpperCase()} ET`;
+      const cw = ctx.measureText(counter).width;
+      ctx.fillStyle = "rgba(3, 6, 7, 0.82)";
+      ctx.fillRect(0, top, 16 + cw + 24 + ctx.measureText(clock).width + 16, s.stripPx);
+      ctx.fillStyle = "#e2e6f0";
+      ctx.fillText(counter, 16, top + s.stripPx / 2);
       ctx.fillStyle = "#7d8496";
-      ctx.fillText(`${beat < 0 ? "" : clockAt(notes, beat).toUpperCase()} ET`, f.width - 16, top + s.stripPx / 2);
+      ctx.fillText(clock, 16 + cw + 24, top + s.stripPx / 2);
       if (reducedMotion()) return; // the counter only: no riding labels
       // Each upcoming note's subject rides beside it: the right hand's to its right, the left hand's to its left.
       const line = f.judgmentLineY;
@@ -62,9 +65,13 @@ export function sonataPlugin(): GamePlugin {
         if (Math.abs(y - last[n.hand]) < s.labelGapPx) continue;
         last[n.hand] = y;
         const k = f.keyX(n.pitch);
-        const text = n.subject.length > s.labelChars ? `${n.subject.slice(0, s.labelChars - 1)}…` : n.subject;
-        ctx.textAlign = n.hand === "R" ? "left" : "right";
-        ctx.fillText(text, n.hand === "R" ? k.x + k.width + 8 : k.x - 8, y - 6);
+        const subject = n.subject.replace(/^Merge pull request (#\d+) from [^/]+\//, "$1 "); // the early merge commits
+        const text = subject.length > s.labelChars ? `${subject.slice(0, s.labelChars - 1)}…` : subject;
+        // A label that would run off its edge goes to the note's other side.
+        const w = ctx.measureText(text).width;
+        const right = n.hand === "R" ? k.x + k.width + 8 + w < f.width - 8 : k.x - 8 - w < 8;
+        ctx.textAlign = right ? "left" : "right";
+        ctx.fillText(text, right ? k.x + k.width + 8 : k.x - 8, y - 6);
       }
       ctx.globalAlpha = 1;
     },

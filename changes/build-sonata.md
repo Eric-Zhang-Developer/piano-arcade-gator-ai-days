@@ -1,0 +1,8 @@
+## What shipped
+The Build Sonata (#1162). The night the agents built Étude, as 90 s of music, one note per merged PR: 707 notes, Fri 9:11 PM to Sun 10:11 AM ET. Lanes are registers. Features are long notes and fixes are passing tones. Main-red stretches turn to A minor until the fix, and it ends on V–I with the pedal down. `/sonata` shows the count, a piano roll you can point at or step through with ← → to read each PR (lane, hash, ET time, scrubbed subject), and three ways to play: Listen (the bot on the DGX), Easy and full. In the Lab, `?x=build-sonata` on `/play` adds a merged-PR counter and the night's clock under the fever gauge, and each note's subject rides beside it (counter only under reduced motion).
+## Where it lives
+`web/src/game/x/build-sonata/`: `sonata.ts` (pure mapping), `make-sonata.mjs` (re-run at the freeze), `snapshot.json`, `SonataPage.tsx`, the plugin in `index.ts` · `web/src/app/sonata/` · `web/public/songs/x/build-sonata/` · `specs/decisions/build-sonata-mapping.md` · shots in `specs/features/experiments/shots/build-sonata/`
+## How to check it
+Unit: `pnpm -C web exec vitest run src/game/x src/game/pedal src/game/songs` (199 pass): traceability, scrub, musicality, the cadence and the library test on the real chart. Perf gate not run locally; main's scheduled run covers it. Not heard by Eric.
+## Gaps
+Validation (d), the 90 s listen on the DGX, needs Eric. The chart shows in the song select (accepted in the spec). Full is a bot's tempo; Easy is the playable one. The snapshot is a point in time until it's re-run at the freeze. One teammate's first name is scrubbed by hand in `make-sonata.mjs`, because the Lanes table doesn't list them yet.

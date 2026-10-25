@@ -75,6 +75,9 @@ describe("traceability (a)", () => {
     expect(scrub("Merge pull request #1 from Eric-Zhang-Developer/setup, eric-agent-1", NAMES, "game")).toBe(
       "Merge pull request #1 from game/setup, game-agent-1",
     );
+    expect(scrub("Merge pull request #343 from Someone-Else/someone/piano-ui-theory", NAMES, "learning")).toBe(
+      "Merge pull request #343 from learning/piano-ui-theory",
+    );
   });
   it("no name, handle or email from the scrub list in the snapshot or the chart", () => {
     const text = JSON.stringify(snap) + JSON.stringify(chart);
@@ -127,6 +130,7 @@ describe("the committed snapshot", () => {
     const text = readFileSync(new URL("./snapshot.json", import.meta.url), "utf8");
     for (const n of NAMES) expect(text).not.toMatch(new RegExp(`\\b${n}\\b`, "i"));
     expect(text).not.toMatch(/Zhang|Developer/); // no piece of a handle either
+    for (const c of snap.commits) expect(c.subject).not.toMatch(/ from [^\s/]+\/[^\s]*\//); // a branch keeps one segment
     expect(text).not.toMatch(/[\w.+-]+@[\w-]+\.[a-z]{2,}/i);
   });
 });

@@ -26,6 +26,8 @@ for (const slug of readdirSync(`${repo}/specs/features`)) {
 const agents = git("show", `${ref}:AGENTS.md`);
 const lanes = agents.slice(agents.indexOf("| Person | GitHub |"), agents.indexOf("\n\n", agents.indexOf("| Person | GitHub |")));
 const names = [...new Set(lanes.split("\n").slice(2).flatMap((row) => row.split("|").slice(1, 3).flatMap((cell) => [...cell.matchAll(/`@?([^`]+)`/g)].map((m) => m[1]))))];
+// A teammate named in a subject whose lane row isn't set yet: scrubbed the same way.
+names.push("Andres");
 
 // The first-parent log, oldest first: a header line per commit, then its numstat lines.
 const commits = [];

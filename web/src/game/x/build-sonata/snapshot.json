@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-10-25T14:12:28.339Z",
+ "generatedAt": "2026-10-25T14:22:04.059Z",
  "count": 707,
  "from": "2026-10-24T01:11:15.000Z",
  "to": "2026-10-25T14:11:13.000Z",
@@ -32,7 +32,7 @@
    "pr": 6,
    "lines": 1881,
    "lane": "game",
-   "subject": "Merge pull request #6 from game/claude/piano-midi-spike-36c26f"
+   "subject": "Merge pull request #6 from game/piano-midi-spike-36c26f"
   },
   {
    "hash": "6207e70aec91d832410f9ac775e2f16d6569f9f3",
@@ -2102,7 +2102,7 @@
    "pr": 343,
    "lines": 885,
    "lane": "learning",
-   "subject": "Merge pull request #343 from learning/seeko/piano-ui-theory"
+   "subject": "Merge pull request #343 from learning/piano-ui-theory"
   },
   {
    "hash": "af6dba85e61e426d2e83bb81efbb33f3025cae57",
@@ -2312,7 +2312,7 @@
    "pr": 390,
    "lines": 152,
    "lane": "learning",
-   "subject": "Merge pull request #390 from learning/seeko/piano-learning-clarity"
+   "subject": "Merge pull request #390 from learning/piano-learning-clarity"
   },
   {
    "hash": "1286329a545cdeae7633182188022106359a3062",
@@ -3952,7 +3952,7 @@
    "pr": 640,
    "lines": 760,
    "lane": "bell",
-   "subject": "contract: the bell and Andres dialogue, and the Duo mood frames that settled the palette (#640)"
+   "subject": "contract: the bell and bell dialogue, and the Duo mood frames that settled the palette (#640)"
   },
   {
    "hash": "58de2617b61a1e26a63ce0bb86087c63eb460e51",

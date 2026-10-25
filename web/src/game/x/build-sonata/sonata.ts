@@ -64,7 +64,8 @@ export function laneOf(type: string, scope: string | null, paths: string[], assi
 // Names and handles become the lane's name, and anything shaped like an email too: the sonata stores no person.
 export const EMAIL = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g;
 export function scrub(text: string, names: string[], lane: Lane): string {
-  let out = text.replace(EMAIL, lane);
+  // A merge commit's branch path can hold anyone's handle, listed or not: only its last segment stays.
+  let out = text.replace(/(Merge pull request #\d+ from )[^\s,]*\/([^/\s,]+)/, `$1${lane}/$2`).replace(EMAIL, lane);
   // Longest first, so a handle goes whole before the name inside it.
   for (const n of [...names].sort((a, b) => b.length - a.length))
     out = out.replace(new RegExp(`@?\\b${n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "gi"), lane);

@@ -344,11 +344,31 @@ describe("engraving", () => {
   it("six notes a sixth of a beat apart print as triplet 16ths in two 3s, under one beam (the Pathétique, bar 8)", () => {
     const notes = [0, 1, 2, 3, 4, 5].map((i) => ({ id: `s${i}`, pitch: 60 + i, beat: i / 6, duration: 1 / 6, hand: "R" as const }));
     const c = synthetic({ notes });
-    expect(placeNotes(c).map((p) => [p.onset, p.end])).toEqual([0, 2, 4, 6, 8, 10].map((o) => [o, o + 2]));
+    const X = DIVISIONS / 6; // a triplet 16th
+    expect(placeNotes(c).map((p) => [p.onset, p.end])).toEqual([0, 1, 2, 3, 4, 5].map((i) => [i * X, (i + 1) * X]));
     const xml = chartToMusicXml(c);
     expect((xml.match(/<time-modification>/g) ?? []).length).toBe(6);
     expect((xml.match(/<tuplet type="start"\/>/g) ?? []).length).toBe(2);
     expect([...xml.matchAll(/<beam number="1">(\w+)<\/beam>/g)].map((m) => m[1]).join(" ")).toBe("begin continue continue continue continue end");
+  });
+
+  it("a 16th figure ending in two 32nds prints them as 32nds, under one beam (the Pathétique, bar 5)", () => {
+    const at = [0, 1 / 4, 1 / 2, 3 / 4, 7 / 8, 1];
+    const notes = at.slice(0, -1).map((b, i) => ({ id: `t${i}`, pitch: 60 + i, beat: b, duration: at[i + 1] - b, hand: "R" as const }));
+    const c = synthetic({ notes });
+    expect(placeNotes(c).map((p) => [p.onset, p.end])).toEqual(at.slice(0, -1).map((b, i) => [b * DIVISIONS, at[i + 1] * DIVISIONS]));
+    const xml = chartToMusicXml(c);
+    expect((xml.match(/<type>32nd<\/type>/g) ?? []).length).toBe(2);
+    expect(xml).not.toContain("<time-modification>");
+    expect(xml).not.toContain("<tie ");
+    expect([...xml.matchAll(/<beam number="1">(\w+)<\/beam>/g)].map((m) => m[1]).join(" ")).toBe("begin continue continue continue end");
+  });
+
+  it("a beat of 16ths over triplets snaps to 16ths and triplets, not to 32nds", () => {
+    const tune = [0, 1, 2, 3].map((i) => ({ id: `u${i}`, pitch: 72 + i, beat: i / 4, duration: 1 / 4, hand: "R" as const }));
+    const trip = [0, 1, 2].map((i) => ({ id: `v${i}`, pitch: 60 + i, beat: i / 3, duration: 1 / 3, hand: "R" as const }));
+    const onsets = placeNotes(synthetic({ notes: [...tune, ...trip] })).map((p) => p.onset);
+    expect(onsets.every((o) => o % (DIVISIONS / 4) === 0 || o % (DIVISIONS / 3) === 0)).toBe(true);
   });
 
   it("a moonlight-1 triplet comes back as three triplet eighths in one beat", () => {
@@ -357,10 +377,11 @@ describe("engraving", () => {
     const k = Math.floor(beat);
     const three = moon.notes.filter((n) => n.hand === "R" && n.beat >= k && n.beat < k + 1 && n.duration < 0.5);
     const placed = placeNotes(moon).filter((p) => three.some((n) => n.id === p.id));
+    const T = DIVISIONS / 3; // an eighth triplet
     expect(placed.map((p) => [p.onset - k * DIVISIONS, p.end - k * DIVISIONS])).toEqual([
-      [0, 4],
-      [4, 8],
-      [8, 12],
+      [0, T],
+      [T, 2 * T],
+      [2 * T, 3 * T],
     ]);
     const xml = chartToMusicXml(moon);
     expect(xml).toContain("<time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes></time-modification>");

@@ -23,3 +23,14 @@ while building it (eric-agent-7, 2026-10-25). Each is reversible in `web/src/gam
   (`SF_SWEEP=1`), so FINDINGS.md can say what one more time box should try. The spec's follower is the answer.
 
 How to undo: each bullet is a few lines in `follow.ts`, `index.ts` or the test.
+
+## Second box: the estimator (2026-10-25)
+- **Order 3, not the planned two states.** The sweep (FINDINGS.md, "Why order 3") shows two states can't both
+  track the drift player and filter the jitter; a third state (the tempo's change per beat) can. How to undo: set
+  `kalmanTune.order` to 2.
+- **R is matched to the scripted jitter** (sd of uniform ±30 ms ≈ 17 ms) and q picked from the sweep. Both are
+  fitted to our scripted players, not to a person: Eric's listen is the check on that.
+- **The mean follower stays** in `follow.ts` as the first box's yardstick in the table. `band=follow` runs the Kalman
+  follower. How to undo: `kalmanFollower` back to `follower` in `index.ts`.
+- **The band still enters on the first press** at the chart's tempo. Waiting for two presses was measured worse and
+  isn't kept.

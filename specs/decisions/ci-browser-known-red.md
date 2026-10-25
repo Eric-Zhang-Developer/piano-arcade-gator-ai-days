@@ -26,5 +26,7 @@ fails if an entry has no issue number or names a file that doesn't exist.
   - The other seven are listed, each pointing at its fix PR, or at #754 where none exists yet.
   - Plus records. It failed its first attempt on main and passed the rerun. A pull request runs one attempt, so it's
     red there every time it flakes.
+  - Plus watch-demo. The first diff missed it: its first attempt on main failed, and the retry was cut off when shard
+    8 hit the 20 min limit. A real bug from duo-start (#763); its fix is #1100.
 - **From here:** the list shrinks under the same rule as before. An entry leaves after its check passes 2 browser runs
   in a row that include the fix.

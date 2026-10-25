@@ -82,7 +82,8 @@ Rank: S ≥ 95%, A ≥ 90%, B ≥ 80%, C ≥ 70%, else D.
 - Lookahead: 2000 ms by default (a setting).
 - Perspective: a setting from 0 (flat, the default) to 0.3, where the top of the highway is (1 - p) times as wide as
   the bottom. The judgment line stays aligned with the keys at every value. Settable with `?perspective=0.15`.
-- A count-in of 8 beats (two bars) before beat 0: show the beats; emit `countInBeat`. No sound in this feature
+- A count-in of 3 musical pulses (meter-aware: a dotted quarter in compound meters like 12/8) before beat 0, with
+  a Skip button: show the beats; emit `countInBeat`. No sound in this feature
   (`beat-track` plays it). Each note ends with a gap and starts with a bright leading edge, so repeated notes read
   as separate (playtest, `specs/context/findings.md`).
 - The judgment word for the latest note (PERFECT, GREAT or MISS) and its offset in ms, once, centered above the line.

@@ -110,12 +110,15 @@ The game opens the port at 115200, waits for the line that starts `PAL1 leds=`, 
 - nothing extra for wrong keys: the game sends `0x80` for every released key but `0x90` only for judged notes, so a
   release of a key that never lit flashes it red (setting 8, on by default; only while a song is live, so not in the
   count-in). It shows on release, since the board never hears the press;
-- two modes (setting 15): **learning** (0, the default: hints that build up from very faint to gold when the note is
-  due, wrong-key red, and brightness-only glows for the count-in, fever, pause, the end and idle); **demo** (1: every
-  key pressed on the piano lights and splashes, and nothing else: no hints, no red, no song shows; the website sends
-  each press, on any page, its color scaled by how hard it went down). The splash is a ripple that drifts one step
-  along the Duo palette, reaches further the harder the press, and throws glitter; three keys at once throw a
-  magenta-and-gold shower. A game hit on a key already held only recolors it, and a miss never ripples. **The BOOT
+- two modes (setting 15): **learning** (0: hints that build up from very faint to gold when the note is due,
+  wrong-key red, and brightness-only glows for the count-in, fever, pause, the end and idle); **demo** (1, the default:
+  every key pressed on the piano lights with a ripple, and nothing else: no hints, no red, no song shows, no fever;
+  the website sends each press, on any page, blue for the left hand and pink for the right). The ripple is two soft
+  crests, steep at the front with foam behind like a breaking wave, that stop about nine keys each way, cooling as
+  they go (less red, more green and blue, from whatever color the website sent), and crashing (a bright flare) where
+  two ripples cross; 600 ms, no white. The website's Lights panel picks the two colors. Demo's colors go through a gamma of 2.2
+  so screen colors stay saturated on the LEDs. A game hit on a key already held only recolors it, and a miss never
+  ripples. **The BOOT
   button on the ESP32 flips between them** and saves it (a soft white glow means learning, one blue ripple means demo); the tester's and the
   playground's Mode menus and the website's lights button do the same;
 - nothing extra for the shows (setting 9): `0xF0` with no song live starts the count-in: a charge bar, cyan from the

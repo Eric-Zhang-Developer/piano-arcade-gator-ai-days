@@ -32,21 +32,20 @@ export function PracticeWorkspace() {
   // #946: the take is a sample learner's, never the player's: nothing is heard, so nothing here describes their playing.
   const instruction = state.busy ? ['An example take', 'Follow the score while a sample learner plays both bars. Nothing you play is heard.']
     : state.stage === 'feedback' ? ['Let the last G ring', 'In that example take the ending was cut short. Hold the G in bar 2 for two full beats.']
-    : state.stage === 'drill' ? ['Give G two full beats', 'Play the opening two bars on your piano. Count “one, two” on the final G.']
+    : state.stage === 'drill' ? ['Give G two full beats', `Play the opening two bars on your piano. Count “one, two” on the final G. ${state.repetitions} of 4 repetitions.`]
     : state.stage === 'fade' ? state.hints ? ['Read from the staff', 'The next example removes note names. Keep the score in view.'] : state.tempo < targetTempo ? ['Bring it up to tempo', `The next example runs at ${targetTempo} bpm.`] : ['Keep the ending steady', 'Play both bars once more.']
     : state.stage === 'complete' ? ['Connect the whole melody', 'The practice example is complete. Return to your learning map.']
     : ['Give the ending room', 'Play the opening two bars. Hold the final G for two full beats.'];
   const takeLabel = state.stage === 'fade' ? state.hints ? 'Example without note names' : state.tempo < targetTempo ? `Example at ${targetTempo} bpm` : 'See an example take' : 'See an example take';
   return <section className={styles.workspace} aria-label="Guided practice">
     <div className={styles.stage} aria-busy={locked}>
-      <header className={styles.header}><div><h1>{music.title}</h1></div><span className={styles.preview}>Interactive demo</span></header>
+      <header className={styles.header}><div><h1>{music.title}</h1></div></header>
       <div className={styles.scoreArea}><Score beat={playback.beat} hints={state.hints} /><ScoreSource /></div>
     </div>
     <aside className={styles.guide} aria-label="Current practice step">
       <div className={styles.guideBody}>
-        <div aria-live="polite"><h2>{instruction[0]}</h2><p>{instruction[1]}</p></div>
-        {state.stage === 'drill' && <p className={styles.repetitions}>{state.repetitions} of 4 repetitions</p>}
-        {state.error && <p role="alert" className={styles.error}>{state.error}</p>}
+        {/* An error takes the instruction's place, so the step reads as one heading and one line. */}
+        <div aria-live="polite"><h2>{instruction[0]}</h2>{state.error ? <p role="alert" className={styles.error}>{state.error}</p> : <p>{instruction[1]}</p>}</div>
       </div>
       <div className={styles.actions} ref={actions}>
         {locked ? <button type="button" className={styles.secondary} onClick={stop}>Stop {demo ? 'demo' : 'example'}</button>

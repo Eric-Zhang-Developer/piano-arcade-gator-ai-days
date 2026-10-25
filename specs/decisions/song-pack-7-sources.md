@@ -55,9 +55,9 @@ lilypond chopin_prelude_op28_no15.ly           # and debussy_Arabesque_1.ly: wri
   converter refuses them. Pack 1's rule charts an ornament as its main note, so a pre-pass keeps each figure's first
   note, held to the end of its beat, and drops the other six. The pre-pass is local: it reads the export's track 1
   and rewrites beats 15–16 and 91–92 (12 notes dropped, 2 lengthened).
-- **The Pathétique's three 32nd notes** (the last note of bars 5, 13 and 16, at beat x.875) are off the grid too. The
-  converter skips them as slivers. This is the one place a printed note is missing. Holding them needs a 1/24-beat
-  grid in the converter, a `fix(song-pack-1)`.
+- **The Pathétique's three 32nd notes** (the last note of bars 5, 13 and 16, at beat x.875) sit on the 1/8-beat grid.
+  The first chart skipped them as slivers; #999 taught the converter that grid, and the chart was re-run from the same
+  MIDI with the same arguments (fix(song-pack-7)). The sheet prints them as 32nds since #1072.
 - **Grace notes and appoggiaturas** are skipped (pack 1): 9 in the Moment musical and the Raindrop's 3-note
   appoggiaturas in bars 11, 15 and 17.
 
@@ -70,7 +70,7 @@ against the chart:
 |---|---|---|---|
 | `chopin-prelude-20` | 286 | 286 | none |
 | `raindrop-prelude` | 435 (401 once two voices sharing a head count once) | 389 | the 12 fioritura notes |
-| `pathetique-2` | 267 | 263 | the three 32nds above, and a C3 struck in two voices at once (bar 14), sounded once |
+| `pathetique-2` | 267 | 266 | a C3 struck in two voices at once (bar 14), sounded once |
 | `moment-musical-3` | 438 | 438 | none |
 | `debussy-arabesque-1` | 534 (523 once shared heads count once) | 515 | 8 pitches both hands strike at once, kept once in the left hand |
 

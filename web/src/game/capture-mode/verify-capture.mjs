@@ -24,8 +24,9 @@ const say = (s) => process.stdout.write(`${s}\n`);
 // The spec's five, plus song-preview's status line (#295), which the first run of this check turned up on /. "OPTIONS"
 // is the drawer's button that replaced the Calibrate link on / (#385; Calibrate is now inside the closed drawer, #431),
 // in capitals because innerText applies its text-transform. /play's "Laptop keys" line is gone (duo-start, #772: no key
-// hints on the start screen), so it's no longer a word to hide.
-const WORDS = ["MIDI:", "Latency", "Effects", "OPTIONS", "Press any key for previews"];
+// hints on the start screen), so it's no longer a word to hide. CONTROLS: the select's ? link (mouse-first), in place of
+// song-preview's "Press any key for previews", which mouse-first removed.
+const WORDS = ["MIDI:", "Latency", "Effects", "OPTIONS", "CONTROLS"];
 
 if (!process.argv.includes("--no-build")) {
   say("verify-capture: next build");

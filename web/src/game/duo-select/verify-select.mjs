@@ -105,6 +105,15 @@ await home();
 await page.keyboard.press("l");
 await page.waitForURL(/\/play\?/, { timeout: 30_000 });
 check(params(page).get("song") === first && params(page).get("mode") === "wait", `L opens ${new URL(page.url()).search} (want mode=wait)`);
+// mouse-first: LEARN and WATCH as buttons on the panel, the same as L and W.
+await home();
+await page.getByTestId("select-learn").click();
+await page.waitForURL(/\/play\?/, { timeout: 30_000 });
+check(params(page).get("song") === first && params(page).get("mode") === "wait", `LEARN opens ${new URL(page.url()).search} (want mode=wait)`);
+await home();
+await page.getByTestId("select-watch").click();
+await page.waitForURL(/\/play\?/, { timeout: 30_000 });
+check(params(page).get("song") === first && params(page).get("demo") === "1" && params(page).get("bot") === "perfect", `WATCH opens ${new URL(page.url()).search} (want the perfect-bot demo)`);
 
 // 3. Next for you: none unsaved, the saved bars once seeded.
 await home();

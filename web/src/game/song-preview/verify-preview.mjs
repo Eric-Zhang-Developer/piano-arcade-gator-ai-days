@@ -118,7 +118,7 @@ await page.addInitScript(instrument, false);
 // through it instead of tones (spec: laptop-sound).
 await open(page, "/?midi=off");
 await page.waitForTimeout(1500);
-check((await page.getByTestId("preview-status").textContent()) === "Press any key for previews", "before a key press the panel says 'Press any key for previews'");
+check((await page.getByTestId("preview-status").textContent()).trim() === "", "before a key press the status line is blank (mouse-first: no 'Press any key' line)");
 check((await page.evaluate(() => window.__tones + window.__uiTones + window.__midiAsked)) === 0, "nothing plays and no MIDI is asked for on page load");
 const list = (await page.locator("ol a").evaluateAll((as) => as.map((a) => a.getAttribute("href").replace("/play?song=", ""))));
 await page.keyboard.press("ArrowDown");

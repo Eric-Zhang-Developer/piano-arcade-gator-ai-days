@@ -22,6 +22,7 @@ import type { Song } from "../song-select/load";
 import { goToStage } from "./go-to-stage";
 import styles from "./select-layout.module.css";
 import { APP_NAME } from "../app-name";
+import { HelpLink } from "../help-overlay";
 
 // footer: the left column's last row, in flow under the focused song (the Options button, first-run's link). Outside the
 // per-song section, so it isn't remounted on every ↑/↓.
@@ -79,7 +80,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
     }
     if (isLearnKey(e) && song) {
       e.preventDefault();
-      return router.push(withOptions(withLevel(learnUrl(song.id), level), options[song.id]));
+      return router.push(learnHref(song.id));
     }
     if (isWatchKey(e) && song) {
       e.preventDefault();
@@ -106,13 +107,12 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
   }
 
   const playHref = (id: string) => withOptions(withLevel(`/play?song=${id}`, level), options[id]);
+  const learnHref = (id: string) => withOptions(withLevel(learnUrl(id), level), options[id]);
   return (
     <main className={styles.screen}>
       <header className={styles.top}>
         <h1 className={styles.wordmark}>{APP_NAME}</h1>
-        <p className={styles.hint}>
-          <b>↑↓</b> SELECT · <b>ENTER</b> PLAY · <b>P</b> PRACTICE · <b>L</b> LEARN · <b>W</b> WATCH · <b>E</b> EASY
-        </p>
+        <HelpLink />
       </header>
       <div className={styles.left}>
         {song && (
@@ -131,6 +131,8 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
               goToStage(playHref(song.id), router);
             }}
             onPractice={practiceHref ? () => router.push(practiceHref) : null}
+            onLearn={() => router.push(learnHref(song.id))}
+            onWatch={() => router.push(watchUrl(song.id))}
           >
             <LevelToggle normal={song.level} chart={chart?.id === song.id ? chart.chart : null} />
             <SongPreview id={song.id} />
@@ -138,7 +140,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
         )}
         {footer && <div className={styles.footer}>{footer}</div>}
       </div>
-      <ol className={styles.list} onKeyDown={onKeyDown}>
+      <ol className={styles.list} onKeyDown={onKeyDown} aria-label="Songs">
         {songs.map((s, i) => (
           <li key={s.id}>
             <Link

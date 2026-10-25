@@ -34,6 +34,7 @@ import { dynamics } from "./dynamics";
 import { records } from "./records";
 import { recordMoment } from "./record-moment";
 import { replayView } from "./replay-view";
+import { replayKeys } from "./replay-view/keys";
 import { eventSounds } from "./sound";
 import { simPlugin } from "./sim/plugin";
 import { tempoCurve } from "./tempo-curve";
@@ -64,6 +65,7 @@ import { nameThemeSwap } from "./x/name-theme/swap";
 // Open file: each game feature registers its plugin here, one line each. /play draws every plugin's layer on its
 // own canvas above the highway, forwards every GameEvent, and applies transformChart and wrapInput in this order.
 export const plugins: GamePlugin[] = [
+  replayKeys(), // first, before any transformChart: the replay keeps the take's keyboard, the chart as loaded (#419)
   nameThemeSwap(), // song=x/name-theme: first, the held name's chart replaces the placeholder for every plugin after
   easyCharts(), // ?level=easy: first, so every later plugin (chunks, loops, hands, bots, the judge) sees the Easy chart
   scoreCard(), // results panel: Save card, the take as a PNG; before bar-loop, so it keeps the song's own title

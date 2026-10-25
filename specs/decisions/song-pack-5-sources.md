@@ -29,3 +29,22 @@ and the files on it. All five hold: the right piece, the license the table names
   `minuet-g` does.
 - **How to undo:** each chart's `source` field carries this provenance. To swap a source, re-chart from the new file
   and edit its row here.
+
+## Excerpts and how to rebuild them
+These are the commands, run from `game-tools/midi-to-chart/` with the five files in `source/`. Each adds `--id`,
+`--title`, `--composer`, `--catalog`, `--source` and `-o`, taken from the chart's own fields.
+
+```bash
+.venv/bin/python convert.py source/anna-magdalena-05.mid --rh 1 --lh 2 --spans 0-48,0-48 --bpm 90 ...                     # minuet-g-minor
+.venv/bin/python convert.py source/anna-magdalena-22.mid --rh 1 --lh 2 --spans 0-16,0-16,16-40,16-40 --bpm 90 ...         # musette-d
+.venv/bin/python convert.py source/schumann-op68-10-gai-laboureur.mid --rh 1 --lh 3 --pickup 0.5 --bars 1-21 --bpm 90 ...  # happy-farmer
+.venv/bin/python convert.py source/schumann-op68-08-cavalier-sauvage.mid --rh 1 --lh 3 --spans 0-72 --start-beat 2.5 --bpm 120 ...  # wild-horseman
+.venv/bin/python convert.py source/16OldFrenchSong.mid --rh 1 --lh 2 --pickup 0.5 --bars 1-17 --bpm 60 ...                # old-french-song
+```
+
+- **Repeats:**
+  - **Minuet and Musette:** their MIDI files play each repeat once, so the spans write the repeats out.
+  - **The Wild Horseman:** its MIDI already unfolds the A repeat, so one span covers A, A and B. The first try used
+    two spans and played A three times; the note count against the LilyPond source caught it.
+- **No edits after the converter.** Its one change: in the Happy Farmer, the right hand's B♭3 at beat 13 was cut to
+  end where the left hand's B♭3 starts, half a beat later. This is the library's no-overlap rule.

@@ -44,3 +44,8 @@ Sources whose licenses ask for credit. Each chart's `source` field names its sou
   Petro Kostandy after Bosworth & Co. (1896) and Universal Edition (1910), licensed
   [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Changes: an excerpt (pickup and bars 1–13, the
   Lento) converted to a chart; the chart is shared under the same license.
+- **Invention No. 1 in C, BWV 772** (Johann Sebastian Bach), `web/public/songs/invention-1/`: charted from Mutopia
+  Project piece 40 (<https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=40>), typeset by jeff covey after the
+  Bach-Gesellschaft edition, licensed [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). Changes: an
+  excerpt (bars 1–14 and bar 15's first eighth, to the A minor cadence) converted to a chart, with the ornaments
+  charted as their main notes; the chart is shared under the same license.

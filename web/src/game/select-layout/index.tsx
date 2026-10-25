@@ -104,7 +104,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
     const links = [...e.currentTarget.querySelectorAll("a")];
     const next = links[focused + step];
     if (!next) return; // at the list's ends: no move, no sound
-    uiSound("move");
+    uiSound("move", 0, { key: shown[focused + step]?.key });
     next.focus();
     const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
     next.scrollIntoView({ block: "center", behavior: still ? "auto" : "smooth" });
@@ -112,7 +112,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
 
   // A plain click or Enter (a click with detail 0) moves into the stage; modifier and middle clicks stay links.
   function onPlay(e: MouseEvent<HTMLAnchorElement>) {
-    uiSound("confirm"); // Enter on a link clicks it too
+    uiSound("confirm", 0, { key: song?.key }); // Enter on a link clicks it too
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
     goToStage(e.currentTarget.getAttribute("href")!, router);
@@ -123,7 +123,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
     const header = document.getElementById(sectionId(key));
     const first = header?.parentElement?.querySelector("a");
     if (!header || !first) return;
-    uiSound("move");
+    uiSound("move", 0, { key: song?.key });
     first.focus({ preventScroll: true });
     const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
     header.scrollIntoView({ block: "start", behavior: still ? "auto" : "smooth" });
@@ -150,7 +150,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
             notes={song.noteCount}
             best={bestOf(song.id)}
             onPlay={() => {
-              uiSound("confirm");
+              uiSound("confirm", 0, { key: song.key });
               goToStage(playHref(song.id), router);
             }}
             onPractice={practiceHref ? () => router.push(practiceHref) : null}

@@ -1,20 +1,24 @@
-// UI sounds (spec: ui-sounds): short synthesized menu sounds, mixed under the music. Built from juice-sound's tone,
-// on this module's own AudioContext and gain, which follow juice-sound's effects volume and mute.
-import { beatSettings } from "../beat";
-import { getPrefs, subscribePrefs, tone } from "../sound";
+// UI sounds (spec: ui-sounds, then ui-sound-family): short menu sounds, mixed under the music. One soft celesta family
+// in the song's key, rendered by timbre.ts and played as AudioBuffers on this module's own AudioContext and gain,
+// which follow juice-sound's effects volume and mute.
+import { getPrefs, subscribePrefs } from "../sound";
 import { previewSettings } from "../song-preview/opening";
+import { admit, C_MAJOR, LENGTH_S, pileSettings, render, strikes, type Key, type Voice } from "./timbre";
+
+export type { Key } from "./timbre";
+export { keyOf } from "./timbre";
 
 export type UiSound = "move" | "confirm" | "back" | "sting" | "tick" | "tickAccent";
 
-// song-preview's laptop-tone peak (about 0.05): every UI node peaks at or under it, before the effects volume.
+// song-preview's laptop-tone peak (about 0.05), the reference the family sits under.
 export const UI_PEAK = (previewSettings.toneVolume * previewSettings.velocity) / 127;
 
 export const uiSoundSettings = {
-  levels: { move: UI_PEAK, confirm: UI_PEAK, back: UI_PEAK, sting: UI_PEAK, tick: UI_PEAK, tickAccent: UI_PEAK } satisfies Record<UiSound, number>,
+  underPreviewDb: 18, // every sound peaks this far under the preview, before the effects volume. Not 12: RMS binds (decision timbre)
+  restartS: 1, // after this long without a move, move's scale walk starts again on the tonic
 };
 
-const C5 = 523.25;
-const semis = (n: number) => C5 * 2 ** (n / 12);
+export const UI_LEVEL = UI_PEAK * 10 ** (-uiSoundSettings.underPreviewDb / 20);
 
 let ctx: AudioContext | null = null;
 let out: GainNode | null = null;
@@ -49,34 +53,39 @@ if (typeof window !== "undefined")
   for (const type of ["keydown", "pointerdown"])
     window.addEventListener?.(type, (e) => void (pressed ||= e.isTrusted), { capture: true, passive: true });
 
-// Plays a UI sound delayMs from now. Dropped, never queued, before that first press (Chrome starts audio only after
-// one), and when muted.
-export function uiSound(name: UiSound, delayMs = 0): void {
+type Playing = Voice & { src: AudioBufferSourceNode; gain: GainNode };
+let voices: Playing[] = [];
+let last = { atS: -Infinity, velocity: 1 };
+let step = 0;
+
+// Plays a UI sound delayMs from now, in the given key (C major without one). Dropped, never queued, before that first
+// press (Chrome starts audio only after one), and when muted.
+export function uiSound(name: UiSound, delayMs = 0, opts: { key?: Key } = {}): void {
   if (typeof window === "undefined" || typeof AudioContext === "undefined") return;
   if (!pressed) return;
   if (getPrefs().muted) return;
   const { ctx: c, out: o } = audio();
   if (c.state === "suspended") void c.resume(); // allowed now: there has been a gesture
   const t = c.currentTime + delayMs / 1000;
-  const L = uiSoundSettings.levels[name];
-  switch (name) {
-    case "move": // a short blip
-      tone(c, o, "triangle", semis(7), t, 0.03, L);
-      return;
-    case "confirm": // two rising notes
-      tone(c, o, "triangle", semis(7), t, 0.08, L);
-      tone(c, o, "triangle", semis(12), t + 0.07, 0.12, L);
-      return;
-    case "back": // two falling notes
-      tone(c, o, "triangle", semis(12), t, 0.08, L);
-      tone(c, o, "triangle", semis(7), t + 0.07, 0.12, L);
-      return;
-    case "sting": // a rising arpeggio, the last note held: about 0.8 s in all
-      [0, 4, 7, 12].forEach((s, i) => tone(c, o, "square", semis(s - 12), t + i * 0.07, i === 3 ? 0.55 : 0.1, L));
-      return;
-    case "tick": // beat-track's laptop click
-    case "tickAccent":
-      tone(c, o, "sine", name === "tick" ? beatSettings.clickHz : beatSettings.clickAccentHz, t, beatSettings.clickLengthS, L);
-      return;
+  if (name === "move") step = t - last.atS > uiSoundSettings.restartS ? 0 : step + 1;
+  const { live, steal, velocity } = admit(voices, last, t);
+  for (const v of steal) {
+    v.gain.gain.setValueAtTime(v.gain.gain.value, t);
+    v.gain.gain.linearRampToValueAtTime(0, t + pileSettings.fadeS);
+    v.src.stop(t + pileSettings.fadeS);
   }
+  const samples = render(strikes(name, opts.key ?? C_MAJOR, step), LENGTH_S[name], c.sampleRate, UI_LEVEL);
+  const buf = c.createBuffer(1, samples.length, c.sampleRate);
+  buf.copyToChannel(samples, 0);
+  const src = c.createBufferSource();
+  const gain = c.createGain();
+  src.buffer = buf;
+  gain.gain.value = velocity;
+  src.connect(gain).connect(o);
+  src.start(t);
+  voices = [...live, { src, gain, startS: t, endS: t + LENGTH_S[name] }];
+  last = { atS: t, velocity };
 }
+
+// The module's context and gain, for the Lab A/B's old sounds.
+export const uiAudio = () => audio();

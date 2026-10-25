@@ -3,6 +3,7 @@
 // kit chips. useFinder holds the state; the select renders the songs it returns.
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent, type ReactNode } from "react";
 import { kitChip } from "../duo-tokens";
+import { useReflow } from "../select-motion";
 import type { Song } from "../song-select/load";
 import { announcement, filterSongs, readLastPlayed, readSort, SORT_MODES, sortSongs, writeSort, type SortMode } from ".";
 import css from "./finder.module.css";
@@ -72,6 +73,7 @@ export function Finder({ finder, children }: { finder: ReturnType<typeof useFind
       row.closest("a")?.focus({ preventScroll: true });
     row?.scrollIntoView({ block: "center" }); // a statement: Chrome returns a Promise here, and an effect may return only a cleanup
   }, [sort, query]);
+  const reflow = useReflow(column, query); // select-motion: the rows glide to the filter; after the scroll above
   return (
     <div className={css.column} ref={column}>
       <div className={css.finder}>
@@ -82,7 +84,10 @@ export function Finder({ finder, children }: { finder: ReturnType<typeof useFind
               type="search"
               className={css.input}
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                reflow();
+                setQuery(e.target.value);
+              }}
               placeholder="title, composer, catalog"
               aria-label="Find a song"
               spellCheck={false}

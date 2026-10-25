@@ -364,6 +364,14 @@ describe("engraving", () => {
     expect([...xml.matchAll(/<beam number="1">(\w+)<\/beam>/g)].map((m) => m[1]).join(" ")).toBe("begin continue continue continue end");
   });
 
+  it("a 32nd at the end of a beat prints there, not at a sextuplet's 5/6 (the Pathétique, bar 16)", () => {
+    const notes = [
+      { id: "w0", pitch: 60, beat: 0, duration: 1 / 2, hand: "R" as const },
+      { id: "w1", pitch: 60, beat: 7 / 8, duration: 1 / 8, hand: "R" as const },
+    ];
+    expect(placeNotes(synthetic({ notes })).map((p) => p.onset)).toEqual([0, (7 / 8) * DIVISIONS]);
+  });
+
   it("a beat of 16ths over triplets snaps to 16ths and triplets, not to 32nds", () => {
     const tune = [0, 1, 2, 3].map((i) => ({ id: `u${i}`, pitch: 72 + i, beat: i / 4, duration: 1 / 4, hand: "R" as const }));
     const trip = [0, 1, 2].map((i) => ({ id: `v${i}`, pitch: 60 + i, beat: i / 3, duration: 1 / 3, hand: "R" as const }));

@@ -22,7 +22,7 @@
 .button {
   padding: 0.35em 1em;
   border: none;
-  border-radius: 6px;
+  border-radius: 0;
   background: var(--pa-cyan);
   color: var(--pa-bg);
   font: italic 800 1em var(--pa-font-display), system-ui, sans-serif;

@@ -2,6 +2,7 @@
 // labeled DEMO, and goes back to / eight seconds after the results. Without demo=1 it does nothing.
 import { useEffect, useRef } from "react";
 import type { Frame, GamePlugin } from "../../contracts";
+import { kitSettings } from "../duo-tokens";
 import { hudLayout, hudSettings } from "../hud";
 import { bg, cyan, whenDisplayFontReady } from "../ui-tokens";
 import { pickOutput, toneVoice, type Voice } from "../../replay/piano";
@@ -57,13 +58,13 @@ function drawBadge(ctx: CanvasRenderingContext2D, f: Frame, display: string) {
   const right = slots.card.x1 - Math.max(10, h * 0.25) * 0.5;
   const y = h * 0.7; // the composer row (hud: the title at 0.36 h, then 0.34 h down)
   ctx.beginPath();
-  ctx.roundRect(right - w, y - bh / 2, w, bh, bh * 0.22);
+  ctx.rect(right - w, y - bh / 2, w, bh); // Duo: square, framed in a hairline
   ctx.fillStyle = bg;
   ctx.fill();
   ctx.fillStyle = hudSettings.panelBg;
   ctx.fill();
   ctx.strokeStyle = cyan;
-  ctx.lineWidth = Math.max(2, h * 0.025);
+  ctx.lineWidth = kitSettings.hairline;
   ctx.stroke();
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";

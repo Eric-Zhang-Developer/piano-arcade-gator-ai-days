@@ -242,9 +242,11 @@ int main() {
   // The BOOT button: a press flips classy and demo and saves it; a bounce inside 40 ms doesn't count.
   Preferences::len = 0;
   hostBootDown = true; pump(60); hostBootDown = false; pump(60);
-  CHECK(cfg.demo == 1 && Preferences::len > 0 && sparksFlying() > 0, "BOOT: demo, saved, rainbow comets");
+  CHECK(cfg.demo == 1 && Preferences::len > 0 && sparksFlying() > 0, "BOOT: demo, saved, comets");
   hostBootDown = true; pump(5); hostBootDown = false; pump(5); hostBootDown = true; pump(60); hostBootDown = false; pump(60);
-  CHECK(cfg.demo == 0, "a bounce then a press: one flip, back to classy");
+  CHECK(cfg.demo == 2, "a bounce then a press: one step, to demo simple");
+  hostBootDown = true; pump(60); hostBootDown = false; pump(60);
+  CHECK(cfg.demo == 0, "and the next press is back to calm");
   pump(1500);
   Serial.feed({0xF0}); defaults(); pump(5); stopShows(); Preferences::len = 0;
 
@@ -292,7 +294,7 @@ int main() {
   for (int i = 0; i < 3; i++) { Serial.feed({0xFE}); pump(800); }
   int pauseLit = countLit();
   CHECK(showMode == SHOW_PAUSE && pauseShows == pauseBase + 1 && pauseLit > 100, "2 s of heartbeats: pause show, %d lit", pauseLit);
-  CHECK(leds[litFor(60)[0]].b > 60, "the paused hint still shows: %d", leds[litFor(60)[0]].b);
+  CHECK(leds[litFor(60)[0]].b < 40, "demo hides the paused hint (only the pause glow there): %d", leds[litFor(60)[0]].b);
   Serial.feed({0x90, 60, 0, 127, 0}); pump(20);
   CHECK(showMode == SHOW_NONE, "the next message ends the pause show");
   pump(1200);
@@ -324,6 +326,28 @@ int main() {
   CHECK(attractOn && countLit() > 100, "a heartbeat brings the aurora back: %d", countLit());
   Serial.feed({0x90, 62, 0, 127, 0, 0x80, 62}); pump(300);
   Serial.feed({0xF0}); defaults(); pump(5);
+
+  uint32_t wrongAtStart = wrongFlashes;
+  // Demo: a miss stays dark (no red, no ripple). Demo simple: no hint before a note, no red, no count-in show;
+  // a press lights its key and ripples, a miss does nothing. Calm still lights a miss red.
+  Serial.feed({0xB0, 9, 1, 0, 0xB0, 15, 1, 0, 0xA0, 40, 0, 0, 1, 0xA0, 40, 0, 0, 0});  // demo, a song is live
+  Serial.feed({0x90, 66, 127, 38, 47}); pump(60);
+  CHECK(countLit() == 0, "demo: a miss stays dark: %d lit", countLit());
+  Serial.feed({0x80, 66, 0xB0, 15, 2, 0, 0xF0}); pump(300);
+  CHECK(cfg.demo == 2 && showMode == SHOW_NONE && countLit() == 0, "demo simple: no count-in show (%d lit)", countLit());
+  Serial.feed({0xA0, 60, 0, 40, 127}); pump(300);
+  CHECK(countLit() == 0, "demo simple: no hint before the note: %d lit", countLit());
+  Serial.feed({0x90, 62, 127, 38, 47}); pump(60);
+  CHECK(countLit() == 0, "demo simple: a miss does nothing: %d lit", countLit());
+  Serial.feed({0x80, 62, 0x80, 64}); pump(60);
+  CHECK(countLit() == 0 && wrongFlashes == wrongAtStart, "demo simple: no red for a wrong key");
+  Serial.feed({0x90, 60, 127, 113, 61}); pump(150);
+  int simpleLit = countLit();
+  CHECK(simpleLit > (int)litFor(60).size() + 4, "demo simple: a press lights its key and ripples: %d lit", simpleLit);
+  Serial.feed({0x80, 60}); pump(1200);
+  CHECK(countLit() == 0, "demo simple: then dark again: %d", countLit());
+  std::printf("demo simple: a press lit %d LEDs with its ripple, everything else stayed dark\n", simpleLit);
+  Serial.feed({0xF0}); defaults(); pump(5); stopShows();
 
   // A save from older firmware (no hintRampMs at the end) still loads its calibration.
   Serial.feed({0xB0, 10, 160 & 127, 160 >> 7, 0xB0, 20, 0, 0}); pump(5);

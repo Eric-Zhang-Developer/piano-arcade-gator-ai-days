@@ -38,9 +38,10 @@
 //   12 jointIndex          first LED of the second strip (144 for two 1 m strips)
 //   13 jointGap x16        extra space at the joint, in 1/16 LED pitch (6.94 mm at 144/m)
 //   14 reverse 0/1         strip runs right to left (DIN at the treble end)
-//   15 demo 0/1             the shows' style: 0 classy (the default: brightness only, soft glows and fades, for
-//                          learning and normal play), 1 demo (sparks, bursts, comets, fireworks: for demos).
-//                          The board's BOOT button flips it and saves it
+//   15 demo 0-2            the mode: 0 calm (the default: hint build-up, wrong-key red, soft glows for the
+//                          count-in, fever, pause, the end and idle), 1 demo (calm plus the ripple on every press,
+//                          no red, no hint while paused), 2 demo simple (only the key light and the ripple, after
+//                          a press). The board's BOOT button steps through them and saves it
 //   20 save                write settings to flash (survive power off)
 //   21 defaults            reset settings to the compiled defaults (not saved until 20)
 
@@ -122,6 +123,12 @@ Key keys[128];
 Ripple ripples[MAX_RIPPLES];
 int nextRipple = 0;
 Settings cfg;
+// The modes (setting 15); see "The three modes" by demoExtras.
+#define MODE_CALM 0
+#define MODE_DEMO 1
+#define MODE_DEMO_SIMPLE 2
+inline bool demoSimple() { return cfg.demo == MODE_DEMO_SIMPLE; }
+inline bool showsOn() { return cfg.shows && !demoSimple(); }
 Preferences prefs;
 
 uint32_t lastByteAt = 0;
@@ -233,7 +240,7 @@ void setParam(uint8_t param, uint16_t v) {
     case 7: cfg.hintRampMs = v; break;
     case 8: cfg.wrongRed = v ? 1 : 0; break;
     case 9: cfg.shows = v ? 1 : 0; if (!cfg.shows) stopShows(); break;
-    case 15: cfg.demo = v ? 1 : 0; break;
+    case 15: cfg.demo = min<uint16_t>(v, MODE_DEMO_SIMPLE); if (demoSimple()) stopShows(); break;
     case 10: cfg.calLow = v / 16.0f; break;
     case 11: cfg.calHigh = v / 16.0f; break;
     case 12: cfg.jointIndex = min<uint16_t>(v, NUM_LEDS); break;
@@ -331,6 +338,11 @@ void burst(float pos, CRGB color, int count, float speed) {
 // be just the ripple. With them off, every show is drawn the calm way in both modes.
 #define DEMO_EXTRAS 0
 inline bool demoExtras() { return DEMO_EXTRAS && cfg.demo; }
+
+// The three modes (setting 15). Calm (0): everything as designed. Demo (1): calm plus the ripple on every press,
+// with no red (wrong keys and misses stay dark) and no hint while paused. Demo simple (2): only the key light and
+// the ripple, and only after a press: no hints before a note, no red, and none of the song shows.
+inline bool hintsShown() { return !demoSimple() && !(cfg.demo == MODE_DEMO && showMode == SHOW_PAUSE); }
 CRGB scale8Color(CRGB c, uint8_t v) { c.nscale8_video(v); return c; }
 
 // A bloom: a soft glow that spreads from pos to `reach` LEDs either side and fades out, brightest in the middle.
@@ -499,7 +511,7 @@ void feverReset(bool songEnded) {
 // so hints and hits stay on top (classy: the flow is slower and the whole glow breathes). Before fever, the
 // gauge shows: classy, a faint warm underglow that rises as it fills; demo, gold embers sparking more often.
 bool drawFever(uint32_t now, float dt) {
-  if (!cfg.shows) { feverGlow = 0; return false; }  // shows off: the gauge still counts, nothing draws
+  if (!showsOn()) { feverGlow = 0; return false; }  // shows off: the gauge still counts, nothing draws
   feverGlow = fever ? min(1.0f, feverGlow + dt / (demoExtras() ? 400 : 900)) : 0;
   if (feverGlow > 0) {
     uint8_t breath = demoExtras() ? 255 : 190 + scale8(sin8(now / 9), 65);
@@ -712,6 +724,13 @@ void runMessage(const uint8_t *m) {
   switch (m[0]) {
     case 0x90: {
       Key &k = keys[m[1]];
+      uint8_t j = judgedFrom(m);
+      // A miss is the game lighting a key nobody pressed. The demo modes keep it dark (no red) and only the
+      // gauge hears it.
+      if (j == J_MISS && cfg.demo != MODE_CALM) {
+        if (songLive) feverHit(m[1], j);
+        break;
+      }
       k.color = CRGB(scale7(m[2]), scale7(m[3]), scale7(m[4]));
       k.level = 1.0f;
       k.held = true;
@@ -721,17 +740,14 @@ void runMessage(const uint8_t *m) {
       // A hint still on after a hit is for this key's next note (the game keeps one hint lit across
       // a repeated note), so its ramp starts over from the hit. It shows once the key's light fades.
       if (k.hint) k.hintAt = millis();
-      startRipple(m[1], k.color);
-      if (songLive) {
-        uint8_t j = judgedFrom(m);
-        if (j) feverHit(m[1], j);
-      }
+      if (j != J_MISS) startRipple(m[1], k.color);  // ripples come from presses; a miss had none
+      if (songLive && j) feverHit(m[1], j);
       break;
     }
     case 0x80: {
       Key &k = keys[m[1]];
       // A release of a key that isn't lit: the game never sent its key on, so it was a wrong key.
-      if (cfg.wrongRed && songLive && !k.held && k.level <= 0 && m[1] >= LOW_NOTE && m[1] <= HIGH_NOTE) {
+      if (cfg.wrongRed && cfg.demo == MODE_CALM && songLive && !k.held && k.level <= 0 && m[1] >= LOW_NOTE && m[1] <= HIGH_NOTE) {
         k.color = CRGB::Red;
         k.level = 1.0f;
         k.flash = 0;
@@ -770,7 +786,7 @@ void runMessage(const uint8_t *m) {
       feverReset(ending);
       songLive = false;
       stopShows();
-      if (cfg.shows) startShow(ending ? SHOW_FINALE : SHOW_INTRO);
+      if (showsOn()) startShow(ending ? SHOW_FINALE : SHOW_INTRO);
       break;
     }
     case 0xF1: printHello(); break;
@@ -834,24 +850,32 @@ bool stepAnimations(float dtMs, uint32_t now) {
   return animating;
 }
 
-// Two wavefronts per ripple, one each way, 2 LEDs wide on either side. They start at 55% and fade
-// quadratically, so the key itself stays the brightest thing and a chord's ripples add up without
-// washing out. A ripple turns off on the frame it expires, and that frame draws it dark.
+// Two wavefronts per ripple, one each way. A splash, not a slide: they leave fast and slow down (ease-out, to
+// the same reach the first firmware had: RIPPLE_LEDS_PER_MS over the life), start a little white-hot and cool
+// into the key's color, and widen from 2 to 3.5 LEDs as they go; a faint wake glows behind each and fades with
+// it. They start at 70% and fade quadratically, so the key itself stays the brightest thing and a chord's ripples
+// add up without washing out. A ripple turns off on the frame it expires, and that frame draws it dark.
 void renderRipples(uint32_t now) {
   for (auto &r : ripples) {
     if (!r.on) continue;
     uint32_t age = now - r.start;
     uint16_t life = rippleLife();
     if (age >= life) { r.on = false; continue; }
-    float u = (float)age / life, amp = 0.55f * (1 - u) * (1 - u);
-    float radius = age * RIPPLE_LEDS_PER_MS;
+    float u = (float)age / life, fade = (1 - u) * (1 - u), amp = 0.7f * fade;
+    float radius = life * RIPPLE_LEDS_PER_MS * (1 - fade);  // ease-out: 1 - (1 - u)^2
+    float width = 2.0f + 1.5f * u;
+    CRGB crest = blend(r.color, CRGB::White, (uint8_t)(150 * fade * (1 - u)));  // white-hot early, then its color
     for (int side = -1; side <= 1; side += 2) {
       float p = r.center + side * radius;
-      for (int i = max(0, (int)floorf(p - 2)); i <= (int)ceilf(p + 2) && i < activeLeds; i++) {
-        float w = 1 - fabsf(i - p) / 2.0f;
-        if (w <= 0) continue;
-        CRGB c = r.color;
-        c.nscale8_video((uint8_t)(amp * w * 255));
+      int from = max(0, (int)floorf(min(p, r.center) - width)), to = min(activeLeds - 1, (int)ceilf(max(p, r.center) + width));
+      for (int i = from; i <= to; i++) {
+        float d = side * (i - r.center);                      // distance out along this side
+        float w = 1 - fabsf(i - p) / width;                     // the crest
+        float wake = d > 0 && d < radius ? 0.18f * (1 - d / radius) : 0;  // behind it, toward the key
+        float level = max(w > 0 ? w : 0.0f, wake);
+        if (level <= 0) continue;
+        CRGB c = w > wake ? crest : r.color;
+        c.nscale8_video((uint8_t)(amp * level * 255));
         leds[i] += c;  // saturating add
       }
     }
@@ -902,7 +926,7 @@ void renderKeys(uint32_t now) {
       c = k.color;
       if (k.flash > 0) c = blend(c, CRGB::White, (uint8_t)(k.flash * 200));
       c.nscale8_video((uint8_t)(k.level * 255));
-    } else if (k.hint) {
+    } else if (k.hint && hintsShown()) {
       c = scaleBy(k.hint, hintFactor(k, now));  // the key layer wins over the hint while a key is lit
     }
     if (!c) continue;
@@ -952,16 +976,20 @@ void checkBootButton(uint32_t now) {
   bootWas = down;
   bootChangedAt = now;
   if (!down) return;  // act on the press, not the release
-  cfg.demo = !cfg.demo;
+  cfg.demo = (cfg.demo + 1) % (MODE_DEMO_SIMPLE + 1);  // calm, demo, demo simple, calm...
+  if (demoSimple()) stopShows();
   saveSettings();
   printHello();  // the tester shows the new mode
   float mid = (activeLeds - 1) / 2.0f;
-  if (cfg.demo) {
+  if (cfg.demo == MODE_DEMO) {  // demo: comets in the UI colors out both ways
     for (int k = 0; k < 6; k++) {
       spark(mid, 0.22f + k * 0.03f, uiColor(k), 900);
       spark(mid, -(0.22f + k * 0.03f), uiColor(k + 1), 900);
     }
-  } else {
+  } else if (demoSimple()) {  // demo simple: one ripple from the middle, the only thing it does
+    ripples[nextRipple] = {mid, UI_BLUE, millis(), true};
+    nextRipple = (nextRipple + 1) % MAX_RIPPLES;
+  } else {  // calm: a soft white glow
     bloom(mid, CRGB(150, 150, 170), 1200, mid);
   }
   showLive = dirty = true;
@@ -997,7 +1025,7 @@ void loop() {
     watchdogFired = true;
     dirty = true;
   }
-  if (cfg.shows && songLive && showMode == SHOW_NONE && now - lastPlayAt > PAUSE_MS) {
+  if (showsOn() && songLive && showMode == SHOW_NONE && now - lastPlayAt > PAUSE_MS) {
     startShow(SHOW_PAUSE);
     pauseSweeps = 0;
     pauseShows++;

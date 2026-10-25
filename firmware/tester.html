@@ -70,7 +70,7 @@
       <label>Hint ramp ms <input id="ramp" type="number" min="0" max="5000" value="600"></label>
       <label><input id="wrong" type="checkbox" checked> Wrong keys red</label>
       <label><input id="shows" type="checkbox" checked> Count-in and song-end shows</label>
-      <label><input id="demo" type="checkbox"> Demo mode (or press BOOT on the board)</label>
+      <label>Mode <select id="demo"><option value="0">Calm</option><option value="1">Demo (ripple)</option><option value="2">Demo simple (ripple only)</option></select></label>
     </div>
     <div class="row">
       <button data-preset="low">Low (brightness 70)</button>
@@ -214,7 +214,7 @@ function showCfg() {
   if (cfg.ramp !== undefined) $('ramp').value = cfg.ramp;
   if (cfg.wrong !== undefined) $('wrong').checked = !!cfg.wrong;
   if (cfg.shows !== undefined) $('shows').checked = !!cfg.shows;
-  if (cfg.demo !== undefined) $('demo').checked = !!cfg.demo;
+  if (cfg.demo !== undefined) $('demo').value = String(cfg.demo);
 }
 
 // ---- MIDI
@@ -358,7 +358,7 @@ $('ripple').onchange = e => param(6, e.target.value);
 $('ramp').onchange = e => param(7, e.target.value);
 $('wrong').onchange = e => param(8, e.target.checked ? 1 : 0);
 $('shows').onchange = e => param(9, e.target.checked ? 1 : 0);
-$('demo').onchange = e => param(15, e.target.checked ? 1 : 0);
+$('demo').onchange = e => param(15, e.target.value);
 document.querySelectorAll('[data-preset]').forEach(b => b.onclick = () => {
   const v = b.dataset.preset === "low" ? 70 : 160;
   $('bright').value = v; param(1, v);

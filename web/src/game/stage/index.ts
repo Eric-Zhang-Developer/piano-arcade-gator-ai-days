@@ -1,22 +1,15 @@
 // Fever stage: a three.js star field behind the highway that streaks in fever (spec: fever-stage).
-// This file is the pure part (state, grid phase, frame budget, off switches) and the plugin; three.js is in scene.ts.
+// This file is the pure part (state, frame budget, off switches) and the plugin; three.js is in scene.ts.
 import type { Chart, GameEvent, GamePlugin } from "../../contracts";
-import { hudSettings, tierFor } from "../hud";
 import { blackKeyLaneSettings } from "../black-key-lanes";
-import { msPerBeat, settings as core } from "../core/settings";
+import { settings as core } from "../core/settings";
 import { makeScene } from "./scene";
 
-// ponytail: linesPerBeat, glow, flashMs and burstMs (and gridPhase) drove the retired grid and sun; nothing draws them
-// now. They go in a refactor once select-stage stops reading gridPhase.
 export const stageSettings = {
   maxLaneLuma: 0.35, // 0–1: the stage's brightest pixel behind the lanes, after the highway's backdrop
   pixelRatioCap: 1.5,
-  linesPerBeat: [1, 2, 3, 4], // per HUD tier; whole numbers, so the grid is on a line at every beat
-  glow: [0.45, 0.6, 0.8, 1], // grid brightness per HUD tier
   dipMs: 300, // miss / WRONG desaturation
   dipDepth: 0.85, // 0–1 of the saturation taken out at the dip's start
-  flashMs: 150, // count-in grid flash
-  burstMs: 900, // full-combo ring from the sun
   feverEaseMs: 400, // into and out of the hot palette
   budgetMs: 20, // freeze if the mean frame time over budgetWindowMs goes above this
   budgetWindowMs: 1000,
@@ -30,48 +23,33 @@ export const STAGE_KEY = "pianoArcade.stage";
 // ---------- state (pure) ----------
 
 export interface StageState {
-  tier: number; // index into hudSettings.tiers
   fever: boolean;
   feverAtMs: number; // when fever last turned on or off
   dipAtMs: number | null;
-  flashAtMs: number | null;
-  burstAtMs: number | null;
 }
 
-export const emptyStage = (): StageState => ({ tier: 0, fever: false, feverAtMs: -Infinity, dipAtMs: null, flashAtMs: null, burstAtMs: null });
-
-const tierIndex = (combo: number) => hudSettings.tiers.indexOf(tierFor(combo));
+export const emptyStage = (): StageState => ({ fever: false, feverAtMs: -Infinity, dipAtMs: null });
 
 export function reduceStage(s: StageState, e: GameEvent): StageState {
   switch (e.type) {
     case "songStart":
       return emptyStage();
-    case "combo":
-      return { ...s, tier: tierIndex(e.count) };
     case "noteMiss":
-    case "wrongNote": // both break the combo: speed back to tier 1
-      return { ...s, tier: 0, dipAtMs: e.atMs };
-    case "feverStart": // the count-in's grid flash too, so fever's start is a moment (fever-moment)
-      return { ...s, fever: true, feverAtMs: e.atMs, flashAtMs: e.atMs };
+    case "wrongNote":
+      return { ...s, dipAtMs: e.atMs };
+    case "feverStart":
+      return { ...s, fever: true, feverAtMs: e.atMs };
     case "feverEnd":
       return { ...s, fever: false, feverAtMs: e.atMs };
-    case "countInBeat":
-      return { ...s, flashAtMs: e.atMs };
-    case "fullCombo":
-      return { ...s, burstAtMs: e.atMs };
     default:
       return s;
   }
 }
 
-// What the scene shows at nowMs. Every value is 0–1 except speed.
+// What the scene shows at nowMs, each 0–1.
 export interface Look {
-  speed: number; // grid lines per beat
-  glow: number;
-  heat: number; // 0 normal palette … 1 fever
+  heat: number; // 0 out of fever … 1 fever: the stars' streak, and the stage's opacity
   dip: number; // desaturation
-  flash: number;
-  burst: number | null; // the burst's progress, null when none is playing
 }
 
 const fade = (atMs: number | null, nowMs: number, lengthMs: number) =>
@@ -79,23 +57,10 @@ const fade = (atMs: number | null, nowMs: number, lengthMs: number) =>
 
 export function look(s: StageState, nowMs: number): Look {
   const t = Math.min(1, Math.max(0, (nowMs - s.feverAtMs) / stageSettings.feverEaseMs));
-  const burst = s.burstAtMs === null ? 0 : (nowMs - s.burstAtMs) / stageSettings.burstMs;
   return {
-    speed: stageSettings.linesPerBeat[s.tier],
-    glow: stageSettings.glow[s.tier],
     heat: s.fever ? t : 1 - t,
     dip: fade(s.dipAtMs, nowMs, stageSettings.dipMs) * stageSettings.dipDepth,
-    flash: fade(s.flashAtMs, nowMs, stageSettings.flashMs),
-    burst: s.burstAtMs !== null && burst >= 0 && burst < 1 ? burst : null,
   };
-}
-
-// Where the grid is between two lines, 0–1, at nowMs on the chart clock. With whole lines per beat it's 0 at every
-// beat, count-in included, so the grid can't drift from the beat track.
-export function gridPhase(nowMs: number, bpm: number, linesPerBeat: number): number {
-  const lines = (nowMs / msPerBeat(bpm)) * linesPerBeat;
-  if (Math.abs(lines - Math.round(lines)) < 1e-9) return 0; // float error either side of a whole line counts as on it
-  return lines - Math.floor(lines);
 }
 
 // ---------- frame budget (pure) ----------
@@ -158,7 +123,6 @@ export function feverStage(): GamePlugin {
     },
     background(el) {
       if (off || !chart || typeof window === "undefined") return null;
-      const bpm = chart.bpm;
       const still = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
       const scene = makeScene(el, stageOpacity());
       if (!scene) return null; // no WebGL
@@ -179,7 +143,7 @@ export function feverStage(): GamePlugin {
             console.info(`fever-stage: frames averaged over ${stageSettings.budgetMs} ms for 1 s; the stage is frozen for this take`);
             return;
           }
-          scene.render(f, still ? { ...l, heat: 1, burst: null } : l, still ? 0 : gridPhase(f.nowMs, bpm, l.speed));
+          scene.render(f, still ? { ...l, heat: 1 } : l);
           drawn = true;
         },
         dispose: scene.dispose,

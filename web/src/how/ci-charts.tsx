@@ -79,6 +79,7 @@ export function Flight({ snap, points, peakRunning }: { snap: CiSnapshot; points
   const step = points.length > 1 ? points[1].t - points[0].t : 300;
   const area = (top: (p: FlightPoint) => number, bottom: (p: FlightPoint) => number) =>
     points.map((p) => `M${xOf(snap, p.t)},${y(bottom(p))}H${xOf(snap, p.t + step)}V${y(top(p))}H${xOf(snap, p.t)}Z`).join("");
+  const mainPeak = points.reduce<FlightPoint | null>((b, p) => (p.mainQueued > (b?.mainQueued ?? 0) ? p : b), null);
   const mainLine = points.map((p, i) => `${i ? "L" : "M"}${xOf(snap, p.t + step / 2)},${y(p.mainQueued)}`).join("");
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className={s.svg} role="img" aria-label="Browser jobs running and waiting across the night; a table follows">
@@ -86,6 +87,11 @@ export function Flight({ snap, points, peakRunning }: { snap: CiSnapshot; points
       <path d={area((p) => p.running, () => 0)} className={s.running} />
       <path d={area((p) => p.running + p.queued, (p) => p.running)} className={s.queued} />
       <path d={mainLine} className={s.mainLine} />
+      {mainPeak && (
+        <text x={xOf(snap, mainPeak.t + step / 2)} y={y(mainPeak.mainQueued) - 10} className={s.mainLabel} textAnchor="end" data-value="mainPeak" data-n={mainPeak.mainQueued}>
+          main waiting: {mainPeak.mainQueued}
+        </text>
+      )}
       {peakRunning !== null && (
         <g>
           <line x1={L} x2={W - R} y1={y(peakRunning)} y2={y(peakRunning)} className={s.ceiling} />

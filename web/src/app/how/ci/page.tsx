@@ -81,15 +81,36 @@ export default function CiPage() {
       <header className={styles.header}>
         <h1 className={styles.title}>HOW IT WORKS</h1>
         <Tabs current="/how/ci" />
-        <p data-read="">How the browser checks jammed one night, how we measured it, and what we changed.</p>
+        <p className={s.statement} data-read="">
+          One night the browser checks jammed. GitHub kept the record: here is what broke, what we measured, and what we changed.
+        </p>
         <p className={styles.dim} data-read="">
           From GitHub&apos;s run and PR records since <V k="since" v={asOf(snap.since)} />, frozen <V k="at" v={asOf(snap.at)} />.
         </p>
+        <div className={s.hero} data-hero="">
+          <DataCell size={72} label={peakR ? `Running at once · ${clock(snap, peakR.t)}` : "Running at once"} value={<V k="heroRunning" v={peakR?.value} />} />
+          <DataCell size={72} label={peakQ ? `Waiting · ${clock(snap, peakQ.t)}` : "Waiting for a runner"} value={<V k="heroQueued" v={peakQ?.value} />} tone="var(--pa-secondary)" />
+          <DataCell size={72} label="Main's longest wait" value={<V k="heroMainWait" v={mins(waitBefore?.min)} />} />
+          <DataCell size={72} label="PR push to green, median" value={<V k="heroGreen" v={mins(ba.beforeStats?.median)} />} />
+        </div>
       </header>
 
       <section className={s.panel} data-visual="flight">
         <h2 className={styles.h2}>Runners: who got one, and who waited</h2>
         <Panel style={{ padding: 16 }}>
+          <ul className={s.legend}>
+            <li data-read="">
+              <i style={{ background: "var(--pa-primary)" }} /> browser jobs running
+            </li>
+            <li data-read="">
+              <i style={{ background: "var(--pa-secondary)" }} /> waiting for a runner
+            </li>
+            <li data-read="">
+              <i style={{ background: "var(--pa-ink)", height: 3 }} /> main&apos;s jobs waiting
+            </li>
+          </ul>
+          <Flight snap={snap} points={pts} peakRunning={peak(pts, "running")?.value ?? null} />
+          <MarkKey snap={snap} />
           <Beats
             broke={
               <>
@@ -121,25 +142,17 @@ export default function CiPage() {
               )
             }
           />
-          <ul className={s.legend}>
-            <li data-read="">
-              <i style={{ background: "var(--pa-primary)" }} /> browser jobs running
-            </li>
-            <li data-read="">
-              <i style={{ background: "var(--pa-secondary)" }} /> waiting for a runner
-            </li>
-            <li data-read="">
-              <i style={{ background: "var(--pa-ink)", height: 3 }} /> main&apos;s jobs waiting
-            </li>
-          </ul>
-          <Flight snap={snap} points={pts} peakRunning={peak(pts, "running")?.value ?? null} />
-          <MarkKey snap={snap} />
         </Panel>
       </section>
 
       <section className={s.panel} data-visual="green">
         <h2 className={styles.h2}>A PR&apos;s time from push to green</h2>
         <Panel style={{ padding: 16 }}>
+          <div className={s.cells}>
+            <DataCell label="Before · median" value={<V k="cellBefore" v={mins(ba.beforeStats?.median)} />} />
+            <DataCell label="After · median" value={<V k="cellAfter" v={ba.afterStats ? mins(ba.afterStats.median) : MEASURING} />} tone={ba.afterStats ? undefined : "var(--pa-ink-dim)"} />
+          </div>
+          <Green snap={snap} runs={ba.before.concat(ba.after ?? [])} cut={cut} afterReady={afterReady} />
           <Beats
             broke={<>A change to shared code ran every browser check, so most PRs waited for the full suite.</>}
             measured={
@@ -163,17 +176,14 @@ export default function CiPage() {
               )
             }
           />
-          <div className={s.cells}>
-            <DataCell label="Before · median" value={<V k="cellBefore" v={mins(ba.beforeStats?.median)} />} />
-            <DataCell label="After · median" value={<V k="cellAfter" v={ba.afterStats ? mins(ba.afterStats.median) : MEASURING} />} tone={ba.afterStats ? undefined : "var(--pa-ink-dim)"} />
-          </div>
-          <Green snap={snap} runs={ba.before.concat(ba.after ?? [])} cut={cut} afterReady={afterReady} />
         </Panel>
       </section>
 
       <section className={s.panel} data-visual="merges">
         <h2 className={styles.h2}>Merges per hour</h2>
         <Panel style={{ padding: 16 }}>
+          <Merges snap={snap} hours={hours} />
+          <MarkKey snap={snap} />
           <Beats
             broke={<>The rule was: while main is red, merge nothing but the fix. A job timeout stopped every PR.</>}
             measured={
@@ -196,8 +206,6 @@ export default function CiPage() {
               )
             }
           />
-          <Merges snap={snap} hours={hours} />
-          <MarkKey snap={snap} />
         </Panel>
       </section>
 

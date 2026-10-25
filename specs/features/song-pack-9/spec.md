@@ -1,7 +1,7 @@
 ---
 name: "Song pack 9: five very easy songs, Hot Cross Buns, Mary Had a Little Lamb, London Bridge, the Jingle Bells refrain and Frère Jacques"
 depends_on: ["song-pack-1", "level-review"]
-owns: ["web/public/songs/hot-cross-buns/", "web/public/songs/mary-lamb/", "web/public/songs/london-bridge/", "web/public/songs/jingle-bells/", "web/public/songs/frere-jacques-solo/", "specs/features/song-pack-9/", "changes/song-pack-9.md", "specs/decisions/song-pack-9-"]
+owns: ["web/public/songs/hot-cross-buns/", "web/public/songs/mary-lamb/", "web/public/songs/london-bridge/", "web/public/songs/jingle-bells/", "web/public/songs/frere-jacques-solo/", "web/public/songs/flower-dance-demo/", "specs/features/song-pack-9/", "changes/song-pack-9.md", "specs/decisions/song-pack-9-"]
 assignee: "eric"
 ---
 

@@ -18,6 +18,7 @@ import { countIn } from "./count-in";
 import { stageCard } from "./stage-card";
 import { clearCard } from "./clear-card";
 import { feverArc } from "./fever-arc";
+import { touchVisible } from "./touch-visible";
 import { feverGauge } from "./fever-gauge";
 import { feverMoment } from "./fever-moment";
 import { juiceVisual } from "./juice";
@@ -82,6 +83,7 @@ export const plugins: GamePlugin[] = [
   keyPreview(), // ?keypreview=0 off: keys glow before their notes; after ghost (the final chart), under the octave wash and labels
   feverArc(), // fever as one arc on the beat: after every plugin that changes the chart, before its readers
   laptopOctaves(), // Z and X: after scenes and the sim (their bots aren't laptop keys), before note-labels (shifted pitches)
+  touchVisible(), // velocity to energy: after laptop-octaves, so the note-ons it taps carry the pitches noteHit judges
   noteLabels(), // after bar-loop, scenes and the sim: it labels the final chart and sees which device really played
   waitHint(), // ?mode=wait: after 3 s on a note, its key pulses, it sounds once and its name shows; after noteLabels, on the final chart
   juiceVisual(), // under the HUD: wisps and flares never cover the score

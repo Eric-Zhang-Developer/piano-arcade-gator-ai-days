@@ -67,12 +67,25 @@
   padding: 0 0 8vh;
   display: flex;
   flex-direction: column;
-  gap: 1.4vh;
   overflow-y: auto;
   scrollbar-width: none;
   mask-image: linear-gradient(to bottom, #000 calc(100% - 8vh), transparent 100%);
   /* It rests on a row's top edge, so a scrolled list never starts with a sliver of the row above. */
   scroll-snap-type: y mandatory;
+}
+
+/* main-page: one section, its header then its songs. */
+.songs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5vh;
+}
+
+.section + .section {
+  margin-top: 0.8vh;
 }
 
 .link {

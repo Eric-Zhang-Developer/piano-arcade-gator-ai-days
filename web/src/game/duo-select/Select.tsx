@@ -38,8 +38,8 @@ const fill: CSSProperties = { display: "flex", flexDirection: "column", minHeigh
 export function FocusPanel(p: FocusPanelProps) {
   const next = useNextFor(p.id);
   return (
-    <Brackets style={{ ...fill, flex: "0 1 auto" }}>
-      <Panel style={{ ...fill, flex: "0 1 auto", padding: "clamp(14px, 1.4vw, 26px)" }}>
+    <Brackets style={{ ...fill, flex: "1 1 auto" }}>
+      <Panel style={{ ...fill, flex: "1 1 auto", padding: "clamp(14px, 1.4vw, 26px)" }}>
         <section className={styles.panel} aria-live="polite" data-testid="focus-panel">
           <div className={styles.roll} style={{ viewTransitionName: "stage-jacket" }}>
             <PianoRoll roll={p.roll} />
@@ -115,6 +115,10 @@ function useNextFor(id: string): NextFor | null {
   return useMemo(() => readNextFor({ getItem: () => raw }, id), [raw, id]);
 }
 
+// A row's read text, in vh so a taller screen shows more rows rather than bigger ones (main-page): 16 px at 720, 24
+// px at 1080 (visual-direction.md).
+const rowRead = "clamp(16px, 2.25vh, 24px)";
+
 export function SongRow({ title, composer, level, roll, focused }: { title: string; composer: string; level: number; roll: Roll; focused: boolean }) {
   return (
     <Panel style={focused ? { border: "1px solid var(--pa-primary)", background: "color-mix(in srgb, var(--pa-primary) 7%, var(--pa-panel))", boxShadow: "inset 4px 0 0 var(--pa-primary)" } : undefined}>
@@ -126,14 +130,14 @@ export function SongRow({ title, composer, level, roll, focused }: { title: stri
           <div className={styles.rowTitle} title={title}>
             {title}
           </div>
-          <MonoLabel style={{ fontSize: "clamp(12px, 0.9vw, 17px)" }}>
+          <MonoLabel style={{ fontSize: rowRead, minWidth: 0, flex: "1 1 0" }}>
             <span className={styles.rowComposer} title={composer}>
               {shortComposer(composer)}
             </span>
           </MonoLabel>
         </div>
         <div className={styles.rowLevel}>
-          <MonoLabel style={{ fontSize: "clamp(12px, 0.85vw, 16px)" }}>LV</MonoLabel> <b>{lv(level)}</b>
+          <MonoLabel style={{ fontSize: rowRead }}>LV</MonoLabel> <b>{lv(level)}</b>
         </div>
       </div>
     </Panel>

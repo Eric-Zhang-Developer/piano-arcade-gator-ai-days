@@ -14,10 +14,10 @@ export function groupsOf(list: Experiment[]): { group: string; entries: Experime
 export function ExperimentsGallery({ experiments = registry }: { experiments?: Experiment[] }) {
   if (!experiments.length) return null;
   return (
-    <section className={styles.gallery} aria-labelledby="lab-experiments" data-testid="lab-experiments">
+    <section className={styles.gallery} id="on-trial" aria-labelledby="lab-experiments" data-testid="lab-experiments">
       <header className={styles.head}>
         <h2 id="lab-experiments" className={styles.title}>
-          Experiments
+          On trial
         </h2>
         <p className={styles.sub}>
           {experiments.length} on trial, each off until its button turns it on. Kept or cut after a look.

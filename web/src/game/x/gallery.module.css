@@ -2,6 +2,7 @@
    each experiment a filled button, a tone step above the ground. Primary for the target and focus; no hype pink. */
 .gallery {
   margin-top: 1.4em;
+  scroll-margin-top: 3em; /* "On trial ↓" lands below the fixed nav bar */
 }
 
 .head {
@@ -25,7 +26,7 @@
 }
 
 .group {
-  margin-top: 1em;
+  margin-top: 1.4em;
 }
 
 .groupTitle {
@@ -38,7 +39,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(17em, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(20em, 1fr));
   gap: 0.6em;
   margin: 0;
   padding: 0;
@@ -49,12 +50,16 @@
   display: flex;
 }
 
+/* The Lab entry's shape, filled: name and target on the first row, the line under them. */
 .button {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25em;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-content: start;
+  align-items: baseline;
+  column-gap: 1em;
+  row-gap: 0.15em;
   flex: 1;
-  padding: 0.7em 0.85em 0.65em;
+  padding: 0.55em 0.75em 0.6em;
   background: var(--pa-panel);
   color: inherit;
   text-decoration: none;
@@ -82,13 +87,16 @@
 }
 
 .line {
-  flex: 1;
+  grid-column: 1 / -1;
   color: var(--pa-ink);
 }
 
 .meta {
+  grid-column: 2;
+  grid-row: 1;
   color: var(--pa-primary);
   font-size: 0.85em;
+  white-space: nowrap;
 }
 
 @media (prefers-reduced-motion: reduce) {

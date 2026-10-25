@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { experiments } from "../x";
 import { ExperimentsGallery } from "../x/Gallery";
 import { labEntries, labGroups } from "./entries";
 import styles from "./lab.module.css";
@@ -26,9 +27,16 @@ export function Lab() {
         <p className={styles.sub}>
           {labEntries.length} things the menu doesn’t show. Each line is from its feature’s done note.
         </p>
-        <Link href="/" className={styles.back}>
-          Esc · Songs
-        </Link>
+        <nav className={styles.links}>
+          {experiments.length > 0 && (
+            <a href="#on-trial" className={styles.back}>
+              On trial ↓
+            </a>
+          )}
+          <Link href="/" className={styles.back}>
+            Esc · Songs
+          </Link>
+        </nav>
       </header>
       <div className={styles.groups}>
         {labGroups.map((g) => (

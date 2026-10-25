@@ -112,7 +112,7 @@ try {
     const btn = page.getByTestId("connect-lights");
     await btn.waitFor({ state: "attached", timeout: 60_000 });
     const text = await btn.textContent();
-    check(/Chrome or Edge/.test(text) && (await btn.isDisabled()), `no Web Serial: "${text}", disabled`);
+    check(/Chrome, Edge or Brave/.test(text) && (await btn.isDisabled()), `no Web Serial: "${text}", disabled`);
     await page.close();
   }
 

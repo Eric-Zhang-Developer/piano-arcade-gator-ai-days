@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { Chart, GameEvent } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
-import { hintDiff, hintRamp, hintsAt, judgedKey, ledSettings, lightMode, pressKey, rgb7, type Message, type Rgb } from "./messages";
+import { hintDiff, hintRamp, hintsAt, judgedKey, ledHandColors, ledSettings, lightMode, pressColor, pressKey, rgb7, type Message, type Rgb } from "./messages";
 
 // Twinkle: one hand, 600 ms a beat; C C G G A A G (60 60 67 67 69 69 67) from 0 ms.
 const chart: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
@@ -93,13 +93,33 @@ describe("pressKey", () => {
     expect(left?.slice(0, 2)).toEqual([0x90, 48]);
     expect(right?.slice(0, 2)).toEqual([0x90, 72]);
     expect(left?.slice(2)).not.toEqual(right?.slice(2));
-    const soft = pressKey([0x90, 72, 10])!, hard = pressKey([0x90, 72, 127])!;
-    expect(Math.max(...soft.slice(2))).toBeLessThan(Math.max(...hard.slice(2)) * 0.6); // softer presses send dimmer
+    expect(pressKey([0x90, 72, 10])).toEqual(pressKey([0x90, 72, 127])); // no weight: soft and hard look the same
     expect(pressKey([0x80, 48, 0])).toEqual([0x80, 48]);
     expect(pressKey([0x90, 48, 0])).toEqual([0x80, 48]); // a note on at velocity 0 is a release
+  });
+  it("uses the picked colors (the Lights panel's setting)", () => {
+    const picked = { L: "#ff0000", R: "#00ff00" };
+    expect(pressKey([0x90, 48, 100], picked)).toEqual([0x90, 48, 127, 0, 0]);
+    expect(pressKey([0x90, 72, 100], picked)).toEqual([0x90, 72, 0, 127, 0]);
   });
   it("ignores everything that isn't a key", () => {
     expect(pressKey([0xb0, 64, 127])).toBeNull(); // the sustain pedal
     expect(pressKey([0xfe])).toBeNull(); // active sensing
+  });
+});
+
+describe("pressColor (Demo on /play)", () => {
+  // Twinkle with its first note in the left hand: a middle C that is the left hand's, though it's right of middle C.
+  const duo: Chart = { ...chart, notes: chart.notes.map((n, i) => ({ ...n, hand: i === 0 ? "L" : "R" })) };
+  const [first] = duo.notes;
+  const BLUE = rgb7(ledHandColors.L), PINK = rgb7(ledHandColors.R);
+  it("a press takes its falling note's hand: blue left, pink right", () => {
+    expect(BLUE).not.toEqual(PINK);
+    expect(pressColor(duo, -LEAD, new Set(), 60)).toEqual(BLUE);
+    expect(pressColor(duo, -LEAD + 600, new Set([first.id]), 60)).toEqual(PINK); // then the next C's
+  });
+  it("a key with no note falling takes its side's color", () => {
+    expect(pressColor(duo, -LEAD - 1, new Set(), 60)).toEqual(PINK); // not falling yet: right of middle C
+    expect(pressColor(duo, -LEAD, new Set(), 48)).toEqual(BLUE); // no note on that key, left of middle C
   });
 });

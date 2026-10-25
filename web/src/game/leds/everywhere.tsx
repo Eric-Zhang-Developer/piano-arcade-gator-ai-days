@@ -1,5 +1,5 @@
 // The lights on every page (root layout): with the board on and Demo picked, every key pressed on the piano lights
-// with its ripple, whatever page is open. A small Lights button by the top corner's Controls hint connects the board, flips Demo and shows
+// with a quick ripple, whatever page is open (on /play mid-song the game lights them, in the falling notes' colors). A small Lights button by the top corner's Controls hint connects the board, flips Demo and shows
 // whether the keyboard and the lights are there; /play has the same in its pause menu, so the button stays off it.
 "use client";
 import { usePathname } from "next/navigation";
@@ -7,8 +7,8 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { captureOn } from "../capture-mode";
 import { kitChip, Panel } from "../duo-tokens";
 import { hideNav } from "../nav-bar/slots";
-import { ConnectLights, DemoLights, lightModeNow, subscribeLightMode } from ".";
-import { hintRamp, lightMode, pressKey } from "./messages";
+import { ConnectLights, DemoLights, gameOwnsPresses, LightBrightness, LightColors, lightColorsNow, lightModeNow, subscribeLightMode } from ".";
+import { hintRamp, lightMode, pedal, pressKey, rippleLength, sustainMs } from "./messages";
 import { autoConnect, linkState, send, subscribe, type LinkState } from "./serial";
 
 type Midi = { inputs: Map<string, MidiInput>; onstatechange: unknown; addEventListener(t: "statechange", l: () => void): void };
@@ -24,7 +24,11 @@ function usePiano(wanted: boolean): string | null {
     let gone = false;
     let wired: MidiInput[] = [];
     const onMessage = (e: { data: Uint8Array }) => {
-      const m = linkState() === "ready" && lightModeNow() === 1 ? pressKey(e.data) : null;
+      if (linkState() !== "ready" || lightModeNow() !== 1) return;
+      // The sustain pedal, on every page (/play too): held, the ripples ring longer and further.
+      const down = pedal(e.data);
+      if (down !== null) return send(rippleLength(down ? sustainMs : 0));
+      const m = gameOwnsPresses() ? null : pressKey(e.data, lightColorsNow());
       if (m) send(m);
     };
     const unwire = () => {
@@ -57,7 +61,7 @@ const noop = () => () => {};
 
 export function LightsEverywhere() {
   const s = useSyncExternalStore(subscribe, linkState, () => "off" as LinkState);
-  const m = useSyncExternalStore(subscribeLightMode, lightModeNow, () => 0 as const);
+  const m = useSyncExternalStore(subscribeLightMode, lightModeNow, () => 1 as const);
   const capture = useSyncExternalStore(noop, captureOn, () => false);
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -66,9 +70,10 @@ export function LightsEverywhere() {
   useEffect(autoConnect, []);
   // A board that restarted is back in whatever it last saved: send the chosen mode on every connect.
   useEffect(() => {
-    if (s === "ready") for (const msg of [hintRamp(), lightMode(m)]) send(msg);
+    if (s === "ready") for (const msg of [hintRamp(), lightMode(m), rippleLength(0)]) send(msg);
   }, [s, m]);
-  if (s === "unsupported" || capture || hideNav(pathname, false)) return null;
+  // A browser with no Web Serial still gets the button: its panel says why (an old Brave, plain http).
+  if (capture || hideNav(pathname, false)) return null;
   return (
     <div data-testid="lights-everywhere" style={{ position: "fixed", right: 160, top: 38, zIndex: 40, display: "grid", gap: 8, justifyItems: "end" }}>
       <button
@@ -90,6 +95,8 @@ export function LightsEverywhere() {
             <ConnectLights />
             <DemoLights />
           </span>
+          <LightColors />
+          <LightBrightness />
         </Panel>
       )}
     </div>

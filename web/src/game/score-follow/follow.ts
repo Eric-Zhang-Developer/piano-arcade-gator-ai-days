@@ -139,6 +139,112 @@ export function follower(chart: Chart, onsetBeats: readonly number[], startRate 
   };
 }
 
+// The estimating follower (the spike's second box, FINDINGS.md): a Kalman filter on the wall time of the last onset
+// and the ms per beat (order 2), or those and the ms per beat's change per beat (order 3), so each press's jitter is
+// averaged into the state instead of jumped to, and a tempo that keeps moving is tracked. Wall time is linear in the
+// state between onsets, which keeps the model linear: predict the next onset's wall time, measure the press. The first
+// press fixes the phase; the tempo starts at startRate with a wide variance, so the second press sets it.
+export interface KalmanTune {
+  order: 2 | 3;
+  pressSdMs: number; // R = this²: how far a press lands from the player's intended beat
+  drift: number; // q: the white noise driving the highest state (ms per beat per beat for order 2, per beat² for 3)
+  startSd: number; // the start tempo's sd, as a fraction of its ms per beat
+  startAccelSd: number; // order 3: the start sd of the ms per beat's change per beat, as a fraction of the ms per beat
+}
+// The sweep's pick (FINDINGS.md): order 3, R matched to the scripted jitter's sd (uniform ±30 ms), q from the sweep.
+export const kalmanTune: KalmanTune = { order: 3, pressSdMs: 17, drift: 1, startSd: 0.5, startAccelSd: 0.02 };
+
+type M = number[][];
+const mul = (a: M, b: M): M => a.map((r) => b[0].map((_, j) => r.reduce((s, x, k) => s + x * b[k][j], 0)));
+const tr = (a: M): M => a[0].map((_, j) => a.map((r) => r[j]));
+const add = (a: M, b: M): M => a.map((r, i) => r.map((x, j) => x + b[i][j]));
+
+// Transition and process noise over d beats (constant velocity or constant acceleration, white noise on the top state).
+function model(order: 2 | 3, d: number, q: number): { F: M; Q: M } {
+  if (order === 2)
+    return { F: [[1, d], [0, 1]], Q: [[(q * d ** 3) / 3, (q * d * d) / 2], [(q * d * d) / 2, q * d]] };
+  return {
+    F: [[1, d, (d * d) / 2], [0, 1, d], [0, 0, 1]],
+    Q: [
+      [(q * d ** 5) / 20, (q * d ** 4) / 8, (q * d ** 3) / 6],
+      [(q * d ** 4) / 8, (q * d ** 3) / 3, (q * d * d) / 2],
+      [(q * d ** 3) / 6, (q * d * d) / 2, q * d],
+    ],
+  };
+}
+
+export function kalmanFollower(chart: Chart, onsetBeats: readonly number[], startRate = 1, tune: KalmanTune = kalmanTune) {
+  const base = chart.bpm / 60000;
+  const mpbAt = (rate: number) => 1 / (base * clampRate(rate));
+  const [minP, maxP] = [mpbAt(flowSettings.maxRate), mpbAt(flowSettings.minRate)];
+  const n = tune.order;
+  const R = tune.pressSdMs ** 2;
+  let refBeat = onsetBeats[0] ?? 0;
+  let waiting = true; // at refBeat, until it's played
+  let x: number[] = [0, mpbAt(startRate), 0].slice(0, n); // [wall ms of refBeat, ms per beat, (its change per beat)]
+  const sd0 = [0, tune.startSd * x[1], tune.startAccelSd * x[1]];
+  let C: M = x.map((_, i) => x.map((_, j) => (i === j ? sd0[i] ** 2 : 0)));
+  let next = 0;
+
+  const cap = () => (next < onsetBeats.length ? onsetBeats[next] + followSettings.waitBeats : Infinity);
+  const P = () => Math.min(maxP, Math.max(minP, x[1]));
+  // wall time of beat, from the state
+  const wallOf = (beat: number) => {
+    const d = beat - refBeat;
+    return x[0] + d * P() + (n === 3 ? (x[2] * d * d) / 2 : 0);
+  };
+  const raw = (wall: number) => {
+    if (waiting) return refBeat;
+    let lo = refBeat;
+    let hi = refBeat + 64;
+    for (let i = 0; i < 40; i++) {
+      const mid = (lo + hi) / 2;
+      if (wallOf(mid) < wall) lo = mid;
+      else hi = mid;
+    }
+    return lo;
+  };
+
+  return {
+    beatAt: (wall: number) => Math.min(raw(wall), cap()),
+    wallAt(beat: number): number {
+      if (waiting || beat > cap() + 1e-9) return Infinity;
+      return wallOf(beat);
+    },
+    played(k: number, wall: number) {
+      if (k < next) return;
+      const b = onsetBeats[k];
+      if (waiting || raw(wall) >= cap() - 1e-9) {
+        // the first press, or a resume after a wait: the phase is the press; the tempo stays (a wait isn't a sample)
+        x[0] = wall;
+        C = C.map((r, i) => r.map((c, j) => (i === 0 || j === 0 ? (i === j ? R : 0) : c)));
+        waiting = false;
+      } else {
+        const { F, Q } = model(n, b - refBeat, tune.drift ** 2);
+        const px = mul(F, x.map((v) => [v])).map((r) => r[0]);
+        const pC = add(mul(mul(F, C), tr(F)), Q);
+        const S = pC[0][0] + R;
+        const K = pC.map((r) => r[0] / S);
+        const r = wall - px[0];
+        x = px.map((v, i) => v + K[i] * r);
+        C = pC.map((row, i) => row.map((c, j) => c - K[i] * pC[0][j]));
+      }
+      refBeat = b;
+      next = k + 1;
+    },
+    halt() {
+      refBeat = onsetBeats[next] ?? refBeat;
+      waiting = true;
+    },
+    get rate() {
+      return 1 / (P() * base);
+    },
+    get next() {
+      return next;
+    },
+  };
+}
+
 export type Follower = ReturnType<typeof follower>;
 
 // Sends the band's events as their time comes within the lookahead, each once, at the wall time wallAt gives then

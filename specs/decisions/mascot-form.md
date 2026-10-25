@@ -25,6 +25,8 @@ Every colour is a ui-tokens value:
 
 The viewBox is cropped to the art (`3.5 8.5 56 56`).
 
+**D, the happy pose, is the tutor's for a take with no weak run** (Eric: "A." to "Ship A with D as the happy pose?").
+
 **The others ship as files** in `web/public/mascot/`, under the same palette test.
 
 **How to undo or swap.** Copy another file over `web/public/learning/companion-gator.svg` and

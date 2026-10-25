@@ -12,6 +12,6 @@ variants ship as files for a swap.
 by CI. Not seen by Eric in the app.
 ## Gaps
 - No Lab entries; the spec cuts them.
-- One pose in use.
+- Two poses in use: the loaf, and the happy pose (D) on a tutor with no weak run.
 - /learn wasn't shot.
 - The old PNGs stay in `web/public/learning/`.

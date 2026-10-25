@@ -7,7 +7,7 @@ import { duoPanelSettings } from ".";
 
 const pub = new URL("../../../public/", import.meta.url);
 const files = ["learning/companion-gator.svg", ...readdirSync(new URL("mascot/", pub)).map((f) => `mascot/${f}`)];
-const palette = new Set(Object.values(tokens).filter((v): v is string => typeof v === "string" && v.startsWith("#")));
+const palette = new Set(Object.values(tokens).filter((v: unknown): v is string => typeof v === "string" && v.startsWith("#")));
 const maxBytes = 2500; // the largest variant (the sticker, its silhouette drawn twice) is about 2.1 KB
 
 describe("mascot SVGs", () => {
@@ -25,6 +25,7 @@ describe("mascot SVGs", () => {
   it("the default is the select's gator, and the results tutor shows it", () => {
     expect(readFileSync(new URL("learning/companion-gator.svg", pub), "utf8")).toBe(readFileSync(new URL("mascot/a-loaf.svg", pub), "utf8"));
     expect(existsSync(new URL(duoPanelSettings.gator.slice(1), pub))).toBe(true);
+    expect(existsSync(new URL(duoPanelSettings.happyGator.slice(1), pub))).toBe(true);
     expect(duoPanelSettings.gator).toBe("/learning/companion-gator.svg");
   });
 });

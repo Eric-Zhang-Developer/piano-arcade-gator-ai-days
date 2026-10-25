@@ -26,6 +26,8 @@ import argparse
 import json
 import re
 import sys
+from bisect import bisect_right
+from collections import Counter
 from fractions import Fraction
 from pathlib import Path
 
@@ -96,13 +98,14 @@ DYNAMICS = {"ppp", "pp", "p", "mp", "mf", "f", "ff", "fff", "sf", "sfz", "fp", "
 PEDAL = {"sustainOn": "down", "sustainOff": "up", "sustainDown": "down", "sustainUp": "up"}
 
 
-def ly_voice(text, name, unfold=False, marks=()):
+def ly_voice(text, name, unfold=False, marks=(), trace=None):
     """A LilyPond voice or context, read for timing only: ([note onsets], [(onset, mark)]), in quarter notes from its start.
 
     Repeats play the way the score's MIDI plays them: a volta repeat once with its alternatives in turn, or with
     unfold=True (a MIDI made through \\unfoldRepeats) its body before each alternative. A mark is postfix: it belongs to
     the onset of the note, chord, rest or skip it follows. Marks read: dynamics, hairpins, accents, the sustain pedal, and any
-    names in `marks` (a score's own pedal macros). Pitches, markup, scheme and strings are skipped."""
+    names in `marks` (a score's own pedal macros). Pitches, markup, scheme and strings are skipped. `trace`, if given, gets
+    (text index, onset) for every note, chord, rest and skip read."""
     text = re.sub(r"%\{.*?%\}|%[^\n]*", "", text, flags=re.S)
     start = (re.search(r'\\new\s+\w+\s*=\s*"' + re.escape(name) + r'"\s*(?=\{)', text)  # a context with its music here
              or re.search(r"^\s*" + re.escape(name) + r"\s*=", text, re.M))  # or a variable
@@ -157,37 +160,35 @@ def ly_voice(text, name, unfold=False, marks=()):
                 return skip_arg(j)
             j = m.end()
 
-    def event(d, sounding):  # a tied-into note sounds on, but isn't struck again
+    def event(d, sounding, at):  # a tied-into note sounds on, but isn't struck again
         state["onset"] = state["t"]
+        if trace is not None:
+            trace.append((at, state["t"]))
         if sounding and not state["tied"]:
             notes.append(state["t"])
         state["t"] += d
         state["tied"] = False
 
-    def music(j, until="}"):  # read music from j to the closing `until`; returns the index after it
+    def music(j, until="}", stop=()):  # read music from j to the closing `until` (the index after it), or to a `stop`
         while True:
             j = len(text[j:]) - len(text[j:].lstrip()) + j
             if j >= len(text):
                 return j
             c = text[j]
-            if text.startswith(until, j):
+            if until and text.startswith(until, j):
                 return j + len(until)
+            if any(text.startswith(s, j) for s in stop):
+                return j
             if text.startswith("<<", j):
-                t0, ends, j = state["t"], [], j + 2
-                while True:  # branches split by \\, each from t0; the slowest sets the time after
-                    j = music(j, "\\\\") if branch_has(j, "\\\\") else music(j, ">>")
-                    ends.append(state["t"])
-                    if text.startswith(">>", j - 2):
-                        break
-                    state["t"] = t0
-                state["t"] = max(ends)
+                j = simultaneous(j + 2)
                 continue
             if c == "{":
                 j = music(j + 1)
                 continue
             if c == "<":  # a chord: its notes sound together, for the duration after the >
+                at = j
                 d, j = length(text.index(">", j) + 1)
-                event(d, True)
+                event(d, True, at)
                 continue
             if c in '"':
                 j = skip_arg(j)
@@ -260,8 +261,8 @@ def ly_voice(text, name, unfold=False, marks=()):
                         j = skip_arg(j)  # the pitch; \major follows as a command
                     elif w == "time":
                         j = re.compile(r"\s*[\d/,]+").match(text, j).end()
-                    elif w == "partial":
-                        j = re.compile(r"\s*\d+\.*(?:\*\d+(?:/\d+)?)?").match(text, j).end()
+                    elif w == "partial":  # its duration carries to the next note, as any written duration does
+                        j = length(len(text[j:]) - len(text[j:].lstrip()) + j)[1]
                     elif w == "relative":
                         m = NOTE.match(text, len(text[j:]) - len(text[j:].lstrip()) + j)
                         j = m.end() if m and text[j:].lstrip()[0] != "{" else j
@@ -272,8 +273,9 @@ def ly_voice(text, name, unfold=False, marks=()):
                 continue
             m = NOTE.match(text, j)
             if m:
+                at = j
                 d, j = length(m.end())
-                event(d, m.group(1) not in ("r", "R", "s"))
+                event(d, m.group(1) not in ("r", "R", "s"), at)
                 continue
             if c in "-^_" and text.startswith(">", j + 1):  # an accent, ->
                 out.append((state["onset"], "accent"))
@@ -281,6 +283,32 @@ def ly_voice(text, name, unfold=False, marks=()):
                 continue
             state["tied"] |= c == "~"
             j += 1  # anything else: ties, slurs, beams, articulation, fingering, bar checks
+
+    def simultaneous(j):  # from after <<, all from one time; the slowest sets the time after. Returns the index after >>
+        t0, ends = state["t"], []
+        if branch_has(j, "\\\\"):  # voices split by \\: each reads on to the next \\
+            while True:
+                j = music(j, "\\\\") if branch_has(j, "\\\\") else music(j, ">>")
+                ends.append(state["t"])
+                if text.startswith(">>", j - 2):
+                    break
+                state["t"] = t0
+        else:  # each braced block or nested << >> (\context Voice = "1" { ... } too) starts at t0
+            while True:
+                j = len(text[j:]) - len(text[j:].lstrip()) + j
+                if j >= len(text) or text.startswith(">>", j):
+                    j += 2
+                    break
+                state["t"] = t0
+                if text.startswith("<<", j):
+                    j = simultaneous(j + 2)
+                elif text[j] == "{":
+                    j = music(j + 1)
+                else:  # a header, \voiceOne, a lone note: read up to the next block
+                    j = music(j, None, ("{", "<<", ">>"))
+                ends.append(state["t"])
+        state["t"] = max(ends, default=t0)
+        return j
 
     def branch_has(j, sep):  # does a << >> branch end at a \\ before its >>?
         depth, k = 0, j
@@ -302,6 +330,28 @@ def ly_voice(text, name, unfold=False, marks=()):
 
     music(i + 1)
     return notes, out
+
+
+def ly_unfolded_marks(text, name, ref):
+    """The marks of a line written once beside voices that repeat (Wild Horseman's dynamics, outside its \\repeat volta),
+    placed everywhere `ref` plays that written point when its repeats are unfolded: a mark takes the offset of the last
+    note, rest or skip of `ref` at or before it."""
+    written, played = [], []
+    ly_voice(text, ref, trace=written)
+    ly_voice(text, ref, unfold=True, trace=played)
+    plays, count, seen, points = {}, Counter(i for i, _ in written), Counter(), []
+    for i, t in played:
+        plays.setdefault(i, []).append(t)
+    for i, t in written:  # a note read once as written but twice played (a volta body) maps to both plays
+        u = plays.get(i, [])
+        points.append((t, [u[seen[i]]] if len(u) == count[i] else u))
+        seen[i] += 1
+    points.sort(key=lambda p: p[0])
+    out = []
+    for t, m in ly_voice(text, name)[1]:
+        k = bisect_right([w for w, _ in points], t) - 1
+        out += [(t - points[k][0] + u, m) for u in points[k][1]] if k >= 0 else [(t, m)]
+    return sorted(out, key=lambda e: e[0])
 
 
 def ly_pedal(text, name, down="sustainOn", up="sustainOff"):
@@ -476,6 +526,17 @@ def self_test():
     assert got == ["R@0=p", "R@1=mp", "R@5=p", "R@1-3~+16", "R@4!", "L@0=p", "L@5=p", "L@1-5~-16", "L@5!"], got
     assert ly_marks({"R": [(1, "p")]}, [(0, 2, 0), (0, 2, 2)], 4) == ["R@1=p", "R@3=p", "L@1=p", "L@3=p"]
     assert ly_voice(r"v = { c4-> d\accent e^> f\sf }", "v")[1] == [(0, "accent"), (1, "accent"), (2, "accent"), (3, "sf")]
+    # Happy Farmer: a << >> with no \\ holds simultaneous voices, a \context header's words included; a \\ still splits.
+    ly = r'v = { c4 << { d4-> e-> } \context Voice = "1" { \voiceOne f2\sf } >> g4-> << { a4 } \\ { b8-> c } >> d4-> }'
+    assert ly_voice(ly, "v")[1] == [(1, "accent"), (2, "accent"), (1, "sf"), (3, "accent"), (4, "accent"), (5, "accent")]
+    assert ly_voice(r"v = { \partial 8 c\( d4-> }", "v")[1] == [(Fraction(1, 2), "accent")]  # its lower's pickup: an eighth
+    # Wild Horseman: the dynamics line is written once beside a volta (pickup, 2 bars, 2 alternatives of a bar); unfolded,
+    # the body's marks land in both passes and the alternatives' and the coda's after them.
+    ly = r"""up = { \partial 4 c4 \repeat volta 2 { d2 e2 } \alternative { { f2 } { g2 } } a2 b2 }
+      dyn = { s4\mf s2\sf s2 s2\p s2\f s2 s2\sf }"""
+    assert ly_voice(ly, "dyn", unfold=True) == ly_voice(ly, "dyn")  # it has no repeat of its own
+    # Played: c 0, d 1 and 7, e 3 and 9, f 5, g 11, a 13, b 15.
+    assert ly_unfolded_marks(ly, "dyn", "up") == [(0, "mf"), (1, "sf"), (5, "p"), (7, "sf"), (11, "f"), (15, "sf")]
     print("self-test: pass")
 
 
@@ -550,7 +611,15 @@ def dynamics(a, bars, spans):
             if msg.type == "note_on" and msg.velocity:
                 onsets.add((Fraction(t, mid.ticks_per_beat), msg.note))
     text = Path(a.ly).read_text()
-    voices = {h: [m for v in names.split(",") for m in ly_voice(text, v, unfold=a.unfold)[1]]
+    def marks_of(v, names):  # with --unfold, a line with no repeat of its own repeats with the first voice that has one
+        own = ly_voice(text, v, unfold=a.unfold)
+        if a.unfold and own == ly_voice(text, v):
+            ref = next((r for r in names if ly_voice(text, r, unfold=True) != ly_voice(text, r)), None)
+            if ref:
+                return ly_unfolded_marks(text, v, ref)
+        return own[1]
+
+    voices = {h: [m for v in names.split(",") for m in marks_of(v, names.split(","))]
               for h, names in (("R", a.right), ("L", a.left)) if names}
     chart = json.loads(Path(a.chart).read_text())
     end = max(Fraction(n["beat"]) + Fraction(n["duration"]) for n in chart["notes"])

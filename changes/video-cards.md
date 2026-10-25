@@ -5,4 +5,4 @@ The video's title card is played: Étude's letters land on the game's hit line, 
 ## How to check it
 `localhost:3001/shots?card=title&capture=1` (click or press a key for the laptop voice) and `?card=end&capture=1`; `&t=<ms>` freezes the title at that time. `verify-shots.mjs`: not verified locally; covered by main's scheduled full run. Not seen by Eric.
 ## Gaps
-No DGX attached: the letter-vs-note timing was measured on the laptop voice only, in a hidden pane (0–18 ms over 3 runs; one letter at 18 ms, over the 16.7 ms frame). The burst isn't in the frozen shots. WebMs with sound (d) not made: the pane is hidden and can't record audio. The live URL waits on `NEXT_PUBLIC_LIVE_URL`; `facts.json` is a snapshot to re-run at the freeze.
+No DGX attached: the letter-vs-note timing was measured on the laptop voice only, in a hidden pane (0–18 ms over 3 runs; two of 15 letters at 18 ms, over the 16.7 ms frame). The burst isn't in the frozen shots. WebMs with sound (d) not made: the pane is hidden and can't record audio. The live URL waits on `NEXT_PUBLIC_LIVE_URL`; `facts.json` is a snapshot to re-run at the freeze.

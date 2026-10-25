@@ -45,9 +45,8 @@ function Back() {
   );
 }
 
-// wait-hud's LEARN badge, saying DEMO, right-aligned in the HUD band's song-card slot so it covers no counter, score or
-// multiplier. The card's text runs the slot's full width, so the badge sits on the composer row only, on the band's own
-// fill: it hides that line's tail cleanly, and the title stays whole.
+// wait-hud's LEARN badge, saying DEMO, just right of the song tag's brackets and centered in the band: the band is
+// empty between the two clusters (duo-hud), so it covers neither the tag's progress line nor the combo cluster.
 function drawBadge(ctx: CanvasRenderingContext2D, f: Frame) {
   const { panel, slots } = hudLayout(f.width, f.judgmentLineY);
   const h = panel.h;
@@ -55,8 +54,8 @@ function drawBadge(ctx: CanvasRenderingContext2D, f: Frame) {
   ctx.font = canvasFonts.display(size); // Duo: upright, the kit's face
   const w = ctx.measureText("DEMO").width + size * 0.8;
   const bh = size * 1.25;
-  const right = slots.card.x1 - Math.max(10, h * 0.25) * 0.5;
-  const y = h * 0.7; // the composer row (hud: the title at 0.36 h, then 0.34 h down)
+  const right = slots.card.x1 + h * 0.25 + w;
+  const y = h / 2;
   ctx.beginPath();
   ctx.rect(right - w, y - bh / 2, w, bh); // Duo: square, framed in a hairline
   ctx.fillStyle = bg;

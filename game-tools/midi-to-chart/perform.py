@@ -86,56 +86,221 @@ def midi_pedal(path):
     return pairs_of(sorted(events, key=lambda e: (e[0], e[1]))), mid
 
 
-TOKEN = re.compile(r"\\repeat\s+(volta|unfold)\s+(\d+)\s*\{|\\alternative\s*\{|\{|\}|\\sustainOn|\\sustainOff"
-                   r"|\\partial\s+\d+\.*|\\\w+|\b[sR](\d+)(\.*)(?:\*(\d+)(?:/(\d+))?)?")
+# A note, chord repeat, rest or skip, not inside a word (Staff.SustainPedal holds no note): name, octave marks, duration.
+NOTE = re.compile(r"(?<![A-Za-z0-9._-])([a-g](?:isis|eses|is|es|ss|ff|s|f)?|[rRsq])(?![a-zA-Z])[',]*[!?]?")
+DURATION = re.compile(r"(\d+)(\.*)(?:\*(\d+)(?:/(\d+))?)?")
+DYNAMICS = {"ppp", "pp", "p", "mp", "mf", "f", "ff", "fff", "sf", "sfz", "fp", "<", ">", "!", "cresc", "dim", "decresc"}
+PEDAL = {"sustainOn": "down", "sustainOff": "up", "sustainDown": "down", "sustainUp": "up"}
 
 
-def ly_pedal(text, context):
-    """A LilyPond pedal line -> [(down, up)] in quarter notes from its start, read the way notation MIDI plays it: a volta
-    repeat once with its alternatives in turn, an unfold repeat N times. A \\sustainOn/Off is postfix: it sounds at the
-    onset of the skip it follows."""
-    start = re.search(r'\\new\s+\w+\s*=\s*"' + re.escape(context) + r'"\s*\{', text)
+def ly_voice(text, name, unfold=False, marks=()):
+    """A LilyPond voice or context, read for timing only: ([note onsets], [(onset, mark)]), in quarter notes from its start.
+
+    Repeats play the way the score's MIDI plays them: a volta repeat once with its alternatives in turn, or with
+    unfold=True (a MIDI made through \\unfoldRepeats) its body before each alternative. A mark is postfix: it belongs to
+    the onset of the note, chord, rest or skip it follows. Marks read: dynamics, hairpins, the sustain pedal, and any
+    names in `marks` (a score's own pedal macros). Pitches, markup, scheme and strings are skipped."""
+    text = re.sub(r"%\{.*?%\}|%[^\n]*", "", text, flags=re.S)
+    start = (re.search(r'\\new\s+\w+\s*=\s*"' + re.escape(name) + r'"\s*(?=\{)', text)  # a context with its music here
+             or re.search(r"^\s*" + re.escape(name) + r"\s*=", text, re.M))  # or a variable
     if not start:
-        raise SystemExit(f"no context {context!r}")
-    tokens = TOKEN.finditer(text, start.end())
+        raise SystemExit(f"no voice {name!r}")
+    i = text.index("{", start.end())
+    notes, out = [], []
+    state = {"t": Fraction(0), "onset": Fraction(0), "dur": Fraction(1), "scale": Fraction(1), "tied": False}
 
-    def block():  # until the matching }: a list of items, each ("skip", length) | ("on"|"off",) | ("rep", n, items)
-        items = []
-        for m in tokens:
-            s = m.group(0)
-            if s == "}":
-                return items
-            if m.group(1):
-                items.append(("rep", int(m.group(2)) if m.group(1) == "unfold" else 1, block()))
-            elif s.startswith("\\alternative") or s == "{":
-                items.append(("rep", 1, block()))
-            elif s == "\\sustainOn":
-                items.append(("on",))
-            elif s == "\\sustainOff":
-                items.append(("off",))
-            elif m.group(3):
-                length = Fraction(4, int(m.group(3)))
-                length *= sum(Fraction(1, 2 ** k) for k in range(len(m.group(4)) + 1))  # dots
-                if m.group(5):
-                    length *= Fraction(int(m.group(5)), int(m.group(6) or 1))
-                items.append(("skip", length))
-        return items
+    def skip_balanced(j, o, c):
+        depth = 0
+        for k in range(j, len(text)):
+            depth += (text[k] == o) - (text[k] == c)
+            if depth == 0:
+                return k + 1
+        return len(text)
 
-    events, t, onset = [], Fraction(0), Fraction(0)
+    def skip_arg(j):  # one argument: a string, a scheme value, a braced block, or a word
+        j = len(text[j:]) - len(text[j:].lstrip()) + j
+        if text[j] == '"':
+            return re.compile(r'"(?:\\.|[^"\\])*"').match(text, j).end()
+        if text[j] == "#":
+            return skip_scheme(j)
+        if text[j] == "{":
+            return skip_balanced(j, "{", "}")
+        return re.compile(r"[^\s{}]+").match(text, j).end()
 
-    def walk(items):
-        nonlocal t, onset
-        for it in items:
-            if it[0] == "skip":
-                onset, t = t, t + it[1]
-            elif it[0] == "rep":
-                for _ in range(it[1]):
-                    walk(it[2])
-            else:  # a postfix mark: it sounds at the onset of the skip it follows
-                events.append((onset, it[0] == "on"))
+    def skip_scheme(j):
+        j += 1
+        while text[j] in "#'`":
+            j += 1
+        if text[j] == "(":
+            return skip_balanced(j, "(", ")")
+        if text[j] == '"':
+            return skip_arg(j)
+        return re.compile(r"[^\s{}]*").match(text, j).end()
 
-    walk(block())
-    return pairs_of(events)
+    def length(j):  # the duration written at j, or the last one (LilyPond carries it); returns (length, index after)
+        m = DURATION.match(text, j)
+        if m:
+            d = Fraction(4, int(m.group(1))) * sum(Fraction(1, 2 ** k) for k in range(len(m.group(2)) + 1))
+            if m.group(3):
+                d *= Fraction(int(m.group(3)), int(m.group(4) or 1))
+            state["dur"], j = d, m.end()
+        return state["dur"] * state["scale"], j
+
+    def skip_markup(j):  # \markup's argument: its own commands, then a braced block, a string or a word
+        while True:
+            j = len(text[j:]) - len(text[j:].lstrip()) + j
+            m = re.compile(r"\\[a-zA-Z-]+").match(text, j)
+            if not m:
+                return skip_arg(j)
+            j = m.end()
+
+    def event(d, sounding):  # a tied-into note sounds on, but isn't struck again
+        state["onset"] = state["t"]
+        if sounding and not state["tied"]:
+            notes.append(state["t"])
+        state["t"] += d
+        state["tied"] = False
+
+    def music(j, until="}"):  # read music from j to the closing `until`; returns the index after it
+        while True:
+            j = len(text[j:]) - len(text[j:].lstrip()) + j
+            if j >= len(text):
+                return j
+            c = text[j]
+            if text.startswith(until, j):
+                return j + len(until)
+            if text.startswith("<<", j):
+                t0, ends, j = state["t"], [], j + 2
+                while True:  # branches split by \\, each from t0; the slowest sets the time after
+                    j = music(j, "\\\\") if branch_has(j, "\\\\") else music(j, ">>")
+                    ends.append(state["t"])
+                    if text.startswith(">>", j - 2):
+                        break
+                    state["t"] = t0
+                state["t"] = max(ends)
+                continue
+            if c == "{":
+                j = music(j + 1)
+                continue
+            if c == "<":  # a chord: its notes sound together, for the duration after the >
+                d, j = length(text.index(">", j) + 1)
+                event(d, True)
+                continue
+            if c in '"':
+                j = skip_arg(j)
+                continue
+            if c == "#":
+                j = skip_scheme(j)
+                continue
+            if c == "\\":
+                m = re.compile(r"\\([a-zA-Z]+|.)").match(text, j)
+                w, j = m.group(1), m.end()
+                if w in ("<", ">", "!") or w in DYNAMICS or w in PEDAL or w in marks:
+                    out.append((state["onset"], PEDAL.get(w, w)))
+                elif w == "repeat":
+                    kind, n = re.compile(r"\s*(\w+)\s+(\d+)").match(text, j).groups()
+                    j = re.compile(r"\s*(\w+)\s+(\d+)").match(text, j).end()
+                    j = len(text[j:]) - len(text[j:].lstrip()) + j
+                    body = j
+                    end = skip_balanced(j, "{", "}") if text[j] == "{" else skip_arg(j)
+                    alt = re.compile(r"\s*\\alternative\s*\{").match(text, end)
+                    alts = []
+                    if alt:
+                        k = alt.end()
+                        while True:
+                            k = len(text[k:]) - len(text[k:].lstrip()) + k
+                            if text[k] == "}":
+                                break
+                            alts.append(k)
+                            k = skip_balanced(k, "{", "}")
+                        after = k + 1
+                    else:
+                        after = end
+                    times = int(n) if kind == "unfold" or (unfold and not alts) else 1
+                    if kind == "volta" and unfold and alts:
+                        for a in alts:
+                            music(body + 1)
+                            music(a + 1)
+                    else:
+                        for _ in range(times):
+                            music(body + 1) if text[body] == "{" else None
+                        for a in alts:
+                            music(a + 1)
+                    j = after
+                elif w in ("times", "tuplet"):
+                    a2, b2 = re.compile(r"\s*(\d+)/(\d+)").match(text, j).groups()
+                    j = re.compile(r"\s*(\d+)/(\d+)").match(text, j).end()
+                    f = Fraction(int(a2), int(b2)) if w == "times" else Fraction(int(b2), int(a2))
+                    state["scale"] *= f
+                    j = len(text[j:]) - len(text[j:].lstrip()) + j
+                    j = music(j + 1)
+                    state["scale"] /= f
+                elif w in ("grace", "acciaccatura", "appoggiatura", "afterGrace"):
+                    t, scale = state["t"], state["scale"]
+                    state["scale"] = Fraction(0)  # graces take no time
+                    j = len(text[j:]) - len(text[j:].lstrip()) + j
+                    if text[j] == "{":
+                        j = music(j + 1)
+                    else:
+                        m = NOTE.match(text, j)
+                        j = length(m.end())[1] if m else j
+                    state["scale"], state["t"] = scale, t
+                elif w in ("markup", "mark", "bar", "clef", "set", "override", "once", "tempo", "key", "time", "partial",
+                           "relative", "transpose", "change", "context", "new", "unset", "revert", "tweak"):
+                    if w == "markup":
+                        j = skip_markup(j)
+                    elif w in ("bar", "clef", "change"):
+                        j = skip_arg(j)
+                        if w == "change":
+                            j = skip_arg(skip_arg(j))  # Staff = "name"
+                    elif w == "key":
+                        j = skip_arg(j)  # the pitch; \major follows as a command
+                    elif w == "time":
+                        j = re.compile(r"\s*[\d/,]+").match(text, j).end()
+                    elif w == "partial":
+                        j = re.compile(r"\s*\d+\.*(?:\*\d+(?:/\d+)?)?").match(text, j).end()
+                    elif w == "relative":
+                        m = NOTE.match(text, len(text[j:]) - len(text[j:].lstrip()) + j)
+                        j = m.end() if m and text[j:].lstrip()[0] != "{" else j
+                    elif w == "transpose":
+                        j = skip_arg(skip_arg(j))
+                    elif w in ("set", "override", "unset", "revert", "once", "tweak", "context", "new", "tempo", "mark"):
+                        pass  # their arguments are words, strings, scheme or numbers: harmless when skipped one by one
+                continue
+            m = NOTE.match(text, j)
+            if m:
+                d, j = length(m.end())
+                event(d, m.group(1) not in ("r", "R", "s"))
+                continue
+            state["tied"] |= c == "~"
+            j += 1  # anything else: ties, slurs, beams, articulation, fingering, bar checks
+
+    def branch_has(j, sep):  # does a << >> branch end at a \\ before its >>?
+        depth, k = 0, j
+        while k < len(text):
+            if text.startswith("<<", k):
+                depth += 1
+                k += 2
+                continue
+            if text.startswith(">>", k):
+                if depth == 0:
+                    return False
+                depth -= 1
+                k += 2
+                continue
+            if text.startswith(sep, k) and depth == 0:
+                return True
+            k += 1
+        return False
+
+    music(i + 1)
+    return notes, out
+
+
+def ly_pedal(text, name, down="sustainOn", up="sustainOff"):
+    """A score's pedal marks -> [(down, up)] in quarter notes: its \\sustainOn/Off (or Down/Up), or its own macros."""
+    _, marks = ly_voice(text, name, marks=(down, up))
+    return pairs_of([(t, m in ("down", down)) for t, m in marks if m in ("down", "up", down, up)])
 
 
 def harmony_pedal(chart):

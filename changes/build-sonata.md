@@ -5,4 +5,4 @@ The Build Sonata (#1162). The night the agents built Étude, as 90 s of music, o
 ## How to check it
 Unit: `pnpm -C web exec vitest run src/game/x src/game/pedal src/game/songs` (199 pass): traceability, scrub, musicality, the cadence and the library test on the real chart. Perf gate not run locally; main's scheduled run covers it. Not heard by Eric.
 ## Gaps
-Validation (d), the 90 s listen on the DGX, needs Eric. The chart shows in the song select (accepted in the spec). Full is a bot's tempo; Easy is the playable one. The snapshot is a point in time until it's re-run at the freeze. One teammate's first name is scrubbed by hand in `make-sonata.mjs`, because the Lanes table doesn't list them yet.
+Validation (d), the 90 s listen on the DGX, needs Eric. Full is a bot's tempo; Easy is the playable one. The snapshot is a point in time until it's re-run at the freeze. One teammate's first name is scrubbed by hand in `make-sonata.mjs`, because the Lanes table doesn't list them yet.

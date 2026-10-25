@@ -4,7 +4,8 @@
 // 2. /play?song=twinkle&input=test with every note pressed on time (as verify-stage does): sampled every frame, the
 //    stage's element has opacity 0 whenever the fever gauge (window.__pianoArcadeFeverGauge) says no fever, and the
 //    take's fever shows it.
-// 3. Every element on / has a computed border-radius of 0px; /learn still has its own 4px radii.
+// 3. Every element on / has a computed border-radius of 0px; on /learn the reset doesn't reach: a button placed in
+//    #learning-content takes /learn's own 4px rule, and the reset's 0px once the id is gone.
 // 4. Screenshots duo-select-<size>.png and duo-play-<size>.png at 1280×720 and 1920×1080.
 // Usage: node web/src/game/duo-tokens/verify-duo.mjs --out <dir>
 import { spawn } from "node:child_process";
@@ -176,7 +177,31 @@ try {
     await learn.waitForLoadState("networkidle");
     const kept = await radii(learn);
     results.radiiLearn = kept;
-    check(Boolean(kept["4px"]), `/learn: keeps its own radii (${JSON.stringify(kept)}), want some 4px`);
+    // What this guards: the reset skips a page holding #learning-content, so /learn's own radius rules win. Its own
+    // elements can't show that any more: learning-ui put the map on the Duo kit's square buttons (#1120) and sends a
+    // new learner to the square diagnostic (#1233, #1265), so none of them is rounded on purpose. A probe button in
+    // #learning-content takes /learn's own 4px rule (`.app button`); with the id gone, the reset takes it to 0px.
+    const probe = await learn.evaluate(() => {
+      const main = document.querySelector("#learning-content");
+      if (!main) return null;
+      const radius = () => {
+        const b = document.createElement("button");
+        main.appendChild(b);
+        const r = getComputedStyle(b).borderTopLeftRadius;
+        b.remove();
+        return r;
+      };
+      const own = radius();
+      main.id = "";
+      const reset = radius();
+      main.id = "learning-content";
+      return { own, reset, path: location.pathname };
+    });
+    results.radiiLearnProbe = probe;
+    check(
+      probe?.own === "4px" && probe.reset === "0px",
+      `/learn: the reset doesn't reach it: a button in #learning-content keeps /learn's own 4px, and 0px without the id (${JSON.stringify(probe)}; its own elements: ${JSON.stringify(kept)})`,
+    );
     await learn.close();
   }
 

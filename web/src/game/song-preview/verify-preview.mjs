@@ -51,7 +51,7 @@ const check = (ok, line) => {
   if (!ok) failures.push(line);
 };
 
-// Counts the tones started and the buses disconnected; with `piano`, a stand-in DGX records every MIDI send. A tone
+// Counts the tones started (oscillators and, for UI sounds, buffer sources) and the buses disconnected; with `piano`, a stand-in DGX records every MIDI send. A tone
 // started inside a key's dispatch is a UI sound (ui-sounds' ↓ blip runs in the list's keydown handler), counted in
 // __uiTones; the preview starts its tones from a timer previewSettings.delayMs later, counted in __tones (#428).
 const instrument = (piano) => {
@@ -72,6 +72,13 @@ const instrument = (piano) => {
     if (inKey) window.__uiTones++;
     else window.__tones++;
     return osc.call(this);
+  };
+  // Since ui-sound-family (#1169) every UI sound is one rendered buffer: each buffer source is a UI tone, wherever it
+  // starts (song-preview's tones are still oscillators).
+  const buf = BaseAudioContext.prototype.createBufferSource;
+  BaseAudioContext.prototype.createBufferSource = function () {
+    window.__uiTones++;
+    return buf.call(this);
   };
   const disc = AudioNode.prototype.disconnect;
   AudioNode.prototype.disconnect = function (...a) {

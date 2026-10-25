@@ -3,7 +3,7 @@ import type { UiSound } from ".";
 
 // A fake AudioContext: records buffer-source starts and stops, each started buffer's peak, and the master gain.
 function fakeAudio() {
-  const log = { starts: 0, stops: 0, peaks: [] as number[], masters: [] as { value: number }[] };
+  const log = { starts: 0, stops: 0, peaks: [] as number[], masters: [] as { value: number }[], whens: [] as number[] };
   class FakeContext {
     currentTime = 0;
     sampleRate = 48000;
@@ -16,8 +16,9 @@ function fakeAudio() {
       const src = {
         buffer: null as { data: Float32Array } | null,
         connect: (n: unknown) => n,
-        start: () => {
+        start: (when = 0) => {
           log.starts++;
+          log.whens.push(when);
           log.peaks.push(src.buffer!.data.reduce((m, x) => Math.max(m, Math.abs(x)), 0));
         },
         stop: () => log.stops++,
@@ -66,6 +67,24 @@ describe("ui sounds", () => {
       expect(audio.log.starts, name).toBe(before + 1);
     }
     for (const p of audio.log.peaks) expect(p).toBeCloseTo(UI_LEVEL, 6);
+  });
+
+  it("sounds asked for in one run share one now, though the audio clock moves while each renders (#1284)", async () => {
+    const { FakeContext } = audio;
+    class Busy extends FakeContext {
+      createBuffer(channels: number, length: number) {
+        this.currentTime += 0.005; // rendering takes a few ms of audio time
+        return super.createBuffer(channels, length);
+      }
+    }
+    vi.stubGlobal("AudioContext", Busy);
+    const { uiSound } = await load();
+    for (const [i, name] of (["tickAccent", "tick", "tick", "tick"] as UiSound[]).entries()) uiSound(name, i * 600);
+    const gaps = audio.log.whens.slice(1).map((w, i) => Math.round((w - audio.log.whens[i]) * 1e6) / 1e3);
+    expect(gaps).toEqual([600, 600, 600]);
+    await Promise.resolve(); // the next run reads the clock afresh
+    uiSound("move");
+    expect(audio.log.whens.at(-1)).toBeCloseTo(0.02, 6);
   });
 
   it("a burst steals the oldest voice with a fade, never stacking past the cap", async () => {

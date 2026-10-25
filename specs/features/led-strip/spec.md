@@ -20,9 +20,10 @@ build of the sketch with checks (`hosttest/`). Wiring, flashing and calibration 
 - **Mapping:** MIDI 21-108 spread evenly by semitone between two calibrated points (A0 and C8). Neighbouring keys
   never share an LED, except a key whose slot falls in the gap at the strip joint, which borrows the nearest LED.
 - **Layers:** a held or fading key beats a hint on the same key. Released keys fade over `fadeMs` (default 180).
-- **Watchdog:** 2.5 s with no bytes releases every held key. 15 s with no bytes plays a dim idle animation.
+- **Watchdog:** 2.5 s with no bytes releases every held key. In quiet mode, 15 s with no bytes plays a dim idle animation.
+- **Light modes** (setting 15): **Quiet** (0, the default) is key light plus a ripple, breathing hints, and that dim rainbow. **Full** (1) is the show: hint build-up, wrong-key red, count-in bar, fever, pause rainbow, finale and idle aurora, with ripples off until setting 6 turns them back on. The tester and the playground each open a menu that sends setting 15. Save (setting 20) keeps the choice. The game does not send it yet.
 - **Power:** `FastLED.setMaxPowerInVoltsAndMilliamps(5, 3000)`.
-- **Settings** (brightness, fade, calibration, joint gap, reverse) save to flash and survive power off.
+- **Settings** (brightness, fade, calibration, joint gap, reverse, and the light mode) save to flash and survive power off.
 - **Tester:** connect board and piano, hour-0 tests, calibration nudges and save, free play, a Twinkle guide-lights
   demo (the next key glows; hit it and it turns green, a wrong key flashes red).
 

@@ -26,3 +26,12 @@ Sources whose licenses ask for credit. Each chart's `source` field names its sou
   (1913), licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Changes: an excerpt (bars 1–9, in
   the edition's 4/4 grouping) converted to a chart, with the cross-staff chords charted for the left hand; the chart
   is shared under the same license.
+- **The Happy Farmer, *Album for the Young*, Op. 68 No. 10** (Robert Schumann), `web/public/songs/happy-farmer/`:
+  charted from Mutopia Project piece 659 (<https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=659>), typeset by
+  Philippe Hézaine after the Peters edition, licensed [CC BY-SA 2.5](https://creativecommons.org/licenses/by-sa/2.5/).
+  Changes: the whole piece (pickup and bars 1–20) converted to a chart; the chart is shared under the same license.
+- **The Wild Horseman, *Album for the Young*, Op. 68 No. 8** (Robert Schumann), `web/public/songs/wild-horseman/`:
+  charted from Mutopia Project piece 655 (<https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=655>), typeset by
+  Philippe Hézaine after the Peters edition, licensed [CC BY-SA 2.5](https://creativecommons.org/licenses/by-sa/2.5/).
+  Changes: an excerpt (pickup and bars 1–16, the A section's repeat written out) converted to a chart; the chart is
+  shared under the same license.

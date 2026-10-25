@@ -63,6 +63,7 @@ Writes a chart's `pedal.json` and sets velocities from its cited score, without 
 .venv/bin/python perform.py pedal <chart.json> --ly song.ly --context <name> --spans ... --start-beat B  # a LilyPond pedal line
 .venv/bin/python perform.py pedal <chart.json> --harmony   # no Ped. marks: the per-harmony rule
 .venv/bin/python perform.py velocity <chart.json> --mark pp   # one printed mark over the whole excerpt
+.venv/bin/python perform.py dynamics <chart.json> --ly song.ly --right a,b --left c --midi song.mid --bars a-b  # read the marks
 .venv/bin/python perform.py --self-test
 ```
 Batch 1 (#815), with the song pack's sources plus `fur_Elise_WoO59.ly`
@@ -86,4 +87,25 @@ Batch 3 (#818), with `25EF-02.ly` and `K545-1.ly` (Mutopia 203 and 998) read by 
 .venv/bin/python perform.py velocity ../../web/public/songs/mozart-545-1/chart.json --marks "R@0=mp,L@0=p,R@8!,\
 RL@10-11~+16,R@12!,RL@13-14~-16,RL@16=p,RL@16-17.75~+16,RL@18-19.75~-16,RL@20-21.75~+16,RL@22-23.75~-16,\
 RL@24-25.75~+16,RL@26-27.75~-16,RL@28-29.75~+16,RL@30-31.75~-16,RL@32=p,RL@34.25-35.75~+16,RL@40=f,R@40!"
+```
+Batch 2 (#816), from each source's `.ly` and `.mid` on Mutopia: `ftp/SatieE/gymnopedie_1/gymnopedie_1`,
+`ftp/ChopinFF/O9/chopin_nocturne_op9_n2/chopin_nocturne_op9_n2`, `ftp/JoplinS/maple/maple`,
+`ftp/DebussyC/L75/debussy_Ste_Bergamesq_Clair/debussy_Ste_Bergamesq_Clair`, and `moonlight3-a4.ly` and
+`moonlight3.mid` from `ftp/BeethovenLv/O27/moonlight/moonlight-lys.zip` and `moonlight-mids.zip`:
+```bash
+S=../../web/public/songs
+.venv/bin/python perform.py dynamics $S/gymnopedie-1/chart.json --ly source/gymnopedie_1.ly --right top,middle --left bottom \
+  --midi source/gymnopedie_1.mid --bars 22-31
+.venv/bin/python perform.py dynamics $S/nocturne-op9-2/chart.json --ly source/chopin_nocturne_op9_n2.ly --right upper --left lower \
+  --midi source/chopin_nocturne_op9_n2.mid --pickup 0.5 --bars 1-9
+.venv/bin/python perform.py dynamics $S/maple-leaf-rag/chart.json --ly source/maple.ly --right top --left bottom --unfold \
+  --midi source/maple.mid --pickup 0.5 --bars 1-33
+.venv/bin/python perform.py dynamics $S/moonlight-3/chart.json --ly source/moonlight3-a4.ly --right topmain --left bottom \
+  --midi source/moonlight3.mid --bars 1-8
+.venv/bin/python perform.py velocity $S/clair-de-lune/chart.json --mark pp
+.venv/bin/python perform.py pedal $S/nocturne-op9-2/chart.json --ly source/chopin_nocturne_op9_n2.ly --context lower \
+  --down ped --up pes --midi source/chopin_nocturne_op9_n2.mid --pickup 0.5 --bars 1-9
+.venv/bin/python perform.py pedal $S/moonlight-3/chart.json --ly source/moonlight3-a4.ly --context sustain \
+  --midi source/moonlight3.mid --bars 1-8
+for s in gymnopedie-1 clair-de-lune maple-leaf-rag; do .venv/bin/python perform.py pedal $S/$s/chart.json --harmony; done
 ```

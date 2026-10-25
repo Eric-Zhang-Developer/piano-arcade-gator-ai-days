@@ -2,7 +2,7 @@
 
 **Context.** The bot plays `note.velocity ?? KEYS_VELOCITY` (80). The spec asks for velocities from each score's
 dynamic marks with one mapping for the library, never from memory or a recording. The song packs' converter already
-writes velocities where a source's MIDI renders them (decided on #181). Findings: batch 1 on #815, batch 3 on #818.
+writes velocities where a source's MIDI renders them (decided on #181). Findings: batch 1 on #815, batch 2 on #816, batch 3 on #818.
 
 **Options.** (A) golden-demo's ladder for printed marks; (B) whatever each MIDI export renders, which differs by
 typesetter and is flat for most of these sources.
@@ -28,6 +28,19 @@ LilyPond source (the commands are in `game-tools/midi-to-chart/README.md`). Its 
 - mozart-545-1: RH mp and LH p at bar 1; an accent and a one-step swell in bars 3–4; p with a rise and fall each half
   bar in bars 5–8; p and a swell in bar 9; f and an accent at bar 11: 49–112. Its MIDI velocities (69–98) are replaced.
 - clementi-sonatina-36-1, bach-prelude-c, minuet-g: no marks, no velocity (80).
+
+**Read from the LilyPond** (batch 2, #816): `perform.py dynamics` reads the marks and accents (`->`, `\accent`) off the
+cited voices, a mark on the note it follows, and turns them into the same `--marks` list on the same rules, printing it.
+It refuses unless every chart note is a MIDI note-on of its pitch at its mapped time, so a wrong bar range can't put a
+mark on the wrong note. On one note a level comes before a hairpin's start, so `\p\<` swells from p; fp is an accent,
+then p. Text *cresc.*/*dimin.* written as markup isn't read; the hairpins under it are.
+- gymnopedie-1 (bars 22–31): p in force from bar 21; < over bars 22–24, > in 25, < from 26, > in 29: 49–65.
+- nocturne-op9-2 (pickup + bars 1–8): the opening marks only *espress. dolce*, no level, so mf; a swell in bar 2, f at
+  bar 4, p at bar 5, then four accents, a swell and a fall in bars 5–6, f at bar 8 with a swell: 49–112.
+- maple-leaf-rag (the A strain twice, as its MIDI unfolds it): f at the pickup, then p at bar 7 and mf with a
+  crescendo at bar 9 in both passes: 49–96.
+- moonlight-3 (bars 1–8): p, and sf on the right hand's chord in bars 2, 4, 6, 7 and 8: 49, the sf chords 65.
+- clair-de-lune (bars 1–8): pp at the opening, nothing else: every note 33.
 
 A single level reads as "This score marks no dynamics" in the dynamics grade (it needs two levels), as before.
 

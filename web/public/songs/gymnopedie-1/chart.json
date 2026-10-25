@@ -12,476 +12,544 @@
       "pitch": 33,
       "beat": 0,
       "duration": 3,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 49
     },
     {
       "id": "n2",
       "pitch": 69,
       "beat": 0,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 49
     },
     {
       "id": "n3",
       "pitch": 57,
       "beat": 1,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 51
     },
     {
       "id": "n4",
       "pitch": 60,
       "beat": 1,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 51
     },
     {
       "id": "n5",
       "pitch": 64,
       "beat": 1,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 51
     },
     {
       "id": "n6",
       "pitch": 71,
       "beat": 1,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 51
     },
     {
       "id": "n7",
       "pitch": 72,
       "beat": 2,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 53
     },
     {
       "id": "n8",
       "pitch": 38,
       "beat": 3,
       "duration": 3,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 55
     },
     {
       "id": "n9",
       "pitch": 76,
       "beat": 3,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 55
     },
     {
       "id": "n10",
       "pitch": 55,
       "beat": 4,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 57
     },
     {
       "id": "n11",
       "pitch": 59,
       "beat": 4,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 57
     },
     {
       "id": "n12",
       "pitch": 64,
       "beat": 4,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 57
     },
     {
       "id": "n13",
       "pitch": 74,
       "beat": 4,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 57
     },
     {
       "id": "n14",
       "pitch": 71,
       "beat": 5,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 59
     },
     {
       "id": "n15",
       "pitch": 38,
       "beat": 6,
       "duration": 3,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 61
     },
     {
       "id": "n16",
       "pitch": 74,
       "beat": 6,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 61
     },
     {
       "id": "n17",
       "pitch": 50,
       "beat": 7,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 63
     },
     {
       "id": "n18",
       "pitch": 55,
       "beat": 7,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 63
     },
     {
       "id": "n19",
       "pitch": 59,
       "beat": 7,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 63
     },
     {
       "id": "n20",
       "pitch": 64,
       "beat": 7,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 63
     },
     {
       "id": "n21",
       "pitch": 72,
       "beat": 7,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 63
     },
     {
       "id": "n22",
       "pitch": 71,
       "beat": 8,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 65
     },
     {
       "id": "n23",
       "pitch": 38,
       "beat": 9,
       "duration": 3,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 65
     },
     {
       "id": "n24",
       "pitch": 74,
       "beat": 9,
       "duration": 5,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 65
     },
     {
       "id": "n25",
       "pitch": 48,
       "beat": 10,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 60
     },
     {
       "id": "n26",
       "pitch": 52,
       "beat": 10,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 60
     },
     {
       "id": "n27",
       "pitch": 57,
       "beat": 10,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 60
     },
     {
       "id": "n28",
       "pitch": 62,
       "beat": 10,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 60
     },
     {
       "id": "n29",
       "pitch": 38,
       "beat": 12,
       "duration": 3,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 49
     },
     {
       "id": "n30",
       "pitch": 48,
       "beat": 13,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 49
     },
     {
       "id": "n31",
       "pitch": 54,
       "beat": 13,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 49
     },
     {
       "id": "n32",
       "pitch": 57,
       "beat": 13,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 49
     },
     {
       "id": "n33",
       "pitch": 62,
       "beat": 13,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 49
     },
     {
       "id": "n34",
       "pitch": 74,
       "beat": 14,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 49
     },
     {
       "id": "n35",
       "pitch": 38,
       "beat": 15,
       "duration": 3,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 52
     },
     {
       "id": "n36",
       "pitch": 76,
       "beat": 15,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 52
     },
     {
       "id": "n37",
       "pitch": 57,
       "beat": 16,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 54
     },
     {
       "id": "n38",
       "pitch": 60,
       "beat": 16,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 54
     },
     {
       "id": "n39",
       "pitch": 65,
       "beat": 16,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 54
     },
     {
       "id": "n40",
       "pitch": 77,
       "beat": 16,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 54
     },
     {
       "id": "n41",
       "pitch": 79,
       "beat": 17,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 57
     },
     {
       "id": "n42",
       "pitch": 38,
       "beat": 18,
       "duration": 3,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 60
     },
     {
       "id": "n43",
       "pitch": 81,
       "beat": 18,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 60
     },
     {
       "id": "n44",
       "pitch": 57,
       "beat": 19,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 62
     },
     {
       "id": "n45",
       "pitch": 60,
       "beat": 19,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 62
     },
     {
       "id": "n46",
       "pitch": 64,
       "beat": 19,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 62
     },
     {
       "id": "n47",
       "pitch": 72,
       "beat": 19,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 62
     },
     {
       "id": "n48",
       "pitch": 74,
       "beat": 20,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 65
     },
     {
       "id": "n49",
       "pitch": 38,
       "beat": 21,
       "duration": 3,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 65
     },
     {
       "id": "n50",
       "pitch": 76,
       "beat": 21,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 65
     },
     {
       "id": "n51",
       "pitch": 50,
       "beat": 22,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 60
     },
     {
       "id": "n52",
       "pitch": 55,
       "beat": 22,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 60
     },
     {
       "id": "n53",
       "pitch": 59,
       "beat": 22,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 60
     },
     {
       "id": "n54",
       "pitch": 64,
       "beat": 22,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 60
     },
     {
       "id": "n55",
       "pitch": 74,
       "beat": 22,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 60
     },
     {
       "id": "n56",
       "pitch": 71,
       "beat": 23,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 54
     },
     {
       "id": "n57",
       "pitch": 38,
       "beat": 24,
       "duration": 3,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 49
     },
     {
       "id": "n58",
       "pitch": 74,
       "beat": 24,
       "duration": 5,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 49
     },
     {
       "id": "n59",
       "pitch": 48,
       "beat": 25,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 49
     },
     {
       "id": "n60",
       "pitch": 52,
       "beat": 25,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 49
     },
     {
       "id": "n61",
       "pitch": 57,
       "beat": 25,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 49
     },
     {
       "id": "n62",
       "pitch": 62,
       "beat": 25,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 49
     },
     {
       "id": "n63",
       "pitch": 38,
       "beat": 27,
       "duration": 3,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 49
     },
     {
       "id": "n64",
       "pitch": 48,
       "beat": 28,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 49
     },
     {
       "id": "n65",
       "pitch": 54,
       "beat": 28,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 49
     },
     {
       "id": "n66",
       "pitch": 57,
       "beat": 28,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 49
     },
     {
       "id": "n67",
       "pitch": 62,
       "beat": 28,
       "duration": 2,
-      "hand": "L"
+      "hand": "L",
+      "velocity": 49
     },
     {
       "id": "n68",
       "pitch": 74,
       "beat": 29,
       "duration": 1,
-      "hand": "R"
+      "hand": "R",
+      "velocity": 49
     }
   ]
 }

@@ -5,6 +5,11 @@ import { validateChart, type Chart } from "../../contracts";
 import { difficulty } from "../difficulty/difficulty";
 import { roll, type Roll } from "../duo-select/roll";
 
+// Chart folders only an experiment opens, such as the round's (#1123): kept off the select and out of the library's
+// own checks (difficulty order, jackets, sheets), since they aren't library songs. songs/library.test.ts still
+// validates them.
+export const LAB_ONLY = ["rounds"];
+
 export interface Song {
   id: string; // the chart's folder under songs/, what /play?song= takes
   title: string;
@@ -18,7 +23,7 @@ export interface Song {
 export function loadSongs(songsDir: string): { songs: Song[]; invalid: { path: string; problems: string[] }[] } {
   const songs: Song[] = [];
   const invalid: { path: string; problems: string[] }[] = [];
-  const files = readdirSync(songsDir, { recursive: true, encoding: "utf8" }).filter((f) => f.split(sep).pop() === "chart.json");
+  const files = readdirSync(songsDir, { recursive: true, encoding: "utf8" }).filter((f) => f.split(sep).pop() === "chart.json" && !LAB_ONLY.includes(f.split(sep)[0]));
   for (const path of files) {
     let chart: Chart;
     try {

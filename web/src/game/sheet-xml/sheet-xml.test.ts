@@ -4,10 +4,11 @@ import type { Chart } from "../../contracts";
 import { chartToMusicXml, DIVISIONS, keyAndMeter, pickupBeats, placeNotes } from ".";
 import { overrides } from "./overrides";
 import { shouldBeam } from "../sheet-beams";
+import { LAB_ONLY } from "../song-select/load";
 
 const songs = new URL("../../../public/songs/", import.meta.url);
 const charts: Chart[] = readdirSync(songs)
-  .filter((d) => d !== "local")
+  .filter((d) => d !== "local" && !LAB_ONLY.includes(d))
   .map((d) => JSON.parse(readFileSync(new URL(`${d}/chart.json`, songs), "utf8")));
 const byId = (id: string) => charts.find((c) => c.id === id)!;
 const S = DIVISIONS / 4; // a 16th

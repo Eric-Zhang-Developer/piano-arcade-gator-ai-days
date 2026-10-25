@@ -4,6 +4,7 @@
 import * as THREE from "three";
 import type { Frame } from "../../contracts";
 import { DUST, FLOATS, WISP, governor, hitParticleSettings as S, particlePool, type Judgment } from "./pool";
+import { feverHeat } from "../fever-arc";
 
 export interface HitParticles {
   hit(x: number, width: number, y: number, judgment: Judgment, color: string): void;
@@ -19,6 +20,7 @@ uniform float uTime;
 uniform vec2 uView;
 uniform float uLine;
 uniform float uRise;
+uniform float uWarm; // fever's heat (fever-arc): the wisps' white core turns amber, the dust keeps the hand's color
 attribute vec3 aParams; // seed, kind, bright
 attribute vec3 aColor;
 varying vec4 vColor;
@@ -40,7 +42,8 @@ void main() {
   float twinkle = mix(0.5 + 0.5 * sin(age * mix(0.008, 0.03, h(6.0)) + h(7.0) * 40.0), 1.0, wisp);
   float puff = (1.0 - wisp) * step(0.75, h(13.0)); // one speck in four is a faint soft puff: the clouds' haze
   float white = mix(h(8.0) > 0.7 ? 0.8 : 0.3, 0.85, wisp); // a white core among the note's hue
-  vColor = vec4(mix(aColor, vec3(1.0), white), aParams.z * fade * twinkle * mix(0.35, 1.0, lift) * mix(1.0, 0.95, wisp) * mix(1.0, 0.3, puff));
+  vec3 core = mix(vec3(1.0), vec3(1.0, 0.69, 0.18), uWarm * wisp); // #ffb02e
+  vColor = vec4(mix(aColor, core, white), aParams.z * fade * twinkle * mix(0.35, 1.0, lift) * mix(1.0, 0.95, wisp) * mix(1.0, 0.3, puff));
   vWisp = wisp;
   vAngle = h(9.0) * 6.2832 + age * mix(-0.003, 0.003, h(10.0));
   gl_PointSize = mix(mix(h(11.0) > 0.97 ? 3.0 : mix(1.2, 2.6, h(12.0)), mix(5.0, 9.0, h(12.0)), puff), mix(30.0, 60.0, h(11.0)), wisp);
@@ -81,7 +84,7 @@ export function hitParticles(): HitParticles | null {
   geometry.setAttribute("position", new THREE.InterleavedBufferAttribute(buffer, 3, 0));
   geometry.setAttribute("aParams", new THREE.InterleavedBufferAttribute(buffer, 3, 3));
   geometry.setAttribute("aColor", new THREE.InterleavedBufferAttribute(buffer, 3, 6));
-  const uniforms = { uTime: { value: 0 }, uView: { value: new THREE.Vector2(1, 1) }, uLine: { value: 0 }, uRise: { value: 0 } };
+  const uniforms = { uTime: { value: 0 }, uView: { value: new THREE.Vector2(1, 1) }, uLine: { value: 0 }, uRise: { value: 0 }, uWarm: { value: 0 } };
   const material = new THREE.ShaderMaterial({
     uniforms,
     vertexShader: vertex,
@@ -153,6 +156,7 @@ export function hitParticles(): HitParticles | null {
       uniforms.uView.value.set(w, h);
       uniforms.uTime.value = clock;
       uniforms.uLine.value = f.judgmentLineY;
+      uniforms.uWarm.value = feverHeat();
       uniforms.uRise.value = h * 0.5; // spec: the dust rises to about half the screen
       pool.dirty(upload);
       renderer.render(scene, camera);

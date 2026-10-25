@@ -6,6 +6,7 @@ import type { Frame } from "../../contracts";
 import { stageSettings as S, type Look } from ".";
 
 const STARS = 220;
+const AMBER = new THREE.Color("#ffb02e"); // fever's amber (fever-arc)
 const STAR_Z = -130;
 
 export interface Scene {
@@ -64,7 +65,7 @@ export function makeScene(el: HTMLElement, opacity: number): Scene | null {
         for (let i = 0; i < STARS; i++) starPos[i * 6 + 4] = starPos[i * 6 + 1] + len;
         starGeo.attributes.position.needsUpdate = true;
       }
-      starMat.color.copy(desaturate(new THREE.Color(S.star), l.dip));
+      starMat.color.copy(desaturate(new THREE.Color(S.star).lerp(AMBER, l.tint ?? 0), l.dip));
       renderer.render(scene, camera);
     },
     dispose() {

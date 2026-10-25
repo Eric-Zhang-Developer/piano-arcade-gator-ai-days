@@ -4,6 +4,7 @@ import type { Chart, GameEvent, GamePlugin } from "../../contracts";
 import { blackKeyLaneSettings } from "../black-key-lanes";
 import { settings as core } from "../core/settings";
 import { makeScene } from "./scene";
+import { arcNow, arcSettings, ignitionFor, markLit } from "../fever-arc";
 
 export const stageSettings = {
   maxLaneLuma: 0.35, // 0–1: the stage's brightest pixel behind the lanes, after the highway's backdrop
@@ -34,10 +35,10 @@ export function reduceStage(s: StageState, e: GameEvent): StageState {
   switch (e.type) {
     case "songStart":
       return emptyStage();
-    case "feverStart":
-      return { ...s, fever: true, feverAtMs: e.atMs };
-    case "feverEnd":
-      return { ...s, fever: false, feverAtMs: e.atMs };
+    case "feverStart": // the streak-in starts on fever-arc's ignition beat, with the flash, banner and sound
+      return { ...s, fever: true, feverAtMs: ignitionFor(e.atMs) };
+    case "feverEnd": // a break before the ignition beat never lit the stage
+      return { ...s, fever: false, feverAtMs: s.fever && e.atMs < s.feverAtMs ? -Infinity : e.atMs };
     default:
       return s;
   }
@@ -55,6 +56,7 @@ export const applyDip = (s: StageState, atMs: number): StageState => ({ ...s, di
 export interface Look {
   heat: number; // 0 out of fever … 1 fever: the stars' streak, and the stage's opacity
   dip: number; // desaturation
+  tint?: number; // 0–1 toward fever's amber (fever-arc's sustain)
 }
 
 const fade = (atMs: number | null, nowMs: number, lengthMs: number) =>
@@ -152,7 +154,11 @@ export function feverStage(): GamePlugin {
             console.info(`fever-stage: frames averaged over ${stageSettings.budgetMs} ms for 1 s; the stage is frozen for this take`);
             return;
           }
-          scene.render(f, still ? { ...l, heat: 1 } : l);
+          // fever-arc's sustain: the streak swells on each beat, and the stars take amber. Reduced motion: no pulse.
+          const arc = arcNow(f.nowMs);
+          const pulse = !still && arc.phase === "sustain" ? 1 + arcSettings.pulse * (1 - arc.beat) ** 2 : 1;
+          scene.render(f, { ...l, heat: (still ? 1 : l.heat) * pulse, tint: arc.heat * arcSettings.tint });
+          markLit("stars");
           drawn = true;
         },
         dispose: scene.dispose,

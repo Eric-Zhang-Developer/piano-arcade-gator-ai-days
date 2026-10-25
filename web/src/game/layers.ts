@@ -17,6 +17,7 @@ import { warningCard } from "./difficulty";
 import { countIn } from "./count-in";
 import { stageCard } from "./stage-card";
 import { clearCard } from "./clear-card";
+import { feverArc } from "./fever-arc";
 import { feverGauge } from "./fever-gauge";
 import { feverMoment } from "./fever-moment";
 import { juiceVisual } from "./juice";
@@ -74,6 +75,7 @@ export const plugins: GamePlugin[] = [
   simPlugin, // piano-sim: /play?midi=sim only. First, so later plugins asking for MIDI get the fake piano.
   ghost(), // the last take, dashed: under every layer that draws, after every plugin that changes the chart
   keyPreview(), // ?keypreview=0 off: keys glow before their notes; after ghost (the final chart), under the octave wash and labels
+  feverArc(), // fever as one arc on the beat: after every plugin that changes the chart, before its readers
   laptopOctaves(), // Z and X: after scenes and the sim (their bots aren't laptop keys), before note-labels (shifted pitches)
   noteLabels(), // after bar-loop, scenes and the sim: it labels the final chart and sees which device really played
   waitHint(), // ?mode=wait: after 3 s on a note, its key pulses, it sounds once and its name shows; after noteLabels, on the final chart

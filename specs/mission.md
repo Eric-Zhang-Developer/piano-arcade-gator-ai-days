@@ -26,11 +26,12 @@ decides (see the `needs-human` issue). Until then, nothing may claim to meet it.
 - Never invent data. Unknown stays empty and visible. Any number shown to a user is a real count from a real take.
 - Chart notes come from a cited score (cite the source in the chart) or from Eric. Never from an agent's memory.
   Which sources may be committed, and what stays local, is decision 003 (loose on purpose).
-- Judging is against the chart's clock, after the latency offset: PERFECT when |offset| ≤ 25 ms, GREAT when
-  25 ms < |offset| ≤ 50 ms, GOOD when 50 ms < |offset| ≤ the GOOD window (100 ms, a named setting), MISS when no
-  matching key arrives within the GOOD window. Each bound counts as the better judgment (exactly 25 ms is PERFECT).
+- Judging is against the chart's clock, after the latency offset: PERFECT when |offset| ≤ 40 ms, GREAT when
+  40 ms < |offset| ≤ 80 ms, GOOD when 80 ms < |offset| ≤ the GOOD window (120 ms, a named setting), MISS when no
+  matching key arrives within the GOOD window. Each bound counts as the better judgment (exactly 40 ms is PERFECT).
   Punish what a listener hears as wrong: PERFECT, GREAT and GOOD keep the combo; a MISS breaks it, and so does a
-  WRONG note (decision `judging-tiers-punish-what-sounds-wrong.md`).
+  WRONG note (decision `judging-tiers-punish-what-sounds-wrong.md`). A full combo (no MISS, no WRONG) ranks at
+  least B, whatever its accuracy (decision `judging-windows-wider.md`).
 - A key press that matches no chart note is an extra: counted, never a MISS. An extra is a WRONG note unless a note
   of the same pitch is within 150 ms of it (part of that note's timing) or it falls before the first note's window
   opens or after the last one's closes.

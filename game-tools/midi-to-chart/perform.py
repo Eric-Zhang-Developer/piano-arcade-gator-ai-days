@@ -10,13 +10,15 @@ level, for an excerpt under a single printed mark; --marks lists an excerpt's ma
   R@4=p        a level from beat 4 on, in that staff (L, R, or RL for a mark between the staves)
   RL@8-18~+16  a hairpin: ramps linearly from the level at 8 to it +16 (or -16) at 18, then holds
   R@19!        an accent or sf: one step (+16) on the notes starting at 19, in that staff, only
-Before the first mark a staff is at mf.
+Before the first mark a staff is at mf. dynamics reads that list off the cited LilyPond instead: --right and --left name
+the voices on each staff, and --midi with --bars (or --spans) places them, as convert.py placed the chart.
 
   python3 perform.py pedal chart.json --midi song.mid --pickup 1 --bars 1-13
   python3 perform.py pedal chart.json --ly song.ly --context pedalOne --spans 0-12,0-11 --start-beat 1
   python3 perform.py pedal chart.json --harmony
   python3 perform.py velocity chart.json --mark pp
   python3 perform.py velocity chart.json --marks "L@0=p,R@4=p,RL@8-18~+16,R@19!"
+  python3 perform.py dynamics chart.json --ly song.ly --right top,middle --left bottom --midi song.mid --bars 22-31
   python3 perform.py --self-test
 Writes pedal.json next to the chart, or the chart in place with only velocity fields changed.
 """
@@ -86,56 +88,226 @@ def midi_pedal(path):
     return pairs_of(sorted(events, key=lambda e: (e[0], e[1]))), mid
 
 
-TOKEN = re.compile(r"\\repeat\s+(volta|unfold)\s+(\d+)\s*\{|\\alternative\s*\{|\{|\}|\\sustainOn|\\sustainOff"
-                   r"|\\partial\s+\d+\.*|\\\w+|\b[sR](\d+)(\.*)(?:\*(\d+)(?:/(\d+))?)?")
+# A note, chord repeat, rest or skip, not inside a word (Staff.SustainPedal holds no note): name, octave marks, duration.
+NOTE = re.compile(r"(?<![A-Za-z0-9._-])([a-g](?:isis|eses|is|es|ss|ff|s|f)?|[rRsq])(?![a-zA-Z])[',]*[!?]?")
+DURATION = re.compile(r"(\d+)(\.*)(?:\*(\d+)(?:/(\d+))?)?")
+DYNAMICS = {"ppp", "pp", "p", "mp", "mf", "f", "ff", "fff", "sf", "sfz", "fp", "<", ">", "!", "cresc", "dim", "decresc",
+            "accent"}
+PEDAL = {"sustainOn": "down", "sustainOff": "up", "sustainDown": "down", "sustainUp": "up"}
 
 
-def ly_pedal(text, context):
-    """A LilyPond pedal line -> [(down, up)] in quarter notes from its start, read the way notation MIDI plays it: a volta
-    repeat once with its alternatives in turn, an unfold repeat N times. A \\sustainOn/Off is postfix: it sounds at the
-    onset of the skip it follows."""
-    start = re.search(r'\\new\s+\w+\s*=\s*"' + re.escape(context) + r'"\s*\{', text)
+def ly_voice(text, name, unfold=False, marks=()):
+    """A LilyPond voice or context, read for timing only: ([note onsets], [(onset, mark)]), in quarter notes from its start.
+
+    Repeats play the way the score's MIDI plays them: a volta repeat once with its alternatives in turn, or with
+    unfold=True (a MIDI made through \\unfoldRepeats) its body before each alternative. A mark is postfix: it belongs to
+    the onset of the note, chord, rest or skip it follows. Marks read: dynamics, hairpins, accents, the sustain pedal, and any
+    names in `marks` (a score's own pedal macros). Pitches, markup, scheme and strings are skipped."""
+    text = re.sub(r"%\{.*?%\}|%[^\n]*", "", text, flags=re.S)
+    start = (re.search(r'\\new\s+\w+\s*=\s*"' + re.escape(name) + r'"\s*(?=\{)', text)  # a context with its music here
+             or re.search(r"^\s*" + re.escape(name) + r"\s*=", text, re.M))  # or a variable
     if not start:
-        raise SystemExit(f"no context {context!r}")
-    tokens = TOKEN.finditer(text, start.end())
+        raise SystemExit(f"no voice {name!r}")
+    i = text.index("{", start.end())
+    notes, out = [], []
+    state = {"t": Fraction(0), "onset": Fraction(0), "dur": Fraction(1), "scale": Fraction(1), "tied": False}
 
-    def block():  # until the matching }: a list of items, each ("skip", length) | ("on"|"off",) | ("rep", n, items)
-        items = []
-        for m in tokens:
-            s = m.group(0)
-            if s == "}":
-                return items
-            if m.group(1):
-                items.append(("rep", int(m.group(2)) if m.group(1) == "unfold" else 1, block()))
-            elif s.startswith("\\alternative") or s == "{":
-                items.append(("rep", 1, block()))
-            elif s == "\\sustainOn":
-                items.append(("on",))
-            elif s == "\\sustainOff":
-                items.append(("off",))
-            elif m.group(3):
-                length = Fraction(4, int(m.group(3)))
-                length *= sum(Fraction(1, 2 ** k) for k in range(len(m.group(4)) + 1))  # dots
-                if m.group(5):
-                    length *= Fraction(int(m.group(5)), int(m.group(6) or 1))
-                items.append(("skip", length))
-        return items
+    def skip_balanced(j, o, c):
+        depth = 0
+        for k in range(j, len(text)):
+            depth += (text[k] == o) - (text[k] == c)
+            if depth == 0:
+                return k + 1
+        return len(text)
 
-    events, t, onset = [], Fraction(0), Fraction(0)
+    def skip_arg(j):  # one argument: a string, a scheme value, a braced block, or a word
+        j = len(text[j:]) - len(text[j:].lstrip()) + j
+        if text[j] == '"':
+            return re.compile(r'"(?:\\.|[^"\\])*"').match(text, j).end()
+        if text[j] == "#":
+            return skip_scheme(j)
+        if text[j] == "{":
+            return skip_balanced(j, "{", "}")
+        return re.compile(r"[^\s{}]+").match(text, j).end()
 
-    def walk(items):
-        nonlocal t, onset
-        for it in items:
-            if it[0] == "skip":
-                onset, t = t, t + it[1]
-            elif it[0] == "rep":
-                for _ in range(it[1]):
-                    walk(it[2])
-            else:  # a postfix mark: it sounds at the onset of the skip it follows
-                events.append((onset, it[0] == "on"))
+    def skip_scheme(j):
+        j += 1
+        while text[j] in "#'`":
+            j += 1
+        if text[j] == "(":
+            return skip_balanced(j, "(", ")")
+        if text[j] == '"':
+            return skip_arg(j)
+        return re.compile(r"[^\s{}]*").match(text, j).end()
 
-    walk(block())
-    return pairs_of(events)
+    def length(j):  # the duration written at j, or the last one (LilyPond carries it); returns (length, index after)
+        m = DURATION.match(text, j)
+        if m:
+            d = Fraction(4, int(m.group(1))) * sum(Fraction(1, 2 ** k) for k in range(len(m.group(2)) + 1))
+            if m.group(3):
+                d *= Fraction(int(m.group(3)), int(m.group(4) or 1))
+            state["dur"], j = d, m.end()
+        return state["dur"] * state["scale"], j
+
+    def skip_markup(j):  # \markup's argument: its own commands, then a braced block, a string or a word
+        while True:
+            j = len(text[j:]) - len(text[j:].lstrip()) + j
+            m = re.compile(r"\\[a-zA-Z-]+").match(text, j)
+            if not m:
+                return skip_arg(j)
+            j = m.end()
+
+    def event(d, sounding):  # a tied-into note sounds on, but isn't struck again
+        state["onset"] = state["t"]
+        if sounding and not state["tied"]:
+            notes.append(state["t"])
+        state["t"] += d
+        state["tied"] = False
+
+    def music(j, until="}"):  # read music from j to the closing `until`; returns the index after it
+        while True:
+            j = len(text[j:]) - len(text[j:].lstrip()) + j
+            if j >= len(text):
+                return j
+            c = text[j]
+            if text.startswith(until, j):
+                return j + len(until)
+            if text.startswith("<<", j):
+                t0, ends, j = state["t"], [], j + 2
+                while True:  # branches split by \\, each from t0; the slowest sets the time after
+                    j = music(j, "\\\\") if branch_has(j, "\\\\") else music(j, ">>")
+                    ends.append(state["t"])
+                    if text.startswith(">>", j - 2):
+                        break
+                    state["t"] = t0
+                state["t"] = max(ends)
+                continue
+            if c == "{":
+                j = music(j + 1)
+                continue
+            if c == "<":  # a chord: its notes sound together, for the duration after the >
+                d, j = length(text.index(">", j) + 1)
+                event(d, True)
+                continue
+            if c in '"':
+                j = skip_arg(j)
+                continue
+            if c == "#":
+                j = skip_scheme(j)
+                continue
+            if c == "\\":
+                m = re.compile(r"\\([a-zA-Z]+|.)").match(text, j)
+                w, j = m.group(1), m.end()
+                if w in ("<", ">", "!") or w in DYNAMICS or w in PEDAL or w in marks:
+                    out.append((state["onset"], PEDAL.get(w, w)))
+                elif w == "repeat":
+                    kind, n = re.compile(r"\s*(\w+)\s+(\d+)").match(text, j).groups()
+                    j = re.compile(r"\s*(\w+)\s+(\d+)").match(text, j).end()
+                    j = len(text[j:]) - len(text[j:].lstrip()) + j
+                    body = j
+                    end = skip_balanced(j, "{", "}") if text[j] == "{" else skip_arg(j)
+                    alt = re.compile(r"\s*\\alternative\s*\{").match(text, end)
+                    alts = []
+                    if alt:
+                        k = alt.end()
+                        while True:
+                            k = len(text[k:]) - len(text[k:].lstrip()) + k
+                            if text[k] == "}":
+                                break
+                            alts.append(k)
+                            k = skip_balanced(k, "{", "}")
+                        after = k + 1
+                    else:
+                        after = end
+                    times = int(n) if kind == "unfold" or (unfold and not alts) else 1
+                    if kind == "volta" and unfold and alts:
+                        for a in alts:
+                            music(body + 1)
+                            music(a + 1)
+                    else:
+                        for _ in range(times):
+                            music(body + 1) if text[body] == "{" else None
+                        for a in alts:
+                            music(a + 1)
+                    j = after
+                elif w in ("times", "tuplet"):
+                    a2, b2 = re.compile(r"\s*(\d+)/(\d+)").match(text, j).groups()
+                    j = re.compile(r"\s*(\d+)/(\d+)").match(text, j).end()
+                    f = Fraction(int(a2), int(b2)) if w == "times" else Fraction(int(b2), int(a2))
+                    state["scale"] *= f
+                    j = len(text[j:]) - len(text[j:].lstrip()) + j
+                    j = music(j + 1)
+                    state["scale"] /= f
+                elif w in ("grace", "acciaccatura", "appoggiatura", "afterGrace"):
+                    t, scale = state["t"], state["scale"]
+                    state["scale"] = Fraction(0)  # graces take no time
+                    j = len(text[j:]) - len(text[j:].lstrip()) + j
+                    if text[j] == "{":
+                        j = music(j + 1)
+                    else:
+                        m = NOTE.match(text, j)
+                        j = length(m.end())[1] if m else j
+                    state["scale"], state["t"] = scale, t
+                elif w in ("markup", "mark", "bar", "clef", "set", "override", "once", "tempo", "key", "time", "partial",
+                           "relative", "transpose", "change", "context", "new", "unset", "revert", "tweak"):
+                    if w == "markup":
+                        j = skip_markup(j)
+                    elif w in ("bar", "clef", "change"):
+                        j = skip_arg(j)
+                        if w == "change":
+                            j = skip_arg(skip_arg(j))  # Staff = "name"
+                    elif w == "key":
+                        j = skip_arg(j)  # the pitch; \major follows as a command
+                    elif w == "time":
+                        j = re.compile(r"\s*[\d/,]+").match(text, j).end()
+                    elif w == "partial":
+                        j = re.compile(r"\s*\d+\.*(?:\*\d+(?:/\d+)?)?").match(text, j).end()
+                    elif w == "relative":
+                        m = NOTE.match(text, len(text[j:]) - len(text[j:].lstrip()) + j)
+                        j = m.end() if m and text[j:].lstrip()[0] != "{" else j
+                    elif w == "transpose":
+                        j = skip_arg(skip_arg(j))
+                    elif w in ("set", "override", "unset", "revert", "once", "tweak", "context", "new", "tempo", "mark"):
+                        pass  # their arguments are words, strings, scheme or numbers: harmless when skipped one by one
+                continue
+            m = NOTE.match(text, j)
+            if m:
+                d, j = length(m.end())
+                event(d, m.group(1) not in ("r", "R", "s"))
+                continue
+            if c in "-^_" and text.startswith(">", j + 1):  # an accent, ->
+                out.append((state["onset"], "accent"))
+                j += 2
+                continue
+            state["tied"] |= c == "~"
+            j += 1  # anything else: ties, slurs, beams, articulation, fingering, bar checks
+
+    def branch_has(j, sep):  # does a << >> branch end at a \\ before its >>?
+        depth, k = 0, j
+        while k < len(text):
+            if text.startswith("<<", k):
+                depth += 1
+                k += 2
+                continue
+            if text.startswith(">>", k):
+                if depth == 0:
+                    return False
+                depth -= 1
+                k += 2
+                continue
+            if text.startswith(sep, k) and depth == 0:
+                return True
+            k += 1
+        return False
+
+    music(i + 1)
+    return notes, out
+
+
+def ly_pedal(text, name, down="sustainOn", up="sustainOff"):
+    """A score's pedal marks -> [(down, up)] in quarter notes: its \\sustainOn/Off (or Down/Up), or its own macros."""
+    _, marks = ly_voice(text, name, marks=(down, up))
+    return pairs_of([(t, m in ("down", down)) for t, m in marks if m in ("down", "up", down, up)])
 
 
 def harmony_pedal(chart):
@@ -221,6 +393,54 @@ def mark_velocities(notes, marks):
         n["velocity"] = max(1, min(127, round(level(n["hand"], t) + (16 if accent else 0))))
 
 
+HAIRPIN = {"<": 1, "cresc": 1, ">": -1, "dim": -1, "decresc": -1}
+
+
+def ly_marks(voices, segs, end):
+    """{hand: [(source time, mark)]} as ly_voice reads them -> --marks items in chart beats, on decision
+    demo-performance-dynamics's rules. A level or hairpin sets its own staff, and the other staff too unless that staff
+    has its own at that beat; a hairpin (or cresc./dim.) runs to the next mark or \\! in its staff, or the excerpt's end;
+    sf, sfz and accents are their own staff's only; fp is an accent, then p. A level before the excerpt (or between its
+    spans) holds from where the excerpt picks up."""
+    def beats(t, level):  # a source time in every span that plays it; a level outside them, the next span's start
+        got = [t - lo + shift for lo, hi, shift in segs if lo <= t < hi]
+        return got or ([shift for lo, hi, shift in sorted(segs) if lo > t][:1] if level else [])
+
+    sets, ramps, accents = {"R": {}, "L": {}}, {"R": [], "L": []}, {"R": [], "L": []}
+    for h, marks in voices.items():
+        opened = None
+        order = lambda m: 0 if m == "!" else 2 if m in HAIRPIN else 1  # on one note: \\! ends, the level sets, < starts
+        for b, _, _, m in sorted((b, order(m), i, m) for i, (t, m) in enumerate(sorted(marks, key=lambda x: x[0]))
+                                 for b in beats(t, m in LADDER or m == "fp")):
+            if opened and (m in LADDER or m in HAIRPIN or m in ("!", "fp")):
+                if b > opened[0]:
+                    ramps[h].append((opened[0], b, opened[1]))
+                opened = None
+            if m in LADDER or m == "fp":
+                sets[h][b] = "p" if m == "fp" else m  # the last at a beat wins
+            if m in ("sf", "sfz", "fp", "accent"):
+                accents[h].append(b)
+            if m in HAIRPIN:
+                opened = (b, HAIRPIN[m])
+        if opened and end > opened[0]:
+            ramps[h].append((opened[0], end, opened[1]))
+    out = []
+    for h, o in (("R", "L"), ("L", "R")):
+        own = set(sets[h]) | {r[0] for r in ramps[h]}
+        out += [f"{h}@{b}={m}" for b, m in sorted({**{b: m for b, m in sets[o].items() if b not in own}, **sets[h]}.items())]
+        out += [f"{h}@{x}-{y}~{16 * s:+d}" for x, y, s in sorted(ramps[h] + [r for r in ramps[o] if r[0] not in own])]
+        out += [f"{h}@{b}!" for b in sorted(set(accents[h]))]
+    return out
+
+
+def source_time(beat, segs):
+    """The inverse of segments(): a chart beat -> its time in the source, or None if no segment holds it."""
+    for lo, hi, shift in segs:
+        if shift <= beat < shift + (hi - lo):
+            return beat - shift + lo
+    return None
+
+
 def write_pedal(chart_path, pairs):
     chart = json.loads(Path(chart_path).read_text())
     end = max(Fraction(n["beat"]) + Fraction(n["duration"]) for n in chart["notes"])
@@ -248,6 +468,14 @@ def self_test():
     notes = [{"hand": h, "beat": b} for h, b in [("L", 0), ("R", 4), ("R", 8), ("L", 13), ("R", 18), ("R", 19), ("R", 20)]]
     mark_velocities(notes, "L@0=p,R@4=p,RL@8-18~+16,R@19!,R@20=p")
     assert [n["velocity"] for n in notes] == [49, 49, 49, 57, 65, 81, 49], [n["velocity"] for n in notes]
+    # From the score: the last level before the excerpt holds from its start and reaches the left staff; a < written
+    # before its note's mp still starts from mp; each staff's hairpin at 1 stays its own, so the right's mp doesn't reach
+    # the left; the left's fp is its accent and both staves' p; a spans' repeat repeats its marks.
+    got = ly_marks({"R": [(0, "f"), (1, "p"), (3, "<"), (3, "mp"), (5, "!"), (6, "accent")], "L": [(3, ">"), (7, "fp")]},
+                   [(2, 8, 0)], 6)
+    assert got == ["R@0=p", "R@1=mp", "R@5=p", "R@1-3~+16", "R@4!", "L@0=p", "L@5=p", "L@1-5~-16", "L@5!"], got
+    assert ly_marks({"R": [(1, "p")]}, [(0, 2, 0), (0, 2, 2)], 4) == ["R@1=p", "R@3=p", "L@1=p", "L@3=p"]
+    assert ly_voice(r"v = { c4-> d\accent e^> f\sf }", "v")[1] == [(0, "accent"), (1, "accent"), (2, "accent"), (3, "sf")]
     print("self-test: pass")
 
 
@@ -255,7 +483,7 @@ def main():
     if "--self-test" in sys.argv:
         return self_test()
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("what", choices=["pedal", "velocity"])
+    ap.add_argument("what", choices=["pedal", "velocity", "dynamics"])
     ap.add_argument("chart")
     ap.add_argument("--midi")
     ap.add_argument("--ly")
@@ -267,6 +495,11 @@ def main():
     ap.add_argument("--start-beat", type=Fraction, default=0)
     ap.add_argument("--mark", choices=list(LADDER))
     ap.add_argument("--marks")
+    ap.add_argument("--right", help="dynamics: the LilyPond voices on the right hand's staff, comma-separated")
+    ap.add_argument("--left", help="dynamics: the voices on the left hand's staff")
+    ap.add_argument("--unfold", action="store_true", help="the MIDI plays repeats out (made with \\unfoldRepeats)")
+    ap.add_argument("--down", default="sustainOn", help="pedal --ly: the score's own pedal-down command, if a macro")
+    ap.add_argument("--up", default="sustainOff", help="pedal --ly: its pedal-up command")
     a = ap.parse_args()
     if a.what == "velocity":
         chart = json.loads(Path(a.chart).read_text())
@@ -281,18 +514,56 @@ def main():
     bars = tuple(int(x) for x in a.bars.split("-")) if a.bars else None
     if a.harmony:
         return write_pedal(a.chart, harmony_pedal(json.loads(Path(a.chart).read_text())))
-    if a.midi:
-        pairs, mid = midi_pedal(a.midi)
-        from convert import bar_starts
-
-        if bars:
-            ticks, lengths = bar_starts(mid, bars[1], int(a.pickup * mid.ticks_per_beat))
-            starts = ([Fraction(t, mid.ticks_per_beat) for t in ticks], lengths)
-        segs = segments(bars, a.pickup, spans, a.start_beat, starts if bars else None)
+    if a.what == "dynamics":
+        return dynamics(a, bars, spans)
+    if a.midi and not a.ly:
+        pairs, _ = midi_pedal(a.midi)
+        segs, _ = midi_segments(a.midi, bars, a.pickup, spans, a.start_beat)
     else:
-        pairs = ly_pedal(Path(a.ly).read_text(), a.context)
-        segs = segments(None, 0, spans, a.start_beat)
+        pairs = ly_pedal(Path(a.ly).read_text(), a.context, a.down, a.up)
+        segs = midi_segments(a.midi, bars, a.pickup, spans, a.start_beat)[0] if bars else segments(None, 0, spans, a.start_beat)
     write_pedal(a.chart, clip(pairs, segs))
+
+
+def midi_segments(midi, bars, pickup, spans, start_beat):
+    """segments() with --bars measured on the score's MIDI, as convert.py measured them."""
+    import mido
+    from convert import bar_starts
+
+    mid = mido.MidiFile(midi)
+    starts = None
+    if bars:
+        ticks, lengths = bar_starts(mid, bars[1], int(pickup * mid.ticks_per_beat))
+        starts = ([Fraction(t, mid.ticks_per_beat) for t in ticks], lengths)
+    return segments(bars, pickup, spans, start_beat, starts), mid
+
+
+def dynamics(a, bars, spans):
+    """Velocities from the score's marks, placed by its LilyPond voices. Refuses unless every chart note maps back to a
+    note-on of its pitch in the MIDI, so a wrong bar range can't put marks on the wrong notes."""
+    segs, mid = midi_segments(a.midi, bars, a.pickup, spans, a.start_beat)
+    onsets = set()
+    for track in mid.tracks:
+        t = 0
+        for msg in track:
+            t += msg.time
+            if msg.type == "note_on" and msg.velocity:
+                onsets.add((Fraction(t, mid.ticks_per_beat), msg.note))
+    text = Path(a.ly).read_text()
+    voices = {h: [m for v in names.split(",") for m in ly_voice(text, v, unfold=a.unfold)[1]]
+              for h, names in (("R", a.right), ("L", a.left)) if names}
+    chart = json.loads(Path(a.chart).read_text())
+    end = max(Fraction(n["beat"]) + Fraction(n["duration"]) for n in chart["notes"])
+    marks = ",".join(ly_marks(voices, segs, end))
+    times = [source_time(Fraction(n["beat"]).limit_denominator(48), segs) for n in chart["notes"]]
+    off = [n["id"] for n, t in zip(chart["notes"], times) if t is None or (t, n["pitch"]) not in onsets]
+    if off:
+        raise SystemExit(f"{len(off)} of {len(times)} notes aren't note-ons in the MIDI at their mapped time (first {off[:5]})")
+    print(f"--marks {marks}", file=sys.stderr)
+    mark_velocities(chart["notes"], marks)
+    Path(a.chart).write_text(json.dumps(chart, indent=2, ensure_ascii=False) + "\n")
+    levels = sorted({n["velocity"] for n in chart["notes"]})
+    print(f"{a.chart}: {len(times)} notes, velocities {levels[0]}–{levels[-1]} ({len(levels)} levels)", file=sys.stderr)
 
 
 if __name__ == "__main__":

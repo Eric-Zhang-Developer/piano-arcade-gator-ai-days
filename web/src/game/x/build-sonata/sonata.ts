@@ -25,8 +25,13 @@ export interface Snapshot {
   red: { number: number; from: string; to: string | null }[] | null; // main-red issues; null: gh couldn't read them
 }
 
-// "feat(build-sonata): the DGX plays (#1162)" → its type, scope and PR. No PR number: not a merged PR, no note.
+// "feat(build-sonata): the DGX plays (#1162)" → its type, scope and PR. The night's first PRs were merge commits,
+// "Merge pull request #9 from <owner>/plan-game-lane": the PR, and the type its branch name starts with, if any.
+// No PR number: not a merged PR, no note.
+const TYPES = /^(feat|fix|plan|contract|docs|chore|refactor|perf|test|style|revert)[-/]/;
 export function parseSubject(s: string): { type: string; scope: string | null; pr: number } | null {
+  const merge = s.match(/^Merge pull request #(\d+) from [^/\s]+\/(\S+)/);
+  if (merge) return { type: merge[2].match(TYPES)?.[1] ?? "other", scope: null, pr: Number(merge[1]) };
   const pr = s.match(/\(#(\d+)\)\s*$/);
   if (!pr) return null;
   const cc = s.match(/^([a-z]+)(?:\(([^)]+)\))?!?:/);
@@ -60,7 +65,9 @@ export function laneOf(type: string, scope: string | null, paths: string[], assi
 export const EMAIL = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g;
 export function scrub(text: string, names: string[], lane: Lane): string {
   let out = text.replace(EMAIL, lane);
-  for (const n of names) out = out.replace(new RegExp(`@?\\b${n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "gi"), lane);
+  // Longest first, so a handle goes whole before the name inside it.
+  for (const n of [...names].sort((a, b) => b.length - a.length))
+    out = out.replace(new RegExp(`@?\\b${n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "gi"), lane);
   return out;
 }
 
@@ -76,7 +83,7 @@ type Chord = "I" | "V" | "vi" | "IV";
 const PROGRESSION: Chord[] = ["I", "V", "vi", "IV"];
 export const CHORD_TONES: Record<Chord, number[]> = { I: [0, 4, 7], V: [7, 11, 2], vi: [9, 0, 4], IV: [5, 9, 0] };
 const SCALE = [0, 2, 4, 5, 7, 9, 11];
-const REGISTER: Record<Lane, [number, number]> = { game: [72, 88], bell: [96, 108], learning: [55, 69], backend: [36, 52] };
+export const REGISTER: Record<Lane, [number, number]> = { game: [72, 88], bell: [96, 108], learning: [55, 69], backend: [36, 52] };
 export const HAND: Record<Lane, "R" | "L"> = { game: "R", bell: "R", learning: "L", backend: "L" };
 
 const tonesIn = (chord: Chord, [lo, hi]: [number, number]) => {

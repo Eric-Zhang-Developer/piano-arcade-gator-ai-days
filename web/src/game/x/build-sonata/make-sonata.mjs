@@ -5,7 +5,7 @@
 // Lanes table for the names to scrub, and `gh` for main-red issues' open and close times. Writes snapshot.json here,
 // and the chart and pedal it makes into web/public/songs/x/build-sonata/.
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { buildSonata, laneOf, parseSubject, scrub } from "./sonata.ts";
 
 const here = new URL(".", import.meta.url).pathname;

@@ -2,111 +2,159 @@
  "id": "build-sonata",
  "title": "The Build Sonata",
  "composer": "The agents who built Étude",
- "catalog": "691 merged PRs",
+ "catalog": "707 merged PRs",
  "source": "This repository's git history on main, one note per merged PR (game/x/build-sonata/snapshot.json)",
  "bpm": 120,
  "beatsPerBar": 4,
  "notes": [
   {
-   "id": "794db39",
+   "id": "acf9b70",
    "pitch": 76,
    "beat": 0,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 110
+  },
+  {
+   "id": "e04bce3",
+   "pitch": 100,
+   "beat": 0.25,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 87
+  },
+  {
+   "id": "d591016",
+   "pitch": 79,
+   "beat": 2,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 110
+  },
+  {
+   "id": "6207e70",
+   "pitch": 103,
+   "beat": 2.25,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 84
+  },
+  {
+   "id": "143711e",
+   "pitch": 107,
+   "beat": 4.25,
+   "duration": 0.25,
+   "hand": "R",
+   "velocity": 102
+  },
+  {
+   "id": "c1b88e3",
+   "pitch": 107,
+   "beat": 4.5,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 91
+  },
+  {
+   "id": "794db39",
+   "pitch": 86,
+   "beat": 6,
    "duration": 2,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "43e83d4",
-   "pitch": 100,
-   "beat": 0.25,
-   "duration": 0.5,
+   "pitch": 107,
+   "beat": 6.5,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 89
   },
   {
    "id": "9ea194e",
-   "pitch": 103,
-   "beat": 0.5,
-   "duration": 0.5,
+   "pitch": 107,
+   "beat": 6.75,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 83
   },
   {
    "id": "f1c7ae7",
-   "pitch": 108,
-   "beat": 0.75,
+   "pitch": 107,
+   "beat": 7,
    "duration": 0.5,
    "hand": "R",
    "velocity": 88
   },
   {
    "id": "6ac4c2d",
-   "pitch": 79,
-   "beat": 1.25,
-   "duration": 1.5,
+   "pitch": 83,
+   "beat": 7.25,
+   "duration": 2,
    "hand": "R",
    "velocity": 94
   },
   {
    "id": "b12edc9-pass",
-   "pitch": 86,
-   "beat": 1.5,
+   "pitch": 81,
+   "beat": 7.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 70
   },
   {
    "id": "19843d7",
-   "pitch": 88,
-   "beat": 1.75,
+   "pitch": 72,
+   "beat": 8,
    "duration": 2,
    "hand": "R",
    "velocity": 105
   },
   {
    "id": "09ea1fd",
-   "pitch": 103,
-   "beat": 2,
+   "pitch": 105,
+   "beat": 8.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 83
   },
   {
    "id": "62c9e98",
-   "pitch": 84,
-   "beat": 2.5,
-   "duration": 1.75,
+   "pitch": 76,
+   "beat": 8.5,
+   "duration": 2,
    "hand": "R",
    "velocity": 108
   },
   {
    "id": "bc99289",
-   "pitch": 79,
-   "beat": 2.75,
-   "duration": 1.25,
+   "pitch": 81,
+   "beat": 8.75,
+   "duration": 2,
    "hand": "R",
    "velocity": 94
   },
   {
    "id": "5f41783",
-   "pitch": 76,
-   "beat": 3,
-   "duration": 2,
+   "pitch": 84,
+   "beat": 9,
+   "duration": 1,
    "hand": "R",
    "velocity": 101
   },
   {
    "id": "c47b9a2",
    "pitch": 100,
-   "beat": 3.25,
+   "beat": 9.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 81
   },
   {
    "id": "8ca3292",
-   "pitch": 72,
-   "beat": 3.5,
+   "pitch": 88,
+   "beat": 9.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 61
@@ -114,95 +162,111 @@
   {
    "id": "2e20cb7",
    "pitch": 96,
-   "beat": 3.75,
+   "beat": 9.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 88
   },
   {
    "id": "e07d449",
-   "pitch": 79,
-   "beat": 4,
+   "pitch": 84,
+   "beat": 10,
    "duration": 0.5,
    "hand": "R",
    "velocity": 73
   },
   {
    "id": "c0c90ee-pass",
-   "pitch": 84,
-   "beat": 4.25,
+   "pitch": 83,
+   "beat": 10.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 51
   },
   {
    "id": "e36ac62",
-   "pitch": 103,
-   "beat": 4.5,
+   "pitch": 100,
+   "beat": 10.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 84
   },
   {
    "id": "6219438",
-   "pitch": 107,
-   "beat": 4.75,
+   "pitch": 105,
+   "beat": 10.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 95
   },
   {
+   "id": "358352d",
+   "pitch": 108,
+   "beat": 11,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 85
+  },
+  {
    "id": "1709c87",
-   "pitch": 103,
-   "beat": 5,
+   "pitch": 105,
+   "beat": 11.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 84
   },
   {
+   "id": "5a336f6",
+   "pitch": 100,
+   "beat": 11.5,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 85
+  },
+  {
    "id": "a6a5482",
-   "pitch": 98,
-   "beat": 5.25,
+   "pitch": 96,
+   "beat": 11.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 51
   },
   {
    "id": "197ddb7",
-   "pitch": 86,
-   "beat": 5.5,
-   "duration": 1.5,
+   "pitch": 77,
+   "beat": 12,
+   "duration": 2,
    "hand": "R",
    "velocity": 103
   },
   {
    "id": "58825ca",
-   "pitch": 83,
-   "beat": 5.75,
-   "duration": 1.5,
+   "pitch": 72,
+   "beat": 12.25,
+   "duration": 1,
    "hand": "R",
    "velocity": 94
   },
   {
    "id": "f569352-pass",
-   "pitch": 81,
-   "beat": 6,
+   "pitch": 79,
+   "beat": 12.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 72
   },
   {
    "id": "0ad14b2-pass",
-   "pitch": 76,
-   "beat": 6.25,
+   "pitch": 83,
+   "beat": 12.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 56
   },
   {
    "id": "05c0053-pass",
-   "pitch": 77,
-   "beat": 6.5,
+   "pitch": 86,
+   "beat": 13,
    "duration": 0.25,
    "hand": "R",
    "velocity": 78
@@ -210,79 +274,87 @@
   {
    "id": "8d087a6-resolve",
    "pitch": 72,
-   "beat": 6.75,
+   "beat": 13.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 71
   },
   {
    "id": "7e92ec1",
-   "pitch": 86,
-   "beat": 7,
-   "duration": 2,
+   "pitch": 84,
+   "beat": 13.5,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 99
   },
   {
    "id": "ee94e83",
-   "pitch": 83,
-   "beat": 7.25,
-   "duration": 2,
+   "pitch": 84,
+   "beat": 13.75,
+   "duration": 0.5,
    "hand": "R",
    "velocity": 90
   },
   {
+   "id": "e4626d3",
+   "pitch": 101,
+   "beat": 14,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 77
+  },
+  {
    "id": "5ddfc3b",
-   "pitch": 79,
-   "beat": 7.5,
+   "pitch": 84,
+   "beat": 14.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 67
   },
   {
    "id": "3a507a6",
-   "pitch": 103,
-   "beat": 7.75,
+   "pitch": 105,
+   "beat": 14.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 95
   },
   {
    "id": "6a8a575",
-   "pitch": 105,
-   "beat": 8,
+   "pitch": 108,
+   "beat": 14.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 91
   },
   {
    "id": "be7401d",
-   "pitch": 72,
-   "beat": 8.25,
-   "duration": 2,
+   "pitch": 84,
+   "beat": 15,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 109
   },
   {
    "id": "71902eb",
-   "pitch": 76,
-   "beat": 8.5,
-   "duration": 2,
+   "pitch": 84,
+   "beat": 15.25,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 96
   },
   {
    "id": "968e45a",
-   "pitch": 81,
-   "beat": 8.75,
-   "duration": 2,
+   "pitch": 84,
+   "beat": 15.5,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 100
   },
   {
    "id": "9cf8831",
    "pitch": 84,
-   "beat": 9,
+   "beat": 15.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 56
@@ -290,7 +362,7 @@
   {
    "id": "3389207-pass",
    "pitch": 86,
-   "beat": 9.25,
+   "beat": 16,
    "duration": 0.25,
    "hand": "R",
    "velocity": 76
@@ -298,15 +370,15 @@
   {
    "id": "75b23e9",
    "pitch": 84,
-   "beat": 9.5,
+   "beat": 16.25,
    "duration": 2,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "048f017-pass",
-   "pitch": 83,
-   "beat": 9.75,
+   "pitch": 81,
+   "beat": 16.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
@@ -314,7 +386,7 @@
   {
    "id": "cb601c1-pass",
    "pitch": 77,
-   "beat": 10,
+   "beat": 16.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 82
@@ -322,7 +394,7 @@
   {
    "id": "44825ff",
    "pitch": 72,
-   "beat": 10.25,
+   "beat": 17,
    "duration": 2,
    "hand": "R",
    "velocity": 95
@@ -330,15 +402,15 @@
   {
    "id": "c51ce52-pass",
    "pitch": 77,
-   "beat": 10.5,
+   "beat": 17.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 81
   },
   {
    "id": "936ea0a",
-   "pitch": 81,
-   "beat": 10.75,
+   "pitch": 79,
+   "beat": 17.5,
    "duration": 2,
    "hand": "R",
    "velocity": 95
@@ -346,7 +418,7 @@
   {
    "id": "ffa0c42-pass",
    "pitch": 86,
-   "beat": 11,
+   "beat": 17.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 51
@@ -354,7 +426,7 @@
   {
    "id": "836f034-pass",
    "pitch": 86,
-   "beat": 11.25,
+   "beat": 18,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
@@ -362,207 +434,207 @@
   {
    "id": "dc611d7",
    "pitch": 84,
-   "beat": 11.5,
+   "beat": 18.25,
    "duration": 2,
    "hand": "R",
    "velocity": 104
   },
   {
    "id": "4b92f53-pass",
-   "pitch": 83,
-   "beat": 11.75,
+   "pitch": 81,
+   "beat": 18.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 68
   },
   {
    "id": "a472951",
-   "pitch": 108,
-   "beat": 12.25,
+   "pitch": 103,
+   "beat": 18.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 97
   },
   {
    "id": "f9f79d0",
-   "pitch": 77,
-   "beat": 12.5,
-   "duration": 1.5,
+   "pitch": 76,
+   "beat": 19,
+   "duration": 2,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "b6cb41f",
    "pitch": 72,
-   "beat": 12.75,
+   "beat": 19.25,
    "duration": 2,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "8f3d1b2",
-   "pitch": 105,
-   "beat": 13.25,
+   "pitch": 100,
+   "beat": 19.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 83
   },
   {
    "id": "d2c1cf2",
-   "pitch": 101,
-   "beat": 13.5,
+   "pitch": 96,
+   "beat": 19.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 105
   },
   {
    "id": "5fce9c1",
-   "pitch": 96,
-   "beat": 13.75,
+   "pitch": 103,
+   "beat": 20,
    "duration": 0.5,
    "hand": "R",
    "velocity": 108
   },
   {
    "id": "6f3d040",
-   "pitch": 77,
-   "beat": 14,
+   "pitch": 79,
+   "beat": 20.25,
    "duration": 2,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "dd08b0f",
-   "pitch": 101,
-   "beat": 14.25,
+   "pitch": 107,
+   "beat": 20.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 104
   },
   {
    "id": "730a1ff",
-   "pitch": 105,
-   "beat": 14.5,
+   "pitch": 103,
+   "beat": 20.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 67
   },
   {
    "id": "197e5b2",
-   "pitch": 81,
-   "beat": 14.75,
+   "pitch": 83,
+   "beat": 21,
    "duration": 0.5,
    "hand": "R",
    "velocity": 84
   },
   {
    "id": "7efcb69-pass",
-   "pitch": 86,
-   "beat": 15,
+   "pitch": 88,
+   "beat": 21.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 98
   },
   {
    "id": "de96e6c-pass",
-   "pitch": 83,
-   "beat": 15.25,
+   "pitch": 84,
+   "beat": 21.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 80
   },
   {
    "id": "2bd71af-pass",
-   "pitch": 79,
-   "beat": 15.5,
+   "pitch": 81,
+   "beat": 21.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 84
   },
   {
    "id": "1d4c008-pass",
-   "pitch": 74,
-   "beat": 15.75,
+   "pitch": 76,
+   "beat": 22,
    "duration": 0.25,
    "hand": "R",
    "velocity": 77
   },
   {
    "id": "a8128f7-pass",
-   "pitch": 77,
-   "beat": 16,
+   "pitch": 81,
+   "beat": 22.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 77
   },
   {
    "id": "ceb5687-pass",
-   "pitch": 81,
-   "beat": 16.25,
+   "pitch": 84,
+   "beat": 22.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 85
   },
   {
    "id": "37ae272",
-   "pitch": 84,
-   "beat": 16.5,
-   "duration": 0.5,
+   "pitch": 86,
+   "beat": 22.75,
+   "duration": 1.5,
    "hand": "R",
    "velocity": 97
   },
   {
    "id": "96301a1",
-   "pitch": 88,
-   "beat": 16.75,
-   "duration": 2,
+   "pitch": 83,
+   "beat": 23,
+   "duration": 1,
    "hand": "R",
    "velocity": 94
   },
   {
    "id": "fe3308d",
-   "pitch": 84,
-   "beat": 17,
-   "duration": 1.5,
+   "pitch": 79,
+   "beat": 23.25,
+   "duration": 0.5,
    "hand": "R",
    "velocity": 69
   },
   {
    "id": "c0aee19",
-   "pitch": 79,
-   "beat": 17.25,
+   "pitch": 74,
+   "beat": 23.5,
    "duration": 2,
    "hand": "R",
    "velocity": 86
   },
   {
    "id": "19e19e9",
-   "pitch": 76,
-   "beat": 17.5,
+   "pitch": 79,
+   "beat": 23.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 89
   },
   {
    "id": "67d4e96-pass",
-   "pitch": 74,
-   "beat": 17.75,
+   "pitch": 83,
+   "beat": 24,
    "duration": 0.25,
    "hand": "R",
    "velocity": 68
   },
   {
    "id": "a151917-pass",
-   "pitch": 77,
-   "beat": 18,
+   "pitch": 86,
+   "beat": 24.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "5759605-pass",
-   "pitch": 81,
-   "beat": 18.25,
+   "pitch": 86,
+   "beat": 24.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 71
@@ -570,191 +642,191 @@
   {
    "id": "94680df",
    "pitch": 84,
-   "beat": 18.5,
+   "beat": 24.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 58
   },
   {
    "id": "0e6c856",
-   "pitch": 88,
-   "beat": 18.75,
-   "duration": 1.75,
+   "pitch": 81,
+   "beat": 25,
+   "duration": 1,
    "hand": "R",
    "velocity": 94
   },
   {
    "id": "5b348d5-pass",
-   "pitch": 86,
-   "beat": 19,
+   "pitch": 77,
+   "beat": 25.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "26e19bf",
-   "pitch": 79,
-   "beat": 19.25,
-   "duration": 0.75,
+   "pitch": 72,
+   "beat": 25.5,
+   "duration": 2,
    "hand": "R",
    "velocity": 96
   },
   {
    "id": "e5742cc",
    "pitch": 76,
-   "beat": 19.5,
-   "duration": 2,
+   "beat": 25.75,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 95
   },
   {
    "id": "924e4d0",
-   "pitch": 72,
-   "beat": 19.75,
-   "duration": 2,
+   "pitch": 81,
+   "beat": 26,
+   "duration": 1.25,
    "hand": "R",
    "velocity": 90
   },
   {
    "id": "bef27a6",
-   "pitch": 79,
-   "beat": 20,
-   "duration": 1.25,
+   "pitch": 84,
+   "beat": 26.25,
+   "duration": 2,
    "hand": "R",
    "velocity": 93
   },
   {
    "id": "0369118",
-   "pitch": 83,
-   "beat": 20.25,
-   "duration": 0.75,
+   "pitch": 88,
+   "beat": 26.5,
+   "duration": 2,
    "hand": "R",
    "velocity": 98
   },
   {
    "id": "be0fdae-pass",
-   "pitch": 88,
-   "beat": 20.5,
+   "pitch": 86,
+   "beat": 26.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
   },
   {
    "id": "2775ad5",
-   "pitch": 107,
-   "beat": 20.75,
+   "pitch": 96,
+   "beat": 27,
    "duration": 0.5,
    "hand": "R",
    "velocity": 70
   },
   {
    "id": "2b22058",
-   "pitch": 83,
-   "beat": 21,
+   "pitch": 81,
+   "beat": 27.25,
    "duration": 1.5,
    "hand": "R",
    "velocity": 95
   },
   {
    "id": "f498da3",
-   "pitch": 79,
-   "beat": 21.25,
+   "pitch": 76,
+   "beat": 27.5,
    "duration": 2,
    "hand": "R",
    "velocity": 85
   },
   {
    "id": "84282d3-pass",
-   "pitch": 76,
-   "beat": 21.5,
+   "pitch": 74,
+   "beat": 27.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 51
   },
   {
    "id": "870884a-pass",
-   "pitch": 81,
-   "beat": 21.75,
+   "pitch": 79,
+   "beat": 28,
    "duration": 0.25,
    "hand": "R",
    "velocity": 102
   },
   {
    "id": "a992e97-pass",
-   "pitch": 84,
-   "beat": 22,
+   "pitch": 83,
+   "beat": 28.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 82
   },
   {
    "id": "aec8f13-pass",
-   "pitch": 88,
-   "beat": 22.25,
+   "pitch": 86,
+   "beat": 28.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 82
   },
   {
    "id": "fdeb19a",
-   "pitch": 83,
-   "beat": 22.5,
-   "duration": 2,
+   "pitch": 81,
+   "beat": 28.75,
+   "duration": 1.5,
    "hand": "R",
    "velocity": 101
   },
   {
    "id": "4ab9f71-pass",
-   "pitch": 81,
-   "beat": 22.75,
+   "pitch": 79,
+   "beat": 29,
    "duration": 0.25,
    "hand": "R",
    "velocity": 73
   },
   {
    "id": "ed191c1-pass",
-   "pitch": 76,
-   "beat": 23,
+   "pitch": 74,
+   "beat": 29.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 87
   },
   {
    "id": "7ef24d8-pass",
-   "pitch": 81,
-   "beat": 23.25,
+   "pitch": 79,
+   "beat": 29.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 75
   },
   {
    "id": "7d00667-pass",
-   "pitch": 84,
-   "beat": 23.5,
+   "pitch": 83,
+   "beat": 29.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 79
   },
   {
    "id": "8b26487",
-   "pitch": 86,
-   "beat": 23.75,
-   "duration": 2,
+   "pitch": 84,
+   "beat": 30,
+   "duration": 1.5,
    "hand": "R",
    "velocity": 65
   },
   {
    "id": "f200252",
    "pitch": 81,
-   "beat": 24,
-   "duration": 2,
+   "beat": 30.25,
+   "duration": 1.5,
    "hand": "R",
    "velocity": 101
   },
   {
    "id": "db7697a",
-   "pitch": 76,
-   "beat": 24.25,
+   "pitch": 77,
+   "beat": 30.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 72
@@ -762,23 +834,23 @@
   {
    "id": "ab95bfe",
    "pitch": 72,
-   "beat": 24.5,
+   "beat": 30.75,
    "duration": 2,
    "hand": "R",
    "velocity": 74
   },
   {
    "id": "bfb08e7",
-   "pitch": 76,
-   "beat": 24.75,
-   "duration": 1.5,
+   "pitch": 77,
+   "beat": 31,
+   "duration": 2,
    "hand": "R",
    "velocity": 97
   },
   {
    "id": "e39842a-pass",
    "pitch": 83,
-   "beat": 25,
+   "beat": 31.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 73
@@ -786,31 +858,31 @@
   {
    "id": "330170b",
    "pitch": 84,
-   "beat": 25.25,
-   "duration": 0.5,
+   "beat": 31.5,
+   "duration": 2,
    "hand": "R",
    "velocity": 83
   },
   {
    "id": "6a41d46",
-   "pitch": 88,
-   "beat": 25.5,
+   "pitch": 81,
+   "beat": 31.75,
    "duration": 2,
    "hand": "R",
    "velocity": 100
   },
   {
    "id": "c81c12b",
-   "pitch": 84,
-   "beat": 25.75,
-   "duration": 2,
+   "pitch": 76,
+   "beat": 32,
+   "duration": 0.5,
    "hand": "R",
    "velocity": 101
   },
   {
    "id": "c079469-pass",
-   "pitch": 83,
-   "beat": 26,
+   "pitch": 74,
+   "beat": 32.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 76
@@ -818,31 +890,31 @@
   {
    "id": "2fe3dc8",
    "pitch": 76,
-   "beat": 26.25,
-   "duration": 2,
+   "beat": 32.5,
+   "duration": 1.5,
    "hand": "R",
    "velocity": 72
   },
   {
    "id": "45a2028",
-   "pitch": 72,
-   "beat": 26.5,
-   "duration": 2,
+   "pitch": 79,
+   "beat": 32.75,
+   "duration": 1,
    "hand": "R",
    "velocity": 92
   },
   {
    "id": "b5758ce-pass",
-   "pitch": 77,
-   "beat": 26.75,
+   "pitch": 86,
+   "beat": 33,
    "duration": 0.25,
    "hand": "R",
    "velocity": 82
   },
   {
    "id": "064a20e-pass",
-   "pitch": 83,
-   "beat": 27,
+   "pitch": 86,
+   "beat": 33.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 97
@@ -850,247 +922,247 @@
   {
    "id": "7bd7e11-pass",
    "pitch": 86,
-   "beat": 27.25,
+   "beat": 33.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 65
   },
   {
    "id": "3feaf83",
-   "pitch": 88,
-   "beat": 27.5,
+   "pitch": 79,
+   "beat": 33.75,
    "duration": 2,
    "hand": "R",
    "velocity": 99
   },
   {
    "id": "5fde456",
-   "pitch": 84,
-   "beat": 27.75,
-   "duration": 1.5,
+   "pitch": 76,
+   "beat": 34,
+   "duration": 0.5,
    "hand": "R",
    "velocity": 65
   },
   {
    "id": "7dcbcaa",
-   "pitch": 81,
-   "beat": 28,
-   "duration": 1,
+   "pitch": 72,
+   "beat": 34.25,
+   "duration": 2,
    "hand": "R",
    "velocity": 80
   },
   {
    "id": "3e14389",
-   "pitch": 77,
-   "beat": 28.25,
-   "duration": 0.5,
+   "pitch": 76,
+   "beat": 34.5,
+   "duration": 2,
    "hand": "R",
    "velocity": 84
   },
   {
    "id": "ce243d5-pass",
-   "pitch": 74,
-   "beat": 28.5,
+   "pitch": 81,
+   "beat": 34.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 80
   },
   {
    "id": "657a231",
-   "pitch": 77,
-   "beat": 28.75,
-   "duration": 2,
+   "pitch": 84,
+   "beat": 35,
+   "duration": 0.5,
    "hand": "R",
    "velocity": 96
   },
   {
    "id": "ef4c17a",
-   "pitch": 81,
-   "beat": 29,
-   "duration": 0.5,
+   "pitch": 88,
+   "beat": 35.25,
+   "duration": 2,
    "hand": "R",
    "velocity": 101
   },
   {
    "id": "c1630da",
    "pitch": 84,
-   "beat": 29.25,
-   "duration": 1.5,
+   "beat": 35.5,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 97
   },
   {
    "id": "94ff782",
-   "pitch": 81,
-   "beat": 29.5,
-   "duration": 1,
+   "pitch": 79,
+   "beat": 35.75,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 73
   },
   {
    "id": "97d0de5-pass",
-   "pitch": 79,
-   "beat": 29.75,
+   "pitch": 81,
+   "beat": 36,
    "duration": 0.25,
    "hand": "R",
    "velocity": 58
   },
   {
    "id": "2745194",
-   "pitch": 72,
-   "beat": 30,
+   "pitch": 74,
+   "beat": 36.25,
    "duration": 1.5,
    "hand": "R",
    "velocity": 62
   },
   {
    "id": "5b9dca9-pass",
-   "pitch": 79,
-   "beat": 30.25,
+   "pitch": 81,
+   "beat": 36.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 82
   },
   {
    "id": "50ddb72",
-   "pitch": 81,
-   "beat": 30.5,
-   "duration": 2,
+   "pitch": 83,
+   "beat": 36.75,
+   "duration": 1.5,
    "hand": "R",
    "velocity": 88
   },
   {
    "id": "ee53cbe",
-   "pitch": 84,
-   "beat": 30.75,
+   "pitch": 86,
+   "beat": 37,
    "duration": 2,
    "hand": "R",
    "velocity": 95
   },
   {
    "id": "2c9829f-pass",
-   "pitch": 83,
-   "beat": 31,
+   "pitch": 84,
+   "beat": 37.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 72
   },
   {
    "id": "2e6988e",
-   "pitch": 77,
-   "beat": 31.25,
+   "pitch": 79,
+   "beat": 37.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 99
   },
   {
    "id": "8d66818",
-   "pitch": 72,
-   "beat": 31.5,
+   "pitch": 74,
+   "beat": 37.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 60
   },
   {
    "id": "baacc9a",
-   "pitch": 77,
-   "beat": 31.75,
-   "duration": 1.5,
+   "pitch": 79,
+   "beat": 38,
+   "duration": 1,
    "hand": "R",
    "velocity": 73
   },
   {
    "id": "69dfed8",
-   "pitch": 79,
-   "beat": 32,
-   "duration": 1,
+   "pitch": 83,
+   "beat": 38.25,
+   "duration": 2,
    "hand": "R",
    "velocity": 95
   },
   {
    "id": "0a162ee-pass",
-   "pitch": 86,
-   "beat": 32.25,
+   "pitch": 88,
+   "beat": 38.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 47
   },
   {
    "id": "8955e30-pass",
-   "pitch": 86,
-   "beat": 32.5,
+   "pitch": 84,
+   "beat": 38.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 75
   },
   {
    "id": "0f0b790",
-   "pitch": 84,
-   "beat": 32.75,
+   "pitch": 79,
+   "beat": 39,
    "duration": 2,
    "hand": "R",
    "velocity": 104
   },
   {
    "id": "eb09edb",
-   "pitch": 79,
-   "beat": 33,
+   "pitch": 74,
+   "beat": 39.25,
    "duration": 2,
    "hand": "R",
    "velocity": 94
   },
   {
    "id": "83cb807-pass",
-   "pitch": 77,
-   "beat": 33.25,
+   "pitch": 81,
+   "beat": 39.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 85
   },
   {
    "id": "1e363ed-pass",
-   "pitch": 74,
-   "beat": 33.5,
+   "pitch": 84,
+   "beat": 39.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 70
   },
   {
    "id": "2e1c3fd",
-   "pitch": 103,
-   "beat": 33.75,
+   "pitch": 100,
+   "beat": 40,
    "duration": 0.5,
    "hand": "R",
    "velocity": 105
   },
   {
    "id": "fa57aaa",
-   "pitch": 76,
-   "beat": 34,
+   "pitch": 84,
+   "beat": 40.25,
    "duration": 2,
    "hand": "R",
    "velocity": 102
   },
   {
    "id": "4c1a373",
-   "pitch": 100,
-   "beat": 34.5,
+   "pitch": 105,
+   "beat": 40.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 100
   },
   {
    "id": "692b96a-pass",
-   "pitch": 81,
-   "beat": 34.75,
+   "pitch": 86,
+   "beat": 40.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 88
   },
   {
    "id": "b066f73",
-   "pitch": 96,
-   "beat": 35,
+   "pitch": 108,
+   "beat": 41,
    "duration": 0.5,
    "hand": "R",
    "velocity": 110
@@ -1098,151 +1170,151 @@
   {
    "id": "2f012cf-pass",
    "pitch": 86,
-   "beat": 35.25,
+   "beat": 41.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 85
   },
   {
    "id": "78b4785",
-   "pitch": 88,
-   "beat": 35.5,
-   "duration": 1.75,
+   "pitch": 81,
+   "beat": 41.5,
+   "duration": 2,
    "hand": "R",
    "velocity": 89
   },
   {
    "id": "d0df8aa",
-   "pitch": 84,
-   "beat": 35.75,
-   "duration": 1.75,
+   "pitch": 76,
+   "beat": 41.75,
+   "duration": 2,
    "hand": "R",
    "velocity": 88
   },
   {
    "id": "9e42fef",
-   "pitch": 83,
-   "beat": 36,
-   "duration": 1,
+   "pitch": 72,
+   "beat": 42,
+   "duration": 2,
    "hand": "R",
    "velocity": 81
   },
   {
    "id": "9a1a77b-pass",
-   "pitch": 81,
-   "beat": 36.25,
+   "pitch": 77,
+   "beat": 42.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 77
   },
   {
    "id": "6ff3213-pass",
-   "pitch": 76,
-   "beat": 36.5,
+   "pitch": 83,
+   "beat": 42.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 91
   },
   {
    "id": "37b19ba-pass",
-   "pitch": 81,
-   "beat": 36.75,
+   "pitch": 86,
+   "beat": 42.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 61
   },
   {
    "id": "e33b9b9",
-   "pitch": 83,
-   "beat": 37,
+   "pitch": 88,
+   "beat": 43,
    "duration": 2,
    "hand": "R",
    "velocity": 64
   },
   {
    "id": "4db5861-pass",
-   "pitch": 88,
-   "beat": 37.25,
+   "pitch": 86,
+   "beat": 43.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 75
   },
   {
    "id": "dea37ff-pass",
-   "pitch": 84,
-   "beat": 37.5,
+   "pitch": 83,
+   "beat": 43.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 56
   },
   {
    "id": "5e4337c-pass",
-   "pitch": 81,
-   "beat": 37.75,
+   "pitch": 77,
+   "beat": 43.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 68
   },
   {
    "id": "ca8d980",
-   "pitch": 74,
-   "beat": 38,
+   "pitch": 72,
+   "beat": 44,
    "duration": 2,
    "hand": "R",
    "velocity": 105
   },
   {
    "id": "b608b5e",
-   "pitch": 79,
-   "beat": 38.25,
+   "pitch": 77,
+   "beat": 44.25,
    "duration": 1,
    "hand": "R",
    "velocity": 98
   },
   {
    "id": "09be5dc-pass",
-   "pitch": 84,
-   "beat": 38.5,
+   "pitch": 83,
+   "beat": 44.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
   },
   {
    "id": "16f9d20",
-   "pitch": 86,
-   "beat": 38.75,
-   "duration": 1.5,
+   "pitch": 84,
+   "beat": 44.75,
+   "duration": 2,
    "hand": "R",
    "velocity": 85
   },
   {
    "id": "72a9b79-pass",
-   "pitch": 84,
-   "beat": 39,
+   "pitch": 83,
+   "beat": 45,
    "duration": 0.25,
    "hand": "R",
    "velocity": 79
   },
   {
    "id": "e3ebad6",
-   "pitch": 79,
-   "beat": 39.25,
+   "pitch": 77,
+   "beat": 45.25,
    "duration": 2,
    "hand": "R",
    "velocity": 94
   },
   {
    "id": "0b9f950-pass",
-   "pitch": 76,
-   "beat": 39.5,
+   "pitch": 74,
+   "beat": 45.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 65
   },
   {
    "id": "d28b1bb-pass",
-   "pitch": 81,
-   "beat": 39.75,
+   "pitch": 79,
+   "beat": 45.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 70
@@ -1250,7 +1322,7 @@
   {
    "id": "f1c3448-pass",
    "pitch": 83,
-   "beat": 40,
+   "beat": 46,
    "duration": 0.25,
    "hand": "R",
    "velocity": 72
@@ -1258,383 +1330,391 @@
   {
    "id": "92c1159-pass",
    "pitch": 86,
-   "beat": 40.25,
+   "beat": 46.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 75
   },
   {
    "id": "f30a259-pass",
-   "pitch": 86,
-   "beat": 40.5,
+   "pitch": 83,
+   "beat": 46.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 78
   },
   {
    "id": "b1a4121-pass",
-   "pitch": 86,
-   "beat": 40.75,
+   "pitch": 79,
+   "beat": 46.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 66
   },
   {
    "id": "fbaf6da",
-   "pitch": 81,
-   "beat": 41,
-   "duration": 1,
+   "pitch": 72,
+   "beat": 47,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 101
   },
   {
    "id": "47de4cf",
-   "pitch": 76,
-   "beat": 41.25,
-   "duration": 0.5,
+   "pitch": 77,
+   "beat": 47.25,
+   "duration": 2,
    "hand": "R",
    "velocity": 66
   },
   {
    "id": "1faa336-pass",
-   "pitch": 74,
-   "beat": 41.5,
+   "pitch": 83,
+   "beat": 47.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 87
   },
   {
    "id": "3bdded3",
-   "pitch": 76,
-   "beat": 41.75,
+   "pitch": 84,
+   "beat": 47.75,
    "duration": 1.75,
    "hand": "R",
    "velocity": 104
   },
   {
    "id": "515ba87",
-   "pitch": 81,
-   "beat": 42,
+   "pitch": 79,
+   "beat": 48,
    "duration": 1.25,
    "hand": "R",
    "velocity": 102
   },
   {
    "id": "5830386",
-   "pitch": 100,
-   "beat": 42.25,
+   "pitch": 103,
+   "beat": 48.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 66
   },
   {
    "id": "ad51206",
-   "pitch": 84,
-   "beat": 42.5,
+   "pitch": 76,
+   "beat": 48.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 100
   },
   {
    "id": "9b5f1af",
-   "pitch": 88,
-   "beat": 42.75,
+   "pitch": 72,
+   "beat": 48.75,
    "duration": 2,
    "hand": "R",
    "velocity": 94
   },
   {
    "id": "f0329d2",
-   "pitch": 84,
-   "beat": 43,
+   "pitch": 76,
+   "beat": 49,
    "duration": 1.5,
    "hand": "R",
    "velocity": 101
   },
   {
    "id": "6ed656c",
-   "pitch": 81,
-   "beat": 43.25,
+   "pitch": 79,
+   "beat": 49.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 66
   },
   {
    "id": "9237b92",
-   "pitch": 76,
-   "beat": 43.5,
-   "duration": 2,
+   "pitch": 84,
+   "beat": 49.5,
+   "duration": 0.5,
    "hand": "R",
    "velocity": 86
   },
   {
    "id": "645c85a",
-   "pitch": 72,
-   "beat": 43.75,
+   "pitch": 88,
+   "beat": 49.75,
    "duration": 2,
    "hand": "R",
    "velocity": 99
   },
   {
    "id": "8501222",
-   "pitch": 77,
-   "beat": 44,
+   "pitch": 84,
+   "beat": 50,
    "duration": 0.5,
    "hand": "R",
    "velocity": 91
   },
   {
    "id": "489b46e-pass",
-   "pitch": 83,
-   "beat": 44.25,
+   "pitch": 81,
+   "beat": 50.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 95
   },
   {
    "id": "e8c0554",
-   "pitch": 84,
-   "beat": 44.5,
-   "duration": 1.5,
+   "pitch": 76,
+   "beat": 50.5,
+   "duration": 2,
    "hand": "R",
    "velocity": 102
   },
   {
    "id": "3cf5733",
-   "pitch": 81,
-   "beat": 44.75,
-   "duration": 1,
+   "pitch": 72,
+   "beat": 50.75,
+   "duration": 2,
    "hand": "R",
    "velocity": 99
   },
   {
    "id": "e935245-pass",
-   "pitch": 79,
-   "beat": 45,
+   "pitch": 77,
+   "beat": 51,
    "duration": 0.25,
    "hand": "R",
    "velocity": 81
   },
   {
    "id": "6425e52-pass",
-   "pitch": 74,
-   "beat": 45.25,
+   "pitch": 81,
+   "beat": 51.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 79
   },
   {
    "id": "efa8489-pass",
-   "pitch": 79,
-   "beat": 45.5,
+   "pitch": 86,
+   "beat": 51.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 56
   },
   {
    "id": "f5bf131",
-   "pitch": 81,
-   "beat": 45.75,
-   "duration": 0.5,
+   "pitch": 88,
+   "beat": 51.75,
+   "duration": 1,
    "hand": "R",
    "velocity": 73
   },
   {
    "id": "cbe8cb4",
-   "pitch": 84,
-   "beat": 46,
-   "duration": 1.75,
+   "pitch": 86,
+   "beat": 52,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 62
   },
   {
    "id": "2e18582",
-   "pitch": 81,
-   "beat": 46.25,
+   "pitch": 86,
+   "beat": 52.25,
    "duration": 1.25,
    "hand": "R",
    "velocity": 64
   },
   {
    "id": "5668282",
-   "pitch": 105,
-   "beat": 46.5,
+   "pitch": 103,
+   "beat": 52.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 63
   },
   {
    "id": "d6fcf98-pass",
-   "pitch": 79,
-   "beat": 46.75,
+   "pitch": 88,
+   "beat": 52.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 56
   },
   {
    "id": "f027776-pass",
-   "pitch": 74,
-   "beat": 47,
+   "pitch": 88,
+   "beat": 53,
    "duration": 0.25,
    "hand": "R",
    "velocity": 90
   },
   {
    "id": "d16ac56-pass",
-   "pitch": 79,
-   "beat": 47.25,
+   "pitch": 88,
+   "beat": 53.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 93
   },
   {
    "id": "fb876d4",
-   "pitch": 81,
-   "beat": 47.5,
-   "duration": 1.5,
+   "pitch": 86,
+   "beat": 53.5,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 102
   },
   {
    "id": "f20e8f0",
-   "pitch": 84,
-   "beat": 47.75,
-   "duration": 1.5,
+   "pitch": 86,
+   "beat": 53.75,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 94
   },
   {
    "id": "7a2e90e",
-   "pitch": 79,
-   "beat": 48,
-   "duration": 2,
+   "pitch": 86,
+   "beat": 54,
+   "duration": 0.5,
    "hand": "R",
    "velocity": 73
   },
   {
    "id": "c789b5e-pass",
-   "pitch": 77,
-   "beat": 48.25,
+   "pitch": 88,
+   "beat": 54.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 47
   },
   {
    "id": "d74300e",
-   "pitch": 72,
-   "beat": 48.5,
-   "duration": 2,
+   "pitch": 86,
+   "beat": 54.5,
+   "duration": 0.75,
    "hand": "R",
    "velocity": 98
   },
   {
    "id": "e864e4b-pass",
-   "pitch": 77,
-   "beat": 48.75,
+   "pitch": 88,
+   "beat": 54.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 64
   },
   {
    "id": "fe7283f-pass",
-   "pitch": 81,
-   "beat": 49,
+   "pitch": 88,
+   "beat": 55,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
   },
   {
    "id": "570a1fc",
-   "pitch": 84,
-   "beat": 49.25,
+   "pitch": 86,
+   "beat": 55.25,
    "duration": 2,
    "hand": "R",
    "velocity": 90
   },
   {
+   "id": "cd6bc8b",
+   "pitch": 59,
+   "beat": 55.25,
+   "duration": 0.5,
+   "hand": "L",
+   "velocity": 109
+  },
+  {
    "id": "e9edf7d-pass",
-   "pitch": 86,
-   "beat": 49.5,
+   "pitch": 88,
+   "beat": 55.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 81
   },
   {
    "id": "0e3cf2f-pass",
-   "pitch": 86,
-   "beat": 49.75,
+   "pitch": 88,
+   "beat": 55.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 73
   },
   {
    "id": "ee4bd16",
-   "pitch": 79,
-   "beat": 50,
+   "pitch": 88,
+   "beat": 56,
    "duration": 0.5,
    "hand": "R",
    "velocity": 104
   },
   {
    "id": "f8777b1",
-   "pitch": 76,
-   "beat": 50.25,
+   "pitch": 84,
+   "beat": 56.25,
    "duration": 2,
    "hand": "R",
    "velocity": 62
   },
   {
    "id": "356844a",
-   "pitch": 72,
-   "beat": 50.5,
-   "duration": 2,
+   "pitch": 81,
+   "beat": 56.5,
+   "duration": 1.25,
    "hand": "R",
    "velocity": 93
   },
   {
    "id": "198c902-pass",
    "pitch": 77,
-   "beat": 50.75,
+   "beat": 56.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
   },
   {
    "id": "c10fc30-pass",
-   "pitch": 81,
-   "beat": 51,
+   "pitch": 74,
+   "beat": 57,
    "duration": 0.25,
    "hand": "R",
    "velocity": 71
   },
   {
    "id": "af6dba8-pass",
-   "pitch": 86,
-   "beat": 51.25,
+   "pitch": 77,
+   "beat": 57.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 90
   },
   {
    "id": "1d3f933",
-   "pitch": 108,
-   "beat": 51.5,
+   "pitch": 96,
+   "beat": 57.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 86
   },
   {
    "id": "1fc2e39",
-   "pitch": 88,
-   "beat": 51.75,
-   "duration": 0.25,
+   "pitch": 81,
+   "beat": 57.75,
+   "duration": 1.25,
    "hand": "R",
    "velocity": 82
   },
   {
    "id": "e5aab4b-pass",
-   "pitch": 88,
-   "beat": 52,
+   "pitch": 86,
+   "beat": 58,
    "duration": 0.25,
    "hand": "R",
    "velocity": 86
@@ -1642,7 +1722,7 @@
   {
    "id": "c035a4f-pass",
    "pitch": 86,
-   "beat": 52.25,
+   "beat": 58.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 60
@@ -1650,15 +1730,15 @@
   {
    "id": "3c9089b",
    "pitch": 84,
-   "beat": 52.5,
-   "duration": 1.75,
+   "beat": 58.5,
+   "duration": 2,
    "hand": "R",
    "velocity": 63
   },
   {
    "id": "569f8f9",
-   "pitch": 105,
-   "beat": 52.75,
+   "pitch": 100,
+   "beat": 58.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 110
@@ -1666,111 +1746,119 @@
   {
    "id": "86ec534",
    "pitch": 81,
-   "beat": 53,
-   "duration": 1,
+   "beat": 59,
+   "duration": 2,
    "hand": "R",
    "velocity": 101
   },
   {
    "id": "5d001f1-resolve",
    "pitch": 72,
-   "beat": 53.25,
+   "beat": 59.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 75
   },
   {
    "id": "5c1bb0e-pass",
-   "pitch": 76,
-   "beat": 53.5,
+   "pitch": 74,
+   "beat": 59.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 77
   },
   {
    "id": "78c6546",
-   "pitch": 103,
-   "beat": 53.75,
+   "pitch": 105,
+   "beat": 59.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 90
   },
   {
    "id": "a559576-pass",
-   "pitch": 81,
-   "beat": 54,
+   "pitch": 79,
+   "beat": 60,
    "duration": 0.25,
    "hand": "R",
    "velocity": 70
   },
   {
+   "id": "7172d49",
+   "pitch": 65,
+   "beat": 60,
+   "duration": 0.5,
+   "hand": "L",
+   "velocity": 91
+  },
+  {
    "id": "7c60e88-pass",
-   "pitch": 84,
-   "beat": 54.25,
+   "pitch": 83,
+   "beat": 60.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 84
   },
   {
+   "id": "2452550",
+   "pitch": 41,
+   "beat": 60.25,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 110
+  },
+  {
    "id": "bfc8cf9-pass",
-   "pitch": 88,
-   "beat": 54.5,
+   "pitch": 86,
+   "beat": 60.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 82
   },
   {
    "id": "eb3368e",
-   "pitch": 98,
-   "beat": 54.75,
+   "pitch": 108,
+   "beat": 60.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 89
   },
   {
    "id": "9a437a6-pass",
-   "pitch": 84,
-   "beat": 55,
+   "pitch": 83,
+   "beat": 61,
    "duration": 0.25,
    "hand": "R",
    "velocity": 73
   },
   {
    "id": "c969dfe",
-   "pitch": 79,
-   "beat": 55.25,
+   "pitch": 77,
+   "beat": 61.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 62
   },
   {
    "id": "0813d91-pass",
-   "pitch": 76,
-   "beat": 55.5,
+   "pitch": 74,
+   "beat": 61.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 86
   },
   {
    "id": "5f74296",
-   "pitch": 79,
-   "beat": 55.75,
-   "duration": 2,
+   "pitch": 77,
+   "beat": 61.75,
+   "duration": 1,
    "hand": "R",
    "velocity": 97
   },
   {
-   "id": "2452550",
-   "pitch": 43,
-   "beat": 55.75,
-   "duration": 2,
-   "hand": "L",
-   "velocity": 110
-  },
-  {
    "id": "fecfe49",
    "pitch": 81,
-   "beat": 56,
+   "beat": 62,
    "duration": 0.5,
    "hand": "R",
    "velocity": 67
@@ -1778,367 +1866,367 @@
   {
    "id": "1286329",
    "pitch": 84,
-   "beat": 56.25,
-   "duration": 0.5,
+   "beat": 62.25,
+   "duration": 2,
    "hand": "R",
    "velocity": 74
   },
   {
    "id": "1c9e205",
-   "pitch": 88,
-   "beat": 56.5,
-   "duration": 2,
+   "pitch": 81,
+   "beat": 62.5,
+   "duration": 1.5,
    "hand": "R",
    "velocity": 92
   },
   {
    "id": "2c3c826",
-   "pitch": 84,
-   "beat": 56.75,
+   "pitch": 77,
+   "beat": 62.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 102
   },
   {
    "id": "eccd81c",
-   "pitch": 81,
-   "beat": 57,
+   "pitch": 72,
+   "beat": 63,
    "duration": 2,
    "hand": "R",
    "velocity": 91
   },
   {
    "id": "e4931cb-pass",
-   "pitch": 77,
-   "beat": 57.25,
+   "pitch": 79,
+   "beat": 63.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 80
   },
   {
    "id": "ab56cbf-pass",
-   "pitch": 74,
-   "beat": 57.5,
+   "pitch": 83,
+   "beat": 63.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 90
   },
   {
    "id": "d54dc5e-pass",
-   "pitch": 77,
-   "beat": 57.75,
+   "pitch": 86,
+   "beat": 63.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 86
   },
   {
    "id": "af8e0d4-pass",
-   "pitch": 83,
-   "beat": 58,
+   "pitch": 81,
+   "beat": 64,
    "duration": 0.25,
    "hand": "R",
    "velocity": 74
   },
   {
+   "id": "a7fdf17-pass",
+   "pitch": 45,
+   "beat": 64,
+   "duration": 0.25,
+   "hand": "L",
+   "velocity": 97
+  },
+  {
    "id": "b1764d0",
-   "pitch": 100,
-   "beat": 58.25,
+   "pitch": 103,
+   "beat": 64.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 86
   },
   {
    "id": "4d13d35-pass",
-   "pitch": 86,
-   "beat": 58.5,
+   "pitch": 77,
+   "beat": 64.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 77
   },
   {
    "id": "308ce39-pass",
-   "pitch": 86,
-   "beat": 58.75,
+   "pitch": 74,
+   "beat": 64.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 64
   },
   {
    "id": "683ba33",
-   "pitch": 84,
-   "beat": 59,
+   "pitch": 76,
+   "beat": 65,
    "duration": 2,
    "hand": "R",
    "velocity": 64
   },
   {
    "id": "207ae3d-pass",
-   "pitch": 83,
-   "beat": 59.25,
+   "pitch": 81,
+   "beat": 65.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 82
   },
   {
+   "id": "dfd1a20-pass",
+   "pitch": 50,
+   "beat": 65.25,
+   "duration": 0.25,
+   "hand": "L",
+   "velocity": 67
+  },
+  {
    "id": "24d57b5",
-   "pitch": 76,
-   "beat": 59.5,
+   "pitch": 84,
+   "beat": 65.5,
    "duration": 2,
    "hand": "R",
    "velocity": 67
   },
   {
    "id": "8c948e8",
-   "pitch": 72,
-   "beat": 59.75,
+   "pitch": 88,
+   "beat": 65.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 87
   },
   {
-   "id": "a7fdf17-pass",
-   "pitch": 47,
-   "beat": 59.75,
-   "duration": 0.25,
-   "hand": "L",
-   "velocity": 97
-  },
-  {
    "id": "5416ca0",
-   "pitch": 105,
-   "beat": 60,
+   "pitch": 100,
+   "beat": 66,
    "duration": 0.5,
    "hand": "R",
    "velocity": 83
   },
   {
    "id": "dcbc4b1",
-   "pitch": 108,
-   "beat": 60.25,
+   "pitch": 96,
+   "beat": 66.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 51
   },
   {
    "id": "41beb98",
-   "pitch": 105,
-   "beat": 60.5,
+   "pitch": 100,
+   "beat": 66.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 93
   },
   {
    "id": "1f31cb3-pass",
-   "pitch": 79,
-   "beat": 60.75,
+   "pitch": 86,
+   "beat": 66.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 83
   },
   {
    "id": "a04f2a5-pass",
-   "pitch": 83,
-   "beat": 61,
+   "pitch": 81,
+   "beat": 67,
    "duration": 0.25,
    "hand": "R",
    "velocity": 76
   },
   {
-   "id": "dfd1a20-pass",
-   "pitch": 50,
-   "beat": 61,
-   "duration": 0.25,
-   "hand": "L",
-   "velocity": 67
-  },
-  {
    "id": "e4a6a8e",
-   "pitch": 84,
-   "beat": 61.25,
+   "pitch": 76,
+   "beat": 67.25,
    "duration": 2,
    "hand": "R",
    "velocity": 67
   },
   {
    "id": "17efd59-pass",
-   "pitch": 83,
-   "beat": 61.5,
+   "pitch": 74,
+   "beat": 67.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 67
   },
   {
    "id": "dc94d20-pass",
-   "pitch": 79,
-   "beat": 61.75,
+   "pitch": 77,
+   "beat": 67.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 47
   },
   {
    "id": "069dcdf-pass",
-   "pitch": 74,
-   "beat": 62,
+   "pitch": 84,
+   "beat": 68,
    "duration": 0.25,
    "hand": "R",
    "velocity": 78
   },
   {
    "id": "c0e835b",
-   "pitch": 77,
-   "beat": 62.25,
+   "pitch": 86,
+   "beat": 68.25,
    "duration": 2,
    "hand": "R",
    "velocity": 94
   },
   {
    "id": "4605e7a-pass",
-   "pitch": 83,
-   "beat": 62.5,
+   "pitch": 84,
+   "beat": 68.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 64
   },
   {
+   "id": "2bbd1d2",
+   "pitch": 50,
+   "beat": 68.5,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 97
+  },
+  {
    "id": "379b76b-pass",
-   "pitch": 86,
-   "beat": 62.75,
+   "pitch": 81,
+   "beat": 68.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
   },
   {
    "id": "3cb3642",
-   "pitch": 81,
-   "beat": 63,
-   "duration": 1,
+   "pitch": 74,
+   "beat": 69,
+   "duration": 2,
    "hand": "R",
    "velocity": 99
   },
   {
    "id": "0236a65-pass",
-   "pitch": 79,
-   "beat": 63.25,
+   "pitch": 81,
+   "beat": 69.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
   },
   {
    "id": "262840c",
-   "pitch": 72,
-   "beat": 63.5,
-   "duration": 2,
+   "pitch": 83,
+   "beat": 69.5,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 95
   },
   {
    "id": "5ed0ca6-pass",
-   "pitch": 79,
-   "beat": 63.75,
+   "pitch": 88,
+   "beat": 69.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 71
   },
   {
    "id": "e304448-pass",
-   "pitch": 81,
-   "beat": 64,
+   "pitch": 84,
+   "beat": 70,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
   },
   {
    "id": "daa4737",
-   "pitch": 100,
-   "beat": 64.25,
+   "pitch": 107,
+   "beat": 70.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 56
   },
   {
-   "id": "2bbd1d2",
-   "pitch": 43,
-   "beat": 64.25,
-   "duration": 2,
-   "hand": "L",
-   "velocity": 97
-  },
-  {
    "id": "1d96623-pass",
-   "pitch": 86,
-   "beat": 64.5,
+   "pitch": 81,
+   "beat": 70.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 71
   },
   {
    "id": "1c8b2bb-pass",
-   "pitch": 86,
-   "beat": 64.75,
+   "pitch": 76,
+   "beat": 70.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 47
   },
   {
    "id": "2008f7c-pass",
-   "pitch": 86,
-   "beat": 65,
+   "pitch": 81,
+   "beat": 71,
    "duration": 0.25,
    "hand": "R",
    "velocity": 79
   },
   {
    "id": "35fe0d0",
-   "pitch": 79,
-   "beat": 65.25,
+   "pitch": 83,
+   "beat": 71.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "135ef83",
-   "pitch": 76,
-   "beat": 65.5,
+   "pitch": 86,
+   "beat": 71.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 88
   },
   {
    "id": "670a290",
-   "pitch": 72,
-   "beat": 65.75,
-   "duration": 2,
+   "pitch": 83,
+   "beat": 71.75,
+   "duration": 1,
    "hand": "R",
    "velocity": 98
   },
   {
    "id": "8745a42-pass",
    "pitch": 77,
-   "beat": 66,
+   "beat": 72,
    "duration": 0.25,
    "hand": "R",
    "velocity": 47
   },
   {
    "id": "19048f1-pass",
-   "pitch": 81,
-   "beat": 66.25,
+   "pitch": 74,
+   "beat": 72.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
   },
   {
    "id": "72825fd",
-   "pitch": 84,
-   "beat": 66.5,
-   "duration": 1.75,
+   "pitch": 76,
+   "beat": 72.5,
+   "duration": 2,
    "hand": "R",
    "velocity": 68
   },
   {
    "id": "e0e076e-pass",
-   "pitch": 86,
-   "beat": 66.75,
+   "pitch": 83,
+   "beat": 72.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
@@ -2146,159 +2234,167 @@
   {
    "id": "edddaf4-pass",
    "pitch": 86,
-   "beat": 67,
+   "beat": 73,
    "duration": 0.25,
    "hand": "R",
    "velocity": 47
   },
   {
    "id": "e3d8777",
-   "pitch": 96,
-   "beat": 67.25,
+   "pitch": 100,
+   "beat": 73.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 58
   },
   {
    "id": "e71406f",
-   "pitch": 100,
-   "beat": 67.5,
+   "pitch": 96,
+   "beat": 73.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 94
   },
   {
    "id": "b783b62",
-   "pitch": 103,
-   "beat": 67.75,
+   "pitch": 100,
+   "beat": 73.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 93
   },
   {
    "id": "f4fb64f",
-   "pitch": 107,
-   "beat": 68,
+   "pitch": 105,
+   "beat": 74,
    "duration": 0.5,
    "hand": "R",
    "velocity": 73
   },
   {
    "id": "d29bdac-pass",
-   "pitch": 84,
-   "beat": 68.25,
+   "pitch": 86,
+   "beat": 74.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 78
   },
   {
    "id": "c19ef74",
-   "pitch": 107,
-   "beat": 68.5,
-   "duration": 0.25,
+   "pitch": 108,
+   "beat": 74.5,
+   "duration": 0.5,
    "hand": "R",
    "velocity": 82
   },
   {
    "id": "da65031",
-   "pitch": 107,
-   "beat": 68.75,
+   "pitch": 105,
+   "beat": 74.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 87
   },
   {
    "id": "7210429",
-   "pitch": 79,
-   "beat": 69,
+   "pitch": 84,
+   "beat": 75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 58
   },
   {
    "id": "f268b15-pass",
-   "pitch": 76,
-   "beat": 69.25,
+   "pitch": 83,
+   "beat": 75.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 78
   },
   {
    "id": "d679409-pass",
-   "pitch": 81,
-   "beat": 69.5,
+   "pitch": 77,
+   "beat": 75.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 71
   },
   {
    "id": "24a4b85-pass",
-   "pitch": 84,
-   "beat": 69.75,
+   "pitch": 74,
+   "beat": 75.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 73
   },
   {
    "id": "6c0ecac",
-   "pitch": 86,
-   "beat": 70,
-   "duration": 2,
+   "pitch": 77,
+   "beat": 76,
+   "duration": 1,
    "hand": "R",
    "velocity": 93
   },
   {
    "id": "e9950a7-pass",
-   "pitch": 84,
-   "beat": 70.25,
+   "pitch": 83,
+   "beat": 76.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 56
   },
   {
    "id": "5dae09b",
-   "pitch": 79,
-   "beat": 70.5,
-   "duration": 0.5,
+   "pitch": 84,
+   "beat": 76.5,
+   "duration": 2,
    "hand": "R",
    "velocity": 98
   },
   {
    "id": "8f79e11",
-   "pitch": 74,
-   "beat": 70.75,
+   "pitch": 81,
+   "beat": 76.75,
    "duration": 2,
    "hand": "R",
    "velocity": 64
   },
   {
    "id": "169b631",
-   "pitch": 79,
-   "beat": 71,
+   "pitch": 77,
+   "beat": 77,
    "duration": 0.5,
    "hand": "R",
    "velocity": 72
   },
   {
    "id": "eb1872a",
-   "pitch": 107,
-   "beat": 71.25,
+   "pitch": 101,
+   "beat": 77.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 84
   },
   {
+   "id": "5af39dd-pass",
+   "pitch": 50,
+   "beat": 77.25,
+   "duration": 0.25,
+   "hand": "L",
+   "velocity": 92
+  },
+  {
    "id": "6c08a2e",
-   "pitch": 83,
-   "beat": 71.5,
-   "duration": 0.75,
+   "pitch": 72,
+   "beat": 77.5,
+   "duration": 2,
    "hand": "R",
    "velocity": 94
   },
   {
    "id": "7b33c95-pass",
-   "pitch": 88,
-   "beat": 71.75,
+   "pitch": 79,
+   "beat": 77.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 77
@@ -2306,7 +2402,7 @@
   {
    "id": "204c983-pass",
    "pitch": 83,
-   "beat": 72.25,
+   "beat": 78,
    "duration": 0.25,
    "hand": "R",
    "velocity": 80
@@ -2314,127 +2410,119 @@
   {
    "id": "c2bb006-resolve",
    "pitch": 96,
-   "beat": 72.75,
+   "beat": 78.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 104
   },
   {
    "id": "a4138ee",
-   "pitch": 76,
-   "beat": 73,
+   "pitch": 84,
+   "beat": 78.5,
    "duration": 2,
    "hand": "R",
    "velocity": 92
   },
   {
    "id": "9c66b7b-pass",
-   "pitch": 74,
-   "beat": 73.25,
+   "pitch": 83,
+   "beat": 78.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 84
   },
   {
    "id": "7535456-pass",
-   "pitch": 77,
-   "beat": 73.5,
+   "pitch": 79,
+   "beat": 79,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
   },
   {
-   "id": "5af39dd-pass",
-   "pitch": 41,
-   "beat": 73.5,
-   "duration": 0.25,
-   "hand": "L",
-   "velocity": 92
-  },
-  {
    "id": "68ce7e9",
-   "pitch": 105,
-   "beat": 74,
+   "pitch": 101,
+   "beat": 79.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 86
   },
   {
    "id": "fadd59e-pass",
-   "pitch": 83,
-   "beat": 74.25,
+   "pitch": 74,
+   "beat": 79.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 92
   },
   {
    "id": "d7c91bc",
-   "pitch": 84,
-   "beat": 74.5,
-   "duration": 1.25,
+   "pitch": 77,
+   "beat": 79.75,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 93
   },
   {
    "id": "a7a61aa",
-   "pitch": 100,
-   "beat": 75,
+   "pitch": 103,
+   "beat": 80,
    "duration": 0.5,
    "hand": "R",
    "velocity": 51
   },
   {
    "id": "e2e37fe",
-   "pitch": 88,
-   "beat": 75.25,
+   "pitch": 79,
+   "beat": 80.25,
    "duration": 2,
    "hand": "R",
    "velocity": 92
   },
   {
+   "id": "2a8dc98-pass",
+   "pitch": 50,
+   "beat": 80.25,
+   "duration": 0.25,
+   "hand": "L",
+   "velocity": 102
+  },
+  {
    "id": "7bcd679",
    "pitch": 84,
-   "beat": 75.75,
+   "beat": 80.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 92
   },
   {
+   "id": "081ef70",
+   "pitch": 48,
+   "beat": 80.5,
+   "duration": 2,
+   "hand": "L",
+   "velocity": 110
+  },
+  {
    "id": "d763ee8",
-   "pitch": 81,
-   "beat": 76,
+   "pitch": 88,
+   "beat": 80.75,
    "duration": 2,
    "hand": "R",
    "velocity": 64
   },
   {
    "id": "315cea2",
-   "pitch": 76,
-   "beat": 76.25,
+   "pitch": 84,
+   "beat": 81,
    "duration": 2,
    "hand": "R",
    "velocity": 93
   },
   {
-   "id": "2a8dc98-pass",
-   "pitch": 38,
-   "beat": 76.75,
-   "duration": 0.25,
-   "hand": "L",
-   "velocity": 102
-  },
-  {
-   "id": "081ef70",
-   "pitch": 40,
-   "beat": 77,
-   "duration": 2,
-   "hand": "L",
-   "velocity": 110
-  },
-  {
    "id": "b8ca0f2-pass",
-   "pitch": 74,
-   "beat": 77.25,
+   "pitch": 83,
+   "beat": 81.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 74
@@ -2442,7 +2530,7 @@
   {
    "id": "1601cc8-pass",
    "pitch": 77,
-   "beat": 77.5,
+   "beat": 81.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 87
@@ -2450,15 +2538,15 @@
   {
    "id": "e50ace9-resolve",
    "pitch": 72,
-   "beat": 78,
+   "beat": 81.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 83
   },
   {
    "id": "be81d6c-pass",
-   "pitch": 86,
-   "beat": 78.5,
+   "pitch": 77,
+   "beat": 82,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
@@ -2466,15 +2554,15 @@
   {
    "id": "803b430-pass",
    "pitch": 47,
-   "beat": 78.75,
+   "beat": 82,
    "duration": 0.25,
    "hand": "L",
    "velocity": 54
   },
   {
    "id": "f055dc9-pass",
-   "pitch": 86,
-   "beat": 79.5,
+   "pitch": 83,
+   "beat": 82.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 64
@@ -2482,47 +2570,47 @@
   {
    "id": "0ba1e1b-resolve",
    "pitch": 72,
-   "beat": 80.25,
+   "beat": 83.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 70
   },
   {
    "id": "a1f40c9-pass",
-   "pitch": 50,
-   "beat": 80.75,
+   "pitch": 41,
+   "beat": 83.75,
    "duration": 0.25,
    "hand": "L",
    "velocity": 107
   },
   {
    "id": "ea3db65-pass",
-   "pitch": 81,
-   "beat": 81,
+   "pitch": 88,
+   "beat": 84,
    "duration": 0.25,
    "hand": "R",
    "velocity": 88
   },
   {
    "id": "ee45173",
-   "pitch": 76,
-   "beat": 81.25,
+   "pitch": 86,
+   "beat": 84.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 96
   },
   {
    "id": "3ea0c35-pass",
-   "pitch": 74,
-   "beat": 81.75,
+   "pitch": 86,
+   "beat": 84.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 67
   },
   {
    "id": "91844de",
-   "pitch": 76,
-   "beat": 82,
+   "pitch": 84,
+   "beat": 85,
    "duration": 2,
    "hand": "R",
    "velocity": 94
@@ -2530,31 +2618,31 @@
   {
    "id": "3ae55cc-pass",
    "pitch": 83,
-   "beat": 82.25,
+   "beat": 85.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 72
   },
   {
    "id": "8dfd289-pass",
-   "pitch": 86,
-   "beat": 82.75,
+   "pitch": 77,
+   "beat": 85.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 88
   },
   {
    "id": "e0bd710",
-   "pitch": 96,
-   "beat": 83,
+   "pitch": 108,
+   "beat": 86,
    "duration": 0.5,
    "hand": "R",
    "velocity": 76
   },
   {
    "id": "c76bfca",
-   "pitch": 100,
-   "beat": 83.75,
+   "pitch": 105,
+   "beat": 86.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 51
@@ -2562,127 +2650,127 @@
   {
    "id": "dd43165-resolve",
    "pitch": 72,
-   "beat": 84,
+   "beat": 86.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 75
   },
   {
    "id": "e37ebce",
-   "pitch": 86,
-   "beat": 84.25,
-   "duration": 0.25,
+   "pitch": 79,
+   "beat": 87,
+   "duration": 2,
    "hand": "R",
    "velocity": 86
   },
   {
    "id": "5665939",
-   "pitch": 86,
-   "beat": 84.5,
-   "duration": 1,
+   "pitch": 83,
+   "beat": 87.25,
+   "duration": 0.75,
    "hand": "R",
    "velocity": 90
   },
   {
    "id": "53eba99-pass",
    "pitch": 88,
-   "beat": 84.75,
+   "beat": 87.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 77
   },
   {
    "id": "551d5aa-pass",
-   "pitch": 52,
-   "beat": 84.75,
+   "pitch": 40,
+   "beat": 87.75,
    "duration": 0.25,
    "hand": "L",
    "velocity": 92
   },
   {
    "id": "042e904-pass",
-   "pitch": 88,
-   "beat": 85,
+   "pitch": 83,
+   "beat": 88,
    "duration": 0.25,
    "hand": "R",
    "velocity": 72
   },
   {
    "id": "f7148fa-pass",
-   "pitch": 88,
-   "beat": 85.25,
+   "pitch": 77,
+   "beat": 88.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 71
   },
   {
    "id": "3d68489",
-   "pitch": 86,
-   "beat": 85.5,
-   "duration": 0.25,
+   "pitch": 72,
+   "beat": 88.5,
+   "duration": 2,
    "hand": "R",
    "velocity": 97
   },
   {
    "id": "4a4f56c",
-   "pitch": 86,
-   "beat": 85.75,
+   "pitch": 76,
+   "beat": 88.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 88
   },
   {
    "id": "085f640-pass",
-   "pitch": 88,
-   "beat": 86,
+   "pitch": 83,
+   "beat": 89,
    "duration": 0.25,
    "hand": "R",
    "velocity": 78
   },
   {
    "id": "35d4bf8",
-   "pitch": 86,
-   "beat": 86.25,
-   "duration": 0.75,
+   "pitch": 84,
+   "beat": 89.25,
+   "duration": 2,
    "hand": "R",
    "velocity": 93
   },
   {
    "id": "c0a43c6-pass",
-   "pitch": 88,
-   "beat": 86.5,
+   "pitch": 86,
+   "beat": 89.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 68
   },
   {
    "id": "2a4bd80-pass",
-   "pitch": 88,
-   "beat": 86.75,
+   "pitch": 86,
+   "beat": 89.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 67
   },
   {
    "id": "45d576c",
-   "pitch": 86,
-   "beat": 87,
-   "duration": 1,
+   "pitch": 81,
+   "beat": 90,
+   "duration": 2,
    "hand": "R",
    "velocity": 104
   },
   {
    "id": "8337a3b-pass",
-   "pitch": 86,
-   "beat": 88,
+   "pitch": 77,
+   "beat": 90.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 47
   },
   {
    "id": "7e60670",
-   "pitch": 81,
-   "beat": 88.25,
+   "pitch": 72,
+   "beat": 91,
    "duration": 2,
    "hand": "R",
    "velocity": 95
@@ -2690,23 +2778,23 @@
   {
    "id": "4e372b4-pass",
    "pitch": 77,
-   "beat": 88.75,
+   "beat": 91.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 61
   },
   {
    "id": "2c46987-pass",
-   "pitch": 74,
-   "beat": 89,
+   "pitch": 83,
+   "beat": 91.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 60
   },
   {
    "id": "8e1ff99-pass",
-   "pitch": 77,
-   "beat": 89.25,
+   "pitch": 86,
+   "beat": 92,
    "duration": 0.25,
    "hand": "R",
    "velocity": 83
@@ -2714,23 +2802,23 @@
   {
    "id": "80ee0e9-pass",
    "pitch": 83,
-   "beat": 89.5,
+   "beat": 92.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 69
   },
   {
    "id": "bb95f63-pass",
-   "pitch": 86,
-   "beat": 90,
+   "pitch": 77,
+   "beat": 92.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 56
   },
   {
    "id": "f91c323-pass",
-   "pitch": 86,
-   "beat": 90.5,
+   "pitch": 74,
+   "beat": 93,
    "duration": 0.25,
    "hand": "R",
    "velocity": 58
@@ -2738,15 +2826,15 @@
   {
    "id": "98c8503-resolve",
    "pitch": 72,
-   "beat": 91.25,
-   "duration": 1,
+   "beat": 93.75,
+   "duration": 1.5,
    "hand": "R",
    "velocity": 102
   },
   {
    "id": "9999e46",
-   "pitch": 105,
-   "beat": 91.5,
+   "pitch": 101,
+   "beat": 94,
    "duration": 0.5,
    "hand": "R",
    "velocity": 88
@@ -2754,47 +2842,47 @@
   {
    "id": "ee20e33",
    "pitch": 81,
-   "beat": 91.75,
-   "duration": 1,
+   "beat": 94.25,
+   "duration": 0.5,
    "hand": "R",
    "velocity": 94
   },
   {
    "id": "c6d5db0",
-   "pitch": 77,
-   "beat": 92,
+   "pitch": 84,
+   "beat": 94.5,
    "duration": 2,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "72b0aaa",
-   "pitch": 72,
-   "beat": 92.25,
-   "duration": 2,
+   "pitch": 81,
+   "beat": 94.75,
+   "duration": 1,
    "hand": "R",
    "velocity": 96
   },
   {
    "id": "e448304-pass",
    "pitch": 79,
-   "beat": 92.5,
+   "beat": 95,
    "duration": 0.25,
    "hand": "R",
    "velocity": 63
   },
   {
    "id": "9ae925d",
-   "pitch": 81,
-   "beat": 92.75,
-   "duration": 0.75,
+   "pitch": 72,
+   "beat": 95.25,
+   "duration": 2,
    "hand": "R",
    "velocity": 107
   },
   {
    "id": "bbb7c2f",
-   "pitch": 84,
-   "beat": 93.25,
+   "pitch": 77,
+   "beat": 95.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 54
@@ -2802,143 +2890,143 @@
   {
    "id": "a3593dd",
    "pitch": 81,
-   "beat": 93.5,
+   "beat": 95.75,
    "duration": 2,
    "hand": "R",
    "velocity": 101
   },
   {
    "id": "6445877",
-   "pitch": 108,
-   "beat": 93.75,
+   "pitch": 96,
+   "beat": 96,
    "duration": 0.5,
    "hand": "R",
    "velocity": 90
   },
   {
    "id": "b74399a",
-   "pitch": 77,
-   "beat": 94.5,
+   "pitch": 84,
+   "beat": 96.75,
    "duration": 2,
    "hand": "R",
    "velocity": 101
   },
   {
    "id": "ec250db",
-   "pitch": 72,
-   "beat": 95,
+   "pitch": 88,
+   "beat": 97.25,
    "duration": 2,
    "hand": "R",
    "velocity": 91
   },
   {
    "id": "23ef6aa-pass",
-   "pitch": 79,
-   "beat": 95.5,
+   "pitch": 86,
+   "beat": 97.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 86
   },
   {
    "id": "4038b11-pass",
-   "pitch": 83,
-   "beat": 95.75,
+   "pitch": 81,
+   "beat": 97.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 86
   },
   {
    "id": "0e9be4c",
-   "pitch": 84,
-   "beat": 96,
-   "duration": 1.25,
+   "pitch": 76,
+   "beat": 98.25,
+   "duration": 1,
    "hand": "R",
    "velocity": 101
   },
   {
    "id": "3939fb0-pass",
-   "pitch": 86,
-   "beat": 96.5,
+   "pitch": 74,
+   "beat": 98.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 76
   },
   {
    "id": "03b4e95",
-   "pitch": 84,
-   "beat": 97.25,
+   "pitch": 76,
+   "beat": 99.25,
    "duration": 2,
    "hand": "R",
    "velocity": 92
   },
   {
    "id": "e12d133",
-   "pitch": 103,
-   "beat": 97.75,
+   "pitch": 100,
+   "beat": 99.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 87
   },
   {
    "id": "fd50b04",
-   "pitch": 79,
-   "beat": 98,
-   "duration": 1.75,
+   "pitch": 83,
+   "beat": 100,
+   "duration": 2,
    "hand": "R",
    "velocity": 104
   },
   {
    "id": "aa1d3ca-pass",
-   "pitch": 77,
-   "beat": 98.25,
+   "pitch": 88,
+   "beat": 100.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 51
   },
   {
    "id": "bad711d-pass",
-   "pitch": 74,
-   "beat": 98.75,
+   "pitch": 84,
+   "beat": 100.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 78
   },
   {
    "id": "f39b2f4",
-   "pitch": 100,
-   "beat": 99,
+   "pitch": 107,
+   "beat": 100.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 95
   },
   {
    "id": "5995429",
-   "pitch": 96,
-   "beat": 99.25,
+   "pitch": 103,
+   "beat": 101,
    "duration": 0.5,
    "hand": "R",
    "velocity": 99
   },
   {
    "id": "a8400f6",
-   "pitch": 76,
-   "beat": 99.5,
-   "duration": 1.5,
+   "pitch": 79,
+   "beat": 101.5,
+   "duration": 2,
    "hand": "R",
    "velocity": 91
   },
   {
    "id": "9695189",
-   "pitch": 79,
-   "beat": 99.75,
-   "duration": 1,
+   "pitch": 74,
+   "beat": 101.75,
+   "duration": 2,
    "hand": "R",
    "velocity": 105
   },
   {
    "id": "1047974-pass",
-   "pitch": 88,
-   "beat": 100,
+   "pitch": 81,
+   "beat": 102,
    "duration": 0.25,
    "hand": "R",
    "velocity": 64
@@ -2946,23 +3034,23 @@
   {
    "id": "4d3cdfc",
    "pitch": 83,
-   "beat": 100.5,
-   "duration": 1.75,
+   "beat": 102.25,
+   "duration": 2,
    "hand": "R",
    "velocity": 102
   },
   {
    "id": "ea28ed4",
-   "pitch": 79,
-   "beat": 100.75,
+   "pitch": 86,
+   "beat": 102.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 98
   },
   {
    "id": "90a136d-pass",
-   "pitch": 76,
-   "beat": 101,
+   "pitch": 84,
+   "beat": 102.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 76
@@ -2970,87 +3058,87 @@
   {
    "id": "29b296d-pass",
    "pitch": 81,
-   "beat": 101.5,
+   "beat": 103,
    "duration": 0.25,
    "hand": "R",
    "velocity": 56
   },
   {
    "id": "f7d1b1f-pass",
-   "pitch": 84,
-   "beat": 101.75,
+   "pitch": 76,
+   "beat": 103.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
   },
   {
    "id": "69d08bf-pass",
-   "pitch": 88,
-   "beat": 102,
+   "pitch": 81,
+   "beat": 103.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 76
   },
   {
    "id": "e8c4f67",
-   "pitch": 83,
-   "beat": 102.25,
+   "pitch": 81,
+   "beat": 104,
    "duration": 1,
    "hand": "R",
    "velocity": 100
   },
   {
    "id": "4673311-pass",
-   "pitch": 81,
-   "beat": 102.5,
+   "pitch": 86,
+   "beat": 104.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 75
   },
   {
    "id": "1f0fdb9-pass",
-   "pitch": 76,
-   "beat": 102.75,
+   "pitch": 86,
+   "beat": 104.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 51
   },
   {
    "id": "491600d-pass",
-   "pitch": 81,
-   "beat": 103,
+   "pitch": 86,
+   "beat": 104.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 66
   },
   {
    "id": "9e312e1",
-   "pitch": 83,
-   "beat": 103.25,
-   "duration": 2,
+   "pitch": 81,
+   "beat": 105,
+   "duration": 1.25,
    "hand": "R",
    "velocity": 70
   },
   {
    "id": "fe57a50-pass",
-   "pitch": 88,
-   "beat": 103.5,
+   "pitch": 77,
+   "beat": 105.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 79
   },
   {
    "id": "470d75b",
-   "pitch": 103,
-   "beat": 103.75,
+   "pitch": 96,
+   "beat": 105.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 82
   },
   {
    "id": "c4a2868",
-   "pitch": 81,
-   "beat": 104,
+   "pitch": 72,
+   "beat": 105.75,
    "duration": 2,
    "hand": "R",
    "velocity": 93
@@ -3058,55 +3146,55 @@
   {
    "id": "cac584d-pass",
    "pitch": 77,
-   "beat": 104.25,
+   "beat": 106,
    "duration": 0.25,
    "hand": "R",
    "velocity": 58
   },
   {
    "id": "c075ff9",
-   "pitch": 72,
-   "beat": 104.5,
+   "pitch": 81,
+   "beat": 106.25,
    "duration": 2,
    "hand": "R",
    "velocity": 101
   },
   {
    "id": "72bdd76",
-   "pitch": 105,
-   "beat": 104.75,
+   "pitch": 100,
+   "beat": 106.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 107
   },
   {
    "id": "58de261",
-   "pitch": 108,
-   "beat": 105,
+   "pitch": 105,
+   "beat": 106.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 88
   },
   {
    "id": "c9d7b0f",
-   "pitch": 105,
-   "beat": 105.25,
+   "pitch": 108,
+   "beat": 107,
    "duration": 0.5,
    "hand": "R",
    "velocity": 100
   },
   {
    "id": "1d996ef-pass",
-   "pitch": 50,
-   "beat": 105.5,
+   "pitch": 41,
+   "beat": 107,
    "duration": 0.25,
    "hand": "L",
    "velocity": 78
   },
   {
    "id": "a7a88f4",
-   "pitch": 100,
-   "beat": 105.75,
+   "pitch": 105,
+   "beat": 107.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 77
@@ -3114,31 +3202,31 @@
   {
    "id": "c62fdeb-pass",
    "pitch": 47,
-   "beat": 106,
+   "beat": 107.5,
    "duration": 0.25,
    "hand": "L",
    "velocity": 93
   },
   {
    "id": "649e4fb",
-   "pitch": 96,
-   "beat": 106.25,
+   "pitch": 100,
+   "beat": 107.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 68
   },
   {
    "id": "c7367d9",
-   "pitch": 76,
-   "beat": 106.5,
+   "pitch": 84,
+   "beat": 108,
    "duration": 2,
    "hand": "R",
    "velocity": 97
   },
   {
    "id": "e440f98",
-   "pitch": 100,
-   "beat": 106.75,
+   "pitch": 96,
+   "beat": 108.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 69
@@ -3146,47 +3234,47 @@
   {
    "id": "ba193b7",
    "pitch": 81,
-   "beat": 107,
-   "duration": 2,
-   "hand": "R",
-   "velocity": 88
-  },
-  {
-   "id": "0b7879e-pass",
-   "pitch": 41,
-   "beat": 107.25,
-   "duration": 0.25,
-   "hand": "L",
-   "velocity": 91
-  },
-  {
-   "id": "a622d4d",
-   "pitch": 105,
-   "beat": 107.5,
-   "duration": 0.5,
-   "hand": "R",
-   "velocity": 82
-  },
-  {
-   "id": "08c9d7e",
-   "pitch": 108,
-   "beat": 108,
-   "duration": 0.5,
-   "hand": "R",
-   "velocity": 94
-  },
-  {
-   "id": "6cdc7e2",
-   "pitch": 84,
    "beat": 108.5,
    "duration": 2,
    "hand": "R",
    "velocity": 88
   },
   {
-   "id": "03f32ee-pass",
-   "pitch": 83,
+   "id": "a622d4d",
+   "pitch": 101,
    "beat": 108.75,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 82
+  },
+  {
+   "id": "0b7879e-pass",
+   "pitch": 50,
+   "beat": 108.75,
+   "duration": 0.25,
+   "hand": "L",
+   "velocity": 91
+  },
+  {
+   "id": "08c9d7e",
+   "pitch": 105,
+   "beat": 109.5,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 94
+  },
+  {
+   "id": "6cdc7e2",
+   "pitch": 77,
+   "beat": 109.75,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 88
+  },
+  {
+   "id": "03f32ee-pass",
+   "pitch": 74,
+   "beat": 110,
    "duration": 0.25,
    "hand": "R",
    "velocity": 82
@@ -3194,31 +3282,31 @@
   {
    "id": "38f95bd",
    "pitch": 77,
-   "beat": 109,
-   "duration": 0.5,
+   "beat": 110.25,
+   "duration": 2,
    "hand": "R",
    "velocity": 92
   },
   {
    "id": "540528e-pass",
-   "pitch": 74,
-   "beat": 109.25,
+   "pitch": 83,
+   "beat": 110.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 75
   },
   {
    "id": "4b360ae-pass",
-   "pitch": 77,
-   "beat": 109.5,
+   "pitch": 86,
+   "beat": 110.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 56
   },
   {
    "id": "227598c-pass",
-   "pitch": 83,
-   "beat": 109.75,
+   "pitch": 86,
+   "beat": 111.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 91
@@ -3226,15 +3314,15 @@
   {
    "id": "5b6e78c-resolve",
    "pitch": 96,
-   "beat": 110,
+   "beat": 111.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 99
   },
   {
    "id": "8651391",
-   "pitch": 101,
-   "beat": 110.25,
+   "pitch": 105,
+   "beat": 111.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 85
@@ -3242,39 +3330,39 @@
   {
    "id": "6e378b7-pass",
    "pitch": 86,
-   "beat": 110.5,
+   "beat": 112,
    "duration": 0.25,
    "hand": "R",
    "velocity": 51
   },
   {
    "id": "7ede6f7-pass",
-   "pitch": 83,
-   "beat": 111,
+   "pitch": 81,
+   "beat": 112.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 92
   },
   {
    "id": "def5bf8",
-   "pitch": 96,
-   "beat": 111.25,
+   "pitch": 100,
+   "beat": 112.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 84
   },
   {
    "id": "532c3cf",
-   "pitch": 101,
-   "beat": 111.5,
+   "pitch": 96,
+   "beat": 112.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 63
   },
   {
    "id": "1e5cae1-pass",
-   "pitch": 79,
-   "beat": 111.75,
+   "pitch": 77,
+   "beat": 113,
    "duration": 0.25,
    "hand": "R",
    "velocity": 56
@@ -3282,7 +3370,7 @@
   {
    "id": "9553591-pass",
    "pitch": 74,
-   "beat": 112,
+   "beat": 113.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 73
@@ -3290,7 +3378,7 @@
   {
    "id": "96e68b0-pass",
    "pitch": 77,
-   "beat": 112.25,
+   "beat": 113.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 69
@@ -3298,7 +3386,7 @@
   {
    "id": "5d608a7",
    "pitch": 79,
-   "beat": 112.5,
+   "beat": 113.75,
    "duration": 1.75,
    "hand": "R",
    "velocity": 92
@@ -3306,7 +3394,7 @@
   {
    "id": "050dc97",
    "pitch": 84,
-   "beat": 112.75,
+   "beat": 114,
    "duration": 2,
    "hand": "R",
    "velocity": 104
@@ -3314,23 +3402,23 @@
   {
    "id": "1d0f4cd",
    "pitch": 88,
-   "beat": 113,
+   "beat": 114.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 67
   },
   {
    "id": "87b8d94",
-   "pitch": 103,
-   "beat": 113.25,
+   "pitch": 100,
+   "beat": 114.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 86
   },
   {
    "id": "67d5c94",
-   "pitch": 108,
-   "beat": 113.5,
+   "pitch": 103,
+   "beat": 114.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 74
@@ -3338,15 +3426,15 @@
   {
    "id": "c7cd909-pass",
    "pitch": 86,
-   "beat": 113.75,
+   "beat": 115,
    "duration": 0.25,
    "hand": "R",
    "velocity": 82
   },
   {
    "id": "f86c0f0",
-   "pitch": 103,
-   "beat": 114,
+   "pitch": 108,
+   "beat": 115.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 82
@@ -3354,63 +3442,63 @@
   {
    "id": "39eaaf3",
    "pitch": 79,
-   "beat": 114.25,
+   "beat": 115.5,
    "duration": 2,
    "hand": "R",
    "velocity": 73
   },
   {
    "id": "4f2f424",
-   "pitch": 100,
-   "beat": 114.5,
+   "pitch": 103,
+   "beat": 115.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 75
   },
   {
    "id": "52223de-pass",
-   "pitch": 77,
-   "beat": 114.75,
+   "pitch": 81,
+   "beat": 116,
    "duration": 0.25,
    "hand": "R",
    "velocity": 74
   },
   {
    "id": "9335443",
-   "pitch": 60,
-   "beat": 114.75,
+   "pitch": 67,
+   "beat": 116,
    "duration": 2,
    "hand": "L",
    "velocity": 93
   },
   {
    "id": "f7b9f72-pass",
-   "pitch": 74,
-   "beat": 115,
+   "pitch": 76,
+   "beat": 116.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
   },
   {
    "id": "eff1f0d",
-   "pitch": 96,
-   "beat": 115.5,
+   "pitch": 103,
+   "beat": 116.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 85
   },
   {
    "id": "831d481-pass",
-   "pitch": 77,
-   "beat": 115.75,
+   "pitch": 81,
+   "beat": 116.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 72
   },
   {
    "id": "58c36d3",
-   "pitch": 103,
-   "beat": 116,
+   "pitch": 98,
+   "beat": 117,
    "duration": 0.5,
    "hand": "R",
    "velocity": 85
@@ -3418,7 +3506,7 @@
   {
    "id": "e3c00ae-pass",
    "pitch": 64,
-   "beat": 116.25,
+   "beat": 117.25,
    "duration": 0.25,
    "hand": "L",
    "velocity": 89
@@ -3426,23 +3514,23 @@
   {
    "id": "f895168",
    "pitch": 83,
-   "beat": 116.5,
+   "beat": 117.5,
    "duration": 2,
    "hand": "R",
    "velocity": 89
   },
   {
    "id": "a0c8df6-pass",
-   "pitch": 69,
-   "beat": 116.5,
+   "pitch": 60,
+   "beat": 117.5,
    "duration": 0.25,
    "hand": "L",
    "velocity": 105
   },
   {
    "id": "ffabdee",
-   "pitch": 107,
-   "beat": 116.75,
+   "pitch": 103,
+   "beat": 117.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 88
@@ -3450,7 +3538,7 @@
   {
    "id": "7d886fb-pass",
    "pitch": 88,
-   "beat": 117,
+   "beat": 118,
    "duration": 0.25,
    "hand": "R",
    "velocity": 64
@@ -3458,7 +3546,7 @@
   {
    "id": "4bd1265-pass",
    "pitch": 84,
-   "beat": 117.25,
+   "beat": 118.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 61
@@ -3466,15 +3554,15 @@
   {
    "id": "01d7789",
    "pitch": 79,
-   "beat": 117.5,
-   "duration": 1.5,
+   "beat": 118.5,
+   "duration": 2,
    "hand": "R",
    "velocity": 99
   },
   {
    "id": "0b8c745-pass",
    "pitch": 76,
-   "beat": 117.75,
+   "beat": 118.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 85
@@ -3482,7 +3570,7 @@
   {
    "id": "f35a4a8-pass",
    "pitch": 81,
-   "beat": 118,
+   "beat": 119,
    "duration": 0.25,
    "hand": "R",
    "velocity": 91
@@ -3490,15 +3578,15 @@
   {
    "id": "6f0a6da-pass",
    "pitch": 84,
-   "beat": 118.25,
+   "beat": 119.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 71
   },
   {
    "id": "f80ddf0",
-   "pitch": 38,
-   "beat": 118.25,
+   "pitch": 47,
+   "beat": 119.25,
    "duration": 2,
    "hand": "L",
    "velocity": 110
@@ -3506,7 +3594,7 @@
   {
    "id": "b491c58",
    "pitch": 86,
-   "beat": 118.5,
+   "beat": 119.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 94
@@ -3514,55 +3602,55 @@
   {
    "id": "27841de-pass",
    "pitch": 84,
-   "beat": 118.75,
+   "beat": 119.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 75
   },
   {
    "id": "18b7330",
-   "pitch": 79,
-   "beat": 119,
+   "pitch": 76,
+   "beat": 120,
    "duration": 2,
    "hand": "R",
    "velocity": 98
   },
   {
    "id": "1da0ac4-pass",
-   "pitch": 45,
-   "beat": 119.25,
+   "pitch": 41,
+   "beat": 120,
    "duration": 0.25,
    "hand": "L",
    "velocity": 100
   },
   {
    "id": "cbd7844-pass",
-   "pitch": 76,
-   "beat": 119.5,
+   "pitch": 74,
+   "beat": 120.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 47
   },
   {
    "id": "cd326be",
-   "pitch": 103,
-   "beat": 119.75,
+   "pitch": 105,
+   "beat": 120.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 78
   },
   {
    "id": "3e1cda9",
-   "pitch": 96,
-   "beat": 120,
+   "pitch": 108,
+   "beat": 120.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 69
   },
   {
    "id": "bd35215",
-   "pitch": 100,
-   "beat": 120.25,
+   "pitch": 105,
+   "beat": 121,
    "duration": 0.5,
    "hand": "R",
    "velocity": 51
@@ -3570,7 +3658,7 @@
   {
    "id": "c12cf17-pass",
    "pitch": 77,
-   "beat": 120.5,
+   "beat": 121.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
@@ -3578,15 +3666,15 @@
   {
    "id": "d219bea-pass",
    "pitch": 83,
-   "beat": 120.75,
+   "beat": 121.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 95
   },
   {
    "id": "f5e77da",
-   "pitch": 105,
-   "beat": 121,
+   "pitch": 100,
+   "beat": 121.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 69
@@ -3594,15 +3682,15 @@
   {
    "id": "05f8b9c",
    "pitch": 84,
-   "beat": 121.25,
+   "beat": 122,
    "duration": 0.75,
    "hand": "R",
    "velocity": 96
   },
   {
    "id": "6364e78",
-   "pitch": 108,
-   "beat": 121.5,
+   "pitch": 96,
+   "beat": 122.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 82
@@ -3610,7 +3698,7 @@
   {
    "id": "d360e4e-pass",
    "pitch": 86,
-   "beat": 121.75,
+   "beat": 122.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 75
@@ -3618,15 +3706,15 @@
   {
    "id": "daa4624",
    "pitch": 84,
-   "beat": 122,
+   "beat": 122.75,
    "duration": 2,
    "hand": "R",
    "velocity": 91
   },
   {
    "id": "af6887d",
-   "pitch": 105,
-   "beat": 122.25,
+   "pitch": 100,
+   "beat": 123,
    "duration": 0.5,
    "hand": "R",
    "velocity": 79
@@ -3634,47 +3722,47 @@
   {
    "id": "619d206-pass",
    "pitch": 83,
-   "beat": 122.5,
+   "beat": 123.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 60
   },
   {
    "id": "0bdebec",
-   "pitch": 100,
-   "beat": 122.75,
+   "pitch": 105,
+   "beat": 123.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 54
   },
   {
    "id": "f68381c",
-   "pitch": 96,
-   "beat": 123,
+   "pitch": 108,
+   "beat": 123.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 83
   },
   {
    "id": "73928de",
-   "pitch": 100,
-   "beat": 123.25,
+   "pitch": 105,
+   "beat": 124,
    "duration": 0.5,
    "hand": "R",
    "velocity": 69
   },
   {
    "id": "b7f277b",
-   "pitch": 105,
-   "beat": 123.5,
+   "pitch": 101,
+   "beat": 124.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 66
   },
   {
    "id": "7812c27",
-   "pitch": 108,
-   "beat": 123.75,
+   "pitch": 96,
+   "beat": 124.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 82
@@ -3682,7 +3770,7 @@
   {
    "id": "1cb8b57-pass",
    "pitch": 79,
-   "beat": 124,
+   "beat": 124.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 99
@@ -3690,7 +3778,7 @@
   {
    "id": "0ec16c9",
    "pitch": 72,
-   "beat": 124.25,
+   "beat": 125,
    "duration": 2,
    "hand": "R",
    "velocity": 96
@@ -3698,31 +3786,31 @@
   {
    "id": "80005c2",
    "pitch": 77,
-   "beat": 124.5,
+   "beat": 125.25,
    "duration": 2,
    "hand": "R",
    "velocity": 100
   },
   {
    "id": "d6eb3ad",
-   "pitch": 105,
-   "beat": 124.75,
+   "pitch": 101,
+   "beat": 125.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 86
   },
   {
    "id": "9a23e60",
-   "pitch": 101,
-   "beat": 125,
+   "pitch": 105,
+   "beat": 125.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 93
   },
   {
    "id": "28bfee1-pass",
-   "pitch": 47,
-   "beat": 125,
+   "pitch": 38,
+   "beat": 125.75,
    "duration": 0.25,
    "hand": "L",
    "velocity": 92
@@ -3730,7 +3818,7 @@
   {
    "id": "86a8e9e-pass",
    "pitch": 83,
-   "beat": 125.25,
+   "beat": 126,
    "duration": 0.25,
    "hand": "R",
    "velocity": 88
@@ -3738,15 +3826,15 @@
   {
    "id": "15d9fd6",
    "pitch": 84,
-   "beat": 125.5,
+   "beat": 126.25,
    "duration": 2,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "deb32a1",
-   "pitch": 96,
-   "beat": 125.75,
+   "pitch": 108,
+   "beat": 126.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 58
@@ -3754,7 +3842,7 @@
   {
    "id": "5a1505f-pass",
    "pitch": 83,
-   "beat": 126,
+   "beat": 126.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 101
@@ -3762,31 +3850,31 @@
   {
    "id": "ce461f7-pass",
    "pitch": 79,
-   "beat": 126.25,
+   "beat": 127,
    "duration": 0.25,
    "hand": "R",
    "velocity": 67
   },
   {
    "id": "f39f50b-pass",
-   "pitch": 67,
-   "beat": 126.25,
+   "pitch": 59,
+   "beat": 127,
    "duration": 0.25,
    "hand": "L",
    "velocity": 103
   },
   {
    "id": "d173cb7",
-   "pitch": 101,
-   "beat": 126.5,
+   "pitch": 105,
+   "beat": 127.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 69
   },
   {
    "id": "7e38f9b",
-   "pitch": 105,
-   "beat": 126.75,
+   "pitch": 101,
+   "beat": 127.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 63
@@ -3794,95 +3882,95 @@
   {
    "id": "3c1faae-pass",
    "pitch": 74,
-   "beat": 127,
+   "beat": 127.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
   },
   {
-   "id": "486b632-pass",
-   "pitch": 79,
-   "beat": 127.25,
-   "duration": 0.25,
-   "hand": "R",
-   "velocity": 79
-  },
-  {
    "id": "27e6a2f-pass",
    "pitch": 62,
-   "beat": 127.25,
+   "beat": 127.75,
    "duration": 0.25,
    "hand": "L",
    "velocity": 108
   },
   {
+   "id": "486b632-pass",
+   "pitch": 77,
+   "beat": 128,
+   "duration": 0.25,
+   "hand": "R",
+   "velocity": 79
+  },
+  {
    "id": "33f2499",
-   "pitch": 81,
-   "beat": 127.5,
-   "duration": 0.75,
+   "pitch": 79,
+   "beat": 128.25,
+   "duration": 2,
    "hand": "R",
    "velocity": 93
   },
   {
    "id": "b0f2b93-pass",
    "pitch": 86,
-   "beat": 127.75,
+   "beat": 128.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 101
   },
   {
    "id": "9bd7aec",
-   "pitch": 108,
-   "beat": 128,
+   "pitch": 96,
+   "beat": 128.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 63
   },
   {
    "id": "5f59a10-pass",
-   "pitch": 81,
-   "beat": 128.25,
+   "pitch": 86,
+   "beat": 129,
    "duration": 0.25,
    "hand": "R",
    "velocity": 92
   },
   {
    "id": "9c92e6c",
-   "pitch": 76,
-   "beat": 128.5,
-   "duration": 1,
+   "pitch": 84,
+   "beat": 129.25,
+   "duration": 2,
    "hand": "R",
    "velocity": 69
   },
   {
-   "id": "65e623c",
-   "pitch": 103,
-   "beat": 128.75,
-   "duration": 0.5,
-   "hand": "R",
-   "velocity": 83
-  },
-  {
    "id": "0d00647-pass",
-   "pitch": 50,
-   "beat": 128.75,
+   "pitch": 41,
+   "beat": 129.25,
    "duration": 0.25,
    "hand": "L",
    "velocity": 66
   },
   {
+   "id": "65e623c",
+   "pitch": 100,
+   "beat": 129.5,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 83
+  },
+  {
    "id": "c767f2f-pass",
-   "pitch": 74,
-   "beat": 129,
+   "pitch": 81,
+   "beat": 129.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 76
   },
   {
    "id": "58f6a28",
-   "pitch": 100,
-   "beat": 129.25,
+   "pitch": 103,
+   "beat": 130,
    "duration": 0.5,
    "hand": "R",
    "velocity": 83
@@ -3890,103 +3978,103 @@
   {
    "id": "c62089f",
    "pitch": 76,
-   "beat": 129.5,
-   "duration": 2,
+   "beat": 130.25,
+   "duration": 0.5,
    "hand": "R",
    "velocity": 91
   },
   {
    "id": "9dd33b3",
-   "pitch": 79,
-   "beat": 129.75,
+   "pitch": 72,
+   "beat": 130.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 88
   },
   {
-   "id": "b76f44a",
-   "pitch": 84,
-   "beat": 130,
-   "duration": 1.25,
-   "hand": "R",
-   "velocity": 110
-  },
-  {
    "id": "18091ed-pass",
-   "pitch": 57,
-   "beat": 130,
+   "pitch": 65,
+   "beat": 130.5,
    "duration": 0.25,
    "hand": "L",
    "velocity": 105
   },
   {
+   "id": "b76f44a",
+   "pitch": 76,
+   "beat": 130.75,
+   "duration": 2,
+   "hand": "R",
+   "velocity": 110
+  },
+  {
    "id": "55c2797",
-   "pitch": 96,
-   "beat": 130.25,
+   "pitch": 108,
+   "beat": 131,
    "duration": 0.5,
    "hand": "R",
    "velocity": 58
   },
   {
-   "id": "e5dafe0",
-   "pitch": 100,
-   "beat": 130.5,
-   "duration": 0.5,
-   "hand": "R",
-   "velocity": 73
-  },
-  {
    "id": "1e2b3bf-pass",
-   "pitch": 62,
-   "beat": 130.5,
+   "pitch": 69,
+   "beat": 131,
    "duration": 0.25,
    "hand": "L",
    "velocity": 103
   },
   {
-   "id": "bd5da16",
+   "id": "e5dafe0",
    "pitch": 103,
-   "beat": 130.75,
+   "beat": 131.25,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 73
+  },
+  {
+   "id": "bd5da16",
+   "pitch": 100,
+   "beat": 131.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 84
   },
   {
    "id": "6081459",
-   "pitch": 88,
-   "beat": 131,
-   "duration": 1.75,
+   "pitch": 79,
+   "beat": 131.75,
+   "duration": 0.75,
    "hand": "R",
    "velocity": 106
   },
   {
    "id": "56b978d",
-   "pitch": 84,
-   "beat": 131.25,
-   "duration": 1.25,
+   "pitch": 86,
+   "beat": 132,
+   "duration": 2,
    "hand": "R",
    "velocity": 103
   },
   {
    "id": "afe003b-pass",
-   "pitch": 81,
-   "beat": 131.5,
+   "pitch": 84,
+   "beat": 132.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 51
   },
   {
    "id": "137b714",
-   "pitch": 76,
-   "beat": 131.75,
-   "duration": 1.75,
+   "pitch": 79,
+   "beat": 132.5,
+   "duration": 2,
    "hand": "R",
    "velocity": 100
   },
   {
    "id": "b7da78d",
    "pitch": 74,
-   "beat": 132,
+   "beat": 132.75,
    "duration": 2,
    "hand": "R",
    "velocity": 103
@@ -3994,7 +4082,7 @@
   {
    "id": "f831cff-pass",
    "pitch": 81,
-   "beat": 132.25,
+   "beat": 133,
    "duration": 0.25,
    "hand": "R",
    "velocity": 78
@@ -4002,7 +4090,7 @@
   {
    "id": "4605493-pass",
    "pitch": 84,
-   "beat": 132.5,
+   "beat": 133.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 75
@@ -4010,7 +4098,7 @@
   {
    "id": "384051c-pass",
    "pitch": 88,
-   "beat": 132.75,
+   "beat": 133.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 91
@@ -4018,7 +4106,7 @@
   {
    "id": "ee6c722-pass",
    "pitch": 84,
-   "beat": 133,
+   "beat": 133.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 95
@@ -4026,7 +4114,7 @@
   {
    "id": "8ae2b8c-pass",
    "pitch": 81,
-   "beat": 133.25,
+   "beat": 134,
    "duration": 0.25,
    "hand": "R",
    "velocity": 75
@@ -4034,7 +4122,7 @@
   {
    "id": "00aaa78-pass",
    "pitch": 76,
-   "beat": 133.5,
+   "beat": 134.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 72
@@ -4042,23 +4130,23 @@
   {
    "id": "b5acc5e-pass",
    "pitch": 81,
-   "beat": 133.75,
+   "beat": 134.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 77
   },
   {
    "id": "ee937b8",
-   "pitch": 107,
-   "beat": 134,
-   "duration": 0.25,
+   "pitch": 98,
+   "beat": 134.75,
+   "duration": 0.5,
    "hand": "R",
    "velocity": 87
   },
   {
    "id": "2823d2c",
-   "pitch": 107,
-   "beat": 134.25,
+   "pitch": 103,
+   "beat": 135,
    "duration": 0.5,
    "hand": "R",
    "velocity": 68
@@ -4066,7 +4154,7 @@
   {
    "id": "371800a-pass",
    "pitch": 84,
-   "beat": 134.5,
+   "beat": 135.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 85
@@ -4074,7 +4162,7 @@
   {
    "id": "952a847",
    "pitch": 86,
-   "beat": 134.75,
+   "beat": 135.5,
    "duration": 2,
    "hand": "R",
    "velocity": 102
@@ -4082,31 +4170,31 @@
   {
    "id": "eca7139-pass",
    "pitch": 84,
-   "beat": 135,
+   "beat": 135.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 68
   },
   {
    "id": "f596de3",
-   "pitch": 107,
-   "beat": 135.25,
+   "pitch": 105,
+   "beat": 136,
    "duration": 0.5,
    "hand": "R",
    "velocity": 91
   },
   {
    "id": "28cf07c",
-   "pitch": 79,
-   "beat": 135.5,
-   "duration": 2,
+   "pitch": 76,
+   "beat": 136.25,
+   "duration": 0.75,
    "hand": "R",
    "velocity": 96
   },
   {
    "id": "a12c9aa",
-   "pitch": 107,
-   "beat": 135.75,
+   "pitch": 108,
+   "beat": 136.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 91
@@ -4114,7 +4202,7 @@
   {
    "id": "954568a-pass",
    "pitch": 74,
-   "beat": 136,
+   "beat": 136.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 80
@@ -4122,7 +4210,7 @@
   {
    "id": "b035a3d",
    "pitch": 76,
-   "beat": 136.25,
+   "beat": 137,
    "duration": 2,
    "hand": "R",
    "velocity": 88
@@ -4130,7 +4218,7 @@
   {
    "id": "f648635",
    "pitch": 81,
-   "beat": 136.5,
+   "beat": 137.25,
    "duration": 2,
    "hand": "R",
    "velocity": 93
@@ -4138,15 +4226,15 @@
   {
    "id": "d5c8645",
    "pitch": 84,
-   "beat": 136.75,
+   "beat": 137.5,
    "duration": 2,
    "hand": "R",
    "velocity": 73
   },
   {
    "id": "63156a0",
-   "pitch": 108,
-   "beat": 137,
+   "pitch": 105,
+   "beat": 137.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 80
@@ -4154,7 +4242,7 @@
   {
    "id": "34594b8",
    "pitch": 88,
-   "beat": 137.25,
+   "beat": 138,
    "duration": 2,
    "hand": "R",
    "velocity": 103
@@ -4162,23 +4250,23 @@
   {
    "id": "5f431c5-pass",
    "pitch": 86,
-   "beat": 137.5,
+   "beat": 138.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 62
   },
   {
    "id": "2adb3f9",
-   "pitch": 105,
-   "beat": 137.75,
+   "pitch": 100,
+   "beat": 138.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 85
   },
   {
    "id": "8dc1402",
-   "pitch": 100,
-   "beat": 138,
+   "pitch": 96,
+   "beat": 138.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 77
@@ -4186,7 +4274,7 @@
   {
    "id": "378257f-pass",
    "pitch": 83,
-   "beat": 138.25,
+   "beat": 139,
    "duration": 0.25,
    "hand": "R",
    "velocity": 78
@@ -4194,7 +4282,7 @@
   {
    "id": "54e1d49-pass",
    "pitch": 77,
-   "beat": 138.5,
+   "beat": 139.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 70
@@ -4202,7 +4290,7 @@
   {
    "id": "6e90840-pass",
    "pitch": 74,
-   "beat": 138.75,
+   "beat": 139.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 77
@@ -4210,15 +4298,15 @@
   {
    "id": "eb4bd57-pass",
    "pitch": 77,
-   "beat": 139,
+   "beat": 139.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 85
   },
   {
    "id": "2a89b1e",
-   "pitch": 96,
-   "beat": 139.25,
+   "pitch": 101,
+   "beat": 140,
    "duration": 0.5,
    "hand": "R",
    "velocity": 97
@@ -4226,7 +4314,7 @@
   {
    "id": "847cf71-pass",
    "pitch": 83,
-   "beat": 139.5,
+   "beat": 140.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 110
@@ -4234,71 +4322,87 @@
   {
    "id": "2af07b3-pass",
    "pitch": 86,
-   "beat": 139.75,
+   "beat": 140.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 90
   },
   {
    "id": "c41d99a",
-   "pitch": 84,
-   "beat": 140,
-   "duration": 0.75,
+   "pitch": 81,
+   "beat": 140.75,
+   "duration": 2,
    "hand": "R",
    "velocity": 94
   },
   {
    "id": "9b58d2a",
-   "pitch": 101,
-   "beat": 140.25,
+   "pitch": 105,
+   "beat": 141,
    "duration": 0.5,
    "hand": "R",
    "velocity": 88
   },
   {
    "id": "6b5f678-pass",
-   "pitch": 86,
-   "beat": 140.5,
+   "pitch": 79,
+   "beat": 141.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 108
   },
   {
    "id": "2b27832",
-   "pitch": 84,
-   "beat": 140.75,
-   "duration": 0.25,
+   "pitch": 72,
+   "beat": 141.5,
+   "duration": 2,
    "hand": "R",
    "velocity": 108
   },
   {
    "id": "2fefb0b",
-   "pitch": 84,
-   "beat": 141,
-   "duration": 1,
+   "pitch": 77,
+   "beat": 141.75,
+   "duration": 2,
    "hand": "R",
    "velocity": 109
   },
   {
+   "id": "8df5bd9-pass",
+   "pitch": 67,
+   "beat": 141.75,
+   "duration": 0.25,
+   "hand": "L",
+   "velocity": 110
+  },
+  {
    "id": "f6c9395-pass",
-   "pitch": 86,
-   "beat": 141.25,
+   "pitch": 83,
+   "beat": 142,
    "duration": 0.25,
    "hand": "R",
    "velocity": 87
   },
   {
+   "id": "07b2d35-pass",
+   "pitch": 62,
+   "beat": 142,
+   "duration": 0.25,
+   "hand": "L",
+   "velocity": 110
+  },
+  {
    "id": "10935d4",
-   "pitch": 105,
-   "beat": 141.5,
+   "pitch": 108,
+   "beat": 142.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 96
   },
   {
    "id": "369c8e0",
-   "pitch": 108,
-   "beat": 141.75,
+   "pitch": 105,
+   "beat": 142.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 90
@@ -4306,58 +4410,26 @@
   {
    "id": "2183726",
    "pitch": 84,
-   "beat": 142,
+   "beat": 142.75,
    "duration": 2,
    "hand": "R",
    "velocity": 108
   },
   {
-   "id": "8df5bd9-pass",
-   "pitch": 67,
-   "beat": 142,
-   "duration": 0.25,
-   "hand": "L",
-   "velocity": 110
-  },
-  {
-   "id": "ea8d4c9-pass",
-   "pitch": 86,
-   "beat": 142.25,
-   "duration": 0.25,
-   "hand": "R",
-   "velocity": 82
-  },
-  {
-   "id": "07b2d35-pass",
-   "pitch": 67,
-   "beat": 142.25,
-   "duration": 0.25,
-   "hand": "L",
-   "velocity": 110
-  },
-  {
-   "id": "ab7c1d8-pass",
-   "pitch": 86,
-   "beat": 142.5,
-   "duration": 0.25,
-   "hand": "R",
-   "velocity": 74
-  },
-  {
-   "id": "22b15eb-pass",
-   "pitch": 86,
-   "beat": 142.75,
-   "duration": 0.25,
-   "hand": "R",
-   "velocity": 86
-  },
-  {
    "id": "cb09962-pass",
-   "pitch": 67,
+   "pitch": 59,
    "beat": 142.75,
    "duration": 0.25,
    "hand": "L",
    "velocity": 107
+  },
+  {
+   "id": "ea8d4c9-pass",
+   "pitch": 83,
+   "beat": 143,
+   "duration": 0.25,
+   "hand": "R",
+   "velocity": 82
   },
   {
    "id": "a0c53b1-pass",
@@ -4368,49 +4440,65 @@
    "velocity": 89
   },
   {
-   "id": "970f056-pass",
-   "pitch": 86,
+   "id": "ab7c1d8-pass",
+   "pitch": 79,
    "beat": 143.25,
+   "duration": 0.25,
+   "hand": "R",
+   "velocity": 74
+  },
+  {
+   "id": "22b15eb-pass",
+   "pitch": 74,
+   "beat": 143.5,
+   "duration": 0.25,
+   "hand": "R",
+   "velocity": 86
+  },
+  {
+   "id": "ed9f645-pass",
+   "pitch": 67,
+   "beat": 143.5,
+   "duration": 0.25,
+   "hand": "L",
+   "velocity": 110
+  },
+  {
+   "id": "970f056-pass",
+   "pitch": 79,
+   "beat": 143.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "e71c94c-pass",
-   "pitch": 86,
-   "beat": 143.5,
+   "pitch": 81,
+   "beat": 144,
    "duration": 0.25,
    "hand": "R",
    "velocity": 71
   },
   {
-   "id": "ed9f645-pass",
-   "pitch": 59,
-   "beat": 143.5,
-   "duration": 0.25,
-   "hand": "L",
-   "velocity": 110
-  },
-  {
-   "id": "0650fce",
-   "pitch": 105,
-   "beat": 143.75,
-   "duration": 0.5,
-   "hand": "R",
-   "velocity": 93
-  },
-  {
    "id": "d271400-pass",
-   "pitch": 62,
+   "pitch": 69,
    "beat": 144,
    "duration": 0.25,
    "hand": "L",
    "velocity": 110
   },
   {
-   "id": "bead973",
+   "id": "0650fce",
    "pitch": 100,
    "beat": 144.25,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 93
+  },
+  {
+   "id": "bead973",
+   "pitch": 96,
+   "beat": 144.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 98
@@ -4418,26 +4506,18 @@
   {
    "id": "0ba35d8-pass",
    "pitch": 86,
-   "beat": 144.5,
+   "beat": 144.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 73
   },
   {
    "id": "d04dcdb",
-   "pitch": 79,
-   "beat": 144.75,
-   "duration": 1,
+   "pitch": 88,
+   "beat": 145,
+   "duration": 2,
    "hand": "R",
    "velocity": 102
-  },
-  {
-   "id": "e0ec3ac-pass",
-   "pitch": 77,
-   "beat": 145,
-   "duration": 0.25,
-   "hand": "R",
-   "velocity": 70
   },
   {
    "id": "e06ed5c-pass",
@@ -4448,41 +4528,49 @@
    "velocity": 110
   },
   {
-   "id": "d00b153",
-   "pitch": 72,
+   "id": "e0ec3ac-pass",
+   "pitch": 86,
    "beat": 145.25,
-   "duration": 2,
+   "duration": 0.25,
+   "hand": "R",
+   "velocity": 70
+  },
+  {
+   "id": "d00b153",
+   "pitch": 79,
+   "beat": 145.5,
+   "duration": 1,
    "hand": "R",
    "velocity": 101
   },
   {
    "id": "25ad716-pass",
    "pitch": 77,
-   "beat": 145.5,
+   "beat": 145.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 79
   },
   {
    "id": "3ab028e",
-   "pitch": 79,
-   "beat": 145.75,
+   "pitch": 72,
+   "beat": 146,
    "duration": 2,
    "hand": "R",
    "velocity": 102
   },
   {
    "id": "87269e1-pass",
-   "pitch": 86,
-   "beat": 146,
+   "pitch": 77,
+   "beat": 146.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 82
   },
   {
    "id": "7c80d47",
-   "pitch": 88,
-   "beat": 146.25,
+   "pitch": 79,
+   "beat": 146.5,
    "duration": 2,
    "hand": "R",
    "velocity": 93
@@ -4490,63 +4578,63 @@
   {
    "id": "3e3e92e-pass",
    "pitch": 86,
-   "beat": 146.5,
+   "beat": 146.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 78
   },
   {
    "id": "5af5975-pass",
-   "pitch": 81,
-   "beat": 146.75,
+   "pitch": 86,
+   "beat": 147,
    "duration": 0.25,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "3932bb0",
-   "pitch": 96,
-   "beat": 147,
+   "pitch": 100,
+   "beat": 147.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 92
   },
   {
    "id": "a02d858-pass",
-   "pitch": 77,
-   "beat": 147.25,
+   "pitch": 86,
+   "beat": 147.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
   },
   {
    "id": "4a43061-pass",
-   "pitch": 74,
-   "beat": 147.5,
+   "pitch": 81,
+   "beat": 147.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 70
   },
   {
    "id": "d8f6e86-pass",
-   "pitch": 77,
-   "beat": 147.75,
+   "pitch": 81,
+   "beat": 148,
    "duration": 0.25,
    "hand": "R",
    "velocity": 96
   },
   {
    "id": "2f4870c",
-   "pitch": 83,
-   "beat": 148,
+   "pitch": 74,
+   "beat": 148.25,
    "duration": 2,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "451e6e9-pass",
-   "pitch": 88,
-   "beat": 148.25,
+   "pitch": 81,
+   "beat": 148.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 83
@@ -4554,39 +4642,39 @@
   {
    "id": "6b8f95a-pass",
    "pitch": 84,
-   "beat": 148.5,
+   "beat": 148.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "c87e36a",
-   "pitch": 103,
-   "beat": 148.75,
+   "pitch": 107,
+   "beat": 149,
    "duration": 0.5,
    "hand": "R",
    "velocity": 94
   },
   {
    "id": "32d74b1",
-   "pitch": 107,
-   "beat": 149,
+   "pitch": 103,
+   "beat": 149.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 95
   },
   {
    "id": "76d0df7-pass",
-   "pitch": 81,
-   "beat": 149.25,
+   "pitch": 88,
+   "beat": 149.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 75
   },
   {
    "id": "354ff1b-pass",
-   "pitch": 76,
-   "beat": 149.5,
+   "pitch": 84,
+   "beat": 149.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 75
@@ -4594,23 +4682,23 @@
   {
    "id": "739352b-pass",
    "pitch": 81,
-   "beat": 149.75,
+   "beat": 150,
    "duration": 0.25,
    "hand": "R",
    "velocity": 67
   },
   {
    "id": "4cbfa9f",
-   "pitch": 83,
-   "beat": 150,
-   "duration": 1.75,
+   "pitch": 74,
+   "beat": 150.25,
+   "duration": 2,
    "hand": "R",
    "velocity": 62
   },
   {
    "id": "b1c4efd-pass",
-   "pitch": 88,
-   "beat": 150.25,
+   "pitch": 81,
+   "beat": 150.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 47
@@ -4618,31 +4706,31 @@
   {
    "id": "e345e37-pass",
    "pitch": 84,
-   "beat": 150.5,
+   "beat": 150.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 75
   },
   {
    "id": "9cbf2f7-pass",
-   "pitch": 81,
-   "beat": 150.75,
+   "pitch": 88,
+   "beat": 151,
    "duration": 0.25,
    "hand": "R",
    "velocity": 47
   },
   {
    "id": "0802608",
-   "pitch": 74,
-   "beat": 151,
+   "pitch": 83,
+   "beat": 151.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 94
   },
   {
    "id": "6ed15ea",
-   "pitch": 103,
-   "beat": 151.25,
+   "pitch": 98,
+   "beat": 151.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 94
@@ -4650,31 +4738,39 @@
   {
    "id": "affb48e",
    "pitch": 79,
-   "beat": 151.5,
+   "beat": 151.75,
    "duration": 2,
    "hand": "R",
    "velocity": 102
   },
   {
    "id": "5143250",
-   "pitch": 83,
-   "beat": 151.75,
+   "pitch": 72,
+   "beat": 152,
    "duration": 2,
    "hand": "R",
    "velocity": 109
   },
   {
-   "id": "e7acc25",
-   "pitch": 84,
+   "id": "788161e-pass",
+   "pitch": 62,
    "beat": 152,
+   "duration": 0.25,
+   "hand": "L",
+   "velocity": 69
+  },
+  {
+   "id": "e7acc25",
+   "pitch": 76,
+   "beat": 152.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 89
   },
   {
    "id": "da47fa1-pass",
-   "pitch": 86,
-   "beat": 152.25,
+   "pitch": 83,
+   "beat": 152.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 62
@@ -4682,55 +4778,47 @@
   {
    "id": "3342a12-pass",
    "pitch": 86,
-   "beat": 152.5,
+   "beat": 152.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 67
   },
   {
-   "id": "788161e-pass",
-   "pitch": 67,
-   "beat": 152.5,
-   "duration": 0.25,
-   "hand": "L",
-   "velocity": 69
-  },
-  {
    "id": "304035c",
-   "pitch": 81,
-   "beat": 152.75,
+   "pitch": 88,
+   "beat": 153,
    "duration": 2,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "099aa7a",
-   "pitch": 96,
-   "beat": 153,
+   "pitch": 100,
+   "beat": 153.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 63
   },
   {
    "id": "2d8ecf6",
-   "pitch": 76,
-   "beat": 153.25,
+   "pitch": 84,
+   "beat": 153.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 73
   },
   {
    "id": "2b3d9b4",
-   "pitch": 100,
-   "beat": 153.5,
+   "pitch": 105,
+   "beat": 153.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 98
   },
   {
    "id": "106322d",
-   "pitch": 72,
-   "beat": 153.75,
+   "pitch": 81,
+   "beat": 154,
    "duration": 2,
    "hand": "R",
    "velocity": 103
@@ -4738,31 +4826,31 @@
   {
    "id": "3a30966-pass",
    "pitch": 77,
-   "beat": 154,
+   "beat": 154.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 61
   },
   {
    "id": "2fd9753-pass",
-   "pitch": 83,
-   "beat": 154.25,
+   "pitch": 74,
+   "beat": 154.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 85
   },
   {
    "id": "b75d7c2-pass",
-   "pitch": 86,
-   "beat": 154.5,
+   "pitch": 77,
+   "beat": 154.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 75
   },
   {
    "id": "92b9b46-pass",
-   "pitch": 86,
-   "beat": 154.75,
+   "pitch": 83,
+   "beat": 155,
    "duration": 0.25,
    "hand": "R",
    "velocity": 106
@@ -4770,255 +4858,255 @@
   {
    "id": "bcfe5cd-pass",
    "pitch": 86,
-   "beat": 155,
+   "beat": 155.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 71
   },
   {
    "id": "4032072-pass",
-   "pitch": 83,
-   "beat": 155.25,
+   "pitch": 86,
+   "beat": 155.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 62
   },
   {
    "id": "de76ded",
-   "pitch": 105,
-   "beat": 155.5,
+   "pitch": 108,
+   "beat": 155.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 90
   },
   {
    "id": "4be221e-pass",
-   "pitch": 77,
-   "beat": 155.75,
+   "pitch": 86,
+   "beat": 156,
    "duration": 0.25,
    "hand": "R",
    "velocity": 58
   },
   {
    "id": "eff4653",
-   "pitch": 72,
-   "beat": 156,
-   "duration": 2,
+   "pitch": 84,
+   "beat": 156.25,
+   "duration": 1,
    "hand": "R",
    "velocity": 105
   },
   {
    "id": "8a58176-pass",
-   "pitch": 79,
-   "beat": 156.25,
+   "pitch": 86,
+   "beat": 156.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 77
   },
   {
    "id": "b82bece-pass",
-   "pitch": 83,
-   "beat": 156.5,
+   "pitch": 86,
+   "beat": 156.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 75
   },
   {
    "id": "59b4628",
-   "pitch": 108,
-   "beat": 156.75,
+   "pitch": 105,
+   "beat": 157,
    "duration": 0.5,
    "hand": "R",
    "velocity": 92
   },
   {
+   "id": "275d2bf-pass",
+   "pitch": 59,
+   "beat": 157,
+   "duration": 0.25,
+   "hand": "L",
+   "velocity": 84
+  },
+  {
    "id": "d561e37",
    "pitch": 84,
-   "beat": 157,
-   "duration": 2,
+   "beat": 157.25,
+   "duration": 0.5,
    "hand": "R",
    "velocity": 96
   },
   {
    "id": "c82bf3b",
-   "pitch": 105,
-   "beat": 157.25,
+   "pitch": 101,
+   "beat": 157.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 63
   },
   {
    "id": "9521e9d",
-   "pitch": 81,
-   "beat": 157.5,
-   "duration": 1.25,
+   "pitch": 84,
+   "beat": 157.75,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "edbf6e3",
-   "pitch": 77,
-   "beat": 157.75,
-   "duration": 0.75,
-   "hand": "R",
-   "velocity": 110
-  },
-  {
-   "id": "275d2bf-pass",
-   "pitch": 67,
-   "beat": 157.75,
-   "duration": 0.25,
-   "hand": "L",
-   "velocity": 84
-  },
-  {
-   "id": "af7ef00",
-   "pitch": 72,
+   "pitch": 84,
    "beat": 158,
-   "duration": 2,
-   "hand": "R",
-   "velocity": 110
-  },
-  {
-   "id": "1afa6a1",
-   "pitch": 101,
-   "beat": 158.25,
-   "duration": 0.5,
-   "hand": "R",
-   "velocity": 58
-  },
-  {
-   "id": "1cefee0",
-   "pitch": 77,
-   "beat": 158.5,
-   "duration": 1.5,
-   "hand": "R",
-   "velocity": 105
-  },
-  {
-   "id": "93319d4",
-   "pitch": 81,
-   "beat": 158.75,
-   "duration": 2,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "b1a7577-pass",
    "pitch": 62,
-   "beat": 158.75,
+   "beat": 158,
    "duration": 0.25,
    "hand": "L",
    "velocity": 106
   },
   {
-   "id": "51f2eb3",
-   "pitch": 96,
-   "beat": 159,
+   "id": "af7ef00",
+   "pitch": 84,
+   "beat": 158.25,
    "duration": 0.5,
    "hand": "R",
-   "velocity": 91
+   "velocity": 110
+  },
+  {
+   "id": "1afa6a1",
+   "pitch": 96,
+   "beat": 158.5,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 58
   },
   {
    "id": "c7903cb-pass",
-   "pitch": 59,
-   "beat": 159,
+   "pitch": 67,
+   "beat": 158.5,
    "duration": 0.25,
    "hand": "L",
    "velocity": 77
   },
   {
-   "id": "c86a3e0-pass",
-   "pitch": 86,
-   "beat": 159.25,
+   "id": "1cefee0",
+   "pitch": 84,
+   "beat": 158.75,
    "duration": 0.25,
    "hand": "R",
-   "velocity": 54
+   "velocity": 105
   },
   {
-   "id": "25f33fb-pass",
-   "pitch": 83,
-   "beat": 159.5,
-   "duration": 0.25,
+   "id": "93319d4",
+   "pitch": 84,
+   "beat": 159,
+   "duration": 2,
    "hand": "R",
-   "velocity": 75
+   "velocity": 110
   },
   {
    "id": "bfc1765-pass",
-   "pitch": 62,
-   "beat": 159.5,
+   "pitch": 67,
+   "beat": 159,
    "duration": 0.25,
    "hand": "L",
    "velocity": 78
   },
   {
-   "id": "b7d90a7",
+   "id": "51f2eb3",
    "pitch": 101,
+   "beat": 159.25,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 91
+  },
+  {
+   "id": "e6875b6-pass",
+   "pitch": 67,
+   "beat": 159.25,
+   "duration": 0.25,
+   "hand": "L",
+   "velocity": 110
+  },
+  {
+   "id": "c86a3e0-pass",
+   "pitch": 86,
+   "beat": 159.5,
+   "duration": 0.25,
+   "hand": "R",
+   "velocity": 54
+  },
+  {
+   "id": "dc65d01-pass",
+   "pitch": 62,
+   "beat": 159.5,
+   "duration": 0.25,
+   "hand": "L",
+   "velocity": 105
+  },
+  {
+   "id": "25f33fb-pass",
+   "pitch": 86,
    "beat": 159.75,
+   "duration": 0.25,
+   "hand": "R",
+   "velocity": 75
+  },
+  {
+   "id": "b7d90a7",
+   "pitch": 103,
+   "beat": 160,
    "duration": 0.5,
    "hand": "R",
    "velocity": 67
   },
   {
    "id": "dd4e9bf-pass",
-   "pitch": 77,
-   "beat": 160,
+   "pitch": 86,
+   "beat": 160.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 64
   },
   {
-   "id": "e6875b6-pass",
-   "pitch": 65,
-   "beat": 160,
-   "duration": 0.25,
-   "hand": "L",
-   "velocity": 110
-  },
-  {
    "id": "0ce9e9b",
-   "pitch": 72,
-   "beat": 160.25,
-   "duration": 2,
+   "pitch": 79,
+   "beat": 160.5,
+   "duration": 1,
    "hand": "R",
    "velocity": 110
   },
   {
-   "id": "dc65d01-pass",
-   "pitch": 69,
-   "beat": 160.25,
-   "duration": 0.25,
-   "hand": "L",
-   "velocity": 105
-  },
-  {
    "id": "f3a9ee0-pass",
    "pitch": 77,
-   "beat": 160.5,
+   "beat": 160.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 61
   },
   {
    "id": "712afa7-pass",
-   "pitch": 81,
-   "beat": 160.75,
+   "pitch": 74,
+   "beat": 161,
    "duration": 0.25,
    "hand": "R",
    "velocity": 82
   },
   {
    "id": "3e21b55-pass",
-   "pitch": 86,
-   "beat": 161,
+   "pitch": 77,
+   "beat": 161.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 80
   },
   {
    "id": "038186c",
-   "pitch": 88,
-   "beat": 161.25,
+   "pitch": 79,
+   "beat": 161.5,
    "duration": 2,
    "hand": "R",
    "velocity": 95
@@ -5026,39 +5114,47 @@
   {
    "id": "0b2ce82-pass",
    "pitch": 86,
-   "beat": 161.5,
+   "beat": 161.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 47
   },
   {
    "id": "3ff1902-pass",
-   "pitch": 81,
-   "beat": 161.75,
+   "pitch": 86,
+   "beat": 162,
    "duration": 0.25,
    "hand": "R",
    "velocity": 88
   },
   {
    "id": "3681752-pass",
-   "pitch": 77,
-   "beat": 162,
+   "pitch": 86,
+   "beat": 162.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 74
   },
   {
    "id": "a923447-pass",
-   "pitch": 74,
-   "beat": 162.25,
+   "pitch": 81,
+   "beat": 162.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 63
   },
   {
-   "id": "c45ae0f",
-   "pitch": 103,
+   "id": "08fbc3a-pass",
+   "pitch": 57,
    "beat": 162.5,
+   "duration": 0.25,
+   "hand": "L",
+   "velocity": 110
+  },
+  {
+   "id": "c45ae0f",
+   "pitch": 108,
+   "beat": 162.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 93
@@ -5066,47 +5162,47 @@
   {
    "id": "b2c0ab3-pass",
    "pitch": 77,
-   "beat": 162.75,
+   "beat": 163,
    "duration": 0.25,
    "hand": "R",
    "velocity": 73
   },
   {
    "id": "71453a5-pass",
-   "pitch": 81,
-   "beat": 163,
+   "pitch": 74,
+   "beat": 163.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 56
   },
   {
-   "id": "8ecf7b4-pass",
-   "pitch": 86,
+   "id": "bbebffd-pass",
+   "pitch": 62,
    "beat": 163.25,
+   "duration": 0.25,
+   "hand": "L",
+   "velocity": 66
+  },
+  {
+   "id": "8ecf7b4-pass",
+   "pitch": 77,
+   "beat": 163.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 78
   },
   {
-   "id": "08fbc3a-pass",
-   "pitch": 65,
-   "beat": 163.25,
-   "duration": 0.25,
-   "hand": "L",
-   "velocity": 110
-  },
-  {
    "id": "8e4d3d6-pass",
-   "pitch": 86,
-   "beat": 163.5,
+   "pitch": 81,
+   "beat": 163.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 67
   },
   {
    "id": "37e9784-pass",
-   "pitch": 86,
-   "beat": 163.75,
+   "pitch": 88,
+   "beat": 164,
    "duration": 0.25,
    "hand": "R",
    "velocity": 65
@@ -5114,23 +5210,15 @@
   {
    "id": "a65a46b-pass",
    "pitch": 84,
-   "beat": 164,
+   "beat": 164.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 54
   },
   {
-   "id": "bbebffd-pass",
-   "pitch": 60,
-   "beat": 164,
-   "duration": 0.25,
-   "hand": "L",
-   "velocity": 66
-  },
-  {
    "id": "62bb4c3-pass",
    "pitch": 81,
-   "beat": 164.25,
+   "beat": 164.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 56
@@ -5138,7 +5226,7 @@
   {
    "id": "65b2f1e-pass",
    "pitch": 76,
-   "beat": 164.5,
+   "beat": 164.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 61
@@ -5146,7 +5234,7 @@
   {
    "id": "42199d8-pass",
    "pitch": 81,
-   "beat": 164.75,
+   "beat": 165,
    "duration": 0.25,
    "hand": "R",
    "velocity": 73
@@ -5154,7 +5242,7 @@
   {
    "id": "ba572aa-pass",
    "pitch": 84,
-   "beat": 165,
+   "beat": 165.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 73
@@ -5162,7 +5250,7 @@
   {
    "id": "9f30b57-pass",
    "pitch": 88,
-   "beat": 165.25,
+   "beat": 165.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 61
@@ -5170,7 +5258,7 @@
   {
    "id": "1f420f8-pass",
    "pitch": 84,
-   "beat": 165.5,
+   "beat": 165.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 62
@@ -5178,7 +5266,7 @@
   {
    "id": "f1bea92-pass",
    "pitch": 81,
-   "beat": 165.75,
+   "beat": 166,
    "duration": 0.25,
    "hand": "R",
    "velocity": 84
@@ -5186,7 +5274,7 @@
   {
    "id": "89b57c3",
    "pitch": 107,
-   "beat": 166,
+   "beat": 166.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 89
@@ -5194,7 +5282,7 @@
   {
    "id": "b8b0feb-pass",
    "pitch": 76,
-   "beat": 166.25,
+   "beat": 166.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 85
@@ -5202,15 +5290,23 @@
   {
    "id": "b878080-pass",
    "pitch": 81,
-   "beat": 166.5,
+   "beat": 166.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 102
   },
   {
+   "id": "71912d7-pass",
+   "pitch": 64,
+   "beat": 166.75,
+   "duration": 0.25,
+   "hand": "L",
+   "velocity": 79
+  },
+  {
    "id": "c3e3014",
    "pitch": 83,
-   "beat": 166.75,
+   "beat": 167,
    "duration": 2,
    "hand": "R",
    "velocity": 110
@@ -5218,7 +5314,7 @@
   {
    "id": "ab4f0ad-pass",
    "pitch": 88,
-   "beat": 167,
+   "beat": 167.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 76
@@ -5226,7 +5322,7 @@
   {
    "id": "0f575ec",
    "pitch": 107,
-   "beat": 167.25,
+   "beat": 167.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 91
@@ -5234,31 +5330,23 @@
   {
    "id": "d2f9d36-pass",
    "pitch": 84,
-   "beat": 167.5,
+   "beat": 167.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 70
   },
   {
    "id": "a619a70",
-   "pitch": 107,
-   "beat": 167.75,
+   "pitch": 105,
+   "beat": 168,
    "duration": 0.5,
    "hand": "R",
    "velocity": 96
   },
   {
-   "id": "71912d7-pass",
-   "pitch": 57,
-   "beat": 167.75,
-   "duration": 0.25,
-   "hand": "L",
-   "velocity": 79
-  },
-  {
    "id": "f75dab9-pass",
    "pitch": 77,
-   "beat": 168,
+   "beat": 168.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 110
@@ -5266,7 +5354,7 @@
   {
    "id": "aa5909b-pass",
    "pitch": 74,
-   "beat": 168.25,
+   "beat": 168.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 77
@@ -5274,7 +5362,7 @@
   {
    "id": "8bc1ea6-pass",
    "pitch": 77,
-   "beat": 168.5,
+   "beat": 168.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 110
@@ -5282,15 +5370,15 @@
   {
    "id": "6c5e259-pass",
    "pitch": 83,
-   "beat": 168.75,
+   "beat": 169,
    "duration": 0.25,
    "hand": "R",
    "velocity": 89
   },
   {
    "id": "a7fe4d0",
-   "pitch": 105,
-   "beat": 169,
+   "pitch": 100,
+   "beat": 169.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 89
@@ -5298,7 +5386,7 @@
   {
    "id": "4020adf",
    "pitch": 84,
-   "beat": 169.25,
+   "beat": 169.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 101
@@ -5306,7 +5394,7 @@
   {
    "id": "5414e76-pass",
    "pitch": 86,
-   "beat": 169.5,
+   "beat": 169.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 110
@@ -5314,7 +5402,7 @@
   {
    "id": "b85e9bc",
    "pitch": 84,
-   "beat": 169.75,
+   "beat": 170,
    "duration": 2,
    "hand": "R",
    "velocity": 110
@@ -5322,7 +5410,7 @@
   {
    "id": "babc5cf-pass",
    "pitch": 83,
-   "beat": 170,
+   "beat": 170.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 88
@@ -5330,7 +5418,7 @@
   {
    "id": "48d46f0",
    "pitch": 76,
-   "beat": 170.25,
+   "beat": 170.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 105
@@ -5338,7 +5426,7 @@
   {
    "id": "ac8b79c",
    "pitch": 72,
-   "beat": 170.5,
+   "beat": 170.75,
    "duration": 0.75,
    "hand": "R",
    "velocity": 108
@@ -5346,7 +5434,7 @@
   {
    "id": "d1fcc0f",
    "pitch": 76,
-   "beat": 170.75,
+   "beat": 171,
    "duration": 2,
    "hand": "R",
    "velocity": 108
@@ -5354,7 +5442,7 @@
   {
    "id": "023c80b-pass",
    "pitch": 83,
-   "beat": 171,
+   "beat": 171.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 87
@@ -5362,7 +5450,7 @@
   {
    "id": "b4d5f80-resolve",
    "pitch": 72,
-   "beat": 171.25,
+   "beat": 171.5,
    "duration": 2,
    "hand": "R",
    "velocity": 110
@@ -5370,15 +5458,15 @@
   {
    "id": "d3fb6a2-pass",
    "pitch": 86,
-   "beat": 171.5,
+   "beat": 171.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 56
   },
   {
    "id": "4218fbb",
-   "pitch": 100,
-   "beat": 171.75,
+   "pitch": 98,
+   "beat": 172,
    "duration": 0.5,
    "hand": "R",
    "velocity": 90
@@ -5386,7 +5474,7 @@
   {
    "id": "163237d",
    "pitch": 86,
-   "beat": 172,
+   "beat": 172.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 110
@@ -5394,7 +5482,7 @@
   {
    "id": "2f1d911",
    "pitch": 86,
-   "beat": 172.25,
+   "beat": 172.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 71
@@ -5402,15 +5490,15 @@
   {
    "id": "f45cc83",
    "pitch": 86,
-   "beat": 172.5,
+   "beat": 172.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 103
   },
   {
    "id": "41296e6",
-   "pitch": 98,
-   "beat": 172.75,
+   "pitch": 103,
+   "beat": 173,
    "duration": 0.5,
    "hand": "R",
    "velocity": 91
@@ -5418,7 +5506,7 @@
   {
    "id": "da757c5",
    "pitch": 86,
-   "beat": 173,
+   "beat": 173.25,
    "duration": 0.25,
    "hand": "R",
    "velocity": 72
@@ -5426,7 +5514,7 @@
   {
    "id": "5b29401",
    "pitch": 86,
-   "beat": 173.25,
+   "beat": 173.5,
    "duration": 0.25,
    "hand": "R",
    "velocity": 105
@@ -5434,7 +5522,7 @@
   {
    "id": "11beafc",
    "pitch": 86,
-   "beat": 173.5,
+   "beat": 173.75,
    "duration": 0.25,
    "hand": "R",
    "velocity": 72
@@ -5442,7 +5530,7 @@
   {
    "id": "6d6d00d",
    "pitch": 86,
-   "beat": 173.75,
+   "beat": 174,
    "duration": 0.25,
    "hand": "R",
    "velocity": 76
@@ -5450,21 +5538,13 @@
   {
    "id": "ae69926",
    "pitch": 86,
-   "beat": 174,
+   "beat": 174.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 81
   },
   {
    "id": "f439708",
-   "pitch": 103,
-   "beat": 174.25,
-   "duration": 0.5,
-   "hand": "R",
-   "velocity": 90
-  },
-  {
-   "id": "3a412df",
    "pitch": 107,
    "beat": 174.5,
    "duration": 0.5,
@@ -5472,17 +5552,25 @@
    "velocity": 90
   },
   {
+   "id": "3a412df",
+   "pitch": 103,
+   "beat": 174.75,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 90
+  },
+  {
    "id": "c912571",
    "pitch": 86,
-   "beat": 174.75,
+   "beat": 175,
    "duration": 0.5,
    "hand": "R",
    "velocity": 110
   },
   {
    "id": "0e18df8",
-   "pitch": 103,
-   "beat": 175,
+   "pitch": 98,
+   "beat": 175.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 61
@@ -5490,50 +5578,90 @@
   {
    "id": "629f70d",
    "pitch": 86,
-   "beat": 175.25,
+   "beat": 175.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 82
   },
   {
    "id": "df0f468",
-   "pitch": 98,
-   "beat": 175.5,
+   "pitch": 103,
+   "beat": 175.75,
    "duration": 0.5,
    "hand": "R",
    "velocity": 60
   },
   {
    "id": "6aaa11a",
-   "pitch": 86,
-   "beat": 175.75,
+   "pitch": 84,
+   "beat": 176,
    "duration": 0.5,
    "hand": "R",
    "velocity": 58
   },
   {
    "id": "ed6a1f2",
-   "pitch": 100,
-   "beat": 176,
+   "pitch": 103,
+   "beat": 176.25,
    "duration": 0.5,
    "hand": "R",
    "velocity": 90
   },
   {
    "id": "64aa376",
-   "pitch": 88,
-   "beat": 176.25,
+   "pitch": 79,
+   "beat": 176.5,
    "duration": 0.5,
    "hand": "R",
    "velocity": 69
   },
   {
    "id": "e829b3f",
-   "pitch": 72,
-   "beat": 176.5,
-   "duration": 4,
+   "pitch": 76,
+   "beat": 176.75,
+   "duration": 0.5,
    "hand": "R",
    "velocity": 73
+  },
+  {
+   "id": "89fda5c",
+   "pitch": 108,
+   "beat": 177,
+   "duration": 0.5,
+   "hand": "R",
+   "velocity": 89
+  },
+  {
+   "id": "0a60307",
+   "pitch": 72,
+   "beat": 177.25,
+   "duration": 2,
+   "hand": "R",
+   "velocity": 107
+  },
+  {
+   "id": "34a14f8",
+   "pitch": 76,
+   "beat": 177.5,
+   "duration": 2,
+   "hand": "R",
+   "velocity": 110
+  },
+  {
+   "id": "3f58dc8",
+   "pitch": 79,
+   "beat": 177.75,
+   "duration": 2,
+   "hand": "R",
+   "velocity": 102
+  },
+  {
+   "id": "b4786d1",
+   "pitch": 96,
+   "beat": 178,
+   "duration": 4,
+   "hand": "R",
+   "velocity": 89
   }
  ]
 }

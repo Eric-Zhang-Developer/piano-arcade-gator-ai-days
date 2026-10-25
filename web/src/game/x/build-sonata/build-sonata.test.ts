@@ -54,6 +54,12 @@ describe("traceability (a)", () => {
     expect(new Set(notes.map((n) => n.hash)).size).toBe(snap.commits.length);
     for (const n of chart.notes) expect(snap.commits.filter((c) => n.id.startsWith(c.hash.slice(0, 7)))).toHaveLength(1);
   });
+  it("parses a squash subject and the night's first merge commits", () => {
+    expect(parseSubject("feat(core-loop): play Twinkle (#36)")).toEqual({ type: "feat", scope: "core-loop", pr: 36 });
+    expect(parseSubject("Merge pull request #9 from someone/plan-game-lane")).toEqual({ type: "plan", scope: null, pr: 9 });
+    expect(parseSubject("Merge pull request #1 from someone/agent-brigade-setup")).toEqual({ type: "other", scope: null, pr: 1 });
+    expect(parseSubject("Initial commit")).toBeNull();
+  });
   it("the counter ends at the snapshot's count", () => {
     expect(counterAt(chart.notes, Infinity)).toBe(snap.count);
   });
@@ -64,6 +70,11 @@ describe("traceability (a)", () => {
     expect(lane("fix", null, ["web/src/learn/a.ts", "web/src/learn/b.ts", "web/src/game/c.ts"])).toBe("learning");
     expect(lane("chore", "learning-ui", ["supabase/migrations/x.sql"])).toBe("backend"); // no assignee: by path
     for (const t of ["plan", "contract", "docs"]) expect(lane(t, "core-loop", [])).toBe("bell");
+  });
+  it("a handle that contains a name is replaced whole, not around the name", () => {
+    expect(scrub("Merge pull request #1 from Eric-Zhang-Developer/setup, eric-agent-1", NAMES, "game")).toBe(
+      "Merge pull request #1 from game/setup, game-agent-1",
+    );
   });
   it("no name, handle or email from the scrub list in the snapshot or the chart", () => {
     const text = JSON.stringify(snap) + JSON.stringify(chart);
@@ -115,6 +126,7 @@ describe("the committed snapshot", () => {
   it("holds no scrubbed name and no email", () => {
     const text = readFileSync(new URL("./snapshot.json", import.meta.url), "utf8");
     for (const n of NAMES) expect(text).not.toMatch(new RegExp(`\\b${n}\\b`, "i"));
+    expect(text).not.toMatch(/Zhang|Developer/); // no piece of a handle either
     expect(text).not.toMatch(/[\w.+-]+@[\w-]+\.[a-z]{2,}/i);
   });
 });

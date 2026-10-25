@@ -1,9 +1,69 @@
 {
- "generatedAt": "2026-10-25T13:55:02.815Z",
- "count": 691,
- "from": "2026-10-24T05:28:19.000Z",
- "to": "2026-10-25T13:52:07.000Z",
+ "generatedAt": "2026-10-25T14:12:28.339Z",
+ "count": 707,
+ "from": "2026-10-24T01:11:15.000Z",
+ "to": "2026-10-25T14:11:13.000Z",
  "commits": [
+  {
+   "hash": "acf9b703a9c5dd8cb7aa9c59aa47b1a386156ccd",
+   "time": "2026-10-24T01:11:15.000Z",
+   "type": "other",
+   "scope": null,
+   "pr": 1,
+   "lines": 3360,
+   "lane": "game",
+   "subject": "Merge pull request #1 from game/agent-brigade-setup"
+  },
+  {
+   "hash": "e04bce3b1ba21aa568f1996d99d5a3a25419a860",
+   "time": "2026-10-24T01:22:00.000Z",
+   "type": "plan",
+   "scope": null,
+   "pr": 4,
+   "lines": 106,
+   "lane": "bell",
+   "subject": "Merge pull request #4 from bell/plan-piano-midi-spike"
+  },
+  {
+   "hash": "d5910161ea78b7accc90e848407fa01f3651a16f",
+   "time": "2026-10-24T02:38:12.000Z",
+   "type": "other",
+   "scope": null,
+   "pr": 6,
+   "lines": 1881,
+   "lane": "game",
+   "subject": "Merge pull request #6 from game/claude/piano-midi-spike-36c26f"
+  },
+  {
+   "hash": "6207e70aec91d832410f9ac775e2f16d6569f9f3",
+   "time": "2026-10-24T02:39:55.000Z",
+   "type": "docs",
+   "scope": null,
+   "pr": 7,
+   "lines": 78,
+   "lane": "bell",
+   "subject": "Merge pull request #7 from bell/docs-story"
+  },
+  {
+   "hash": "143711e95a6135ea5b0d7b1f10c24e68bd60a93f",
+   "time": "2026-10-24T04:10:49.000Z",
+   "type": "plan",
+   "scope": null,
+   "pr": 9,
+   "lines": 468,
+   "lane": "bell",
+   "subject": "Merge pull request #9 from bell/plan-game-lane"
+  },
+  {
+   "hash": "c1b88e3000efabb95b3552958f26569f25bd34e1",
+   "time": "2026-10-24T04:11:01.000Z",
+   "type": "contract",
+   "scope": null,
+   "pr": 8,
+   "lines": 152,
+   "lane": "bell",
+   "subject": "Merge pull request #8 from bell/contract-mission-lanes"
+  },
   {
    "hash": "794db394684b77935ff27560f9474d8b174eb6b9",
    "time": "2026-10-24T05:28:19.000Z",
@@ -185,6 +245,16 @@
    "subject": "plan: operator board and attract-mode replay (#73)"
   },
   {
+   "hash": "358352db3db0bfedcb2705ce4740a3a4f60a1937",
+   "time": "2026-10-24T06:33:56.000Z",
+   "type": "plan",
+   "scope": null,
+   "pr": 40,
+   "lines": 85,
+   "lane": "bell",
+   "subject": "Merge pull request #40 from bell/plan-led-strip"
+  },
+  {
    "hash": "1709c875d543885e238f744bbcac368d8794b971",
    "time": "2026-10-24T06:36:42.000Z",
    "type": "plan",
@@ -193,6 +263,16 @@
    "lines": 76,
    "lane": "bell",
    "subject": "plan: song select earlier, /play?song, and a Minuet in G chart (#78)"
+  },
+  {
+   "hash": "5a336f664a2732774d6799787e6e4781e9071742",
+   "time": "2026-10-24T06:41:00.000Z",
+   "type": "docs",
+   "scope": null,
+   "pr": 79,
+   "lines": 85,
+   "lane": "bell",
+   "subject": "Merge pull request #79 from bell/docs-readme"
   },
   {
    "hash": "a6a5482b41c19dedd05d50c900be2460bc03522b",
@@ -283,6 +363,16 @@
    "lines": 144,
    "lane": "game",
    "subject": "feat(song-select): / lists every song in the library, click or Enter to play (#81)"
+  },
+  {
+   "hash": "e4626d3351a8874259e08dbe9bfa2dc56f154d7d",
+   "time": "2026-10-24T07:03:47.000Z",
+   "type": "contract",
+   "scope": null,
+   "pr": 59,
+   "lines": 37,
+   "lane": "bell",
+   "subject": "Merge pull request #59 from bell/contract-take-store"
   },
   {
    "hash": "5ddfc3b9eb6de0476b49afa13fb9ac93068e888f",
@@ -2005,6 +2095,16 @@
    "subject": "fix(song-select): the Options drawer takes the Calibrate link's place on / (#385)"
   },
   {
+   "hash": "cd6bc8b30b5b8b00cbea2fd2e25b406e4cb610f1",
+   "time": "2026-10-24T14:51:13.000Z",
+   "type": "other",
+   "scope": null,
+   "pr": 343,
+   "lines": 885,
+   "lane": "learning",
+   "subject": "Merge pull request #343 from learning/seeko/piano-ui-theory"
+  },
+  {
    "hash": "af6dba85e61e426d2e83bb81efbb33f3025cae57",
    "time": "2026-10-24T14:56:52.000Z",
    "type": "fix",
@@ -2203,6 +2303,16 @@
    "lines": 14,
    "lane": "game",
    "subject": "chore: get the app ready for Vercel (health route, charts shipped with the save route) (#405)"
+  },
+  {
+   "hash": "7172d491ab38e3684ea24bfa4a183becad501866",
+   "time": "2026-10-24T15:29:11.000Z",
+   "type": "other",
+   "scope": null,
+   "pr": 390,
+   "lines": 152,
+   "lane": "learning",
+   "subject": "Merge pull request #390 from learning/seeko/piano-learning-clarity"
   },
   {
    "hash": "1286329a545cdeae7633182188022106359a3062",
@@ -6913,6 +7023,56 @@
    "lines": 25,
    "lane": "game",
    "subject": "fix(ci-browser): a known-red check gets one attempt, not two (#1117)"
+  },
+  {
+   "hash": "89fda5c2f87488d30a1c199b7fc906e652b04ba6",
+   "time": "2026-10-25T13:56:29.000Z",
+   "type": "plan",
+   "scope": null,
+   "pr": 1168,
+   "lines": 130,
+   "lane": "bell",
+   "subject": "plan: ui-sound-family, the menu sounds as one soft family in the song's key (#1168)"
+  },
+  {
+   "hash": "0a60307b624b4c9031d931b65bfb815057ca16c8",
+   "time": "2026-10-25T14:03:14.000Z",
+   "type": "feat",
+   "scope": "hand-palette",
+   "pr": 1163,
+   "lines": 791,
+   "lane": "game",
+   "subject": "feat(hand-palette): the hand and judgment colors three ways, measured, with a colour-blind simulation in the Lab (#1163)"
+  },
+  {
+   "hash": "34a14f8d7ac08f54d95f140a19656059c1097fb3",
+   "time": "2026-10-25T14:08:27.000Z",
+   "type": "feat",
+   "scope": "round",
+   "pr": 1158,
+   "lines": 999,
+   "lane": "game",
+   "subject": "feat(round): play a round once and the piano plays your take back as voices 2, 3 and 4 (#1158)"
+  },
+  {
+   "hash": "3f58dc8fd52c411c5681c6ac272f2a3ae0f62a10",
+   "time": "2026-10-25T14:09:34.000Z",
+   "type": "feat",
+   "scope": "fever-arc",
+   "pr": 1161,
+   "lines": 467,
+   "lane": "game",
+   "subject": "feat(fever-arc): fever as one arc, build-up, ignition on the beat, sustain and release (#1161)"
+  },
+  {
+   "hash": "b4786d1a7f33a30f86904ee479d41d5d5aeb8391",
+   "time": "2026-10-25T14:11:13.000Z",
+   "type": "plan",
+   "scope": null,
+   "pr": 1172,
+   "lines": 124,
+   "lane": "bell",
+   "subject": "plan: pinned, your take as a brass music-box cylinder, a steel comb and an STL (#1172)"
   }
  ],
  "red": [

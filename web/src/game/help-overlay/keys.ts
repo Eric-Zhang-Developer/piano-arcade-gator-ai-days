@@ -147,6 +147,7 @@ export const unlisted: Record<string, string> = {
   "game/audio-track/index.ts": "starts a local song's recording on the first key or pointer press: not a control",
   "game/cabinet/idle.ts": "any key restarts the cabinet's idle timer: not a control",
   "game/take-graph/TakeGraph.tsx": "arrows, Home and End step the take graph's readout only while the graph has focus, like a slider: the graph names its own keys",
+  "game/x/Gallery.tsx": "Esc in an On trial note field leaves the field instead of the Lab: the field's own key, not a control",
   "game/x/build-sonata/SonataPage.tsx": "arrows, Home and End step /sonata's PR readout only while the roll has focus: its legend names the keys, and it isn't /play",
   "game/song-preview/index.tsx": "Enter and L stop the preview as you leave the select: the select's lines cover them",
   "game/results-landing/index.ts": "any key or click skips the results landing to its end state and does nothing else: not a control",

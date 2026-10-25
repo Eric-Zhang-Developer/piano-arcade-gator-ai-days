@@ -13,5 +13,5 @@ A slot shows once its feature's done note is on main; the current page is primar
 Vitest `src/game/nav-bar` passes (7). Design rounds were looked at live on a dev server at 1280×720 and 1920×1080.
 
 ## Gaps
-The top-band pass (#PR) is not verified locally; covered by CI. One look at 1280×720 on `/` only.
+The top-band pass (#1392) is not verified locally; covered by CI. One look at 1280×720 on `/` only.
 Login stays bottom-right (sharan's AccountChip, decision nav-bar-login). Eric's look on `/` (Validation 3) is pending.

@@ -126,8 +126,8 @@ CI and test-only PRs are exempt. Eric, 2026-10-25: "Every time we're doing somet
    runs that one check locally, under `verify.lock`.
 4. The PR body gets a **Design** section: the skills invoked, each round's score, the fixes, and before/after shots.
    No Design section, no ready PR.
-5. **At most 2 worker dev servers at once,** besides Eric's :3000. Take a slot with
-   `mkdir "$(git rev-parse --git-common-dir)/devserver.1"` (or `.2`) and write your pid into it. Remove the slot
+5. **At most 4 worker dev servers at once,** besides Eric's :3000 (Eric, 2026-10-25: "4 dev servers"). Take a slot
+   with `mkdir "$(git rev-parse --git-common-dir)/devserver.1"` (`.1` to `.4`) and write your pid into it. Remove the slot
    when you stop the server, and stop it whenever you go idle. A slot whose pid is dead is free.
 
 ## When something needs a person

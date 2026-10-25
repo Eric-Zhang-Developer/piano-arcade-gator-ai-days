@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { KIND_LABEL, KINDS, ROLES, howData } from "../../how/data";
 import { kindLegend, Life, Lanes, Time, V, Who } from "../../how/diagrams";
 import { readInputs } from "../../how/read";
+import { Tabs } from "../../how/tabs";
 import styles from "../../how/how.module.css";
 
 export const metadata: Metadata = { title: "How it works · Piano Arcade" };
@@ -26,6 +27,7 @@ export default function HowPage() {
     <main className={styles.page}>
       <header className={styles.header}>
         <h1 className={styles.title}>HOW IT WORKS</h1>
+        <Tabs current="/how" />
         <p data-read="">This page is about how Piano Arcade was built (the process), not the game.</p>
         <p className={styles.dim} data-read="">
           Data as of <V k="at" v={at(d.at)} /> · main <V k="mainSha" v={d.mainSha} />

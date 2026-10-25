@@ -1,0 +1,142 @@
+/* /how/ci in the Duo look (visual-direction.md, the kit in game/duo-tokens): hairline panels, sharp corners, monospace
+   caps for labels. Blue is running work, violet is waiting; pink stays out (it's for the arcade's big moments). */
+.panel {
+  margin: 0 0 32px;
+}
+
+.beats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.beats li {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  border-left: 1px solid var(--pa-line);
+}
+
+.cells {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 0 12px;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.axis {
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: 18px;
+  fill: var(--pa-ink-dim);
+}
+
+.grid {
+  stroke: var(--pa-line);
+  stroke-width: 1;
+}
+
+.running {
+  fill: var(--pa-primary);
+}
+
+.queued {
+  fill: var(--pa-secondary);
+  opacity: 0.7;
+}
+
+.mainLine {
+  fill: none;
+  stroke: var(--pa-ink);
+  stroke-width: 3;
+}
+
+.ceiling {
+  stroke: var(--pa-ink-dim);
+  stroke-width: 1.5;
+  stroke-dasharray: 10 6;
+}
+
+.mark {
+  stroke: var(--pa-ink);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+
+.markLabel {
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: 18px;
+  fill: var(--pa-ink);
+}
+
+.dot {
+  fill: var(--pa-primary);
+  opacity: 0.8;
+}
+
+.dotAfter {
+  fill: var(--pa-secondary);
+}
+
+.bar {
+  fill: var(--pa-primary);
+}
+
+.measuring {
+  fill: var(--pa-line);
+}
+
+.measuringLabel {
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: 26px;
+  letter-spacing: 4px;
+  fill: var(--pa-ink-dim);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.legend i {
+  display: inline-block;
+  width: 22px;
+  height: 14px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.tabs {
+  display: flex;
+  gap: 0;
+  margin: 0 0 24px;
+}
+
+.tab {
+  padding: 10px 24px;
+  border: 1px solid var(--pa-line);
+  color: var(--pa-ink-dim);
+  text-decoration: none;
+}
+
+.tab[aria-current="page"] {
+  border-color: var(--pa-primary);
+  color: var(--pa-ink);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--pa-ink);
+  outline-offset: 2px;
+}

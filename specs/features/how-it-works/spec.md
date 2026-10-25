@@ -138,6 +138,27 @@ so ("the game:"), so process and product stay apart.
 **Offline:** no request off localhost. Fonts come from `next/font`, which serves them locally, and no image or
 script loads from elsewhere. offline-ready stays true.
 
+## The CI tab (`/how/ci`), added 2026-10-25
+Eric asked for it, relayed by eric-planning-agent: the night the browser checks jammed, told for the video's "how it
+was built" beat and the live demo. The incident is `docs/incidents/2026-10-25-ci-gridlock.md`.
+
+- **Tabs:** `/how` and `/how/ci` share a tab row ("The build", "CI"), plain links in the Duo kit's monospace caps.
+- **Data:** `web/src/how/ci-freeze.mjs` asks GitHub (`gh api`) for every workflow run since `--since`, each run's
+  jobs (queued, started and completed times), the PRs merged in that window, and when the marked fixes landed
+  (#673 opened; #674, #679, #692 and #687 merged). It writes `web/src/how/ci-snapshot.json`, which this feature
+  commits; times are seconds after `since`. The page reads only that file. No number is typed by hand.
+- **Three panels,** each with one sentence per beat (what broke, what we measured, what we changed, what changed as a
+  result) and an SVG:
+  1. **Runners:** browser jobs running and waiting across the night, in 5-minute steps, main's waiting jobs as a
+     line, the most running at once as a dashed rule, and the fixes marked.
+  2. **Push to green:** each green PR run's minutes from push to green, before and after #687.
+  3. **Merges per hour,** New York time, the fixes marked.
+- **"After" waits for data.** Everything after #687 reads "measuring" until #687 has merged, 3 hours have passed and
+  at least 3 green PR runs have finished since. Refreeze then (around midday) and commit the snapshot.
+- **Look:** Duo (`visual-direction.md`, the kit in `web/src/game/duo-tokens/`): hairline panels, sharp corners, blue
+  for running work, violet for waiting, no pink. It reads at 1920×1080.
+- **No new browser check:** `verify-how.mjs` gains a step for `/how/ci`.
+
 ## Validation
 - `pnpm -C web exec vitest run src/how`, with no network and fixtures passed in:
   - **Merges per hour,** the bucketing function:
@@ -151,6 +172,13 @@ script loads from elsewhere. offline-ready stays true.
     with no line takes the Lanes Folder column, else "no owner listed".
   - A null snapshot gives `unknown` for every value read from the snapshot, and none from git.
   - The incident gap is computed from two `mergedAt` values. A missing PR gives `unknown`.
+- `pnpm -C web exec vitest run src/how` also runs `ci.test.ts`: jobs running and waiting at each step (a job cancelled
+  while queued stops waiting; one still queued at the freeze waits to the end), the peak, main's longest wait, the
+  median and slowest push-to-green, "after" staying null until 3 hours and 3 green runs past #687, and merges per New
+  York hour.
+- `verify-how.mjs`'s `/how/ci` step: the three `section[data-visual]` (`flight`, `green`, `merges`) each hold an SVG
+  and four beats; the tab row links both pages; the numbers on the page match `ci.ts` run on the committed snapshot;
+  and with no smoke-only data yet, every "after" value reads `measuring`.
 - `node web/src/how/verify-how.mjs --out <dir>`, one run, with its own `next dev` like the other `verify*.mjs`
   checks. ci-browser's runner picks it up by its name.
   - `/how` shows the four `figure[data-visual]` (`who`, `life`, `lanes`, `time`), each with an SVG and a

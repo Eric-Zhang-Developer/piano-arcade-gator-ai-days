@@ -121,7 +121,9 @@ CI and test-only PRs are exempt. Eric, 2026-10-25: "Every time we're doing somet
 2. Between iterations, screenshot at 1280×720 and 1920×1080 (plus reduced motion when motion changed), score against
    taste v2's `references/critique.md`, and fix the top three problems. At most three rounds.
 3. Take those shots from your running dev server through the in-app browser, not a fresh headless run each round.
-   `verify.py` still runs once before the done note.
+   No local `verify.py` or `node verify-*.mjs` (Eric, 2026-10-25: "lets also do #1"): the done note names the check
+   and says "not verified locally; covered by main's scheduled full run". Only a fix that must reproduce a failure
+   runs that one check locally, under `verify.lock`.
 4. The PR body gets a **Design** section: the skills invoked, each round's score, the fixes, and before/after shots.
    No Design section, no ready PR.
 5. **At most 2 worker dev servers at once,** besides Eric's :3000. Take a slot with

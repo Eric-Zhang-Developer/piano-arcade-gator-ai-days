@@ -1,5 +1,7 @@
 // The nav bar's slots (spec: nav-bar). A slot shows only once its feature's done note is on main, Lab's rule, so How
 // it's built appears by itself when changes/how-it-works.md lands. Client-safe: done.ts does the file reading.
+import { labEntries } from "../lab/entries";
+
 export interface Slot {
   label: string;
   path: string;
@@ -24,6 +26,15 @@ export const HIDDEN_ON = ["/play", "/stage", "/cabinet", "/attract"];
 export const hideNav = (pathname: string, capture: boolean) =>
   capture || HIDDEN_ON.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
-// A slot is the current page on its own path or below it; Play only on / itself.
+const under = (path: string, pathname: string) => pathname === path || pathname.startsWith(`${path}/`);
+const ownSlot = (slot: Slot, pathname: string) => (slot.path === "/" ? pathname === "/" : under(slot.path, pathname));
+
+// The pages you reach from the Lab that no other slot owns (/simon, /wrong-note, /sim, …): Lab is current there (#1043).
+// Read from the Lab's own list, so a new entry lights Lab without an edit here.
+export const LAB_PAGES = [...new Set(labEntries.map((e) => new URL(e.href, "http://lab").pathname))].filter(
+  (p) => !SLOTS.some((s) => s.path !== "/lab" && ownSlot(s, p)),
+);
+
+// A slot is the current page on its own path or below it; Play only on / itself; Lab also on the pages it lists.
 export const isCurrent = (slot: Slot, pathname: string) =>
-  slot.path === "/" ? pathname === "/" : pathname === slot.path || pathname.startsWith(`${slot.path}/`);
+  ownSlot(slot, pathname) || (slot.path === "/lab" && LAB_PAGES.some((p) => under(p, pathname)));

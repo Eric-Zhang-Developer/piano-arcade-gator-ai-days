@@ -8,6 +8,11 @@ design, novelty, presentation ([event.md](../specs/context/event.md), section 2)
 Practicing piano alone, you don't know what you got wrong or what to do next. Étude is a rhythm game played on a real
 piano in Chrome, or on laptop keys with no piano at all ([mission.md](../specs/mission.md)).
 
+- **Know what to practice next.** The tutor at `/learn` finds what you know with a diagnostic of up to 15 minutes
+  over a cited skill graph (207 skills), then Claude Opus 5.5 picks the next steps from candidates the graph checks,
+  and practice help fades until a cold check: at tempo, both hands, no help
+  ([devpost.md](devpost.md#how-we-built-it), [mastery](../web/src/learn/frontend/mastery/)). It doesn't read your
+  `/play` takes yet ([#874]).
 - **Play a real piece on a real piano.** Notes fall toward the keys and every note is judged against the chart's
   clock. The laptop hears each key with millisecond timing: two keys grazed together arrived 3.1 ms apart, as two
   separate events ([chapter 1](story.md#chapter-1-will-the-piano-even-talk-to-us)).
@@ -89,3 +94,4 @@ What we know is not yet true:
 [#660]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/660
 [#792]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/792
 [#869]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/869
+[#874]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/874

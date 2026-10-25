@@ -1,4 +1,4 @@
-.app { --learn-bg:var(--pa-bg); --learn-surface:var(--pa-panel); --learn-text:var(--pa-ink); --learn-muted:var(--pa-ink-dim); --learn-border:rgb(242 242 245 / .16); --learn-accent:var(--pa-cyan); --learn-paper:#0c0c10; --learn-paper-text:var(--pa-ink); --learn-score-cursor:var(--pa-cyan); background:var(--learn-bg); color:var(--learn-text); min-height:100dvh; display:flex; flex-direction:column; --learn-header-height:72px; font-family:system-ui,sans-serif; font-size:16px; line-height:1.55; color-scheme:dark; }
+.app { --learn-bg:var(--pa-bg); --learn-surface:var(--pa-panel); --learn-text:var(--pa-ink); --learn-muted:var(--pa-ink-dim); --learn-border:var(--pa-line); --learn-accent:var(--pa-primary); --learn-secondary:var(--pa-secondary); --learn-wrong:var(--pa-wrong); --learn-paper:var(--pa-paper); --learn-paper-text:var(--pa-paper-ink); --learn-score-cursor:var(--pa-primary); --learn-font-display:var(--pa-font-display),system-ui,sans-serif; --learn-font-data:var(--pa-font-data),ui-monospace,monospace; background:var(--learn-bg); color:var(--learn-text); min-height:100dvh; display:flex; flex-direction:column; --learn-header-height:72px; font-family:system-ui,sans-serif; font-size:16px; line-height:1.55; color-scheme:dark; }
 .app * { box-sizing:border-box; }
 .app ::selection { background:var(--pa-cyan); color:var(--pa-bg); }
 .app :focus-visible { outline:2px solid var(--pa-magenta); outline-offset:4px; }
@@ -37,7 +37,7 @@
 .workspaceTabs button { border:0; border-bottom:2px solid transparent; border-radius:0; padding:0; background:none; color:var(--learn-muted); font-size:14px; }
 .workspaceTabs button[aria-pressed=true] { border-bottom-color:var(--learn-accent); color:var(--learn-text); font-weight:700; }
 .workspaceBody { padding:28px; overflow:auto; flex:1; }
-.paper { padding:32px; background:var(--learn-paper); color:var(--learn-paper-text); border-radius:6px; color-scheme:dark; min-height:440px; }
+.paper { --learn-muted:var(--learn-paper-text); --learn-border:var(--learn-paper-text); padding:32px; background:var(--learn-paper); color:var(--learn-paper-text); border-radius:6px; color-scheme:dark; min-height:440px; }
 .paper>header { text-align:center; padding-bottom:14px; }
 .paper h2 { font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-weight:800; font-size:24px; line-height:1.25; margin:0 0 8px; }
 .paper header p { color:var(--learn-muted); margin:0; font-size:12px; }

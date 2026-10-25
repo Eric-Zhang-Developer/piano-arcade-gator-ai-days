@@ -1,0 +1,8 @@
+/* What /learn adds to the Duo kit (duo-tokens), read only from the --learn-* tokens in learning.module.css: the reading
+   face with upright Saira headings, and the judged-answer mark. Red only ever sits beside a ✕. */
+.scope { --learn-font-body:var(--duo-font-reading),system-ui,sans-serif; font-family:var(--learn-font-body); }
+.scope :where(h1,h2,h3) { font-family:var(--learn-font-display); font-style:normal; font-stretch:75%; font-weight:700; letter-spacing:.01em; }
+
+.mark { display:inline-flex; align-items:baseline; gap:6px; font-family:var(--learn-font-data); font-size:16px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; }
+.mark[data-kind=correct] { color:var(--learn-accent); }
+.mark[data-kind=wrong] { color:var(--learn-wrong); }

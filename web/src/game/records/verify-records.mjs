@@ -93,11 +93,24 @@ try {
   await page.getByTestId("records").screenshot({ path: join(out, "records-second.png") });
   await page.goto(`${base}/`);
   const s2 = await stored(page);
-  // Song select: Twinkle's card shows the best grade (take 1's S at 100%), and no other card shows one.
-  const bestText = (await page.getByTestId("song-twinkle").locator('[data-testid="best"]').innerText()).replace(/\s+/g, " ");
-  const bestCards = await page.locator('[data-testid="best"]').count();
-  say(`verify-records: song select -> Twinkle "${bestText}", ${bestCards} card(s) with a grade`);
-  if (!/BEST 100\.0% S/i.test(bestText) || bestCards !== 1) fail.push(`song select: "${bestText}" on ${bestCards} cards`);
+  // Song select: Twinkle's best grade (take 1's S at 100%) shows, and no other song's. On the card select each card
+  // shows its own; on duo-select's panel the focused song's BEST cell does (Twinkle is first, so focused).
+  await page.locator("ol a").first().waitFor({ timeout: 60_000 });
+  if (await page.locator('[data-testid="best"]').count()) {
+    const bestText = (await page.getByTestId("song-twinkle").locator('[data-testid="best"]').innerText()).replace(/\s+/g, " ");
+    const bestCards = await page.locator('[data-testid="best"]').count();
+    say(`verify-records: song select -> Twinkle "${bestText}", ${bestCards} card(s) with a grade`);
+    if (!/BEST 100\.0% S/i.test(bestText) || bestCards !== 1) fail.push(`song select: "${bestText}" on ${bestCards} cards`);
+  } else {
+    const cell = page.getByTestId("cell-best");
+    await cell.waitFor({ timeout: 10_000 }).catch(() => {});
+    const first = (await cell.count()) ? (await cell.innerText()).trim() : "(no BEST cell)";
+    await page.getByTestId("song-ode-to-joy").focus();
+    await page.waitForTimeout(300);
+    const other = (await cell.count()) ? (await cell.innerText()).trim() : "(no BEST cell)";
+    say(`verify-records: song select -> Twinkle's BEST "${first}", Ode to Joy's "${other}"`);
+    if (first !== "100.0%" || other !== "—") fail.push(`song select: Twinkle's BEST "${first}", Ode to Joy's "${other}"`);
+  }
   await page.screenshot({ path: join(out, "song-select.png") });
   const top = s2.twinkle?.top ?? [];
   say(`verify-records: take 2 -> NEW RECORD shown ${newRecord2 > 0}, top 5 ${top.map((t) => `${t.initials} ${t.score}`).join(", ")}`);

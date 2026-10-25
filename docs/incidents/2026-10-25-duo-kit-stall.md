@@ -81,7 +81,7 @@ Eric adopted fix 3 ("Yeah, let's do fix 3", relayed by the planner). Fixes 1, 2 
    waits included.
 3. **Adopted: the planner's loop flags a draft whose only commit is its claim after 30 minutes,** blockers first (a
    blocker is a slug in `status.py`'s Blocked list). It nudges the worker to push WIP, and relays blockers to
-   eric-asking-agent. Since about 02:35, in the planner's 15-minute loop, per the planner. Its first run flagged #655:
+   eric-asking-agent. Since about 02:29, in the planner's 15-minute loop, per the planner. Its first run flagged #655:
    claim-only for 96 minutes, with 3 features waiting.
 4. **Proposed: `status.py` leads with "N features waiting on X",** so a blocker is the first thing anyone reads.
 

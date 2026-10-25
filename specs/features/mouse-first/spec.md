@@ -1,5 +1,5 @@
 ---
-name: "Mouse first: key hints off / and /simon, every shortcut still bound and listed on the ? card"
+name: "Mouse first: every action clickable, key hints off / and /simon, shortcuts listed on the ? card"
 depends_on: ["duo-select", "select-layout", "song-preview", "song-options", "options-panel", "first-run", "simon-says-spike"]
 owns: ["specs/features/mouse-first/", "changes/mouse-first.md", "specs/decisions/mouse-first-"]
 assignee: "eric"
@@ -18,6 +18,22 @@ controls`) touches `select-layout/index.tsx`, `options-panel/index.tsx` and `son
 open, build anyway and ask the planner to hold the PR until #600 merges or closes.
 
 ## Requirements
+**Every action is clickable; keys are only shortcuts** (scope added on #772, Eric 2026-10-25: "a lot of the cool
+features we have are hidden behind ... a keyboard key instead of a button. For instance, the demo feature ... There's
+no demo button", then "Let's do it"). The buttons and the hint removal land in **this same PR**: hints off without
+buttons would make features impossible to find. Don't merge hint removal ahead of the buttons.
+- **Key-only today** (from `help-overlay/keys.ts`): W watch, L learn, E easy, F first run, X lab, Esc pause, ← →
+  rewind while learning. Each gets a control. Z/X octave stays key-only (a laptop-play aid), and named operator
+  tricks (Shift+Esc demo reset) stay key-only, listed on the `?` card as such.
+- **Select:** PLAY stays the primary action. **LEARN and WATCH** (the demo) join PRACTICE as secondary buttons on the
+  focused panel, the same 2×2 pattern as duo-start (#763). Easy/Normal become clickable chips.
+- **Playing (`/play`):** a small pause button in a corner, hidden under `?capture=1`. Learn mode gets on-screen ◀ ▶
+  bar buttons for rewind.
+- First run and the lab are reached by link (the lab through the nav bar). Everything else goes in the Options
+  drawer or on the `?` card, not on the screen.
+- **A test enforces it:** each `HelpLine` in `help-overlay/keys.ts` names its control (an accessible name), and a
+  test fails when a help line's control doesn't exist on its screen. It extends the existing "every key handler has a
+  help line" test.
 - **The `<kbd>` badges and key-hint lines come off `/` and `/simon`.** Today's, on origin/main:
   - `web/src/game/select-layout/index.tsx`: the header line "↑↓ SELECT · ENTER PLAY · P PRACTICE · L LEARN · W WATCH
     · E EASY".
@@ -34,7 +50,7 @@ open, build anyway and ask the planner to hold the PR until #600 merges or close
   `Space`). The card's own `Esc` badge stays: it is the list.
 - **The laptop-key letters drawn on the keys stay** (`labels=keys`): a gameplay aid, not a nav hint.
 - **The automatic return to songs after a take stays.**
-- **Not in scope:** `/play`'s start screen ("Laptop keys: A S D F …" in `web/src/app/play/page.tsx`, laptop-octaves'
+- **Not in scope:** besides the pause and rewind buttons above, `/play`'s start screen ("Laptop keys: A S D F …" in `web/src/app/play/page.tsx`, laptop-octaves'
   "Z / X: octave down / up" start panel, rewind's "← → back or ahead a bar"). duo-start rebuilds that screen and
   carries the same requirement. No other screens, no new controls, no change to what any control does.
 
@@ -46,8 +62,8 @@ doesn't compete with the song list or Start.
 
 ## Validation
 1. `pnpm -C web exec vitest run --passWithNoTests` for the touched features (select-layout, song-preview,
-   song-options, options-panel, first-run, help-overlay, simon): every shortcut above is still handled, and the
-   help card has a line for each.
+   song-options, options-panel, first-run, help-overlay, simon): every shortcut above is still handled, the help
+   card has a line for each, and the new test finds each help line's named control on its screen.
 2. The browser checks that assert hint text get updated to the new UI, not weakened: each still proves its key works.
    From `grep` over `verify-*.mjs` on origin/main:
    - `web/src/game/learn-from-select/verify-learn.mjs` reads the header hint for L, W and E: read the `?` card instead.

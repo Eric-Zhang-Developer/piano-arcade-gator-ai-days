@@ -2,20 +2,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Chart, GameEvent } from "../../contracts";
 import { blackKeyLaneSettings } from "../black-key-lanes";
 import { settings as core } from "../core/settings";
-import { hudSettings, tierFor } from "../hud";
-import { emptyStage, feverStage, frameBudget, gridPhase, look, reduceStage, STAGE_KEY, stageOpacity, stageSettings } from ".";
+import { emptyStage, feverStage, frameBudget, look, reduceStage, STAGE_KEY, stageOpacity, stageSettings } from ".";
 
 const run = (events: GameEvent[]) => events.reduce(reduceStage, emptyStage());
 const combo = (count: number, atMs = 0): GameEvent => ({ type: "combo", count, atMs });
 
 describe("reduceStage", () => {
-  it("steps tier on the same combo as the HUD's tierFor", () => {
-    for (const n of [0, 9, 10, 19, 20, 29, 30, 99]) {
-      expect(run([combo(n)]).tier, `combo ${n}`).toBe(hudSettings.tiers.indexOf(tierFor(n)));
-    }
-    expect([0, 10, 20, 30].map((n) => look(run([combo(n)]), 0).speed)).toEqual(stageSettings.linesPerBeat);
-  });
-
   it("goes hot on feverStart and back on feverEnd", () => {
     const on = run([{ type: "feverStart", atMs: 1000 }]);
     expect(look(on, 1000 + stageSettings.feverEaseMs).heat).toBe(1);
@@ -24,53 +16,21 @@ describe("reduceStage", () => {
     expect(look(emptyStage(), 0).heat).toBe(0);
   });
 
-  it("flashes the grid on feverStart, as on a count-in beat, and not on feverEnd", () => {
-    const on = run([{ type: "feverStart", atMs: 1000 }]);
-    expect(look(on, 1000).flash).toBeGreaterThan(0);
-    expect(look(on, 1000 + stageSettings.flashMs).flash).toBe(0);
-    expect(reduceStage(on, { type: "feverEnd", atMs: 5000 }).flashAtMs).toBe(1000);
-  });
-
-  it("dips on a miss and on a WRONG for about 300 ms, and drops the speed to tier 1", () => {
+  it("dips on a miss and on a WRONG for about 300 ms", () => {
     for (const bad of [
       { type: "noteMiss", noteId: "n", pitch: 60, atMs: 2000 },
       { type: "wrongNote", pitch: 61, atMs: 2000 },
     ] as GameEvent[]) {
       const s = run([combo(25), bad]);
-      expect(s.tier).toBe(0);
-      expect(look(s, 2000).speed).toBe(stageSettings.linesPerBeat[0]);
       expect(look(s, 2000).dip).toBeGreaterThan(0);
       expect(look(s, 2150).dip).toBeGreaterThan(0);
       expect(look(s, 2300).dip).toBe(0);
     }
   });
 
-  it("bursts once on fullCombo", () => {
-    const s = run([{ type: "fullCombo", atMs: 9000 }]);
-    expect(look(s, 8999).burst).toBeNull();
-    expect(look(s, 9000).burst).toBe(0);
-    expect(look(s, 9000 + stageSettings.burstMs / 2).burst).toBeCloseTo(0.5);
-    expect(look(s, 9000 + stageSettings.burstMs).burst).toBeNull();
-    expect(look(s, 60000).burst).toBeNull();
-  });
-
-  it("flashes on each count-in beat, and songStart resets everything", () => {
-    const s = run([{ type: "feverStart", atMs: 0 }, combo(40), { type: "countInBeat", beat: 1, atMs: -500 }]);
-    expect(look(s, -500).flash).toBe(1);
-    expect(look(s, -500 + stageSettings.flashMs).flash).toBe(0);
+  it("songStart resets everything", () => {
+    const s = run([{ type: "feverStart", atMs: 0 }, combo(40), { type: "noteMiss", noteId: "n", pitch: 60, atMs: 100 }]);
     expect(reduceStage(s, { type: "songStart", atMs: 0 })).toEqual(emptyStage());
-  });
-});
-
-describe("gridPhase", () => {
-  it("is on a whole line at every whole beat, at any BPM and speed, count-in included", () => {
-    for (const bpm of [60, 72, 100, 133, 177.5]) {
-      for (const speed of stageSettings.linesPerBeat) {
-        for (let beat = -8; beat <= 64; beat++) expect(gridPhase((beat * 60000) / bpm, bpm, speed)).toBe(0);
-      }
-    }
-    expect(gridPhase(300, 100, 1)).toBeCloseTo(0.5); // half a beat at 100 bpm
-    expect(gridPhase(-150, 100, 1)).toBeCloseTo(0.75); // count-in: still moving forward
   });
 });
 

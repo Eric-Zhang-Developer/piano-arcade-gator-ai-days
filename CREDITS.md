@@ -21,3 +21,8 @@ Sources whose licenses ask for credit. Each chart's `source` field names its sou
   charted from Mutopia Project piece 998 (<https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=998>), typeset by
   Alejandro Sierra from IMSLP, licensed [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). Changes: an
   excerpt (bars 1–12) converted to a chart; the chart is shared under the same license.
+- **Gnossienne No. 1** (Erik Satie), `web/public/songs/gnossienne-1/`: charted from Mutopia Project piece 2035
+  (<https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2035>), typeset by Knute Snortum after Éditions Salabert
+  (1913), licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Changes: an excerpt (bars 1–9, in
+  the edition's 4/4 grouping) converted to a chart, with the cross-staff chords charted for the left hand; the chart
+  is shared under the same license.

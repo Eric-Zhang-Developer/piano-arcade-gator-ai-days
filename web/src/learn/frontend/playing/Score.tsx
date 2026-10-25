@@ -1,4 +1,5 @@
 import { music } from './model';
+import { APP_NAME } from '../../../game/app-name';
 import styles from './playing.module.css';
 
 const letterSteps: Record<number, number> = { 60: -2, 62: -1, 64: 0, 65: 1, 67: 2, 69: 3 };
@@ -35,5 +36,5 @@ export function Score({ whole = false, beat = -1, hints = false }: { whole?: boo
   </div>;
 }
 export function ScoreSource() {
-  return <details className={styles.details}><summary>Score source</summary><p>Traditional French melody, right hand. Uses the cited Twinkle chart already in Piano Arcade. <a href="https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2236" target="_blank" rel="noreferrer">Public-domain score at Mutopia</a>.</p></details>;
+  return <details className={styles.details}><summary>Score source</summary><p>Traditional French melody, right hand. Uses the cited Twinkle chart already in {APP_NAME}. <a href="https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2236" target="_blank" rel="noreferrer">Public-domain score at Mutopia</a>.</p></details>;
 }

@@ -31,7 +31,7 @@ export function Passage({ notes, hands = 'both', beat = -1, guide = false, playe
   const next = beat < 0 ? notes.filter(inTake).filter((n) => n.startBeat === Math.min(...notes.filter(inTake).map((m) => m.startBeat))) : [];
   const lit = new Set([...(guide ? [...now, ...next].map((n) => n.pitch) : []), ...down]);
   const missed = played.length && beat < 0 ? missedNotes(notes.filter(inTake), played) : new Set<PassageNote>();
-  const label = Math.min(rowH - 3, 11);
+  const label = 14; // user units in a 1000-wide viewBox: about 12 px on screen at 1280×720 (learn-kit, #947)
   return <svg className={styles.roll} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`The passage: ${notes.length} notes over ${beats} beats`}>
     <rect className={styles.keyBed} x={0} y={top} width={keys - 2} height={rows * rowH} />
     {Array.from({ length: rows }, (_, i) => {

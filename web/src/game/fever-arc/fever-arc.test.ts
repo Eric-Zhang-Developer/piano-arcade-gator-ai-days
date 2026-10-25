@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import type { GameEvent } from "../../contracts";
 import { msPerBeat } from "../core/settings";
 import { momentSettings } from "../fever-moment";
-import { soundsFor } from "../sound";
 import { type ArcState, arcAt, arcSettings, emptyArc, feverArc, ignitionFor, nextBeat, reduceArc, towardAmber } from ".";
 
 const hit: GameEvent = { type: "noteHit", noteId: "n", pitch: 60, judgment: "PERFECT", offsetMs: 0, atMs: 0 };
@@ -74,13 +73,11 @@ describe("the arc", () => {
   });
 });
 
-describe("the sweep", () => {
-  it("starts on the ignition beat, not at feverStart", () => {
+describe("ignitionFor", () => {
+  it("follows the take's tempo: the beat after feverStart, for the sweep to start on once sound/ is free (#600)", () => {
     const p = feverArc();
     p.transformChart!({ notes: Array(42).fill({}), bpm: 100 } as never, new URLSearchParams());
-    const [s] = soundsFor([{ type: "feverStart", atMs: 6100 }], 0);
     expect(ignitionFor(6100)).toBe(6600); // 100 BPM: 600 ms beats
-    expect(s).toEqual({ sound: "sweep", startTime: 6.6 });
   });
 });
 

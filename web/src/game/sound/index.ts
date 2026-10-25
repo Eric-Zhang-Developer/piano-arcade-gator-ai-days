@@ -9,7 +9,6 @@ import { stampImpactMs } from "../rank-stamp";
 import { showsMoment } from "../record-moment/timing";
 import { takeOutcome } from "../records";
 import { isWaitMode } from "../wait-mode";
-import { ignitionFor } from "../fever-arc";
 
 export type Sound = "stinger" | "sweep" | "fanfare" | "drumroll" | "rankHit" | "miss";
 
@@ -80,7 +79,7 @@ export function soundsFor(events: GameEvent[], audioAtZero: number, missCue = tr
       case "comboMilestone":
         return [{ sound: "stinger", startTime: at(e.atMs) }];
       case "feverStart":
-        return [{ sound: "sweep", startTime: at(ignitionFor(e.atMs)) }]; // on the beat the visuals ignite (fever-arc)
+        return [{ sound: "sweep", startTime: at(e.atMs) }];
       case "noteMiss": {
         const since = e.atMs - gate.lastMissMs;
         if (!missCue || (since >= 0 && since < soundSettings.missGapMs)) return []; // a rewind moves time back: a new run

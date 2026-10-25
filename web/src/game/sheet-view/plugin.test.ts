@@ -65,6 +65,18 @@ describe("sheet-view plugin", () => {
     ]);
   });
 
+  it("forwards the judge's combo, milestones and full combo for /stage", async () => {
+    const heard = listen();
+    const p = sheetView();
+    p.transformChart!(chart, new URLSearchParams());
+    p.onEvent!({ type: "songStart", atMs: -2000 });
+    p.onEvent!({ type: "combo", count: 25, atMs: 0 });
+    p.onEvent!({ type: "comboMilestone", count: 25, atMs: 0 });
+    p.onEvent!({ type: "fullCombo", atMs: 900 });
+    p.onEvent!({ type: "songEnd", atMs: 1500, results: {} as never });
+    expect((await heard).slice(1)).toEqual([{ type: "combo", count: 25 }, { type: "milestone", count: 25 }, { type: "fullCombo" }, { type: "end" }]);
+  });
+
   it("ends on quit too", async () => {
     const heard = listen();
     const p = sheetView();

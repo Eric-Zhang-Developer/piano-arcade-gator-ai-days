@@ -226,3 +226,18 @@
     transition: none;
   }
 }
+
+/* Read by a screen reader, not drawn: the framing announcement (framing.tsx). */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The page takes focus back on Again (tabIndex -1); it's a canvas, not a control, so no ring. */
+.page:focus {
+  outline: none;
+}

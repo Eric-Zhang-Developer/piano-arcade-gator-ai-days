@@ -3,6 +3,6 @@
 ## Where it lives
 `web/src/game/sheet-xml/index.ts` (DIVISIONS 12, `snapper`, `staffPlan`, tuplets), `web/src/game/sheet-beams/index.ts`, `web/src/game/sheet-view/SheetView.tsx` (zoom), `sheet-view.module.css` (title size), `specs/decisions/sheet-engraving-{quantize,tuplets,clefs}.md`
 ## How to check it
-`pnpm -C web exec vitest run src/game/sheet-xml src/game/sheet-beams src/game/sheet-view` (142 pass). In the in-app browser, OSMD drew every beam sheet-beams asks for: maple-leaf-rag 470/470, moonlight-1 111/111, mountain-king 80/80, fur-elise 260/260. The verify-sheet checks were not run locally; main's scheduled full run covers them.
+`pnpm -C web exec vitest run src/game/sheet-xml src/game/sheet-beams src/game/sheet-view` (142 pass). In the in-app browser, OSMD drew every beam sheet-beams asks for: maple-leaf-rag 470/470, moonlight-1 111/111, mountain-king 80/80, fur-elise 260/260. verify.py: not verified locally; covered by main's scheduled full run (verify-sheet, verify-beams).
 ## Gaps
 Eric hasn't looked yet: /sheet?song=fur-elise and ?song=moonlight-1, readable? The clef and 8va thresholds come from the median-pitch rule, not from a published edition. Clefs change only at a barline. Charts off any grid (Flower Dance, Golden's) stay rough until #831.

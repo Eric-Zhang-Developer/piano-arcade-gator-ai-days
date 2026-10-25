@@ -4,6 +4,7 @@ export interface Slot {
   label: string;
   path: string;
   slug: string; // the feature whose changes/<slug>.md turns the slot on
+  devOnly?: boolean; // left out of a production build
 }
 
 export const SLOTS: Slot[] = [
@@ -12,7 +13,10 @@ export const SLOTS: Slot[] = [
   { label: "Lab", path: "/lab", slug: "lab" },
   { label: "How it's built", path: "/how", slug: "how-it-works" },
   { label: "Progress", path: "/progress", slug: "take-store" },
+  { label: "Status", path: "/operator", slug: "operator-board", devOnly: true }, // /operator's API routes 404 in production
 ];
+
+export const GITHUB_URL = "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days";
 
 // Pages the bar never covers: the take, the kiosk loop and the operator's own screens. Capture mode hides it too.
 export const HIDDEN_ON = ["/play", "/cabinet", "/attract", "/operator"];

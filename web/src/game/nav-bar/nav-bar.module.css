@@ -31,6 +31,10 @@
   color: var(--pa-ink) !important; /* MonoLabel's ink is inline; hover lifts a dim label to full ink */
 }
 
+.repo {
+  margin-left: 1.2em; /* the repo is off-site: set apart from the pages */
+}
+
 .slot[aria-current="page"] {
   border-bottom-color: var(--pa-primary);
 }

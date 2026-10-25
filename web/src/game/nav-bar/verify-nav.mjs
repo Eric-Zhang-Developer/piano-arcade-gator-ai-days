@@ -1,7 +1,8 @@
 // Headless proof of the nav bar (spec: nav-bar, Validation 2). Its own `next dev`:
 // 1. / shows the bar with Play current, in the kit's inks, clear of the wordmark and the build stamp.
 // 2. Each slot's link answers 200 with no page error, and that page marks its own slot current.
-// 3. /play?song=twinkle, /cabinet and /?capture=1 show no bar.
+// 3. /play?song=twinkle, /cabinet and /?capture=1 show no bar (nor /operator, Status's page).
+// Also: the GitHub link opens the repo in a new tab.
 // 4. nav-1280.png and nav-1920.png of /.
 // Usage: node web/src/game/nav-bar/verify-nav.mjs --out <dir>
 import { spawn } from "node:child_process";
@@ -97,7 +98,9 @@ try {
       return [...document.querySelectorAll('[data-testid="nav-bar"] a')].map((a) => getComputedStyle(a.firstElementChild).color === (a.getAttribute("aria-current") ? primary : dim));
     });
     check(inks.length > 0 && inks.every(Boolean), `${w}×${h} /: each label is dim ink, the current one primary (${inks})`);
-    hrefs = await page.$$eval('[data-testid="nav-bar"] a', (as) => as.map((a) => a.getAttribute("href")));
+    const repo = await page.$eval('[data-testid="nav-github"]', (a) => [a.href, a.target, a.rel].join(" ")).catch(() => "missing");
+    check(repo === "https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days _blank noopener noreferrer", `${w}×${h} /: the GitHub link opens the repo in a new tab (${repo})`);
+    hrefs = await page.$$eval('[data-testid="nav-bar"] a[data-testid^="nav-"]:not([data-testid="nav-github"])', (as) => as.map((a) => a.getAttribute("href")));
     await page.screenshot({ path: join(out, `nav-${w}.png`) });
     await page.close();
   }
@@ -111,7 +114,9 @@ try {
     await page.getByTestId("nav-bar").waitFor({ timeout: 60_000 }).catch(() => {});
     await page.waitForTimeout(1500);
     const cur = await current(page);
-    check(res?.status() === 200 && !errs.length && cur.length === 1 && cur[0] === href, `${href} -> ${res?.status()}, current ${JSON.stringify(cur)}${errs.length ? `, page error: ${errs[0]}` : ""}`);
+    // Status opens /operator, a screen the bar stays off: there it's enough that the page loads with no bar.
+    const own = href === "/operator" ? !(await shown(page)) : cur.length === 1 && cur[0] === href;
+    check(res?.status() === 200 && !errs.length && own, `${href} -> ${res?.status()}, current ${JSON.stringify(cur)}${errs.length ? `, page error: ${errs[0]}` : ""}`);
     await page.screenshot({ path: join(out, `slot${href.replaceAll("/", "-") || "-home"}.png`) });
     await page.close();
   }

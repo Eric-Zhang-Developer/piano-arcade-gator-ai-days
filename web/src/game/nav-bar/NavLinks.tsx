@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MonoLabel } from "../duo-tokens";
-import { hideNav, isCurrent, type Slot } from "./slots";
+import { GITHUB_URL, hideNav, isCurrent, type Slot } from "./slots";
 import styles from "./nav-bar.module.css";
 
 // Thin, centered in the top edge's empty band (decision nav-bar-layout), off the take and kiosk pages. Capture mode
@@ -29,6 +29,9 @@ export function NavLinks({ slots }: { slots: Slot[] }) {
           </Link>
         );
       })}
+      <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className={`${styles.slot} ${styles.repo}`} data-testid="nav-github">
+        <MonoLabel dim style={{ fontSize: "inherit" }}>GitHub ↗</MonoLabel>
+      </a>
     </nav>
   );
 }

@@ -114,6 +114,13 @@ export const labGroups: LabGroup[] = [
         open: "/simon",
       },
       {
+        slug: "wrong-note-spike",
+        name: "Spot the Wrong Note",
+        description: "the DGX plays 8 notes of Twinkle (or Ode to Joy, Minuet in G, Für Elise) with one moved 2 semitones",
+        href: "/wrong-note",
+        open: "/wrong-note",
+      },
+      {
         slug: "veritas",
         name: "Veritas",
         description: "five test players (Golden, Rusher, Jitter, Fumbler, Chord Roller) plant mistakes in real library songs",

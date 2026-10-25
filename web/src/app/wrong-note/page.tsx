@@ -4,7 +4,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Chart } from "../../contracts";
-import { Brackets, Button, MonoLabel } from "../../game/duo-tokens";
+import { Brackets, Button, MonoLabel, kitButton } from "../../game/duo-tokens";
 import { PIANO_NAME } from "../../game/laptop-sound";
 import { melody } from "../../game/simon";
 import { newSet, roundMessages, score, sendAhead, step, wrongNoteSettings, type WrongNoteEvent, type WrongNoteSet } from "../../game/wrong-note";
@@ -172,7 +172,8 @@ function WrongNote() {
           </p>
         </div>
 
-        {set?.phase === "done" ? (
+        {/* An unknown song has nothing to play: no pads, and the Start below becomes a way to a known song. */}
+        {error ? null : set?.phase === "done" ? (
           <p className={styles.score} data-testid="score">
             {score(set)} <span>/ {set.rounds.length}</span>
           </p>
@@ -203,7 +204,11 @@ function WrongNote() {
         )}
 
         <div className={styles.actions}>
-          {!set || set.phase === "done" ? (
+          {error ? (
+            <a {...kitButton("primary")} style={{ ...kitButton("primary").style, ...big }} href={`/wrong-note?song=${SONGS[0][0]}${shift === 1 ? "&shift=1" : ""}`}>
+              Play {SONGS[0][1]} instead
+            </a>
+          ) : !set || set.phase === "done" ? (
             <Button style={big} onClick={start} disabled={!tune.length} aria-keyshortcuts="Space Enter" data-testid="start">
               {set ? "Again · Space" : "Start · Space"}
             </Button>

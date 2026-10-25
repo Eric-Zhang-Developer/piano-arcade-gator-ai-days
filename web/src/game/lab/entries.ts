@@ -59,7 +59,7 @@ export const labGroups: LabGroup[] = [
       {
         slug: "rewind",
         name: "Rewind",
-        description: "In wait mode, and so in chunk-practice's learn steps, ← moves back a bar and → skips ahead one",
+        description: "In wait mode, ◀ (or ←) moves back a bar and ▶ (or →) skips ahead one, from the HUD's buttons.",
         href: "/play?song=twinkle&mode=wait",
         open: "Twinkle, Learn",
       },
@@ -71,7 +71,7 @@ export const labGroups: LabGroup[] = [
       {
         slug: "watch-demo",
         name: "Watch demo",
-        description: "W on the music select plays the focused song with the perfect bot, audible and hands-off.",
+        description: "WATCH on the music select plays the focused song with the perfect bot, audible and hands-off.",
         href: "/play?song=twinkle&bot=perfect&audible=1&demo=1",
         open: "Twinkle, the perfect bot",
       },

@@ -49,7 +49,7 @@
       <label>Menu
         <select id="lightMode">
           <option value="0" selected>Calm — key light, build-up hints, soft glows</option>
-          <option value="1">Demo — calm plus the ripple on every hit</option>
+          <option value="1">Demo — every key you press lights with its ripple, nothing else</option>
         </select>
       </label>
     </div>
@@ -133,7 +133,7 @@ async function readBoard(port) {
 
 function applyHello(line) {
   const cfg = Object.fromEntries(line.split(' ').slice(1).map(kv => kv.split('=')).map(([k, v]) => [k, parseFloat(v)]));
-  if (cfg.demo === 0 || cfg.demo === 1) $('lightMode').value = String(cfg.demo);
+  if (cfg.demo >= 0 && cfg.demo <= 1) $('lightMode').value = String(cfg.demo);
   if (cfg.ripple !== undefined && !Number.isNaN(cfg.ripple)) {
     $('ripple').value = cfg.ripple; $('rippleVal').textContent = cfg.ripple + ' ms';
   }

@@ -2,10 +2,12 @@
 
 Read [Product philosophy](../../../PRODUCT_PHILOSOPHY.md) first. The three
 previous Practice Room, Field Notes and After Hours directions were rejected.
-This replaces their review implementation with one proposed Operate interface;
+The current editable baseline replaces them with one task-first Operate interface;
 canonical `/learn` keeps its incumbent branding. Its prepared theory handoff
 also receives the scoped rendering repair described below.
-The user selected the center upright inviting alligator, not a complete brand.
+The user selected the center upright inviting alligator. Current visual and asset
+choices are documented for collaboration in [Product and design handoff](../../../PRODUCT_AND_DESIGN.md);
+these remain editable under the canonical philosophy.
 
 ## Task and visual system
 
@@ -33,8 +35,8 @@ Neutral review chrome contains the authored-demo/sample-learner/local-session
 disclosure, Replay, an explicit Prior UI link and a reference/application panel.
 The incumbent header identifies Prior UI and links back to Proposed preview. These
 controls are outside the student UI. Opening references makes the student flow
-inert so covered controls cannot receive focus. No main-product rollout, rename
-or publication is authorized by this study.
+inert so covered controls cannot receive focus. The complete current frontend is shared as an editable baseline; this does not
+rename the product, redirect the prior route or connect a production tutor.
 
 ## Sources and transfer
 

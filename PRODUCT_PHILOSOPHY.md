@@ -54,6 +54,12 @@ the purpose and relationship with the learner, not those design choices, a
 particular teaching algorithm, or claims that a prototype already delivers
 a connected personal tutor.
 
+## Current implementation
+
+[Product and design handoff](PRODUCT_AND_DESIGN.md) records the current editable
+frontend, selected media, typography, motion and contributor entry points. These
+implementation choices may evolve; the principles above remain canonical.
+
 ## Verbatim source
 
 The user's philosophy-freeze statement, 2026-10-24, reproduced verbatim from

@@ -27,6 +27,33 @@ pnpm dev            # http://localhost:3000 redirects to /play
 
 Web MIDI works in Chrome only. Laptop keys always work, so the game is playable with the piano unplugged.
 
+## Learning preview
+
+The current editable learning frontend is at
+[http://localhost:3000/learn/brand-preview](http://localhost:3000/learn/brand-preview)
+after starting the development server above. Open that path explicitly: `/`
+starts the arcade. The authored local demo supports a guided map, a real
+question/score workspace and Start/Resume; it is not connected to an adaptive
+agent, account sync or persistent learning progress.
+
+Start with the [product and design handoff](PRODUCT_AND_DESIGN.md) for the frozen
+purpose, selected assets, current typography/colors, motion boundaries and edit
+map. [Product philosophy](PRODUCT_PHILOSOPHY.md) is the canonical purpose.
+
+| Edit | Location |
+|---|---|
+| Current frontend composition, styling and motion | `web/src/learn/frontend/brand-preview/` |
+| Route and font loading | `web/src/app/learn/brand-preview/page.tsx` |
+| Shared question/score/reference workspace and local state | `web/src/learn/frontend/TheoryWorkspace.tsx`, `LearningSessions.tsx` |
+| Selected mascot and previous character | `web/public/learning/` |
+| Graph nodes, mastery fixtures, layout and preparation | `web/src/learn/frontend/graph/` |
+
+`/learn` is explicitly labelled Prior UI and remains available for comparison.
+The four existing activity routes remain `/learn/understand`, `/learn/practice`,
+`/learn/review/theory` and `/learn/play-through`; the current prepared assignment
+leads directly into theory without asking the learner to manage those categories.
+The current frontend uses isolated in-memory demo state; refreshing clears it.
+
 ## How it works
 
 ```

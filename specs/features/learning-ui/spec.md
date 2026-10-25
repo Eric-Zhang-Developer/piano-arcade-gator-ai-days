@@ -1,7 +1,7 @@
 ---
 name: "Desktop learning frontend with four focused activities"
 depends_on: []
-owns: ["web/src/app/learn/", "web/src/learn/frontend/", "web/public/learning/"]
+owns: ["web/src/app/learn/", "web/src/learn/frontend/", "web/public/learning/", "README.md", "PRODUCT_PHILOSOPHY.md", "PRODUCT_AND_DESIGN.md"]
 assignee: ""
 ---
 
@@ -50,14 +50,16 @@ This is the frontend slice commissioned from the published `piano-learning` plan
 ## Defaults
 Preview state is local and disposable. Unknown student progress stays unknown. No auth, backend or model connection is implied.
 
-## Review-only brand prototype
+## Current editable frontend
 
-`/learn/brand-preview` proposes one task-first desktop interface grounded in
+`/learn/brand-preview` is the current task-first desktop frontend baseline grounded in
 [Product philosophy](../../../PRODUCT_PHILOSOPHY.md), official cross-industry
 research and the user-selected upright inviting alligator. It replaces the three
 rejected studies. [BRAND_STUDY.md](BRAND_STUDY.md) records source mechanisms,
 actual assets, composition, motion and verification limits. The study uses the
 real graph/lesson and isolated sessions, external provenance/reference controls,
-replay/back/stop and continuous guide identity. It does not rename the product
-or replace `/learn`. Check both desktop sizes, real Start/Resume, target/caption
+replay/back/stop and continuous guide identity. The repository [product/design handoff](../../../PRODUCT_AND_DESIGN.md) and README
+provide contributor entry/edit paths; their exact publication paths are included
+in this feature’s declared ownership. It does not rename the product or redirect
+the prior `/learn` comparison route. Check both desktop sizes, real Start/Resume, target/caption
 clearance, lesson theming and accessible review controls.

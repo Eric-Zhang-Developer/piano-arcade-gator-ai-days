@@ -1,8 +1,8 @@
 ## What shipped
-Local rendering repair: proposed guide keeps one 112px full-body silhouette and settles into a reserved slot before lesson reveal; prior UI retains its existing guide beside the question. No crop ghost, racing shrink or score/title crossing. Prior/proposed navigation is explicit.
+Current desktop learning frontend: guided mastery map, three-state parent/leaf examples, one prepared Start/real Resume, four existing activities, selected upright gator and coherent map-to-question handoff. Canonical product philosophy and a contributor design/asset handoff accompany the editable baseline.
 ## Where it lives
-`web/src/learn/frontend/brand-preview/`, shared guided entry/lesson shell and `/learn/understand`; `specs/features/learning-ui/BRAND_STUDY.md` records actual motion evidence and limitations. Branding remains a proposal.
+Start `/learn/brand-preview`; `/learn` remains Prior UI. `PRODUCT_PHILOSOPHY.md`, `PRODUCT_AND_DESIGN.md` and README explain purpose/assets/edit paths. Code lives in `web/src/learn/frontend/`, its learning routes and committed `web/public/learning/` media.
 ## How to check it
-Scoped eslint/typecheck and 15 graph/study cases pass. Independent normal-speed CFT Start/Resume at1440/1280 confirms coherent guide, persistent tutor and exact Q2 draft/history/Reference with visible prompt. Stop during docking, duplicate Start, offline cleanup/reconnect and simulated reduced-motion branch pass. Native trace filmstrips preserve real timing.
+Scoped eslint/typecheck and 15 graph/study cases pass. Independent normal-speed 1440/1280 Start/Resume confirms one constant-size guide, no title/score crossing, visible prompt and exact Q2 draft/history/Reference. Stop/duplicate-entry/offline cleanup and simulated reduced-motion branch pass; publication pipeline owns full repository checks and CI.
 ## Gaps
-Single illustrated pose with positional motion, no rigged flight/stride or new render. Transformed raster can soften while moving; no persistent source/aspect defect established. Actual OS reduced motion, native keyboard activation, audio and completion untested. Desktop only; no publication, CI or canonical branding rollout.
+Authored sample learner/assignment and in-memory sessions, no connected tutor/progress inference. One illustrated pose with positional motion; transformed raster can soften. Actual OS reduced motion, native keyboard activation, audio and completion were not established by the bounded browser evidence. Desktop only; publishing code does not deploy a production service.

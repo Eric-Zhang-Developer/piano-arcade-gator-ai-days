@@ -34,6 +34,7 @@ The director accepts the actual contextual href/target for every supported learn
 A separate [working brand study](BRAND_STUDY.md) at `/learn/brand-preview`
 replaces the three rejected aesthetic options with one proposed task-first
 interface informed by official cross-industry research and the user-selected
-upright alligator. Its fonts, assets, composition and motion remain route-scoped;
-the selected character does not approve a canonical visual rollout. This incumbent
-system remains unchanged until the complete interface is reviewed.
+upright alligator. Its fonts, assets, composition and motion remain route-scoped. This is the current
+editable baseline shared with Eric; the prior interface remains for comparison.
+[Product and design handoff](../../../PRODUCT_AND_DESIGN.md) records the current
+choices and contributor edit paths under the frozen product purpose.

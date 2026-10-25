@@ -95,7 +95,7 @@ try {
   }
   const goldenLine = (await page.locator('[data-run="golden"] [data-tally]').innerText()).replace(/\s+/g, " ").trim();
   check(goldenLine === "2 planted, 2 found, 0 false alarms", `golden says "${goldenLine}"`);
-  check((await page.title()) === "Veritas · Piano Arcade", `title "${await page.title()}"`);
+  check((await page.title()) === "Veritas · Étude", `title "${await page.title()}"`);
 
   // 2. The dashboard against the snapshot file.
   if (snap) {

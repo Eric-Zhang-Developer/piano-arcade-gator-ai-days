@@ -60,7 +60,19 @@ jobs:
       - name: Install
         run: pnpm -C web install --frozen-lockfile
       - name: Project checks
-        run: pnpm -C web lint && pnpm -C web typecheck && pnpm -C web test && pnpm -C web build
+        # The JSON reporter runs beside the default one (same tests, same verdict) so the run keeps per-suite results
+        # for /veritas (specs/features/veritas/spec.md); the log alone has only the totals.
+        run: |
+          mkdir -p "$RUNNER_TEMP/unit"
+          pnpm -C web lint && pnpm -C web typecheck \
+            && pnpm -C web test --reporter=default --reporter=json --outputFile.json="$RUNNER_TEMP/unit/vitest.json" \
+            && pnpm -C web build
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unit-results
+          path: ${{ runner.temp }}/unit
+          if-no-files-found: ignore
 
   plan:
     # How many browser shards this run needs: one per 3 checks, 1 to 8. Every run used to take 8 runners, even a PR
@@ -149,7 +161,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: node web/e2e/run-checks.mjs ${{ steps.select.outputs.args }} --out "$RUNNER_TEMP/evidence"
       - uses: actions/upload-artifact@v4
-        if: failure()
+        if: always()  # a green run keeps its screenshots and results.json too, for /veritas
         with:
           name: browser-evidence-${{ matrix.shard }}
           path: ${{ runner.temp }}/evidence

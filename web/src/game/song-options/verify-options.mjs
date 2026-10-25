@@ -82,7 +82,8 @@ try {
     await page.getByTestId(`song-${id}`).focus();
     await page.getByTestId("song-options").waitFor({ timeout: 60_000 });
     if (twoHands) await page.getByTestId("hands-R").waitFor({ timeout: 10_000 });
-    else await page.getByTestId("preview-practice").waitFor({ timeout: 10_000 }); // the chart has loaded
+    // The chart has loaded: song-preview's PRACTICE 70% shows, or duo-select's PRACTICE turns on.
+    else await page.locator('[data-testid="preview-practice"], [data-testid="select-practice"]:not([disabled])').first().waitFor({ timeout: 10_000 });
   };
   const home = async () => {
     await page.goto(`${base}/`);
@@ -131,15 +132,16 @@ try {
   const twinkleHref = await page.getByTestId("song-twinkle").getAttribute("href");
   check((await page.locator('[data-testid^="hands-"]').count()) === 0 && (await pressed("speed-100")) && twinkleHref === "/play?song=twinkle", `Twinkle: no Hands, 100%, href ${twinkleHref}`);
 
-  // 4. L on Für Elise learns with the options; LEARN's href is the same URL.
+  // 4. L on Für Elise learns with the options; LEARN's href, where there is one, is the same URL.
   await focus("fur-elise", true);
-  const learnHref = await page.getByTestId("preview-learn").getAttribute("href");
+  // duo-select's panel has no LEARN link (L is the way in), so the href check runs only where it's drawn.
+  const learnHref = (await page.getByTestId("preview-learn").count()) ? await page.getByTestId("preview-learn").getAttribute("href") : null;
   await page.keyboard.press("l");
   await page.waitForURL(/\/play\?/, { timeout: 30_000 });
   const learn = new URL(page.url());
   const lp = learn.searchParams;
   check(lp.get("mode") === "wait" && lp.get("hands") === "R" && lp.get("tempo") === "70", `L opens /play?${lp}`);
-  check(learnHref === `${learn.pathname}${learn.search}`, `LEARN's href matches (${learnHref})`);
+  if (learnHref !== null) check(learnHref === `${learn.pathname}${learn.search}`, `LEARN's href matches (${learnHref})`);
 
   // 5. The panel at both sizes.
   for (const [w, h] of [

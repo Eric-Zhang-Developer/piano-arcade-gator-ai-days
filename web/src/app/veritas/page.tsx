@@ -4,8 +4,9 @@ import type { Metadata } from "next";
 import { Dashboard } from "../../veritas/dashboard";
 import { Hero } from "../../veritas/hero";
 import styles from "./veritas.module.css";
+import { APP_NAME } from "@/game/app-name";
 
-export const metadata: Metadata = { title: "Veritas · Piano Arcade" };
+export const metadata: Metadata = { title: `Veritas · ${APP_NAME}` };
 
 export default function VeritasPage() {
   return (

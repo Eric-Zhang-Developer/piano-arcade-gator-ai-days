@@ -1,13 +1,13 @@
 import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { metadata } from "../../../app/paint/layout";
 import { APP_NAME } from "../../app-name";
 import { CLEAR, keyOff, keyOn, type Message } from "../../leds/messages";
 import { hexOf, rgbOf, SCRIABIN } from "./colors";
 import { caption, focusAfter, frameAnnouncement, FramedPainting, Live, stripLights } from "./framing";
-import { createPainter, keyboard, over, pedalCurve, pedalSettings, ranges, type PaintParams, type Splat, type Surface } from "./paint";
+import { createPainter, keyboard, over, pedalCurve, pedalSettings, ranges, spaceIsPedal, type PaintParams, type Splat, type Surface } from "./paint";
 
 const decision = new URL("../../../../../specs/decisions/wet-paint-colors.md", import.meta.url);
 
@@ -185,5 +185,40 @@ describe("wet-paint-polish", () => {
     expect(live).toMatch(/role="status" aria-live="polite"/);
     expect(live).toContain(`Framed. ${caption(f)}`);
     expect(caption(f)).toBe("Free play · 1:01 · 42 notes · after Scriabin");
+  });
+});
+
+describe("the pedal across framing (#1327, #1328)", () => {
+  it("Again takes up the pedal the foot let go of while the painting was framed: Dry, not Wet", () => {
+    const m = cpuSurface();
+    const p = painterOn(m);
+    p.pedal(127);
+    p.noteOn(60, 100);
+    // framed: the page holds the pedal's CC64 (0 now) but the painting takes nothing
+    p.again(0);
+    expect(p.cc).toBe(0);
+    expect(p.cc >= pedalSettings.downAt).toBe(false); // the Pedal cell's wet test
+    expect(m.params()).toEqual(pedalCurve(0));
+    expect(p.fixes).toBe(0); // a cleared canvas has nothing to dry
+    p.again(); // with no CC64 since, the pedal stays where it is
+    expect(p.cc).toBe(0);
+  });
+
+  it("Space is the pedal only from the page itself, and never while framed", () => {
+    class El {
+      constructor(private tag: string) {}
+      closest(sel: string) {
+        return sel.split(", ").includes(this.tag) ? this : null;
+      }
+    }
+    vi.stubGlobal("Element", El);
+    try {
+      expect(spaceIsPedal(new El("button") as unknown as Element, false)).toBe(false); // Save PNG, Frame it
+      expect(spaceIsPedal(new El("a") as unknown as Element, false)).toBe(false);
+      expect(spaceIsPedal(new El("main") as unknown as Element, false)).toBe(true);
+      expect(spaceIsPedal(new El("main") as unknown as Element, true)).toBe(false);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

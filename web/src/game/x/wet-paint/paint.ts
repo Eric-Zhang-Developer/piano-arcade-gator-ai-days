@@ -118,7 +118,7 @@ export interface Painter {
   noteOff(pitch: number): void;
   pedal(cc: number): void;
   frame(dt: number): void;
-  again(): void;
+  again(cc?: number): void; // cc: the pedal as the foot holds it now (it moved while the painting was framed, #1327)
   readonly notes: number; // struck this session
   readonly cc: number;
   readonly fixes: number; // times the paint dried
@@ -162,11 +162,13 @@ export function createPainter(surface: Surface, opts: { xOf(pitch: number): numb
       }
       surface.step(dt);
     },
-    again() {
+    again(next = cc) {
       held.clear();
       notes = 0;
       fixes = 0;
       surface.clear();
+      cc = next; // nothing to dry on a clear canvas
+      surface.params(pedalCurve(cc));
     },
     get notes() {
       return notes;
@@ -182,3 +184,8 @@ export function createPainter(surface: Surface, opts: { xOf(pitch: number): numb
     },
   };
 }
+
+// Space is the pedal only from the page itself (#1328): on a focused button or link it's that control's, and while
+// the painting is framed the dialog's buttons own it.
+export const spaceIsPedal = (target: EventTarget | null, framed: boolean) =>
+  !framed && !(typeof Element !== "undefined" && target instanceof Element && target.closest("a, button, input, select, textarea, [contenteditable]"));

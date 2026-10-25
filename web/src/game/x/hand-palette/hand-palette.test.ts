@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Chart, Frame } from "../../../contracts";
 import { meterSettings } from "../../fever-gauge";
 import { handColorSettings } from "../../hand-colors";
@@ -6,7 +6,7 @@ import { hudSettings } from "../../hud";
 import { juiceSettings } from "../../juice";
 import { candidates, field, passes, table, today } from "./candidates";
 import { contrast, deltaE, deltaE00, lightness, MACHADO, oklchToRgb, rgbToHex, rgbToOklch, hexToRgb } from "./color";
-import { apply, matrixValues, notches, restore, visionOf } from ".";
+import { apply, handPalette, matrixValues, notches, restore, visionOf } from ".";
 import { sharma2005 } from "./sharma2005";
 
 describe("the color math", () => {
@@ -103,5 +103,62 @@ describe("the experiment", () => {
     expect(n).toHaveLength(1);
     expect(n[0].cx).toBeCloseTo(10);
     expect(n[0].y).toBeCloseTo(600 - 1000 * (600 / 2000) - 1);
+  });
+});
+
+describe("the experiment's state across takes and pages", () => {
+  const chart = {
+    bpm: 60,
+    notes: [
+      { id: "l", pitch: 60, beat: 1, duration: 1, hand: "L" },
+      { id: "r", pitch: 64, beat: 1, duration: 1, hand: "R" },
+    ],
+  } as unknown as Chart;
+  const frame = { nowMs: 0, judgmentLineY: 600, keyX: (p: number) => ({ x: (p - 60) * 20, width: 20 }), width: 1000, height: 720 } as unknown as Frame;
+  const plugin = () => handPalette.plugin() as ReturnType<typeof handPalette.plugin> & Required<Pick<ReturnType<typeof handPalette.plugin>, "transformChart" | "onEvent" | "draw">>;
+  const moves = () => {
+    let n = 0;
+    const ctx = { save() {}, restore() {}, beginPath() {}, rect() {}, clip() {}, fill() {}, closePath() {}, lineTo() {}, moveTo: () => n++, fillStyle: "" };
+    return { ctx: ctx as unknown as CanvasRenderingContext2D, count: () => n };
+  };
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  it("leaving /play from the start screen puts today's colours back and unfilters every canvas (#1324)", () => {
+    vi.useFakeTimers();
+    // Just enough of a page: /play's path, its canvases, and a body for the filter's <svg>.
+    const canvases = [{ style: { filter: "" } }, { style: { filter: "" } }];
+    const el = () => ({ id: "", setAttribute() {}, append() {}, remove() {} });
+    const location = { pathname: "/play" };
+    vi.stubGlobal("window", { addEventListener() {}, removeEventListener() {} });
+    vi.stubGlobal("location", location);
+    vi.stubGlobal("document", { createElementNS: el, body: { append() {} }, querySelectorAll: () => canvases });
+    const before = { ...handColorSettings.colors };
+    const p = plugin();
+    p.transformChart(chart, new URLSearchParams("p=B&sim=deutan"));
+    vi.advanceTimersByTime(300);
+    expect(handColorSettings.colors.R).toBe(candidates.B.palette.R);
+    expect(canvases.every((c) => c.style.filter.includes("url("))).toBe(true);
+    location.pathname = "/"; // Back from the start screen: no songStart, songEnd or quit
+    vi.advanceTimersByTime(300);
+    expect(handColorSettings.colors).toEqual(before);
+    expect(canvases.map((c) => c.style.filter)).toEqual(["", ""]);
+  });
+
+  it("Retry from the results plays the next take in the candidate, notched (#1325)", () => {
+    const before = { ...handColorSettings.colors };
+    const p = plugin();
+    p.transformChart(chart, new URLSearchParams("p=B"));
+    p.onEvent({ type: "songEnd" } as never);
+    expect(handColorSettings.colors).toEqual(before);
+    p.onEvent({ type: "songStart" } as never);
+    expect(handColorSettings.colors.R).toBe(candidates.B.palette.R);
+    const m = moves();
+    p.draw(m.ctx, frame);
+    expect(m.count()).toBeGreaterThan(0);
+    p.onEvent({ type: "quit" } as never);
+    expect(handColorSettings.colors).toEqual(before);
   });
 });

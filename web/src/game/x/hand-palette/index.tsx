@@ -151,6 +151,7 @@ export const handPalette: Experiment = {
   plugin: () => {
     let saved: Snapshot | null = null;
     let unfilter: (() => void) | null = null;
+    let leave: ReturnType<typeof setInterval> | null = null;
     let chart: Chart | null = null;
     let both = false;
     let cand = candidates.A;
@@ -161,7 +162,21 @@ export const handPalette: Experiment = {
       saved = null;
       unfilter?.();
       unfilter = null;
+      if (leave) clearInterval(leave);
+      leave = null;
       if (typeof window !== "undefined") window.removeEventListener("pagehide", off);
+    };
+    const on = () => {
+      saved = snapshot();
+      apply(cand.palette);
+      if (typeof window === "undefined") return;
+      window.addEventListener("pagehide", off);
+      if (vision !== "normal") unfilter = mountFilter(vision);
+      // Leaving /play ends no take when it's from the start screen, so neither songEnd nor quit comes (#1324): any
+      // route off this path puts today's colours back. ponytail: a 250 ms poll, as audio-track's; a route event if
+      // /play ever gets one.
+      const path = location.pathname;
+      leave = setInterval(() => location.pathname !== path && off(), 250);
     };
     return {
       id: "x-hand-palette",
@@ -172,16 +187,14 @@ export const handPalette: Experiment = {
         hit.clear();
         cand = candidateOf(params.get("p"));
         vision = visionOf(params.get("sim"));
-        saved = snapshot();
-        apply(cand.palette);
-        if (typeof window !== "undefined") {
-          window.addEventListener("pagehide", off);
-          if (vision !== "normal") unfilter = mountFilter(vision);
-        }
+        on();
         return c;
       },
       onEvent(e) {
-        if (e.type === "songStart") hit.clear();
+        if (e.type === "songStart") {
+          hit.clear();
+          if (!saved && chart) on(); // a Retry starts a take with no transformChart: the candidate goes back on (#1325)
+        }
         else if (e.type === "noteHit") hit.add(e.noteId);
         else if (e.type === "songEnd" || e.type === "quit") off();
       },

@@ -65,6 +65,20 @@ describe("the plugin (screen-shake)", () => {
     expect(s.overlay.style.transform).toBe("");
   });
 
+  it("shakes the second /play's canvases, not the first's (#1326)", () => {
+    const [a, b] = [stage(), stage()];
+    const p = screenShake.plugin();
+    p.onEvent!(ev({ type: "comboMilestone", count: 100, atMs: 1000 }));
+    p.draw!(a.ctx, a.frame(1040));
+    expect(a.overlay.style.transform).not.toBe("");
+    p.onEvent!(ev({ type: "songStart" }));
+    p.onEvent!(ev({ type: "comboMilestone", count: 100, atMs: 1000 }));
+    for (let t = 1000; t < 1100 && !b.overlay.style.transform; t += 4) p.draw!(b.ctx, b.frame(t));
+    expect(b.overlay.style.transform).not.toBe("");
+    expect(b.highway.style.transform).toBe(b.overlay.style.transform);
+    expect(a.overlay.style.transform).toBe("");
+  });
+
   it.each(["pause", "quit", "songEnd", "songStart"])("%s clears it at once", (type) => {
     const s = stage();
     const p = screenShake.plugin();

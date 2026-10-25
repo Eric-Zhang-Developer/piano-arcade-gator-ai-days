@@ -12,7 +12,7 @@ import { rgb7 } from "../../leds/messages";
 import { connect, linkState, send, subscribe, type LinkState } from "../../leds/serial";
 import { hexOf, rgbOf } from "./colors";
 import { caption, clock, focusAfter, frameAnnouncement, FramedPainting, Live, stripLights, type Framed } from "./framing";
-import { createPainter, keyboard, pedalSettings, ranges, xOfPitch, type Painter } from "./paint";
+import { createPainter, keyboard, pedalSettings, ranges, spaceIsPedal, xOfPitch, type Painter } from "./paint";
 import styles from "./wet-paint.module.css";
 import { createFluid, type Fluid } from "./vendor/fluid";
 
@@ -60,6 +60,8 @@ export function WetPaint() {
   const mainRef = useRef<HTMLElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const wasFramed = useRef(false);
+  const footRef = useRef(0); // the last CC64 in, framed or not
+  const spaceRef = useRef(false); // Space is holding the pedal
   const lights = useSyncExternalStore<LinkState>(onLights, linkState, () => "off");
 
   const frameIt = useCallback(() => {
@@ -77,7 +79,8 @@ export function WetPaint() {
   }, [strip]);
 
   const again = useCallback(() => {
-    painterRef.current?.again();
+    painterRef.current?.again(footRef.current);
+    setCc(footRef.current);
     startRef.current = null;
     frozenRef.current = false;
     strip.clear();
@@ -91,6 +94,7 @@ export function WetPaint() {
   // One event in, from any source: the painter, the held keys, the lights.
   const play = useCallback((e: { type: "on" | "off"; pitch: number; velocity: number } | { type: "cc"; value: number }) => {
     const painter = painterRef.current;
+    if (e.type === "cc") footRef.current = e.value; // kept while framed too: Again takes it up (#1327)
     if (!painter || frozenRef.current) return;
     if (e.type === "cc") {
       painter.pedal(e.value);
@@ -228,7 +232,11 @@ export function WetPaint() {
       if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
       const down = e.type === "keydown";
       if (e.code === "Space") {
-        e.preventDefault();
+        const pedal = spaceIsPedal(e.target, frozenRef.current);
+        if (pedal) e.preventDefault();
+        // A press that began as the pedal still lets it up, wherever focus went (a release can't stick it down).
+        if (down ? !pedal : !spaceRef.current) return;
+        spaceRef.current = down;
         play({ type: "cc", value: down ? 127 : 0 });
       } else if (down && (e.code === "KeyZ" || e.code === "KeyX")) {
         const d = e.code === "KeyZ" ? -1 : 1;

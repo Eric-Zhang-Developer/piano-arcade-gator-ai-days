@@ -72,9 +72,11 @@ export const screenShake: Experiment = {
         if (atMs === null) return;
         try {
           // The overlay canvas this draws on, and the highway canvas just before it in /play's <main>.
-          if (!moved.length) {
+          // Re-resolved when the canvas changes: a second /play in the tab mounts new ones (#1326).
+          if (moved.at(-1) !== ctx.canvas) {
             const prev = ctx.canvas.previousElementSibling;
             moved = prev?.tagName === "CANVAS" ? [prev as HTMLElement, ctx.canvas] : [ctx.canvas];
+            shown = "";
           }
           shakeAt(reducedMotion() ? -1 : f.nowMs - atMs, atMs, count, f.height, off);
           if (off.x === 0 && off.y === 0 && f.nowMs - atMs >= shakeSettings.decayMs) return stop();

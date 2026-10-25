@@ -5,7 +5,7 @@ import { useEffect, useSyncExternalStore } from "react";
 import type { Chart, GamePlugin, InputDevice } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
 import { kitChip } from "../duo-tokens";
-import { CLEAR, demoMode, hintDiff, hintsAt, judgedKey, keyOff, ledSettings, type Rgb } from "./messages";
+import { CLEAR, hintDiff, hintsAt, judgedKey, keyOff, ledSettings, lightMode, type LightMode, type Rgb } from "./messages";
 import { autoConnect, connect, linkState, send, subscribe, type LinkState } from "./serial";
 
 export { hintDiff, hintsAt, judgedKey, ledSettings, rgb7 } from "./messages";
@@ -79,54 +79,73 @@ const label: Record<LinkState, string> = {
   unsupported: "Lights need Chrome or Edge (Web Serial)",
 };
 
-// Demo lights: with the board on, a chip that flips the strip into demo mode (hits ripple out both ways, sparks
-// for the big moments) and back. The choice is kept in this browser and sent again whenever the board connects,
-// since a board that restarted is back in its calm default.
-const demoKey = "pa.lights.demo";
-let demoOn: boolean | null = null; // read from storage on first use
-const demoListeners = new Set<() => void>();
-const demoSnapshot = () => {
-  if (demoOn === null) {
+// The pause menu's status (pause-skin's status slot): is the keyboard there, are the lights on, and the lights'
+// mode chip, so a demo can be checked and flipped mid-song without leaving it. `midi` is /play's own status line.
+export function PauseLights({ midi }: { midi: string }) {
+  return (
+    <>
+      <span data-testid="pause-keyboard">Keyboard: {midi.replace(/^(MIDI|Piano): /, "")}</span>
+      <span style={{ display: "flex" }}>
+        <ConnectLights />
+        <DemoLights />
+      </span>
+    </>
+  );
+}
+
+// The lights' mode chip: with the board on, a click steps the strip through its three modes (firmware setting 15):
+// Calm (hint build-up, red wrong keys, soft glows), Demo (calm plus a ripple on every press, no red) and Demo simple
+// (only the key light and its ripple, after a press). The choice is kept in this browser and sent again whenever
+// the board connects, since a board that restarted is back in whatever it last saved.
+const modeKey = "pa.lights.demo"; // "0", "1" or "2"; older pages stored only "0" and "1"
+const modeNames: Record<LightMode, string> = { 0: "Calm", 1: "Demo", 2: "Demo simple" };
+let mode: LightMode | null = null; // read from storage on first use
+const modeListeners = new Set<() => void>();
+const modeSnapshot = (): LightMode => {
+  if (mode === null) {
+    let v = 0;
     try {
-      demoOn = localStorage.getItem(demoKey) === "1";
+      v = Number(localStorage.getItem(modeKey) ?? 0);
     } catch {
-      demoOn = false; // storage blocked: start calm
+      // storage blocked: start calm
     }
+    mode = v === 1 || v === 2 ? v : 0;
   }
-  return demoOn;
+  return mode;
 };
-const subscribeDemo = (l: () => void) => {
-  demoListeners.add(l);
-  return () => demoListeners.delete(l);
+const subscribeMode = (l: () => void) => {
+  modeListeners.add(l);
+  return () => modeListeners.delete(l);
 };
-function setDemo(on: boolean) {
-  demoOn = on;
+function setMode(m: LightMode) {
+  mode = m;
   try {
-    localStorage.setItem(demoKey, on ? "1" : "0");
+    localStorage.setItem(modeKey, String(m));
   } catch {
     // storage blocked: the choice lasts this page only
   }
-  for (const l of demoListeners) l();
+  for (const l of modeListeners) l();
 }
 
 function DemoLights() {
   const s = useSyncExternalStore(subscribe, linkState, () => "off" as LinkState);
-  const on = useSyncExternalStore(subscribeDemo, demoSnapshot, () => false);
+  const m = useSyncExternalStore(subscribeMode, modeSnapshot, () => 0 as LightMode);
   useEffect(() => {
-    if (s === "ready") send(demoMode(on));
-  }, [s, on]);
+    if (s === "ready") send(lightMode(m));
+  }, [s, m]);
   if (s !== "ready") return null;
-  const flip = () => setDemo(!on);
+  const next = () => setMode(((m + 1) % 3) as LightMode);
   return (
     <button
       type="button"
       data-testid="demo-lights"
-      aria-pressed={on}
-      onClick={flip}
-      className={kitChip(on).className}
-      style={{ ...kitChip(on).style, cursor: "pointer", marginLeft: 8 }}
+      data-mode={m}
+      aria-label={`Lights mode: ${modeNames[m]}. Click for ${modeNames[((m + 1) % 3) as LightMode]}`}
+      onClick={next}
+      className={kitChip(m !== 0).className}
+      style={{ ...kitChip(m !== 0).style, cursor: "pointer", marginLeft: 8 }}
     >
-      {on ? "Demo lights: on" : "Demo lights: off"}
+      {`Mode: ${modeNames[m]}`}
     </button>
   );
 }

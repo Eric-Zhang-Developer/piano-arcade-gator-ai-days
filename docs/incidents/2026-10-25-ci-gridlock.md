@@ -60,6 +60,38 @@ Blameless: each change below was a sensible fix for the problem in front of it. 
    recommended 12 against 16, it flagged the runner pool as unverified but didn't measure it first (the planner's own
    account).
 
+## A sensible rule that became the bottleneck
+
+The merge rule grew one incident at a time, and it lived in a shared agent memory file
+(`merge-retest-when-main-moved.md`, outside the repo), not in [AGENTS.md](../../AGENTS.md). Every session in this
+project loads that file, and any agent can append to it. It was written or appended to 11 times by at least four
+sessions before Eric replaced it, and none of it went through a PR. Each step below was a reasonable answer to the
+incident before it. Times are EDT; "note" means the memory file's own words, which GitHub can't confirm.
+
+| When | Incident | Rule added |
+|---|---|---|
+| Sat 02:49 | [#65] (02:42:30) and [#69] (02:45:54) were each green alone and broke `main` together ([#88]). `main`'s ci failed at 02:46 and was green again by 02:49:26. The note says red for about 10 minutes; GitHub shows about 3. | Retest against current `main` before merging if `main` moved. Gate on `pr_ready.py`'s exit code, never through `tail`. The note says that pipe merged [#58] while not ready; GitHub only shows its merge time (02:14:48). |
+| Sat 04:11 | A chained branch delete closed #109 before it merged (the note). | Delete a branch only after the PR shows MERGED. |
+| Sat 07:11 | A merge loop merged #237 after a local test failed, because CI was green (the note). | Gate the push and the merge on the local checks' exit codes. |
+| Sat 13:40 | Branch protection doesn't require an up-to-date branch. The planner's `train.sh` merged [#509], [#498], [#487], [#501], [#468] and [#491] in 66 seconds (13:37:47 to 13:38:53), untested together. | Check `behind_by`; update the branch when it isn't 0; wait for `main`'s own run to go green before the next merge. |
+| Sat 14:04 | `behind_by` 0 livelocked: a ~15-minute browser run, while six workers move `main`. The note says [#511] failed three rounds; GitHub shows eight PR runs on its branch from 13:26 to 14:03, three cancelled, and a merge at 14:05:56. | Merge while behind only if `main`'s new commits don't touch the PR's folders or shared core (the planner's `overlap.sh`). |
+| Sat 15:26 | [#476] merged at 14:50:38, before its planned fix [#492]; `main` went red ([#563], open 15:19 to 15:50). [#495] and [#513] merged while #563 was open. The note says a `train.sh` that survived a stop merged #476. | Wait while any `main-red` issue is open. |
+| Sat 17:33 | Each `main` push cancels the older run, so "the newest run is green" never came true. | Gate on the newest finished, uncancelled run. |
+| Sat ~23:50 | Pushing a `main` merge restarted the ~17-minute PR run, and `main` moved faster, so a PR never landed. | `mergeloop7.sh`: merge `main` locally, retest without pushing, merge with `--match-head-commit`. |
+| Sun 01:30 | The newest 10 or more `main` runs were all cancelled; a short look-back found none, and a queue waited about 20 minutes for nothing (the note). | Look back 40 runs. |
+| Sun ~03:10 | | Eric replaced it: "merge when the PR's own CI is green and pr_ready exits 0, no retest when main moved, stacks merge back to back". |
+
+**The effect.** By Saturday evening a PR could merge only after its own run and, by turns, `main`'s run, so the
+merge loops lined up one at a time behind a 15-to-17-minute browser run. Merges per hour (the table above) ran 5 to 12
+from 19:00 to 23:00. That table counts every merge, so it shows the pace, not how much of it the rule cost.
+
+**The planner's part.** `train.sh` and `overlap.sh` were the planner's merge scripts, and it wrote the 13:40, 14:04
+and 15:26 rules. The overlap rule was never approved by Eric (the 17:33 note says so).
+
+**Lesson.** A rule kept in agent memory binds every agent, like [AGENTS.md](../../AGENTS.md) does, but it skips the
+review AGENTS.md gets (a `contract:` PR that Eric merges). Proposed: a rule that changes how agents merge goes into
+AGENTS.md through a `contract:` PR, or it isn't a rule; memory keeps only the incidents behind it.
+
 ## Rules from now on
 
 - **Adopted: the CI package ([#692] merged, [#687] in CI).** A PR or a push runs the smoke check only, unless it
@@ -68,7 +100,23 @@ Blameless: each change below was a sensible fix for the problem in front of it. 
 - **Proposed: a reviewer session,** waiting for Eric to start it.
 - **Pending: the `AGENTS.md` change,** as a `contract:` PR for Eric.
 
+[#58]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/58
+[#65]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/65
+[#69]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/69
+[#88]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/88
 [#415]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/415
+[#468]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/468
+[#476]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/476
+[#487]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/487
+[#491]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/491
+[#492]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/492
+[#495]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/495
+[#498]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/498
+[#501]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/501
+[#509]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/509
+[#511]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/511
+[#513]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/513
+[#563]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/563
 [#657]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/657
 [#671]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/671
 [#673]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/673

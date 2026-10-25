@@ -52,7 +52,8 @@ export function withLevel(href: string, l: Level): string {
   return q ? `${path}?${q}` : path;
 }
 
-// Two halves in song-preview's LEARN / PRACTICE outline and type, stacked; the level in force is lit in the primary blue
+// Two chips in song-preview's LEARN / PRACTICE outline and type, stacked, each its own button (mouse-first: click the
+// level you want; E still switches); the level in force is lit in the primary blue
 // (Duo: zero radius, hairline frames), the other dimmed. Stacked so it fits beside the stats without a row of its own: a row
 // pushed the panel's last line onto the first-run link at 1280×720 (#532).
 const box: CSSProperties = {
@@ -60,17 +61,19 @@ const box: CSSProperties = {
   flexDirection: "column",
   alignItems: "stretch",
   gap: "0.35em",
-  padding: 0,
-  font: "inherit",
   fontSize: "clamp(13px, 1vw, 20px)" /* song-options' chips, beside it */,
+};
+const half: CSSProperties = {
+  padding: "0.25em 0.75em",
+  borderRadius: 0,
+  border: "1px solid var(--pa-line)",
+  background: "none",
+  font: "inherit",
   fontWeight: 700,
   letterSpacing: "0.08em",
   color: "var(--pa-ink-dim)",
-  background: "none",
-  border: "none",
   cursor: "pointer",
 };
-const half: CSSProperties = { padding: "0.25em 0.75em", borderRadius: 0, border: "1px solid var(--pa-line)", color: "var(--pa-ink-dim)" };
 const lit: CSSProperties = { ...half, border: "1px solid var(--pa-primary)", background: "color-mix(in srgb, var(--pa-primary) 14%, transparent)", color: "var(--pa-primary)" };
 
 // NORMAL Lv n · EASY Lv m; the lit half is the level in force. m waits for the focused chart.
@@ -78,9 +81,13 @@ export function LevelToggle({ normal, chart }: { normal: number; chart: Chart | 
   const [l, set] = useLevel();
   const easy = useMemo(() => (chart ? difficulty(easyChart(chart)).level : null), [chart]);
   return (
-    <button type="button" data-testid="level-toggle" aria-pressed={l === "easy"} style={box} onClick={() => set(l === "easy" ? "normal" : "easy")}>
-      <span style={l === "normal" ? lit : half}>NORMAL Lv {normal}</span>
-      <span style={l === "easy" ? lit : half}>EASY Lv {easy ?? "…"}</span>
-    </button>
+    <div role="group" aria-label="Level" data-testid="level-toggle" style={box}>
+      <button type="button" data-testid="level-normal" aria-pressed={l === "normal"} title="Normal (E switches)" aria-keyshortcuts="E" style={l === "normal" ? lit : half} onClick={() => set("normal")}>
+        NORMAL Lv {normal}
+      </button>
+      <button type="button" data-testid="level-easy" aria-pressed={l === "easy"} title="Easy (E switches)" aria-keyshortcuts="E" style={l === "easy" ? lit : half} onClick={() => set("easy")}>
+        EASY Lv {easy ?? "…"}
+      </button>
+    </div>
   );
 }

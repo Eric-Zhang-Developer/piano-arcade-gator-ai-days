@@ -20,12 +20,3 @@
 .link:hover {
   color: var(--pa-ink);
 }
-
-.kbd {
-  min-width: 1.4em;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: rgb(242 242 245 / 0.12);
-  font: 700 1em system-ui, sans-serif;
-  text-align: center;
-}

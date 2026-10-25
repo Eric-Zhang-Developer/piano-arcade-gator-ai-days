@@ -1,7 +1,7 @@
 "use client";
 // The music select's two pieces in the Duo look (spec: duo-select, frame F-duo-1): the focused song's bracketed panel
 // and one song row, built from the Duo kit (duo-tokens). select-layout places them and owns the keys and links; these
-// only draw, and say when PLAY or PRACTICE is pressed.
+// only draw, and say when PLAY, PRACTICE, LEARN or WATCH is pressed.
 import { useMemo, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import { nextForKey, type NextFor } from "../duo-results/scores";
 import { Brackets, Button, DataCell, MonoLabel, Panel } from "../duo-tokens";
@@ -23,6 +23,8 @@ export interface FocusPanelProps {
   best?: { accuracy: number }; // records' best for this level; absent if never played
   onPlay: () => void;
   onPractice: (() => void) | null; // null until the chart is in (adaptive practice needs its phrases)
+  onLearn?: () => void; // learn-from-select's L, as a button (mouse-first)
+  onWatch?: () => void; // watch-demo's W, as a button (mouse-first)
   children?: ReactNode; // under the buttons: the level toggle, the preview's options and status
 }
 
@@ -61,12 +63,23 @@ export function FocusPanel(p: FocusPanelProps) {
             </a>
           )}
           <div className={styles.buttons}>
-            <Button kind="primary" onClick={p.onPlay} data-testid="select-play" style={buttonSize}>
+            {/* 2×2 (mouse-first): PLAY primary, then the three ways in that were keys only. Keys stay in title and aria. */}
+            <Button kind="primary" onClick={p.onPlay} title="Play (Enter)" aria-keyshortcuts="Enter" data-testid="select-play" style={buttonSize}>
               PLAY
             </Button>
-            <Button kind="secondary" onClick={p.onPractice ?? undefined} disabled={!p.onPractice} data-testid="select-practice" style={buttonSize}>
+            <Button kind="secondary" onClick={p.onPractice ?? undefined} disabled={!p.onPractice} title="Practice (P)" aria-keyshortcuts="P" data-testid="select-practice" style={buttonSize}>
               PRACTICE
             </Button>
+            {p.onLearn && (
+              <Button kind="secondary" onClick={p.onLearn} title="Learn: the song waits for each note (L)" aria-keyshortcuts="L" data-testid="select-learn" style={buttonSize}>
+                LEARN
+              </Button>
+            )}
+            {p.onWatch && (
+              <Button kind="secondary" onClick={p.onWatch} title="Watch the perfect bot play it (W)" aria-keyshortcuts="W" data-testid="select-watch" style={buttonSize}>
+                WATCH
+              </Button>
+            )}
           </div>
           {p.children && <div className={styles.extras}>{p.children}</div>}
         </section>
@@ -75,7 +88,7 @@ export function FocusPanel(p: FocusPanelProps) {
   );
 }
 
-const buttonSize: CSSProperties = { fontSize: "clamp(15px, 1.2vw, 23px)", padding: "1.5vh 0", letterSpacing: "0.16em" };
+const buttonSize: CSSProperties = { fontSize: "clamp(15px, 1.2vw, 23px)", padding: "1.2vh 0", letterSpacing: "0.16em" };
 
 // The browser's storage, read as a snapshot (none on the server), so the strip appears after hydration.
 const noop = () => () => {};

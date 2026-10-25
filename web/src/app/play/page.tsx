@@ -19,6 +19,7 @@ import { SfxControls } from "../../game/sound/SfxControls";
 import { nextPause, pauseClock, type PauseAction, type PauseMode } from "../../game/play-slots";
 import { StartScreen } from "../../game/duo-start/StartScreen";
 import { PauseMenu } from "../../game/pause-skin";
+import { Button } from "../../game/duo-tokens";
 import { ResultsLayout } from "../../game/results-layout";
 import { emptyHud, reduceHud } from "../../game/hud";
 import { barStep, holdClock, isWaitMode } from "../../game/wait-mode";
@@ -80,6 +81,7 @@ export default function Play() {
   const overlayRef = useRef<HTMLCanvasElement>(null); // every plugin's draw, in layers.ts order
   const stopRef = useRef<() => void>(() => {});
   const pauseRef = useRef<(a: PauseAction) => void>(() => {});
+  const rewindRef = useRef<(dir: -1 | 1) => void>(() => {}); // the ◀ ▶ buttons, the same as ← → (mouse-first)
   const startRef = useRef<() => void>(() => {}); // Retry from the pause menu, inside start itself
 
   // Load settings and the chart once.
@@ -317,6 +319,7 @@ export default function Play() {
       wait.seek(target, pauses.now(perf));
       emit({ type: "resume", atMs: target });
     };
+    rewindRef.current = rewind;
     const onArrow = (e: KeyboardEvent) => {
       if ((e.key !== "ArrowLeft" && e.key !== "ArrowRight") || e.repeat || e.shiftKey || e.ctrlKey || e.metaKey || e.altKey || !wait) return;
       e.preventDefault();
@@ -444,6 +447,27 @@ export default function Play() {
       <canvas ref={highwayRef} style={canvasStyle} />
       <canvas ref={overlayRef} style={canvasStyle} />
 
+      {/* mouse-first: Esc and ← → as buttons in the corner, while playing only; ?capture=1 hides them. Pressing one
+          keeps focus where it was, so a later Space or Enter doesn't press it again. ?input=test never pauses. */}
+      {phase === "playing" && pauseMode === "playing" && (
+        <div data-capture-hide style={corner} onMouseDown={(e) => e.preventDefault()}>
+          {loaded && isWaitMode(loaded.params) && (
+            <>
+              <Button kind="secondary" tabIndex={-1} aria-label="Back a bar" title="Back a bar (←)" aria-keyshortcuts="ArrowLeft" style={cornerButton} onClick={() => rewindRef.current(-1)} data-testid="bar-back">
+                ◀
+              </Button>
+              <Button kind="secondary" tabIndex={-1} aria-label="Ahead a bar" title="Ahead a bar (→)" aria-keyshortcuts="ArrowRight" style={cornerButton} onClick={() => rewindRef.current(1)} data-testid="bar-ahead">
+                ▶
+              </Button>
+            </>
+          )}
+          {!isTest && (
+            <Button kind="secondary" tabIndex={-1} aria-label="Pause" title="Pause (Esc)" aria-keyshortcuts="Escape" style={cornerButton} onClick={() => pauseRef.current("esc")} data-testid="pause-button">
+              ❚❚
+            </Button>
+          )}
+        </div>
+      )}
       {phase === "playing" && (
         <PauseMenu
           mode={pauseMode}
@@ -543,4 +567,16 @@ const button: React.CSSProperties = {
   background: settings.noteColor,
   color: "#000",
   cursor: "pointer",
+};
+
+// The play corner (mouse-first): small square kit buttons in the HUD's top-right status gutter (hudSettings.statusGutterPx,
+// 120 px), under beat-track's status line at y = 20 and inside the band, so they cover neither the HUD nor the lanes.
+const corner: React.CSSProperties = { position: "fixed", top: 28, right: 12, display: "flex", gap: 4, zIndex: 5 };
+const cornerButton: React.CSSProperties = {
+  width: 28,
+  height: 28,
+  padding: 0,
+  fontSize: 12,
+  background: "color-mix(in srgb, var(--pa-panel) 80%, transparent)",
+  color: "var(--pa-ink-dim)",
 };

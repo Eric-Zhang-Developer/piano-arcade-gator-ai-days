@@ -27,6 +27,13 @@ OLD, NEW = "2026-10-24T15:50:25Z", "2026-10-24T15:51:24Z"
 
 
 class Rollup(unittest.TestCase):
+    def test_no_checks_yet_waits(self):
+        # Right after a PR is marked ready, GitHub has attached no checks yet; #745 merged then, before its CI ran.
+        self.assertEqual(code(), 8)
+
+    def test_other_checks_but_no_ci_yet_waits(self):
+        self.assertEqual(code(run("plan", "COMPLETED", "SUCCESS", OLD, NEW, workflow="plan")), 8)
+
     def test_a_newer_success_supersedes_an_older_cancelled_run(self):
         # A PR body edit fires `edited`; the concurrency group cancels the run already going (#433).
         self.assertEqual(code(run("ci", "COMPLETED", "CANCELLED", OLD, NEW), run("ci", "COMPLETED", "SUCCESS", NEW)), 0)

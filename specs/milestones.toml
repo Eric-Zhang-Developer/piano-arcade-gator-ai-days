@@ -267,6 +267,7 @@ features = [
   "crowd", # Eric, 2026-10-25 (#1345): wow feeder; the room claps along and the mic scores its timing, an experiment; ships only if its outside checks pass
   "touch-visible", # Eric, 2026-10-25 (#1350): MIDI velocity scales each hit's visual energy, a #856 hero item
   "well-tempered", # Eric, 2026-10-25 (#1356): wow feeder; the DGX retunes and each interval's beat rate pulses, an experiment
+  "hitch-free", # Eric, 2026-10-25 (#1362): no hitch from Start to results on Eric's setup, measured first, a #856 hero item
 ]
 cut = []
 

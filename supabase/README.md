@@ -11,7 +11,7 @@ run locally, and a take that can't be saved waits in the browser's outbox. Owner
 | `takes` | table | one finished take: counts, accuracy, rank, drill bars, versions, the raw `Take` and `Results` JSON | that player |
 | `note_judgments` | table | one row per chart note per take: pitch, hand, bar, beat, judgment, signed offset, velocity | that player |
 | `coach_feedback` | table | what the coach said and the exact numbers it was checked against | that player |
-| `learning_attempts` | table | the learning lane's evidence (#753): one row per theory answer or playing attempt (item, node, kind, mode, correct, cold, help share, details ≤ 8 KB), append-only | that player |
+| `learning_attempts` | table | the learning lane's evidence (#753): one row per theory answer or playing attempt (item, node, kind, mode, correct, cold, help share, hint shown, details ≤ 8 KB), append-only | that player |
 | `learner_goals` | table | up to 3 goal song ids per player | that player |
 | `save_learning_attempt(p)` | function | saves one attempt; answers `saved`, `duplicate`, `conflict`, or `limited` (over 300 in 5 minutes) | server only |
 | `set_learner_goals(player, song_ids)` | function | replaces a player's goals (at most 3) | server only |

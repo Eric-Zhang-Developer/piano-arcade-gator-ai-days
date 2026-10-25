@@ -189,6 +189,11 @@ assert.equal(await saveAttempt(attempt()), "limited");
 await db.exec(`update learning_attempts set created_at = now() - interval '6 minutes' where player_id = '${learner}'`);
 assert.equal(await saveAttempt(attempt()), "saved");
 say("ok  300 learning attempts per player per 5 minutes, then 'limited'");
+const withHint = attempt({ revealed: true });
+assert.equal(await saveAttempt(withHint), "saved");
+assert.equal((await rows(`select revealed from learning_attempts where id = '${withHint.id}'`))[0].revealed, true);
+assert.equal((await rows(`select revealed from learning_attempts where id = '${a1.id}'`))[0].revealed, false, "default is false");
+say("ok  an attempt's revealed flag is stored; it defaults to false");
 
 const g2a = attempt({ player_id: guest2 });
 assert.equal(await saveAttempt(g2a), "saved");

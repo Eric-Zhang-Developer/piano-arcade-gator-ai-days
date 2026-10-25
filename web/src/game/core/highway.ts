@@ -8,7 +8,8 @@ import { meterLayout } from "../fever-gauge";
 import { whiteIndex as whiteIndexOf, type Range } from "../highway-zoom";
 import { drawBlackKey, drawWhiteKey } from "../key-skin";
 import { brightness, pillRect } from "../note-pills";
-import { gold, good, handR, miss, whenDisplayFontReady, wrong } from "../ui-tokens";
+import { canvasFonts, kitSettings } from "../duo-tokens";
+import { flare, gold, good, ink, miss, primary, secondary, wrong } from "../ui-tokens";
 import { staticRange, type KeyRange } from "./range";
 import { msPerBeat, settings } from "./settings";
 
@@ -16,8 +17,8 @@ export { staticRange, type KeyRange } from "./range";
 
 const JUDGMENT_SHOW_MS = 600;
 // Keyed by name, not Record<Judgment>, so a judgment added to the contract doesn't break the build first.
-// The HUD's counter colors (ui-tokens); GREAT has no token of its own and shares the right hand's mint.
-const JUDGMENT_COLORS: Record<string, string> = { PERFECT: gold, GREAT: handR, GOOD: good, MISS: miss, WRONG: wrong };
+// The HUD's judgment colors (ui-tokens). GREAT is ink, as on the HUD: a hand color would read as a note (duo-hud).
+const JUDGMENT_COLORS: Record<string, string> = { PERFECT: gold, GREAT: ink, GOOD: good, MISS: miss, WRONG: wrong };
 const JUDGMENT_POP_MS = 120; // the word lands slightly large and settles; none under reduced motion
 
 // Where the judgment word goes: top center, just under the HUD's band (its panel and the fever strip), where notes are
@@ -25,23 +26,10 @@ const JUDGMENT_POP_MS = 120; // the word lands slightly large and settles; none 
 // through it; under the combo instead, it covered bright notes under a second away (the #244 complaint). The readout
 // under the word is its lowest line; bottom is where that ends.
 export function judgmentPlace(width: number, judgmentLineY: number) {
-  const size = Math.max(18, Math.round(judgmentLineY * 0.07));
+  const size = Math.max(18, Math.round(judgmentLineY * 0.045)); // the frame's small spaced word, 24 px+ at 1920
   const meter = meterLayout(width, judgmentLineY).bar;
   const cy = meter.y + meter.h + size * 0.8;
   return { cx: width / 2, cy, size, readoutY: cy + size * 0.85, bottom: cy + size * 1.1 };
-}
-// Body face until the display face has loaded, as the HUD does, so the word never draws in a half-loaded font.
-const BODY_FONT = "system-ui, sans-serif";
-let displayFont: string | null = null;
-function judgmentFont(): string {
-  if (displayFont === null && typeof document !== "undefined") {
-    displayFont = BODY_FONT;
-    whenDisplayFontReady().then(() => {
-      const family = getComputedStyle(document.documentElement).getPropertyValue("--pa-font-display").trim();
-      if (family) displayFont = `${family}, ${BODY_FONT}`;
-    });
-  }
-  return displayFont ?? BODY_FONT;
 }
 const BLACK_KEY_WIDTH = 0.6; // × white key width
 const MAX_PERSPECTIVE = 0.3;
@@ -313,29 +301,34 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
   ctx.fillRect(0, line, L.width, 10);
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
-  trace();
-  ctx.strokeStyle = "rgba(255,255,255,0.6)";
-  ctx.lineWidth = 3;
-  ctx.shadowColor = "rgba(255,255,255,0.8)";
-  ctx.shadowBlur = 10;
-  ctx.stroke();
+  // Its glow: purple at the left (the left hand's side) to blue at the right, faint and wide, then narrower.
+  const glow = ctx.createLinearGradient(0, 0, L.width, 0);
+  glow.addColorStop(0, secondary);
+  glow.addColorStop(1, primary);
+  ctx.strokeStyle = glow;
+  for (const [w, a] of [[14, 0.22], [5, 0.5]]) {
+    trace();
+    ctx.globalAlpha = a;
+    ctx.lineWidth = w;
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
   for (const p of s.pressed) {
     const k = L.keyX(p);
     const cx = k.x + k.width / 2;
-    const glow = ctx.createRadialGradient(cx, line, 0, cx, line, k.width * 1.2);
-    glow.addColorStop(0, "rgba(255,255,255,0.95)");
-    glow.addColorStop(0.3, lit(p));
-    glow.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = glow;
+    const lamp = ctx.createRadialGradient(cx, line, 0, cx, line, k.width * 1.2);
+    lamp.addColorStop(0, "rgba(255,255,255,0.95)");
+    lamp.addColorStop(0.3, lit(p));
+    lamp.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = lamp;
     ctx.beginPath();
     ctx.ellipse(cx, line, k.width * 1.2, 10, 0, 0, Math.PI * 2);
     ctx.fill();
   }
-  ctx.shadowBlur = 0;
+  // The line itself: white-hot, 2 px.
   trace();
-  ctx.strokeStyle = settings.noteHeadColor;
-  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = flare;
+  ctx.lineWidth = 2;
   ctx.stroke();
   ctx.restore();
 
@@ -356,18 +349,20 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
     const { cx, cy, size, readoutY } = judgmentPlace(L.width, line);
     const pop = reducedMotion() || t >= JUDGMENT_POP_MS ? 1 : 1.15 - 0.15 * (t / JUDGMENT_POP_MS);
     const fade = Math.min(1, (JUDGMENT_SHOW_MS - t) / 150);
-    const font = judgmentFont();
     ctx.save();
     ctx.globalAlpha = fade;
     ctx.shadowColor = "rgba(0,0,0,0.85)";
     ctx.shadowBlur = size * 0.35;
     ctx.fillStyle = JUDGMENT_COLORS[judgment];
-    ctx.font = `italic 800 ${Math.round(size * pop)}px ${font}`;
+    // The kit's display face, upright, in spaced caps; the ms in its monospace (the frame's PERFECT / -3 MS).
+    ctx.font = canvasFonts.display(Math.round(size * pop));
+    ctx.letterSpacing = "0.12em";
     ctx.fillText(judgment, cx, cy);
     if (offsetMs !== null) {
       const ms = Math.round(offsetMs);
-      ctx.font = `italic 600 ${Math.round(size * 0.5)}px ${font}`;
-      const signed = `${ms > 0 ? "+" : ""}${ms} ms`;
+      ctx.font = canvasFonts.data(Math.round(size * 0.5));
+      ctx.letterSpacing = kitSettings.dataTracking;
+      const signed = `${ms > 0 ? "+" : ""}${ms} MS`;
       // GREAT and GOOD say which way you were off; PERFECT just shows the ms.
       const label = judgment === "PERFECT" ? signed : `${offsetMs < 0 ? "EARLY" : "LATE"} ${signed}`;
       ctx.fillText(label, cx, readoutY);

@@ -187,6 +187,7 @@ features = [
   "fever-arc", # Eric, 2026-10-25 (#1150): fever as one designed arc, build-up, drop, sustain, release, a #856 hero item
   "hand-palette", # Eric, 2026-10-25 (#1127): the hand and judgment colors solved for CVD, compared in the Lab first
   "build-sonata", # Eric, 2026-10-25 (#1162): wow feeder; the night of merged PRs as music on the DGX, an experiment
+  "ui-sound-family", # Eric, 2026-10-25 (#1167): one deep polish pass on the menu sounds, one celesta family in key
   "laptop-sound",
   "flow-mode",
   "duo-tokens",

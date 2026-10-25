@@ -170,6 +170,7 @@ cut = []
 name = "extras"
 ship = ""
 features = [
+  "golden-demo", # Eric, 2026-10-25 (#807): Golden's DGX autoplay sounds like a performance; his priority now
   "laptop-sound",
   "flow-mode",
   "duo-tokens",

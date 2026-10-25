@@ -1,6 +1,6 @@
 import { createElement } from "react";
 import type { Chart, GamePlugin } from "../../contracts";
-import { GOOD_WEIGHT, msPerBeat } from "../core/settings";
+import { GOOD_WEIGHT, GREAT_WEIGHT, msPerBeat } from "../core/settings";
 import { isWaitMode } from "../wait-mode";
 
 export const barLoopSettings = {
@@ -69,7 +69,7 @@ interface Pass {
 }
 
 // Same formula as the judge's accuracy, per pass.
-export const passAccuracy = (p: Pass, notes: number) => (p.PERFECT + 0.5 * p.GREAT + GOOD_WEIGHT * p.GOOD) / (notes + p.wrong);
+export const passAccuracy = (p: Pass, notes: number) => (p.PERFECT + GREAT_WEIGHT * p.GREAT + GOOD_WEIGHT * p.GOOD) / (notes + p.wrong);
 
 // Practice bars X to Y at a slower tempo: /play?song=<id>&from=<bar>&to=<bar>&tempo=<percent>[&passes=<n>].
 // Each pass is scored on its own, and the list is a results panel (Passes, in duo-details' How I played) so improvement

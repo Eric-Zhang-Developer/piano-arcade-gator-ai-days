@@ -64,15 +64,15 @@ describe("per-pass results", () => {
     const chart = plugin.transformChart!(twinkle, q("from=1&to=2&tempo=70&passes=3"));
     const judge = new Judge(chart, (e: GameEvent) => plugin.onEvent!(e));
     plugin.onEvent!({ type: "songStart", atMs: 0 });
-    // Pass 1 perfect, pass 2 skips one note, pass 3 every note 40 ms late (GREAT).
+    // Pass 1 perfect, pass 2 skips one note, pass 3 every note 60 ms late (GREAT).
     chart.notes.forEach((n, i) => {
       const pass = Number(n.id[1]);
       if (n.id === `p2-${twinkle.notes[0].id}`) return;
-      judge.press(n.pitch, noteTimeMs(chart, n) + (pass === 3 ? 40 : 0), i);
+      judge.press(n.pitch, noteTimeMs(chart, n) + (pass === 3 ? 60 : 0), i);
     });
     judge.finish(1e9);
     const per = chart.notes.length / 3;
-    expect(plugin.passes()).toEqual([1, (per - 1) / per, 0.5]);
+    expect(plugin.passes()).toEqual([1, (per - 1) / per, 0.8]);
   });
 
   it("counts a wrong note against the pass it fell in", () => {

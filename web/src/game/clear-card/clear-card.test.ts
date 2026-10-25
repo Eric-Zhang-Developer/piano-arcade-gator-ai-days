@@ -57,7 +57,7 @@ describe("against the real judge", () => {
   it("FULL COMBO or ALL PERFECT exactly when the judge sends fullCombo", () => {
     const cases: [(number | null)[], string][] = [
       [Array(8).fill(0), "ALL PERFECT"],
-      [[0, 0, 0, 40, 0, 0, 0, 0], "FULL COMBO"],
+      [[0, 0, 0, 60, 0, 0, 0, 0], "FULL COMBO"],
       [[0, 0, null, 0, 0, 0, 0, 0], "CLEAR"],
     ];
     for (const [offsets, kind] of cases) {

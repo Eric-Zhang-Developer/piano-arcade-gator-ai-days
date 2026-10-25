@@ -53,25 +53,39 @@ describe("synthetic players on Twinkle", () => {
     expect(r.judgments[9].judgment).toBe("MISS");
   });
 
-  it("Late40: every note at +40 ms is GREAT", () => {
-    const r = judgeTake(chart, play(() => 40));
+  it("Late60: every note at +60 ms is GREAT, 80%", () => {
+    const r = judgeTake(chart, play(() => 60));
     expect(r.counts).toEqual({ PERFECT: 0, GREAT: N, GOOD: 0, MISS: 0, extra: 0, wrong: 0 });
-    expect(r.judgments.every((j) => j.offsetMs === 40)).toBe(true);
+    expect(r.judgments.every((j) => j.offsetMs === 60)).toBe(true);
+    expect(r.accuracy).toBe(0.8);
   });
 
-  it("Late80: every note at +80 ms is GOOD, 25%, rank D, and the combo never breaks", () => {
-    const r = judgeTake(chart, play(() => 80));
+  it("Late100: every note at +100 ms is GOOD, 50%, and the full combo floors the rank at B", () => {
+    const r = judgeTake(chart, play(() => 100));
     expect(r.counts).toEqual({ PERFECT: 0, GREAT: 0, GOOD: N, MISS: 0, extra: 0, wrong: 0 });
-    expect(r.accuracy).toBe(0.25);
-    expect(r.rank).toBe("D");
+    expect(r.accuracy).toBe(0.5);
+    expect(r.rank).toBe("B");
     expect(r.maxCombo).toBe(N);
   });
 
-  it("Boundary: +25 PERFECT, -50 GREAT, +51 GOOD, +100 GOOD, +101 MISS plus an extra that isn't WRONG", () => {
-    const shifts: Record<number, number> = { 0: 25, 1: -50, 2: 51, 3: 100, 4: 101 };
+  it("Late100 with one skipped note: no full combo, so no floor: rank D", () => {
+    const r = judgeTake(chart, play((i) => (i === 5 ? null : 100)));
+    expect(r.counts).toMatchObject({ GOOD: N - 1, MISS: 1 });
+    expect(r.rank).toBe("D");
+  });
+
+  it("Eric's take's mix (18 PERFECT, 18 GREAT, 6 GOOD of 42, no miss): 84.3%, B", () => {
+    const r = judgeTake(chart, play((i) => (i < 18 ? 0 : i < 36 ? 60 : 100)));
+    expect(r.counts).toEqual({ PERFECT: 18, GREAT: 18, GOOD: 6, MISS: 0, extra: 0, wrong: 0 });
+    expect(r.accuracy).toBeCloseTo(35.4 / 42, 10);
+    expect(r.rank).toBe("B");
+  });
+
+  it("Boundary: +40 PERFECT, -80 GREAT, +81 GOOD, +120 GOOD, +121 MISS plus an extra that isn't WRONG", () => {
+    const shifts: Record<number, number> = { 0: 40, 1: -80, 2: 81, 3: 120, 4: 121 };
     const r = judgeTake(chart, play((i) => shifts[i] ?? 0));
     expect(r.judgments.slice(0, 5).map((j) => j.judgment)).toEqual(["PERFECT", "GREAT", "GOOD", "GOOD", "MISS"]);
-    expect(r.judgments[1].offsetMs).toBe(-50);
+    expect(r.judgments[1].offsetMs).toBe(-80);
     expect(r.counts).toMatchObject({ MISS: 1, extra: 1, wrong: 0 });
   });
 
@@ -125,12 +139,12 @@ describe("live judging", () => {
     const judge = new Judge(synth(3), (e) => events.push(e));
     judge.press(60, 10, 0); // note 0, +10
     judge.press(72, 300, 1); // no such pitch, mid-song: an extra and a WRONG note
-    judge.advance(700); // note 1 at 600 is still open (600 + 100 is not < 700)
+    judge.advance(720); // note 1 at 600 is still open (600 + 120 is not < 720)
     expect(judge.noteState.has("n1")).toBe(false);
-    judge.advance(701);
+    judge.advance(721);
     judge.press(60, 1190, 2); // note 2 at 1200, -10
     expect(events.map((e) => e.type)).toEqual(["noteHit", "combo", "extra", "wrongNote", "noteMiss", "noteHit", "combo"]);
-    expect(events[4]).toMatchObject({ noteId: "n1", atMs: 700 });
+    expect(events[4]).toMatchObject({ noteId: "n1", atMs: 720 });
     expect(judge.noteState.get("n1")).toBe("MISS");
     const r = judge.finish(2000);
     expect(r.counts).toEqual({ PERFECT: 2, GREAT: 0, GOOD: 0, MISS: 1, extra: 1, wrong: 1 });

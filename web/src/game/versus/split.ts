@@ -1,6 +1,6 @@
 // Versus (spec: versus): the chart split at middle C into two players' copies, and each player's tally. Pure.
 import type { Chart, GameEvent } from "../../contracts";
-import { GOOD_WEIGHT } from "../core/settings";
+import { GOOD_WEIGHT, GREAT_WEIGHT } from "../core/settings";
 
 export const MIDDLE_C = 60;
 const LOWEST = 21; // A0
@@ -61,10 +61,10 @@ export function reduceTallies(t: Record<Player, Tally>, e: GameEvent): Record<Pl
   return { ...t, [who]: p };
 }
 
-// Results' formula, per player: (PERFECT + 0.5 GREAT + GOOD_WEIGHT GOOD) / (notes judged + WRONG).
+// Results' formula, per player: (PERFECT + GREAT_WEIGHT GREAT + GOOD_WEIGHT GOOD) / (notes judged + WRONG).
 export function accuracy(p: Tally): number {
   const judged = p.PERFECT + p.GREAT + p.GOOD + p.MISS;
-  return judged ? (p.PERFECT + 0.5 * p.GREAT + GOOD_WEIGHT * p.GOOD) / (judged + p.wrong) : 0;
+  return judged ? (p.PERFECT + GREAT_WEIGHT * p.GREAT + GOOD_WEIGHT * p.GOOD) / (judged + p.wrong) : 0;
 }
 
 // DRAW when the accuracies match to 0.1%.

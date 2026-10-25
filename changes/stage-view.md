@@ -4,8 +4,8 @@
   curve, the timing and the effects are measured from the reference video.
 - **Moments:** each hit gets a pillar, a starburst and its judgment; a milestone gets a ghost of the combo; a full
   combo gets a wash and a FULL COMBO banner.
-- **Display:** full screen on F or a button. No controls show during a take, and with no take it shows a quiet
-  waiting state.
+- **Display:** full screen from a button between takes. No controls show during a take, and with no take it shows
+  a quiet waiting state.
 - **Plumbing:** it reads sheet-view's channel, which now also carries the judge's combo, milestones and full combo.
 - **The way in:** "Stage view ↗" on `/play`'s start screen. The nav bar doesn't cover `/stage`.
 
@@ -32,4 +32,6 @@
   channel. The button's click wasn't seen locally.
 - **Not seen by Eric** on a second display.
 - **Silent:** `/stage` plays no sound.
+- **No full-screen key yet:** a key needs a line on help-overlay's card, and #965 has `keys.ts` open. The button
+  covers it meanwhile.
 - **Lab entry** comes after this note lands, per the spec.

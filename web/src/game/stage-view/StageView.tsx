@@ -1,7 +1,8 @@
 "use client";
 
 // /stage (stage-view): the audience's highway. It listens to /play's take on sheet-view's channel, read-only, and draws
-// it on NOSTALGIA's hill. No controls show during a take; between takes, a quiet line and the full screen button.
+// it on NOSTALGIA's hill. No controls show during a take; between takes, a quiet line and the full screen button. No
+// key yet (decision stage-view-look): a key needs a line on help-overlay's card, and #965 has keys.ts open.
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../duo-tokens";
 import { SHEET_CHANNEL, type SheetMessage } from "../sheet-view/plugin";
@@ -46,14 +47,9 @@ export function StageView() {
     size();
     window.addEventListener("resize", size);
     void whenDisplayFontReady().then(() => (raf = requestAnimationFrame(frame)));
-    const key = (e: KeyboardEvent) => {
-      if (e.key === "f" || e.key === "F") void fullScreen();
-    };
-    window.addEventListener("keydown", key);
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", size);
-      window.removeEventListener("keydown", key);
     };
   }, []);
 
@@ -69,7 +65,7 @@ export function StageView() {
             </p>
           )}
           <Button kind="secondary" className={styles.full} onClick={() => void fullScreen()} data-testid="stage-fullscreen">
-            Full screen · F
+            Full screen
           </Button>
         </div>
       )}

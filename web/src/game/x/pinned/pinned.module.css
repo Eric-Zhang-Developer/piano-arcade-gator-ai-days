@@ -124,6 +124,19 @@
 
 /* The kit's mono label, scaled with the rail. */
 .rail [data-kit="mono"] {
-  font-size: clamp(11px, 0.72vw, 14px) !important;
+  font-size: clamp(12px, 0.72vw, 14px) !important; /* the kit's 12 px floor (#1200) */
   max-width: 36em;
+}
+
+/* A toggle's two labels in one cell: it keeps its longer label's width, and the idle one is hidden (#1200). */
+.swap {
+  display: inline-grid;
+}
+
+.swap > span {
+  grid-area: 1 / 1;
+}
+
+.swap > [data-idle] {
+  visibility: hidden;
 }

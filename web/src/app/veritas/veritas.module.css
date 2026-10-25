@@ -6,7 +6,7 @@
 .page {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 40px 40px 96px;
+  padding: calc(4vh + 24px) 40px 96px; /* the top 4vh is the nav bar's band (nav-bar): the header starts under it */
   min-height: 100vh;
   color: var(--pa-ink);
   font-family: system-ui, sans-serif;

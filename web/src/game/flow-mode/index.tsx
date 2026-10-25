@@ -7,10 +7,10 @@ import type { Chart, Frame, GamePlugin, Hand } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
 import { msPerBeat, settings } from "../core/settings";
 import { noteColorFor } from "../hand-colors";
+import { canvasFonts, kitButton, kitSettings } from "../duo-tokens";
 import { hudLayout, hudSettings } from "../hud";
-import { bg, cyan, fontDisplay, ink, inkDim, panel, whenDisplayFontReady } from "../ui-tokens";
+import { bg, cyan, fontDisplay, ink, inkDim, panel } from "../ui-tokens";
 import { waitHintSettings } from "../wait-hint/hint";
-import { kitButton } from "../duo-tokens";
 import { graduates, modeHref, withMode } from "../play-modes/modes";
 import { flowSettings, isFlowMode } from "./clock";
 import { FlowJudge } from "./judge";
@@ -48,14 +48,8 @@ export function flowMode(): GamePlugin {
   let chart: Chart | null = null;
   let tempo = 1; // ?tempo= as a fraction: bar-loop already slowed the chart by it, so the percent is of the song's own
   let color: (hand: Hand) => string = () => ink;
-  let display = "system-ui, sans-serif";
   let calmFrom: number | null = null; // performance.now() when "Take your time" appeared
   let heldFrom: number | null = null; // performance.now() when the current hold began, for the glow's phase
-  if (typeof document !== "undefined")
-    void whenDisplayFontReady().then(() => {
-      const f = getComputedStyle(document.documentElement).getPropertyValue("--pa-font-display").trim();
-      if (f) display = `${f}, system-ui, sans-serif`;
-    });
   const setHook = (v: FlowHook | null) => {
     if (typeof window !== "undefined") window.__pianoArcadeFlow = v;
   };
@@ -80,12 +74,12 @@ export function flowMode(): GamePlugin {
       const calm = clock.holding && clock.heldMs > (flowSettings.freeBeats * mpb) / clock.rate;
       heldFrom = clock.holding ? (heldFrom ?? now) : null;
       calmFrom = calm ? (calmFrom ?? now) : null;
-      drawReadout(ctx, f, Math.round(chart.bpm * clock.rate), Math.round(tempo * clock.rate * 100), display);
+      drawReadout(ctx, f, Math.round(chart.bpm * clock.rate), Math.round(tempo * clock.rate * 100));
       if (clock.holding && clock.front !== null) {
         const front = clock.front;
         const waiting = chart.notes.filter((n) => noteTimeMs(chart!, n) === front && !judge.noteState.has(n.id));
         drawGlow(ctx, f, waiting.map((n) => ({ pitch: n.pitch, color: color(n.hand) })), now - heldFrom!);
-        if (calm && waiting.length) drawCalm(ctx, f, waiting.map((n) => n.pitch), now - calmFrom!, display);
+        if (calm && waiting.length) drawCalm(ctx, f, waiting.map((n) => n.pitch), now - calmFrom!);
       }
       setHook({ rate: clock.rate, holding: clock.holding, slips: judge.slips, front: clock.front, calm });
     },
@@ -111,14 +105,14 @@ export function flowMode(): GamePlugin {
 }
 
 // Under the HUD band, right-aligned with the score: ♩ 92 · 115%, in a cyan frame as wait mode's LEARN badge.
-function drawReadout(ctx: CanvasRenderingContext2D, f: Frame, bpm: number, percent: number, display: string) {
+function drawReadout(ctx: CanvasRenderingContext2D, f: Frame, bpm: number, percent: number) {
   const { h } = hudLayout(f.width, f.judgmentLineY).panel;
   const pad = Math.max(10, h * 0.25);
   const px = Math.round(h * 0.34);
   const right = f.width - pad - hudSettings.statusGutterPx;
   const top = h + pad * 0.5;
   ctx.save();
-  ctx.font = `italic 800 ${px}px ${display}`;
+  ctx.font = canvasFonts.display(px); // Duo: upright, the kit's face
   const bpmText = `♩ ${bpm}`;
   const pctText = ` · ${percent}%`;
   const bw = ctx.measureText(bpmText).width;
@@ -127,9 +121,9 @@ function drawReadout(ctx: CanvasRenderingContext2D, f: Frame, bpm: number, perce
   const bh = px * 1.5;
   ctx.fillStyle = panel;
   ctx.strokeStyle = cyan;
-  ctx.lineWidth = Math.max(1.5, h * 0.025);
+  ctx.lineWidth = kitSettings.hairline; // Duo: a square hairline frame, like every interface element
   ctx.beginPath();
-  ctx.roundRect(right - w, top, w, bh, bh * 0.28);
+  ctx.rect(right - w, top, w, bh);
   ctx.fill();
   ctx.stroke();
   ctx.textBaseline = "middle";
@@ -173,14 +167,14 @@ function drawGlow(ctx: CanvasRenderingContext2D, f: Frame, keys: { pitch: number
 }
 
 // "Take your time" over the waiting note, where wait-hint puts a note's name: calm ink, never red.
-function drawCalm(ctx: CanvasRenderingContext2D, f: Frame, pitches: number[], shownMs: number, display: string) {
+function drawCalm(ctx: CanvasRenderingContext2D, f: Frame, pitches: number[], shownMs: number) {
   const xs = pitches.map((p) => f.keyX(p));
   const cx = (Math.min(...xs.map((k) => k.x)) + Math.max(...xs.map((k) => k.x + k.width))) / 2;
   const px = Math.round(0.05 * f.height);
   const text = "Take your time";
   ctx.save();
   ctx.globalAlpha = reducedMotion() ? 1 : Math.min(1, shownMs / flowLook.calmFadeMs);
-  ctx.font = `italic 800 ${px}px ${display}`;
+  ctx.font = canvasFonts.display(px); // Duo: upright, the kit's face
   ctx.textAlign = "center";
   ctx.textBaseline = "bottom";
   const half = ctx.measureText(text).width / 2;
@@ -200,7 +194,6 @@ const link = kitButton("secondary");
 const headlineStyle: CSSProperties = {
   margin: 0,
   fontFamily: fontDisplay,
-  fontStyle: "italic",
   fontWeight: 800,
   fontSize: "clamp(18px, 1.6vw, 28px)",
   color: ink,

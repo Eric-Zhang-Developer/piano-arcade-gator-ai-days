@@ -72,6 +72,119 @@
   font-size: 24vh;
 }
 
+/* The played title (Title.tsx): the name on the hit line, each letter hidden until its note sounds. Kerning for the
+   É-T and T-U pairs is hand-set (decision video-cards-kerning). */
+.title {
+  position: absolute;
+  left: 8.6vw;
+  bottom: calc(40% - 0.06em);
+  margin: 0;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 40vh;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  --kern-et: -0.02em;
+  --kern-tu: -0.015em;
+}
+.letter {
+  position: relative;
+  display: inline-block;
+  opacity: 0;
+}
+.letter:nth-child(2) {
+  margin-left: var(--kern-et);
+}
+.letter:nth-child(3) {
+  margin-left: var(--kern-tu);
+}
+.letter[data-on] {
+  opacity: 1;
+  animation: land 160ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+/* Each landing lights the hit line under its letter, as a hit does in the game. */
+.letter::after {
+  content: "";
+  position: absolute;
+  left: 0.04em;
+  right: 0.04em;
+  bottom: calc(0.06em - 0.42vh);
+  height: 1.3vh;
+  background: var(--pa-flare);
+  opacity: 0;
+}
+.letter[data-on]::after {
+  animation: hit 420ms ease-out both;
+}
+/* The title's hit line: drawn in on the first note. */
+.hitline {
+  opacity: 0;
+  animation: none;
+}
+.hitline[data-on] {
+  opacity: 1;
+  animation: draw 300ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+/* The É's acute, its own part: it lands last, on the motif's final note. */
+.acute {
+  position: absolute;
+  left: 0.2em;
+  top: -0.24em;
+  font-size: 1em;
+  line-height: 1;
+  opacity: 0;
+}
+.acute[data-on] {
+  opacity: 1;
+  animation: land 160ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+/* Flush with the É's stem ink (0.06em in from its box at 40vh), not the box. */
+.title + .tagline {
+  left: calc(8.6vw + 2.2vh);
+  opacity: 0;
+  animation: none;
+}
+.title + .tagline[data-on] {
+  opacity: 1;
+  animation: rise 400ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.burst {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+/* Reduced motion, or the card told to hold still: every part in its place from the first frame. A part set
+   data-frozen (?t=) is shown at rest. */
+.card[data-still] .letter,
+.card[data-still] .acute,
+.card[data-still] .title + .tagline,
+.card[data-still] .hitline,
+.hitline[data-frozen],
+.letter[data-frozen],
+.acute[data-frozen],
+.title + .tagline[data-frozen] {
+  opacity: 1;
+  animation: none;
+}
+
+/* The end card's facts line: small and quiet, under the links. */
+.facts {
+  margin: 1vh 0 0;
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: 2.2vh;
+  color: var(--pa-ink-dim);
+}
+.endTagline {
+  margin: 0 0 3vh;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 3.4vh;
+  line-height: 1.2;
+  color: var(--pa-ink-dim);
+}
+
 /* One line per clause: the tagline breaks at its comma, never mid-phrase. */
 .clause {
   display: block;
@@ -96,18 +209,25 @@
   top: calc(60% + 5vh);
   animation: rise var(--dur) cubic-bezier(0.2, 0.7, 0.2, 1) var(--delay) both;
 }
-/* The URL is the end card's whole job: the largest words on it after the name, in the accent. */
+/* The URL is the end card's whole job: the largest words on it after the name, in the full ink (16:1 on the black;
+   the kit's blue is 7.00:1, on the 7:1 line). The first link takes that slot: the live URL, or the repo while unset. */
 .repo,
 .live {
-  margin: 0 0 2vh;
+  margin: 0 0 1.6vh;
   font-family: var(--pa-font-display), system-ui, sans-serif;
   font-weight: 700;
-  font-size: 4.4vh;
   line-height: 1.15;
   /* A URL a viewer types reads on one line, never broken at a hyphen. */
   white-space: nowrap;
 }
-.repo {
+/* 6vh, or smaller to fit one line: the box is 78.4vw and Saira's bold averages 0.502em a character on the repo URL,
+   so the 58-character repo fits at 2.69vw (52 px at 1920, x-height 26 px; decision video-cards-end). */
+.lead {
+  font-size: min(6vh, calc(78.4vw / (var(--chars, 1) * 0.51)));
+  color: var(--pa-ink);
+}
+.second {
+  font-size: 3.2vh;
   color: var(--pa-primary);
 }
 
@@ -126,6 +246,12 @@
     opacity: 0.9;
   }
 }
+@keyframes land {
+  from {
+    opacity: 0.35;
+    transform: translateY(-0.08em);
+  }
+}
 @keyframes rise {
   from {
     opacity: 0;
@@ -139,8 +265,19 @@
   .flash,
   .name,
   .tagline,
-  .links {
+  .links,
+  .letter[data-on],
+  .letter[data-on]::after,
+  .acute[data-on],
+  .title + .tagline[data-on],
+  .hitline[data-on] {
     animation: none;
+  }
+  .letter,
+  .acute,
+  .title + .tagline,
+  .hitline {
+    opacity: 1;
   }
 }
 

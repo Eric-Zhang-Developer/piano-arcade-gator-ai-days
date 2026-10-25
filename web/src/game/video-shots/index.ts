@@ -19,18 +19,15 @@ export const LIVE_URL = (process.env.NEXT_PUBLIC_LIVE_URL ?? "").trim();
 // A URL as a viewer types it: no scheme, no trailing slash.
 export const bare = (url: string) => url.replace(/^https?:\/\//, "").replace(/\/+$/, "");
 export const endLinks = (live = LIVE_URL) => [GITHUB_URL, ...(live ? [live] : [])].map(bare);
+// The end card's two URL slots: the big one is the live URL, or the repo while that's unset (decision
+// video-cards-end); the small one is the repo, when the live URL took the big one.
+export const endSlots = (live = LIVE_URL): [string, string | null] => (live ? [bare(live), bare(GITHUB_URL)] : [bare(GITHUB_URL), null]);
 
 // Each part's entrance, in ms from the card's first frame (decision video-shots-brief: a hard cut in, one move,
 // then dead still). The CSS reads these through --delay and --dur, so this table is the only timing.
 export type Part = "line" | "notes" | "flash" | "name" | "words";
 export const MOTION: Record<Card, Partial<Record<Part, { delay: number; dur: number }>>> = {
-  title: {
-    line: { delay: 0, dur: 300 },
-    notes: { delay: 150, dur: 450 }, // the two hands fall onto the hit line
-    flash: { delay: 600, dur: 300 }, // and are hit
-    name: { delay: 600, dur: 400 },
-    words: { delay: 1000, dur: 500 },
-  },
+  title: {}, // played: its timing is motif.ts's (video-cards)
   end: {
     line: { delay: 0, dur: 300 },
     name: { delay: 150, dur: 400 },
@@ -39,4 +36,4 @@ export const MOTION: Record<Card, Partial<Record<Part, { delay: number; dur: num
 };
 
 // When a card stops moving: every part's delay plus its duration. The spec's bar is 2000 ms.
-export const motionEnd = (card: Card) => Math.max(...Object.values(MOTION[card]).map((m) => m.delay + m.dur));
+export const motionEnd = (card: Card) => Math.max(0, ...Object.values(MOTION[card]).map((m) => m.delay + m.dur));

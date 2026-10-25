@@ -100,9 +100,10 @@
   border-color: var(--pa-hand-r);
 }
 
+/* The game's only play surface, so it grows with the screen (#1040): six whites span half the stage at 1920. */
 .keys {
   display: flex;
-  height: clamp(140px, 30vh, 280px);
+  height: clamp(140px, 38vh, 440px);
   max-width: 92vw;
 }
 
@@ -112,13 +113,13 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding-bottom: 12px;
-  font: 700 18px/1 var(--pa-font-display);
+  padding-bottom: 0.7em;
+  font: 700 clamp(18px, 1.6vw, 32px) / 1 var(--pa-font-display);
   transition: background 60ms linear;
 }
 
 .white {
-  width: clamp(36px, 5vw, 72px);
+  width: clamp(36px, 7.6vw, 160px);
   margin-right: 3px;
   border-radius: 0 0 8px 8px;
   background: var(--pa-tier-x1);
@@ -135,7 +136,7 @@
   border-radius: 0 0 6px 6px;
   background: #16161c;
   color: var(--pa-ink-dim);
-  font-size: 14px;
+  font-size: clamp(14px, 1.25vw, 24px);
 }
 
 .white[data-held],

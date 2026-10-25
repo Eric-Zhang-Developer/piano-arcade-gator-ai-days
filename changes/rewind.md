@@ -1,5 +1,6 @@
 ## What shipped
 In wait mode, and so in chunk-practice's learn steps, ← moves back a bar and → skips ahead one, one bar per press. The clock moves to the bar start and holds there. ← makes that bar's notes playable again, while → skips the notes in between. The HUD's note count and the wait hint follow. Plain mode ignores the keys, and wait mode's start screen says "← → back or ahead a bar".
+Since mouse-first, the keys have buttons too. In wait mode, ◀ (or ←) moves back a bar and ▶ (or →) skips ahead one, from the HUD's buttons.
 ## Where it lives
 `web/src/game/rewind/` (the hint, `verify-rewind.mjs`) · `web/src/game/wait-mode/` (`barStep`, `holdClock.seek`, the hold floor, #562) · `Judge.rewind` in `web/src/game/core/judge.ts` and the keys in `web/src/app/play/page.tsx` (#571) · `web/src/game/wait-hud/` (#565) · `web/src/game/wait-hint/` (#572) · the `resume` comment in `web/src/contracts/index.ts` (#561)
 ## How to check it

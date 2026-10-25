@@ -133,7 +133,11 @@
 }
 
 /* LabLink, in the select's footer row after first-run's link: the same quiet look. */
+/* 24 px tall for the target size (#951); no side padding, the 1280 footer row has ~2 px to spare. */
 .footerLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   color: var(--pa-ink-dim);
   font: clamp(13px, 1.6vh, 18px) system-ui, sans-serif;
   text-decoration: none;

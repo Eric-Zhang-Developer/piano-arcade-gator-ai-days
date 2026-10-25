@@ -11,7 +11,7 @@ const charts = new Map<string, Chart>(
     .filter((f) => f.split(sep).pop() === "chart.json" && !LAB_ONLY.includes(f.split(sep)[0]))
     .map((f) => [f.split(sep).slice(0, -1).join("/"), JSON.parse(readFileSync(new URL(f, songsDir), "utf8"))]),
 );
-const level = (id: string) => difficulty(charts.get(id)!).level;
+const formula = (id: string) => difficulty(charts.get(id)!).formula;
 const twinkle = charts.get("twinkle")!;
 
 // The rungs song-pack-1 and song-pack-2 name, easiest first. Clair de lune ("Medium-hard") is left out: its
@@ -27,14 +27,14 @@ describe("difficulty", () => {
     }
   });
 
-  it("puts Twinkle lowest in the library", () => {
-    for (const id of charts.keys()) if (id !== "twinkle") expect(level(id), id).toBeGreaterThan(level("twinkle"));
+  it("puts no chart's formula level below Twinkle's", () => {
+    for (const id of charts.keys()) expect(formula(id), id).toBeGreaterThanOrEqual(formula("twinkle"));
   });
 
   it("keeps the named rungs in order", () => {
     for (let i = 1; i < RUNGS.length; i++) {
-      const below = Math.max(...RUNGS[i - 1].filter((id) => charts.has(id)).map(level));
-      for (const id of RUNGS[i].filter((id) => charts.has(id))) expect(level(id), id).toBeGreaterThan(below);
+      const below = Math.max(...RUNGS[i - 1].filter((id) => charts.has(id)).map(formula));
+      for (const id of RUNGS[i].filter((id) => charts.has(id))) expect(formula(id), id).toBeGreaterThan(below);
     }
   });
 

@@ -4,6 +4,7 @@
 // laptop plays. Core's key map doesn't change: laptop-key events are shifted on their way in.
 import type { Frame, GamePlugin, InputDevice } from "../../contracts";
 import { makeLayout } from "../core/highway";
+import { kitSettings } from "../duo-tokens";
 import { keyMap } from "../core/input";
 import { isBlack } from "../highway-zoom";
 import { setLaptopShift } from "../note-labels";
@@ -115,9 +116,9 @@ export function laptopOctaves(): GamePlugin {
       const x = Math.max(2, Math.min(f.width - chipW - 2, cx - chipW / 2));
       ctx.fillStyle = "rgba(8, 10, 16, 0.85)";
       ctx.strokeStyle = colors!.cyan;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = kitSettings.hairline; // Duo: a square hairline chip, like every interface element
       ctx.beginPath();
-      ctx.roundRect(x, chipY, chipW, chipH, px * 0.3);
+      ctx.rect(x, chipY, chipW, chipH);
       ctx.fill();
       ctx.stroke();
       ctx.fillStyle = colors!.cyan;

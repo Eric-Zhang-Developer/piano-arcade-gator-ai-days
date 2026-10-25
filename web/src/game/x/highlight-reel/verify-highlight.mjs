@@ -169,6 +169,10 @@ try {
     const r = await render(page, name);
     await measure(page, name, r);
     if (!first) {
+      // the design pass's four reel frames (cold open, the 0.5× hold, the finish, the title card), at 1920×1080
+      const [slow, finish, title] = r.edl.segments;
+      for (const [label, n] of [["cold-open", slow.fromFrame + 20], ["hold", slow.fromFrame + Math.floor(slow.frames / 2)], ["finish", finish.fromFrame + 60], ["title", title.fromFrame + 45]])
+        writeFileSync(join(out, `reel-${label}.png`), Buffer.from(await page.evaluate((n) => window.__highlightReel.framePng(n), n), "base64"));
       const hashes = await page.evaluate(() => Array.from({ length: 30 }, (_, k) => window.__highlightReel.frameHash(k * 30)));
       first = { url, audioHash: r.audioHash, hashes };
     }

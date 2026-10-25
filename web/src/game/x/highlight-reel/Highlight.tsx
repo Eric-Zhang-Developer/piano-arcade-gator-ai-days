@@ -219,9 +219,9 @@ export function Highlight() {
         <aside className={styles.side}>
           <Panel>
             <div className={styles.cells}>
-              <DataCell label={edl?.run.kind === "hits" ? "Hits in a row" : "Perfect in a row"} value={edl ? edl.run.count : "—"} size={56} />
-              <DataCell label="Rank" value={saved?.results.rank ?? "—"} size={56} />
-              <DataCell label="Accuracy" value={saved ? `${(saved.results.accuracy * 100).toFixed(1)}%` : "—"} size={56} />
+              <DataCell label={edl?.run.kind === "hits" ? "Hits in a row" : "Perfect in a row"} value={edl ? edl.run.count : "—"} size={64} />
+              <DataCell label="Rank" value={saved?.results.rank ?? "—"} size={64} />
+              <DataCell label="Accuracy" value={saved ? `${(saved.results.accuracy * 100).toFixed(1)}%` : "—"} size={64} />
             </div>
           </Panel>
           {state === "done" && video ? (
@@ -230,7 +230,7 @@ export function Highlight() {
             </a>
           ) : (
             <Button onClick={render} disabled={state !== "ready"} data-testid="highlight-render">
-              {state === "rendering" ? `Rendering ${seconds(frame)} / 15.0 s` : "Render reel"}
+              {state === "rendering" ? `Recording ${(frame / S.fps).toFixed(1)} s` : "Render reel"}
             </Button>
           )}
           <p className={styles.small}>

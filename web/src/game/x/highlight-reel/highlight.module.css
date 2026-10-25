@@ -4,7 +4,7 @@
 .page {
   box-sizing: border-box;
   min-height: 100vh;
-  padding: 3.4em 2.5em 1.5em;
+  padding: 3.2em 2.5em 1.2em;
   background: var(--pa-bg);
   color: var(--pa-ink);
   font: 400 clamp(14px, 1.25vw, 28px) / 1.35 system-ui, sans-serif;
@@ -52,8 +52,10 @@
   align-items: start;
 }
 
+/* as wide as the column allows, but short enough that the timeline stays on the first screen */
 .monitor {
   aspect-ratio: 16 / 9;
+  width: min(100%, calc((100vh - 13.5em) * 16 / 9));
   background: #000;
 }
 

@@ -62,7 +62,7 @@ function readBack(xml: string) {
   const score = parse(xml);
   const measures = kids(kid(score, "part")!, "measure");
   const notes: { staff: number; onset: number; end: number; pitch: number }[] = [];
-  const open = new Map<string, (typeof notes)[number]>(); // a tie in progress, by staff:pitch
+  const open = new Map<string, (typeof notes)[number]>(); // a tie in progress, by staff:voice:pitch (#989)
   const voiceTotals: { bar: number; voice: string; total: number; barLen: number }[] = [];
   let divisions = 0;
   let barLen = 0;
@@ -99,7 +99,7 @@ function readBack(xml: string) {
       const midi = (num(kid(p, "octave")) + 1) * 12 + STEP_PC[kid(p, "step")!.text] + (kid(p, "alter") ? num(kid(p, "alter")) : 0);
       const staff = num(kid(e, "staff"));
       const ties = kids(e, "tie").map((t) => t.attrs.type);
-      const k = `${staff}:${midi}`;
+      const k = `${staff}:${v}:${midi}`; // a held note and a new one at its pitch can overlap in two voices
       if (ties.includes("stop") && open.has(k)) {
         const n = open.get(k)!;
         n.end = onset + d;
@@ -294,9 +294,10 @@ it("a fifth voice in one hand throws, naming the note", () => {
   expect(() => chartToMusicXml(synthetic({ notes }))).toThrow(/fifth voice .* v4/);
 });
 
-it("the charts use what the spec's planning check found: at most 2 voices a hand, and some use 2", () => {
+it("the charts stay within the writer's 4 voices a hand, and some use 2 or more", () => {
   const most = charts.map((c) => Math.max(0, ...[...chartToMusicXml(c).matchAll(/<voice>(\d)<\/voice>/g)].map((m) => ((Number(m[1]) - 1) % 4) + 1)));
-  expect(Math.max(...most)).toBe(2);
+  expect(Math.max(...most)).toBeLessThanOrEqual(4); // Chopin's Op. 28 No. 7 holds a note under two moving voices (#986)
+  expect(Math.max(...most)).toBeGreaterThanOrEqual(2);
 });
 
 // ---------- engraving (sheet-engraving) ----------

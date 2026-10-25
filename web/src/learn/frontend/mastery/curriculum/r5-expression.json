@@ -1,1 +1,4870 @@
-{ "nodes": [], "edges": [], "items": [] }
+{
+  "nodes": [
+    {
+      "id": "expression.dynamic-levels",
+      "region": "expression",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Dynamic levels",
+      "whyImportant": "Dynamic marks from ppp to fff tell you how loud each passage should be.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Other Aspects of Notation",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-aspects-of-notation/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus Outline, Grades 1-5",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.hairpins",
+      "region": "expression",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Crescendo and diminuendo",
+      "whyImportant": "Hairpins and cresc. or dim. tell you when the loudness should grow or fade.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Other Aspects of Notation",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-aspects-of-notation/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus Outline, Grades 1-5",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.accents-sforzando",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Accents, sforzando and fp",
+      "whyImportant": "Accents pick out single notes, so you know which ones to stress.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Other Aspects of Notation",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-aspects-of-notation/"
+        },
+        {
+          "title": "Open Music Theory, v2: Glossary",
+          "url": "https://viva.pressbooks.pub/openmusictheory/back-matter/glossary/"
+        }
+      ]
+    },
+    {
+      "id": "expression.staccato-tenuto",
+      "region": "expression",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Staccato and tenuto",
+      "whyImportant": "Staccato and tenuto marks say how long each note really sounds.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Other Aspects of Notation",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-aspects-of-notation/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus Outline, Grades 1-5",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.slurs-legato",
+      "region": "expression",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Slurs, ties and legato",
+      "whyImportant": "A slur asks for smooth joins, and telling it from a tie stops you re-striking or dropping notes.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Other Aspects of Notation",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-aspects-of-notation/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus Outline, Grades 1-5",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.tempo-terms",
+      "region": "expression",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Italian tempo terms",
+      "whyImportant": "Words like Andante and Allegro set the speed before you play a note.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Glossary",
+          "url": "https://viva.pressbooks.pub/openmusictheory/back-matter/glossary/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus Outline, Grades 1-5",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.metronome-marks",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Metronome marks",
+      "whyImportant": "A metronome mark gives the exact speed as beats per minute.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Glossary",
+          "url": "https://viva.pressbooks.pub/openmusictheory/back-matter/glossary/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus Outline, Grades 1-5",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.tempo-changes",
+      "region": "expression",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Changes of tempo",
+      "whyImportant": "Terms like rit., accel. and a tempo tell you where the speed bends and where it comes back.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Glossary",
+          "url": "https://viva.pressbooks.pub/openmusictheory/back-matter/glossary/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus Outline, Grades 1-5",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.character-terms",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Terms for character",
+      "whyImportant": "Words like dolce and maestoso tell you the mood, which shapes touch and tone.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Glossary",
+          "url": "https://viva.pressbooks.pub/openmusictheory/back-matter/glossary/"
+        },
+        {
+          "title": "ABRSM Music Theory Grade 5",
+          "url": "https://ag.abrsm.org/en/our-exams/music-theory-exams/music-theory-grade-5/"
+        }
+      ]
+    },
+    {
+      "id": "expression.qualifiers",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Qualifying words",
+      "whyImportant": "Words like molto, poco and sempre change what the term next to them asks for.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Glossary",
+          "url": "https://viva.pressbooks.pub/openmusictheory/back-matter/glossary/"
+        },
+        {
+          "title": "ABRSM Music Theory Grade 5",
+          "url": "https://ag.abrsm.org/en/our-exams/music-theory-exams/music-theory-grade-5/"
+        }
+      ]
+    },
+    {
+      "id": "expression.fermata",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "The pause (fermata)",
+      "whyImportant": "A pause sign tells you to hold a note or rest longer than written.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Other Aspects of Notation",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-aspects-of-notation/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus Outline, Grades 1-5",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.ornaments",
+      "region": "expression",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Ornaments",
+      "whyImportant": "Ornament signs stand for whole groups of notes, so you must know what each one plays.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Other Aspects of Notation",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-aspects-of-notation/"
+        },
+        {
+          "title": "ABRSM Music Theory Grade 5",
+          "url": "https://ag.abrsm.org/en/our-exams/music-theory-exams/music-theory-grade-5/"
+        }
+      ]
+    },
+    {
+      "id": "expression.trill",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "The trill",
+      "whyImportant": "A trill sign means a fast alternation you have to work out from one written note.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Other Aspects of Notation",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-aspects-of-notation/"
+        },
+        {
+          "title": "Open Music Theory, v2: Glossary",
+          "url": "https://viva.pressbooks.pub/openmusictheory/back-matter/glossary/"
+        }
+      ]
+    },
+    {
+      "id": "expression.mordents",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Upper and lower mordents",
+      "whyImportant": "The two mordent signs look alike but go in opposite directions.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Other Aspects of Notation",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-aspects-of-notation/"
+        },
+        {
+          "title": "ABRSM Music Theory Grade 5",
+          "url": "https://ag.abrsm.org/en/our-exams/music-theory-exams/music-theory-grade-5/"
+        }
+      ]
+    },
+    {
+      "id": "expression.turn",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "The turn",
+      "whyImportant": "A turn sign stands for four notes that wind around the written one.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Other Aspects of Notation",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-aspects-of-notation/"
+        },
+        {
+          "title": "ABRSM Music Theory Grade 5",
+          "url": "https://ag.abrsm.org/en/our-exams/music-theory-exams/music-theory-grade-5/"
+        }
+      ]
+    },
+    {
+      "id": "expression.grace-notes",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Acciaccatura and appoggiatura",
+      "whyImportant": "The two small-note ornaments take very different amounts of time.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Other Aspects of Notation",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-aspects-of-notation/"
+        },
+        {
+          "title": "ABRSM Music Theory Grade 5",
+          "url": "https://ag.abrsm.org/en/our-exams/music-theory-exams/music-theory-grade-5/"
+        }
+      ]
+    },
+    {
+      "id": "expression.repeat-signs",
+      "region": "expression",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Repeat signs",
+      "whyImportant": "Repeat dots and first and second time bars tell you which bars to play twice.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Other Aspects of Notation",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-aspects-of-notation/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus Outline, Grades 1-5",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.da-capo-dal-segno",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Da capo, dal segno, Fine and Coda",
+      "whyImportant": "These signs map a jump back in the score, so you know where to go and where to stop.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Other Aspects of Notation",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-aspects-of-notation/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus Outline, Grades 1-5",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.pedal-markings",
+      "region": "expression",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Pedal markings",
+      "whyImportant": "Pedal marks say when the sustain pedal goes down and when it lifts.",
+      "sources": [
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        },
+        {
+          "title": "Open Music Theory, v2: Glossary",
+          "url": "https://viva.pressbooks.pub/openmusictheory/back-matter/glossary/"
+        }
+      ]
+    },
+    {
+      "id": "expression.satb-voices",
+      "region": "expression",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "SATB voices",
+      "whyImportant": "Four-part writing for soprano, alto, tenor and bass underlies hymns, chorales and Grade 5 questions.",
+      "sources": [
+        {
+          "title": "ABRSM Music Theory Grade 5",
+          "url": "https://ag.abrsm.org/en/our-exams/music-theory-exams/music-theory-grade-5/"
+        },
+        {
+          "title": "ABRSM Music Theory Syllabus Outline, Grades 1-5",
+          "url": "https://www.abrsm.org/sites/default/files/2023-09/music-theory-syllabus-outline-grades-1-5-from-2020.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.open-short-score",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Open score and short score",
+      "whyImportant": "Reading four voices means knowing whether they share two staves or have one each.",
+      "sources": [
+        {
+          "title": "ABRSM Music Theory Grade 5",
+          "url": "https://ag.abrsm.org/en/our-exams/music-theory-exams/music-theory-grade-5/"
+        },
+        {
+          "title": "Open Music Theory, v2: Glossary",
+          "url": "https://viva.pressbooks.pub/openmusictheory/back-matter/glossary/"
+        }
+      ]
+    },
+    {
+      "id": "expression.instrument-families",
+      "region": "expression",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Orchestral instruments",
+      "whyImportant": "Knowing the families and which instruments transpose lets you read a score for more than piano.",
+      "sources": [
+        {
+          "title": "ABRSM Music Theory Grade 5",
+          "url": "https://ag.abrsm.org/en/our-exams/music-theory-exams/music-theory-grade-5/"
+        },
+        {
+          "title": "Open Music Theory, v2: Glossary",
+          "url": "https://viva.pressbooks.pub/openmusictheory/back-matter/glossary/"
+        }
+      ]
+    },
+    {
+      "id": "expression.instrument-clefs",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Alto and tenor clefs",
+      "whyImportant": "The viola, cello, bassoon and trombone read clefs a pianist rarely sees.",
+      "sources": [
+        {
+          "title": "ABRSM Music Theory Grade 5",
+          "url": "https://ag.abrsm.org/en/our-exams/music-theory-exams/music-theory-grade-5/"
+        },
+        {
+          "title": "Open Music Theory, v2: Other Aspects of Notation",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-aspects-of-notation/"
+        }
+      ]
+    },
+    {
+      "id": "expression.velocity-control",
+      "region": "expression",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "An even touch",
+      "whyImportant": "Even key speed gives an even tone, the base for every dynamic you choose.",
+      "sources": [
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.crescendo-playing",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Playing a crescendo",
+      "whyImportant": "A steady crescendo grows note by note instead of jumping.",
+      "sources": [
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.accent-playing",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Playing accents",
+      "whyImportant": "Accenting the beat while keeping the rest light makes the metre heard.",
+      "sources": [
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.staccato-touch",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Staccato touch",
+      "whyImportant": "A crisp staccato lifts each key early without losing the beat.",
+      "sources": [
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.legato-touch",
+      "region": "expression",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Legato touch",
+      "whyImportant": "Legato means holding each key until the next one sounds, so the line never breaks.",
+      "sources": [
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.phrasing",
+      "region": "expression",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Shaping a phrase",
+      "whyImportant": "A phrase played as one breath, joined and gently shaped, sounds like singing.",
+      "sources": [
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.melody-balance",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Melody over accompaniment",
+      "whyImportant": "The tune has to sing above the accompaniment, which means one hand plays lighter.",
+      "sources": [
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.sustain-pedal",
+      "region": "expression",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Using the sustain pedal",
+      "whyImportant": "The pedal joins sounds the hands cannot hold, and changing it at each chord keeps them clean.",
+      "sources": [
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.legato-pedalling",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Legato (syncopated) pedalling",
+      "whyImportant": "Lifting just after the new chord and pressing again joins the chords with no gap and no blur.",
+      "sources": [
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        }
+      ]
+    },
+    {
+      "id": "expression.playing-at-tempo",
+      "region": "expression",
+      "layer": "detail",
+      "kind": "procedural",
+      "title": "Playing at the marked tempo",
+      "whyImportant": "Holding a steady marked tempo is how a tempo term becomes real speed.",
+      "sources": [
+        {
+          "title": "RCM Piano Syllabus, 2022 Edition",
+          "url": "https://teacherportal.rcmusic.com/getattachment/57f3734d-97e5-4777-b67e-4b1111ee31a3/piano-syllabus-2022-edition.pdf"
+        },
+        {
+          "title": "Open Music Theory, v2: Glossary",
+          "url": "https://viva.pressbooks.pub/openmusictheory/back-matter/glossary/"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "expression.dynamic-levels",
+      "to": "expression-dynamics-articulation",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Dynamic levels are the dynamics half of the backbone, spelled out from ppp to fff."
+    },
+    {
+      "from": "expression.hairpins",
+      "to": "expression-dynamics-articulation",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A hairpin is a dynamic mark that moves from one level to another."
+    },
+    {
+      "from": "expression.staccato-tenuto",
+      "to": "expression-dynamics-articulation",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Staccato and tenuto are the commonest articulation marks."
+    },
+    {
+      "from": "expression.slurs-legato",
+      "to": "expression-dynamics-articulation",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "A slur is the articulation mark for joined notes."
+    },
+    {
+      "from": "expression.tempo-terms",
+      "to": "expression-dynamics-articulation",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Tempo terms sit beside dynamics and articulation on the score, in the same Italian."
+    },
+    {
+      "from": "expression.ornaments",
+      "to": "expression-dynamics-articulation",
+      "relation": "in-context",
+      "weight": 2,
+      "rationale": "Ornaments are signs above the notes, read alongside the articulation marks."
+    },
+    {
+      "from": "expression.repeat-signs",
+      "to": "expression-dynamics-articulation",
+      "relation": "in-context",
+      "weight": 2,
+      "rationale": "Repeat signs are the other score marks a player reads with dynamics and articulation."
+    },
+    {
+      "from": "expression.pedal-markings",
+      "to": "expression-dynamics-articulation",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Pedal marks shape how notes join, as articulation does."
+    },
+    {
+      "from": "expression.instrument-families",
+      "to": "expression-dynamics-articulation",
+      "relation": "in-context",
+      "weight": 2,
+      "rationale": "Dynamics and articulation are read the same way in every instrument part."
+    },
+    {
+      "from": "expression.hairpins",
+      "to": "expression.dynamic-levels",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "A crescendo or diminuendo travels between two dynamic levels."
+    },
+    {
+      "from": "expression.accents-sforzando",
+      "to": "expression.dynamic-levels",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "An accent or sf is louder than the dynamic level around it."
+    },
+    {
+      "from": "expression.accents-sforzando",
+      "to": "expression.staccato-tenuto",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Accents are articulation marks placed on single notes, like staccato dots."
+    },
+    {
+      "from": "expression.metronome-marks",
+      "to": "expression.tempo-terms",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "A metronome mark pins the speed that a tempo term only describes."
+    },
+    {
+      "from": "expression.tempo-changes",
+      "to": "expression.tempo-terms",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Rit., accel. and a tempo change the speed the tempo term set."
+    },
+    {
+      "from": "expression.character-terms",
+      "to": "expression.tempo-terms",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Character words often come with the tempo term, as in Allegro con brio."
+    },
+    {
+      "from": "expression.qualifiers",
+      "to": "expression.tempo-terms",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Qualifiers modify tempo terms, as in molto Allegro or poco rit."
+    },
+    {
+      "from": "expression.qualifiers",
+      "to": "expression.character-terms",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Qualifiers modify character words too, as in molto espressivo."
+    },
+    {
+      "from": "expression.fermata",
+      "to": "expression.tempo-changes",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "A pause stops the beat for a moment, a local change of tempo."
+    },
+    {
+      "from": "expression.trill",
+      "to": "expression.ornaments",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "The trill is one of the ornaments."
+    },
+    {
+      "from": "expression.mordents",
+      "to": "expression.ornaments",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "The mordents are ornaments."
+    },
+    {
+      "from": "expression.turn",
+      "to": "expression.ornaments",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "The turn is an ornament."
+    },
+    {
+      "from": "expression.grace-notes",
+      "to": "expression.ornaments",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Acciaccaturas and appoggiaturas are ornaments written as small notes."
+    },
+    {
+      "from": "expression.turn",
+      "to": "expression.mordents",
+      "relation": "analogous",
+      "weight": 2,
+      "rationale": "Both decorate a note with its upper and lower neighbours, the turn using both and a mordent one."
+    },
+    {
+      "from": "expression.da-capo-dal-segno",
+      "to": "expression.repeat-signs",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "D.C. and D.S. are repeats written as words and signs instead of dots."
+    },
+    {
+      "from": "expression.open-short-score",
+      "to": "expression.satb-voices",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Open and short score are the two ways the four SATB voices are written."
+    },
+    {
+      "from": "expression.instrument-clefs",
+      "to": "expression.open-short-score",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "In open score the tenor part gets its own staff, sometimes in a clef other than treble or bass."
+    },
+    {
+      "from": "expression.instrument-clefs",
+      "to": "expression.instrument-families",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The alto and tenor clefs belong to particular instruments, the viola above all."
+    },
+    {
+      "from": "expression.instrument-families",
+      "to": "expression.slurs-legato",
+      "relation": "in-context",
+      "weight": 2,
+      "rationale": "A string player takes the notes under a slur in one bow, a wind player in one breath without tonguing."
+    },
+    {
+      "from": "expression.hairpins",
+      "to": "expression.tempo-changes",
+      "relation": "analogous",
+      "weight": 2,
+      "rationale": "A crescendo changes loudness gradually just as an accelerando changes speed gradually."
+    },
+    {
+      "from": "expression.staccato-tenuto",
+      "to": "expression.slurs-legato",
+      "relation": "contradicts",
+      "weight": 3,
+      "rationale": "Staccato detaches the notes that legato joins."
+    },
+    {
+      "from": "expression.velocity-control",
+      "to": "expression.dynamic-levels",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Playing a dynamic level means controlling how fast each key goes down."
+    },
+    {
+      "from": "expression.crescendo-playing",
+      "to": "expression.hairpins",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Playing a crescendo is how a hairpin sign becomes sound."
+    },
+    {
+      "from": "expression.crescendo-playing",
+      "to": "expression.velocity-control",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A smooth crescendo needs the key-speed control an even touch builds."
+    },
+    {
+      "from": "expression.accent-playing",
+      "to": "expression.accents-sforzando",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Playing an accent is how the accent mark becomes sound."
+    },
+    {
+      "from": "expression.staccato-touch",
+      "to": "expression.staccato-tenuto",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Staccato touch is how the staccato dot becomes sound."
+    },
+    {
+      "from": "expression.legato-touch",
+      "to": "expression.slurs-legato",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Legato touch is how a slur becomes sound."
+    },
+    {
+      "from": "expression.phrasing",
+      "to": "expression.slurs-legato",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A phrase mark is a long slur, and shaping one needs a legato touch."
+    },
+    {
+      "from": "expression.phrasing",
+      "to": "expression.legato-touch",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A phrase is joined from the inside by legato touch."
+    },
+    {
+      "from": "expression.melody-balance",
+      "to": "expression.dynamic-levels",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Balance means playing two dynamic levels at once, one in each hand."
+    },
+    {
+      "from": "expression.melody-balance",
+      "to": "expression.satb-voices",
+      "relation": "in-context",
+      "weight": 2,
+      "rationale": "In four-part writing the soprano usually carries the tune, as the melody does over an accompaniment."
+    },
+    {
+      "from": "expression.sustain-pedal",
+      "to": "expression.pedal-markings",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Using the pedal is how pedal marks become sound."
+    },
+    {
+      "from": "expression.legato-pedalling",
+      "to": "expression.pedal-markings",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The notched pedal line asks for exactly this lift and press at each change."
+    },
+    {
+      "from": "expression.legato-pedalling",
+      "to": "expression.sustain-pedal",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Legato pedalling is the sustain pedal changed just after each new chord."
+    },
+    {
+      "from": "expression.playing-at-tempo",
+      "to": "expression.tempo-terms",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Playing at tempo turns a term like Allegro into a speed held steady."
+    },
+    {
+      "from": "expression.playing-at-tempo",
+      "to": "expression.metronome-marks",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "A metronome mark is the speed you play at when it is given."
+    }
+  ],
+  "items": [
+    {
+      "type": "theory",
+      "id": "expression.dynamic-levels-1",
+      "nodeId": "expression.dynamic-levels",
+      "prompt": "Which list goes from quietest to loudest?",
+      "answer": {
+        "id": "a",
+        "text": "pp, p, mp, mf, f, ff",
+        "explanation": "Right: each step is a little louder, with mp and mf in the middle."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "pp, p, mf, mp, f, ff",
+          "explanation": "mf (mezzo forte, moderately loud) is louder than mp (mezzo piano, moderately quiet), so they are swapped."
+        },
+        {
+          "id": "c",
+          "text": "ff, f, mf, mp, p, pp",
+          "explanation": "This is the right set but in the other direction, loudest first."
+        },
+        {
+          "id": "d",
+          "text": "p, pp, mp, mf, ff, f",
+          "explanation": "More letters means more extreme: pp is quieter than p and ff louder than f."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.dynamic-levels-2",
+      "nodeId": "expression.dynamic-levels",
+      "prompt": "What does mp mean?",
+      "answer": {
+        "id": "mp",
+        "text": "Moderately quiet",
+        "explanation": "Right: mezzo piano, a little louder than p."
+      },
+      "wrong": [
+        {
+          "id": "mf",
+          "text": "Moderately loud",
+          "explanation": "That is mf, mezzo forte. The p in mp means quiet."
+        },
+        {
+          "id": "pp",
+          "text": "Very quiet",
+          "explanation": "That is pp, pianissimo. Mezzo softens the p, it does not double it."
+        },
+        {
+          "id": "sub",
+          "text": "Suddenly quiet",
+          "explanation": "That is subito piano. Mezzo means moderately."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.hairpins-1",
+      "nodeId": "expression.hairpins",
+      "prompt": "A hairpin opens out from a point to a wide end. What does it ask for?",
+      "answer": {
+        "id": "cresc",
+        "text": "Get gradually louder",
+        "explanation": "Right: the opening hairpin is a crescendo."
+      },
+      "wrong": [
+        {
+          "id": "dim",
+          "text": "Get gradually quieter",
+          "explanation": "That is the closing hairpin, wide end first, a diminuendo."
+        },
+        {
+          "id": "acc",
+          "text": "Get gradually faster",
+          "explanation": "Hairpins are about loudness. Getting faster is accelerando."
+        },
+        {
+          "id": "acc2",
+          "text": "Accent the first note",
+          "explanation": "An accent is a small > on one note. A hairpin stretches across many."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.hairpins-2",
+      "nodeId": "expression.hairpins",
+      "prompt": "Which term means the same as decrescendo?",
+      "answer": {
+        "id": "dim",
+        "text": "Diminuendo (dim.)",
+        "explanation": "Right: both mean getting gradually quieter."
+      },
+      "wrong": [
+        {
+          "id": "cresc",
+          "text": "Crescendo (cresc.)",
+          "explanation": "Crescendo is the opposite, getting gradually louder."
+        },
+        {
+          "id": "rit",
+          "text": "Ritardando (rit.)",
+          "explanation": "Ritardando means gradually slower. It changes speed, not loudness."
+        },
+        {
+          "id": "mor",
+          "text": "Morendo",
+          "explanation": "Morendo means dying away, which fades but also slows. Diminuendo is the exact match."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.accents-sforzando-1",
+      "nodeId": "expression.accents-sforzando",
+      "prompt": "What does sf (or sfz) under a note mean?",
+      "answer": {
+        "id": "a",
+        "text": "A sudden strong accent on that note",
+        "explanation": "Right: sforzando means forced, one note made suddenly loud."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Play suddenly quiet from here on",
+          "explanation": "That is subito piano. Sforzando is a sudden loud accent."
+        },
+        {
+          "id": "c",
+          "text": "Get louder gradually",
+          "explanation": "That is crescendo. Sforzando is sudden and on one note."
+        },
+        {
+          "id": "d",
+          "text": "Hold the note longer",
+          "explanation": "That is a pause or tenuto. Sforzando is about loudness."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.accents-sforzando-2",
+      "nodeId": "expression.accents-sforzando",
+      "prompt": "What does fp mean?",
+      "answer": {
+        "id": "a",
+        "text": "Loud, then at once quiet",
+        "explanation": "Right: fortepiano, strike the note loud and drop straight to quiet."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Moderately loud",
+          "explanation": "That is mf. fp is two dynamics in a row."
+        },
+        {
+          "id": "c",
+          "text": "Quiet, then at once loud",
+          "explanation": "That would be pf. The letters are read in order, f first."
+        },
+        {
+          "id": "d",
+          "text": "The piano (the instrument)",
+          "explanation": "Pianoforte is the instrument's full name, but under a note fp is a dynamic."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.staccato-tenuto-1",
+      "nodeId": "expression.staccato-tenuto",
+      "prompt": "A dot above or below a note head means what?",
+      "answer": {
+        "id": "stacc",
+        "text": "Staccato: short and detached",
+        "explanation": "Right: a staccato dot shortens the note."
+      },
+      "wrong": [
+        {
+          "id": "dotted",
+          "text": "Add half the note's value",
+          "explanation": "That is a dot beside the note head. Above or below it means staccato."
+        },
+        {
+          "id": "ten",
+          "text": "Hold the note its full value",
+          "explanation": "That is a tenuto, a short line, not a dot."
+        },
+        {
+          "id": "acc",
+          "text": "Play the note loudly",
+          "explanation": "That is an accent, a > sign."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.staccato-tenuto-2",
+      "nodeId": "expression.staccato-tenuto",
+      "prompt": "A short horizontal line over a note (tenuto) asks for what?",
+      "answer": {
+        "id": "ten",
+        "text": "Hold the note for its full value, with slight weight",
+        "explanation": "Right: tenuto means held."
+      },
+      "wrong": [
+        {
+          "id": "stacc",
+          "text": "Play it short",
+          "explanation": "That is staccato. Tenuto asks for the opposite."
+        },
+        {
+          "id": "tie",
+          "text": "Join it to the next note of the same pitch",
+          "explanation": "That is a tie, a curved line between two notes."
+        },
+        {
+          "id": "pause",
+          "text": "Hold it much longer than written",
+          "explanation": "That is a pause (fermata). Tenuto holds the note for its own value."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.slurs-legato-1",
+      "nodeId": "expression.slurs-legato",
+      "prompt": "A curved line joins two notes of the same pitch. What is it?",
+      "answer": {
+        "id": "tie",
+        "text": "A tie: play once and hold for both values",
+        "explanation": "Right: a curve between two of the same pitch is a tie."
+      },
+      "wrong": [
+        {
+          "id": "slur",
+          "text": "A slur: play both notes smoothly",
+          "explanation": "A slur joins different pitches. On the same pitch the curve is a tie, so you strike only once."
+        },
+        {
+          "id": "phrase",
+          "text": "A phrase mark",
+          "explanation": "Phrase marks span many notes of different pitches."
+        },
+        {
+          "id": "rep",
+          "text": "Repeat the note",
+          "explanation": "A tie means do not strike again."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.slurs-legato-2",
+      "nodeId": "expression.slurs-legato",
+      "prompt": "A slur over four different notes asks for what?",
+      "answer": {
+        "id": "legato",
+        "text": "Play them legato, smoothly joined",
+        "explanation": "Right: a slur over different pitches means legato."
+      },
+      "wrong": [
+        {
+          "id": "hold",
+          "text": "Hold the first note through all four",
+          "explanation": "That would be a tie, and ties only join the same pitch."
+        },
+        {
+          "id": "stacc",
+          "text": "Play them detached",
+          "explanation": "Detached is staccato, the opposite of what a slur asks."
+        },
+        {
+          "id": "loud",
+          "text": "Play them louder",
+          "explanation": "A slur is about joining notes, not loudness."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.tempo-terms-1",
+      "nodeId": "expression.tempo-terms",
+      "prompt": "Which tempo term means at a walking pace?",
+      "answer": {
+        "id": "and",
+        "text": "Andante",
+        "explanation": "Right: andante comes from the Italian for walking."
+      },
+      "wrong": [
+        {
+          "id": "alg",
+          "text": "Allegro",
+          "explanation": "Allegro means quick and lively, faster than walking."
+        },
+        {
+          "id": "lento",
+          "text": "Lento",
+          "explanation": "Lento means slow, slower than walking."
+        },
+        {
+          "id": "presto",
+          "text": "Presto",
+          "explanation": "Presto means very fast."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.tempo-terms-2",
+      "nodeId": "expression.tempo-terms",
+      "prompt": "Which list goes from slowest to fastest?",
+      "answer": {
+        "id": "a",
+        "text": "Largo, Andante, Allegro, Presto",
+        "explanation": "Right: broad, walking, quick, very fast."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Andante, Largo, Presto, Allegro",
+          "explanation": "Largo is slower than Andante, and Presto faster than Allegro."
+        },
+        {
+          "id": "c",
+          "text": "Presto, Allegro, Andante, Largo",
+          "explanation": "Right terms, but fastest first."
+        },
+        {
+          "id": "d",
+          "text": "Largo, Allegro, Andante, Presto",
+          "explanation": "Andante (walking) is slower than Allegro (quick)."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.metronome-marks-1",
+      "nodeId": "expression.metronome-marks",
+      "prompt": "A score shows a crotchet (quarter note) = 60. What does it mean?",
+      "answer": {
+        "id": "a",
+        "text": "60 crotchet beats per minute, one per second",
+        "explanation": "Right: the number is beats per minute."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "The piece lasts 60 seconds",
+          "explanation": "A metronome mark gives speed, not length."
+        },
+        {
+          "id": "c",
+          "text": "Play 60 bars",
+          "explanation": "It counts beats per minute, not bars."
+        },
+        {
+          "id": "d",
+          "text": "Each crotchet lasts 60 seconds",
+          "explanation": "It is 60 per minute, so each lasts one second."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.metronome-marks-2",
+      "nodeId": "expression.metronome-marks",
+      "prompt": "Which metronome mark is fastest?",
+      "answer": {
+        "id": "120",
+        "text": "Crotchet = 120",
+        "explanation": "Right: more beats per minute means faster."
+      },
+      "wrong": [
+        {
+          "id": "60",
+          "text": "Crotchet = 60",
+          "explanation": "Half as many beats per minute as 120, so slower."
+        },
+        {
+          "id": "80",
+          "text": "Crotchet = 80",
+          "explanation": "Faster than 60 but slower than 120."
+        },
+        {
+          "id": "40",
+          "text": "Crotchet = 40",
+          "explanation": "The fewest beats per minute, so the slowest."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.tempo-changes-1",
+      "nodeId": "expression.tempo-changes",
+      "prompt": "What does a tempo mean after a rit.?",
+      "answer": {
+        "id": "a",
+        "text": "Go back to the speed before the change",
+        "explanation": "Right: a tempo means in time again."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Keep slowing down",
+          "explanation": "That would be poco a poco rit. A tempo ends the slowing."
+        },
+        {
+          "id": "c",
+          "text": "Play freely",
+          "explanation": "That is ad libitum or rubato."
+        },
+        {
+          "id": "d",
+          "text": "Speed up beyond the first tempo",
+          "explanation": "That would be più mosso or accelerando. A tempo returns to the earlier speed."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.tempo-changes-2",
+      "nodeId": "expression.tempo-changes",
+      "prompt": "Which term means gradually getting faster?",
+      "answer": {
+        "id": "acc",
+        "text": "Accelerando (accel.)",
+        "explanation": "Right."
+      },
+      "wrong": [
+        {
+          "id": "rall",
+          "text": "Rallentando (rall.)",
+          "explanation": "Rallentando means gradually slower."
+        },
+        {
+          "id": "meno",
+          "text": "Meno mosso",
+          "explanation": "Meno mosso means less movement, slower, and at once rather than gradually."
+        },
+        {
+          "id": "cresc",
+          "text": "Crescendo (cresc.)",
+          "explanation": "Crescendo is gradually louder, not faster."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.character-terms-1",
+      "nodeId": "expression.character-terms",
+      "prompt": "What does dolce mean?",
+      "answer": {
+        "id": "dolce",
+        "text": "Sweetly",
+        "explanation": "Right."
+      },
+      "wrong": [
+        {
+          "id": "maest",
+          "text": "Majestically",
+          "explanation": "That is maestoso."
+        },
+        {
+          "id": "legg",
+          "text": "Lightly",
+          "explanation": "That is leggiero."
+        },
+        {
+          "id": "agit",
+          "text": "Agitated",
+          "explanation": "That is agitato."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.character-terms-2",
+      "nodeId": "expression.character-terms",
+      "prompt": "Which term means in a singing style?",
+      "answer": {
+        "id": "cant",
+        "text": "Cantabile",
+        "explanation": "Right: cantabile comes from the Italian for to sing."
+      },
+      "wrong": [
+        {
+          "id": "gioc",
+          "text": "Giocoso",
+          "explanation": "Giocoso means playful, merry."
+        },
+        {
+          "id": "sost",
+          "text": "Sostenuto",
+          "explanation": "Sostenuto means sustained. It is close, but singing is cantabile."
+        },
+        {
+          "id": "graz",
+          "text": "Grazioso",
+          "explanation": "Grazioso means gracefully."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.qualifiers-1",
+      "nodeId": "expression.qualifiers",
+      "prompt": "What does poco a poco cresc. mean?",
+      "answer": {
+        "id": "a",
+        "text": "Get louder little by little",
+        "explanation": "Right: poco a poco means little by little."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Get a little louder, at once",
+          "explanation": "That is poco più forte. Poco a poco spreads the change out."
+        },
+        {
+          "id": "c",
+          "text": "Get much louder",
+          "explanation": "That would be molto cresc."
+        },
+        {
+          "id": "d",
+          "text": "Get louder, then quieter",
+          "explanation": "That would be a crescendo then a diminuendo. Poco a poco only says how gradually."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.qualifiers-2",
+      "nodeId": "expression.qualifiers",
+      "prompt": "What does sempre staccato mean?",
+      "answer": {
+        "id": "a",
+        "text": "Always staccato",
+        "explanation": "Right: sempre means always."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Without staccato",
+          "explanation": "That would be senza staccato. Senza means without."
+        },
+        {
+          "id": "c",
+          "text": "Less staccato",
+          "explanation": "That would be meno staccato."
+        },
+        {
+          "id": "d",
+          "text": "Staccato, but not too much",
+          "explanation": "That would be staccato ma non troppo."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.fermata-1",
+      "nodeId": "expression.fermata",
+      "prompt": "What does a pause sign (fermata) over a note ask for?",
+      "answer": {
+        "id": "a",
+        "text": "Hold the note longer than its written value",
+        "explanation": "Right: how much longer is the player's choice."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Rest for one beat after the note",
+          "explanation": "A fermata lengthens the note itself. It adds no rest."
+        },
+        {
+          "id": "c",
+          "text": "Play the note short",
+          "explanation": "That is staccato, a dot."
+        },
+        {
+          "id": "d",
+          "text": "Stop the piece there",
+          "explanation": "That is Fine. A fermata can be mid-piece and the music goes on."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.fermata-2",
+      "nodeId": "expression.fermata",
+      "prompt": "Can a pause sign go over a rest?",
+      "answer": {
+        "id": "yes",
+        "text": "Yes: the silence is held longer than written",
+        "explanation": "Right: a pause can lengthen a rest as well as a note."
+      },
+      "wrong": [
+        {
+          "id": "no",
+          "text": "No, only over notes",
+          "explanation": "Pauses over rests are common, often at the end of a phrase."
+        },
+        {
+          "id": "fine",
+          "text": "Only at the very end of a piece",
+          "explanation": "It is often at the end, but can appear anywhere."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.ornaments-1",
+      "nodeId": "expression.ornaments",
+      "prompt": "What is an ornament?",
+      "answer": {
+        "id": "a",
+        "text": "A sign or small notes that add decoration to a main note",
+        "explanation": "Right: trills, mordents, turns and grace notes are all ornaments."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "A mark that says how loud to play",
+          "explanation": "That is a dynamic."
+        },
+        {
+          "id": "c",
+          "text": "A mark that says how fast to play",
+          "explanation": "That is a tempo mark."
+        },
+        {
+          "id": "d",
+          "text": "A sign that sends you back in the score",
+          "explanation": "That is a repeat or D.C. sign."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.ornaments-2",
+      "nodeId": "expression.ornaments",
+      "prompt": "Which of these is an ornament sign?",
+      "answer": {
+        "id": "tr",
+        "text": "tr",
+        "explanation": "Right: tr is a trill."
+      },
+      "wrong": [
+        {
+          "id": "sf",
+          "text": "sf",
+          "explanation": "sf is a sforzando, a dynamic accent."
+        },
+        {
+          "id": "ped",
+          "text": "Ped.",
+          "explanation": "Ped. is a pedal mark."
+        },
+        {
+          "id": "dc",
+          "text": "D.C.",
+          "explanation": "D.C. is a repeat instruction."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.trill-1",
+      "nodeId": "expression.trill",
+      "prompt": "A trill (tr) on a written C, with no accidental, in C major. Which notes does it alternate?",
+      "answer": {
+        "id": "cd",
+        "text": "C and D, the note above",
+        "explanation": "Right: a trill alternates the note with the note a step above, in the key."
+      },
+      "wrong": [
+        {
+          "id": "cb",
+          "text": "C and B, the note below",
+          "explanation": "A trill uses the note above. Using the note below is a lower mordent's idea."
+        },
+        {
+          "id": "ce",
+          "text": "C and E",
+          "explanation": "A trill moves by step, not by a third."
+        },
+        {
+          "id": "ccs",
+          "text": "C and C sharp",
+          "explanation": "Only an accidental above the tr sign would raise the upper note."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.trill-2",
+      "nodeId": "expression.trill",
+      "prompt": "How is a trill played?",
+      "answer": {
+        "id": "a",
+        "text": "A rapid repeated alternation of the note and the one above",
+        "explanation": "Right."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Three notes: the note, the one above, the note",
+          "explanation": "That is an upper mordent, one quick alternation."
+        },
+        {
+          "id": "c",
+          "text": "Four notes winding round the main note",
+          "explanation": "That is a turn."
+        },
+        {
+          "id": "d",
+          "text": "One quick note crushed in before the main note",
+          "explanation": "That is an acciaccatura."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.mordents-1",
+      "nodeId": "expression.mordents",
+      "prompt": "An upper mordent on a written E (key of C) is played as what?",
+      "answer": {
+        "id": "a",
+        "text": "E, F, E",
+        "explanation": "Right: the note, the note above, the note."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "E, D, E",
+          "explanation": "That is a lower mordent, which goes to the note below. Its sign has a vertical line through it."
+        },
+        {
+          "id": "c",
+          "text": "F, E, D, E",
+          "explanation": "That is a turn."
+        },
+        {
+          "id": "d",
+          "text": "E, F, E, F, E, F",
+          "explanation": "That is a trill, longer than a mordent's single alternation."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.mordents-2",
+      "nodeId": "expression.mordents",
+      "prompt": "How do you tell a lower mordent sign from an upper one?",
+      "answer": {
+        "id": "a",
+        "text": "The lower mordent has a short vertical line through it",
+        "explanation": "Right."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "The lower mordent is written below the note",
+          "explanation": "Both are written above the note. The line through it marks the lower one."
+        },
+        {
+          "id": "c",
+          "text": "The lower mordent is a turned-over S shape",
+          "explanation": "That is a turn sign."
+        },
+        {
+          "id": "d",
+          "text": "The lower mordent has tr in front",
+          "explanation": "tr marks a trill."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.turn-1",
+      "nodeId": "expression.turn",
+      "prompt": "A turn over a written D (key of C) is played as which four notes?",
+      "answer": {
+        "id": "a",
+        "text": "E, D, C, D",
+        "explanation": "Right: the note above, the note, the note below, the note."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "C, D, E, D",
+          "explanation": "That starts below. A plain turn starts on the note above. The one starting below is an inverted turn."
+        },
+        {
+          "id": "c",
+          "text": "D, E, D",
+          "explanation": "That is an upper mordent, three notes."
+        },
+        {
+          "id": "d",
+          "text": "D, E, D, E",
+          "explanation": "That is the start of a trill."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.turn-2",
+      "nodeId": "expression.turn",
+      "prompt": "Which notes does a turn use around the written note?",
+      "answer": {
+        "id": "a",
+        "text": "The note above and the note below",
+        "explanation": "Right: it winds around the note on both sides."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Only the note above",
+          "explanation": "Using only the note above is a trill or upper mordent."
+        },
+        {
+          "id": "c",
+          "text": "Only the note below",
+          "explanation": "Using only the note below is a lower mordent."
+        },
+        {
+          "id": "d",
+          "text": "The notes a third above and below",
+          "explanation": "A turn moves by step."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.grace-notes-1",
+      "nodeId": "expression.grace-notes",
+      "prompt": "A small note with a stroke through its stem, before a main note. What is it?",
+      "answer": {
+        "id": "acc",
+        "text": "An acciaccatura: crushed in as quickly as possible",
+        "explanation": "Right: the stroke marks the acciaccatura."
+      },
+      "wrong": [
+        {
+          "id": "app",
+          "text": "An appoggiatura: leans and takes time from the main note",
+          "explanation": "The appoggiatura has no stroke and takes real time, often half the main note."
+        },
+        {
+          "id": "mord",
+          "text": "A mordent",
+          "explanation": "A mordent is a sign above the note, not a small note."
+        },
+        {
+          "id": "stacc",
+          "text": "A staccato note",
+          "explanation": "Staccato is a dot."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.grace-notes-2",
+      "nodeId": "expression.grace-notes",
+      "prompt": "An appoggiatura comes before an undotted minim. How long does it usually last?",
+      "answer": {
+        "id": "a",
+        "text": "Half the minim: a crotchet",
+        "explanation": "Right: an appoggiatura usually takes half the main note's value."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "As short as possible",
+          "explanation": "That is the acciaccatura."
+        },
+        {
+          "id": "c",
+          "text": "Two thirds of the minim",
+          "explanation": "Two thirds is the usual rule before a dotted note."
+        },
+        {
+          "id": "d",
+          "text": "No time: it is played with the main note",
+          "explanation": "An appoggiatura takes time from the main note and delays it."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.repeat-signs-1",
+      "nodeId": "expression.repeat-signs",
+      "prompt": "A passage has a 1st time bar and a 2nd time bar. How do you play it?",
+      "answer": {
+        "id": "a",
+        "text": "Play the 1st time bar, repeat, then skip it and play the 2nd",
+        "explanation": "Right."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Play both, then repeat",
+          "explanation": "The 1st time bar is skipped on the repeat."
+        },
+        {
+          "id": "c",
+          "text": "Play only the 2nd time bar",
+          "explanation": "The 1st time bar is played the first time through."
+        },
+        {
+          "id": "d",
+          "text": "Play the 2nd time bar first",
+          "explanation": "The order is 1st, then repeat, then 2nd."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.repeat-signs-2",
+      "nodeId": "expression.repeat-signs",
+      "prompt": "Two dots before a double barline mean what?",
+      "answer": {
+        "id": "a",
+        "text": "Go back to the matching start repeat sign, or the beginning if there is none",
+        "explanation": "Right."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "End of the piece",
+          "explanation": "A plain final barline or Fine ends it. Dots mean repeat."
+        },
+        {
+          "id": "c",
+          "text": "Hold the last note",
+          "explanation": "That is a pause."
+        },
+        {
+          "id": "d",
+          "text": "Jump to the coda",
+          "explanation": "That is the coda sign."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.da-capo-dal-segno-1",
+      "nodeId": "expression.da-capo-dal-segno",
+      "prompt": "What does D.C. al Fine mean?",
+      "answer": {
+        "id": "a",
+        "text": "Go back to the beginning and play to Fine",
+        "explanation": "Right: da capo means from the head."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Go back to the sign and play to Fine",
+          "explanation": "That is D.S. al Fine. D.S. means from the sign."
+        },
+        {
+          "id": "c",
+          "text": "Go back to the beginning and play to the coda",
+          "explanation": "That is D.C. al Coda."
+        },
+        {
+          "id": "d",
+          "text": "Stop here",
+          "explanation": "That is Fine on its own."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.da-capo-dal-segno-2",
+      "nodeId": "expression.da-capo-dal-segno",
+      "prompt": "In D.S. al Coda, what is the segno?",
+      "answer": {
+        "id": "a",
+        "text": "The sign you go back to",
+        "explanation": "Right: dal segno means from the sign, a slanted S with dots."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "The ending section you jump to",
+          "explanation": "That is the coda, marked with a circle and cross."
+        },
+        {
+          "id": "c",
+          "text": "The end of the piece",
+          "explanation": "That is Fine."
+        },
+        {
+          "id": "d",
+          "text": "A pause",
+          "explanation": "That is the fermata."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.pedal-markings-1",
+      "nodeId": "expression.pedal-markings",
+      "prompt": "Under a piano part you see Ped. and later *. What do they mean?",
+      "answer": {
+        "id": "a",
+        "text": "Press the sustain pedal at Ped. and lift it at *",
+        "explanation": "Right."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Press the soft pedal, then lift it",
+          "explanation": "The soft pedal is una corda. Ped. means the sustain pedal."
+        },
+        {
+          "id": "c",
+          "text": "Play louder, then quieter",
+          "explanation": "These are pedal marks, not dynamics."
+        },
+        {
+          "id": "d",
+          "text": "Lift at Ped. and press at *",
+          "explanation": "It is the other way round."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.pedal-markings-2",
+      "nodeId": "expression.pedal-markings",
+      "prompt": "What does una corda mean?",
+      "answer": {
+        "id": "a",
+        "text": "Use the soft (left) pedal",
+        "explanation": "Right: una corda means one string, and tre corde lifts it."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Use the sustain pedal",
+          "explanation": "The sustain pedal is marked Ped."
+        },
+        {
+          "id": "c",
+          "text": "Play one note at a time",
+          "explanation": "Corda means string, the piano's strings under the soft pedal."
+        },
+        {
+          "id": "d",
+          "text": "Play with one hand",
+          "explanation": "That would be mano sinistra or mano destra."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.satb-voices-1",
+      "nodeId": "expression.satb-voices",
+      "prompt": "In SATB, which two voices are written on the treble staff in short score?",
+      "answer": {
+        "id": "a",
+        "text": "Soprano and alto",
+        "explanation": "Right: soprano and alto on the treble, tenor and bass on the bass staff."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Soprano and tenor",
+          "explanation": "Tenor goes on the bass staff in short score."
+        },
+        {
+          "id": "c",
+          "text": "Alto and tenor",
+          "explanation": "Alto is on the treble staff but tenor is on the bass."
+        },
+        {
+          "id": "d",
+          "text": "Tenor and bass",
+          "explanation": "They share the bass staff."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.satb-voices-2",
+      "nodeId": "expression.satb-voices",
+      "prompt": "In short score, which voices have stems pointing up?",
+      "answer": {
+        "id": "a",
+        "text": "Soprano and tenor",
+        "explanation": "Right: the upper voice on each staff has stems up."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Soprano and alto",
+          "explanation": "Alto shares the treble staff with soprano, so its stems go down."
+        },
+        {
+          "id": "c",
+          "text": "Alto and bass",
+          "explanation": "These are the lower voices on their staves, so stems go down."
+        },
+        {
+          "id": "d",
+          "text": "All four",
+          "explanation": "Stems show which voice is which, so each staff has one up and one down."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.open-short-score-1",
+      "nodeId": "expression.open-short-score",
+      "prompt": "What is open score for SATB?",
+      "answer": {
+        "id": "a",
+        "text": "Each voice on its own staff, four staves",
+        "explanation": "Right."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "Two staves, two voices on each",
+          "explanation": "That is short score."
+        },
+        {
+          "id": "c",
+          "text": "One staff with all four voices",
+          "explanation": "Four voices on one staff is not a standard layout."
+        },
+        {
+          "id": "d",
+          "text": "Only the soprano line with chord symbols",
+          "explanation": "That is a lead sheet."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.open-short-score-2",
+      "nodeId": "expression.open-short-score",
+      "prompt": "In open score, the tenor part is often in a treble clef with a small 8 below. What does it mean?",
+      "answer": {
+        "id": "a",
+        "text": "It sounds an octave lower than written",
+        "explanation": "Right."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "It sounds an octave higher than written",
+          "explanation": "The 8 below means lower. An 8 above would mean higher."
+        },
+        {
+          "id": "c",
+          "text": "Play it eight times",
+          "explanation": "The 8 is about octave, not repeats."
+        },
+        {
+          "id": "d",
+          "text": "It is in 8/8 time",
+          "explanation": "Time signatures are written after the clef and key, not on it."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.instrument-families-1",
+      "nodeId": "expression.instrument-families",
+      "prompt": "Which family does the oboe belong to?",
+      "answer": {
+        "id": "wood",
+        "text": "Woodwind",
+        "explanation": "Right: the oboe is a double-reed woodwind."
+      },
+      "wrong": [
+        {
+          "id": "brass",
+          "text": "Brass",
+          "explanation": "Brass instruments are played by buzzing the lips, like the trumpet."
+        },
+        {
+          "id": "str",
+          "text": "Strings",
+          "explanation": "Strings, like the violin, are bowed or plucked."
+        },
+        {
+          "id": "perc",
+          "text": "Percussion",
+          "explanation": "Percussion is struck, like the timpani."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.instrument-families-2",
+      "nodeId": "expression.instrument-families",
+      "prompt": "Which instrument sounds an octave lower than written?",
+      "answer": {
+        "id": "db",
+        "text": "Double bass",
+        "explanation": "Right: its part is written an octave above where it sounds."
+      },
+      "wrong": [
+        {
+          "id": "picc",
+          "text": "Piccolo",
+          "explanation": "The piccolo sounds an octave higher than written."
+        },
+        {
+          "id": "cl",
+          "text": "Clarinet in B flat",
+          "explanation": "It sounds a major 2nd lower, not an octave."
+        },
+        {
+          "id": "vn",
+          "text": "Violin",
+          "explanation": "The violin sounds as written."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.instrument-clefs-1",
+      "nodeId": "expression.instrument-clefs",
+      "prompt": "In the alto clef, which note is on the middle line?",
+      "answer": {
+        "id": "c",
+        "text": "Middle C",
+        "explanation": "Right: the alto clef centres on middle C."
+      },
+      "wrong": [
+        {
+          "id": "b",
+          "text": "B",
+          "explanation": "B is the middle line of the treble clef."
+        },
+        {
+          "id": "d",
+          "text": "D",
+          "explanation": "D is the middle line of the bass clef."
+        },
+        {
+          "id": "a",
+          "text": "A",
+          "explanation": "In the tenor clef, A is on the middle line, since middle C is one line up."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression.instrument-clefs-2",
+      "nodeId": "expression.instrument-clefs",
+      "prompt": "Which instrument reads mainly in the alto clef?",
+      "answer": {
+        "id": "vla",
+        "text": "Viola",
+        "explanation": "Right."
+      },
+      "wrong": [
+        {
+          "id": "vc",
+          "text": "Cello",
+          "explanation": "The cello reads bass clef, and tenor clef for higher notes."
+        },
+        {
+          "id": "vn",
+          "text": "Violin",
+          "explanation": "The violin reads treble clef."
+        },
+        {
+          "id": "tbn",
+          "text": "Trombone",
+          "explanation": "The trombone reads bass clef, and tenor clef for higher notes."
+        }
+      ]
+    },
+    {
+      "type": "playing",
+      "id": "expression.velocity-control-1",
+      "nodeId": "expression.velocity-control",
+      "prompt": "Ode to Joy (Beethoven), right hand, bars 1-4. Play every note at the same mezzo forte, with no note louder or quieter than the rest.",
+      "notes": [
+        {
+          "pitch": 71,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 12,
+          "beats": 1.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 13.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "right"
+        }
+      ],
+      "bpm": 80.0,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.velocity-control-2",
+      "nodeId": "expression.velocity-control",
+      "prompt": "Twinkle, Twinkle, Little Star, first four bars. Keep the touch even and quiet, piano, on every note, the repeated ones too.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 6,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 12,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 13,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "right"
+        }
+      ],
+      "bpm": 100,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.crescendo-playing-1",
+      "nodeId": "expression.crescendo-playing",
+      "prompt": "Twinkle, Twinkle, Little Star, first two bars. Start piano and grow steadily to forte by the last note, a little louder on each one.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 6,
+          "beats": 2,
+          "hand": "right"
+        }
+      ],
+      "bpm": 100,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 30
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.crescendo-playing-2",
+      "nodeId": "expression.crescendo-playing",
+      "prompt": "Ode to Joy (Beethoven), right hand, bars 1-2. Make a smooth crescendo from p to f, then hold the forte.",
+      "notes": [
+        {
+          "pitch": 71,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "right"
+        }
+      ],
+      "bpm": 80.0,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 30
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.accent-playing-1",
+      "nodeId": "expression.accent-playing",
+      "prompt": "Minuet in G (attributed to Petzold), right hand, bars 1-4. Accent the first beat of each bar and keep beats 2 and 3 light.",
+      "notes": [
+        {
+          "pitch": 74,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 1,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 2,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 7,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 8,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 78,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "right"
+        }
+      ],
+      "bpm": 100,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 30
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.accent-playing-2",
+      "nodeId": "expression.accent-playing",
+      "prompt": "Clementi, Sonatina Op. 36 No. 1, bars 1-2. Give each bar's first beat a clear accent and keep the other notes lighter.",
+      "notes": [
+        {
+          "pitch": 48,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 1,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "right"
+        }
+      ],
+      "bpm": 100.0,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 30
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.staccato-touch-1",
+      "nodeId": "expression.staccato-touch",
+      "prompt": "Burgmüller, L'arabesque, left hand, bars 1-4. Play the chords staccato: short, light and exactly on the beat.",
+      "notes": [
+        {
+          "pitch": 57,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "left"
+        }
+      ],
+      "bpm": 70.0,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.staccato-touch-2",
+      "nodeId": "expression.staccato-touch",
+      "prompt": "Twinkle, Twinkle, Little Star, first two bars. Play every note staccato, bouncing off the keys, and keep the beat steady.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 1,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 6,
+          "beats": 2,
+          "hand": "right"
+        }
+      ],
+      "bpm": 100,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.legato-touch-1",
+      "nodeId": "expression.legato-touch",
+      "prompt": "Beethoven, Moonlight Sonata, 1st movement, right-hand triplets, bars 1-3. Hold each key until the next goes down, so the triplets flow without a gap. No pedal.",
+      "notes": [
+        {
+          "pitch": 56,
+          "startBeat": 0,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 0.3333,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 0.6667,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 1,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 1.3333,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 1.6667,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 2,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 2.3333,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2.6667,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 3,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 3.3333,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 3.6667,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 4,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 4.3333,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 4.6667,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 5,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 5.3333,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 5.6667,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 6,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 6.3333,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 6.6667,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 7,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 7.3333,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 7.6667,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 8,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 8.3333,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 8.6667,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 9,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 9.3333,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 9.6667,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 10,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 10.3333,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 10.6667,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 11,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 11.3333,
+          "beats": 0.333333,
+          "hand": "right"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 11.6667,
+          "beats": 0.33333299999999966,
+          "hand": "right"
+        }
+      ],
+      "bpm": 60.0,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.legato-touch-2",
+      "nodeId": "expression.legato-touch",
+      "prompt": "Chopin, Nocturne in E flat Op. 9 No. 2, right-hand melody from bar 3. Join every note to the next with your fingers alone: no gaps, no pedal.",
+      "notes": [
+        {
+          "pitch": 79,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 1,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 84,
+          "startBeat": 1.5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 82,
+          "startBeat": 3,
+          "beats": 1.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 80,
+          "startBeat": 4.5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 6,
+          "beats": 1.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 7.5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 9,
+          "beats": 1.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 10.5,
+          "beats": 1.5,
+          "hand": "right"
+        }
+      ],
+      "bpm": 60.0,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.phrasing-1",
+      "nodeId": "expression.phrasing",
+      "prompt": "Chopin, Nocturne in E flat Op. 9 No. 2, the opening phrase in the right hand. Shape it as one breath: joined throughout, rising a little to the top note and easing off at the end.",
+      "notes": [
+        {
+          "pitch": 70,
+          "startBeat": 0.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 0.5,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 3.5,
+          "beats": 1.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 5.0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 6.0,
+          "beats": 0.5,
+          "hand": "right"
+        }
+      ],
+      "bpm": 60.0,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 30,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.phrasing-2",
+      "nodeId": "expression.phrasing",
+      "prompt": "Satie, Gymnopédie No. 1, the first melody phrase in the right hand. Play it as one long, joined line that swells gently and fades.",
+      "notes": [
+        {
+          "pitch": 74,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 81,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "right"
+        }
+      ],
+      "bpm": 56.0,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 30,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.melody-balance-1",
+      "nodeId": "expression.melody-balance",
+      "prompt": "Mozart, Sonata in C K. 545, 1st movement, bars 1-2. Let the right-hand melody sing over a quiet, even left-hand Alberti bass.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 0,
+          "beats": 2,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 1,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 2,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 3,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 4,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 4,
+          "beats": 1.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 5.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 5.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 6,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 7,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "left"
+        }
+      ],
+      "bpm": 92.0,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 70,
+        "velocitySpread": 30
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.melody-balance-2",
+      "nodeId": "expression.melody-balance",
+      "prompt": "Satie, Gymnopédie No. 1, from where the melody enters. Keep the left-hand bass and chords soft and let the right-hand tune float above them.",
+      "notes": [
+        {
+          "pitch": 38,
+          "startBeat": 0,
+          "beats": 3,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 1,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 1,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 1,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 1,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 38,
+          "startBeat": 3,
+          "beats": 3,
+          "hand": "left"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 4,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 4,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 4,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 38,
+          "startBeat": 6,
+          "beats": 3,
+          "hand": "left"
+        },
+        {
+          "pitch": 81,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 7,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 7,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 7,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 8,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 38,
+          "startBeat": 9,
+          "beats": 3,
+          "hand": "left"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 10,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 10,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 10,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 10,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "right"
+        }
+      ],
+      "bpm": 56.0,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 30
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.sustain-pedal-1",
+      "nodeId": "expression.sustain-pedal",
+      "prompt": "Beethoven, Moonlight Sonata, 1st movement, left-hand octaves, bars 1-4. Change the pedal at each new octave: lift as the new one sounds, then press again.",
+      "notes": [
+        {
+          "pitch": 37,
+          "startBeat": 0,
+          "beats": 4,
+          "hand": "left"
+        },
+        {
+          "pitch": 49,
+          "startBeat": 0,
+          "beats": 4,
+          "hand": "left"
+        },
+        {
+          "pitch": 35,
+          "startBeat": 4,
+          "beats": 4,
+          "hand": "left"
+        },
+        {
+          "pitch": 47,
+          "startBeat": 4,
+          "beats": 4,
+          "hand": "left"
+        },
+        {
+          "pitch": 33,
+          "startBeat": 8,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 45,
+          "startBeat": 8,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 30,
+          "startBeat": 10,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 42,
+          "startBeat": 10,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 32,
+          "startBeat": 12,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 44,
+          "startBeat": 12,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 32,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 44,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "left"
+        }
+      ],
+      "bpm": 60.0,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 20,
+        "pedal": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.sustain-pedal-2",
+      "nodeId": "expression.sustain-pedal",
+      "prompt": "Chopin, Prelude in E minor Op. 28 No. 4, left-hand chords. Change the pedal each time the harmony changes, and keep it down through the repeated chords.",
+      "notes": [
+        {
+          "pitch": 55,
+          "startBeat": 0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 1,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 1,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 1,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 2,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 2,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 3,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 3,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 3,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 4,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 4,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 4,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 6,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 6,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 6,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 7,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 7,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 7,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 8,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 8,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 8,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 9,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 9,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 9,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 9.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 9.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 9.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 10,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 10,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 10,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 10.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 10.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 10.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 11,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 11,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 11,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 53,
+          "startBeat": 11.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 11.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 11.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 12,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 12,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 12,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 12.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 12.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 12.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 13,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 13,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 13,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 13.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 13.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 13.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 14,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 14,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 14,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 14.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 14.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 14.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 15,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 15,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 15,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 15.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 15.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 15.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 16,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 16,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 16,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 16.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 16.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 16.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 17,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 17,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 17,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 17.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 17.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 17.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 18,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 18,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 18,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 18.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 18.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 18.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 19,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 19,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 19,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 19.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 19.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 19.5,
+          "beats": 0.5,
+          "hand": "left"
+        }
+      ],
+      "bpm": 44.0,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 20,
+        "pedal": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.legato-pedalling-1",
+      "nodeId": "expression.legato-pedalling",
+      "prompt": "Debussy, Clair de lune, left-hand thirds from bar 1. Use legato pedalling: lift just after each new third sounds and press again at once, so nothing blurs and nothing breaks.",
+      "notes": [
+        {
+          "pitch": 65,
+          "startBeat": 0.0,
+          "beats": 4,
+          "hand": "left"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 0.0,
+          "beats": 4,
+          "hand": "left"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 4.0,
+          "beats": 4.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 4.0,
+          "beats": 4.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 8.5,
+          "beats": 4.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 8.5,
+          "beats": 4.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 13.0,
+          "beats": 4.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 66,
+          "startBeat": 13.0,
+          "beats": 4.5,
+          "hand": "left"
+        }
+      ],
+      "bpm": 60.0,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 20,
+        "pedal": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.legato-pedalling-2",
+      "nodeId": "expression.legato-pedalling",
+      "prompt": "Beethoven, Moonlight Sonata, 1st movement, left hand, bars 5-9. Change the pedal just after each new chord or octave, with no gap in the sound.",
+      "notes": [
+        {
+          "pitch": 37,
+          "startBeat": 0,
+          "beats": 4,
+          "hand": "left"
+        },
+        {
+          "pitch": 44,
+          "startBeat": 0,
+          "beats": 4,
+          "hand": "left"
+        },
+        {
+          "pitch": 49,
+          "startBeat": 0,
+          "beats": 4,
+          "hand": "left"
+        },
+        {
+          "pitch": 36,
+          "startBeat": 4,
+          "beats": 4,
+          "hand": "left"
+        },
+        {
+          "pitch": 44,
+          "startBeat": 4,
+          "beats": 4,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 4,
+          "beats": 4,
+          "hand": "left"
+        },
+        {
+          "pitch": 37,
+          "startBeat": 8,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 49,
+          "startBeat": 8,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 30,
+          "startBeat": 10,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 42,
+          "startBeat": 10,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 35,
+          "startBeat": 12,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 47,
+          "startBeat": 12,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 35,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 47,
+          "startBeat": 14,
+          "beats": 2,
+          "hand": "left"
+        },
+        {
+          "pitch": 40,
+          "startBeat": 16,
+          "beats": 4,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 16,
+          "beats": 4,
+          "hand": "left"
+        }
+      ],
+      "bpm": 60.0,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 20,
+        "pedal": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.playing-at-tempo-1",
+      "nodeId": "expression.playing-at-tempo",
+      "prompt": "Clementi, Sonatina Op. 36 No. 1 (Allegro), bars 1-2, at crotchet = 100. Hold the tempo steady with the click from the first note to the last.",
+      "notes": [
+        {
+          "pitch": 48,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 1,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "left"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 7,
+          "beats": 1,
+          "hand": "right"
+        }
+      ],
+      "bpm": 100.0,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "expression.playing-at-tempo-2",
+      "nodeId": "expression.playing-at-tempo",
+      "prompt": "Minuet in G (attributed to Petzold), right hand, bars 1-4, at crotchet = 100. Keep every beat exactly with the click, no rushing.",
+      "notes": [
+        {
+          "pitch": 74,
+          "startBeat": 0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 1,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 2,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 3,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 4,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 5,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 6,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 7,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 8,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 78,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 9,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 10,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 11,
+          "beats": 1,
+          "hand": "right"
+        }
+      ],
+      "bpm": 100,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20
+      }
+    }
+  ]
+}

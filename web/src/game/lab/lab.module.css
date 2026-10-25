@@ -127,9 +127,6 @@
 
 /* LabLink, in the select's footer row after first-run's link: the same quiet look. */
 .footerLink {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   color: var(--pa-ink-dim);
   font: clamp(13px, 1.6vh, 18px) system-ui, sans-serif;
   text-decoration: none;
@@ -137,13 +134,4 @@
 
 .footerLink:hover {
   color: var(--pa-ink);
-}
-
-.kbd {
-  min-width: 1.4em;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: rgb(242 242 245 / 0.12);
-  font: 700 1em system-ui, sans-serif;
-  text-align: center;
 }

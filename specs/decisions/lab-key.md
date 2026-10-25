@@ -13,4 +13,8 @@ say on a video. It's a constant, `LAB_KEY` in `web/src/game/lab/LabLink.tsx`.
 `feat(lab)` (the page, the entries and their test, `LabLink`), then `fix(song-select)` (mounts `LabLink` in the
 footer), then `feat(lab)` (`verify-lab.mjs`, the shots, the done note).
 
-**How to undo.** Change `LAB_KEY` and the `<kbd>` text, or drop `<LabLink />` from `app/page.tsx`.
+**How to undo.** Change `LAB_KEY` and the link's `title` and `aria-keyshortcuts`, or drop `<LabLink />` from `app/page.tsx`.
+
+**The link shows only "Lab" (2026-10-25).** "Lab X" with a `<kbd>` made the footer row 471 px against 469 at 1280, so
+it wrapped and song-options' fit check failed on #631 (moonlight-3, −21 px). The word alone is 24 px wide. The key
+is in `title` and `aria-keyshortcuts`.

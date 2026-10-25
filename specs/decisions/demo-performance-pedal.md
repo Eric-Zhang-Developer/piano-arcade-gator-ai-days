@@ -1,7 +1,7 @@
 # demo-performance: where each song's pedal comes from
 
 **Context.** The bot sends a song's `pedal.json` as CC64 (golden-demo). The spec takes it from the score's Ped. marks
-and, for a score with none, from golden-demo's per-harmony rule, logged here. Findings: batch 1 on #815, batch 2 on #816, batch 3 on #818, batch 4 on #819, batch 6 on #1102, batch 7 on #1103, batch 8 on #1104.
+and, for a score with none, from golden-demo's per-harmony rule, logged here. Findings: batch 1 on #815, batch 2 on #816, batch 3 on #818, batch 4 on #819, batch 6 on #1102, batch 7 on #1103, batch 8 on #1104, batch 9 on #1105.
 
 **Options.** For each song, in order: (A) the score's printed Ped. marks; (B) a pedal layer in the cited source file
 that only its MIDI renders, written by the edition's typesetter; (C) the per-harmony rule, an arrangement choice.
@@ -46,6 +46,11 @@ the commands.
 | moment-musical-3 | Mutopia 1023: none; a staccato left hand (marked in bars 1–2) | **none**, as alla-turca and wild-horseman: the rule would hold the staccato accompaniment. Eric may prefer C. |
 | pathetique-2 | Mutopia 295: none | C (16 pairs) |
 | raindrop-prelude | Mutopia 471: `\sustainOn/Off` macros in `sIsustain` (`sec1.ly`), rendered in its MIDI as CC64 | A, the MIDI's CC64 over bars 1–27 (47 pairs, checked against `sIsustain`) |
+| chopin-fantaisie-impromptu | Mutopia 1693: `pd`/`pu` macros (`\sustainDown/Up`), one or two a bar, rendered in its MIDI as CC64 | A, the MIDI's CC64 over bars 1–24 (35 pairs, checked against the macros) |
+| chopin-revolutionary | Mutopia 743: none | **none**, as invention-1: the left hand is one running line of sixteenths, which the rule would read as changing harmony and blur. Eric may prefer C. |
+| liszt-consolation-3 | Mutopia 1647: `\sustainOn/Off`, rendered in its MIDI as CC64; bars 15–16 printed dry | A, the MIDI's CC64 over bars 1–18 (12 pairs) |
+| rachmaninoff-prelude-cs | Mutopia 2033: none | C (26 pairs): a held bass under tenuto chords |
+| pathetique-3 | Mutopia 296: none | C (71 pairs), as pathetique-2. The theme's staccato eighths will be held; Eric may prefer none. |
 
 **The rule (C)**, as golden-demo's (`specs/context/findings.md`, 2026-10-25). A harmony is the left hand's pitch
 classes struck in a half bar (a whole bar unless the bar has 4 beats). A new pair starts at a window that strikes a

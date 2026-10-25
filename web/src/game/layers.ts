@@ -14,6 +14,7 @@ import { missMoment } from "./miss-moment";
 import { firstRun } from "./first-run";
 import { waitHud } from "./wait-hud";
 import { warningCard } from "./difficulty";
+import { countIn } from "./count-in";
 import { stageCard } from "./stage-card";
 import { clearCard } from "./clear-card";
 import { feverGauge } from "./fever-gauge";
@@ -109,6 +110,7 @@ export const plugins: GamePlugin[] = [
   feverGauge(), // late: its gauge sizes from the chart after every transformChart, as the judge does
   clearCard(), // over the HUD and the meter: ALL PERFECT, FULL COMBO or CLEAR from the last note to the results
   warningCard(), // after every transformChart too: the level is the chart the player gets; WARNING at Lv 13+
+  countIn(), // the 8 beats before the first note: ruler, 4 3 2 1, the hit line's pulse; after the WARNING card
   stageCard(), // start panel: ARE YOU READY, the jacket, title and level, above Start
   cabinet(), // ?cabinet=1 returns a finished game to /cabinet; ?cabinet=demo starts the demo and reports it
   demoReset(), // 60 s with no input on a plain take's results (not ?cabinet) loads / clean

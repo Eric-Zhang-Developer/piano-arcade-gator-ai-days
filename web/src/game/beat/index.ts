@@ -126,6 +126,8 @@ export function beatTrack(): GamePlugin {
 
   const play = (h: Hit) => {
     const perf = zero + h.atMs;
+    // For verify-count-in: each count-in click's chart time and the performance time it's scheduled for (read-only).
+    if (h.atMs < 0 && typeof window !== "undefined") (window.__pianoArcadeBeat ??= { countIn: [] }).countIn.push({ atMs: h.atMs, perfMs: perf });
     if (output) {
       output.send([0x99, h.note, h.velocity], perf);
       output.send([0x89, h.note, 0], perf + beatSettings.noteLengthMs);
@@ -225,6 +227,7 @@ export function beatTrack(): GamePlugin {
       if (e.type === "resume") return begin(e.atMs);
       if (e.type !== "songStart") return;
       silence();
+      if (typeof window !== "undefined") window.__pianoArcadeBeat = { countIn: [] }; // this take's clicks only
       if (!output) {
         try {
           audio ??= new AudioContext();
@@ -249,4 +252,10 @@ export function beatTrack(): GamePlugin {
       ctx.fillText(off ? "Beat: off" : where, frame.width - 12, 20);
     },
   };
+}
+
+declare global {
+  interface Window {
+    __pianoArcadeBeat?: { countIn: { atMs: number; perfMs: number }[] }; // read by verify-count-in.mjs
+  }
 }

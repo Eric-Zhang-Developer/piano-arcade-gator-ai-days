@@ -406,7 +406,7 @@ export default function Play() {
       const drawn = out ? t0Chart! + out.clockMs : now;
       hw.nowMs = drawn;
       const beat = now < 0 ? Math.floor(now / mpb) + settings.countInBeats + 1 : 0;
-      hw.countInBeat = beat > 0 ? beat : null;
+      hw.countInBeat = null; // count-in draws the 8 beats; highway.ts's old digit comes out after #747 (count-in spec)
       if (beat > lastBeat) emit({ type: "countInBeat", beat, atMs: (beat - 1 - settings.countInBeats) * mpb });
       lastBeat = beat;
       // Flow's advance never MISSes: it only notices a stop past the free beats.

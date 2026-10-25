@@ -3,9 +3,9 @@
 .review { height:46px; padding:0 24px; display:flex; align-items:center; gap:24px; background:#e9ebec; border-bottom:1px solid #c6cbd0; flex:none; color:#374454; }
 .review>div { display:flex; align-items:baseline; gap:16px; margin-right:auto; }
 .review strong { font-weight:600; }
-.review span { font-size:12px; }
-.study .review button,.sources button { background:none; color:inherit; border:0; border-radius:4px; padding:6px 0; font:inherit; font-size:12px; cursor:pointer; text-decoration:underline; text-underline-offset:4px; }
-.review>a { font-size:12px; text-decoration:underline!important; white-space:nowrap; }
+.review span { font-size:16px; }
+.study .review button,.sources button { background:none; color:inherit; border:0; border-radius:0; padding:6px 0; font:inherit; font-size:16px; cursor:pointer; text-decoration:underline; text-underline-offset:4px; }
+.review>a { font-size:16px; text-decoration:underline!important; white-space:nowrap; }
 .sources { position:absolute; z-index:85; top:46px; right:0; bottom:0; width:650px; max-width:65vw; overflow:auto; padding:28px 32px; background:#fff; box-shadow:-12px 10px 36px rgb(25 36 50 / .16); color:#253141; }
 .sources header { display:flex; align-items:center; justify-content:space-between; gap:16px; }
 .sources h2 { font:600 24px/1.2 var(--mentor-heading),sans-serif; margin:0 0 12px; }

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import type { Chart } from "../../contracts";
 import { melody } from "../simon";
-import { makeRound, newSet, roundMessages, score, seeded, sendAhead, step, wrongNoteSettings } from ".";
+import { makeRound, newSet, pageKey, roundMessages, score, seeded, sendAhead, step, wrongNoteSettings } from ".";
 
 // Synthetic charts only: no notes typed from a song.
 const chartOf = (pitches: number[], bpm = 120): Chart =>
@@ -109,4 +109,41 @@ it("sendAhead: a stop leaves no key down and nothing sounds later; left alone, e
   } finally {
     vi.useRealTimers();
   }
+});
+
+describe("the page's keys (#1323)", () => {
+  // Node has no DOM: a stand-in Element whose closest() answers for a link, a button or plain page.
+  class El {
+    constructor(private tag: string) {}
+    closest(sel: string) {
+      return sel.split(", ").includes(this.tag) ? this : null;
+    }
+  }
+  const press = (code: string, tag: string, phase?: "ask" | "reveal" | "done") => {
+    vi.stubGlobal("Element", El);
+    const e = { key: code === "Space" ? " " : code, code, repeat: false, metaKey: false, ctrlKey: false, altKey: false, target: new El(tag), defaultPrevented: false, preventDefault() { this.defaultPrevented = true; } };
+    const dispatch = vi.fn();
+    const start = vi.fn();
+    pageKey(e as unknown as KeyboardEvent, phase, dispatch, start);
+    vi.unstubAllGlobals();
+    return { e, dispatch, start };
+  };
+
+  it("leaves Enter and Space on a link or button to it", () => {
+    for (const tag of ["a", "button"])
+      for (const code of ["Enter", "Space"]) {
+        const { e, dispatch, start } = press(code, tag, "done");
+        expect(e.defaultPrevented).toBe(false);
+        expect(start).not.toHaveBeenCalled();
+        expect(dispatch).not.toHaveBeenCalled();
+      }
+  });
+
+  it("still starts and moves on from the page itself", () => {
+    const begin = press("Enter", "main");
+    expect(begin.e.defaultPrevented).toBe(true);
+    expect(begin.start).toHaveBeenCalledOnce();
+    const next = press("Space", "main", "reveal");
+    expect(next.dispatch).toHaveBeenCalledWith({ type: "next" });
+  });
 });

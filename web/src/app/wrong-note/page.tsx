@@ -8,7 +8,7 @@ import { Brackets, Button, MonoLabel, kitButton, kitChip } from "../../game/duo-
 import { HelpLink } from "../../game/help-overlay";
 import { PIANO_NAME } from "../../game/laptop-sound";
 import { melody } from "../../game/simon";
-import { newSet, roundMessages, score, sendAhead, step, wrongNoteSettings, type WrongNoteEvent, type WrongNoteSet } from "../../game/wrong-note";
+import { newSet, pageKey, roundMessages, score, sendAhead, step, wrongNoteSettings, type WrongNoteEvent, type WrongNoteSet } from "../../game/wrong-note";
 import styles from "../../game/wrong-note/wrong-note.module.css";
 
 const SONGS = [
@@ -118,19 +118,9 @@ function WrongNote() {
     if (s.phase === "ask") play(s);
   }, [tune, seed0, shift, play]);
 
-  // 2–8 answer, R replays, Space or Enter moves on (Start, Next, Again). All Notes Off when the page goes away.
+  // The keys (pageKey). All Notes Off when the page goes away.
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
-      const phase = setRef.current?.phase;
-      if (/^[2-8]$/.test(e.key)) dispatch({ type: "answer", note: Number(e.key) });
-      else if (e.key === "r" || e.key === "R") dispatch({ type: "replay" });
-      else if (e.code === "Space" || e.code === "Enter") {
-        e.preventDefault(); // a focused button would act twice
-        if (phase === "reveal") dispatch({ type: "next" });
-        else if (!phase || phase === "done") start();
-      }
-    };
+    const onKey = (e: KeyboardEvent) => pageKey(e, setRef.current?.phase, dispatch, start);
     window.addEventListener("keydown", onKey);
     window.addEventListener("pagehide", silence);
     return () => {

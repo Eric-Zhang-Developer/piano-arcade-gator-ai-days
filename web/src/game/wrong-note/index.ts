@@ -105,6 +105,21 @@ export function step(set: WrongNoteSet, e: WrongNoteEvent): WrongNoteSet {
   return set.index + 1 < set.rounds.length ? { ...set, index: set.index + 1, replays: 0, phase: "ask" } : { ...set, phase: "done" };
 }
 
+// The page's window keys: 2–8 answer, R replays, Space or Enter moves on (Start, Next, Again). Space and Enter on a
+// link, button or form control are that control's own (#1323): the button's click moves on, a song link follows.
+export const ownsKey = (t: EventTarget | null) =>
+  typeof Element !== "undefined" && t instanceof Element && !!t.closest("a, button, input, select, textarea, [contenteditable]");
+export function pageKey(e: KeyboardEvent, phase: WrongNoteSet["phase"] | undefined, dispatch: (e: WrongNoteEvent) => void, start: () => void): void {
+  if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (/^[2-8]$/.test(e.key)) dispatch({ type: "answer", note: Number(e.key) });
+  else if (e.key === "r" || e.key === "R") dispatch({ type: "replay" });
+  else if ((e.code === "Space" || e.code === "Enter") && !ownsKey(e.target)) {
+    e.preventDefault(); // Space would scroll the page
+    if (phase === "reveal") dispatch({ type: "next" });
+    else if (!phase || phase === "done") start();
+  }
+}
+
 export const score = (set: WrongNoteSet) => set.answers.filter((a) => a.answer === a.changed).length;
 
 type Out = Pick<MIDIOutput, "send">;

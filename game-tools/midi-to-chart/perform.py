@@ -91,10 +91,10 @@ def midi_pedal(path):
 
 
 # A note, chord repeat, rest or skip, not inside a word (Staff.SustainPedal holds no note): name, octave marks, duration.
-NOTE = re.compile(r"(?<![A-Za-z0-9._-])([a-g](?:isis|eses|is|es|ss|ff|s|f)?|[rRsq])(?![a-zA-Z])[',]*[!?]?")
+NOTE = re.compile(r"(?<![A-Za-z0-9._-])([a-h](?:isis|eses|is|es|ss|ff|s|f)?|[rRsq])(?![a-zA-Z])[',]*[!?]?")
 DURATION = re.compile(r"(\d+)(\.*)(?:\*(\d+)(?:/(\d+))?)?")
-DYNAMICS = {"ppp", "pp", "p", "mp", "mf", "f", "ff", "fff", "sf", "sfz", "fp", "<", ">", "!", "cresc", "dim", "decresc",
-            "accent"}
+DYNAMICS = {"ppp", "pp", "p", "mp", "mf", "f", "ff", "fff", "sf", "sfz", "fz", "fp", "<", ">", "!", "cresc", "dim",
+            "decresc", "accent"}
 PEDAL = {"sustainOn": "down", "sustainOff": "up", "sustainDown": "down", "sustainUp": "up"}
 
 
@@ -462,7 +462,7 @@ def ly_marks(voices, segs, end):
     """{hand: [(source time, mark)]} as ly_voice reads them -> --marks items in chart beats, on decision
     demo-performance-dynamics's rules. A level or hairpin sets its own staff, and the other staff too unless that staff
     has its own at that beat; a hairpin (or cresc./dim.) runs to the next mark or \\! in its staff, or the excerpt's end;
-    sf, sfz and accents are their own staff's only; fp is an accent, then p. A level before the excerpt (or between its
+    sf, sfz, fz and accents are their own staff's only; fp is an accent, then p. A level before the excerpt (or between its
     spans) holds from where the excerpt picks up."""
     def beats(t, level):  # a source time in every span that plays it; a level outside them, the next span's start
         got = [t - lo + shift for lo, hi, shift in segs if lo <= t < hi]
@@ -480,7 +480,7 @@ def ly_marks(voices, segs, end):
                 opened = None
             if m in LADDER or m == "fp":
                 sets[h][b] = "p" if m == "fp" else m  # the last at a beat wins
-            if m in ("sf", "sfz", "fp", "accent"):
+            if m in ("sf", "sfz", "fz", "fp", "accent"):
                 accents[h].append(b)
             if m in HAIRPIN:
                 opened = (b, HAIRPIN[m])
@@ -546,6 +546,8 @@ def self_test():
     assert ly_voice(ly, "up")[1] == [(4, "p"), (4, "down"), (5, "accent"), (6, "f")], ly_voice(ly, "up")[1]
     assert ly_voice(r"v = { c4 \slashedGrace d8 e4-> \slashedGrace{f16[ g]} a4\f }", "v")[1] == [(1, "accent"), (2, "f")]
     assert ly_voice(r"v = { c1 \octaveCheck c e4-> }", "v")[1] == [(4, "accent")]  # Rachmaninoff's: a check, not a note
+    assert ly_voice(r"v = { h16 his as g c4\fz }", "v")[1] == [(1, "fz")]  # the Revolutionary's German names: h is B
+    assert ly_marks({"R": [(0, "f"), (1, "fz")]}, [(0, 2, 0)], 2) == ["R@0=f", "R@1!", "L@0=f"]  # fz: as sf
     assert ly_voice(r"v = { \partial 8 c\( d4-> }", "v")[1] == [(Fraction(1, 2), "accent")]  # its lower's pickup: an eighth
     # Wild Horseman: the dynamics line is written once beside a volta (pickup, 2 bars, 2 alternatives of a bar); unfolded,
     # the body's marks land in both passes and the alternatives' and the coda's after them.

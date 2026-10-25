@@ -5,6 +5,7 @@ import { createElement, Fragment, type ReactNode } from "react";
 import type { GamePlugin } from "../../contracts";
 import { createGuard, type Guard } from "../crash-guard";
 import { sample } from "./sample";
+import { screenShake } from "./screen-shake";
 
 export interface Experiment {
   name: string; // its folder and its flag: ?x=<name>, comma-separated for several
@@ -18,6 +19,7 @@ export interface Experiment {
 
 export const experiments: Experiment[] = [
   sample, // the sample that proves the frame; pruning it is the prune rule's first use
+  screenShake,
 ];
 
 // The names a take's ?x= turns on.

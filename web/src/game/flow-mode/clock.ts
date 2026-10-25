@@ -5,6 +5,8 @@ import type { Chart, Judgment } from "../../contracts";
 import { msPerBeat } from "../core/settings";
 import { noteTimeMs } from "../core/judge";
 
+export const isFlowMode = (params: URLSearchParams) => params.get("mode") === "flow";
+
 export const flowSettings = {
   minRate: 0.5, // the player's tempo as a fraction of the chart's, clamped to this range
   maxRate: 1.3,

@@ -41,6 +41,9 @@ export class FlowJudge {
   private gauge: Gauge;
   private results: Results | null = null;
 
+  // The newest judge: plugins can't reach the page's judge, so flow mode's plugin reads its clock and slips here.
+  static live: FlowJudge | null = null;
+
   // hands: R or L judges that hand only (hand-mode usually drops the other hand from the chart first). startRate is
   // ?tempo= as a fraction: the player's intended tempo, so steadiness is judged from the second onset.
   constructor(
@@ -56,6 +59,7 @@ export class FlowJudge {
     this.judgments = this.chart.notes.map(() => null);
     this.gauge = emptyGauge(this.chart.notes.length);
     this.clock = flowClock(this.chart, this.onsets, this.noteState, opts.startRate);
+    FlowJudge.live = this;
   }
 
   // The test hook's front: the earliest onset with notes still unplayed, or null once every note is judged.

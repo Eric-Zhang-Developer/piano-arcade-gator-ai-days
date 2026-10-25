@@ -16,7 +16,7 @@ export interface Move {
   section?: string; // a chip's section
 }
 
-// Keys and chips sound, as before; hover and Find stay silent, as before (decision select-motion-causes).
+// Keys and chips sound, as before; hover and Find stay silent, as before (decision select-motion-moves).
 const SOUNDED: ReadonlySet<Cause> = new Set(["key", "repeat", "chip"]);
 
 type Listener = (m: Move, settle: boolean) => void;
@@ -219,7 +219,7 @@ export function useMoveAnimation(ref: RefObject<HTMLElement | null>, frames: (m:
 }
 
 // The detail panel (spec 3): a fade from 40% with 6 px of travel the way focus went. Not while a key repeats; once
-// when it stops (decision select-motion-panel).
+// when it stops (decision select-motion-moves).
 export const panelFrames = (m: Move, settle: boolean) =>
   m.cause === "repeat" && !settle
     ? null

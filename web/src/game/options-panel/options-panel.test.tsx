@@ -10,10 +10,11 @@ test("stored values render: latency, volume, mute, miss sound and labels", () =>
   expect(html).toMatch(/data-testid="opt-latency-value">-12(<!-- -->)? ms</);
   expect(html).toMatch(/id="opt-latency"[^>]*value="-12"/);
   expect(html).toMatch(/>35(<!-- -->)?%</);
+  expect(html).toMatch(/id="opt-piano-volume"[^>]*value="0.7"/); // laptop-sound's default, apart from the effects
   expect(html).toMatch(/data-testid="opt-mute"[^>]*checked=""/);
   expect(html).toMatch(/aria-checked="true"[^>]*data-testid="opt-labels-off"/);
   // the rows in the spec's order
-  const order = ["Latency offset", "Effects volume", "Mute", "Miss sound", "Note labels"].map((t) => html.indexOf(t));
+  const order = ["Latency offset", "Effects volume", "Piano volume", "Mute", "Miss sound", "Note labels"].map((t) => html.indexOf(t));
   expect(order).toEqual([...order].sort((a, b) => a - b));
 });
 

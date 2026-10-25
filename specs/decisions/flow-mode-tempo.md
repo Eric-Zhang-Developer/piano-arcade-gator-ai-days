@@ -17,3 +17,7 @@ starts the tempo over from the next played onset.
 
 **How to undo.** `flowSettings.tempoOnsets` and the `samples` mean in `web/src/game/flow-mode/clock.ts`'s `played()`;
 drop `clampRate` around each sample to smooth raw samples.
+
+**The readout's percent** is of the song's own tempo: with `?tempo=70` bar-loop has already slowed the chart to 70%,
+so the readout shows `tempo × rate` (rate 1.0 there reads 70%), while the bpm is the slowed chart's bpm × rate, the
+tempo you're actually playing. Undo: `tempo` in `flowMode()`'s draw in `web/src/game/flow-mode/index.tsx`.

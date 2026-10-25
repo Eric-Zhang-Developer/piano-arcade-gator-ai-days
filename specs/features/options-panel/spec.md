@@ -25,9 +25,11 @@ place of the results screen's raw slider and `SfxControls` once results-layout i
 ## Requirements
 - **Opening:** O on `/` and the Options button toggle the drawer, and Esc closes it.
 - **Rows, in order:** Latency offset (`LATENCY_MIN` to `LATENCY_MAX` in 1 ms steps, showing "N ms") with a Calibrate
-  link to `/calibrate`; Effects volume (0–100%); Mute; Miss sound; Note labels (Auto, Note names, Laptop keys, Off).
+  link to `/calibrate`; Effects volume (0–100%); Piano volume (0–100%, laptop-sound's, #612); Mute; Miss sound;
+  Note labels (Auto, Note names, Laptop keys, Off).
 - **Same storage, no new keys:** `loadLatencyOffset` and `saveLatencyOffset` (`web/src/game/core/settings.ts`);
-  juice-sound's `getPrefs`, `savePrefs` and `subscribePrefs`; note-labels' `LABELS_KEY`. `/play`'s own controls
+  juice-sound's `getPrefs`, `savePrefs` and `subscribePrefs`; note-labels' `LABELS_KEY`; laptop-sound's
+  `getPianoVolume`, `setPianoVolume` and `subscribePianoVolume` (its key, not the drawer's). `/play`'s own controls
   show what the drawer set, and the drawer, read each time it opens, shows what `/play` set.
 - **When it applies:** effects, mute and miss sound at once. Latency and labels when `/play` next loads, since it
   reads both then (`loadLatencyOffset()` in its load effect, note-labels in `transformChart`).

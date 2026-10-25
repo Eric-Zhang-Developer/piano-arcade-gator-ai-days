@@ -5,7 +5,7 @@ import { msPerBeat } from "../core/settings";
 import type { HandsSetting } from "../hand-mode/hands";
 import { onsetsOf } from "./clock";
 import { FlowJudge } from "./judge";
-import { steadiness } from "./steady";
+import { headline, steadiness } from "./steady";
 
 const song = (id: string): Chart => JSON.parse(readFileSync(`public/songs/${id}/chart.json`, "utf8"));
 const twinkle = song("twinkle");
@@ -90,12 +90,15 @@ describe.each([
     const first = onsetsOf(chart)[0].ms;
     let max = -Infinity;
     let holding = false; // at the last frame, before run's finish() marks every note MISS
+    let slips = -1;
     run(chart, [], { tailMs: 10_000 }, (t, j) => {
       max = Math.max(max, j.clock.now(t));
       holding = j.clock.holding;
+      slips = j.slips;
     });
     expect(max).toBeLessThanOrEqual(first);
     expect(holding).toBe(true);
+    expect(slips).toBe(0); // waiting before the first note isn't a slip
   });
 
   it("it catches up: each played onset is reached within half a beat, and no frame jumps a beat", () => {
@@ -195,5 +198,13 @@ describe("steadiness", () => {
     expect(steadiness([-0.3, -0.25, -0.2, 0.05])).toBe("a bit rushed");
     expect(steadiness([0.3, -0.25, 0.2, -0.15])).toBe("a bit uneven");
     expect(steadiness([])).toBe("steady");
+  });
+
+  it("the headline: right notes, the word, the slips", () => {
+    const { judge, results } = run(twinkle, steadyPlayer(twinkle, 1));
+    expect(headline(results, judge.slips, judge.deviations)).toBe("100% right notes · steady · 0 slips");
+    const k = 10;
+    const skip = run(twinkle, player(twinkle, (_, beat) => beat * msPerBeat(twinkle.bpm), (i) => i === k));
+    expect(headline(skip.results, skip.judge.slips, skip.judge.deviations)).toBe(`${Math.round((100 * 41) / 42)}% right notes · steady · 1 slip`);
   });
 });

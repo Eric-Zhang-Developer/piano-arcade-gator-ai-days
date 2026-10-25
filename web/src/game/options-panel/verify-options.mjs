@@ -104,13 +104,13 @@ for (const viewport of [
   let slider = await playLatency(page);
   check((await slider.inputValue()) === "10", `/play's slider shows ${await slider.inputValue()}`);
 
-  // 2. Mute and labels Off, by keyboard: ↓ to Mute, Space; ↓↓ to labels, → three times.
+  // 2. Mute and labels Off, by keyboard: ↓↓↓ to Mute (past Effects and Piano volume), Space; ↓↓ to labels, → three
+  // times.
   await home(page);
   await page.keyboard.press("o");
   await page.waitForTimeout(300);
-  await page.keyboard.press("ArrowDown");
-  await page.keyboard.press("ArrowDown");
-  check((await focused(page)) === "opt-mute", `↓↓ reaches Mute (${await focused(page)})`);
+  for (let i = 0; i < 3; i++) await page.keyboard.press("ArrowDown");
+  check((await focused(page)) === "opt-mute", `↓↓↓ reaches Mute (${await focused(page)})`);
   await page.keyboard.press("Space");
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("ArrowDown");

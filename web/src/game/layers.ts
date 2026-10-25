@@ -40,6 +40,7 @@ import { demoReset } from "./demo-reset";
 import { versus } from "./versus";
 import { takeMidi } from "./take-midi";
 import { waitMode } from "./wait-mode/plugin";
+import { flowMode } from "./flow-mode";
 import { rewind } from "./rewind";
 import { waitHint } from "./wait-hint";
 import { scoreCard } from "./score-card";
@@ -75,6 +76,7 @@ export const plugins: GamePlugin[] = [
   beatTrack(),
   midiWatchdog(), // reconnects a piano that goes silent mid-song
   waitMode(), // start panel: Learn it first; results panel after a wait-mode take: Play it judged, on top
+  flowMode(), // ?mode=flow: the tempo readout, the waiting note's glow, Take your time; Play in Flow; the results headline
   rewind(), // wait mode's start panel: ← → back or ahead a bar, under wait mode's line
   records(), // results panel: initials and the top 5, first under the score (a NEW RECORD take's entry is record-moment's)
   recordMoment(), // results panel: NEW RECORD stamps after the rank, with the high-score entry; after records, which sets the outcome

@@ -105,7 +105,7 @@ The bars are the planner's, not measured thresholds.
   - note-pills' tests stay green.
 - **Perf:** maple-leaf-rag at 1920×1080 with `bot=fever`, measured on your dev server through the in-app browser
   with perf-budget's `probe.js` (`__perfProbe.report()`), 3 runs before (origin/main) and after. Report p95 and
-  spread. The bar is no regression past the before runs' spread and p95 ≤ 6 ms. `perf.mjs` itself runs locally only
+  spread. The bar is no regression past the before runs' spread, inside perf-budget's own budget (p95 ≤ 16.7 ms). `perf.mjs` itself runs locally only
   under `verify.lock`; otherwise "not run locally; main's scheduled run covers it".
 - **A 5-second read test:**
   - three after frames, one each from fur-elise, maple-leaf-rag and moonlight-1, at chart times where chords and long

@@ -27,6 +27,14 @@ export const labGroups: LabGroup[] = [
         open: "Twinkle, wait mode",
       },
       {
+        slug: "flow-mode",
+        name: "Flow mode",
+        description:
+          "the song waits at each note and follows your tempo (0.5–1.3×), scored on wrong notes, skipped notes and stops past 2 beats, not timing",
+        href: "/play?song=twinkle&mode=flow",
+        open: "Twinkle, flow mode",
+      },
+      {
         slug: "adaptive-chunks",
         name: "Adaptive chunks",
         description:

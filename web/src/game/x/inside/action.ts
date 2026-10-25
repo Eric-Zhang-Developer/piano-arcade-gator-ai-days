@@ -3,11 +3,13 @@
 // Hammer 0 is at rest and 1 is at the string; key 0 is up and 1 is the full dip; damper 0 sits on the string and 1 is
 // fully lifted. Each value is a choice or a source's, logged in specs/decisions/inside-geometry.md and inside-timing.md.
 
+import { G } from "./geometry";
+
 export const actionSettings = {
-  letOff: 0.96, // hammer height at let-off: 1 − let-off distance ÷ blow distance (geometry)
-  check: 0.7, // hammer height where the backcheck catches it on the rebound (geometry)
+  letOff: 1 - G.letOff / G.blow, // hammer height at let-off
+  check: 1 - G.check / G.blow, // hammer height where the backcheck catches it on the rebound
   repetition: 0.8, // hammer height the repetition lever holds it at while the key rises (geometry)
-  damperPoint: 0.5, // the key depth where the damper starts to lift: half the dip
+  damperPoint: 0.5, // the damper starts to lift at half the stroke (Kawai US 5,159,762, the conventional regulation)
   strikeMs: 4, // the hammer's contact with the string
   reboundMs: 60, // from the string down to the backcheck
   keyUpMs: 90, // a released key's rise to rest
@@ -72,6 +74,17 @@ export class KeyAction {
   forget(t: number, keepMs = 5000) {
     while (this.presses.length > 1 && this.presses[0].at < t - keepMs) this.presses.shift();
     while (this.releases.length && this.releases[0] < this.presses[0]?.at) this.releases.shift();
+  }
+
+  // The loudest strike in (t0, t1], or 0: what sets the string ringing this frame.
+  struckBetween(t0: number, t1: number): number {
+    return this.presses.reduce((v, p) => (p.at > t0 && p.at <= t1 ? Math.max(v, p.velocity) : v), 0);
+  }
+
+  // The latest press whose movement has begun by t (its approach, or its note-on live), or null.
+  begunAt(t: number): number | null {
+    for (let i = this.presses.length - 1; i >= 0; i--) if (this.start(this.presses[i]) <= t) return this.start(this.presses[i]);
+    return null;
   }
 
   private releaseAfter(at: number) {

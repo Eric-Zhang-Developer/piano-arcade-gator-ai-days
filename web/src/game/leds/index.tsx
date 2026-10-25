@@ -5,7 +5,7 @@ import { useEffect, useSyncExternalStore } from "react";
 import type { Chart, GamePlugin, InputDevice } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
 import { kitChip } from "../duo-tokens";
-import { CLEAR, hintDiff, hintsAt, judgedKey, keyOff, ledSettings, lightMode, type LightMode, type Rgb } from "./messages";
+import { CLEAR, hintDiff, hintRamp, hintsAt, judgedKey, keyOff, ledSettings, lightMode, type LightMode, type Rgb } from "./messages";
 import { autoConnect, connect, linkState, send, subscribe, type LinkState } from "./serial";
 
 export { hintDiff, hintsAt, judgedKey, ledSettings, rgb7 } from "./messages";
@@ -93,15 +93,15 @@ export function PauseLights({ midi }: { midi: string }) {
   );
 }
 
-// The lights' mode chip: with the board on, a click steps the strip through its three modes (firmware setting 15):
-// Calm (hint build-up, red wrong keys, soft glows), Demo (calm plus a ripple on every press, no red) and Demo simple
-// (only the key light and its ripple, after a press). The choice is kept in this browser and sent again whenever
-// the board connects, since a board that restarted is back in whatever it last saved.
-const modeKey = "pa.lights.demo"; // "0", "1" or "2"; older pages stored only "0" and "1"
-const modeNames: Record<LightMode, string> = { 0: "Calm", 1: "Demo", 2: "Demo simple" };
+// The lights' mode chip: with the board on, a click flips the strip between its two modes (firmware setting 15):
+// Learning (hints that build up from very faint to gold, red wrong keys, soft glows) and Demo (every key pressed on the piano lights with its ripple,
+// on every page: see everywhere.tsx). The choice is kept in this browser and sent again whenever the board
+// connects, since a board that restarted is back in whatever it last saved.
+const modeKey = "pa.lights.demo"; // "0" or "1"
+const modeNames: Record<LightMode, string> = { 0: "Learning", 1: "Demo" };
 let mode: LightMode | null = null; // read from storage on first use
 const modeListeners = new Set<() => void>();
-const modeSnapshot = (): LightMode => {
+export const lightModeNow = (): LightMode => {
   if (mode === null) {
     let v = 0;
     try {
@@ -109,11 +109,11 @@ const modeSnapshot = (): LightMode => {
     } catch {
       // storage blocked: start calm
     }
-    mode = v === 1 || v === 2 ? v : 0;
+    mode = v === 1 || v === 2 ? 1 : 0; // a "2" from an older page was a demo too
   }
   return mode;
 };
-const subscribeMode = (l: () => void) => {
+export const subscribeLightMode = (l: () => void) => {
   modeListeners.add(l);
   return () => modeListeners.delete(l);
 };
@@ -127,21 +127,21 @@ function setMode(m: LightMode) {
   for (const l of modeListeners) l();
 }
 
-function DemoLights() {
+export function DemoLights() {
   const s = useSyncExternalStore(subscribe, linkState, () => "off" as LinkState);
-  const m = useSyncExternalStore(subscribeMode, modeSnapshot, () => 0 as LightMode);
+  const m = useSyncExternalStore(subscribeLightMode, lightModeNow, () => 0 as LightMode);
   useEffect(() => {
-    if (s === "ready") send(lightMode(m));
+    if (s === "ready") for (const msg of [hintRamp(), lightMode(m)]) send(msg);
   }, [s, m]);
   if (s !== "ready") return null;
-  const next = () => setMode(((m + 1) % 3) as LightMode);
+  const other: LightMode = m === 0 ? 1 : 0;
   return (
     <button
       type="button"
       data-testid="demo-lights"
       data-mode={m}
-      aria-label={`Lights mode: ${modeNames[m]}. Click for ${modeNames[((m + 1) % 3) as LightMode]}`}
-      onClick={next}
+      aria-label={`Lights mode: ${modeNames[m]}. Click for ${modeNames[other]}`}
+      onClick={() => setMode(other)}
       className={kitChip(m !== 0).className}
       style={{ ...kitChip(m !== 0).style, cursor: "pointer", marginLeft: 8 }}
     >
@@ -150,7 +150,7 @@ function DemoLights() {
   );
 }
 
-function ConnectLights() {
+export function ConnectLights() {
   const s = useSyncExternalStore(subscribe, linkState, () => "off" as LinkState);
   useEffect(autoConnect, []);
   const idle = s === "off" || s === "no-board" || s === "error";

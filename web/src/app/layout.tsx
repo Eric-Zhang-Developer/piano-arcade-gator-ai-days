@@ -5,6 +5,7 @@ import { GameBoundary } from "../game/crash-guard/boundary";
 import { PhoneGuard } from "../game/phone-guard";
 import { DemoReset } from "../game/demo-reset";
 import { HelpOverlay } from "../game/help-overlay";
+import { LightsEverywhere } from "../game/leds/everywhere";
 import { LaptopSound } from "../game/laptop-sound/install";
 import { NavBar } from "../game/nav-bar";
 import { NameThemeGuard } from "../game/x/name-theme/Guard";
@@ -48,6 +49,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <HelpOverlay />
         {/* the top-level pages, off /play, the kiosk screens and capture mode (nav-bar) */}
         <NavBar />
+        {/* the LED strip on every page: Demo lights every piano press, and a Lights button off /play (led-game) */}
+        <LightsEverywhere />
         <NameThemeGuard />
         {/* a phone or tablet on / or /play: a card saying it's made for a laptop or a piano (phone-guard) */}
         <PhoneGuard />

@@ -20,6 +20,7 @@ import { nextPause, pauseClock, type PauseAction, type PauseMode } from "../../g
 import { StartScreen } from "../../game/duo-start/StartScreen";
 import { PauseLights } from "../../game/leds";
 import { PauseMenu } from "../../game/pause-skin";
+import { PianoControlsHint, usePianoControls } from "../../game/piano-controls";
 import { Button, MonoLabel, Panel, kitButton } from "../../game/duo-tokens";
 import { ResultsLayout } from "../../game/results-layout";
 import { emptyHud, hudLayout, hudSettings, reduceHud, tierFor } from "../../game/hud";
@@ -466,6 +467,13 @@ export default function Play() {
     start();
   }, [isTest, phase, start]);
 
+  // piano-controls: the lowest keys pause, retry, resume and go back to the songs.
+  const paused = phase === "playing" && pauseMode !== "playing" ? (pauseMode === "menu" ? "menu" : "off") : null;
+  const piano = usePianoControls(isTest ? "off" : phase === "results" ? "results" : (paused ?? (phase === "playing" ? "playing" : "off")), (c) => {
+    if (phase === "results") return c === "retry" ? start() : c === "songs" ? router.push("/") : undefined;
+    pauseRef.current(c === "pause" ? "esc" : c === "songs" ? "quit" : c);
+  });
+
   const onLatency = (v: number) => {
     latencyRef.current = v;
     setLatency(v);
@@ -512,7 +520,7 @@ export default function Play() {
           onResume={() => pauseRef.current("resume")}
           onRetry={() => pauseRef.current("retry")}
           onQuit={() => pauseRef.current("quit")}
-          status={!isTest && <PauseLights midi={midiStatus} />}
+          status={!isTest && (<><PauseLights midi={midiStatus} /><PianoControlsHint screen="menu" piano={piano} /></>)}
         />
       )}
       {phase !== "playing" && (
@@ -553,6 +561,7 @@ export default function Play() {
               status={!isTest && <p data-capture-hide>{midiStatus}</p>}
             />
           )}
+          {phase === "results" && !isTest && <div data-capture-hide style={{ position: "fixed", bottom: 16, left: 0, right: 0, textAlign: "center" }}><PianoControlsHint screen="results" piano={piano} /></div>}
         </div>
       )}
     </main>

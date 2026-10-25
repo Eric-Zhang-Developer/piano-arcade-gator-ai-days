@@ -17,8 +17,10 @@ export const highlightReel: Experiment = {
     id: "x-highlight-reel",
     resultsPanel: ({ chart, take, results }) => {
       saveLast({ chart, take, results }); // the chart as played: after every transformChart
+      const button = kitButton("secondary");
+      // Its own width, like Details' other buttons: the card is a stretching column.
       return (
-        <Link href="/highlight?take=last" data-testid="highlight-reel-link" {...kitButton("secondary")}>
+        <Link href="/highlight?take=last" data-testid="highlight-reel-link" className={button.className} style={{ ...button.style, alignSelf: "flex-start" }}>
           Highlight reel →
         </Link>
       );

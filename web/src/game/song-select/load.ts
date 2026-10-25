@@ -6,10 +6,10 @@ import { difficulty } from "../difficulty/difficulty";
 import { roll, type Roll } from "../duo-select/roll";
 import { keyOf, type Key } from "../ui-sounds/timbre";
 
-// Chart folders only an experiment opens, such as the round's (#1123): kept off the select and out of the library's
-// own checks (difficulty order, jackets, sheets), since they aren't library songs. songs/library.test.ts still
-// validates them.
-export const LAB_ONLY = ["rounds"];
+// Chart folders only an experiment opens, such as the round's (#1123) and anything under songs/x/ (#1165, such as
+// build-sonata's bot chart): kept off the select and out of the library's own checks (difficulty order, jackets,
+// sheets), since they aren't library songs. songs/library.test.ts still validates them; /play?song=x/<id> opens them.
+export const LAB_ONLY = ["rounds", "x"];
 
 export interface Song {
   id: string; // the chart's folder under songs/, what /play?song= takes

@@ -1,7 +1,8 @@
-import { cpSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "vitest";
+import { validateChart } from "../../contracts";
 import { loadSongs } from "./load";
 
 const songs = new URL("../../../public/songs", import.meta.url).pathname;
@@ -41,4 +42,13 @@ test("the real library is sorted easiest first, Twinkle at the top", () => {
     const [a, b] = [found[i - 1], found[i]];
     expect(a.level < b.level || (a.level === b.level && a.title.localeCompare(b.title) <= 0), `${a.id} before ${b.id}`).toBe(true);
   }
+});
+
+test("experiment-only charts under songs/x/ stay off the select, and stay where /play fetches them (#1165)", () => {
+  const dir = mkdtempSync(join(tmpdir(), "songs-"));
+  cpSync(join(songs, "twinkle"), join(dir, "twinkle"), { recursive: true });
+  cpSync(join(songs, "twinkle"), join(dir, "x", "demo"), { recursive: true });
+  expect(loadSongs(dir).songs.map((s) => s.id)).toEqual(["twinkle"]);
+  // /play?song=x/demo fetches /songs/x/demo/chart.json: the chart is still there and still valid.
+  expect(validateChart(JSON.parse(readFileSync(join(dir, "x", "demo", "chart.json"), "utf8")))).toEqual([]);
 });

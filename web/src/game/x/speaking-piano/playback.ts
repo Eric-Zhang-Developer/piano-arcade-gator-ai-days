@@ -2,6 +2,7 @@
 // Grand" (the DGX, or laptop-sound's virtual one), handed over on piano-out's lookahead so Stop leaves at most that
 // much queued. The caps are hard: no velocity above velCap and no more than n notes a frame, whatever the table says.
 import { allNotesOff, pianoOutSettings, type Message } from "../../piano-out";
+import { silence } from "../composers-hands/rolls";
 
 export interface Caps {
   velCap: number;
@@ -47,7 +48,7 @@ export interface Player {
 }
 
 /** Hands the messages to the output pianoOutSettings.lookaheadMs ahead of their time. Stop: clear what's queued, then
- * All Notes Off and pedal up now. */
+ * All Notes Off and pedal up now and again after the lookahead, since Chrome can't clear what it already holds. */
 export function play(output: Output, messages: Message[], now = () => performance.now()): Player {
   let i = 0;
   let timer: ReturnType<typeof setInterval> | null = null;
@@ -73,8 +74,7 @@ export function play(output: Output, messages: Message[], now = () => performanc
       if (timer) clearInterval(timer);
       timer = null;
       i = messages.length;
-      output.clear?.();
-      for (const m of [...allNotesOff(now()), PEDAL_UP(now())]) output.send(m.bytes);
+      silence(output, now(), pianoOutSettings.lookaheadMs);
       finish();
     },
     done,

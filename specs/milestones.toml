@@ -210,6 +210,11 @@ features = [
   "adaptive-chunks",
   "song-pack-3",
   "song-pack-4",
+  "song-pack-5", # Eric, 2026-10-25 (#849): about 20 more songs, easiest first; five Easy pieces
+  "song-pack-6", # Eric, 2026-10-25 (#849): five Easy-medium to Medium pieces
+  "song-pack-7", # Eric, 2026-10-25 (#849): five famous Medium to Medium-hard pieces
+  "song-pack-8", # Eric, 2026-10-25 (#849): five Medium-hard to Expert showpieces
+  "song-finder", # Eric, 2026-10-25 (#850): sort by level, composer or recently played, and filter, at about 40 songs
 ]
 cut = []
 

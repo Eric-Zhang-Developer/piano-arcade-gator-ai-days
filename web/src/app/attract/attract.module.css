@@ -371,3 +371,99 @@
     animation: none;
   }
 }
+
+/* ?film=1: the cut for the video. The stage edge to edge, one quiet title, three counters, then the hero frame. */
+.film {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--pa-bg);
+  color: var(--pa-ink);
+}
+
+.filmTitle {
+  position: absolute;
+  top: 4.4vh;
+  left: 4.2vw;
+  margin: 0;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(18px, 1.6vw, 34px);
+  color: var(--pa-ink);
+}
+
+.filmCounters {
+  position: absolute;
+  left: 4.2vw;
+  bottom: 5.5vh;
+  display: flex;
+  gap: 3.2vw;
+  margin: 0;
+  pointer-events: none;
+}
+
+.filmCounters dt {
+  color: var(--pa-ink-dim);
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: clamp(11px, 0.75vw, 16px);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+}
+
+.filmCounters dd {
+  margin: 0.25em 0 0;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-stretch: 75%;
+  font-weight: 800;
+  font-size: clamp(44px, 4.2vw, 88px);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: start;
+  gap: 0.2em;
+  background: color-mix(in srgb, var(--pa-bg) 78%, transparent);
+  animation: heroIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.heroBig {
+  margin: 0;
+  font-family: var(--pa-font-moment), var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(64px, 7.6vw, 160px);
+  line-height: 0.95;
+  font-variant-numeric: tabular-nums;
+}
+
+.heroBig span {
+  font-size: 0.42em;
+  font-weight: 800;
+  color: var(--pa-ink-dim);
+}
+
+.heroSub {
+  margin: 0.8em 0 0;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(18px, 1.6vw, 34px);
+  color: var(--pa-primary);
+}
+
+@keyframes heroIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero {
+    animation: none;
+  }
+}

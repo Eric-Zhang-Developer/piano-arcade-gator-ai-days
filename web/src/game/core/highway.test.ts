@@ -9,6 +9,7 @@ import { meterLayout } from "../fever-gauge";
 import { readFileSync } from "node:fs";
 import { drawHighway, isBlack, judgmentPlace, makeLayout, staticRange, type HighwayState } from "./highway";
 import { settings } from "./settings";
+import { css, rgb } from "../note-material";
 
 const chart = (pitches: number[]): Chart => ({
   id: "t",
@@ -141,7 +142,8 @@ describe("drawHighway black-key lanes (black-key-lanes)", () => {
     const L = makeLayout(c, 800, 600, 0.2);
     drawHighway(ctx, L, c, { nowMs: 0, noteState: new Map(), pressed: new Set(), latest: null, countInBeat: null });
     expect(blackKeyLaneSettings.tint).toBe(0);
-    expect(fills.slice(0, 2)).toEqual(["#000", settings.noteColor]); // nothing between the backdrop and the first note
+    // nothing between the backdrop and the first note. note-material fills the body as rgba(), the same exact color.
+    expect(fills.slice(0, 2)).toEqual(["#000", css(rgb(settings.noteColor))]);
   });
 });
 
@@ -164,10 +166,12 @@ describe("drawHighway hand colors (hand-colors)", () => {
   };
 
   it("a two-hand chart falls in both hands' colors; a one-hand chart in today's color only", () => {
-    expect(draw(twoHands)).toEqual(expect.arrayContaining([handColor("R"), handColor("L")]));
+    // note-material fills each body in its hand's exact color, written as rgba()
+    const body = (hex: string) => css(rgb(hex));
+    expect(draw(twoHands)).toEqual(expect.arrayContaining([body(handColor("R")), body(handColor("L"))]));
     const oneHand = { ...twoHands, notes: twoHands.notes.map((n) => ({ ...n, hand: "L" as const })) };
-    expect(draw(oneHand)).not.toContain(handColor("L"));
-    expect(draw(oneHand)).toContain(settings.noteColor);
+    expect(draw(oneHand)).not.toContain(body(handColor("L")));
+    expect(draw(oneHand)).toContain(body(settings.noteColor));
   });
 
   it("a key lights in the hand of the note it hit, and as before when it hit nothing", () => {

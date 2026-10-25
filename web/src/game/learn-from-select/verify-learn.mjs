@@ -89,7 +89,9 @@ await page.keyboard.press("ArrowDown");
 await page.keyboard.press("l");
 await page.waitForURL(/\/play\?/, { timeout: 30_000 });
 check(search(page) === `?song=${ids[1]}&mode=wait`, `↓ then L opens ${search(page)} (want ?song=${ids[1]}&mode=wait)`);
-const line = page.getByText("Learn: the song waits for each note");
+// wait-mode's whole start line: the ? card (help-overlay) lists L as "Learn: the song waits for each note" too, and
+// a bare match finds both (strict mode).
+const line = page.getByText("Learn: the song waits for each note. Not scored.");
 await line.waitFor({ timeout: 30_000 }).catch(() => {});
 check(await line.isVisible(), "… and wait mode's start line shows");
 

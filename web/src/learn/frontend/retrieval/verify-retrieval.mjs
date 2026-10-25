@@ -1,7 +1,8 @@
 // Headless proof of the retrieval test (spec: theory-screens, slice V3). Its own `next dev`. At 1280×720 on
 // /learn/review/theory: answer question 1 right (Correct, no ✕), question 2 wrong (✕, and the chosen option's
 // explanation in its own row, to the right of the option), and check the look: square, upright, no gradient,
-// nothing under 16px, no reference beside the question. Usage: node web/src/learn/frontend/retrieval/verify-retrieval.mjs --out <dir>
+// nothing under 16px, no reference beside the question. Then ?node=pitch-grand-staff: only that node's questions, each
+// Check appended to the device's attempts, ending on Test done and the way back to the map. Usage: node web/src/learn/frontend/retrieval/verify-retrieval.mjs --out <dir>
 import { spawn } from "node:child_process";
 import { mkdirSync } from "node:fs";
 import { createServer } from "node:net";
@@ -69,7 +70,8 @@ try {
   // Hydration: the radio only answers once React is attached.
   await page.waitForFunction(() => document.querySelector("input[type=radio]") && Object.keys(document.querySelector("input[type=radio]")).some((k) => k.startsWith("__react")), null, { timeout: 60_000 });
 
-  check((await page.getByText("Question 1 of 11").count()) === 1, "question 1 of 11 is shown alone");
+  // Next decides what follows, so no count is shown (decision "Agent drives").
+  check((await page.getByText(/Question \d+ of/).count()) === 0, "no question count");
   check((await page.getByText(/Reference|Previous answers/).count()) === 0, "no reference or history beside the question");
 
   await option("C").click();
@@ -79,7 +81,7 @@ try {
   check((await page.getByText("✕").count()) === 0, "a right answer shows no ✕");
   await page.getByRole("button", { name: "Next", exact: true }).click();
 
-  await page.getByText("Question 2 of 11").waitFor({ timeout: 10_000 });
+  await option("5").waitFor({ timeout: 10_000 });
   await option("5").click();
   await page.getByRole("button", { name: "Check", exact: true }).click();
   await page.getByText(EXPLANATION).waitFor({ timeout: 10_000 });
@@ -121,6 +123,32 @@ try {
   check(!look.scrollX, "no horizontal scroll at 1280");
   await page.screenshot({ path: join(out, "retrieval.png") });
   say(`verify-retrieval: screenshot ${join(out, "retrieval.png")}`);
+
+  // One node, as Next sends it: its own two questions, each Check appended to the device.
+  const ATTEMPTS_KEY = "pianoArcade.mastery.attempts.v1";
+  await page.goto(`${base}/learn/review/theory?node=pitch-grand-staff`);
+  await page.evaluate((key) => localStorage.removeItem(key), ATTEMPTS_KEY);
+  await page.reload();
+  await option("G").waitFor({ timeout: 30_000 });
+  await page.waitForFunction(() => document.querySelector("input[type=radio]") && Object.keys(document.querySelector("input[type=radio]")).some((k) => k.startsWith("__react")), null, { timeout: 60_000 });
+  check((await page.getByText("In treble clef, which note sits on the second line from the bottom?").count()) === 1, "the node's first question is shown");
+  await option("G").click();
+  await page.getByRole("button", { name: "Check", exact: true }).click();
+  await page.getByText("Correct", { exact: true }).waitFor({ timeout: 10_000 });
+  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await option("On the bottom line of the treble staff").click();
+  await page.getByRole("button", { name: "Check", exact: true }).click();
+  await page.getByText("✕").waitFor({ timeout: 10_000 });
+  await page.waitForFunction((key) => JSON.parse(localStorage.getItem(key) ?? "[]").length === 2, ATTEMPTS_KEY, { timeout: 10_000 }).catch(() => {});
+  const stored = await page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "[]"), ATTEMPTS_KEY);
+  check(
+    stored.length === 2 && stored.map((a) => a.correct).join() === "true,false" && stored.every((a) => a.nodeId === "pitch-grand-staff" && a.learnerId === "local"),
+    `both Checks are appended for the node (${JSON.stringify(stored.map(({ itemId, correct, cold }) => ({ itemId, correct, cold })))})`,
+  );
+  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await page.getByText("Test done", { exact: true }).waitFor({ timeout: 10_000 });
+  check(await page.getByRole("link", { name: "Back to map" }).isVisible(), "the node test ends on Test done and the way back to the map");
+  await page.screenshot({ path: join(out, "retrieval-node.png") });
 } catch (e) {
   check(false, e.message.split("\n")[0]);
 }

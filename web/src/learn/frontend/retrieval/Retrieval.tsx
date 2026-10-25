@@ -1,40 +1,72 @@
 'use client';
 
 import Link from 'next/link';
-import { type MouseEvent, useReducer, useRef } from 'react';
+import { type MouseEvent, useMemo, useReducer, useRef, useState } from 'react';
 import { Brackets, Button, DuoScope, Mark, Panel } from '../duo';
-import { choices } from '../theory';
-import { current, initialRetrieval, retrievalReducer, summary, theoryItems, verdict, type RetrievalEvent, type RetrievalState } from './model';
+import { choices, recordAnswer, theoryGates, type Gate, type NodeScreen } from '../theory';
+import { current, initialRetrieval, items, retrievalReducer, summary, verdict, type Item, type RetrievalEvent, type RetrievalState } from './model';
 import styles from './retrieval.module.css';
 
 /**
  * The clean retrieval test: one question at a time in one panel, with no workspace or reference
- * beside it. A checked answer is final; the end view counts only the answers given in this round.
+ * beside it. A checked answer is final; the end view counts only the answers given in this round, and lists the
+ * questions to revisit when there are any. Next decides what comes after, so the end view only leads back to the map.
+ * With a node, the test is that node's items and every checked answer is appended to the device's attempts.
+ * A null node has no items to test.
  */
-export function Retrieval({ initial = initialRetrieval }: { initial?: RetrievalState }) {
-  const [state, dispatch] = useReducer((s: RetrievalState, e: RetrievalEvent) => retrievalReducer(s, e), initial);
-  const heading = useRef<HTMLHeadingElement>(null);
-  const item = current(state);
-  const focusHeading = () => requestAnimationFrame(() => heading.current?.focus());
-
+export function Retrieval({ initial = initialRetrieval, node }: { initial?: RetrievalState; node?: NodeScreen | null }) {
   return <DuoScope className={styles.screen}>
     <div className={styles.column}>
       <Brackets>
         <Panel style={{ padding: 40 }}>
-          {item ? <Question state={state} dispatch={dispatch} heading={heading} focusHeading={focusHeading}/> : <End state={state} heading={heading} restart={() => { dispatch({ type: 'restart' }); focusHeading(); }}/>}
+          {node === null ? <Empty/> : <Test initial={initial} node={node}/>}
         </Panel>
       </Brackets>
     </div>
   </DuoScope>;
 }
 
-type Heading = React.RefObject<HTMLHeadingElement | null>;
+function Empty() {
+  return <>
+    <h1 className={styles.prompt}>No theory questions for this node</h1>
+    <div className={styles.actions}><Link href="/learn" className={styles.primaryLink}>Back to map</Link></div>
+  </>;
+}
 
-function Question({ state, dispatch, heading, focusHeading }: { state: RetrievalState; dispatch: (e: RetrievalEvent) => void; heading: Heading; focusHeading: () => void }) {
-  const item = current(state)!;
+type Heading = React.RefObject<HTMLHeadingElement | null>;
+type Round = { gates: readonly Gate[]; list: readonly Item[]; node?: NodeScreen };
+
+function Test({ initial, node }: { initial: RetrievalState; node?: NodeScreen }) {
+  const round = useMemo<Round>(() => {
+    const gates = node ? [node.gate] : theoryGates;
+    return { gates, list: items(gates), node };
+  }, [node]);
+  const [state, dispatch] = useReducer((s: RetrievalState, e: RetrievalEvent) => retrievalReducer(s, e, round.list), initial);
+  const [unsaved, setUnsaved] = useState(false);
+  const heading = useRef<HTMLHeadingElement>(null);
+  const focusHeading = () => requestAnimationFrame(() => heading.current?.focus());
+
+  function check() {
+    const item = current(state, round.list);
+    if (round.node && item && state.selected !== null && !state.checked) {
+      void recordAnswer({ nodeId: round.node.gate.id, question: item.question, choiceId: state.selected, earlier: state.attempts })
+        .then(saved => { if (!saved) setUnsaved(true); });
+    }
+    dispatch({ type: 'check' });
+  }
+
+  return <>
+    {current(state, round.list)
+      ? <Question state={state} round={round} dispatch={dispatch} check={check} heading={heading} focusHeading={focusHeading}/>
+      : <End state={state} round={round} heading={heading}/>}
+    {unsaved && <p className={styles.note} role="status">Answers aren&apos;t being saved on this device.</p>}
+  </>;
+}
+
+function Question({ state, round, dispatch, check, heading, focusHeading }: { state: RetrievalState; round: Round; dispatch: (e: RetrievalEvent) => void; check: () => void; heading: Heading; focusHeading: () => void }) {
+  const item = current(state, round.list)!;
   const { question } = item;
-  const result = verdict(state);
-  const last = state.index === theoryItems.length - 1;
+  const result = verdict(state, round.list);
   function next(event: MouseEvent<HTMLButtonElement>) {
     // A double click on Check must not also skip the question it just checked.
     if (event.detail > 1) return;
@@ -42,7 +74,6 @@ function Question({ state, dispatch, heading, focusHeading }: { state: Retrieval
     focusHeading();
   }
   return <>
-    <p className={styles.count}>Question {state.index + 1} of {theoryItems.length}</p>
     <h1 id="retrieval-question" ref={heading} tabIndex={-1} className={styles.prompt}>{question.prompt}</h1>
     <fieldset key={question.id} className={styles.options} aria-describedby="retrieval-question">
       <legend className={styles.hidden}>Your answer</legend>
@@ -62,25 +93,24 @@ function Question({ state, dispatch, heading, focusHeading }: { state: Retrieval
     </fieldset>
     <div className={styles.actions}>
       {state.checked
-        ? <Button style={{ fontSize: 16 }} onClick={next}>{last ? 'See results' : 'Next'}</Button>
-        : <Button style={{ fontSize: 16 }} disabled={state.selected === null} onClick={() => dispatch({ type: 'check' })}>Check</Button>}
+        ? <Button style={{ fontSize: 16 }} onClick={next}>Next</Button>
+        : <Button style={{ fontSize: 16 }} disabled={state.selected === null} onClick={check}>Check</Button>}
     </div>
   </>;
 }
 
-function End({ state, heading, restart }: { state: RetrievalState; heading: Heading; restart: () => void }) {
-  const { right, revisit, answered } = summary(state.attempts);
+function End({ state, round, heading }: { state: RetrievalState; round: Round; heading: Heading }) {
+  if (round.node) return <>
+    <h1 ref={heading} tabIndex={-1} className={styles.prompt}>Test done</h1>
+    <div className={styles.actions}><Link href="/learn" className={styles.primaryLink}>Back to map</Link></div>
+  </>;
+  const { right, revisit, answered } = summary(state.attempts, round.gates);
   return <>
-    <p className={styles.count}>Round complete</p>
     <h1 ref={heading} tabIndex={-1} className={styles.prompt}>{right.length} of {answered} right on the first try</h1>
-    <h2 className={styles.subhead}>To revisit</h2>
-    {revisit.length
-      ? <ul className={styles.revisit}>{revisit.map(q => <li key={q.id}>{q.prompt}</li>)}</ul>
-      : <p className={styles.body}>Nothing to revisit from this round.</p>}
-    <p className={styles.note}>Counted only from the answers you gave in this round.</p>
-    <div className={styles.actions}>
-      <Link href="/learn" className={styles.primaryLink}>Back to map</Link>
-      <Button kind="secondary" style={{ fontSize: 16 }} onClick={restart}>Try again</Button>
-    </div>
+    {revisit.length > 0 && <>
+      <h2 className={styles.subhead}>To revisit</h2>
+      <ul className={styles.revisit}>{revisit.map(q => <li key={q.id}>{q.prompt}</li>)}</ul>
+    </>}
+    <div className={styles.actions}><Link href="/learn" className={styles.primaryLink}>Back to map</Link></div>
   </>;
 }

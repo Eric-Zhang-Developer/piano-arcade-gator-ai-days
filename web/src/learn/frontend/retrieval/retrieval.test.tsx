@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
-import { theoryGates, type Attempt } from '../theory';
+import { curriculum } from '../mastery/curriculum';
+import { nodeScreen, theoryGates, type Attempt } from '../theory';
 
 vi.mock('next/font/google', () => ({ Source_Sans_3: () => ({ variable: 'reading-face', className: 'reading-face', style: { fontFamily: 'Source Sans 3' } }) }));
 
@@ -39,9 +40,6 @@ describe('retrievalReducer', () => {
     expect(s).toMatchObject({ index: 1, selected: null, checked: false });
     expect(current(s)?.question.id).toBe('tonic-degree');
   });
-  it('restarts empty', () => {
-    expect(retrievalReducer(answer(initialRetrieval, 'c'), { type: 'restart' })).toBe(initialRetrieval);
-  });
 });
 
 describe('verdict', () => {
@@ -70,7 +68,8 @@ describe('Retrieval', () => {
   it('shows one question, its options and Check, and no reference', () => {
     const html = renderToStaticMarkup(<Retrieval />);
     const t = text(html);
-    expect(t).toContain('|Question 1 of 11|');
+    // Next decides what follows, so the test shows no count (decision "Agent drives").
+    expect(t).not.toMatch(/Question \d+ of/);
     expect(t).toContain(theoryItems[0].question.prompt);
     for (const o of ['|C|', '|G|', '|F|']) expect(t).toContain(o);
     expect(t).toContain('|Check|');
@@ -103,6 +102,36 @@ describe('Retrieval', () => {
     expect(t).toContain('|Which scale degree is the tonic?|');
     expect(html).toContain('href="/learn"');
     expect(html).not.toMatch(/master|mastery|passed|unlocked/i);
+  });
+  it('ends on the map, with no list when nothing needs revisiting and no restart', () => {
+    const attempts: Attempt[] = [{ type: 'answer', gateId: 'home', questionId: 'tonic', choiceId: 'c' }];
+    const t = text(renderToStaticMarkup(<Retrieval initial={{ index: theoryItems.length, selected: null, checked: false, attempts }} />));
+    expect(t).toContain('|1 of 1 right on the first try|');
+    expect(t).not.toContain('To revisit');
+    expect(t).not.toMatch(/Try again|Round complete/);
+    expect(t).toContain('|Back to map|');
+  });
+});
+
+describe('Retrieval for a node', () => {
+  const node = nodeScreen(curriculum, 'pitch-grand-staff')!;
+  it('tests only the node\'s items, with no count', () => {
+    const t = text(renderToStaticMarkup(<Retrieval node={node} />));
+    expect(t).toContain(`|${node.gate.questions[0].prompt}|`);
+    expect(t).toContain('|Check|');
+    expect(t).not.toMatch(/Question \d+ of/);
+    expect(t).not.toContain(theoryItems[0].question.prompt);
+  });
+  it('ends with Test done and the way back to the map', () => {
+    const t = text(renderToStaticMarkup(<Retrieval node={node} initial={{ index: node.gate.questions.length, selected: null, checked: false, attempts: [] }} />));
+    expect(t).toContain('|Test done|');
+    expect(t).toContain('|Back to map|');
+    expect(t).not.toContain('right on the first try');
+  });
+  it('says there is nothing to test for a node without theory items', () => {
+    const t = text(renderToStaticMarkup(<Retrieval node={null} />));
+    expect(t).toContain('|No theory questions for this node|');
+    expect(t).not.toContain('|Check|');
   });
 });
 

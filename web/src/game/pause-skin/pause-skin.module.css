@@ -99,3 +99,16 @@
     animation: none;
   }
 }
+
+/* Under the menu: the keyboard's and the lights' status, and the Demo lights switch (led-game), small and dim so the
+   menu stays the thing to read. Outside .menu, so ↑/↓ never step onto it. */
+.status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2vh;
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: clamp(13px, 1vw, 18px);
+  color: var(--pa-ink-dim);
+  animation: enter 220ms ease-out;
+}

@@ -18,6 +18,7 @@ import { laptopKey } from "../../game/laptop-sound";
 import { describeTiming, timingSummary, type TimingSummary } from "../../game/timing";
 import { nextPause, pauseClock, type PauseAction, type PauseMode } from "../../game/play-slots";
 import { StartScreen } from "../../game/duo-start/StartScreen";
+import { PauseLights } from "../../game/leds";
 import { PauseMenu } from "../../game/pause-skin";
 import { Button, MonoLabel, Panel, kitButton } from "../../game/duo-tokens";
 import { ResultsLayout } from "../../game/results-layout";
@@ -511,6 +512,7 @@ export default function Play() {
           onResume={() => pauseRef.current("resume")}
           onRetry={() => pauseRef.current("retry")}
           onQuit={() => pauseRef.current("quit")}
+          status={!isTest && <PauseLights midi={midiStatus} />}
         />
       )}
       {phase !== "playing" && (

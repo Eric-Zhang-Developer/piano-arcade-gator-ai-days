@@ -4,6 +4,7 @@
 // Options drawer (options-panel), not on the screen (Eric, #763). Each plugin's start panel goes in its group by id; a
 // panel in no group (first-run, versus, the demo's auto-start, any new one) goes under Start. Key hints never show
 // (#772): their shortcuts stay bound and are on the ? card.
+import Link from "next/link";
 import type { ReactNode } from "react";
 import type { GamePlugin } from "../../contracts";
 import { Brackets, Button, Panel } from "../duo-tokens";
@@ -57,6 +58,10 @@ export function StartScreen({
             </div>
             <div className={styles.bar} data-group="bar">
               {slots(groups.bar)}
+              {/* The way back to the list with a mouse, as the results screen's Songs (#881). */}
+              <Link href="/" className={styles.songs} data-testid="start-songs">
+                Songs
+              </Link>
               <OptionsDrawer keys={false} onLatency={onLatency}>
                 <div data-group="drawer">{slots(groups.drawer)}</div>
                 {status}

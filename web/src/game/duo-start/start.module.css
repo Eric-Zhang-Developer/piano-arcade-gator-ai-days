@@ -28,6 +28,15 @@
   display: none;
 }
 
+/* A panel's line under Start (first-run's, #900): left-aligned with the column, with room above and below, not a
+   centered line wedged against the modes. */
+.notes p {
+  max-width: none;
+  margin: 0.6vh 0;
+  text-align: left;
+  text-wrap: balance; /* two even lines at 1280, never a short last line */
+}
+
 /* The play modes: secondary buttons, side by side. A mode that's on shows its line instead of its button. */
 .modes {
   display: grid;
@@ -41,6 +50,16 @@
 .modes > [data-testid="slot-flow-mode"] {
   grid-column: 1 / -1;
   order: -1;
+}
+
+/* An adaptive step's strip and line: a row of their own under the ladder, too wide for one button's cell. */
+.modes > [data-testid="slot-chunk-practice"]:has([data-testid="chunk-step"]) {
+  grid-column: 1 / -1;
+}
+
+.modes [data-testid="chunk-step"] {
+  align-items: stretch;
+  text-align: left; /* the column's edge, like the mode's line above it */
 }
 
 .modes > *,
@@ -63,7 +82,7 @@
   font-size: clamp(13px, 0.9vw, 17px);
 }
 
-/* The hands on the left, Options on the right: the only settings on the screen. */
+/* The hands on the left; Songs and Options on the right. */
 .bar {
   display: flex;
   align-items: center;
@@ -74,8 +93,8 @@
 }
 
 /* options-panel's button, in the kit's secondary look (its own style is the select footer's). */
+.bar .songs,
 .bar [data-testid="options-open"] {
-  margin-left: auto;
   padding: 0.55em 1.2em;
   border: 1px solid var(--pa-line);
   border-radius: 0;
@@ -87,6 +106,18 @@
   cursor: pointer;
 }
 
+.bar .songs {
+  margin-left: auto;
+  text-decoration: none;
+  text-transform: uppercase; /* as options-panel's own button */
+}
+
+.bar .songs:focus-visible {
+  outline: 2px solid var(--pa-ink);
+  outline-offset: 2px;
+}
+
+.bar .songs:hover,
 .bar [data-testid="options-open"]:hover {
   background: rgba(125, 132, 150, 0.12);
 }

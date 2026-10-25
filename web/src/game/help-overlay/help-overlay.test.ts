@@ -50,6 +50,30 @@ describe("help overlay's drift test", () => {
     for (const f of [...sources, ...Object.keys(unlisted)]) expect(existsSync(join(src, f)), f).toBe(true);
   });
 
+  // mouse-first: every action is clickable, keys are only shortcuts. A control is found by its accessible name in the
+  // screen's sources: an exact string literal (aria-label="Pause", ["Resume", onResume]) or an element's whole JSX text
+  // (`>PLAY<`, `>EASY Lv {easy}`), so a word inside a sentence (the old "· W WATCH ·" hint) doesn't count.
+  it("every line names its control on its screen, or says why it's key-only", () => {
+    const esc = (t: string) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const wrong: string[] = [];
+    for (const g of helpGroups) {
+      const text = g.files.map((f) => readFileSync(join(src, f), "utf8")).join("\n");
+      for (const l of g.lines) {
+        const what = `${g.screen}: ${l.keys.join(" ")} ${l.what}`;
+        if (!l.control === !l.keyOnly) wrong.push(`${what}: needs exactly one of control and keyOnly`);
+        else if (l.control && !new RegExp(`["'\`]${esc(l.control)}["'\`]|>\\s*${esc(l.control)}\\s*[<{]`).test(text))
+          wrong.push(`${what}: no control named "${l.control}" in ${g.files.join(", ")}`);
+      }
+    }
+    expect(wrong).toEqual([]);
+  });
+
+  it("the control check fails on a control that isn't there", () => {
+    const src = '<button aria-label="Pause">❚❚</button><b>\n  PLAY\n</b><p><b>W</b> WATCH · <b>E</b> EASY</p>';
+    const found = (name: string) => new RegExp(`["'\`]${name}["'\`]|>\\s*${name}\\s*[<{]`).test(src);
+    expect([found("Pause"), found("PLAY"), found("WATCH"), found("PLA")]).toEqual([true, true, false, false]);
+  });
+
   it("renders the laptop keys from core's key map at middle C", () => {
     expect(laptopWhites.length + laptopBlacks.length).toBe(keyMap(60).size);
     expect(laptopWhites[0]).toBe("A"); // C4

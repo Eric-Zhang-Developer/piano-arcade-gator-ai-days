@@ -93,14 +93,11 @@ const line = page.getByText("Wait mode: the song waits for each note");
 await line.waitFor({ timeout: 30_000 }).catch(() => {});
 check(await line.isVisible(), "… and wait mode's start line shows");
 
-// 2. LEARN on the focused song, where the select has the link. duo-select's panel has PLAY and PRACTICE only, and L
-// (step 1) is its way into wait mode.
+// 2. The LEARN button on the focused song's panel (mouse-first): the same wait-mode take as L.
 await home();
-if (await page.getByTestId("preview-learn").count()) {
-  await page.getByTestId("preview-learn").click();
-  await page.waitForURL(/\/play\?/, { timeout: 30_000 });
-  check(search(page) === `?song=${ids[0]}&mode=wait`, `LEARN opens ${search(page)} (want ?song=${ids[0]}&mode=wait)`);
-} else say("verify-learn: no LEARN link on this select (duo-select): L covers it, step 1");
+await page.getByTestId("select-learn").click();
+await page.waitForURL(/\/play\?/, { timeout: 30_000 });
+check(search(page) === `?song=${ids[0]}&mode=wait`, `LEARN opens ${search(page)} (want ?song=${ids[0]}&mode=wait)`);
 
 // 3. Enter is unchanged: a judged take.
 await home();

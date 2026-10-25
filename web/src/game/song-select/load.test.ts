@@ -44,10 +44,11 @@ test("the real library is sorted easiest first, Twinkle at the top", () => {
   }
 });
 
-test("experiment-only charts under songs/x/ stay off the select, and stay where /play fetches them (#1165)", () => {
+test("experiment-only charts under songs/x/ and songs/rounds/ stay off the select, and stay where /play fetches them (#1165)", () => {
   const dir = mkdtempSync(join(tmpdir(), "songs-"));
   cpSync(join(songs, "twinkle"), join(dir, "twinkle"), { recursive: true });
   cpSync(join(songs, "twinkle"), join(dir, "x", "demo"), { recursive: true });
+  cpSync(join(songs, "twinkle"), join(dir, "rounds", "demo"), { recursive: true });
   expect(loadSongs(dir).songs.map((s) => s.id)).toEqual(["twinkle"]);
   // /play?song=x/demo fetches /songs/x/demo/chart.json: the chart is still there and still valid.
   expect(validateChart(JSON.parse(readFileSync(join(dir, "x", "demo", "chart.json"), "utf8")))).toEqual([]);

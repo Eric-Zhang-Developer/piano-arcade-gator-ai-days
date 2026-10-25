@@ -1,7 +1,7 @@
 .app { --learn-bg:var(--pa-bg); --learn-surface:var(--pa-panel); --learn-text:var(--pa-ink); --learn-muted:var(--pa-ink-dim); --learn-border:var(--pa-line); --learn-accent:var(--pa-primary); --learn-secondary:var(--pa-secondary); --learn-wrong:var(--pa-wrong); --learn-paper:var(--pa-paper); --learn-paper-text:var(--pa-paper-ink); --learn-score-cursor:var(--pa-primary); --learn-font-display:var(--pa-font-display),system-ui,sans-serif; --learn-font-data:var(--pa-font-data),ui-monospace,monospace; background:var(--learn-bg); color:var(--learn-text); min-height:100dvh; display:flex; flex-direction:column; --learn-header-height:72px; font-family:system-ui,sans-serif; font-size:16px; line-height:1.55; color-scheme:dark; }
 .app * { box-sizing:border-box; }
 .app ::selection { background:var(--pa-cyan); color:var(--pa-bg); }
-.app :focus-visible { outline:2px solid var(--pa-magenta); outline-offset:4px; }
+.app :focus-visible { outline:2px solid var(--pa-primary); outline-offset:4px; }
 .app button,.app a,.app textarea { -webkit-tap-highlight-color:transparent; }
 .app button { cursor:pointer; font:inherit; }
 .app button:disabled { cursor:not-allowed; opacity:.5; }
@@ -105,10 +105,9 @@
 .topbar nav a { display:flex; align-items:center; padding:0 18px; border-bottom:2px solid transparent; font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-weight:800; font-size:16px; letter-spacing:.04em; text-transform:uppercase; }
 .topbar nav a:hover { background:rgb(242 242 245 / .05); }
 .topbar nav a[aria-current] { color:var(--pa-cyan); border-bottom-color:var(--pa-cyan); }
-.previewInfo { position:relative; margin-left:auto; color:var(--learn-muted); font-size:12px; }
-.previewInfo>div { position:absolute; right:0; top:calc(100% + 20px); width:320px; padding:18px 22px; border:1px solid var(--learn-border); border-radius:6px; background:#0c0c10; z-index:4; font-size:14px; }
-.previewInfo p { margin:0 0 16px; }
-.previewInfo a { text-decoration:underline; color:var(--learn-text); }
+.honest { margin:0 0 0 auto; color:var(--learn-muted); font-size:14px; }
+.arcade { font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-weight:800; font-size:16px; letter-spacing:.04em; text-transform:uppercase; }
+.arcade:hover { color:var(--learn-accent); }
 .landing { min-height:calc(100dvh - var(--learn-header-height)); max-width:1080px; margin:0 auto; padding:68px 56px 40px; }
 .landingIntro { margin-bottom:52px; }
 .landingIntro h1 { margin:0 0 16px; font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-weight:900; font-size:40px; line-height:1.05; letter-spacing:-.01em; text-transform:uppercase; }

@@ -1,5 +1,5 @@
-/* NEW RECORD in Saira 900 italic gold, stamped on rank-stamp's curve; the cells rise in under it. Times come from
-   timing.ts as custom properties, measured from the results showing (when this panel mounts). */
+/* NEW RECORD in Saira 900 gold, upright as the Duo look sets it, stamped on rank-stamp's curve; the cells rise in
+   under it. Times come from timing.ts as custom properties, measured from the results showing (when this panel mounts). */
 .moment {
   display: grid;
   justify-items: center;
@@ -8,7 +8,7 @@
 }
 
 .stamp {
-  font: italic 900 clamp(40px, 7vh, 76px) var(--pa-font-display), system-ui, sans-serif;
+  font: 900 clamp(40px, 7vh, 76px) var(--pa-font-display), system-ui, sans-serif;
   line-height: 1;
   letter-spacing: 0.02em;
   color: var(--pa-gold);
@@ -26,7 +26,7 @@
 .cells {
   display: flex;
   gap: 0.35em;
-  font: italic 900 clamp(28px, 5vh, 54px) var(--pa-font-display), system-ui, sans-serif;
+  font: 900 clamp(28px, 5vh, 54px) var(--pa-font-display), system-ui, sans-serif;
 }
 
 .cell {
@@ -36,7 +36,7 @@
   width: 1.25em;
   height: 1.45em;
   border: 2px solid rgb(242 242 245 / 0.22);
-  border-radius: 6px;
+  border-radius: 0;
   background: var(--pa-panel);
 }
 
@@ -59,11 +59,11 @@
 
 .hint {
   color: var(--pa-ink-dim);
-  font: clamp(12px, 1.5vh, 16px) system-ui, sans-serif;
+  font: clamp(16px, 2.223vh, 24px) system-ui, sans-serif; /* 16 px at 720, 24 px at 1080: read on video */
 }
 
 .saved {
-  font: italic 800 clamp(22px, 3.4vh, 36px) var(--pa-font-display), system-ui, sans-serif;
+  font: 800 clamp(22px, 3.4vh, 36px) var(--pa-font-display), system-ui, sans-serif;
   letter-spacing: 0.06em;
   color: var(--pa-ink);
 }

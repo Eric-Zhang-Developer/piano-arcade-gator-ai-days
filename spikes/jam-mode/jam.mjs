@@ -47,20 +47,21 @@ export function createHeld() {
   const sustained = new Set();
   let pedal = false;
   return {
-    // Returns true when the held set changed. Other channels are ignored: the DGX copies CC 64 to channel 2, and in the
-    // loopback run the band's own notes come back on 2 and 10.
+    // What changed: "on" (a key struck), "off" (a key or the pedal let go) or false. Only "on" should rename the
+    // chord: a hand lifting off C E G passes through E G, which names Em. Other channels are ignored: the DGX copies
+    // CC 64 to channel 2, and in the loopback run the band's own notes come back on 2 and 10.
     message([s, a, b]) {
       if ((s & 0x0f) !== 0) return false;
       const type = s & 0xf0;
       if (type === 0x90 && b > 0) {
         down.add(a);
         sustained.delete(a);
-        return true;
+        return "on";
       }
       if (type === 0x80 || type === 0x90) {
         if (!down.delete(a)) return false;
         if (pedal) sustained.add(a);
-        return true;
+        return "off";
       }
       if (type === 0xb0 && a === 64) {
         const now = b >= 64;
@@ -68,7 +69,7 @@ export function createHeld() {
         pedal = now;
         if (!pedal && sustained.size) {
           sustained.clear();
-          return true;
+          return "off";
         }
       }
       return false;

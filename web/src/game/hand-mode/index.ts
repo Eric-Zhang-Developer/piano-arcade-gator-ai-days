@@ -7,6 +7,7 @@ import { createElement } from "react";
 import type { Chart, ChartNote, GamePlugin, InputDevice } from "../../contracts";
 import { HandPicker } from "./HandPicker";
 import { isWaitMode } from "../wait-mode";
+import { isFlowMode } from "../flow-mode/clock";
 import {
   ALL_NOTES_OFF_CH1,
   echoGuard,
@@ -27,7 +28,7 @@ const midiHz = (p: number) => 440 * 2 ** ((p - 69) / 12);
 
 export function handMode(): GamePlugin {
   let hands: HandsSetting = "both";
-  let wait = false; // ?mode=wait
+  let wait = false; // ?mode=wait, or ?mode=flow: either clock holds at your notes, so nothing is queued ahead
   let chart: Chart | null = null; // the full chart, for playback timing
   let playback: ChartNote[] = [];
   let twoHands = false;
@@ -114,7 +115,7 @@ export function handMode(): GamePlugin {
     id: "hand-mode",
     transformChart(c, params) {
       hands = handsSetting(params.get("hands"));
-      wait = isWaitMode(params);
+      wait = isWaitMode(params) || isFlowMode(params);
       const split = splitHands(c, hands);
       chart = c;
       playback = split.playback;

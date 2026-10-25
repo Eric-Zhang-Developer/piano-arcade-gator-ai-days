@@ -27,6 +27,7 @@ const SELECT = "game/select-layout/index.tsx";
 const OPTIONS = "game/options-panel/index.tsx";
 const RECORDS = "game/records/initials.ts"; // the entry's keys, shared with record-moment (#495, #499)
 const PAUSE = "game/pause-skin/index.tsx";
+const SONG_OPTIONS = "game/song-options/index.tsx"; // its keys are compared in song-options/options.ts (keyOptions)
 
 export const helpGroups: HelpGroup[] = [
   {
@@ -35,6 +36,9 @@ export const helpGroups: HelpGroup[] = [
       { keys: ["↑", "↓"], what: "choose a song", source: [SELECT], match: ["ArrowUp", "ArrowDown"] },
       { keys: ["Enter"], what: "play it" },
       { keys: ["L"], what: "learn it: the song waits for each note", source: [SELECT] },
+      { keys: ["W"], what: "watch it: the perfect bot plays it", source: [SELECT] }, // through watch-demo's isWatchKey (#580)
+      { keys: ["H"], what: "Hands: both, right or left", source: [SONG_OPTIONS], match: ["h"] },
+      { keys: ["←", "→"], what: "Speed: slower or faster", source: [SONG_OPTIONS], match: ["ArrowLeft", "ArrowRight"] },
       { keys: ["E"], what: "switch Normal and Easy", source: [SELECT], match: ["e"] },
       { keys: ["F"], what: "a guided first song, 30 seconds", source: ["game/first-run/index.tsx"], match: ["f"] },
       { keys: ["O"], what: "Options: latency, volume, labels", source: [OPTIONS], match: ["o"] },
@@ -68,6 +72,7 @@ export const helpGroups: HelpGroup[] = [
     lines: [
       { keys: ["Esc"], what: "pause, and again to resume", source: ["app/play/page.tsx", PAUSE], match: ["Escape"] },
       { keys: ["↑", "↓", "Enter"], what: "Resume, Retry or Quit", where: "paused", source: [PAUSE], match: ["ArrowUp", "ArrowDown"] },
+      { keys: ["←", "→"], what: "a bar back or ahead", where: "learning", source: ["app/play/page.tsx"], match: ["ArrowLeft", "ArrowRight"] },
     ],
   },
   {

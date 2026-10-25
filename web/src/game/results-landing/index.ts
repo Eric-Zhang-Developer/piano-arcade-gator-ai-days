@@ -164,6 +164,7 @@ export function stopLanding(): void {
   run = null;
   setStampTiming(null);
   setTallyDriver(null);
+  document.getElementById("results-landing-style")?.remove();
   delete window.__pianoArcadeLanding;
 }
 
@@ -206,6 +207,10 @@ function fly(el: HTMLElement, from: FlyFrom, target: HTMLElement, u: number, tex
   el.style.fontSize = `${size}px`;
   el.style.color = cs.color;
   el.style.letterSpacing = cs.letterSpacing;
+  // In flight it rides on a tile of the page's own color, so it passes over the cells instead of through their
+  // labels; the tile dissolves as it lands.
+  el.style.padding = "0.08em 0.3em";
+  el.style.background = `color-mix(in srgb, var(--pa-bg) ${Math.round(100 * Math.min(1, (1 - u) / 0.2))}%, transparent)`;
   const x = lerp(from.x, b.left + b.width / 2, u);
   const y = lerp(from.y, b.top + b.height / 2, u);
   el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
@@ -216,7 +221,7 @@ function apply(): void {
   if (!r) return;
   const t = landingT();
   const st = landingAt(t, r.plan);
-  const done = t >= r.plan.endMs;
+  const done = r.plan.reduced || t >= r.plan.endMs; // reduced motion: the end state from the first frame
   r.version++;
   for (const cb of r.listeners) cb();
   const results = document.querySelector<HTMLElement>('[data-testid="results"]');

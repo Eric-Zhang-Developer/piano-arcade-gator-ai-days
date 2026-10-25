@@ -15,7 +15,6 @@ import { songTitle } from './song-titles';
 import { useGuidedEntry } from './GuidedEntry';
 import type { PreparedActivity } from './prepared';
 import styles from './graph.module.css';
-import learning from '../learning.module.css';
 export type MasteryGraphHomeProps = { guide: { activity: PreparedActivity; href: string; actionLabel: string; complete: boolean; onStart: () => void } };
 const colourWords: Record<Colour, string> = { unknown: 'Not yet', 'in-progress': 'In progress', mastered: 'Mastered' };
 const legend: readonly Colour[] = ['unknown', 'in-progress', 'mastered'];
@@ -101,7 +100,7 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
   }
   const songs = curriculum.songs, chosen = loaded?.goals.songIds ?? [];
   return <DuoScope className={styles.home} aria-busy={!!active || !loaded} aria-label="Your map">
-    <h1 className={learning.srOnly}>Your map</h1>
+    <h1 className={styles.srOnly}>Your map</h1>
     <div className={styles.body}>
       <div ref={frame} className={styles.mapStage} data-entering={!!active} data-camera-scale={camera.scale} data-camera-x={camera.x} data-camera-y={camera.y}>
         <div ref={stage} className={styles.mapField}>
@@ -133,7 +132,7 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
         {songs.length
           ? <ul className={styles.songs}>{songs.map(song => {
             const lit = chosen.includes(song.songId), full = !lit && chosen.length >= maxGoals, chip = kitChip(lit);
-            return <li key={song.songId}><button type="button" className={chip.className} style={{ ...chip.style, fontSize: 16 }} aria-pressed={lit} disabled={!loaded || full} onClick={() => chooseGoal(song.songId)}>{songTitle(song.songId)}</button></li>;
+            return <li key={song.songId}><button type="button" className={chip.className} style={{ ...chip.style, fontSize: 16, textAlign: 'left' }} aria-pressed={lit} disabled={!loaded || full} onClick={() => chooseGoal(song.songId)}>{songTitle(song.songId)}</button></li>;
           })}</ul>
           : <p className={styles.empty}>No songs are tagged in the curriculum yet.</p>}
         {!goalsSaved && <p className={styles.error} role="alert">Your goals could not be saved on this device.</p>}

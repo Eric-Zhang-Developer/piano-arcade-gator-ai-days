@@ -22,15 +22,17 @@ export function TakeCount({ phase, beat, beats }: { phase: TakePhase; beat: numb
  */
 export function useKeepFocus() {
   const group = useRef<HTMLDivElement>(null);
-  const inside = useRef(false); // the last focus or press was in the group; a removed button fires neither
+  const inside = useRef(false); // the last focus, press or click was in the group; a removed button fires none
   useEffect(() => {
+    // Capture, so the click is counted before React's own listener re-renders and the effect below runs.
+    const events = ['focusin', 'pointerdown', 'click'] as const;
     const track = (e: Event) => { inside.current = !!group.current?.contains(e.target as Node); };
-    document.addEventListener('focusin', track);
-    document.addEventListener('pointerdown', track);
-    return () => { document.removeEventListener('focusin', track); document.removeEventListener('pointerdown', track); };
+    for (const type of events) document.addEventListener(type, track, true);
+    return () => { for (const type of events) document.removeEventListener(type, track, true); };
   }, []);
   useEffect(() => {
-    const lost = !document.activeElement || document.activeElement === document.body;
+    // A removed button can stay document.activeElement until the browser's next rendering update, so disconnected counts.
+    const active = document.activeElement, lost = !active || active === document.body || !active.isConnected;
     if (inside.current && lost) group.current?.querySelector<HTMLElement>('button:not(:disabled), a[href]')?.focus();
   });
   return group;

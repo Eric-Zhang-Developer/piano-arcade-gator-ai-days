@@ -5,7 +5,7 @@
 import type { GameEvent, GamePlugin } from "../../contracts";
 import { msPerBeat } from "../core/settings";
 import { type Gauge, emptyGauge, reduceGauge } from "../fever-gauge/gauge";
-import { landingSettings } from "../results-landing/timeline";
+import { landingPlan, landingSettings, landingT } from "../results-landing";
 import { momentSettings } from "../fever-moment"; // read at call time only: fever-moment imports this module too
 
 export const arcSettings = {
@@ -67,10 +67,19 @@ export function reduceArc(s: ArcState, e: GameEvent): ArcState {
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const easeInOut = (u: number) => (u < 0.5 ? 4 * u ** 3 : 1 - (-2 * u + 2) ** 3 / 2);
 
-export function arcAt(s: ArcState, nowMs: number): Arc {
+/**
+ * The arc at chart time nowMs. landingMs is ms since results-landing's T0 while its cut runs (null without one): a
+ * take that ends lit drains over the out on that timeline, since the drawn chart clock eases to a stop there and
+ * songEnd only arrives at the mount (#1333).
+ */
+export function arcAt(s: ArcState, nowMs: number, landingMs: number | null = null): Arc {
   const beat = (((nowMs / s.beatMs) % 1) + 1) % 1;
   const at = (phase: Phase, progress: number, heat: number): Arc => ({ phase, progress: clamp01(progress), beat, igniteAtMs: s.igniteAtMs, heat });
   const lit = s.igniteAtMs !== null && nowMs >= s.igniteAtMs;
+  if (landingMs !== null && lit && s.endKind !== "break") {
+    const u = landingMs / arcSettings.handoffMs;
+    return at("handoff", u, 1 - easeInOut(clamp01(u)));
+  }
   if (s.endAtMs !== null && nowMs >= s.endAtMs) {
     // A break before the ignition beat never lit anything: back to idle at once.
     if (s.igniteAtMs === null || s.endAtMs < s.igniteAtMs) return at("idle", 0, 0);
@@ -90,7 +99,7 @@ export function arcAt(s: ArcState, nowMs: number): Arc {
 
 // One take at a time: the plugin feeds this, the readers ask it.
 let state = emptyArc();
-export const arcNow = (nowMs: number): Arc => arcAt(state, nowMs);
+export const arcNow = (nowMs: number): Arc => arcAt(state, nowMs, landingPlan() ? landingT() : null);
 /** Where a feverStart at atMs ignites: for the sound, which is scheduled at event time. */
 export const ignitionFor = (atMs: number): number => nextBeat(atMs, state.beatMs);
 // fever's heat at the last drawn frame, for readers that don't see the chart clock (the sparks).

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Chart, Frame, GameEvent } from "../../contracts";
 import { soundsFor } from "../sound";
 
@@ -178,6 +178,55 @@ describe("the plugin (miss-moment)", () => {
     const r = recorder();
     q.draw!(r.ctx, frame(1050));
     expect(r.calls.some((c) => c.op.startsWith("fillText"))).toBe(false);
+  });
+});
+
+describe("while the chart clock holds (#1331)", () => {
+  // In Learn and in Flow's wait a press is timed at the held note, so the wrongNote's atMs is the frame's nowMs and
+  // nowMs doesn't move until the right key: only wall time does.
+  let wall = 0;
+  beforeEach(() => {
+    wall = 50_000;
+    vi.spyOn(performance, "now").mockImplementation(() => wall);
+  });
+  afterEach(() => vi.restoreAllMocks());
+  const wrongAt = (params: string) => {
+    const p = missMoment();
+    p.transformChart!(chart, new URLSearchParams(params));
+    p.onEvent!({ type: "combo", count: 12, atMs: 900 } as GameEvent);
+    p.onEvent!({ type: "wrongNote", pitch: 61, atMs: 1000 } as GameEvent);
+    return (advanceMs: number) => {
+      wall += advanceMs;
+      const { ctx, calls } = recorder();
+      p.draw!(ctx, frame(1000));
+      return { digits: calls.filter((c) => c.op.startsWith("fillText")), pulse: calls.filter((c) => c.style === "#ff4d5e") };
+    };
+  };
+
+  it("Learn: no combo break, and the pulse ends 180 ms of wall time after its first frame", () => {
+    const draw = wrongAt("song=twinkle&mode=wait");
+    const first = draw(0);
+    expect(first.digits).toEqual([]);
+    expect(first.pulse[0].alpha).toBe(missSettings.pulseAlpha);
+    expect(draw(300)).toEqual({ digits: [], pulse: [] });
+    expect(dip).not.toHaveBeenCalled();
+  });
+
+  it("Flow's wait: the break's digits and the pulse both end in their own durations", () => {
+    const draw = wrongAt("song=twinkle&mode=flow");
+    expect(draw(0).digits.map((c) => c.op)).toEqual(["fillText 12"]);
+    expect(draw(100).digits[0].alpha).toBeCloseTo(1 - 100 / missSettings.breakMs, 6);
+    expect(draw(200)).toEqual({ digits: [], pulse: [] });
+  });
+
+  it("a rewind drops a pulse ahead of the clock it lands on", () => {
+    const p = missMoment();
+    p.transformChart!(chart, new URLSearchParams("mode=wait"));
+    p.onEvent!({ type: "wrongNote", pitch: 61, atMs: 3000 } as GameEvent);
+    p.onEvent!({ type: "resume", atMs: 2000 } as GameEvent);
+    const { ctx, calls } = recorder();
+    p.draw!(ctx, frame(3000));
+    expect(calls).toEqual([]);
   });
 });
 

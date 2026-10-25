@@ -3,6 +3,7 @@ import type { GameEvent } from "../../contracts";
 import { msPerBeat } from "../core/settings";
 import { flashAt, momentSettings } from "../fever-moment";
 import { shimmerAt } from "../fever-gauge";
+import { landingSettings } from "../results-landing";
 import { type ArcState, arcAt, arcSettings, emptyArc, feverArc, ignitionFor, nextBeat, reduceArc } from ".";
 
 const hit: GameEvent = { type: "noteHit", noteId: "n", pitch: 60, judgment: "PERFECT", offsetMs: 0, atMs: 0 };
@@ -66,6 +67,22 @@ describe("the arc", () => {
     const ended = reduceArc(filled, { type: "songEnd", atMs: 20_000 } as GameEvent);
     expect(arcAt(ended, 20_000 + arcSettings.handoffMs / 2)).toMatchObject({ phase: "handoff" });
     expect(arcAt(ended, 20_000 + arcSettings.handoffMs).heat).toBe(0);
+  });
+
+  it("under results-landing the handoff follows the landing's own timeline, not the stalled chart clock (#1333)", () => {
+    // The out: the drawn clock eases to a stop near T0 (20 000), and songEnd comes at the mount, later on the real clock.
+    const drawn = (ms: number) => 20_000 + Math.min(ms, landingSettings.outMs) / 3;
+    expect(arcAt(filled, drawn(0), 0)).toMatchObject({ phase: "handoff", heat: 1 });
+    expect(arcAt(filled, drawn(200), 200).heat).toBeCloseTo(0.5, 6);
+    expect(arcAt(filled, drawn(landingSettings.outMs), landingSettings.outMs).heat).toBe(0);
+    // The last frame behind the results is drawn at the out's clock, before songEnd's time: still drained.
+    const ended = reduceArc(filled, { type: "songEnd", atMs: 20_400 } as GameEvent);
+    expect(arcAt(ended, drawn(landingSettings.outMs), landingSettings.outMs)).toMatchObject({ phase: "handoff", heat: 0 });
+    // Without the landing, the frozen frame #1333 reported: sustain until songEnd.
+    expect(arcAt(filled, drawn(landingSettings.outMs)).phase).toBe("sustain");
+    // A break before T0 keeps its own release; a take that never lit has nothing to hand off.
+    expect(arcAt(brk(filled, 19_900), 20_000, 100).phase).toBe("release");
+    expect(arcAt(run(eleven), 20_000, 100).phase).toBe("build");
   });
 
   it("leaves the chart as it found it, so judging can't move", () => {

@@ -1,7 +1,8 @@
 // Headless proof of miss-moment (spec Validation): a rank-C bot plays Twinkle with the luminance probe on. Every missed
 // note's tail is gone within 300 ms; a miss moves the playfield's luminance less than a GOOD hit does; under emulated
 // reduced motion a tail only changes opacity (full width throughout); the miss cue sits 18 dB or more under the piano;
-// no console error. Not run locally (AGENTS.md load rule); CI's browser suite runs it.
+// no console error. Then Learn (#1331): ten notes right, a wrong key on the 11th while the clock holds: its pulse shows,
+// then ends in its own 180 ms though the clock doesn't move, and no broken combo's digits appear (Learn has no combo). Not run locally (AGENTS.md load rule); CI's browser suite runs it.
 // Usage: node web/src/game/miss-moment/verify-miss.mjs --out <dir>
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -113,6 +114,39 @@ try {
   const calmTails = calm.probe.frames.flatMap((f) => f.tails);
   check(calmTails.length > 0 && calmTails.every((t) => t.width === 1), `reduced motion: tails change opacity only (${calmTails.length} drawn, all full width)`);
   check(calm.errors.length === 0, `reduced motion: no console error${calm.errors.length ? `: ${calm.errors.join("; ")}` : ""}`);
+
+  // Learn: the wrong key's pulse ends while the chart clock holds, and no combo breaks.
+  {
+    const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
+    const page = await context.newPage();
+    const errors = [];
+    page.on("pageerror", (e) => errors.push(e.message));
+    await page.addInitScript(() => (window.__pianoArcadeMiss = { frames: [] }));
+    await page.goto(`${base}/play?song=twinkle&input=test&beat=off&stage=off&mode=wait`);
+    await page.waitForFunction(() => window.__pianoArcade?.ready === true, null, { timeout: 60_000 });
+    const held = await page.evaluate(async () => {
+      const hook = window.__pianoArcade;
+      const mpb = 60000 / hook.chart.bpm;
+      const notes = [...hook.chart.notes].sort((a, b) => a.beat - b.beat);
+      for (const n of notes.slice(0, 10)) {
+        while (hook.now() < n.beat * mpb) await new Promise(requestAnimationFrame);
+        hook.press(n.pitch, n.beat * mpb);
+      }
+      const at = notes[10].beat * mpb;
+      while (hook.now() < at) await new Promise(requestAnimationFrame);
+      const from = window.__pianoArcadeMiss.frames.length;
+      hook.press(notes[10].pitch + 1, at); // the wrong key, while the clock holds on note 11
+      await new Promise((r) => setTimeout(r, 600));
+      return { at, frames: window.__pianoArcadeMiss.frames.slice(from), now: hook.now() };
+    });
+    const pulsed = held.frames.filter((f) => f.pulse > 0);
+    const last = held.frames.at(-1);
+    check(held.now === held.at && pulsed.length > 0 && last && last.pulse === 0, `Learn: the wrong key's pulse shows (${pulsed.length} frames) and is gone 600 ms later with the clock still at ${held.now} ms`);
+    check(held.frames.every((f) => !f.digits), "Learn: no broken combo's digits");
+    await page.screenshot({ path: join(out, "learn-wrong-key.png") });
+    check(errors.length === 0, `Learn: no page error${errors.length ? `: ${errors.join("; ")}` : ""}`);
+    await context.close();
+  }
 
   writeFileSync(join(out, "verify-miss.json"), JSON.stringify({ fail, misses: misses.length, goods: goods.length, missDelta: m, goodDelta: g, cue }, null, 2));
 } finally {

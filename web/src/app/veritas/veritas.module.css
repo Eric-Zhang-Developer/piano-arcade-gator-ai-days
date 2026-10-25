@@ -1,7 +1,8 @@
-/* /veritas: cabinet chrome on the sky (visual-direction.md). All of the page's styling lives here, so veritas-polish
-   changes CSS only; components set nothing inline but data positions (--x, --y, --row, --i).
-   The look: the cabinet's marquee up top, each take a calm black lane where the notes flare white as the playhead
-   reaches them (Synthesia's center), the judge's marks stamped over it; below, a quiet scoreboard. */
+/* /veritas in the Duo kit (visual-direction.md): flat black, 1px hairlines, square panels, upright condensed Saira,
+   the primary blue for the one moving thing. All of the page's styling lives here; components set nothing inline but
+   data positions (--x, --y, --row, --i).
+   The look: the wordmark up top, each take a calm black lane where the notes flare white as the playhead reaches them
+   (Synthesia's center), the judge's marks stamped over it; below, a quiet scoreboard. */
 .page {
   max-width: 1600px;
   margin: 0 auto;
@@ -14,18 +15,7 @@
   box-sizing: content-box;
 }
 
-/* The sky, lit from the top edge in the cabinet's two chrome colors: loud at the edge, dark behind the lanes. */
-:global(html):has(.page),
-:global(body):has(.page) {
-  background-color: var(--pa-sky);
-  background-image:
-    radial-gradient(70% 38% at 18% -6%, rgba(255, 47, 208, 0.2), transparent 70%),
-    radial-gradient(60% 34% at 88% -8%, rgba(39, 225, 255, 0.14), transparent 70%);
-  background-repeat: no-repeat; /* once, at the top: repeated, it tiled every screen height with a seam */
-  /* not background-attachment: fixed: that repaints the whole page on every scroll, a stutter in a screen capture */
-}
-
-/* --- the marquee ------------------------------------------------------------------------------------------------- */
+/* --- the header -------------------------------------------------------------------------------------------------- */
 
 .header {
   display: grid;
@@ -34,28 +24,36 @@
   gap: 8px 40px;
   padding-bottom: 20px;
   margin-bottom: 32px;
-  border-bottom: 2px solid transparent;
-  border-image: linear-gradient(90deg, var(--pa-magenta), var(--pa-cyan) 60%, transparent) 1;
+  border-bottom: 1px solid var(--pa-line);
 }
 
 .title,
 .player,
 .h2 {
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 900;
+  font-stretch: 75%;
+  font-weight: 700;
 }
 
+/* The select's wordmark (select-layout): wide-tracked caps after a slanted bar in the primary. */
 .title {
   margin: 0;
   font-size: max(56px, 5.5vw);
   line-height: 0.9;
-  letter-spacing: 0.04em;
-  color: var(--pa-magenta);
-  /* a neon tube: the magenta's own glow, and a thin cyan ghost off its edge */
-  text-shadow:
-    0 0 0.25em rgba(255, 47, 208, 0.55),
-    0.04em 0.03em 0 rgba(39, 225, 255, 0.55);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-stretch: 100%;
+  color: var(--pa-ink);
+}
+
+.title::before {
+  content: "";
+  display: inline-block;
+  width: 0.2em;
+  height: 0.78em;
+  margin-right: 0.4em;
+  background: var(--pa-primary);
+  transform: skewX(-18deg);
 }
 
 .header p {
@@ -69,7 +67,7 @@
   margin: 0 0 20px;
   font-size: max(24px, 1.9vw);
   letter-spacing: 0.04em;
-  color: var(--pa-cyan);
+  color: var(--pa-ink);
 }
 
 .dim {
@@ -78,8 +76,8 @@
 
 .num {
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 800;
+  font-stretch: 75%;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
@@ -104,24 +102,19 @@
 .run {
   position: relative;
   padding: 0.7em 0.9em 0.8em 1.1em;
-  border: 1px solid rgba(39, 225, 255, 0.28);
-  border-radius: 12px;
+  border: 1px solid var(--pa-line);
   background: var(--pa-panel);
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.6) inset,
-    0 18px 40px -24px rgba(255, 47, 208, 0.35);
 }
 
-/* the cabinet's edge: a magenta rail down the card's left side */
+/* the take's edge: a primary rail down the card's left side, the select's focused-row mark */
 .run::before {
   content: "";
   position: absolute;
   left: 0;
-  top: 14px;
-  bottom: 14px;
-  width: 4px;
-  border-radius: 0 4px 4px 0;
-  background: linear-gradient(var(--pa-magenta), var(--pa-cyan));
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--pa-primary);
 }
 
 .runHead {
@@ -152,12 +145,11 @@
   position: relative;
   height: 9.5em;
   margin: 0.6em 0 0.5em;
-  border-radius: 8px;
   background:
     repeating-linear-gradient(90deg, rgba(242, 242, 245, 0.05) 0 1px, transparent 1px 10%),
     linear-gradient(transparent 3.6em, rgba(242, 242, 245, 0.08) 3.6em, transparent calc(3.6em + 1px)),
     var(--pa-bg);
-  box-shadow: 0 0 0 1px rgba(242, 242, 245, 0.1) inset;
+  border: 1px solid var(--pa-line);
   overflow: hidden;
 }
 
@@ -174,17 +166,17 @@
   width: 9px;
   height: 6px;
   margin-left: -4px;
-  border-radius: 3px;
+  border-radius: 2px; /* a note pill: the one rounded thing (Duo) */
   background: var(--pa-ink);
   opacity: 0.35;
   animation: lit 450ms ease-out forwards;
   animation-delay: calc(var(--i) * var(--sweep) + var(--x) * var(--sweep));
 }
 
-/* a planted mistake: ringed in the fever's orange, so the eye knows where the judge must look. Thin: Chord Roller
-   and Jitter plant on nearly every note, and a thick ring merged them into bars. */
+/* a planted mistake: ringed in the primary, so the eye knows where the judge must look. Thin: Chord Roller and
+   Jitter plant on nearly every note, and a thick ring merged them into bars. */
 .planted {
-  outline: 1px solid rgba(255, 176, 46, 0.8);
+  outline: 1px solid var(--pa-primary);
   outline-offset: 2px;
 }
 
@@ -204,8 +196,8 @@
   font-size: 1em;
   line-height: 1.1;
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 900;
+  font-stretch: 75%;
+  font-weight: 800;
   letter-spacing: 0.03em;
   white-space: nowrap;
   opacity: 0;
@@ -215,7 +207,6 @@
 
 .wrong {
   color: var(--pa-wrong);
-  text-shadow: 0 0 0.4em rgba(255, 77, 94, 0.7);
 }
 
 /* EARLY, LATE and ROLLED come by the dozen (Jitter 79, Chord Roller 89), so no size makes one readable on its
@@ -227,37 +218,27 @@
   font-size: 0.6em;
 }
 
+/* Timing slips read as GOOD's blue, a rolled chord as the secondary: red stays WRONG's alone. */
 .early,
 .late {
-  color: var(--pa-sun);
+  color: var(--pa-good);
 }
 
 .rolled {
-  color: var(--pa-magenta);
+  color: var(--pa-secondary);
 }
 
-/* The playhead: a magenta scan line with a fading trail behind it, the cabinet sweeping the take. */
+/* The playhead: a primary scan line sweeping the take. */
 .playhead {
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
-  width: 3px;
-  background: var(--pa-magenta);
-  box-shadow: 0 0 14px 2px rgba(255, 47, 208, 0.8);
+  width: 2px;
+  background: var(--pa-primary);
   opacity: 0;
   animation: sweep var(--sweep) linear forwards;
   animation-delay: calc(var(--i) * var(--sweep));
-}
-
-.playhead::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 100%;
-  width: 140px;
-  background: linear-gradient(90deg, transparent, rgba(255, 47, 208, 0.22));
 }
 
 .tally {
@@ -349,24 +330,22 @@
 .replay {
   margin-left: 12px;
   padding: 0.2em 0.9em;
-  border: 2px solid var(--pa-magenta);
-  border-radius: 999px;
+  border: 1px solid var(--pa-primary);
+  border-radius: 0;
   background: transparent;
   color: var(--pa-ink);
   font: inherit;
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  font-stretch: 75%;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition:
-    background-color 180ms ease-out,
-    box-shadow 180ms ease-out;
+  transition: background-color 180ms ease-out;
 }
 
 .replay:hover {
-  background: rgba(255, 47, 208, 0.16);
-  box-shadow: 0 0 18px rgba(255, 47, 208, 0.45);
+  background: color-mix(in srgb, var(--pa-primary) 16%, transparent);
 }
 
 .replay:active {
@@ -374,7 +353,7 @@
 }
 
 .replay:focus-visible {
-  outline: 3px solid var(--pa-magenta);
+  outline: 2px solid var(--pa-primary);
   outline-offset: 3px;
 }
 
@@ -382,10 +361,8 @@
 
 .dashboard {
   padding: 28px 32px 32px;
-  border: 1px solid rgba(242, 242, 245, 0.1);
-  border-top: 2px solid rgba(39, 225, 255, 0.5);
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--pa-line);
+  background: var(--pa-panel);
 }
 
 .dash > p:first-child {
@@ -393,24 +370,23 @@
 }
 
 .dash a {
-  color: var(--pa-cyan);
+  color: var(--pa-primary);
   text-underline-offset: 3px;
 }
 
 .dash a:focus-visible {
-  outline: 3px solid var(--pa-magenta);
+  outline: 2px solid var(--pa-primary);
   outline-offset: 3px;
 }
 
 .h3 {
   margin: 32px 0 12px;
   padding-bottom: 6px;
-  border-bottom: 1px solid rgba(242, 242, 245, 0.12);
-  font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 800;
-  font-size: 1em;
-  letter-spacing: 0.08em;
+  border-bottom: 1px solid var(--pa-line);
+  font-family: var(--pa-font-data), ui-monospace, monospace; /* the kit's mono caps, for data */
+  font-weight: 700;
+  font-size: 0.8em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--pa-ink-dim);
 }
@@ -427,8 +403,7 @@
 
 .jobs li {
   padding: 0.1em 0.7em;
-  border: 1px solid rgba(242, 242, 245, 0.14);
-  border-radius: 999px;
+  border: 1px solid var(--pa-line);
 }
 
 .suites {
@@ -437,13 +412,13 @@
   gap: 4px 32px;
 }
 
-/* Pass and fail say so in words; the color only repeats it. Red stays WRONG's alone (visual-direction.md). */
+/* Pass and fail say so in words: pass stays quiet, FAIL is the loud word. Red stays WRONG's alone. */
 .pass {
-  color: var(--pa-cyan);
+  color: var(--pa-ink-dim);
 }
 
 .fail {
-  color: var(--pa-sun);
+  color: var(--pa-ink);
   font-weight: 800;
 }
 
@@ -454,7 +429,7 @@
 
 .checks td {
   padding: 6px 24px 6px 0;
-  border-bottom: 1px solid rgba(242, 242, 245, 0.07);
+  border-bottom: 1px solid var(--pa-line);
 }
 
 /* the seconds column: a number, so the display face, right-aligned like a scoreboard's */
@@ -462,7 +437,7 @@
   padding-right: 0;
   text-align: right;
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
+  font-stretch: 75%;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -480,8 +455,7 @@
 .shots img {
   display: block;
   width: 100%;
-  border-radius: 6px;
-  border: 1px solid rgba(242, 242, 245, 0.16);
+  border: 1px solid var(--pa-line);
 }
 
 .shots figcaption {

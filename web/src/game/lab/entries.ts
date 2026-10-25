@@ -27,6 +27,14 @@ export const labGroups: LabGroup[] = [
         open: "Twinkle, wait mode",
       },
       {
+        slug: "flow-mode",
+        name: "Flow mode",
+        description:
+          "the song waits at each note and follows your tempo (0.5–1.3×), scored on wrong notes, skipped notes and stops past 2 beats, not timing",
+        href: "/play?song=twinkle&mode=flow",
+        open: "Twinkle, flow mode",
+      },
+      {
         slug: "adaptive-chunks",
         name: "Adaptive chunks",
         description:
@@ -115,7 +123,7 @@ export const labGroups: LabGroup[] = [
       {
         slug: "piano-sim",
         name: "Piano sim",
-        description: '/sim shows the game, a virtual keyboard, a raw MIDI log, fault buttons, "Watch the bot"',
+        description: 'the game, a virtual keyboard, a raw MIDI log, fault buttons, "Watch the bot"',
         href: "/sim",
         open: "/sim",
       },

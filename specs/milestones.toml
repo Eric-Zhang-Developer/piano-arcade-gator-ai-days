@@ -178,6 +178,7 @@ features = [
   "sheet-paper",
   "lab",
   "nav-bar",
+  "duo-start",
   "level-forge",
   "veritas",
   "veritas-polish",

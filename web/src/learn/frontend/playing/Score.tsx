@@ -28,7 +28,7 @@ export function Score({ whole = false, beat = -1, hints = false }: { whole?: boo
               {hints && <text x={nx} y={y + 82} textAnchor="middle" fontSize="14" opacity=".7">{['C', 'D', 'E', 'F', 'G', 'A', 'B'][(letterSteps[n.pitch] + 2) % 7]}</text>}
             </g>;
           })}
-          {beat >= first && beat < end && <line x1={x(beat) + 24} x2={x(beat) + 24} y1={y - 9} y2={y + 61} stroke="var(--learn-accent, #a65e2d)" strokeWidth="2.5" />}
+          {beat >= first && beat < end && <line x1={x(beat) + 24} x2={x(beat) + 24} y1={y - 9} y2={y + 61} stroke="var(--learn-score-cursor, #711887)" strokeWidth="2.5" />}
         </g>;
       })}
     </svg>

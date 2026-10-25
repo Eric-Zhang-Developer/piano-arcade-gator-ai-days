@@ -359,6 +359,10 @@
   box-shadow: 0 0 18px rgba(255, 47, 208, 0.45);
 }
 
+.replay:active {
+  scale: 0.96;
+}
+
 .replay:focus-visible {
   outline: 3px solid var(--pa-magenta);
   outline-offset: 3px;
@@ -478,5 +482,16 @@
 @media (max-width: 900px) {
   .header {
     grid-template-columns: 1fr;
+  }
+}
+
+/* a phone: the 16 px gutter, so a strip keeps most of the width */
+@media (max-width: 600px) {
+  .page {
+    padding: 24px 16px 64px;
+  }
+
+  .dashboard {
+    padding: 20px 16px 24px;
   }
 }

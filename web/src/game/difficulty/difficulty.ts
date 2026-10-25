@@ -2,6 +2,7 @@
 // the WARNING card at play time.
 import type { Chart } from "../../contracts";
 import { msPerBeat } from "../core/settings";
+import { reviewedLevels } from "./reviewed";
 
 // Calibrated on the charts on main so the song-pack rungs keep their order, and so speed outweighs reach: at 0.7 a
 // leap of 43 semitones was worth 30 notes a second, and Flower Dance tied Moonlight's Presto at 15 (decision
@@ -63,10 +64,16 @@ export function difficultyInputs(chart: Chart): DifficultyInputs {
   };
 }
 
-export function difficulty(chart: Chart): { level: number; inputs: DifficultyInputs } {
+const clamp = (n: number) => Math.max(1, Math.min(15, n));
+
+// level: the formula shifted by the reviewed row (spec: level-review), so the published chart gets the row's level
+// and its Easy chart moves by the same amount. formula: the chart-only computation, unchanged.
+export function difficulty(chart: Chart): { level: number; formula: number; inputs: DifficultyInputs } {
   const inputs = difficultyInputs(chart);
   const { weights: w, offset, scale } = difficultySettings;
   const sum = w.nps * inputs.nps + w.chordShare * inputs.chordShare + w.maxLeap * inputs.maxLeap + w.range * inputs.range +
     w.bothHands * (inputs.bothHands ? 1 : 0);
-  return { level: Math.max(1, Math.min(15, Math.round(1 + scale * (sum + offset)))), inputs };
+  const formula = clamp(Math.round(1 + scale * (sum + offset)));
+  const row = reviewedLevels[chart.id];
+  return { level: row ? clamp(formula + row.level - row.old) : formula, formula, inputs };
 }

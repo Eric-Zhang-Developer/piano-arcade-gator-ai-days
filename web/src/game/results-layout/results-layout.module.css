@@ -5,7 +5,7 @@
   color: var(--pa-ink);
   text-align: center;
   /* Over the page's dimmed overlay: the frozen highway (combo, keys) stays a hint, not a second layer of text. */
-  background: rgb(3 6 7 / 0.88);
+  background: rgb(3 6 7 / 0.96); /* the frozen HUD showed through behind the data cells at 0.88 */
 }
 
 /* The ceremony: exactly one window tall, so the rank, cells, middle band and buttons need no scroll. */
@@ -34,8 +34,8 @@
   font-family: var(--pa-font-display), system-ui, sans-serif;
   font-stretch: 75%;
   font-weight: 800;
-  font-size: clamp(88px, 19vh, 220px);
-  line-height: 0.82;
+  font-size: clamp(110px, 25vh, 300px);
+  line-height: 0.8;
   color: var(--pa-gold);
 }
 
@@ -69,6 +69,16 @@
 .cells {
   display: flex;
   gap: clamp(6px, 0.6vw, 14px);
+}
+
+/* The kit's cells take a fixed px size; at 1920 wide they'd read small on video, so they scale with the window. */
+.cells [data-kit="numeral"] {
+  font-size: clamp(40px, 3.4vw, 76px) !important;
+}
+
+.cells [data-kit="mono"],
+.extra [data-kit="mono"] {
+  font-size: clamp(12px, 0.8vw, 17px) !important;
 }
 
 .unscored {
@@ -122,28 +132,57 @@
   margin: 0 auto;
 }
 
+/* Beside the tutor: the buttons in two equal columns on the right, as in F-duo-3, so the line keeps its width. */
 .tutor:not(:empty) + .actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: clamp(360px, 32vw, 560px);
+  flex-shrink: 0;
   margin-right: 0;
 }
 
-/* Songs is a link: the kit's secondary button, drawn the same way (duo-tokens' Button). */
-.songs {
-  padding: 12px 24px;
-  border: 1px solid var(--pa-line);
-  font-family: var(--pa-font-data), ui-monospace, monospace;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+/* Every action is drawn as the kit's secondary button, whichever plugin renders it (score-card, sheet-review,
+   piano-out's inline-styled Replay): one button style in the row, not each panel's own. !important beats those
+   panels' inline styles; the layout owns this row's look. */
+.actions button,
+.actions a {
+  box-sizing: border-box !important;
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 12px 10px !important;
+  border: 1px solid var(--pa-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  font-family: var(--pa-font-data), ui-monospace, monospace !important;
+  font-size: 13px !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  text-align: center;
   text-decoration: none;
-  color: var(--pa-ink);
+  white-space: nowrap;
+  color: var(--pa-ink) !important;
+  cursor: pointer;
 }
 
-.songs:hover {
-  background: rgba(125, 132, 150, 0.12);
+/* A panel that wraps its button (score-card's span) still fills the cell. */
+.actions > div > span {
+  display: block;
 }
 
-.songs:focus-visible,
+.actions button:hover,
+.actions a:hover {
+  background: rgba(125, 132, 150, 0.12) !important;
+}
+
+.actions button:focus-visible,
+.actions a:focus-visible {
+  outline: 2px solid var(--pa-ink);
+  outline-offset: 2px;
+}
+
 .cue:focus-visible {
   outline: 2px solid var(--pa-ink);
   outline-offset: 2px;
@@ -190,7 +229,7 @@
 
 @media (min-width: 1280px) {
   .grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); /* a wide panel can't push the page sideways */
   }
 }
 

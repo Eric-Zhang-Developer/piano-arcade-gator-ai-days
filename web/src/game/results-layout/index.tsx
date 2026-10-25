@@ -166,7 +166,7 @@ export function ResultsLayout({
                 Retry
               </Button>
               <Slots plugins={only(actions)} panel={panel} />
-              <Link href="/" className={styles.songs}>
+              <Link href="/">
                 Songs
               </Link>
             </div>

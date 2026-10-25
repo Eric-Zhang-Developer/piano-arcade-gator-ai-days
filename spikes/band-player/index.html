@@ -1,0 +1,43 @@
+<!doctype html>
+<!-- Band player: plays a Standard MIDI File's channels to a MIDI output (the DGX) over Web MIDI. See README.md. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Band player</title>
+<style>
+  :root { --bg: #07020f; --ink: #f2f2f5; --dim: rgba(242,242,245,.6); --cyan: #27e1ff; --magenta: #ff2fd0; }
+  body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 50% 120%, #3a0b4d, var(--bg) 60%); color: var(--ink);
+         font: 16px/1.4 system-ui, sans-serif; display: grid; place-items: center; }
+  main { width: min(720px, 92vw); display: grid; gap: 12px; }
+  h1 { font: italic 800 clamp(32px, 6vw, 56px)/1 system-ui, sans-serif; margin: 0;
+       background: linear-gradient(90deg, var(--cyan), var(--magenta)); -webkit-background-clip: text; color: transparent; }
+  p { margin: 0; color: var(--dim); }
+  button { font: inherit; color: var(--ink); background: rgba(12,12,16,.7); border: 1px solid rgba(39,225,255,.45);
+           border-radius: 6px; padding: .6em 1em; cursor: pointer; }
+  button:hover, button:focus-visible { border-color: var(--cyan); outline: none; }
+  button.on { background: rgba(39,225,255,.14); border-color: var(--cyan); }
+  button:disabled { opacity: .4; cursor: default; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  #status { font-variant-numeric: tabular-nums; min-height: 1.4em; }
+  ul { margin: 0; padding-left: 1.2em; color: var(--dim); }
+  progress { width: 100%; accent-color: var(--magenta); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Band player</h1>
+  <p id="file">No file: add <code>?file=</code> or pick one.</p>
+  <div class="row"><input id="pick" type="file" accept=".mid,.midi,audio/midi"></div>
+  <ul id="parts"></ul>
+  <div class="row">
+    <button id="play" disabled>Play</button>
+    <button id="stop">Stop (All Notes Off)</button>
+    <button id="countin" class="on" aria-pressed="true">Count-in: on</button>
+  </div>
+  <p id="status">Asking for MIDI…</p>
+  <progress id="bar" value="0" max="1"></progress>
+</main>
+<script type="module" src="player.mjs"></script>
+</body>
+</html>

@@ -1,9 +1,6 @@
 import type { Attempt, Curriculum, Hand, Node, PassageNote, PlayingItem } from '../mastery/schema';
 import type { Verdict } from '../mastery/piano/score';
 
-/** One learner id (student-graph decision): 'local' on every screen until accounts carry X's learnerId(). */
-export const LEARNER_ID = 'local';
-
 /** Which hands a take asks for: both, or one while practising hands separate. */
 export type Hands = 'both' | Hand;
 /** What a playing screen needs of a node, resolved on the server so the curriculum stays out of the browser. */
@@ -33,10 +30,10 @@ export function notesFor(item: PlayingItem, hands: Hands): readonly PassageNote[
 }
 
 /** The append-only record of one take. It is cold only with no help at all; whether it counts is the engine's call. */
-export function playingAttempt(a: { item: PlayingItem; verdict: Verdict; helpShare: number; id: string; at: string }): Attempt {
+export function playingAttempt(a: { learnerId: string; item: PlayingItem; verdict: Verdict; helpShare: number; id: string; at: string }): Attempt {
   return {
     id: a.id,
-    learnerId: LEARNER_ID,
+    learnerId: a.learnerId,
     at: a.at,
     itemId: a.item.id,
     nodeId: a.item.nodeId,

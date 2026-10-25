@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { counts } from '../mastery/engine';
 import { curriculum } from '../mastery/curriculum';
 import type { PlayingItem } from '../mastery/schema';
-import { handsOf, keyName, LEARNER_ID, missedNotes, notesFor, passageBeats, playingAttempt, playingNode } from './attempt';
+import { handsOf, keyName, missedNotes, notesFor, passageBeats, playingAttempt, playingNode } from './attempt';
 
 const findKeys = playingNode(curriculum, 'pitch.find-keys')!;
 const together = playingNode(curriculum, 'rhythm.play-hands-together')!;
@@ -45,10 +45,9 @@ describe('a passage', () => {
 
 describe('a take becomes an attempt', () => {
   const item = findKeys.items[0];
-  const attempt = (helpShare: number) => playingAttempt({ item, verdict, helpShare, id: 'a1', at: '2026-10-25T08:00:00.000Z' });
+  const attempt = (helpShare: number) => playingAttempt({ learnerId: 'local', item, verdict, helpShare, id: 'a1', at: '2026-10-25T08:00:00.000Z' });
   it('is a playing activity for this learner, item and node', () => {
-    expect(attempt(0)).toMatchObject({ id: 'a1', learnerId: LEARNER_ID, itemId: item.id, nodeId: 'pitch.find-keys', mode: 'activity', kind: 'playing', correct: true, revealed: false, details: verdict.measures });
-    expect(LEARNER_ID).toBe('local');
+    expect(attempt(0)).toMatchObject({ id: 'a1', learnerId: 'local', itemId: item.id, nodeId: 'pitch.find-keys', mode: 'activity', kind: 'playing', correct: true, revealed: false, details: verdict.measures });
   });
   it('is cold only with no help, and counts with at most 30% help', () => {
     expect(attempt(0)).toMatchObject({ cold: true, helpShare: 0 });

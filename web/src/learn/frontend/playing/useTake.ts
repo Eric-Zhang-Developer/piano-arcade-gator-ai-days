@@ -1,6 +1,7 @@
 'use client';
 import { type RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { counts } from '../mastery/engine';
+import { learnerId } from '../mastery/diagnostic/learner';
 import { listenToPiano, type PianoEvent, type PianoStatus } from '../mastery/piano/capture';
 import { type HelpSegment, helpShare, scoreTake, type Verdict } from '../mastery/piano/score';
 import { remoteStore } from '../mastery/remote';
@@ -95,7 +96,7 @@ export function useTake() {
     halt();
     const run = generation.current;
     setResult(null); setPlayed([]);
-    const ctx = await audio(context);
+    const [ctx, learner] = await Promise.all([audio(context), learnerId()]);
     if (run !== generation.current) return;
     setSilent(!ctx);
     const notes = notesFor(item, hands);
@@ -133,7 +134,7 @@ export function useTake() {
       segments.current.forEach((s) => { if (s.endMs === Infinity) s.endMs = t; });
       const share = wholeHelp ? 1 : helpShare(segments.current, startMs, t);
       const verdict = scoreTake({ ...item, notes }, { startMs, bpm, events });
-      const attempt = playingAttempt({ item, verdict, helpShare: share, id: crypto.randomUUID(), at: new Date().toISOString() });
+      const attempt = playingAttempt({ learnerId: learner, item, verdict, helpShare: share, id: crypto.randomUUID(), at: new Date().toISOString() });
       setPlayed(bars(events, startMs, beatMs, t));
       const shown = { verdict, attempt, counts: counts(attempt), saved: null };
       setResult(shown);

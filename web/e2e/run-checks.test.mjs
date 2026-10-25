@@ -1,9 +1,9 @@
-import { spawn } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { KNOWN_RED, MAIN_CHECK, allChecks, exitCode, runChecks, selectChecks, shard } from "./run-checks.mjs";
+import { DEFAULT_SECONDS, KNOWN_RED, MAIN_CHECK, SECONDS, allChecks, exitCode, retriesFor, runChecks, selectChecks, shard } from "./run-checks.mjs";
 
 const TOAST = "web/src/game/notice-toast/verify-toast.mjs";
 const SIM = "web/src/game/sim/verify-sim.mjs";
@@ -55,8 +55,20 @@ describe("selectChecks", () => {
 describe("shard", () => {
   it("puts every check in exactly one of 4 shards, and their union is the whole list", () => {
     const parts = [1, 2, 3, 4].map((i) => shard(checks, i, 4));
-    expect(parts).toEqual([[MAIN_CHECK, REPLAY], [TOAST], [SIM], [OPERATOR]]);
+    expect(parts.every((p) => p.length >= 1)).toBe(true);
     expect(parts.flat().sort()).toEqual([...checks].sort());
+  });
+
+  it("balances by seconds: the longest check alone, the short ones together", () => {
+    const secs = { a: 400, b: 100, c: 100, d: 100, e: 100 };
+    expect([1, 2].map((i) => shard(["a", "b", "c", "d", "e"], i, 2, secs))).toEqual([["a"], ["b", "c", "d", "e"]]);
+    expect(shard(["x", "y"], 1, 2, {})).toEqual(["x"]); // unknown checks count DEFAULT_SECONDS each
+  });
+
+  it("a full run's 8 shards each fit well inside the 20 min job, by the table (#673)", () => {
+    const all = allChecks(execFileSync("git", ["ls-files", "web/src", "web/e2e"], { cwd: new URL("../../", import.meta.url).pathname, encoding: "utf8" }).split("\n"));
+    const minutes = [1, 2, 3, 4, 5, 6, 7, 8].map((i) => shard(all, i, 8).reduce((s, c) => s + (SECONDS[c] ?? DEFAULT_SECONDS), 0) / 60);
+    expect(Math.max(...minutes), minutes.map((m) => m.toFixed(1)).join(" ")).toBeLessThan(14);
   });
 
   it("leaves a shard empty when there are fewer checks than shards", () => {
@@ -110,6 +122,14 @@ describe("runChecks", () => {
     await new Promise((done) => child.on("close", done));
     expect(Date.now() - start).toBeLessThan(10_000);
   }, 30_000);
+
+  it("on a pull request, one attempt: a first failure is FAIL and nothing reruns (main keeps two)", async () => {
+    expect([retriesFor({ GITHUB_EVENT_NAME: "pull_request" }), retriesFor({ GITHUB_EVENT_NAME: "push" }), retriesFor({})]).toEqual([1, 2, 2]);
+    const out = join(dir, "out-pr");
+    const rows = await runChecks(dir, ["pass.mjs", "fail.mjs"], out, "1/1", 1);
+    expect(rows.map((r) => r.result)).toEqual(["pass", "FAIL"]);
+    expect(existsSync(join(out, "fail-retry"))).toBe(false);
+  });
 
   it("reports two failures as FAIL, and the shard exits 1", async () => {
     const rows = await run(["pass.mjs", "fail.mjs"]);

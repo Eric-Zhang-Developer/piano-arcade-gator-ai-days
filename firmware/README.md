@@ -8,6 +8,7 @@ and releases stuck keys if the browser goes quiet.
 |---|---|
 | `piano_leds/piano_leds.ino` | The firmware. The protocol is documented at the top of the file. |
 | `tester.html` | Chrome page: connect board and piano, hour-0 tests, calibration, free play, guide-lights demo. Works without the game. |
+| `playground.html` | Chrome page to play the strip with no piano: on-screen keys, computer-keyboard keys (A W S E D F ...), color, brightness, ripple and fade, and five effects (rainbow wave, sparkle, chase, ripple rain, breathe). |
 | `hosttest/run.sh` | Builds the sketch on a laptop against FastLED's stub and checks mapping, protocol, fades, settings and the watchdog. |
 | `platformio.ini` | Optional PlatformIO build instead of the Arduino IDE. |
 | `TEST-PLAN.md` | **Hardware day:** the step-by-step run with pass lines and what's still unproven. |
@@ -36,6 +37,25 @@ and releases stuck keys if the browser goes quiet.
 - Keep the GPIO18 → DIN wire short (under ~15 cm). This is the main defense against having no level shifter.
 - The 330 Ω resistor and 1000 µF capacitor are nice to have, not blockers. Ask the hardware table.
 - Put DIN at the bass end. If you have to mount it at the treble end, tick "Strip runs right to left" in the tester.
+
+### With the parts we bought (how it was wired on 2026-10-25)
+
+No soldering or cutting. The BTF strip's input end is a 3-pin plug molded `V+ D G`, with a small arrow pointing
+toward the strip. The bag has a short **pigtail**: one plug clicks into the strip, the other plug has red, green and
+white wires, and two loose wires (red, white) with bare tips stick out.
+
+| From | To |
+|---|---|
+| Pigtail loose **red** | PSU's screw adapter **+** |
+| Pigtail loose **white** | PSU's screw adapter **−** |
+| Pigtail plug, **green** hole (D) | ESP32 **D18**, through the breadboard |
+| Pigtail plug, **white** hole (G) | ESP32 **GND**, through the breadboard |
+| Pigtail plug, **red** hole (V+) | nothing |
+
+The ESP32 DevKit V1 (30-pin) is too wide for the half-size breadboard: with both pin rows in, every hole beside a
+pin is under the board. Put in **only the row with D18 and GND**, in the outermost column, and let the other row
+hang off the edge. On that row, counting from the USB end: 3V3, **GND** (2nd), D15, D2, D4, RX2, TX2, D5, **D18** (9th).
+The kit's jumper wires are pin-to-pin, so each goes into a free hole in the same numbered row as its pin.
 
 ## Flash it (Mac, Arduino IDE 2)
 

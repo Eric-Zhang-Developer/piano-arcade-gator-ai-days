@@ -1,7 +1,9 @@
 // Perf budget's frame timer (spec: perf-budget). One plain script with no imports: perf.mjs injects it before load,
 // and a person can paste it into the console mid-song. It wraps window.requestAnimationFrame and times each callback;
 // callbacks sharing a frame timestamp sum to one frame. Only frames during fever, before the results show, count.
-// At the results: __perfProbe.report() -> { frames, p50, p95, max } in ms.
+// At the results: __perfProbe.report() -> { frames, p50, p95, max } in ms. __perfProbe.intervals() gives the same stats
+// for the gaps between consecutive counted frames: what compositing costs shows there and not in callback time, but an
+// empty headless page already reads p95 17.6 ms that way, so it's only for comparing two runs, never a budget.
 (function (window) {
   if (window.__perfProbe) return;
   var BUDGET_MS = 16.7; // one 60 Hz frame
@@ -65,6 +67,14 @@
     verdict: verdict,
     feverSeen: function () {
       return feverSeen;
+    },
+    intervals: function () {
+      var gaps = [];
+      for (var i = 1; i < frames.length; i++) {
+        var gap = frames[i].ts - frames[i - 1].ts;
+        if (gap < 250) gaps.push(gap); // longer is fever stopping and starting again, not a frame
+      }
+      return stats(gaps);
     },
     report: function () {
       var r = stats(

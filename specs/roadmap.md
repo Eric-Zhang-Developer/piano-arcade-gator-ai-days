@@ -73,6 +73,9 @@ when no piano is connected. Cut if it isn't done by Sunday noon.
 Then, on his word: `flow-mode` (#618), the song waits for you and follows your tempo, judging what a listener
 hears (Eric: strict mode is "completely undemoable"); then `lab` (#619), one page that opens every hidden feature.
 Both are cut if they aren't done by Sunday noon.
+Then the Duo restyle, which Eric and Andres chose on 2026-10-25 (`visual-direction.md`, #636), video first:
+`duo-tokens` (#645), `duo-hud` (#647, the cold open's screen), `duo-select` (#646), `duo-results` (#648, where the
+tutor visibly decides) and `sheet-paper` (#649). Each is cut if it isn't done by Sunday noon.
 
 ## Spikes
 Milestone **spikes**, after `extras`: `simon-says-spike`, then `restyle-spike`. About 3 hours each, findings whatever

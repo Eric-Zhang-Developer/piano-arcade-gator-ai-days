@@ -1,5 +1,6 @@
 import type { GamePlugin } from "../contracts";
 import { barLoop } from "./bar-loop";
+import { audioTrack } from "./audio-track";
 import { chordSync } from "./chord-sync";
 import { chunkPractice } from "./chunk-practice";
 import { easyCharts } from "./easy-charts";
@@ -35,6 +36,7 @@ import { tempoCurve } from "./tempo-curve";
 import { weakBars } from "./weak-bars";
 import { feverStage } from "./stage";
 import { takeGraph } from "./take-graph";
+import { duoResults, duoTutor } from "./duo-results";
 import { cabinet } from "./cabinet/plugin";
 import { demoReset } from "./demo-reset";
 import { helpOverlay } from "./help-overlay";
@@ -57,6 +59,7 @@ export const plugins: GamePlugin[] = [
   easyCharts(), // ?level=easy: first, so every later plugin (chunks, loops, hands, bots, the judge) sees the Easy chart
   scoreCard(), // results panel: Save card, the take as a PNG; before bar-loop, so it keeps the song's own title
   chunkPractice(), // before bar-loop, so it sees the whole chart to cut into chunks (returns it unchanged)
+  audioTrack(), // ?song=local/…: before bar-loop, so it sees the song's own bars to map a loop window into the recording
   barLoop(), // first: every later plugin (the sim's bot included) sees the looped chart
   handMode(), // ?hands=R|L: before scenes and the sim, so their bots and the judge get only the played hand
   versus(), // ?versus=1: before scenes and the sim, so their bots and the judge get both players' copies
@@ -92,6 +95,8 @@ export const plugins: GamePlugin[] = [
   evenness(), // results panel: how even each hand's runs were
   chordSync(), // results panel: chords rolled by more than 30 ms, per hand
   takeGraph(), // results panel: every note's timing over the song
+  duoResults(), // results panel: BY BAR and TIMING, the Duo results' middle band
+  duoTutor(), // results panel: the tutor's line and PRACTICE BARS X–Y on the weakest bars
   eventSounds(), // laptop sounds at combo milestones, fever, full combo, rank and (optionally) misses
   feverGauge(), // late: its gauge sizes from the chart after every transformChart, as the judge does
   clearCard(), // over the HUD and the meter: ALL PERFECT, FULL COMBO or CLEAR from the last note to the results

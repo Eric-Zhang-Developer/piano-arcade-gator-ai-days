@@ -1,7 +1,7 @@
 // The handle rule is the database's CHECK, so the page says "no" before the server has to. User details come from
 // Supabase Auth's user body, and a field Google didn't send stays empty instead of becoming a made-up name.
 import { describe, expect, it } from "vitest";
-import { checkHandle, userDetails } from "./account";
+import { checkHandle, userDetails, suggestName, greetingName } from "./account";
 
 describe("checkHandle", () => {
   it("takes letters, numbers, spaces and _ up to 16", () => {
@@ -58,5 +58,21 @@ describe("userDetails", () => {
   it("keeps only https avatars and non-blank names", () => {
     const user = { user_metadata: { full_name: "  ", avatar_url: "javascript:alert(1)", picture: "http://x.example/p.png" } };
     expect(userDetails(user)).toEqual({ name: null, email: null, avatarUrl: null, google: false });
+  });
+});
+
+describe("first sign-in name and greeting", () => {
+  it("suggests the Google first name, cut to what a handle allows", () => {
+    expect(suggestName({ name: "Sharan Santharam", email: "s@example.com" })).toBe("Sharan");
+    expect(suggestName({ name: "José-María López", email: null })).toBe("JosMara");
+    expect(suggestName({ name: null, email: "piano.fan@example.com" })).toBe("pianofan");
+    expect(suggestName({ name: "Bartholomew_the_Magnificent", email: null })).toBe("Bartholomew_the_");
+    expect(suggestName(null)).toBe("");
+  });
+
+  it("greets the handle first, then the Google first name, then 'player'", () => {
+    expect(greetingName("Keys", { name: "Sharan Santharam", email: null })).toBe("Keys");
+    expect(greetingName(null, { name: "Sharan Santharam", email: null })).toBe("Sharan");
+    expect(greetingName("  ", null)).toBe("player");
   });
 });

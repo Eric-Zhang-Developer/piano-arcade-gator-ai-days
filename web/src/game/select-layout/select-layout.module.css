@@ -7,7 +7,6 @@
   grid-template-rows: auto minmax(0, 1fr);
   column-gap: 4vw;
   padding: 4vh 4vw 0;
-  isolation: isolate; /* select-stage's layer (z-index -1) paints above the page's black, below the select */
   color: var(--pa-ink);
   overflow: hidden;
 }
@@ -17,37 +16,44 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 2vh;
+  margin-bottom: 3vh;
+  padding-bottom: 1.6vh;
+  border-bottom: 1px solid var(--pa-line);
 }
 
+/* Duo (frame F-duo-1): upright, wide-tracked caps after a slanted bar in the primary. */
 .wordmark {
   margin: 0;
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 900;
-  font-size: clamp(32px, 3.4vw, 64px);
+  font-weight: 700;
+  font-size: clamp(28px, 2.4vw, 46px);
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
+.wordmark::before {
+  content: "";
+  display: inline-block;
+  width: 0.28em;
+  height: 0.78em;
+  margin-right: 0.55em;
+  background: var(--pa-primary);
+  transform: skewX(-18deg);
+}
+
+/* Monospace caps, the verbs dim and the keys in ink. */
 .hint {
   margin: 0;
-  font-size: clamp(16px, 1.25vw, 24px);
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: clamp(13px, 0.95vw, 18px);
+  letter-spacing: 0.12em;
   color: var(--pa-ink-dim);
 }
 
-/* The keys in full ink, the verbs dim: the one-letter L is easy to miss otherwise. */
 .hint b {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--pa-ink);
-}
-
-.focus {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  animation: enter 200ms ease-out;
 }
 
 /* The left column: the focused song, then the footer pushed to the bottom. All in flow, so nothing in it can overlap;
@@ -67,99 +73,19 @@
   padding: 1.2vh 0 2vh;
 }
 
-@keyframes enter {
-  from {
-    opacity: 0;
-    transform: translateX(-12px);
-  }
-}
-
-.jacket {
-  width: min(100%, 30vh); /* leaves room under the stats for song-preview's row and song-options' two */
-  aspect-ratio: 1;
-  flex: none;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.title {
-  margin: 2vh 0 0;
-  font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 800;
-  font-size: clamp(28px, 2.6vw, 48px);
-  line-height: 1.05;
-  text-wrap: balance;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.composer {
-  margin: 1vh 0 0;
-  font-size: clamp(16px, 1.25vw, 24px);
-  color: var(--pa-ink-dim);
-}
-
-/* The stats and the level toggle share one row, so the toggle adds no height (#532). */
-.statsRow {
-  display: flex;
-  align-items: center;
-  gap: 2vw;
-  margin: 2vh 0 0;
-}
-
-.stats {
-  display: flex;
-  gap: 2vw;
-  margin: 0;
-}
-
-.stats > div {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.level {
-  min-width: 6em;
-  padding: 0.6em 0.8em;
-  border: 1px solid rgba(39, 225, 255, 0.5);
-  border-radius: 4px;
-  background: rgba(11, 2, 32, 0.8);
-}
-
-.stats dt {
-  font-size: clamp(12px, 0.8vw, 16px);
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--pa-ink-dim);
-}
-
-.stats dd {
-  margin: 0;
-  font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
-  font-weight: 900;
-  font-size: clamp(36px, 3.4vw, 64px);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Scrolls inside its column; the side padding leaves room for the focused card's 1.05 scale and glow. */
+/* Scrolls inside its column, its top row level with the panel's top; the foot fades out. */
 .list {
   list-style: none;
   margin: 0;
-  padding: 4vh 3% 8vh;
+  padding: 0 0 8vh;
   display: flex;
   flex-direction: column;
-  gap: 1.6vh;
+  gap: 1.4vh;
   overflow-y: auto;
   scrollbar-width: none;
-  mask-image: linear-gradient(to bottom, transparent 0, #000 4vh, #000 calc(100% - 8vh), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 8vh), transparent 100%);
+  /* It rests on a row's top edge, so a scrolled list never starts with a sliver of the row above. */
+  scroll-snap-type: y mandatory;
 }
 
 .link {
@@ -167,11 +93,5 @@
   color: inherit;
   text-decoration: none;
   outline: none;
-  scroll-margin: 2vh;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .focus {
-    animation: none;
-  }
+  scroll-snap-align: start;
 }

@@ -52,8 +52,8 @@ export function withLevel(href: string, l: Level): string {
   return q ? `${path}?${q}` : path;
 }
 
-// Two halves in song-preview's LEARN / PRACTICE outline and type, stacked; the level in force is lit in cyan
-// (cabinet chrome: selection), the other dimmed. Stacked so it fits beside the stats without a row of its own: a row
+// Two halves in song-preview's LEARN / PRACTICE outline and type, stacked; the level in force is lit in the primary blue
+// (Duo: zero radius, hairline frames), the other dimmed. Stacked so it fits beside the stats without a row of its own: a row
 // pushed the panel's last line onto the first-run link at 1280×720 (#532).
 const box: CSSProperties = {
   display: "inline-flex",
@@ -62,7 +62,7 @@ const box: CSSProperties = {
   gap: "0.35em",
   padding: 0,
   font: "inherit",
-  fontSize: "clamp(14px, 1.25vw, 24px)",
+  fontSize: "clamp(13px, 1vw, 20px)" /* song-options' chips, beside it */,
   fontWeight: 700,
   letterSpacing: "0.08em",
   color: "var(--pa-ink-dim)",
@@ -70,8 +70,8 @@ const box: CSSProperties = {
   border: "none",
   cursor: "pointer",
 };
-const half: CSSProperties = { padding: "0.25em 0.75em", borderRadius: 4, border: "1px solid rgba(242, 242, 245, 0.2)", color: "var(--pa-ink-dim)" };
-const lit: CSSProperties = { ...half, border: "1px solid var(--pa-cyan)", background: "rgba(39, 225, 255, 0.14)", color: "var(--pa-cyan)" };
+const half: CSSProperties = { padding: "0.25em 0.75em", borderRadius: 0, border: "1px solid var(--pa-line)", color: "var(--pa-ink-dim)" };
+const lit: CSSProperties = { ...half, border: "1px solid var(--pa-primary)", background: "color-mix(in srgb, var(--pa-primary) 14%, transparent)", color: "var(--pa-primary)" };
 
 // NORMAL Lv n · EASY Lv m; the lit half is the level in force. m waits for the focused chart.
 export function LevelToggle({ normal, chart }: { normal: number; chart: Chart | null }) {

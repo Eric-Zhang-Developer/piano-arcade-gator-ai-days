@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Chart, GameEvent, InputDevice, InputEvent, Results, Take } from "../../contracts";
+import type { Chart, Frame, GameEvent, InputDevice, InputEvent, Results, Take } from "../../contracts";
 import { validateChart } from "../../contracts";
 import { plugins } from "../../game/layers";
 import { barLines } from "../../game/bar-lines";
@@ -77,7 +77,7 @@ export default function Play() {
   const latencyRef = useRef(0);
   const backgroundRef = useRef<HTMLDivElement>(null);
   const highwayRef = useRef<HTMLCanvasElement>(null);
-  const layerRefs = useRef<(HTMLCanvasElement | null)[]>([]);
+  const overlayRef = useRef<HTMLCanvasElement>(null); // every plugin's draw, in layers.ts order
   const stopRef = useRef<() => void>(() => {});
   const pauseRef = useRef<(a: PauseAction) => void>(() => {});
   const startRef = useRef<() => void>(() => {}); // Retry from the pause menu, inside start itself
@@ -153,11 +153,8 @@ export default function Play() {
     };
     // crash-guard: one plugin's throw turns that plugin off for this take (its layer cleared once, a toast says so) and
     // the game goes on; Retry's new guard brings it back. Core's own throws are logged once and the frame goes on.
-    const guard = createGuard((id) => {
-      toast(`${id} stopped after an error. The game goes on.`);
-      const c = layerRefs.current[plugins.findIndex((p) => p.id === id)];
-      c?.getContext("2d")?.clearRect(0, 0, c.width, c.height);
-    });
+    // The overlay is cleared and redrawn every frame, so a plugin that's off simply isn't drawn from the next one on.
+    const guard = createGuard((id) => toast(`${id} stopped after an error. The game goes on.`));
     const core = coreGuard();
     const bgId = plugins.find((p) => p.background)?.id ?? "";
     const handOf = new Map(chart.notes.map((n) => [n.id, n.hand]));
@@ -219,7 +216,22 @@ export default function Play() {
 
     // Canvases sized to the window, in CSS pixels.
     const ctx = canvas.getContext("2d")!;
-    const layerCtxs = layerRefs.current.map((c) => c?.getContext("2d") ?? null);
+    const overlay = overlayRef.current;
+    const octx = overlay?.getContext("2d") ?? null;
+    const drawers = plugins.filter((p) => p.draw);
+    // One canvas for every plugin's layer: cleared once, then each plugin draws in layers.ts order, its canvas state
+    // (transform, alpha, composite mode) saved and restored around it so nothing leaks into the next. One full-window
+    // canvas per plugin was 53 layers for the compositor to blend each frame (#678).
+    const drawLayers = (f: Frame) => {
+      if (!octx) return;
+      octx.clearRect(0, 0, f.width, f.height);
+      for (const p of drawers) {
+        if (guard.off(p.id)) continue;
+        octx.save();
+        guard.run(p.id, "draw", () => p.draw!(octx, f));
+        octx.restore();
+      }
+    };
     let layout: Layout | null = null;
     const keys = keysRef.current ?? staticRange(chart);
     // highway-zoom: on wide charts (or ?zoom=on) the layout follows the music, rebuilt each frame from its range.
@@ -230,7 +242,7 @@ export default function Play() {
       w = window.innerWidth;
       h = window.innerHeight;
       const dpr = Math.min(window.devicePixelRatio || 1, settings.pixelRatioCap);
-      for (const c of [canvas, ...layerRefs.current]) {
+      for (const c of [canvas, overlay]) {
         if (!c) continue;
         c.width = w * dpr;
         c.height = h * dpr;
@@ -319,6 +331,9 @@ export default function Play() {
     const finish = (now: number) => {
       done = true;
       const r = judge.finish(now);
+      // The last frame behind the results: songEnd has gone out, so a plugin that ends with the song draws nothing now
+      // and every other one leaves its final state, as their own canvases did.
+      drawLayers({ ...layout!, nowMs: now });
       stop();
       if (background) idleRaf = requestAnimationFrame(idle);
       if (window.__pianoArcade) window.__pianoArcade.results = r;
@@ -355,12 +370,7 @@ export default function Play() {
       if (zoom) layout = makeLayout(chart, w, h, perspective, zoom(now));
       core("drawHighway", () => drawHighway(ctx, layout!, chart, hw));
       const f = { ...layout!, nowMs: now };
-      plugins.forEach((p, i) => {
-        const lc = layerCtxs[i];
-        if (!lc || !p.draw || guard.off(p.id)) return;
-        lc.clearRect(0, 0, f.width, f.height);
-        guard.run(p.id, "draw", () => p.draw!(lc, f));
-      });
+      drawLayers(f);
       if (background) guard.run(bgId, "background", () => background.frame(f));
 
       if (now > lastNoteMs + GOOD_MS + Math.max(0, latencyRef.current) + INPUT_GRACE_MS + END_TAIL_MS) finish(now);
@@ -432,9 +442,7 @@ export default function Play() {
     <main style={{ position: "fixed", inset: 0, overflow: "hidden" }}>
       <div ref={backgroundRef} style={canvasStyle} />
       <canvas ref={highwayRef} style={canvasStyle} />
-      {/* A canvas only for a plugin that draws, still at its plugin's index, so the crash guard and the frame find it.
-          Every canvas is a full-window layer the compositor blends each frame, drawn on or not. */}
-      {plugins.map((p, i) => p.draw && <canvas key={p.id} ref={(c) => void (layerRefs.current[i] = c)} style={canvasStyle} />)}
+      <canvas ref={overlayRef} style={canvasStyle} />
 
       {phase === "playing" && (
         <PauseMenu
@@ -472,6 +480,7 @@ export default function Play() {
             <ResultsLayout
               results={results}
               title={loaded?.chart.title}
+              composer={loaded?.chart.composer}
               scored={!(loaded && isWaitMode(loaded.params))}
               score={score}
               timing={timing && <TimingPanel timing={timing} latency={latency} onLatency={onLatency} />}

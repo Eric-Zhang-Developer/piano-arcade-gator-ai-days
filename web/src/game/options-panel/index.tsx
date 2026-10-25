@@ -8,6 +8,7 @@ import { LATENCY_MAX, LATENCY_MIN, loadLatencyOffset, saveLatencyOffset } from "
 import { LABEL_SETTINGS, LABELS_KEY, labelSetting, type LabelSetting } from "../note-labels/labels";
 import { DEFAULT_PREFS, getPrefs, savePrefs, subscribePrefs, type Prefs } from "../sound";
 import { DEFAULT_PIANO_VOLUME, getPianoVolume, setPianoVolume, subscribePianoVolume } from "../laptop-sound/volume";
+import { DEFAULT_RECORDING_VOLUME, getRecordingVolume, setRecordingVolume, subscribeRecordingVolume } from "../audio-track";
 import styles from "./options-panel.module.css";
 
 export const LABEL_NAMES: Record<LabelSetting, string> = { auto: "Auto", notes: "Note names", keys: "Laptop keys", off: "Off" };
@@ -67,17 +68,45 @@ function PianoVolumeRow() {
   );
 }
 
+// audio-track's "Recording volume": the level of a local song's own recording under /play, on its own store too.
+function RecordingVolumeRow() {
+  const volume = useSyncExternalStore(subscribeRecordingVolume, getRecordingVolume, () => DEFAULT_RECORDING_VOLUME);
+  return (
+    <div className={styles.row}>
+      <label className={styles.label} htmlFor="opt-recording-volume">
+        Recording volume
+      </label>
+      <div className={styles.control}>
+        <input
+          id="opt-recording-volume"
+          data-row
+          data-testid="opt-recording-volume"
+          type="range"
+          min={0}
+          max={1}
+          step={0.05}
+          value={volume}
+          onChange={(e) => setRecordingVolume(Number(e.target.value))}
+        />
+        <output className={styles.value}>{Math.round(volume * 100)}%</output>
+      </div>
+    </div>
+  );
+}
+
 // The rows, in the spec's order. Each row's first control carries data-row, the target of ↑/↓.
 export function OptionsRows({
   values,
   onLatency,
   onPrefs,
   onLabels,
+  recording = false,
 }: {
   values: OptionValues;
   onLatency(ms: number): void;
   onPrefs(p: Partial<Prefs>): void;
   onLabels(s: LabelSetting): void;
+  recording?: boolean; // a song on this machine has a recording (audio-track): only then the Recording volume row
 }) {
   const { latency, prefs, labels } = values;
   const enterToggles = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -130,6 +159,7 @@ export function OptionsRows({
         </div>
       </div>
       <PianoVolumeRow />
+      {recording && <RecordingVolumeRow />}
       <label className={styles.row}>
         <span className={styles.label}>Mute</span>
         <input data-row data-testid="opt-mute" type="checkbox" className={styles.check} checked={prefs.muted} onKeyDown={enterToggles} onChange={(e) => onPrefs({ muted: e.target.checked })} />
@@ -173,7 +203,7 @@ export function OptionsRows({
 const typing = (t: EventTarget | null) => t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
 
 // The Options button and its drawer. O toggles it from anywhere on the page; Esc closes it (the dialog's own).
-export function OptionsDrawer() {
+export function OptionsDrawer({ recording = false }: { recording?: boolean }) {
   const ref = useRef<HTMLDialogElement>(null);
   const prefs = useSyncExternalStore(subscribePrefs, getPrefs, () => DEFAULT_PREFS);
   const [latency, setLatency] = useState(0);
@@ -224,6 +254,7 @@ export function OptionsDrawer() {
         </header>
         <OptionsRows
           values={{ latency, prefs, labels }}
+          recording={recording}
           onLatency={(ms) => {
             setLatency(ms);
             saveLatencyOffset(ms);

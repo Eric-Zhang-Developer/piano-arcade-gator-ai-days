@@ -56,7 +56,7 @@ bar lines:
 
 ## Defaults
 - **Work it in when a worker is free** (Eric named eric-agent-3 and eric-agent-4, once CI frees them), after the Duo
-  features in `extras`. Cut whatever isn't merged by the freeze.
+  features in `extras`.
 - Prefer the smaller option: a shorter excerpt over a longer one.
 - If an opening is too sparse to be fun or too hard to read on the highway, pick the next section that works and say
   why in the done note.

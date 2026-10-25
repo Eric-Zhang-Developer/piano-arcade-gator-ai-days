@@ -2,6 +2,7 @@
 // flash up both edges (above the 500 ms mark only) and a FEVER banner sweeping through the HUD band. The grid flash
 // on the stage is fever-stage's.
 import type { Frame, GamePlugin } from "../../contracts";
+import { isolated } from "../core/isolated";
 import { settings } from "../core/settings";
 import { hudLayout } from "../hud";
 import { bg, sunFrom, sunTo, whenDisplayFontReady } from "../ui-tokens";
@@ -62,34 +63,35 @@ function drawMoment(ctx: CanvasRenderingContext2D, f: Frame, elapsed: number, st
   // steady glow instead of ending at a hard edge.
   const a = still ? 0 : flashAt(elapsed) * s.edgeAlpha;
   if (a > 0) {
-    ctx.save();
-    const sun = ctx.createLinearGradient(0, band, 0, cut);
-    sun.addColorStop(0, sunFrom);
-    sun.addColorStop(1, sunTo);
-    ctx.globalAlpha = a;
-    ctx.fillStyle = sun;
-    ctx.fillRect(0, 0, s.edgePx, cut);
-    ctx.fillRect(f.width - s.edgePx, 0, s.edgePx, cut);
-    ctx.globalAlpha = 1;
-    ctx.globalCompositeOperation = "destination-out";
-    for (const [x0, x1] of [
-      [0, s.edgePx],
-      [f.width, f.width - s.edgePx],
-    ]) {
-      const inward = ctx.createLinearGradient(x0, 0, x1, 0);
-      inward.addColorStop(0, "rgba(0,0,0,0)");
-      inward.addColorStop(0.35, "rgba(0,0,0,0.45)"); // eased: the light stays bright near the edge
-      inward.addColorStop(1, "rgba(0,0,0,1)");
-      ctx.fillStyle = inward;
-      ctx.fillRect(Math.min(x0, x1), 0, s.edgePx, cut);
-    }
-    const down = ctx.createLinearGradient(0, cut * 0.45, 0, cut);
-    down.addColorStop(0, "rgba(0,0,0,0)");
-    down.addColorStop(1, "rgba(0,0,0,1)");
-    ctx.fillStyle = down;
-    ctx.fillRect(0, cut * 0.45, s.edgePx, cut * 0.55);
-    ctx.fillRect(f.width - s.edgePx, cut * 0.45, s.edgePx, cut * 0.55);
-    ctx.restore();
+    // Isolated: the fades erase, which on /play's shared overlay would reach other plugins' pixels.
+    isolated(ctx, (ctx) => {
+      const sun = ctx.createLinearGradient(0, band, 0, cut);
+      sun.addColorStop(0, sunFrom);
+      sun.addColorStop(1, sunTo);
+      ctx.globalAlpha = a;
+      ctx.fillStyle = sun;
+      ctx.fillRect(0, 0, s.edgePx, cut);
+      ctx.fillRect(f.width - s.edgePx, 0, s.edgePx, cut);
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = "destination-out";
+      for (const [x0, x1] of [
+        [0, s.edgePx],
+        [f.width, f.width - s.edgePx],
+      ]) {
+        const inward = ctx.createLinearGradient(x0, 0, x1, 0);
+        inward.addColorStop(0, "rgba(0,0,0,0)");
+        inward.addColorStop(0.35, "rgba(0,0,0,0.45)"); // eased: the light stays bright near the edge
+        inward.addColorStop(1, "rgba(0,0,0,1)");
+        ctx.fillStyle = inward;
+        ctx.fillRect(Math.min(x0, x1), 0, s.edgePx, cut);
+      }
+      const down = ctx.createLinearGradient(0, cut * 0.45, 0, cut);
+      down.addColorStop(0, "rgba(0,0,0,0)");
+      down.addColorStop(1, "rgba(0,0,0,1)");
+      ctx.fillStyle = down;
+      ctx.fillRect(0, cut * 0.45, s.edgePx, cut * 0.55);
+      ctx.fillRect(f.width - s.edgePx, cut * 0.45, s.edgePx, cut * 0.55);
+    });
     drew = true;
   }
 
@@ -133,7 +135,7 @@ export function feverMoment(): GamePlugin {
   let startAtMs: number | null = null;
   let endAtMs: number | null = null;
   let lastDrawnAtMs: number | null = null;
-  let lastCtx: CanvasRenderingContext2D | null = null; // /play stops drawing at the results: clear what's left
+  let ended = false; // songEnd: nothing more to draw, including /play's last frame behind the results
   let display = "system-ui, sans-serif";
   if (typeof document !== "undefined")
     void whenDisplayFontReady().then(() => {
@@ -144,6 +146,7 @@ export function feverMoment(): GamePlugin {
     if (typeof window !== "undefined") window.__pianoArcadeFeverMoment = { startAtMs, lastDrawnAtMs };
   };
   const clear = () => {
+    ended = false;
     startAtMs = endAtMs = lastDrawnAtMs = null;
     publish();
   };
@@ -157,10 +160,10 @@ export function feverMoment(): GamePlugin {
         publish();
       }
       if (e.type === "feverEnd") endAtMs = e.atMs; // within the 2 s: it ends at once
-      if (e.type === "songEnd") lastCtx?.clearRect(0, 0, lastCtx.canvas.width, lastCtx.canvas.height);
+      if (e.type === "songEnd") ended = true;
     },
     draw(ctx, f) {
-      lastCtx = ctx;
+      if (ended) return;
       const still = reducedMotion();
       const live = still
         ? startAtMs !== null && moment(f.nowMs, startAtMs, endAtMs) > 0 && f.nowMs - startAtMs < momentSettings.stillMs

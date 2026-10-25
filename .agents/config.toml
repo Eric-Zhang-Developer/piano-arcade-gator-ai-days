@@ -19,7 +19,7 @@ max_parallel = 4      # agents running at once on one machine
 reporter = ""                    # worker that refreshes the Status issue (full size)
 
 [pr]
-warn_lines = 400                 # CI warns (never fails) above this many changed lines; 0 = off
+warn_lines = 1000                # CI warns (never fails) above this many changed lines; 0 = off
 exclude = []                     # prefixes not counted: lockfiles, generated data
 
 [verify]

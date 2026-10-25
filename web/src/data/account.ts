@@ -103,3 +103,34 @@ export async function saveHandle(raw: string): Promise<HandleCheck> {
     return { ok: false, reason: "Couldn't reach the server. Your old handle is kept." };
   }
 }
+
+/** A first-sign-in suggestion from the Google name: its first word, cut to what players.handle accepts. */
+export function suggestName(details: Pick<UserDetails, "name" | "email"> | null): string {
+  const first = (details?.name ?? details?.email?.split("@")[0] ?? "").trim().split(/\s+/)[0] ?? "";
+  return first.replace(/[^A-Za-z0-9_ ]/g, "").slice(0, HANDLE_MAX);
+}
+
+/** Who "Welcome, …" greets: the handle, else the Google first name, else "player". */
+export function greetingName(handle: string | null | undefined, details: Pick<UserDetails, "name" | "email"> | null): string {
+  return handle?.trim() || suggestName(details) || "player";
+}
+
+const SKIPPED_KEY = "pianoArcade.nameSkipped";
+
+/** Whether this player skipped the Name prompt on this device, so sign-in doesn't ask again here. */
+export function nameSkipped(userId: string): boolean {
+  try {
+    return (JSON.parse(localStorage.getItem(SKIPPED_KEY) ?? "[]") as string[]).includes(userId);
+  } catch {
+    return false;
+  }
+}
+
+export function rememberNameSkipped(userId: string): void {
+  try {
+    const ids = JSON.parse(localStorage.getItem(SKIPPED_KEY) ?? "[]") as string[];
+    if (!ids.includes(userId)) localStorage.setItem(SKIPPED_KEY, JSON.stringify([...ids, userId].slice(-20)));
+  } catch {
+    // storage blocked: the prompt may ask again next time
+  }
+}

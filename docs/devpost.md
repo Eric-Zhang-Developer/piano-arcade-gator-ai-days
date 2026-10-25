@@ -49,6 +49,34 @@ you played them, and arcade rhythm games are loud and addictive but don't teach 
   and the game sends it the next key and every hit, checked so far against a simulated board (42 of 42 hints), not yet
   with the real strip ([led-game](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/changes/led-game.md)).
 - 40 songs, each charted from a cited score ([`web/public/songs/`](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/tree/main/web/public/songs/)).
+- The Lab (`/lab`) holds experiments and spikes, each off the main path:
+  - Real Keys (`/real-keys`), a spike: calibrate a camera on the key bed, then play with the highway's notes falling
+    onto the live picture of the real keys ([real-keys](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/changes/real-keys.md)).
+  - Conduct (`/conduct`), a spike: a hand at the laptop camera leads the piano; a still hand holds, a fist cuts off,
+    and stroke size swells the velocities ([conductor](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/changes/conductor.md)).
+  - Highlight reel (`/highlight`), a spike: a take rendered into a 15 s broadcast replay WebM. The encode was a no:
+    MediaRecorder dropped frames, so the recommendation is to iterate with WebCodecs ([highlight-reel](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/changes/highlight-reel.md)).
+  - Wrong note (`/wrong-note`), a listening spike: the DGX plays 8 notes of a song with one moved 2 semitones, and you
+    press the wrong one ([wrong-note-spike](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/changes/wrong-note-spike.md)).
+  - Simon (`/simon`), a spike: the DGX plays the opening notes of a library song, you repeat them, and each round adds
+    a note ([simon-says-spike](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/changes/simon-says-spike.md)).
+  - The Composer's Hands (`/composers-hands`), a spike: a composer's own piano roll, his left hand while you play the
+    right, and his tempo drawn against yours ([composers-hands](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/changes/composers-hands.md)).
+  - Wet Paint (`/paint`), a spike: free play where each note blooms as paint in Scriabin's colors, wet while the pedal
+    is down ([wet-paint](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/changes/wet-paint.md)).
+  - The Speaking Piano (`/speak`), a spike: preset phrases or up to 3 s of your voice played on the DGX, the voice's
+    spectrum struck on 88 keys ([speaking-piano](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/changes/speaking-piano.md)).
+  - Pinned (`/musicbox`), a Lab experiment: your take as a brass music-box cylinder over a steel comb, with an STL
+    export ([pinned](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/changes/pinned.md)).
+  - The Build Sonata (`/sonata`), a Lab experiment: the night the agents built Étude as 90 s of music, one note per
+    merged PR ([build-sonata](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/changes/build-sonata.md)).
+  - The Round (`?x=round`), a Lab experiment: you play a round once and the piano plays your take back as voices 2, 3
+    and 4 ([round](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/changes/round.md)).
+  - Hand palette (`?x=hand-palette`), a Lab experiment: three hand and judgment palettes, with a colour-blind
+    simulation ([hand-palette](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/changes/hand-palette.md)).
+  - Screen shake (`?x=screen-shake`), a Lab experiment: each combo milestone shakes the highway ([screen-shake](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/changes/screen-shake.md)).
+  - Menu sounds A/B (`?x=ui-sounds-ab`), a Lab experiment: the old menu sounds against the new soft family
+    ([ui-sound-family](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/changes/ui-sound-family.md)).
 
 ### How we built it
 

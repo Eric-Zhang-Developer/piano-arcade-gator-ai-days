@@ -1,19 +1,24 @@
-/* Piano Arcade's tokens (specs/context/visual-direction.md); web/src/game/ui-tokens has the same values for canvas
-   code. Declared only: nothing uses them yet, so no screen changes. */
+/* Piano Arcade's tokens, the Duo look (specs/context/visual-direction.md, duo-tokens); web/src/game/ui-tokens has the
+   same values for canvas code, and a test keeps the two equal. */
 :root {
-  --pa-bg: #000000;
-  --pa-hand-r: #5ef2c4;
-  --pa-hand-l: #6aa8ff;
+  --pa-bg: #030607;
+  --pa-hand-r: #2b9bff;
+  --pa-hand-l: #a07cff;
   --pa-flare: #ffffff;
-  --pa-miss: #c98a9a;
+  --pa-miss: #8a8f98;
   --pa-wrong: #ff4d5e;
   --pa-gold: #ffe27a;
   --pa-good: #7cb7ff;
-  --pa-panel: rgba(12, 12, 16, 0.72);
-  --pa-ink: #f2f2f5;
-  --pa-ink-dim: rgba(242, 242, 245, 0.6);
-  --pa-magenta: #ff2fd0;
-  --pa-cyan: #27e1ff;
+  --pa-panel: #0a0d15;
+  --pa-ink: #e2e6f0;
+  --pa-ink-dim: #7d8496;
+  --pa-magenta: #2b9bff; /* aliases --pa-primary and --pa-secondary, so old readers repaint */
+  --pa-cyan: #a07cff;
+  --pa-primary: #2b9bff;
+  --pa-secondary: #a07cff;
+  --pa-line: rgba(125, 132, 150, 0.25);
+  --pa-paper: #f2ede3; /* decision duo-tokens-paper */
+  --pa-paper-ink: #16130f;
   --pa-sun: #ffb02e;
   --pa-sun-from: #ffe66b;
   --pa-sun-to: #ff3fa4;
@@ -28,12 +33,21 @@ html,
 body {
   margin: 0;
   height: 100%;
-  background: #000;
-  color: #eee;
+  background: var(--pa-bg);
+  color: var(--pa-ink);
   font-family: system-ui, sans-serif;
 }
 
 button,
 input {
   font: inherit;
+}
+
+/* Duo: zero corner radius on every interface element (visual-direction.md). !important, so it beats the components'
+   own rules and inline styles. /learn keeps its own radii: its shell always renders main#learning-content, and a page
+   holding that is skipped (decision duo-tokens-radius). Canvas shapes aren't CSS and stay as drawn. */
+html:not(:has(#learning-content)) *,
+html:not(:has(#learning-content)) *::before,
+html:not(:has(#learning-content)) *::after {
+  border-radius: 0 !important;
 }

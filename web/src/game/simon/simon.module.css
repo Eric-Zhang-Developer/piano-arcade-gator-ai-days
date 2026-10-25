@@ -6,7 +6,7 @@
   grid-template-rows: auto 1fr auto;
   gap: 2vh;
   padding: 4vh 4vw;
-  background: radial-gradient(ellipse at 50% 120%, rgba(255, 63, 164, 0.18), transparent 60%), var(--pa-sky);
+  background: var(--pa-bg);
   color: var(--pa-ink);
   overflow: hidden;
 }

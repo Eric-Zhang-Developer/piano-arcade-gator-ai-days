@@ -44,5 +44,5 @@ rely on its library test. If either needs a change, that's a `fix(song-pack-1)` 
 
 ## Defaults
 - **Work it in when a worker is free** (Eric named eric-agent-3 and eric-agent-4, once CI frees them), after the Duo
-  features in `extras`. Cut whatever isn't merged by the freeze.
+  features in `extras`.
 - Prefer the smaller option: a shorter excerpt over a longer one.

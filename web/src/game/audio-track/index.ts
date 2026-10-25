@@ -81,7 +81,8 @@ export function skipReason(params: URLSearchParams): string | null {
   return null;
 }
 
-// "Recording volume", 0–1, saved per browser; its own level, apart from the effects mute and the piano volume.
+// "Recording volume", 0–1, saved per browser; its own level, apart from the effects mute and the piano volume. The
+// options panel's row reads and sets it the way it does laptop-sound's piano volume; each take reads it at its start.
 const VOLUME_KEY = "pianoArcade.recordingVolume";
 export const DEFAULT_RECORDING_VOLUME = 0.7;
 export function loadRecordingVolume(): number {
@@ -94,6 +95,26 @@ export function loadRecordingVolume(): number {
   }
 }
 
+let recordingVolume: number | null = null;
+const volumeListeners = new Set<() => void>();
+
+export const getRecordingVolume = (): number => (recordingVolume ??= loadRecordingVolume());
+
+export function setRecordingVolume(v: number): void {
+  recordingVolume = Math.min(1, Math.max(0, v));
+  try {
+    localStorage.setItem(VOLUME_KEY, String(recordingVolume));
+  } catch {
+    // private mode: the level holds for this page only
+  }
+  volumeListeners.forEach((f) => f());
+}
+
+export function subscribeRecordingVolume(f: () => void): () => void {
+  volumeListeners.add(f);
+  return () => volumeListeners.delete(f);
+}
+
 interface Scheduled {
   node: AudioBufferSourceNode;
   whenS: number; // context time the node starts
@@ -103,7 +124,13 @@ interface Scheduled {
 
 declare global {
   interface Window {
-    __pianoArcadeAudio?: { loaded: boolean; playing: boolean; fileTimeAt(chartMs: number): number; positionMs(): number | null };
+    __pianoArcadeAudio?: {
+      loaded: boolean;
+      playing: boolean;
+      chartMs(): number | null;
+      fileTimeAt(chartMs: number): number;
+      positionMs(): number | null;
+    };
   }
 }
 
@@ -140,7 +167,7 @@ export function audioTrack(): GamePlugin {
     if (!audio || !buffer || !sidecar) return;
     bus?.disconnect();
     bus = audio.createGain();
-    bus.gain.value = loadRecordingVolume();
+    bus.gain.value = getRecordingVolume();
     bus.connect(audio.destination);
     scheduled = [];
     const nowS = audio.currentTime;
@@ -208,21 +235,24 @@ export function audioTrack(): GamePlugin {
           if (anchor) play(anchor.atMs + performance.now() - anchor.perf); // arrived mid-take: join at the clock's time
         })
         .catch((e: Error) => console.warn(`audio-track: no recording: ${e.message}`));
-      if (params.get("input") === "test")
-        window.__pianoArcadeAudio = {
-          get loaded() {
-            return buffer !== null;
-          },
-          get playing() {
-            return sounding() !== null;
-          },
-          fileTimeAt: (chartMs) => fileTimeAt(chartMs, sidecar?.offsetMs ?? 0, loop),
-          // The file time being heard now, or null when nothing sounds.
-          positionMs: () => {
-            const s = sounding();
-            return s ? (s.offsetS + ctxAt(performance.now()) - latencyS() - s.whenS) * 1000 : null;
-          },
-        };
+      // The test hook, on every local take with a recording, not only ?input=test: that mode can't pause (Esc is off),
+      // and verify-audio has to pause, resume and quit the way a player does.
+      window.__pianoArcadeAudio = {
+        get loaded() {
+          return buffer !== null;
+        },
+        get playing() {
+          return sounding() !== null;
+        },
+        // The chart time now, from the clock this plugin follows; null while paused or before the take.
+        chartMs: () => (anchor ? anchor.atMs + performance.now() - anchor.perf : null),
+        fileTimeAt: (chartMs) => fileTimeAt(chartMs, sidecar?.offsetMs ?? 0, loop),
+        // The file time being heard now, or null when nothing sounds.
+        positionMs: () => {
+          const s = sounding();
+          return s ? (s.offsetS + ctxAt(performance.now()) - latencyS() - s.whenS) * 1000 : null;
+        },
+      };
       return c;
     },
     onEvent(e: GameEvent) {

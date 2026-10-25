@@ -480,6 +480,7 @@ export default function Play() {
             <ResultsLayout
               results={results}
               title={loaded?.chart.title}
+              composer={loaded?.chart.composer}
               scored={!(loaded && isWaitMode(loaded.params))}
               score={score}
               timing={timing && <TimingPanel timing={timing} latency={latency} onLatency={onLatency} />}

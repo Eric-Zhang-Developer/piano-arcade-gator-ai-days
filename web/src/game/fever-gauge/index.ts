@@ -8,7 +8,7 @@ import { type Gauge, emptyGauge, reduceGauge } from "./gauge";
 
 export const meterSettings = {
   track: "rgba(242,242,245,0.12)", // --pa-ink, faint
-  fill: "#ffb02e", // --pa-sun: fever's color (visual-direction.md)
+  fill: "#ffb02e", // FEVER's amber, the gauge #728 keeps; the --pa-sun token it came from is retired
   feverFrom: "#ffe66b", // the sun gradient, lit during fever
   feverTo: "#ff3fa4",
   label: "rgba(242,242,245,0.6)", // --pa-ink-dim

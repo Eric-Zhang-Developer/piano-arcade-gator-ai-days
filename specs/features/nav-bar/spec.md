@@ -11,7 +11,7 @@ Issue #706. Eric, 2026-10-25: "We don't have a proper nav bar? There's the whole
 Built' page. There's a lot of random crap that's not here on our core main route. which is /"
 
 Then, on the plan in #706: "lab Into navbar for now, we can remove it later cause yeah rn our nav is really fucked",
-and "Raise this. Send it to the planner." He wants it **before Monday**.
+and "Raise this. Send it to the planner."
 
 Today `/` links to songs, options and `/calibrate`, first run, `/progress`, login and a quiet Lab link (#631). `/learn`,
 and soon `/how`, have no way in from `/`. The bar carries the few top-level pages. Everything else (`/simon`,
@@ -42,9 +42,13 @@ A nav link to a half-done Lab looks worse than none.
   | Lab | `/lab` | `lab` |
   | How it's built | `/how` | `how-it-works` |
   | Progress | `/progress` | `take-store` |
+  | Status | `/operator` | `operator-board`, and only when `NODE_ENV !== "production"`: `/operator`'s API routes return 404 in production |
 
   How it's built appears once #443 and #460 merge and `changes/how-it-works.md` lands. That needs no change to the bar:
   the test reads the folder.
+- **A GitHub link at the right end** (Eric, 2026-10-25, via the planner: he couldn't find status or the repo from `/`):
+  `https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days`, opened in a new tab with
+  `rel="noopener noreferrer"`.
 - **Login at the right.** Move the login link that `/` already shows into the bar. Reuse its component and its
   signed-in behavior; don't write a second copy. If it can't move without changing another lane's folder, leave it
   where it is and log why in `specs/decisions/nav-bar-login.md`.
@@ -64,6 +68,7 @@ A nav link to a half-done Lab looks worse than none.
 1. `pnpm -C web exec vitest run --passWithNoTests src/game/nav-bar`:
    - every slot's slug has a `changes/<slug>.md` (the test reads the folder), and no done slot is missing;
    - every slot's path is a page under `web/src/app/`;
+  - Status links to `/operator` and is left out of a production build; the GitHub link is the repo's URL;
    - the hide rule returns true for `/play`, `/cabinet`, `/attract`, `/operator` and capture mode, and false for `/`,
      `/learn`, `/lab` and `/progress`.
 2. Headless, once, under `verify.lock`:
@@ -80,5 +85,5 @@ Follow `specs/context/visual-direction.md`, build it with the `frontend-design` 
 step 8, "Look", at 1280×720 and 1920×1080. Before and after screenshots of `/` go in the PR.
 
 ## Defaults
-- **After sheet-paper in `extras`, and before Monday.** Cut it if it isn't merged by the final milestone's freeze.
+- **In `extras`, after lab.**
 - Log any choice this spec doesn't make in `specs/decisions/nav-bar-*.md`.

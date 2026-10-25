@@ -1,0 +1,529 @@
+{
+  "nodes": [
+    {
+      "id": "pitch-grand-staff",
+      "region": "pitch",
+      "layer": "backbone",
+      "kind": "declarative",
+      "title": "Note names on the grand staff",
+      "whyImportant": "Piano music is written on the grand staff; naming a note in either clef is the first step from the page to the key.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Notation of Notes, Clefs, and Ledger Lines",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notation-of-notes-clefs-and-ledger-lines/"
+        },
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        }
+      ]
+    },
+    {
+      "id": "rhythm-simple-metre",
+      "region": "rhythm",
+      "layer": "backbone",
+      "kind": "declarative",
+      "title": "Simple metre and time signatures",
+      "whyImportant": "The time signature says how many beats a bar holds and which note gets the beat; without it no rhythm can be counted.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Simple Meter and Time Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/"
+        }
+      ]
+    },
+    {
+      "id": "rhythm-steady-pulse",
+      "region": "rhythm",
+      "layer": "backbone",
+      "kind": "procedural",
+      "title": "Keeping a steady pulse",
+      "whyImportant": "Right notes still sound wrong when the beat wobbles; a steady pulse is what the rest of the playing hangs on.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Simple Meter and Time Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/"
+        }
+      ]
+    },
+    {
+      "id": "keys-major-key-signatures",
+      "region": "keys",
+      "layer": "backbone",
+      "kind": "declarative",
+      "title": "Major scales and key signatures",
+      "whyImportant": "The key signature sets the sharps and flats for the whole piece; misreading it puts wrong notes in every bar.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Major Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/major-scales/"
+        }
+      ]
+    },
+    {
+      "id": "keys-major-scales-playing",
+      "region": "keys",
+      "layer": "backbone",
+      "kind": "procedural",
+      "title": "Playing major scales",
+      "whyImportant": "A scale puts a key under the hand, so passages in that key fall under the fingers without searching.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Major Scales, Scale Degrees, and Key Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/major-scales/"
+        },
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        }
+      ]
+    },
+    {
+      "id": "chords-triads",
+      "region": "chords",
+      "layer": "backbone",
+      "kind": "declarative",
+      "title": "Triads",
+      "whyImportant": "Most chords in tonal music are triads; spelling them is how you read harmony and find the hand shape on the keys.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Triads",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/triads/"
+        }
+      ]
+    },
+    {
+      "id": "chords-cadences",
+      "region": "chords",
+      "layer": "backbone",
+      "kind": "declarative",
+      "title": "Cadences",
+      "whyImportant": "Cadences are where phrases end; naming them shows how a piece is put together and where its phrases breathe.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Introduction to Harmony, Cadences, and Phrase Endings",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/intro-to-harmony/"
+        }
+      ]
+    },
+    {
+      "id": "expression-dynamics-articulation",
+      "region": "expression",
+      "layer": "backbone",
+      "kind": "declarative",
+      "title": "Dynamics and articulation",
+      "whyImportant": "Dynamics and articulation are marked in almost every piece; they say how loud to play and how the notes join.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: Other Aspects of Notation",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-aspects-of-notation/"
+        }
+      ]
+    },
+    {
+      "id": "pieces-hands-together",
+      "region": "pieces",
+      "layer": "backbone",
+      "kind": "procedural",
+      "title": "Playing hands together",
+      "whyImportant": "Pieces need both hands at once, each with its own part; coordinating them turns two lines into one piece.",
+      "sources": [
+        {
+          "title": "Open Music Theory, v2: The Keyboard and the Grand Staff",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/the-keyboard-and-grand-staff/"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "pitch-grand-staff",
+      "to": "rhythm-simple-metre",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Reading a bar means naming each note's pitch and counting its length at the same time."
+    },
+    {
+      "from": "rhythm-simple-metre",
+      "to": "rhythm-steady-pulse",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "The beats the time signature counts are what a steady pulse makes audible."
+    },
+    {
+      "from": "pitch-grand-staff",
+      "to": "keys-major-key-signatures",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A key signature sits on the staff and changes the notes read under it."
+    },
+    {
+      "from": "keys-major-key-signatures",
+      "to": "keys-major-scales-playing",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Playing a scale puts the key signature's sharps and flats under the hand."
+    },
+    {
+      "from": "keys-major-key-signatures",
+      "to": "chords-triads",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Triads are built from the notes of the key, so the key signature decides their sharps and flats."
+    },
+    {
+      "from": "chords-triads",
+      "to": "chords-cadences",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "A cadence is named by the triads it moves between, such as V to I."
+    },
+    {
+      "from": "rhythm-steady-pulse",
+      "to": "keys-major-scales-playing",
+      "relation": "analogous",
+      "weight": 2,
+      "rationale": "Both are judged on even timing against the click."
+    },
+    {
+      "from": "pieces-hands-together",
+      "to": "rhythm-steady-pulse",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Two hands only line up when both follow the same steady beat."
+    },
+    {
+      "from": "pieces-hands-together",
+      "to": "pitch-grand-staff",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Hands together means reading the treble staff for one hand and the bass staff for the other."
+    },
+    {
+      "from": "expression-dynamics-articulation",
+      "to": "pieces-hands-together",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Pieces mark dynamics and articulation, and each hand shapes its part by them."
+    }
+  ],
+  "items": [
+    {
+      "type": "theory",
+      "id": "pitch-grand-staff-1",
+      "nodeId": "pitch-grand-staff",
+      "prompt": "In treble clef, which note sits on the second line from the bottom?",
+      "answer": {
+        "id": "g",
+        "text": "G",
+        "explanation": "The treble clef curls around the second line, which is why it is also called the G clef."
+      },
+      "wrong": [
+        { "id": "e", "text": "E", "explanation": "E is the bottom line of the treble staff, one line lower." },
+        { "id": "b", "text": "B", "explanation": "B is the middle line of the treble staff, one line higher." },
+        { "id": "f", "text": "F", "explanation": "F is the top line of the treble staff." }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "pitch-grand-staff-2",
+      "nodeId": "pitch-grand-staff",
+      "prompt": "Where is middle C written on the grand staff?",
+      "answer": {
+        "id": "ledger",
+        "text": "On one ledger line below the treble staff or above the bass staff",
+        "explanation": "Middle C sits between the two staves, so either clef reaches it with one ledger line."
+      },
+      "wrong": [
+        {
+          "id": "treble-bottom",
+          "text": "On the bottom line of the treble staff",
+          "explanation": "That line is E, two steps above middle C."
+        },
+        {
+          "id": "bass-top",
+          "text": "On the top line of the bass staff",
+          "explanation": "That line is A, two steps below middle C."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm-simple-metre-1",
+      "nodeId": "rhythm-simple-metre",
+      "prompt": "In 3/4, what does the top number tell you?",
+      "answer": {
+        "id": "three-beats",
+        "text": "There are three beats in each bar",
+        "explanation": "In simple metre the top number counts the beats in a bar."
+      },
+      "wrong": [
+        {
+          "id": "quarter-beat",
+          "text": "The beat is a quarter note",
+          "explanation": "That is what the bottom number, 4, says."
+        },
+        {
+          "id": "speed",
+          "text": "Play three times as fast",
+          "explanation": "A time signature sets the beat and the bar, not the speed; the tempo marking does that."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm-simple-metre-2",
+      "nodeId": "rhythm-simple-metre",
+      "prompt": "How many quarter notes fill one bar of 4/4?",
+      "answer": { "id": "four", "text": "Four", "explanation": "4/4 has four beats, and each beat is a quarter note." },
+      "wrong": [
+        { "id": "two", "text": "Two", "explanation": "Two half notes fill a 4/4 bar; a quarter note is half as long." },
+        { "id": "eight", "text": "Eight", "explanation": "Eight eighth notes fill a 4/4 bar; a quarter note is twice as long." }
+      ]
+    },
+    {
+      "type": "playing",
+      "id": "rhythm-steady-pulse-1",
+      "nodeId": "rhythm-steady-pulse",
+      "prompt": "Play middle C on every beat for two bars of 4/4 with the click, right hand.",
+      "notes": [
+        { "pitch": 60, "startBeat": 0, "beats": 1, "hand": "right" },
+        { "pitch": 60, "startBeat": 1, "beats": 1, "hand": "right" },
+        { "pitch": 60, "startBeat": 2, "beats": 1, "hand": "right" },
+        { "pitch": 60, "startBeat": 3, "beats": 1, "hand": "right" },
+        { "pitch": 60, "startBeat": 4, "beats": 1, "hand": "right" },
+        { "pitch": 60, "startBeat": 5, "beats": 1, "hand": "right" },
+        { "pitch": 60, "startBeat": 6, "beats": 1, "hand": "right" },
+        { "pitch": 60, "startBeat": 7, "beats": 1, "hand": "right" }
+      ],
+      "bpm": 80,
+      "pass": { "notesInOrder": 0.9, "timingSpreadMs": 60, "velocitySpread": 20 }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm-steady-pulse-2",
+      "nodeId": "rhythm-steady-pulse",
+      "prompt": "Alternate the C and G below middle C on every beat for two bars of 4/4 with the click, left hand.",
+      "notes": [
+        { "pitch": 48, "startBeat": 0, "beats": 1, "hand": "left" },
+        { "pitch": 55, "startBeat": 1, "beats": 1, "hand": "left" },
+        { "pitch": 48, "startBeat": 2, "beats": 1, "hand": "left" },
+        { "pitch": 55, "startBeat": 3, "beats": 1, "hand": "left" },
+        { "pitch": 48, "startBeat": 4, "beats": 1, "hand": "left" },
+        { "pitch": 55, "startBeat": 5, "beats": 1, "hand": "left" },
+        { "pitch": 48, "startBeat": 6, "beats": 1, "hand": "left" },
+        { "pitch": 55, "startBeat": 7, "beats": 1, "hand": "left" }
+      ],
+      "bpm": 80,
+      "pass": { "notesInOrder": 0.9, "timingSpreadMs": 60, "velocitySpread": 20 }
+    },
+    {
+      "type": "theory",
+      "id": "keys-major-key-signatures-1",
+      "nodeId": "keys-major-key-signatures",
+      "prompt": "Which major key has one sharp, F sharp?",
+      "answer": {
+        "id": "g-major",
+        "text": "G major",
+        "explanation": "G major needs F sharp to keep the major scale's half step between its seventh and eighth notes."
+      },
+      "wrong": [
+        { "id": "d-major", "text": "D major", "explanation": "D major has two sharps, F sharp and C sharp." },
+        { "id": "f-major", "text": "F major", "explanation": "F major has one flat, B flat, and no sharps." }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "keys-major-key-signatures-2",
+      "nodeId": "keys-major-key-signatures",
+      "prompt": "Which pattern of whole (W) and half (H) steps makes a major scale?",
+      "answer": {
+        "id": "major",
+        "text": "W W H W W W H",
+        "explanation": "Every major scale uses this pattern up from its tonic."
+      },
+      "wrong": [
+        { "id": "minor", "text": "W H W W H W W", "explanation": "That is the natural minor pattern." },
+        {
+          "id": "shifted",
+          "text": "W W W H W W H",
+          "explanation": "That puts the first half step between the fourth and fifth notes; in major it falls between the third and fourth."
+        }
+      ]
+    },
+    {
+      "type": "playing",
+      "id": "keys-major-scales-playing-1",
+      "nodeId": "keys-major-scales-playing",
+      "prompt": "Play the C major scale up one octave from middle C, right hand, one note per beat.",
+      "notes": [
+        { "pitch": 60, "startBeat": 0, "beats": 1, "hand": "right" },
+        { "pitch": 62, "startBeat": 1, "beats": 1, "hand": "right" },
+        { "pitch": 64, "startBeat": 2, "beats": 1, "hand": "right" },
+        { "pitch": 65, "startBeat": 3, "beats": 1, "hand": "right" },
+        { "pitch": 67, "startBeat": 4, "beats": 1, "hand": "right" },
+        { "pitch": 69, "startBeat": 5, "beats": 1, "hand": "right" },
+        { "pitch": 71, "startBeat": 6, "beats": 1, "hand": "right" },
+        { "pitch": 72, "startBeat": 7, "beats": 1, "hand": "right" }
+      ],
+      "bpm": 72,
+      "pass": { "notesInOrder": 0.9, "timingSpreadMs": 70, "velocitySpread": 20, "legato": 0.8 }
+    },
+    {
+      "type": "playing",
+      "id": "keys-major-scales-playing-2",
+      "nodeId": "keys-major-scales-playing",
+      "prompt": "Play the G major scale up one octave from the G above middle C, right hand, one note per beat.",
+      "notes": [
+        { "pitch": 67, "startBeat": 0, "beats": 1, "hand": "right" },
+        { "pitch": 69, "startBeat": 1, "beats": 1, "hand": "right" },
+        { "pitch": 71, "startBeat": 2, "beats": 1, "hand": "right" },
+        { "pitch": 72, "startBeat": 3, "beats": 1, "hand": "right" },
+        { "pitch": 74, "startBeat": 4, "beats": 1, "hand": "right" },
+        { "pitch": 76, "startBeat": 5, "beats": 1, "hand": "right" },
+        { "pitch": 78, "startBeat": 6, "beats": 1, "hand": "right" },
+        { "pitch": 79, "startBeat": 7, "beats": 1, "hand": "right" }
+      ],
+      "bpm": 72,
+      "pass": { "notesInOrder": 0.9, "timingSpreadMs": 70, "velocitySpread": 20, "legato": 0.8 }
+    },
+    {
+      "type": "theory",
+      "id": "chords-triads-1",
+      "nodeId": "chords-triads",
+      "prompt": "Which notes make a C major triad?",
+      "answer": {
+        "id": "c-e-g",
+        "text": "C, E, G",
+        "explanation": "A major triad is a root with a major third and a perfect fifth above it."
+      },
+      "wrong": [
+        {
+          "id": "c-eflat-g",
+          "text": "C, E flat, G",
+          "explanation": "E flat is a minor third above C, which makes C minor."
+        },
+        {
+          "id": "c-f-a",
+          "text": "C, F, A",
+          "explanation": "Those notes make an F major triad with C in the bass; its root is F."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "chords-triads-2",
+      "nodeId": "chords-triads",
+      "prompt": "What quality is a triad with a minor third and a perfect fifth above its root?",
+      "answer": { "id": "minor", "text": "Minor", "explanation": "A minor third with a perfect fifth makes a minor triad." },
+      "wrong": [
+        { "id": "major", "text": "Major", "explanation": "A major triad has a major third above its root." },
+        {
+          "id": "diminished",
+          "text": "Diminished",
+          "explanation": "A diminished triad has a minor third and a diminished fifth."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "chords-cadences-1",
+      "nodeId": "chords-cadences",
+      "prompt": "Which chords make an authentic cadence?",
+      "answer": {
+        "id": "v-i",
+        "text": "V to I",
+        "explanation": "An authentic cadence moves from the dominant to the tonic and sounds finished."
+      },
+      "wrong": [
+        { "id": "iv-i", "text": "IV to I", "explanation": "IV to I is a plagal cadence." },
+        {
+          "id": "i-v",
+          "text": "I to V",
+          "explanation": "A phrase that ends on V is a half cadence; it sounds unfinished."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "chords-cadences-2",
+      "nodeId": "chords-cadences",
+      "prompt": "A phrase ends on the V chord. Which cadence is it?",
+      "answer": {
+        "id": "half",
+        "text": "A half cadence",
+        "explanation": "A phrase that stops on V ends with a half cadence."
+      },
+      "wrong": [
+        { "id": "authentic", "text": "An authentic cadence", "explanation": "An authentic cadence ends on I, not V." },
+        { "id": "plagal", "text": "A plagal cadence", "explanation": "A plagal cadence is IV to I." }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression-dynamics-articulation-1",
+      "nodeId": "expression-dynamics-articulation",
+      "prompt": "Which marking means play quietly?",
+      "answer": { "id": "p", "text": "p (piano)", "explanation": "Piano means quiet." },
+      "wrong": [
+        { "id": "f", "text": "f (forte)", "explanation": "Forte means loud." },
+        { "id": "mf", "text": "mf (mezzo forte)", "explanation": "Mezzo forte means moderately loud." }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "expression-dynamics-articulation-2",
+      "nodeId": "expression-dynamics-articulation",
+      "prompt": "What does a dot above or below a note head ask for?",
+      "answer": {
+        "id": "staccato",
+        "text": "Staccato: short and detached",
+        "explanation": "A dot on the note head marks staccato."
+      },
+      "wrong": [
+        { "id": "accent", "text": "An accent: play it louder", "explanation": "An accent is a > sign, not a dot." },
+        {
+          "id": "fermata",
+          "text": "A fermata: hold it longer",
+          "explanation": "A fermata is a dot under an arch; a dot alone is staccato."
+        }
+      ]
+    },
+    {
+      "type": "playing",
+      "id": "pieces-hands-together-1",
+      "nodeId": "pieces-hands-together",
+      "prompt": "Hold the C below middle C in the left hand while the right hand plays C, D, E, F, G up from middle C, one note per beat.",
+      "notes": [
+        { "pitch": 48, "startBeat": 0, "beats": 5, "hand": "left" },
+        { "pitch": 60, "startBeat": 0, "beats": 1, "hand": "right" },
+        { "pitch": 62, "startBeat": 1, "beats": 1, "hand": "right" },
+        { "pitch": 64, "startBeat": 2, "beats": 1, "hand": "right" },
+        { "pitch": 65, "startBeat": 3, "beats": 1, "hand": "right" },
+        { "pitch": 67, "startBeat": 4, "beats": 1, "hand": "right" }
+      ],
+      "bpm": 72,
+      "pass": { "notesInOrder": 0.9, "timingSpreadMs": 80, "velocitySpread": 20 }
+    },
+    {
+      "type": "playing",
+      "id": "pieces-hands-together-2",
+      "nodeId": "pieces-hands-together",
+      "prompt": "Play C, D, E, F, G with both hands an octave apart, right hand from middle C, one note per beat.",
+      "notes": [
+        { "pitch": 48, "startBeat": 0, "beats": 1, "hand": "left" },
+        { "pitch": 60, "startBeat": 0, "beats": 1, "hand": "right" },
+        { "pitch": 50, "startBeat": 1, "beats": 1, "hand": "left" },
+        { "pitch": 62, "startBeat": 1, "beats": 1, "hand": "right" },
+        { "pitch": 52, "startBeat": 2, "beats": 1, "hand": "left" },
+        { "pitch": 64, "startBeat": 2, "beats": 1, "hand": "right" },
+        { "pitch": 53, "startBeat": 3, "beats": 1, "hand": "left" },
+        { "pitch": 65, "startBeat": 3, "beats": 1, "hand": "right" },
+        { "pitch": 55, "startBeat": 4, "beats": 1, "hand": "left" },
+        { "pitch": 67, "startBeat": 4, "beats": 1, "hand": "right" }
+      ],
+      "bpm": 72,
+      "pass": { "notesInOrder": 0.9, "timingSpreadMs": 80, "velocitySpread": 20 }
+    }
+  ]
+}

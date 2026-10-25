@@ -7,10 +7,14 @@ assignee: "eric"
 
 # Fever stage
 
-A three.js synthwave stage behind the 2D highway. A neon grid floor runs to a horizon with a sun and a star field,
-and it moves with the music: the grid scrolls one line per beat, it speeds up as the combo multiplier climbs, it
-bursts into color when fever starts, and it dips when you miss. The highway, notes and keys stay 2D and on top;
-the stage is mood, never information.
+A three.js star field behind the 2D highway, shown only in fever: the stars streak while fever lasts, and they
+dip when you miss. The highway, notes and keys stay 2D and on top; the stage is mood, never information.
+
+**Retired (Eric, 2026-10-25; contract #728):** the synthwave sun, the grid floor and the sky gradient, everywhere,
+fever included ("Did the sun come back? ... I hate it", then "reTire the damn grid too"). The stage keeps only its
+star field, on a transparent canvas over the page's own ground. `specs/decisions/fever-stage-retire.md` has why the
+stars stay. The requirements below that name the grid, the sun or the burst describe the stage as first built; none
+of them is drawn now.
 
 It registers as one `GamePlugin` in `web/src/game/layers.ts` and uses its `background` hook
 (`web/src/contracts/index.ts`). It only listens to `GameEvent`s and the `Frame`; it never calls the judge.
@@ -27,20 +31,18 @@ It registers as one `GamePlugin` in `web/src/game/layers.ts` and uses its `backg
 
 ## Requirements
 **The scene** (three.js, one `WebGLRenderer` on the element it's given):
-- A grid floor in perspective, running from under the keyboard to a horizon about a third down the screen.
-- A low sun on the horizon, with horizontal bands cut out of it, and a sparse star field above.
-- Synthwave colors from `stageSettings` in `web/src/game/stage/`; the palette shifts with the state below.
+- A sparse star field, on a transparent canvas (no sky, no fog). ~~A grid floor~~ and ~~a low banded sun~~: retired.
+- The stars' color from `stageSettings` in `web/src/game/stage/`.
 
 **The motion** (from the `Frame` and events only):
 - **Beat:** the grid scrolls one line per beat at the chart's BPM (read it in `transformChart`, return the chart
   unchanged), locked to `frame.nowMs`, so it never drifts from the beat track. During the count-in it scrolls too.
 - **Combo:** scroll speed and glow step up with the multiplier tier. Use `hud`'s `tierFor` (import it; don't copy
   the thresholds), so the stage and the HUD change tier on the same note.
-- **Fever** (`feverStart` to `feverEnd`): the palette goes hot, the sun swells, the stars streak. This is the stage's
-  loudest state.
+- **Fever** (`feverStart` to `feverEnd`): the stars streak. This is the only time the stage shows.
 - **Miss and WRONG** (`noteMiss`, `wrongNote`): a brief desaturating dip, about 300 ms. A combo break drops the
   speed back to tier 1.
-- **Full combo** (`fullCombo`): a single burst from the sun before the results screen.
+- ~~**Full combo** (`fullCombo`): a single burst from the sun before the results screen.~~ Retired with the sun.
 - **Count-in** (`countInBeat`): the grid's lines flash on each count.
 - **Results:** the stage keeps idling behind the results screen until `dispose()`.
 

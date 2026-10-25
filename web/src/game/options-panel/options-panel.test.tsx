@@ -18,6 +18,16 @@ test("stored values render: latency, volume, mute, miss sound and labels", () =>
   expect(order).toEqual([...order].sort((a, b) => a - b));
 });
 
+test("Recording volume shows only when a song has a recording, after Piano volume", () => {
+  expect(render(0)).not.toMatch(/Recording volume/);
+  const html = renderToStaticMarkup(
+    <OptionsRows values={{ latency: 0, prefs: { volume: 0.35, muted: false, missCue: false }, labels: "off" }} onLatency={() => {}} onPrefs={() => {}} onLabels={() => {}} recording />,
+  );
+  expect(html).toMatch(/id="opt-recording-volume"[^>]*value="0.7"/); // audio-track's default
+  expect(html.indexOf("Piano volume")).toBeLessThan(html.indexOf("Recording volume"));
+  expect(html.indexOf("Recording volume")).toBeLessThan(html.indexOf("Mute"));
+});
+
 test("row movement stops at the ends", () => {
   expect(rowStep(0, -1, 5)).toBe(0);
   expect(rowStep(4, 1, 5)).toBe(4);

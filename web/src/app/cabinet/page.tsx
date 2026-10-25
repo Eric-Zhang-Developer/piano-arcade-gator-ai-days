@@ -153,7 +153,7 @@ const screen: CSSProperties = {
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  background: "linear-gradient(to bottom, var(--pa-bg) 0%, var(--pa-sky) 100%)",
+  background: "var(--pa-bg)",
   color: "var(--pa-ink)",
 };
 const wordmark: CSSProperties = {

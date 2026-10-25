@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { AccountChip } from "@/app/auth/AccountChip";
 import { BuildStamp } from "@/game/build-stamp";
@@ -12,6 +13,8 @@ export default function Home() {
   const { songs, invalid } = loadSongs(join(process.cwd(), "public/songs"));
   for (const { path, problems } of invalid) console.warn(`song-select: skipped songs/${path}: ${problems.join("; ")}`);
   if (!songs.length) return <main style={{ padding: 48 }}>No songs yet.</main>;
+  // audio-track: recordings are local-only, so the Recording volume row shows only where a local song has one.
+  const recording = songs.some((s) => s.id.startsWith("local/") && existsSync(join(process.cwd(), "public/songs", s.id, "audio.json")));
   return (
     <>
       {/* The left column's footer, in flow under the focused song: options-panel's drawer (latency with Calibrate,
@@ -21,7 +24,7 @@ export default function Home() {
         songs={songs}
         footer={
           <>
-            <OptionsDrawer />
+            <OptionsDrawer recording={recording} />
             <FirstRunLink />
             <LabLink />
           </>

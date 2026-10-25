@@ -119,7 +119,7 @@ function Picker({ c, v }: { c: Candidate; v: Vision }) {
     createElement(
       "div",
       { style: { display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }, "data-testid": testid },
-      createElement("span", { style: { font: "700 clamp(12px, 0.85vw, 17px) var(--pa-font-mono, ui-monospace, monospace)", letterSpacing: "0.12em", color: "var(--pa-ink-dim)", minWidth: "6.5em" } }, label),
+      createElement("span", { style: { font: "700 clamp(12px, 0.85vw, 17px) var(--pa-font-data), ui-monospace, monospace", letterSpacing: "0.12em", color: "var(--pa-ink-dim)", minWidth: "6.5em" } }, label),
       ...items.map(([text, to, lit, title]) => createElement("a", { key: text, ...kitChip(lit), href: to, title, "aria-current": lit ? "true" : undefined }, text)),
     );
   // The hands larger and first, then the judgments and fever's amber: the pair this experiment is about leads.

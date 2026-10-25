@@ -4,6 +4,7 @@
 import * as THREE from "three";
 import type { Frame } from "../../contracts";
 import { DUST, FLOATS, WISP, governor, hitParticleSettings as S, particlePool, type Judgment } from "./pool";
+import { feverTint, towardAmber } from "../fever-arc";
 
 export interface HitParticles {
   hit(x: number, width: number, y: number, judgment: Judgment, color: string): void;
@@ -125,7 +126,9 @@ export function hitParticles(): HitParticles | null {
     return Math.floor(v) + (random() < v - Math.floor(v) ? 1 : 0);
   };
   const spawn = (kind: number, n: number, x: number, width: number, y: number, color: string, bright: number) => {
-    if (pool.spawn(kind, scaled(n), x, width, y, rgbOf(color), bright, clock, random) > 0) aliveUntil = clock + LIFE_MS;
+    const k = feverTint(); // fever's amber through the hand color, a hue shift, never a fill (fever-arc)
+    const rgb = k > 0 ? towardAmber(rgbOf(color), k) : rgbOf(color);
+    if (pool.spawn(kind, scaled(n), x, width, y, rgb, bright, clock, random) > 0) aliveUntil = clock + LIFE_MS;
   };
   const upload = (start: number, count: number) => {
     buffer.addUpdateRange(start * FLOATS, count * FLOATS);

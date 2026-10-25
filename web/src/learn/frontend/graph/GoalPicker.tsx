@@ -17,7 +17,7 @@ export function GoalPicker({ chosen, disabled = false, onToggle }: Props) {
   if (!page) return <p className={styles.note}>No songs are tagged in the curriculum yet.</p>;
   return <div className={styles.picker}>
     <fieldset className={styles.songPage}>
-      <legend>Pick up to {maxGoals} · songs with {page.fewest === page.most ? page.fewest : `${page.fewest} to ${page.most}`} skills</legend>
+      <legend>Pick up to {maxGoals}. These songs need {page.fewest === page.most ? page.fewest : `${page.fewest} to ${page.most}`} skills.</legend>
       <ul>{page.songs.map(song => {
         const lit = chosen.includes(song.songId), chip = kitChip(lit);
         return <li key={song.songId}><button type="button" className={chip.className} style={{ ...chip.style, fontSize: 16 }} aria-pressed={lit} disabled={disabled || (!lit && chosen.length >= maxGoals)} onClick={() => onToggle(song.songId)}>{songTitle(song.songId)}</button></li>;

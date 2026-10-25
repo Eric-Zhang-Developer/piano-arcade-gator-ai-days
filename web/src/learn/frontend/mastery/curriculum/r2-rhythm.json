@@ -1,1 +1,5404 @@
-{ "nodes": [], "edges": [], "items": [] }
+{
+  "nodes": [
+    {
+      "id": "rhythm.note-values",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Note values: whole to sixteenth",
+      "whyImportant": "Every rhythm is built from these lengths, each half the one before.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Notating Rhythm, Note Values",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notating-rhythm/#chapter-57-section-1"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.rest-values",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Rest values",
+      "whyImportant": "Silence is measured as exactly as sound, and every note value has a rest of the same length.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Notating Rhythm, Rest Values",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notating-rhythm/#chapter-57-section-2"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.dotted-notes",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Dotted notes",
+      "whyImportant": "A dot adds half the note's value again, which makes the long-short rhythms in most melodies.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Notating Rhythm, Dots and Ties",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notating-rhythm/#chapter-57-section-3"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.double-dots",
+      "region": "rhythm",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Double-dotted notes",
+      "whyImportant": "A second dot adds half the first dot again, and it turns up in slow movements and Grade 5 theory.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Notating Rhythm, Dots and Ties",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notating-rhythm/#chapter-57-section-3"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.ties",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Ties",
+      "whyImportant": "A tie joins two notes of the same pitch into one longer sound, so a note can last across a beat or a barline.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Notating Rhythm, Dots and Ties",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notating-rhythm/#chapter-57-section-3"
+        },
+        {
+          "title": "Open Music Theory: Simple Meter, Ties",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-8"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.ties-and-slurs",
+      "region": "rhythm",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Ties versus slurs",
+      "whyImportant": "Both are curved lines, but a tie lengthens one note and a slur shapes several, so misreading one changes the rhythm.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Notating Rhythm, Dots and Ties",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notating-rhythm/#chapter-57-section-3"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.beat-and-division",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Beats and their divisions",
+      "whyImportant": "Knowing how a beat splits into smaller notes is how you place every note inside the bar.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Simple Meter, Terminology",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-1"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.counting",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Counting with beat syllables",
+      "whyImportant": "Saying \"1 e & a\" out loud ties every note to a place in the beat, which is how rhythms are learned and checked.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Simple Meter, Counting",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-5"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.beat-units",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Beat units: the bottom number",
+      "whyImportant": "The bottom number names the note that gets the beat, so 2/2, 2/4 and 2/8 all count two but look different.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Simple Meter, Time Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-4"
+        },
+        {
+          "title": "Open Music Theory: Simple Meter, Beat Units Other Than the Quarter Note",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-6"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.duple-triple-quadruple",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Duple, triple and quadruple metre",
+      "whyImportant": "How many beats a bar holds sets the pattern of strong and weak beats a listener feels.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Simple Meter, Terminology",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-1"
+        },
+        {
+          "title": "Open Music Theory: Simple Meter, Time Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-4"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.compound-metre",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Compound metre",
+      "whyImportant": "In compound time each beat splits into three, which gives jigs, lullabies and barcarolles their lilt.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Compound Meters",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/compound-meters-and-time-signatures/#chapter-4774-section-1"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.compound-time-signatures",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Reading compound time signatures",
+      "whyImportant": "In 6/8, 9/8 and 12/8 the top number counts divisions, not beats, so reading them takes one extra step.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Compound Meters, Time Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/compound-meters-and-time-signatures/#chapter-4774-section-3"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.irregular-metre",
+      "region": "rhythm",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Irregular metres: 5/8 and 7/8",
+      "whyImportant": "Some music groups its bar into unequal beats, and you have to know the grouping to count it.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Twentieth-Century Rhythmic Techniques, Asymmetrical Meter",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/twentieth-century-rhythmic-techniques/#chapter-10495-section-1"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.complete-bars",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Filling a bar",
+      "whyImportant": "Every complete bar adds up to exactly the time signature, which is how you check a rhythm you have read or written.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Simple Meter, Time Signatures",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-4"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.beaming",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Beaming to show the beat",
+      "whyImportant": "Beams group short notes by beat, so the eye sees where each beat starts.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Simple Meter, Beaming",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-7"
+        },
+        {
+          "title": "Open Music Theory: Compound Meters, Beaming",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/compound-meters-and-time-signatures/#chapter-4774-section-5"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.rest-grouping",
+      "region": "rhythm",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Writing rests in the right places",
+      "whyImportant": "Rests follow the beats too, so a reader can still see where each beat falls in a bar of silence.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Notating Rhythm, Rest Values",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notating-rhythm/#chapter-57-section-2"
+        },
+        {
+          "title": "Open Music Theory: Simple Meter, Beaming",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-7"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.triplets",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Triplets",
+      "whyImportant": "A triplet fits three notes into the time of two, bringing compound divisions into simple time.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Other Rhythmic Essentials, Borrowed Divisions",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-rhythmic-essentials/#chapter-63-section-1"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.duplets",
+      "region": "rhythm",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Duplets",
+      "whyImportant": "A duplet fits two notes into the time of three, bringing simple divisions into compound time.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Other Rhythmic Essentials, Borrowed Divisions",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-rhythmic-essentials/#chapter-63-section-1"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.syncopation",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Syncopation",
+      "whyImportant": "Accents that land off the beat drive ragtime, jazz and pop, and they only work against a steady pulse.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Other Rhythmic Essentials, Syncopation",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-rhythmic-essentials/#chapter-63-section-3"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.anacrusis",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "declarative",
+      "title": "Anacrusis (upbeat, pickup)",
+      "whyImportant": "Many melodies begin before the first full bar, and you need to know which beat to start on.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Simple Meter, Terminology",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-1"
+        },
+        {
+          "title": "Open Music Theory: Simple Meter, Counting",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-5"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.breve",
+      "region": "rhythm",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "The breve (double whole note)",
+      "whyImportant": "The longest common value, it appears in older music and in 4/2, and Grade 5 theory expects it.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Notating Rhythm, Note Values",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notating-rhythm/#chapter-57-section-1"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.demisemiquaver",
+      "region": "rhythm",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Thirty-second notes (demisemiquavers)",
+      "whyImportant": "Fast ornaments and runs in slow music are written in thirty-second notes.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Notating Rhythm, Note Values",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notating-rhythm/#chapter-57-section-1"
+        },
+        {
+          "title": "Open Music Theory: Simple Meter, Counting",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-5"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.metronome-marks",
+      "region": "rhythm",
+      "layer": "detail",
+      "kind": "declarative",
+      "title": "Metronome marks",
+      "whyImportant": "A metronome mark gives the exact speed of the beat, which turns the written rhythm into time.",
+      "sources": [
+        {
+          "title": "Wikipedia: Metronome",
+          "url": "https://en.wikipedia.org/wiki/Metronome"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.play-quavers",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Playing eighth notes against the beat",
+      "whyImportant": "Two even notes in a beat are the first subdivision a player has to keep steady.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Simple Meter, Counting",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-5"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.play-semiquavers",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Playing sixteenth notes",
+      "whyImportant": "Four even notes to a beat carry the runs and broken chords of most classical pieces.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Simple Meter, Counting",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-5"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.play-subdivisions",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Switching between subdivisions",
+      "whyImportant": "Moving between twos, threes and fours over the same beat is what keeps a mixed rhythm in time.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Simple Meter, Counting",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-5"
+        },
+        {
+          "title": "Open Music Theory: Other Rhythmic Essentials, Borrowed Divisions",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-rhythmic-essentials/#chapter-63-section-1"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.play-held-values",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Holding long notes for their full value",
+      "whyImportant": "Long notes must be held to the end, not released early, or the music falls silent where it should sing.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Notating Rhythm, Note Values",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notating-rhythm/#chapter-57-section-1"
+        },
+        {
+          "title": "Open Music Theory: Notating Rhythm, Dots and Ties",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notating-rhythm/#chapter-57-section-3"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.play-rests",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Playing rests in time",
+      "whyImportant": "A rest is counted like a note; coming in early or late after one is the most common rhythm slip.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Notating Rhythm, Rest Values",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notating-rhythm/#chapter-57-section-2"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.play-dotted",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Playing dotted rhythms",
+      "whyImportant": "A dotted note followed by a short one is easy to smooth into even notes, which changes the tune.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Notating Rhythm, Dots and Ties",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/notating-rhythm/#chapter-57-section-3"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.play-ties",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Holding notes through a tie",
+      "whyImportant": "A tied note is played once and held, so the next beat comes with no new attack.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Simple Meter, Ties",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-8"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.play-compound-pulse",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Feeling a compound pulse",
+      "whyImportant": "Playing groups of three against a slow dotted beat is what makes 6/8 and 12/8 sway instead of plod.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Compound Meters",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/compound-meters-and-time-signatures/#chapter-4774-section-1"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.play-triplets",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Playing triplets",
+      "whyImportant": "Three even notes per beat, without rushing the first or bunching the last, is a skill of its own.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Other Rhythmic Essentials, Borrowed Divisions",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-rhythmic-essentials/#chapter-63-section-1"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.play-syncopation",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Playing syncopated rhythms",
+      "whyImportant": "Syncopation only sounds when the off-beat notes are placed exactly against a pulse that does not move.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Other Rhythmic Essentials, Syncopation",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/other-rhythmic-essentials/#chapter-63-section-3"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.play-anacrusis",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Starting on an upbeat",
+      "whyImportant": "Entering on the right beat before the first full bar sets up the whole phrase.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Simple Meter, Terminology",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-1"
+        },
+        {
+          "title": "Open Music Theory: Simple Meter, Counting",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-5"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.play-left-hand",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Rhythm in the left hand",
+      "whyImportant": "The left hand usually keeps the time while the right sings, so its rhythm has to stand on its own.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Simple Meter, Counting",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-5"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.play-hands-together",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Rhythm with hands together",
+      "whyImportant": "Each hand must keep its own rhythm while both line up on the beat.",
+      "sources": [
+        {
+          "title": "Open Music Theory: Simple Meter, Counting",
+          "url": "https://viva.pressbooks.pub/openmusictheory/chapter/simple-meter-and-time-signatures/#chapter-3823-section-5"
+        }
+      ]
+    },
+    {
+      "id": "rhythm.play-tempo-range",
+      "region": "rhythm",
+      "layer": "concept",
+      "kind": "procedural",
+      "title": "Keeping time slow and fast",
+      "whyImportant": "A pulse that holds at both slow and fast tempos is what lets you practise slowly and then play at speed.",
+      "sources": [
+        {
+          "title": "Wikipedia: Metronome",
+          "url": "https://en.wikipedia.org/wiki/Metronome"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "rhythm.note-values",
+      "to": "rhythm-simple-metre",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Note values are what a time signature counts in."
+    },
+    {
+      "from": "rhythm.rest-values",
+      "to": "rhythm-simple-metre",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Rests fill bars of simple metre exactly as notes do."
+    },
+    {
+      "from": "rhythm.dotted-notes",
+      "to": "rhythm-simple-metre",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A dotted note is read by counting it against the beats of the metre."
+    },
+    {
+      "from": "rhythm.ties",
+      "to": "rhythm-simple-metre",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Ties carry notes across the beats and barlines a metre sets."
+    },
+    {
+      "from": "rhythm.beat-and-division",
+      "to": "rhythm-simple-metre",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Simple metre is defined by beats that divide into two."
+    },
+    {
+      "from": "rhythm.counting",
+      "to": "rhythm-simple-metre",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Counting syllables name the beats and divisions of a simple metre."
+    },
+    {
+      "from": "rhythm.beat-units",
+      "to": "rhythm-simple-metre",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The bottom number of a simple time signature names its beat."
+    },
+    {
+      "from": "rhythm.duple-triple-quadruple",
+      "to": "rhythm-simple-metre",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The top number of a simple time signature says duple, triple or quadruple."
+    },
+    {
+      "from": "rhythm.complete-bars",
+      "to": "rhythm-simple-metre",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A complete bar adds up to what the time signature says."
+    },
+    {
+      "from": "rhythm.beaming",
+      "to": "rhythm-simple-metre",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Beams are grouped by the beats of the metre."
+    },
+    {
+      "from": "rhythm.syncopation",
+      "to": "rhythm-simple-metre",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Syncopation is only heard against the strong and weak beats of a metre."
+    },
+    {
+      "from": "rhythm.anacrusis",
+      "to": "rhythm-simple-metre",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "An anacrusis is an incomplete bar of the metre."
+    },
+    {
+      "from": "rhythm.triplets",
+      "to": "rhythm-simple-metre",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A triplet borrows a division of three into a simple beat."
+    },
+    {
+      "from": "rhythm.compound-metre",
+      "to": "rhythm-simple-metre",
+      "relation": "analogous",
+      "weight": 4,
+      "rationale": "Compound metre works like simple metre, but each beat divides into three instead of two."
+    },
+    {
+      "from": "rhythm.play-quavers",
+      "to": "rhythm.beat-and-division",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Playing eighth notes is dividing each beat in two at the keys."
+    },
+    {
+      "from": "rhythm.play-quavers",
+      "to": "rhythm-steady-pulse",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Every timed rhythm is placed against a steady pulse."
+    },
+    {
+      "from": "rhythm.play-semiquavers",
+      "to": "rhythm.note-values",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Sixteenth notes are the shortest value most pieces ask the hands to play evenly."
+    },
+    {
+      "from": "rhythm.play-semiquavers",
+      "to": "rhythm-steady-pulse",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Every timed rhythm is placed against a steady pulse."
+    },
+    {
+      "from": "rhythm.play-subdivisions",
+      "to": "rhythm.counting",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Counting \"1 & 2 &\" and \"1 e & a\" is how a player switches subdivision in time."
+    },
+    {
+      "from": "rhythm.play-subdivisions",
+      "to": "rhythm-steady-pulse",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Every timed rhythm is placed against a steady pulse."
+    },
+    {
+      "from": "rhythm.play-held-values",
+      "to": "rhythm.note-values",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Holding a note for its full written value is reading the value at the keys."
+    },
+    {
+      "from": "rhythm.play-held-values",
+      "to": "rhythm-steady-pulse",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Every timed rhythm is placed against a steady pulse."
+    },
+    {
+      "from": "rhythm.play-rests",
+      "to": "rhythm.rest-values",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Playing rests in time is counting their written values."
+    },
+    {
+      "from": "rhythm.play-rests",
+      "to": "rhythm-steady-pulse",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Every timed rhythm is placed against a steady pulse."
+    },
+    {
+      "from": "rhythm.play-dotted",
+      "to": "rhythm.dotted-notes",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "A played dotted rhythm is the dotted value heard."
+    },
+    {
+      "from": "rhythm.play-dotted",
+      "to": "rhythm-steady-pulse",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Every timed rhythm is placed against a steady pulse."
+    },
+    {
+      "from": "rhythm.play-ties",
+      "to": "rhythm.ties",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Holding through a tie is how the tie is played."
+    },
+    {
+      "from": "rhythm.play-ties",
+      "to": "rhythm-steady-pulse",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Every timed rhythm is placed against a steady pulse."
+    },
+    {
+      "from": "rhythm.play-compound-pulse",
+      "to": "rhythm.compound-metre",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Feeling three divisions to a slow beat is compound metre at the keys."
+    },
+    {
+      "from": "rhythm.play-compound-pulse",
+      "to": "rhythm-steady-pulse",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Every timed rhythm is placed against a steady pulse."
+    },
+    {
+      "from": "rhythm.play-triplets",
+      "to": "rhythm.triplets",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Playing three even notes in a beat is how a triplet is performed."
+    },
+    {
+      "from": "rhythm.play-triplets",
+      "to": "rhythm-steady-pulse",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Every timed rhythm is placed against a steady pulse."
+    },
+    {
+      "from": "rhythm.play-syncopation",
+      "to": "rhythm.syncopation",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Syncopated notes have to be placed against the beat while it is played."
+    },
+    {
+      "from": "rhythm.play-syncopation",
+      "to": "rhythm-steady-pulse",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Every timed rhythm is placed against a steady pulse."
+    },
+    {
+      "from": "rhythm.play-anacrusis",
+      "to": "rhythm.anacrusis",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Starting on the upbeat is the anacrusis played."
+    },
+    {
+      "from": "rhythm.play-anacrusis",
+      "to": "rhythm-steady-pulse",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Every timed rhythm is placed against a steady pulse."
+    },
+    {
+      "from": "rhythm.play-left-hand",
+      "to": "rhythm.beat-and-division",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Left-hand accompaniments keep the divisions of the beat."
+    },
+    {
+      "from": "rhythm.play-left-hand",
+      "to": "rhythm-steady-pulse",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Every timed rhythm is placed against a steady pulse."
+    },
+    {
+      "from": "rhythm.play-hands-together",
+      "to": "rhythm.complete-bars",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Both hands must fill the same bar and meet on each beat."
+    },
+    {
+      "from": "rhythm.play-hands-together",
+      "to": "rhythm-steady-pulse",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Every timed rhythm is placed against a steady pulse."
+    },
+    {
+      "from": "rhythm.play-tempo-range",
+      "to": "rhythm.metronome-marks",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "Playing at a set metronome speed is the metronome mark put into practice."
+    },
+    {
+      "from": "rhythm.play-tempo-range",
+      "to": "rhythm-steady-pulse",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Every timed rhythm is placed against a steady pulse."
+    },
+    {
+      "from": "rhythm.dotted-notes",
+      "to": "rhythm.double-dots",
+      "relation": "analogous",
+      "weight": 4,
+      "rationale": "A second dot extends the same rule as the first: add half again."
+    },
+    {
+      "from": "rhythm.dotted-notes",
+      "to": "rhythm.ties",
+      "relation": "analogous",
+      "weight": 4,
+      "rationale": "A dotted note and a note tied to one of half its value sound the same."
+    },
+    {
+      "from": "rhythm.ties",
+      "to": "rhythm.ties-and-slurs",
+      "relation": "contradicts",
+      "weight": 4,
+      "rationale": "A tie and a slur look alike but a tie joins one pitch and a slur joins different ones."
+    },
+    {
+      "from": "rhythm.triplets",
+      "to": "rhythm.duplets",
+      "relation": "analogous",
+      "weight": 4,
+      "rationale": "Duplets borrow the simple division into compound time, just as triplets borrow the compound one into simple time."
+    },
+    {
+      "from": "rhythm.triplets",
+      "to": "rhythm.compound-metre",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "A triplet borrows the three-way division that compound metre uses."
+    },
+    {
+      "from": "rhythm.duplets",
+      "to": "rhythm.compound-metre",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Duplets appear in compound metres."
+    },
+    {
+      "from": "rhythm.syncopation",
+      "to": "rhythm.ties",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Ties from an off-beat over the next beat are a common way to write syncopation."
+    },
+    {
+      "from": "rhythm.anacrusis",
+      "to": "rhythm.complete-bars",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "An anacrusis and the last bar usually add up to one complete bar."
+    },
+    {
+      "from": "rhythm.beaming",
+      "to": "rhythm.beat-and-division",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Beams group the divisions of each beat."
+    },
+    {
+      "from": "rhythm.rest-grouping",
+      "to": "rhythm.beaming",
+      "relation": "analogous",
+      "weight": 4,
+      "rationale": "Rests are grouped by beat for the same reason beams are."
+    },
+    {
+      "from": "rhythm.rest-grouping",
+      "to": "rhythm.rest-values",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Grouping rests means choosing which rest values to write."
+    },
+    {
+      "from": "rhythm.compound-time-signatures",
+      "to": "rhythm.compound-metre",
+      "relation": "in-context",
+      "weight": 5,
+      "rationale": "A compound time signature is how compound metre is written."
+    },
+    {
+      "from": "rhythm.beaming",
+      "to": "rhythm.compound-metre",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "In compound time, eighth notes are beamed in threes to show each beat."
+    },
+    {
+      "from": "rhythm.irregular-metre",
+      "to": "rhythm.duple-triple-quadruple",
+      "relation": "analogous",
+      "weight": 3,
+      "rationale": "Irregular metres group a bar into unequal beats where regular metres use equal ones."
+    },
+    {
+      "from": "rhythm.breve",
+      "to": "rhythm.note-values",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The breve extends the chain of note values one step above the whole note."
+    },
+    {
+      "from": "rhythm.demisemiquaver",
+      "to": "rhythm.note-values",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "The thirty-second note extends the chain of note values one step below the sixteenth."
+    },
+    {
+      "from": "rhythm.rest-values",
+      "to": "rhythm.note-values",
+      "relation": "analogous",
+      "weight": 5,
+      "rationale": "Each rest lasts exactly as long as the note value of the same name."
+    },
+    {
+      "from": "rhythm.counting",
+      "to": "rhythm.beat-and-division",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "Counting syllables name the beat and each of its divisions."
+    },
+    {
+      "from": "rhythm.beat-units",
+      "to": "rhythm.duple-triple-quadruple",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "A time signature gives both the beat unit and the number of beats."
+    },
+    {
+      "from": "rhythm.play-subdivisions",
+      "to": "rhythm.play-triplets",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Switching to triplets is one of the subdivision changes."
+    },
+    {
+      "from": "rhythm.play-quavers",
+      "to": "rhythm.play-semiquavers",
+      "relation": "analogous",
+      "weight": 3,
+      "rationale": "Sixteenth notes divide the beat again, as eighth notes first divided it."
+    },
+    {
+      "from": "rhythm.play-left-hand",
+      "to": "rhythm.play-hands-together",
+      "relation": "in-context",
+      "weight": 4,
+      "rationale": "A steady left hand is half of playing hands together."
+    },
+    {
+      "from": "rhythm.play-syncopation",
+      "to": "rhythm.play-ties",
+      "relation": "in-context",
+      "weight": 3,
+      "rationale": "Many syncopated notes are tied, so they are held through the next beat."
+    },
+    {
+      "from": "rhythm.play-rests",
+      "to": "rhythm.play-anacrusis",
+      "relation": "in-context",
+      "weight": 2,
+      "rationale": "An anacrusis starts after silent beats, which are counted like rests."
+    }
+  ],
+  "items": [
+    {
+      "type": "theory",
+      "id": "rhythm.note-values-1",
+      "nodeId": "rhythm.note-values",
+      "prompt": "How many eighth notes (quavers) last as long as one half note (minim)?",
+      "answer": {
+        "id": "four",
+        "text": "Four",
+        "explanation": "A half note is two quarter notes, and each quarter note is two eighth notes."
+      },
+      "wrong": [
+        {
+          "id": "two",
+          "text": "Two",
+          "explanation": "Two quarter notes make a half note; eighth notes are half as long as quarters, so it takes four."
+        },
+        {
+          "id": "eight",
+          "text": "Eight",
+          "explanation": "Eight eighth notes fill a whole note, which is twice as long as a half note."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.note-values-2",
+      "nodeId": "rhythm.note-values",
+      "prompt": "Which single note lasts as long as two quarter notes?",
+      "answer": {
+        "id": "half",
+        "text": "A half note (minim)",
+        "explanation": "Each value is twice the one below it, so a half note equals two quarter notes."
+      },
+      "wrong": [
+        {
+          "id": "whole",
+          "text": "A whole note (semibreve)",
+          "explanation": "A whole note lasts four quarter notes, twice as long as asked."
+        },
+        {
+          "id": "eighth",
+          "text": "An eighth note (quaver)",
+          "explanation": "An eighth note is half of one quarter note, not two of them."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.note-values-3",
+      "nodeId": "rhythm.note-values",
+      "prompt": "How many flags does a single sixteenth note (semiquaver) have?",
+      "answer": {
+        "id": "two",
+        "text": "Two",
+        "explanation": "Each flag halves the value: one flag is an eighth note, two flags a sixteenth."
+      },
+      "wrong": [
+        {
+          "id": "one",
+          "text": "One",
+          "explanation": "One flag makes an eighth note, twice as long as a sixteenth."
+        },
+        {
+          "id": "three",
+          "text": "Three",
+          "explanation": "Three flags make a thirty-second note, half as long as a sixteenth."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.rest-values-1",
+      "nodeId": "rhythm.rest-values",
+      "prompt": "A whole rest and a half rest are both small blocks. How do you tell them apart on the staff?",
+      "answer": {
+        "id": "position",
+        "text": "The whole rest hangs below the fourth line; the half rest sits on the middle line",
+        "explanation": "Their shape is the same, so their place on the staff is what tells them apart."
+      },
+      "wrong": [
+        {
+          "id": "size",
+          "text": "The whole rest is drawn twice as big",
+          "explanation": "They are drawn the same size; only their position differs."
+        },
+        {
+          "id": "flag",
+          "text": "The half rest has a flag",
+          "explanation": "Flags belong to the eighth rest and shorter rests, not to the half rest."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.rest-values-2",
+      "nodeId": "rhythm.rest-values",
+      "prompt": "How many beats of silence does a quarter rest give in 4/4?",
+      "answer": {
+        "id": "one",
+        "text": "One beat",
+        "explanation": "A quarter rest lasts as long as a quarter note, which is one beat in 4/4."
+      },
+      "wrong": [
+        {
+          "id": "half",
+          "text": "Half a beat",
+          "explanation": "Half a beat of silence in 4/4 is an eighth rest."
+        },
+        {
+          "id": "two",
+          "text": "Two beats",
+          "explanation": "Two beats of silence in 4/4 is a half rest."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.dotted-notes-1",
+      "nodeId": "rhythm.dotted-notes",
+      "prompt": "In 4/4, how many beats does a dotted half note last?",
+      "answer": {
+        "id": "three",
+        "text": "Three",
+        "explanation": "A half note is two beats and the dot adds half of that, one more beat."
+      },
+      "wrong": [
+        {
+          "id": "two",
+          "text": "Two",
+          "explanation": "Two beats is an undotted half note; the dot adds one more."
+        },
+        {
+          "id": "four",
+          "text": "Four",
+          "explanation": "Four beats is a whole note; the dot adds half of two beats, not two whole beats."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.dotted-notes-2",
+      "nodeId": "rhythm.dotted-notes",
+      "prompt": "A dotted quarter note lasts as long as which tied pair?",
+      "answer": {
+        "id": "q-e",
+        "text": "A quarter note tied to an eighth note",
+        "explanation": "The dot adds half of a quarter note, which is an eighth note."
+      },
+      "wrong": [
+        {
+          "id": "q-q",
+          "text": "A quarter note tied to a quarter note",
+          "explanation": "Two tied quarter notes make a half note; the dot adds only half a quarter."
+        },
+        {
+          "id": "q-s",
+          "text": "A quarter note tied to a sixteenth note",
+          "explanation": "A sixteenth is a quarter of a quarter note; the dot adds half, an eighth."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.dotted-notes-3",
+      "nodeId": "rhythm.dotted-notes",
+      "prompt": "In 4/4, a dotted quarter note on beat 1 is followed by which note to reach beat 3?",
+      "answer": {
+        "id": "eighth",
+        "text": "An eighth note",
+        "explanation": "A dotted quarter is one and a half beats, and an eighth note adds the last half beat."
+      },
+      "wrong": [
+        {
+          "id": "quarter",
+          "text": "A quarter note",
+          "explanation": "That makes two and a half beats, so the next note would start halfway through beat 3."
+        },
+        {
+          "id": "sixteenth",
+          "text": "A sixteenth note",
+          "explanation": "That makes one and three quarter beats, a sixteenth short of beat 3."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.double-dots-1",
+      "nodeId": "rhythm.double-dots",
+      "prompt": "In 4/4, how many beats does a double-dotted half note last?",
+      "answer": {
+        "id": "three-half",
+        "text": "Three and a half",
+        "explanation": "Two beats, plus one for the first dot, plus half a beat for the second dot."
+      },
+      "wrong": [
+        {
+          "id": "three",
+          "text": "Three",
+          "explanation": "Three beats is a single-dotted half note; the second dot adds half a beat more."
+        },
+        {
+          "id": "four",
+          "text": "Four",
+          "explanation": "The second dot adds half of the first dot, half a beat, not a whole beat."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.double-dots-2",
+      "nodeId": "rhythm.double-dots",
+      "prompt": "What does the second dot of a double-dotted note add?",
+      "answer": {
+        "id": "half-first",
+        "text": "Half the value of the first dot",
+        "explanation": "Each dot adds half of what the one before it added."
+      },
+      "wrong": [
+        {
+          "id": "same",
+          "text": "The same as the first dot",
+          "explanation": "If it did, a double-dotted half note would last four beats instead of three and a half."
+        },
+        {
+          "id": "half-note",
+          "text": "Half the value of the note itself",
+          "explanation": "That is what the first dot adds; the second adds half of that again."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.ties-1",
+      "nodeId": "rhythm.ties",
+      "prompt": "Two quarter notes on the same pitch are joined by a curved line. How do you play them?",
+      "answer": {
+        "id": "one-sound",
+        "text": "Play once and hold for two beats",
+        "explanation": "A tie adds the second value to the first: one attack, two beats long."
+      },
+      "wrong": [
+        {
+          "id": "two-smooth",
+          "text": "Play twice, smoothly",
+          "explanation": "Playing twice smoothly is what a slur asks of different pitches; a tie is never struck again."
+        },
+        {
+          "id": "two-accent",
+          "text": "Play twice, the second one louder",
+          "explanation": "A tie gives the second note no attack at all."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.ties-2",
+      "nodeId": "rhythm.ties",
+      "prompt": "Why write a half note tied over the barline to a quarter note, instead of a dotted half note?",
+      "answer": {
+        "id": "barline",
+        "text": "A note cannot cross a barline, so a tie carries it into the next bar",
+        "explanation": "Each bar must add up on its own; the tie lets a sound continue past the barline."
+      },
+      "wrong": [
+        {
+          "id": "louder",
+          "text": "The tie makes the note louder",
+          "explanation": "A tie changes only the length of a note, never its volume."
+        },
+        {
+          "id": "shorter",
+          "text": "The tied notes are shorter than a dotted half",
+          "explanation": "Both last three beats; the difference is only where the barline falls."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.ties-and-slurs-1",
+      "nodeId": "rhythm.ties-and-slurs",
+      "prompt": "A curved line joins a C to the D after it. What is it?",
+      "answer": {
+        "id": "slur",
+        "text": "A slur: play both, smoothly connected",
+        "explanation": "A curve between different pitches is a slur; both notes are played."
+      },
+      "wrong": [
+        {
+          "id": "tie",
+          "text": "A tie: hold the C through the D",
+          "explanation": "A tie only ever joins two notes of the same pitch."
+        },
+        {
+          "id": "pause",
+          "text": "A pause over the two notes",
+          "explanation": "A pause is a curve with a dot above one note, not a line joining two notes."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.ties-and-slurs-2",
+      "nodeId": "rhythm.ties-and-slurs",
+      "prompt": "A curved line joins two notes of the same pitch, side by side. How many times do you strike the key?",
+      "answer": {
+        "id": "once",
+        "text": "Once",
+        "explanation": "Same pitch, adjacent, joined by a curve: that is a tie, so you strike once and hold for both values."
+      },
+      "wrong": [
+        {
+          "id": "twice",
+          "text": "Twice, smoothly",
+          "explanation": "Striking twice is what you would do with no curve at all or with a slur over different notes."
+        },
+        {
+          "id": "none",
+          "text": "Not at all; it is a rest",
+          "explanation": "A tie joins sounding notes; silence is written with rests."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.beat-and-division-1",
+      "nodeId": "rhythm.beat-and-division",
+      "prompt": "In simple time, each beat divides into how many equal parts?",
+      "answer": {
+        "id": "two",
+        "text": "Two",
+        "explanation": "Simple time splits the beat in two, as a quarter note splits into two eighths."
+      },
+      "wrong": [
+        {
+          "id": "three",
+          "text": "Three",
+          "explanation": "A beat that divides into three is compound time, like 6/8."
+        },
+        {
+          "id": "five",
+          "text": "Five",
+          "explanation": "No standard metre divides its beat into five; five notes in a beat is a special grouping."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.beat-and-division-2",
+      "nodeId": "rhythm.beat-and-division",
+      "prompt": "In 2/4, how many eighth notes fill one beat?",
+      "answer": {
+        "id": "two",
+        "text": "Two",
+        "explanation": "The beat in 2/4 is a quarter note, which divides into two eighth notes."
+      },
+      "wrong": [
+        {
+          "id": "one",
+          "text": "One",
+          "explanation": "One eighth note is only half of a quarter-note beat."
+        },
+        {
+          "id": "four",
+          "text": "Four",
+          "explanation": "Four eighth notes fill a whole bar of 2/4, which has two beats."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.counting-1",
+      "nodeId": "rhythm.counting",
+      "prompt": "Counting sixteenth notes as \"1 e & a\", which syllable falls exactly halfway through the beat?",
+      "answer": {
+        "id": "and",
+        "text": "\"&\"",
+        "explanation": "The \"&\" splits the beat in half; \"e\" and \"a\" mark the quarters either side of it."
+      },
+      "wrong": [
+        {
+          "id": "e",
+          "text": "\"e\"",
+          "explanation": "\"e\" comes a quarter of the way through the beat, the second sixteenth."
+        },
+        {
+          "id": "a",
+          "text": "\"a\"",
+          "explanation": "\"a\" comes three quarters of the way through the beat, the last sixteenth."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.counting-2",
+      "nodeId": "rhythm.counting",
+      "prompt": "Counting 4/4 as \"1 & 2 & 3 & 4 &\", where does a note on the \"&\" of 2 begin?",
+      "answer": {
+        "id": "between",
+        "text": "Halfway between beat 2 and beat 3",
+        "explanation": "The \"&\" is the second half of the beat it follows."
+      },
+      "wrong": [
+        {
+          "id": "on-2",
+          "text": "On beat 2",
+          "explanation": "A note on beat 2 is counted \"2\"; the \"&\" comes half a beat later."
+        },
+        {
+          "id": "on-3",
+          "text": "On beat 3",
+          "explanation": "A note on beat 3 is counted \"3\"; the \"&\" of 2 comes half a beat earlier."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.beat-units-1",
+      "nodeId": "rhythm.beat-units",
+      "prompt": "In 2/2 (cut time), which note gets the beat?",
+      "answer": {
+        "id": "half",
+        "text": "The half note",
+        "explanation": "The bottom 2 means a half note, so the bar has two half-note beats."
+      },
+      "wrong": [
+        {
+          "id": "quarter",
+          "text": "The quarter note",
+          "explanation": "A quarter-note beat is written with a 4 at the bottom, as in 2/4."
+        },
+        {
+          "id": "whole",
+          "text": "The whole note",
+          "explanation": "A whole note is the whole bar of 2/2, not one beat of it."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.beat-units-2",
+      "nodeId": "rhythm.beat-units",
+      "prompt": "Which time signature does the symbol C stand for?",
+      "answer": {
+        "id": "four-four",
+        "text": "4/4 (common time)",
+        "explanation": "C is common time, four quarter-note beats in a bar."
+      },
+      "wrong": [
+        {
+          "id": "two-two",
+          "text": "2/2",
+          "explanation": "2/2 is cut time, written as a C with a vertical line through it."
+        },
+        {
+          "id": "three-four",
+          "text": "3/4",
+          "explanation": "3/4 has no symbol of its own; it is always written as numbers."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.beat-units-3",
+      "nodeId": "rhythm.beat-units",
+      "prompt": "What fills one bar of 3/8?",
+      "answer": {
+        "id": "three-eighths",
+        "text": "Three eighth notes",
+        "explanation": "The top 3 counts the beats and the bottom 8 makes each one an eighth note."
+      },
+      "wrong": [
+        {
+          "id": "three-quarters",
+          "text": "Three quarter notes",
+          "explanation": "Three quarter notes fill a bar of 3/4; the 8 at the bottom means eighth notes."
+        },
+        {
+          "id": "three-sixteenths",
+          "text": "Three sixteenth notes",
+          "explanation": "A sixteenth-note beat would be written with 16 at the bottom."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.duple-triple-quadruple-1",
+      "nodeId": "rhythm.duple-triple-quadruple",
+      "prompt": "Which kind of metre is 3/4?",
+      "answer": {
+        "id": "simple-triple",
+        "text": "Simple triple",
+        "explanation": "Three beats in a bar, each dividing into two: simple triple."
+      },
+      "wrong": [
+        {
+          "id": "simple-duple",
+          "text": "Simple duple",
+          "explanation": "Simple duple has two beats in a bar, as in 2/4."
+        },
+        {
+          "id": "compound-duple",
+          "text": "Compound duple",
+          "explanation": "Compound duple has two beats that each divide into three, as in 6/8."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.duple-triple-quadruple-2",
+      "nodeId": "rhythm.duple-triple-quadruple",
+      "prompt": "Which time signature is simple quadruple?",
+      "answer": {
+        "id": "four-four",
+        "text": "4/4",
+        "explanation": "Four beats in a bar, each dividing into two."
+      },
+      "wrong": [
+        {
+          "id": "two-four",
+          "text": "2/4",
+          "explanation": "2/4 has two beats in a bar: simple duple."
+        },
+        {
+          "id": "twelve-eight",
+          "text": "12/8",
+          "explanation": "12/8 has four beats, but each divides into three, so it is compound quadruple."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.compound-metre-1",
+      "nodeId": "rhythm.compound-metre",
+      "prompt": "At a moderate tempo, how many beats do you feel in a bar of 6/8?",
+      "answer": {
+        "id": "two",
+        "text": "Two dotted-quarter beats",
+        "explanation": "The six eighth notes group in two threes, and each three is one beat."
+      },
+      "wrong": [
+        {
+          "id": "six",
+          "text": "Six",
+          "explanation": "The six eighth notes are the divisions of the beat; counted one by one they are only felt at very slow tempos."
+        },
+        {
+          "id": "three",
+          "text": "Three",
+          "explanation": "Three beats of two eighth notes is 3/4, which holds the same notes grouped differently."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.compound-metre-2",
+      "nodeId": "rhythm.compound-metre",
+      "prompt": "In compound time, each beat divides into how many equal parts?",
+      "answer": {
+        "id": "three",
+        "text": "Three",
+        "explanation": "A dotted beat splits evenly into three, as a dotted quarter splits into three eighths."
+      },
+      "wrong": [
+        {
+          "id": "two",
+          "text": "Two",
+          "explanation": "A beat that divides into two is simple time."
+        },
+        {
+          "id": "four",
+          "text": "Four",
+          "explanation": "Four parts is the second division of a simple beat, as in sixteenth notes."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.compound-metre-3",
+      "nodeId": "rhythm.compound-metre",
+      "prompt": "Both 6/8 and 3/4 hold six eighth notes. What is the difference?",
+      "answer": {
+        "id": "grouping",
+        "text": "6/8 has two beats of three eighths; 3/4 has three beats of two",
+        "explanation": "The notes are the same; how they group into beats is not."
+      },
+      "wrong": [
+        {
+          "id": "none",
+          "text": "There is no difference",
+          "explanation": "The grouping differs, so the strong beats fall in different places."
+        },
+        {
+          "id": "faster",
+          "text": "6/8 is always faster",
+          "explanation": "A time signature says nothing about speed; the tempo marking does."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.compound-time-signatures-1",
+      "nodeId": "rhythm.compound-time-signatures",
+      "prompt": "Which metre is 12/8?",
+      "answer": {
+        "id": "compound-quadruple",
+        "text": "Compound quadruple",
+        "explanation": "Twelve eighth notes in groups of three make four dotted-quarter beats."
+      },
+      "wrong": [
+        {
+          "id": "simple-twelve",
+          "text": "Twelve beats of an eighth note",
+          "explanation": "In compound time the eighth notes are divisions; they group in threes into beats."
+        },
+        {
+          "id": "compound-triple",
+          "text": "Compound triple",
+          "explanation": "Compound triple is 9/8, three groups of three eighth notes."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.compound-time-signatures-2",
+      "nodeId": "rhythm.compound-time-signatures",
+      "prompt": "Which time signature is compound triple?",
+      "answer": {
+        "id": "nine-eight",
+        "text": "9/8",
+        "explanation": "Nine eighth notes grouped in threes give three dotted-quarter beats."
+      },
+      "wrong": [
+        {
+          "id": "three-four",
+          "text": "3/4",
+          "explanation": "3/4 has three beats that each divide into two: simple triple."
+        },
+        {
+          "id": "six-eight",
+          "text": "6/8",
+          "explanation": "6/8 has two dotted-quarter beats: compound duple."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.compound-time-signatures-3",
+      "nodeId": "rhythm.compound-time-signatures",
+      "prompt": "In 6/8, 9/8 or 12/8, what does the top number divided by three give?",
+      "answer": {
+        "id": "beats",
+        "text": "The number of beats in a bar",
+        "explanation": "Each beat holds three of the counted notes, so dividing by three counts the beats."
+      },
+      "wrong": [
+        {
+          "id": "unit",
+          "text": "The note that gets the beat",
+          "explanation": "The beat is a dotted note; dividing the top number tells how many, not which."
+        },
+        {
+          "id": "tempo",
+          "text": "The tempo",
+          "explanation": "A time signature never sets the speed."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.irregular-metre-1",
+      "nodeId": "rhythm.irregular-metre",
+      "prompt": "How is a bar of 7/8 usually grouped?",
+      "answer": {
+        "id": "unequal",
+        "text": "Into unequal beats of twos and threes, such as 2+2+3",
+        "explanation": "Seven eighth notes cannot split into equal twos or threes, so the beats are of unequal length."
+      },
+      "wrong": [
+        {
+          "id": "equal-three",
+          "text": "Into three equal beats",
+          "explanation": "Seven does not divide evenly by three."
+        },
+        {
+          "id": "compound",
+          "text": "Like 6/8, in groups of three",
+          "explanation": "Groups of only threes would need six or nine eighth notes, not seven."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.irregular-metre-2",
+      "nodeId": "rhythm.irregular-metre",
+      "prompt": "A bar of 5/8 is grouped 3+2. How many beats does it have?",
+      "answer": {
+        "id": "two",
+        "text": "Two: one long and one short",
+        "explanation": "Each group is one beat, so a 3+2 bar has a long beat and then a short one."
+      },
+      "wrong": [
+        {
+          "id": "five",
+          "text": "Five",
+          "explanation": "The five eighth notes are grouped into beats; they are not each a beat."
+        },
+        {
+          "id": "three",
+          "text": "Three",
+          "explanation": "Three is the size of the first group, not the number of groups."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.complete-bars-1",
+      "nodeId": "rhythm.complete-bars",
+      "prompt": "Which fills exactly one bar of 3/4?",
+      "answer": {
+        "id": "half-quarter",
+        "text": "A half note and a quarter note",
+        "explanation": "Two beats plus one beat makes the three beats of 3/4."
+      },
+      "wrong": [
+        {
+          "id": "half-half",
+          "text": "Two half notes",
+          "explanation": "Two half notes make four beats, one too many for 3/4."
+        },
+        {
+          "id": "dhalf-quarter",
+          "text": "A dotted half note and a quarter note",
+          "explanation": "A dotted half note already fills 3/4; the quarter note overflows the bar."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.complete-bars-2",
+      "nodeId": "rhythm.complete-bars",
+      "prompt": "A bar of 4/4 holds a half note and a quarter note. What completes it?",
+      "answer": {
+        "id": "quarter",
+        "text": "A quarter note or a quarter rest",
+        "explanation": "Two beats and one beat make three; one more beat makes four."
+      },
+      "wrong": [
+        {
+          "id": "half",
+          "text": "A half note",
+          "explanation": "That makes five beats, one too many."
+        },
+        {
+          "id": "eighth",
+          "text": "An eighth note",
+          "explanation": "That makes three and a half beats, half a beat short."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.beaming-1",
+      "nodeId": "rhythm.beaming",
+      "prompt": "In 4/4, how are eight eighth notes usually beamed?",
+      "answer": {
+        "id": "fours",
+        "text": "In two groups of four, beats 1-2 and 3-4",
+        "explanation": "Beams may join beats 1 and 2 or 3 and 4, but never beat 2 to beat 3 across the middle of the bar."
+      },
+      "wrong": [
+        {
+          "id": "one-group",
+          "text": "All eight under one beam",
+          "explanation": "One beam hides the middle of the bar, where beat 3 starts."
+        },
+        {
+          "id": "threes",
+          "text": "In groups of three",
+          "explanation": "Groups of three show compound beats, which 4/4 does not have."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.beaming-2",
+      "nodeId": "rhythm.beaming",
+      "prompt": "In 6/8, how are six eighth notes beamed?",
+      "answer": {
+        "id": "two-threes",
+        "text": "In two groups of three",
+        "explanation": "Each group of three is one dotted-quarter beat."
+      },
+      "wrong": [
+        {
+          "id": "three-twos",
+          "text": "In three groups of two",
+          "explanation": "Three groups of two show the three beats of 3/4, not the two beats of 6/8."
+        },
+        {
+          "id": "none",
+          "text": "Each eighth note with its own flag",
+          "explanation": "Separate flags hide the beats; beams are used to show them."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.rest-grouping-1",
+      "nodeId": "rhythm.rest-grouping",
+      "prompt": "In 4/4, silence on beats 2 and 3 is written how?",
+      "answer": {
+        "id": "two-quarters",
+        "text": "As two quarter rests",
+        "explanation": "A half rest starting on beat 2 would hide the middle of the bar, so two quarter rests show beat 3."
+      },
+      "wrong": [
+        {
+          "id": "half",
+          "text": "As one half rest",
+          "explanation": "In 4/4 a half rest belongs on beat 1 or beat 3, where it does not hide the middle of the bar."
+        },
+        {
+          "id": "whole",
+          "text": "As a whole rest",
+          "explanation": "A whole rest silences the entire bar, not two beats of it."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.rest-grouping-2",
+      "nodeId": "rhythm.rest-grouping",
+      "prompt": "In 3/4, how is a whole bar of silence written?",
+      "answer": {
+        "id": "whole",
+        "text": "With a whole rest",
+        "explanation": "A whole rest means a whole bar of silence in any time signature."
+      },
+      "wrong": [
+        {
+          "id": "dotted-half",
+          "text": "With a dotted half rest",
+          "explanation": "A whole bar of rest is written with a whole rest, whatever the metre."
+        },
+        {
+          "id": "three-quarters",
+          "text": "With three quarter rests",
+          "explanation": "Three quarter rests add up correctly, but a whole bar is shown with one whole rest."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.triplets-1",
+      "nodeId": "rhythm.triplets",
+      "prompt": "In 2/4, what does a 3 over three eighth notes mean?",
+      "answer": {
+        "id": "three-in-two",
+        "text": "Play the three evenly in the time of two eighth notes, one beat",
+        "explanation": "A triplet squeezes three equal notes into the time two would take."
+      },
+      "wrong": [
+        {
+          "id": "accent",
+          "text": "Accent the third note",
+          "explanation": "The 3 is a grouping number, not an accent."
+        },
+        {
+          "id": "three-beats",
+          "text": "Hold the group for three beats",
+          "explanation": "The group lasts one beat; the 3 counts the notes in it."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.triplets-2",
+      "nodeId": "rhythm.triplets",
+      "prompt": "How many eighth-note triplets fill one quarter-note beat?",
+      "answer": {
+        "id": "three",
+        "text": "Three",
+        "explanation": "A triplet is three notes in the time of two eighths, which is one quarter-note beat."
+      },
+      "wrong": [
+        {
+          "id": "two",
+          "text": "Two",
+          "explanation": "Two plain eighth notes fill a beat; a triplet puts three in that space."
+        },
+        {
+          "id": "six",
+          "text": "Six",
+          "explanation": "Six triplet eighths fill two beats, or one beat of sixteenth-note triplets."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.duplets-1",
+      "nodeId": "rhythm.duplets",
+      "prompt": "In 6/8, what is a duplet?",
+      "answer": {
+        "id": "two-in-three",
+        "text": "Two equal notes in the time of three eighth notes",
+        "explanation": "A duplet splits a dotted beat in two instead of three."
+      },
+      "wrong": [
+        {
+          "id": "three-in-two",
+          "text": "Three notes in the time of two",
+          "explanation": "That is a triplet, which borrows the other way."
+        },
+        {
+          "id": "two-in-four",
+          "text": "Two notes in the time of four",
+          "explanation": "Two notes in the time of four is just two quarter notes; nothing is borrowed."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.duplets-2",
+      "nodeId": "rhythm.duplets",
+      "prompt": "In which kind of metre do duplets usually appear?",
+      "answer": {
+        "id": "compound",
+        "text": "Compound time",
+        "explanation": "They borrow the simple division of two into a beat that normally divides into three."
+      },
+      "wrong": [
+        {
+          "id": "simple",
+          "text": "Simple time",
+          "explanation": "A simple beat already divides into two, so there is nothing to borrow."
+        },
+        {
+          "id": "any",
+          "text": "Only in 4/4",
+          "explanation": "Duplets belong to compound metres like 6/8; 4/4 is simple."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.syncopation-1",
+      "nodeId": "rhythm.syncopation",
+      "prompt": "What is syncopation?",
+      "answer": {
+        "id": "off-beat",
+        "text": "Stress that falls off the beat or on a weak beat",
+        "explanation": "It works by going against the expected pattern of strong and weak beats."
+      },
+      "wrong": [
+        {
+          "id": "faster",
+          "text": "Playing a passage faster",
+          "explanation": "A change of speed is a tempo change, not syncopation."
+        },
+        {
+          "id": "rests",
+          "text": "Any bar that contains a rest",
+          "explanation": "A rest can help make syncopation, but a rest on its own is not syncopation."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.syncopation-2",
+      "nodeId": "rhythm.syncopation",
+      "prompt": "Which rhythm in 4/4 is syncopated?",
+      "answer": {
+        "id": "e-q-e",
+        "text": "Eighth, quarter, eighth on beats 1 and 2",
+        "explanation": "The quarter note starts on the \"&\" of 1 and holds through beat 2, so beat 2 gets no new note."
+      },
+      "wrong": [
+        {
+          "id": "four-q",
+          "text": "Four quarter notes",
+          "explanation": "Every note lands on a beat, so nothing goes against the pulse."
+        },
+        {
+          "id": "two-h",
+          "text": "Two half notes",
+          "explanation": "Both notes land on strong beats, 1 and 3."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.syncopation-3",
+      "nodeId": "rhythm.syncopation",
+      "prompt": "How does a tie often create syncopation?",
+      "answer": {
+        "id": "over-beat",
+        "text": "It holds a note from an off-beat over the next beat",
+        "explanation": "The beat that follows gets no new attack, so the stress falls on the off-beat."
+      },
+      "wrong": [
+        {
+          "id": "louder",
+          "text": "It makes the tied note louder",
+          "explanation": "A tie only changes length."
+        },
+        {
+          "id": "shorter",
+          "text": "It shortens the note to half a beat",
+          "explanation": "A tie always lengthens a note."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.anacrusis-1",
+      "nodeId": "rhythm.anacrusis",
+      "prompt": "A piece in 3/4 starts with one quarter note before the first full bar. What is that note called?",
+      "answer": {
+        "id": "anacrusis",
+        "text": "An anacrusis (upbeat or pickup)",
+        "explanation": "Notes before the first full bar make an anacrusis."
+      },
+      "wrong": [
+        {
+          "id": "syncopation",
+          "text": "A syncopation",
+          "explanation": "Syncopation is stress against the beat; an anacrusis is just an incomplete opening bar."
+        },
+        {
+          "id": "downbeat",
+          "text": "A downbeat",
+          "explanation": "The downbeat is beat 1 of the first full bar, which comes after the anacrusis."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.anacrusis-2",
+      "nodeId": "rhythm.anacrusis",
+      "prompt": "A piece in 3/4 opens with a one-beat anacrusis. How long is its last bar, usually?",
+      "answer": {
+        "id": "two",
+        "text": "Two beats",
+        "explanation": "The anacrusis and the last bar usually add up to one full bar."
+      },
+      "wrong": [
+        {
+          "id": "three",
+          "text": "Three beats",
+          "explanation": "The opening beat is usually taken from the last bar, so it is a beat short."
+        },
+        {
+          "id": "one",
+          "text": "One beat",
+          "explanation": "One beat at the end would add up to two beats with the anacrusis, not a full bar of 3/4."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.anacrusis-3",
+      "nodeId": "rhythm.anacrusis",
+      "prompt": "Which bar is bar 1 in a piece with an anacrusis?",
+      "answer": {
+        "id": "first-full",
+        "text": "The first full bar after the anacrusis",
+        "explanation": "The incomplete opening bar is not counted."
+      },
+      "wrong": [
+        {
+          "id": "pickup",
+          "text": "The anacrusis itself",
+          "explanation": "Bar numbers start with the first complete bar."
+        },
+        {
+          "id": "second-full",
+          "text": "The second full bar",
+          "explanation": "The first full bar is bar 1."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.breve-1",
+      "nodeId": "rhythm.breve",
+      "prompt": "How many quarter-note beats does a breve last?",
+      "answer": {
+        "id": "eight",
+        "text": "Eight",
+        "explanation": "A breve is two whole notes, and each whole note is four quarter notes."
+      },
+      "wrong": [
+        {
+          "id": "four",
+          "text": "Four",
+          "explanation": "Four quarter notes is a whole note; the breve is twice as long."
+        },
+        {
+          "id": "six",
+          "text": "Six",
+          "explanation": "Six quarter notes is a dotted whole note."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.breve-2",
+      "nodeId": "rhythm.breve",
+      "prompt": "Which note is twice as long as a whole note?",
+      "answer": {
+        "id": "breve",
+        "text": "The breve (double whole note)",
+        "explanation": "Each value doubles the one below it, and the breve is the next step up from the whole note."
+      },
+      "wrong": [
+        {
+          "id": "dotted-whole",
+          "text": "The dotted whole note",
+          "explanation": "A dot adds half, so a dotted whole note is one and a half whole notes."
+        },
+        {
+          "id": "half",
+          "text": "The half note",
+          "explanation": "A half note is half as long as a whole note."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.demisemiquaver-1",
+      "nodeId": "rhythm.demisemiquaver",
+      "prompt": "How many thirty-second notes fill one quarter note?",
+      "answer": {
+        "id": "eight",
+        "text": "Eight",
+        "explanation": "A quarter note is four sixteenths, and each sixteenth is two thirty-seconds."
+      },
+      "wrong": [
+        {
+          "id": "four",
+          "text": "Four",
+          "explanation": "Four sixteenth notes fill a quarter note; thirty-seconds are half as long."
+        },
+        {
+          "id": "sixteen",
+          "text": "Sixteen",
+          "explanation": "Sixteen thirty-second notes fill a half note."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.demisemiquaver-2",
+      "nodeId": "rhythm.demisemiquaver",
+      "prompt": "How many beams join a group of thirty-second notes?",
+      "answer": {
+        "id": "three",
+        "text": "Three",
+        "explanation": "One beam per flag: eighths have one, sixteenths two, thirty-seconds three."
+      },
+      "wrong": [
+        {
+          "id": "two",
+          "text": "Two",
+          "explanation": "Two beams join sixteenth notes."
+        },
+        {
+          "id": "four",
+          "text": "Four",
+          "explanation": "Four beams join sixty-fourth notes."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.metronome-marks-1",
+      "nodeId": "rhythm.metronome-marks",
+      "prompt": "What does \"quarter note = 120\" at the top of a piece mean?",
+      "answer": {
+        "id": "bpm",
+        "text": "120 quarter-note beats per minute",
+        "explanation": "The number counts how many of the named note fit in a minute."
+      },
+      "wrong": [
+        {
+          "id": "bars",
+          "text": "120 bars per minute",
+          "explanation": "The mark counts the named note, not bars."
+        },
+        {
+          "id": "seconds",
+          "text": "The piece lasts 120 seconds",
+          "explanation": "It sets the speed of the beat, not the length of the piece."
+        }
+      ]
+    },
+    {
+      "type": "theory",
+      "id": "rhythm.metronome-marks-2",
+      "nodeId": "rhythm.metronome-marks",
+      "prompt": "At quarter note = 60, how long does each quarter note last?",
+      "answer": {
+        "id": "one-second",
+        "text": "One second",
+        "explanation": "Sixty beats in sixty seconds is one beat per second."
+      },
+      "wrong": [
+        {
+          "id": "half-second",
+          "text": "Half a second",
+          "explanation": "Half a second per beat is quarter note = 120."
+        },
+        {
+          "id": "two-seconds",
+          "text": "Two seconds",
+          "explanation": "Two seconds per beat is quarter note = 30."
+        }
+      ]
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-quavers-1",
+      "nodeId": "rhythm.play-quavers",
+      "prompt": "Play the opening four bars of the Minuet in G, right hand, with the click on each quarter-note beat of 3/4. Keep the eighth notes even.",
+      "notes": [
+        {
+          "pitch": 74,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 2.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 7.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 8.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 78,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 9.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 10.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 80,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-quavers-2",
+      "nodeId": "rhythm.play-quavers",
+      "prompt": "Play the opening three bars of Clementi's Sonatina Op. 36 No. 1, right hand, with the click on each quarter-note beat of 4/4.",
+      "notes": [
+        {
+          "pitch": 72,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 8.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 8.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 9.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 9.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 10.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 10.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 11.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 11.5,
+          "beats": 0.5,
+          "hand": "right"
+        }
+      ],
+      "bpm": 72,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-semiquavers-1",
+      "nodeId": "rhythm.play-semiquavers",
+      "prompt": "Play the first two bars of Bach's Prelude in C, both hands, with the click on each quarter-note beat of 4/4. Keep the sixteenth notes even.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 0.25,
+          "beats": 1.75,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 0.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 0.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 1.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 1.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 1.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 1.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 2.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2.25,
+          "beats": 1.75,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 2.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 3.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 3.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 3.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 4.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 4.25,
+          "beats": 1.75,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 4.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 4.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 5.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 5.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 5.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 5.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 6.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 6.25,
+          "beats": 1.75,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 6.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 6.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 7.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 7.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 7.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 7.75,
+          "beats": 0.25,
+          "hand": "right"
+        }
+      ],
+      "bpm": 56,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 50,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-semiquavers-2",
+      "nodeId": "rhythm.play-semiquavers",
+      "prompt": "Play bars 2-4 of Mozart's Alla Turca, right hand, with the click on each quarter-note beat of 2/4. The sixteenths run straight into the high C.",
+      "notes": [
+        {
+          "pitch": 76,
+          "startBeat": 0.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 1.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 1.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 1.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 1.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 83,
+          "startBeat": 2.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 81,
+          "startBeat": 2.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 80,
+          "startBeat": 2.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 81,
+          "startBeat": 2.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 83,
+          "startBeat": 3.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 81,
+          "startBeat": 3.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 80,
+          "startBeat": 3.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 81,
+          "startBeat": 3.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 84,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 66,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 50,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-subdivisions-1",
+      "nodeId": "rhythm.play-subdivisions",
+      "prompt": "A short exercise on middle C, right hand, with the click on each quarter-note beat of 4/4: one bar of quarter notes, one of eighth notes, one of eighth-note triplets, one of sixteenth notes.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0.0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 1.0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 2.0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 3.0,
+          "beats": 1,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 4.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 6.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 7.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 8.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 8.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 8.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 9.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 9.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 9.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 10.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 10.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 10.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 11.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 11.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 11.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 12.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 12.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 12.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 12.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 13.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 13.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 13.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 13.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 14.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 14.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 14.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 14.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 15.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 15.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 15.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 15.75,
+          "beats": 0.25,
+          "hand": "right"
+        }
+      ],
+      "bpm": 60,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 50,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-subdivisions-2",
+      "nodeId": "rhythm.play-subdivisions",
+      "prompt": "A short exercise on the C below middle C, left hand, with the click on each quarter-note beat of 4/4: one bar of eighth notes, one of sixteenth notes, one of eighth-note triplets, one of eighth notes again.",
+      "notes": [
+        {
+          "pitch": 48,
+          "startBeat": 0.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 2.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 4.0,
+          "beats": 0.25,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 4.25,
+          "beats": 0.25,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 4.5,
+          "beats": 0.25,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 4.75,
+          "beats": 0.25,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 5.0,
+          "beats": 0.25,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 5.25,
+          "beats": 0.25,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 5.5,
+          "beats": 0.25,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 5.75,
+          "beats": 0.25,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 6.0,
+          "beats": 0.25,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 6.25,
+          "beats": 0.25,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 6.5,
+          "beats": 0.25,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 6.75,
+          "beats": 0.25,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 7.0,
+          "beats": 0.25,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 7.25,
+          "beats": 0.25,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 7.5,
+          "beats": 0.25,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 7.75,
+          "beats": 0.25,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 8.0,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 8.3333,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 8.6667,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 9.0,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 9.3333,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 9.6667,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 10.0,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 10.3333,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 10.6667,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 11.0,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 11.3333,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 11.6667,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 12.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 12.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 13.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 13.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 14.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 14.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 15.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 15.5,
+          "beats": 0.5,
+          "hand": "left"
+        }
+      ],
+      "bpm": 60,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 50,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-held-values-1",
+      "nodeId": "rhythm.play-held-values",
+      "prompt": "Play the first four bars of Satie's Gymnopédie No. 1, left hand, with the click on each quarter-note beat of 3/4. Hold each bass note for the whole bar and each chord for two beats.",
+      "notes": [
+        {
+          "pitch": 33,
+          "startBeat": 0.0,
+          "beats": 3.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 1.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 1.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 1.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 38,
+          "startBeat": 3.0,
+          "beats": 3.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 4.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 4.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 4.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 38,
+          "startBeat": 6.0,
+          "beats": 3.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 7.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 7.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 7.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 7.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 38,
+          "startBeat": 9.0,
+          "beats": 3.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 48,
+          "startBeat": 10.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 10.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 10.0,
+          "beats": 2.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 10.0,
+          "beats": 2.0,
+          "hand": "left"
+        }
+      ],
+      "bpm": 56,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20,
+        "legato": 0.7
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-held-values-2",
+      "nodeId": "rhythm.play-held-values",
+      "prompt": "Play bars 1-3 of Chopin's Prelude in E minor, right hand, with the click on each quarter-note beat of 4/4. Hold each B for three full beats before the C.",
+      "notes": [
+        {
+          "pitch": 71,
+          "startBeat": 0.0,
+          "beats": 3.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 4.0,
+          "beats": 3.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 8.0,
+          "beats": 3.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 44,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-rests-1",
+      "nodeId": "rhythm.play-rests",
+      "prompt": "Play bars 2-3 of Beethoven's Für Elise, right hand, landing on the C of bar 4. The click falls on each eighth note of 3/8. Lift for the sixteenth rest before each rising arpeggio.",
+      "notes": [
+        {
+          "pitch": 69,
+          "startBeat": 0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 6,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 120,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-rests-2",
+      "nodeId": "rhythm.play-rests",
+      "prompt": "Play bars 2-4 of Beethoven's Für Elise, left hand. The click falls on each eighth note of 3/8. Each three-note arpeggio is followed by silence until the next bar: count through it.",
+      "notes": [
+        {
+          "pitch": 45,
+          "startBeat": 0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 40,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 4,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 45,
+          "startBeat": 6,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "left"
+        }
+      ],
+      "bpm": 120,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-dotted-1",
+      "nodeId": "rhythm.play-dotted",
+      "prompt": "Play bars 3-4 of Ode to Joy, right hand, with the click on each quarter-note beat of 4/4. The dotted quarter on beat 1 of bar 4 leads into an eighth note.",
+      "notes": [
+        {
+          "pitch": 67,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 4.0,
+          "beats": 1.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 6.0,
+          "beats": 2.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 80,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-dotted-2",
+      "nodeId": "rhythm.play-dotted",
+      "prompt": "Play the first two bars of Mozart's Sonata in C, K. 545, right hand, with the click on each quarter-note beat of 4/4. Hold the dotted quarter B for a beat and a half before the quick turn.",
+      "notes": [
+        {
+          "pitch": 72,
+          "startBeat": 0.0,
+          "beats": 2.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 4.0,
+          "beats": 1.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 5.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 5.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 72,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 50,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-ties-1",
+      "nodeId": "rhythm.play-ties",
+      "prompt": "Play bars 2-5 of Satie's Gymnopédie No. 1, right hand, with the click on each quarter-note beat of 3/4. The last D is tied over the barline: play it once and hold it for five beats.",
+      "notes": [
+        {
+          "pitch": 76,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 6.0,
+          "beats": 5.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 56,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20,
+        "legato": 0.7
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-ties-2",
+      "nodeId": "rhythm.play-ties",
+      "prompt": "Play bars 7-10 of Satie's Gymnopédie No. 1, right hand, with the click on each quarter-note beat of 3/4. The D tied over the barline is played once and held.",
+      "notes": [
+        {
+          "pitch": 81,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 6.0,
+          "beats": 5.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 11.0,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 56,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20,
+        "legato": 0.7
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-compound-pulse-1",
+      "nodeId": "rhythm.play-compound-pulse",
+      "prompt": "Play bar 1 of Chopin's Nocturne Op. 9 No. 2, left hand. The click falls on each dotted-quarter beat of 12/8, four to the bar, with three eighth notes to each click.",
+      "notes": [
+        {
+          "pitch": 39,
+          "startBeat": 0.0,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 0.3333,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 0.3333,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 58,
+          "startBeat": 0.6667,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 0.6667,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 0.6667,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 51,
+          "startBeat": 1.0,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 1.3333,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 1.3333,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 59,
+          "startBeat": 1.6667,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 1.6667,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 1.6667,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 39,
+          "startBeat": 2.0,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 2.3333,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 2.3333,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 58,
+          "startBeat": 2.6667,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 2.6667,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2.6667,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 38,
+          "startBeat": 3.0,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 3.3333,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 3.3333,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 58,
+          "startBeat": 3.6667,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 3.6667,
+          "beats": 0.3333,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3.6667,
+          "beats": 0.3333,
+          "hand": "left"
+        }
+      ],
+      "bpm": 40,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-compound-pulse-2",
+      "nodeId": "rhythm.play-compound-pulse",
+      "prompt": "Play bar 1 of Chopin's Nocturne Op. 9 No. 2, right hand. The click falls on each dotted-quarter beat of 12/8, four to the bar.",
+      "notes": [
+        {
+          "pitch": 79,
+          "startBeat": 0.0,
+          "beats": 1.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 1.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 1.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 3.0,
+          "beats": 0.6667,
+          "hand": "right"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 3.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 4.0,
+          "beats": 0.6667,
+          "hand": "right"
+        }
+      ],
+      "bpm": 40,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-triplets-1",
+      "nodeId": "rhythm.play-triplets",
+      "prompt": "Play the first two bars of Beethoven's Moonlight Sonata, right hand. The piece is in cut time; here the click falls on each quarter note, four to the bar. Play three even triplet notes to every click.",
+      "notes": [
+        {
+          "pitch": 56,
+          "startBeat": 0.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 0.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 0.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 1.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 1.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 1.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 2.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 2.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 3.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 3.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 3.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 4.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 4.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 4.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 5.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 5.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 5.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 6.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 6.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 6.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 7.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 7.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 7.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        }
+      ],
+      "bpm": 50,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 50,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-triplets-2",
+      "nodeId": "rhythm.play-triplets",
+      "prompt": "Play the first two bars of Beethoven's Moonlight Sonata, both hands, with the click on each quarter note, four to the bar. Hold the left-hand octave for the whole bar under the triplets.",
+      "notes": [
+        {
+          "pitch": 37,
+          "startBeat": 0.0,
+          "beats": 4.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 49,
+          "startBeat": 0.0,
+          "beats": 4.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 0.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 0.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 0.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 1.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 1.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 1.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 2.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 2.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 3.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 3.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 3.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 35,
+          "startBeat": 4.0,
+          "beats": 4.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 47,
+          "startBeat": 4.0,
+          "beats": 4.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 4.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 4.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 4.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 5.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 5.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 5.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 6.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 6.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 6.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 56,
+          "startBeat": 7.0,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 61,
+          "startBeat": 7.3333,
+          "beats": 0.3333,
+          "hand": "right"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 7.6667,
+          "beats": 0.3333,
+          "hand": "right"
+        }
+      ],
+      "bpm": 50,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20,
+        "legato": 0.8
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-syncopation-1",
+      "nodeId": "rhythm.play-syncopation",
+      "prompt": "Play bars 1-2 of Joplin's Maple Leaf Rag, right hand, with the click on each quarter-note beat of 2/4. The tied chords start on the off-beat; keep the click steady under them.",
+      "notes": [
+        {
+          "pitch": 68,
+          "startBeat": 0.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 0.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 0.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 0.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 1.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 1.25,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 1.25,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 1.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 2.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 2.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 2.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 2.75,
+          "beats": 1.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 2.75,
+          "beats": 1.25,
+          "hand": "right"
+        }
+      ],
+      "bpm": 60,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 50,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-syncopation-2",
+      "nodeId": "rhythm.play-syncopation",
+      "prompt": "Play bars 3-4 of Joplin's Maple Leaf Rag, right hand, with the click on each quarter-note beat of 2/4. Bar 3 starts with a sixteenth rest, and most chords land between the clicks.",
+      "notes": [
+        {
+          "pitch": 68,
+          "startBeat": 0.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 0.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 0.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 0.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 1.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 1.25,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 1.25,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 1.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 2.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 2.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 70,
+          "startBeat": 2.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 2.75,
+          "beats": 0.75,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 2.75,
+          "beats": 0.75,
+          "hand": "right"
+        },
+        {
+          "pitch": 63,
+          "startBeat": 3.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 3.75,
+          "beats": 0.25,
+          "hand": "right"
+        }
+      ],
+      "bpm": 60,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 50,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-anacrusis-1",
+      "nodeId": "rhythm.play-anacrusis",
+      "prompt": "Play the opening of Mozart's Alla Turca, right hand, with the click on each quarter-note beat of 2/4. The click gives beat 1; start on beat 2, the upbeat, and land on the C of bar 1.",
+      "notes": [
+        {
+          "pitch": 71,
+          "startBeat": 1.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 1.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 68,
+          "startBeat": 1.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 1.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 2.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 3.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 3.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 3.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 3.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 4.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 77,
+          "startBeat": 5.0,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 5.25,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 5.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 5.75,
+          "beats": 0.25,
+          "hand": "right"
+        }
+      ],
+      "bpm": 66,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 50,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-anacrusis-2",
+      "nodeId": "rhythm.play-anacrusis",
+      "prompt": "Play the opening of Beethoven's Für Elise, right hand. The click falls on each eighth note of 3/8; it gives beat 1, and the two sixteenths of the upbeat start on beat 3.",
+      "notes": [
+        {
+          "pitch": 76,
+          "startBeat": 2,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 75,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 4,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 6,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 120,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-left-hand-1",
+      "nodeId": "rhythm.play-left-hand",
+      "prompt": "Play the first two bars of Mozart's Sonata in C, K. 545, left hand, with the click on each quarter-note beat of 4/4. Keep the Alberti eighth notes even.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 2.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 4.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 6.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 7.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "left"
+        }
+      ],
+      "bpm": 72,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-left-hand-2",
+      "nodeId": "rhythm.play-left-hand",
+      "prompt": "Play bars 1-3 of Mozart's Alla Turca, left hand, with the click on each quarter-note beat of 2/4. Keep the eighth-note bass notes and chords even.",
+      "notes": [
+        {
+          "pitch": 57,
+          "startBeat": 0.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 2.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 4.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 57,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "left"
+        }
+      ],
+      "bpm": 66,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-hands-together-1",
+      "nodeId": "rhythm.play-hands-together",
+      "prompt": "Play the first two bars of Ode to Joy, both hands, with the click on each quarter-note beat of 4/4.",
+      "notes": [
+        {
+          "pitch": 55,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 52,
+          "startBeat": 4.0,
+          "beats": 1.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 54,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 55,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 50,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "left"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 7.0,
+          "beats": 1.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 72,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-hands-together-2",
+      "nodeId": "rhythm.play-hands-together",
+      "prompt": "Play the first two bars of Mozart's Sonata in C, K. 545, both hands, with the click on each quarter-note beat of 4/4: a long melody over even eighth notes.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 0.0,
+          "beats": 2.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 0.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 1.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 1.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 2.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 76,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 3.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 79,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 62,
+          "startBeat": 4.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 71,
+          "startBeat": 4.0,
+          "beats": 1.5,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 4.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 65,
+          "startBeat": 5.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 5.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 5.5,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 74,
+          "startBeat": 5.75,
+          "beats": 0.25,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 6.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 72,
+          "startBeat": 6.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 6.5,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 64,
+          "startBeat": 7.0,
+          "beats": 0.5,
+          "hand": "left"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 7.5,
+          "beats": 0.5,
+          "hand": "left"
+        }
+      ],
+      "bpm": 66,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 80,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-tempo-range-1",
+      "nodeId": "rhythm.play-tempo-range",
+      "prompt": "Play the first two bars of Twinkle Twinkle Little Star, right hand, with a slow click on each quarter-note beat of 4/4. Do not rush between clicks.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 6.0,
+          "beats": 2.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 56,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20
+      }
+    },
+    {
+      "type": "playing",
+      "id": "rhythm.play-tempo-range-2",
+      "nodeId": "rhythm.play-tempo-range",
+      "prompt": "Play the first two bars of Twinkle Twinkle Little Star, right hand, with a fast click on each quarter-note beat of 4/4. Stay with the click without falling behind.",
+      "notes": [
+        {
+          "pitch": 60,
+          "startBeat": 0.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 60,
+          "startBeat": 1.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 2.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 3.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 4.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 69,
+          "startBeat": 5.0,
+          "beats": 1.0,
+          "hand": "right"
+        },
+        {
+          "pitch": 67,
+          "startBeat": 6.0,
+          "beats": 2.0,
+          "hand": "right"
+        }
+      ],
+      "bpm": 132,
+      "pass": {
+        "notesInOrder": 0.9,
+        "timingSpreadMs": 60,
+        "velocitySpread": 20
+      }
+    }
+  ]
+}

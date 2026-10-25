@@ -60,7 +60,9 @@ Issue: #407
   check passed, 1 otherwise. No check's tolerance, timeout or arguments change; the runner passes only `--out`.
 - **Known red** (decision `ci-browser-known-red.md`): a check that is already red on `origin/main` when the job
   finds it gets an issue and an entry in `KNOWN_RED` in `run-checks.mjs`. It still runs and reports `known red #N:
-  pass|fail`, but doesn't set the shard's exit code. The entry leaves in the PR that fixes the check.
+  pass|fail`, but doesn't set the shard's exit code. An entry is removed only after its check passes on 2
+  consecutive browser runs that include the fix: some known-red checks pass on a lucky run with no fix merged
+  (#430 passed in #415's second run while its fix, #448, was still open), so one green run proves nothing.
 - **Output:** one line per check (`<check> pass|flaky|FAIL <seconds> s`) and the shard's wall time, also written to
   `$GITHUB_STEP_SUMMARY` when set. Every check's `--out` folder goes under one evidence folder, uploaded with
   `actions/upload-artifact` when the shard fails (`if: failure()`).

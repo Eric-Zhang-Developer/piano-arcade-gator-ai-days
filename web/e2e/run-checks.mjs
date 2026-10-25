@@ -1,13 +1,14 @@
 // CI's browser job (specs/features/ci-browser/spec.md): pick the headless checks a change needs, split them across
-// shards, run them one at a time, and rerun each failure once. A pass on the rerun is `flaky`; two failures fail the
-// shard. Node stdlib only, so `--list` runs before `pnpm install` and an empty shard skips the Chromium install.
+// shards, run them one at a time. On main a failure reruns once (a pass on the rerun is `flaky`; two failures fail
+// the shard); on a pull request the first failure fails it. Node stdlib only, so `--list` runs before
+// `pnpm install` and an empty shard skips the Chromium install.
 // Usage (from anywhere in the repo):
 //   node web/e2e/run-checks.mjs --list [--base <ref> | --all] [--shard i/n]   print the selected checks, one per line
 //   node web/e2e/run-checks.mjs --out <dir> [--base <ref> | --all] [--shard i/n]   run them
 // --base <ref>: verify.mjs plus the checks nearest each file changed since <ref>, or every check when shared code
 // changed. --all (or no --base): every check.
 import { execFileSync, spawn } from "node:child_process";
-import { appendFileSync, mkdirSync } from "node:fs";
+import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -31,15 +32,10 @@ export const SHARED = [
 // Not a check's timeout: decision ci-browser-check-timeout.md.
 const CHECK_TIMEOUT_MS = 8 * 60_000;
 // Checks already red on main when the job landed: each still runs and is reported ("known red #N"), but doesn't fail
-// the shard. Check -> its issue. The list only shrinks: the PR that fixes a check removes its entry.
+// the shard. Check -> its issue. The list only shrinks: an entry leaves after its check passes 2 browser runs in a
+// row that include the fix (one green run can be luck).
 // Decision ci-browser-known-red.md.
-export const KNOWN_RED = {
-  "web/src/game/cabinet/verify-cabinet.mjs": 429,
-  "web/src/game/capture-mode/verify-capture.mjs": 431,
-  "web/src/game/notice-toast/verify-toast.mjs": 432,
-  "web/src/game/song-preview/verify-preview.mjs": 428,
-  "web/src/game/wait-hands/verify-wait-hands.mjs": 430,
-};
+export const KNOWN_RED = {};
 
 /** Every check: verify.mjs first, then each verify*.mjs under web/src/, sorted. `files` are repo-relative paths. */
 export function allChecks(files) {
@@ -67,16 +63,37 @@ export function selectChecks(checks, changed) {
   return checks.filter((c) => picked.has(c));
 }
 
-/** Shard i of n (1-based): the entries whose index mod n is i - 1. */
-export function shard(checks, i, n) {
+// Each check's seconds on CI (main's full run 40164489468, 2026-10-25), to balance the shards; a check not in the
+// table counts DEFAULT_SECONDS, about the median. Refresh it from a full run's logs when a shard nears the job's 20 min.
+export const SECONDS = JSON.parse(readFileSync(new URL("./run-checks.seconds.json", import.meta.url), "utf8"));
+export const DEFAULT_SECONDS = 90;
+
+/**
+ * Shard i of n (1-based), balanced by time: longest check first, each onto the shard with the fewest seconds so far
+ * (the lower shard on a tie). Round-robin by index put 17 of the 84 minutes in one shard, past the 20 min job (#673).
+ * Every runner computes the same split from the same list. A shard keeps the list's order.
+ */
+export function shard(checks, i, n, seconds = SECONDS) {
   if (!(Number.isInteger(i) && Number.isInteger(n) && n >= 1 && i >= 1 && i <= n)) throw new Error(`bad shard ${i}/${n}`);
-  return checks.filter((_, k) => k % n === i - 1);
+  const cost = (c) => seconds[c] ?? DEFAULT_SECONDS;
+  const load = new Array(n).fill(0);
+  const owner = new Map();
+  for (const c of [...checks].sort((a, b) => cost(b) - cost(a) || (a < b ? -1 : 1))) {
+    const k = load.indexOf(Math.min(...load));
+    load[k] += cost(c);
+    owner.set(c, k);
+  }
+  return checks.filter((c) => owner.get(c) === i - 1);
 }
 
-// One check in its own process group, so a server it leaves behind (on a timeout, say) is stopped too.
+// One check in its own process group, so a server it leaves behind (on a timeout, say) is stopped too. Its output
+// comes through pipes of ours, not our own stdout and stderr: a check's detached `next dev` inherits stderr, and one
+// that outlives its check held the CI step's pipe open until the job timed out (#415, run 6).
 function runOnce(root, check, out) {
   return new Promise((done) => {
-    const p = spawn(process.execPath, [check, "--out", out], { cwd: root, stdio: "inherit", detached: true });
+    const p = spawn(process.execPath, [check, "--out", out], { cwd: root, stdio: ["ignore", "pipe", "pipe"], detached: true });
+    p.stdout.pipe(process.stdout, { end: false });
+    p.stderr.pipe(process.stderr, { end: false });
     const kill = (sig) => {
       try {
         process.kill(-p.pid, sig);
@@ -91,19 +108,33 @@ function runOnce(root, check, out) {
     p.on("exit", (code) => {
       clearTimeout(timer);
       kill("SIGTERM");
-      done(code === 0);
+      // Let what it wrote drain, then let go of pipes a leftover server may still hold.
+      const release = () => {
+        p.stdout.destroy();
+        p.stderr.destroy();
+        done(code === 0);
+      };
+      const grace = setTimeout(release, 2000);
+      p.on("close", () => {
+        clearTimeout(grace);
+        release();
+      });
     });
   });
 }
 
-/** Run each check once, rerun a failure once into a fresh folder. Returns [{ check, result, seconds }]. */
-export async function runChecks(root, checks, out) {
+/**
+ * Run each check once; with `attempts` 2, rerun a failure once into a fresh folder. Returns
+ * [{ check, result, seconds, knownRed? }], and keeps them with the shard in <out>/results.json, rewritten after each
+ * check so a job cut short keeps what ran.
+ */
+export async function runChecks(root, checks, out, shardLabel = "1/1", attempts = 2) {
   const rows = [];
   for (const check of checks) {
     const name = check.replace(/\.mjs$/, "").replaceAll("/", "_");
     const start = Date.now();
     let result = "FAIL";
-    for (const attempt of [1, 2]) {
+    for (let attempt = 1; attempt <= attempts; attempt++) {
       const dir = join(out, attempt === 1 ? name : `${name}-retry`);
       mkdirSync(dir, { recursive: true });
       say(`::group::${check}${attempt === 2 ? " (retry)" : ""}`);
@@ -117,11 +148,16 @@ export async function runChecks(root, checks, out) {
     const issue = KNOWN_RED[check];
     if (issue) say(`::warning title=known red #${issue}::${check}: ${result === "FAIL" ? "fail" : "pass"}`);
     else if (result === "flaky") say(`::warning title=flaky::flaky: ${check}`);
-    else if (result === "FAIL") say(`::error title=FAIL::${check} failed twice`);
+    else if (result === "FAIL") say(`::error title=FAIL::${check} failed${attempts > 1 ? " twice" : ""}`);
     rows.push({ check, result, seconds: Math.round((Date.now() - start) / 1000), ...(issue && { knownRed: issue }) });
+    writeFileSync(join(out, "results.json"), `${JSON.stringify({ shard: shardLabel, rows }, null, 2)}\n`);
   }
   return rows;
 }
+
+// One attempt on a pull request (GitHub sets GITHUB_EVENT_NAME), two on main: a PR's failure is its author's to read
+// at once, and only 1 of ~520 sampled check runs passed on a rerun; main keeps the rerun so a flake can't redden it.
+export const retriesFor = (env) => (env.GITHUB_EVENT_NAME === "pull_request" ? 1 : 2);
 
 /** The shard's exit code: 0 when every check passed (flaky counts as passed) or is known red, 1 otherwise. */
 export const exitCode = (rows) => (rows.some((r) => r.result === "FAIL" && !r.knownRed) ? 1 : 0);
@@ -149,7 +185,7 @@ async function main() {
     return 2;
   }
   const start = Date.now();
-  const rows = await runChecks(root, picked, resolve(outArg));
+  const rows = await runChecks(root, picked, resolve(outArg), `${i}/${n}`, retriesFor(process.env));
   const lines = [
     ...rows.map((r) => `${r.check} ${r.knownRed ? `known red #${r.knownRed}: ${r.result === "FAIL" ? "fail" : "pass"}` : r.result} ${r.seconds} s`),
     `shard ${i}/${n}: ${rows.length} check(s) in ${Math.round((Date.now() - start) / 1000)} s`,

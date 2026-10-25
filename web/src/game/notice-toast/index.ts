@@ -12,13 +12,20 @@ export interface Toast {
   leaving: boolean;
 }
 
-// The queue, pure apart from setTimeout, so it tests with fake timers and no DOM. `render` gets the toasts newest
-// first, leaving ones included until they're gone.
-export function toastStack(render: (toasts: readonly Toast[]) => void, reduced: () => boolean) {
+// The queue, pure apart from setTimeout, Date.now and `frame`, so it tests with fake timers and no DOM. `render` gets the toasts
+// newest first, leaving ones included until they're gone. Each toast's removal is timed from its own deadline, not
+// chained after the fade's timer: on a busy machine each timer fires late, and two late timers in a row kept a toast
+// 4106–4139 ms on CI (#432).
+// `frame` (requestAnimationFrame) checks every deadline once per frame while a toast shows: on a starved page each
+// frame is a long task and Chrome runs frames ahead of timers, so the leave's setTimeout alone kept a toast 4130–4387 ms
+// at 6x CPU throttle (#584). A frame is never skipped for a timer; the timers stay for tabs that draw no frames.
+export function toastStack(render: (toasts: readonly Toast[]) => void, reduced: () => boolean, frame?: (cb: () => void) => void) {
   let toasts: Toast[] = [];
   let next = 0;
+  const deadline = new Map<number, number>(); // id -> Date.now() it must be gone by
   const remove = (id: number) => {
     toasts = toasts.filter((t) => t.id !== id);
+    deadline.delete(id);
     render(toasts);
   };
   const leave = (id: number) => {
@@ -27,14 +34,33 @@ export function toastStack(render: (toasts: readonly Toast[]) => void, reduced: 
     if (reduced()) return remove(id); // no fade: it goes at once
     t.leaving = true;
     render(toasts);
-    setTimeout(() => remove(id), toastSettings.leaveMs);
+    // The fade, cut short if the leave itself fired late: never past the deadline.
+    setTimeout(() => remove(id), Math.max(0, Math.min(toastSettings.leaveMs, (deadline.get(id) ?? 0) - Date.now())));
+  };
+  let watching = false;
+  const sweep = () => {
+    const now = Date.now();
+    for (const t of toasts) {
+      const d = deadline.get(t.id) ?? 0;
+      if (now >= d) remove(t.id);
+      else if (now >= d - toastSettings.leaveMs) leave(t.id);
+    }
+    watching = toasts.length > 0;
+    if (watching) frame?.(sweep);
   };
   return (text: string) => {
     const t: Toast = { id: next++, text, leaving: false };
+    deadline.set(t.id, Date.now() + toastSettings.ms);
     toasts = [t, ...toasts];
     for (const old of toasts.filter((x) => !x.leaving).slice(toastSettings.max)) leave(old.id);
     render(toasts);
-    setTimeout(() => leave(t.id), reduced() ? toastSettings.ms : toastSettings.ms - toastSettings.leaveMs);
+    // Both motions leave at 3.8 s: reduced motion goes at once (no fade), so a timer firing up to 200 ms late on a busy
+    // machine still has it gone by 4 s. A 4 s timer had no slack and kept it 4141–4155 ms on CI (#584).
+    setTimeout(() => leave(t.id), toastSettings.ms - toastSettings.leaveMs);
+    if (frame && !watching) {
+      watching = true;
+      frame(sweep);
+    }
   };
 }
 
@@ -83,7 +109,7 @@ function domStack(): (text: string) => void {
       }
       if (t.leaving) el.setAttribute("data-leaving", "");
     }
-  }, reduced);
+  }, reduced, (cb) => requestAnimationFrame(cb));
 }
 
 export function toast(text: string): void {

@@ -42,7 +42,7 @@ Stored, not sent: a BroadcastChannel message is lost when no sheet window is ope
 - Headless, from a clone: `pnpm -C web install && pnpm -C web exec playwright install chromium`, then
   `node web/src/game/sheet-review/verify-review.mjs --out <dir>`: prints `verify-review: pass` and exits 0, or
   names each failed step and exits 1.
-  1. `/play?song=twinkle&input=test&bot=rank-c` -> results; click "Review on sheet ↗" -> a popup on
+  1. `/play?song=twinkle&beat=off&bot=rank-c` -> results; click "Review on sheet ↗" -> a popup on
      `/sheet?song=twinkle&review=1` reaches `data-sheet="ready"`; `__pianoArcadeSheet.colored` equals the results'
      PERFECT, GREAT, GOOD and MISS counts (MISS above 0), `review` is true and `cursorMs` is `null`.
   2. Retry with `bot=perfect`, click again -> the same popup now shows MISS 0: the stored review is this take's,

@@ -111,7 +111,7 @@ describe("stageOpacity", () => {
   const worst = (tint: number) => tint + (1 - tint) * stageOpacity(tint) * (1 - core.stageBackdropAlpha);
   it("keeps a black key's lane at or under maxLaneLuma at the default tint", () => {
     expect(worst(blackKeyLaneSettings.tint)).toBeLessThanOrEqual(stageSettings.maxLaneLuma + 1e-12);
-    expect(stageOpacity()).toBeCloseTo(0.72, 2);
+    expect(stageOpacity()).toBeCloseTo(0.35 / 0.45, 12); // tint 0 by default since 2026-10-25
   });
   it("gives back the old cap at tint 0", () => {
     expect(stageOpacity(0)).toBeCloseTo(0.35 / 0.45, 12);

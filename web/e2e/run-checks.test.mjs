@@ -1,8 +1,9 @@
-import { existsSync, mkdtempSync, writeFileSync } from "node:fs";
+import { execFileSync, spawn } from "node:child_process";
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { KNOWN_RED, MAIN_CHECK, allChecks, exitCode, runChecks, selectChecks, shard } from "./run-checks.mjs";
+import { DEFAULT_SECONDS, KNOWN_RED, MAIN_CHECK, SECONDS, allChecks, exitCode, retriesFor, runChecks, selectChecks, shard } from "./run-checks.mjs";
 
 const TOAST = "web/src/game/notice-toast/verify-toast.mjs";
 const SIM = "web/src/game/sim/verify-sim.mjs";
@@ -54,8 +55,20 @@ describe("selectChecks", () => {
 describe("shard", () => {
   it("puts every check in exactly one of 4 shards, and their union is the whole list", () => {
     const parts = [1, 2, 3, 4].map((i) => shard(checks, i, 4));
-    expect(parts).toEqual([[MAIN_CHECK, REPLAY], [TOAST], [SIM], [OPERATOR]]);
+    expect(parts.every((p) => p.length >= 1)).toBe(true);
     expect(parts.flat().sort()).toEqual([...checks].sort());
+  });
+
+  it("balances by seconds: the longest check alone, the short ones together", () => {
+    const secs = { a: 400, b: 100, c: 100, d: 100, e: 100 };
+    expect([1, 2].map((i) => shard(["a", "b", "c", "d", "e"], i, 2, secs))).toEqual([["a"], ["b", "c", "d", "e"]]);
+    expect(shard(["x", "y"], 1, 2, {})).toEqual(["x"]); // unknown checks count DEFAULT_SECONDS each
+  });
+
+  it("a full run's 8 shards each fit well inside the 20 min job, by the table (#673)", () => {
+    const all = allChecks(execFileSync("git", ["ls-files", "web/src", "web/e2e"], { cwd: new URL("../../", import.meta.url).pathname, encoding: "utf8" }).split("\n"));
+    const minutes = [1, 2, 3, 4, 5, 6, 7, 8].map((i) => shard(all, i, 8).reduce((s, c) => s + (SECONDS[c] ?? DEFAULT_SECONDS), 0) / 60);
+    expect(Math.max(...minutes), minutes.map((m) => m.toFixed(1)).join(" ")).toBeLessThan(14);
   });
 
   it("leaves a shard empty when there are fewer checks than shards", () => {
@@ -80,7 +93,7 @@ describe("runChecks", () => {
       `if (existsSync(${JSON.stringify(marker)})) process.exit(0);\n` +
       `writeFileSync(${JSON.stringify(marker)}, "");\nprocess.exit(1);\n`,
   );
-  const run = (names) => runChecks(dir, names, join(dir, "out"));
+  const run = (names, shardLabel) => runChecks(dir, names, join(dir, "out"), shardLabel);
 
   it("reports a pass on the rerun as flaky, and the shard exits 0", async () => {
     const rows = await run(["pass.mjs", "flaky.mjs"]);
@@ -91,10 +104,44 @@ describe("runChecks", () => {
     expect(exitCode(rows)).toBe(0);
   });
 
+  it("ends its output when the checks end, even if one leaves a server holding stderr", async () => {
+    // The checks start `next dev` detached with stderr inherited. One that outlives its check kept the CI step's pipe
+    // open, so the step hung until the job's timeout (#415, run 6). Run the runner the way the CI runner does: in a
+    // child whose output is a pipe, and wait for that pipe to close.
+    writeFileSync(
+      join(dir, "orphan.mjs"),
+      `import { spawn } from "node:child_process";\n` +
+        `spawn("sleep", ["20"], { detached: true, stdio: ["ignore", "ignore", "inherit"] }).unref();\nprocess.exit(0);\n`,
+    );
+    const runner = new URL("./run-checks.mjs", import.meta.url).href;
+    const script = `import(${JSON.stringify(runner)}).then((m) => m.runChecks(${JSON.stringify(dir)}, ["orphan.mjs"], ${JSON.stringify(join(dir, "out"))})).then(() => process.exit(0));`;
+    const start = Date.now();
+    const child = spawn(process.execPath, ["--input-type=module", "-e", script], { stdio: ["ignore", "pipe", "pipe"] });
+    child.stdout.resume();
+    child.stderr.resume();
+    await new Promise((done) => child.on("close", done));
+    expect(Date.now() - start).toBeLessThan(10_000);
+  }, 30_000);
+
+  it("on a pull request, one attempt: a first failure is FAIL and nothing reruns (main keeps two)", async () => {
+    expect([retriesFor({ GITHUB_EVENT_NAME: "pull_request" }), retriesFor({ GITHUB_EVENT_NAME: "push" }), retriesFor({})]).toEqual([1, 2, 2]);
+    const out = join(dir, "out-pr");
+    const rows = await runChecks(dir, ["pass.mjs", "fail.mjs"], out, "1/1", 1);
+    expect(rows.map((r) => r.result)).toEqual(["pass", "FAIL"]);
+    expect(existsSync(join(out, "fail-retry"))).toBe(false);
+  });
+
   it("reports two failures as FAIL, and the shard exits 1", async () => {
     const rows = await run(["pass.mjs", "fail.mjs"]);
     expect(rows.map((r) => r.result)).toEqual(["pass", "FAIL"]);
     expect(exitCode(rows)).toBe(1);
+  });
+
+  it("keeps the shard and its rows in results.json in --out (veritas reads them)", async () => {
+    const rows = await run(["pass.mjs", "fail.mjs"], "3/8");
+    const kept = JSON.parse(readFileSync(join(dir, "out", "results.json"), "utf8"));
+    expect(kept).toEqual({ shard: "3/8", rows });
+    expect(Object.keys(kept.rows[0])).toEqual(["check", "result", "seconds"]);
   });
 });
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Chart, Judgment } from "../../contracts";
 import { Judge } from "../core/judge";
-import { holdClock, shouldHold } from ".";
+import { barStep, holdClock, shouldHold } from ".";
 import { modeUrl } from "./plugin";
 
 // 60 bpm: beat n is at n * 1000 ms. A note at beat 1, a two-hand chord at beat 2.
@@ -67,6 +67,60 @@ describe("holdClock", () => {
     clock.update(2200);
     expect(clock.holding).toBe(false);
     expect(judge.finish(3000).judgments.map((j) => j.offsetMs)).toEqual([0, 0, 0]);
+  });
+});
+
+describe("holdClock's held time (#592)", () => {
+  it("reads exactly the held note's time, with a zero where (at + zero) - zero rounds past it", () => {
+    const bars = { ...chart, bpm: 66, notes: [{ id: "a", pitch: 69, beat: 12, duration: 1, hand: "R" }] } as Chart;
+    const at = (12 * 60000) / 66; // Für Elise's bar 9, where the left hand's A2 starts with your A4
+    const zero = 1002.96; // found by search: (at + zero) - zero is at + 1.8e-12
+    expect(at + zero - zero).toBeGreaterThan(at);
+    const clock = holdClock(bars, new Judge(bars).noteState);
+    clock.seek(0, zero);
+    clock.update(zero + at + 40); // the frame after the note reached the line
+    expect(clock.holding).toBe(true);
+    expect(clock.now(zero + at + 40)).toBe(at);
+    expect(clock.now(zero + at + 4000)).toBe(at);
+  });
+});
+
+describe("barStep (rewind)", () => {
+  const twinkle = Array.from({ length: 12 }, (_, i) => i * 2400); // 12 bars of 2400 ms at 100 bpm
+  it("← goes to the bar before, → to the next; bar 1 stays, the last bar has no →", () => {
+    expect(barStep(twinkle, 3000, -1)).toBe(0);
+    expect(barStep(twinkle, 3000, 1)).toBe(4800);
+    expect(barStep(twinkle, 500, -1)).toBe(0);
+    expect(barStep(twinkle, 11 * 2400 + 100, 1)).toBeNull();
+    expect(barStep(twinkle, 2400, -1)).toBe(0); // held at bar 2's first note: that's bar 2
+    expect(barStep(twinkle, 2400, 1)).toBe(4800);
+  });
+});
+
+describe("holdClock.seek (rewind)", () => {
+  // 60 bpm: notes at 0, 3000 and 5000 ms.
+  const c = { ...chart, notes: [0, 3, 5].map((beat, i) => ({ id: `n${i}`, pitch: 60 + i, beat, duration: 1, hand: "R" as const })) } as Chart;
+  it("after seek(0) it reads 0 and holds at the 0 ms note", () => {
+    const judge = new Judge(c);
+    const clock = holdClock(c, judge.noteState);
+    clock.update(9000);
+    clock.seek(0, 9000);
+    expect(clock.now(9000)).toBe(0);
+    clock.update(9500);
+    expect(clock.holding).toBe(true);
+    expect(clock.now(9500)).toBe(0);
+  });
+  it("after seek(4800) it never holds at the skipped 3000 ms note, and holds at 5000", () => {
+    const judge = new Judge(c);
+    const clock = holdClock(c, judge.noteState);
+    judge.press(60, 0, 0);
+    clock.update(100);
+    clock.seek(4800, 100);
+    expect(clock.holding).toBe(false);
+    expect(clock.now(100)).toBe(4800);
+    clock.update(400);
+    expect(clock.holding).toBe(true);
+    expect(clock.now(400)).toBe(5000);
   });
 });
 

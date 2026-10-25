@@ -1,0 +1,18 @@
+Please use your image generation tool to create exactly one image from the art brief below. Save it in the current directory as 02-classical-paper-select.png (PNG). Don't create, edit or delete any other file. When you're done, reply with just the saved file's path. Thank you!
+
+Art brief:
+Context: Piano Arcade is a Japanese-style arcade rhythm game played on a real 88-key digital piano in Chrome. Notes fall toward the keys, every note is judged to the millisecond (PERFECT, GREAT, GOOD, MISS), and a learning side tells you what to practice. The image is a high-fidelity UI design mockup of one screen, shown flat and straight-on as a 1920x1080 browser screenshot (16:9, no browser chrome, no device frame, no hands, no people). It should look like a shipped, award-quality game interface: crisp vector edges, generous spacing, a clear visual hierarchy, and only a little text, set large and spelled exactly as given. Avoid generic AI-art clichés: no lens flares, no random glowing particles everywhere, no chrome 80s lettering, no pixel art.
+
+Screen: the music select menu, direction "classical paper": a warm, premium sheet-music app, like a beautifully printed concert program or a Henle urtext edition.
+
+Layout: warm off-white paper background (#f5efe3) with a very subtle paper grain. Left third: the focused song, large. Right two thirds: a vertical list of 6 song cards, the focused one marked by a deep oxblood (#7a1f2b) rule on its left edge.
+
+Each song's cover is a cropped, beautifully engraved first bar of its sheet music in black ink on cream paper, with a small embossed gold catalogue number in the corner (like "BWV" or "Op." stamps).
+
+Type: song titles in an elegant classical serif (like Garamond or Didot), near-black ink. Composer names in small caps. Numbers (level, note count) in tabular old-style figures. Accent colors only: oxblood and a muted gold.
+
+Focused song panel (left): large engraved-score cover, title "Minuet in G", composer "Petzold", then "LEVEL 3" and "128 NOTES", then one primary button "PLAY" (oxblood fill, cream text) and one secondary outlined button "LEARN".
+
+List cards (right), top to bottom: "Twinkle, Twinkle" / "Traditional", "Minuet in G" / "Petzold" (focused), "Für Elise" / "Beethoven", "Clair de lune" / "Debussy", "Gymnopédie No. 1" / "Satie", "Prelude in E minor" / "Chopin".
+
+Top left: the title "Piano Arcade" set like the title page of a score. Mood: quiet, scholarly, warm, tactile, expensive.

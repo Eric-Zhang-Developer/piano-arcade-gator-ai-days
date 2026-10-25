@@ -11,7 +11,9 @@ A person at a real piano keyboard who wants to get better and have fun doing it.
 judges: they can play the browser version on laptop keys.
 
 ## What
-Piano Arcade: a Japanese-style arcade rhythm game played on a real 88-key piano (a Yamaha DGX-660) in Chrome. Notes
+*Named Étude on 2026-10-25; the working name was Piano Arcade (`specs/context/naming.md`).*
+
+Étude: a Japanese-style arcade rhythm game played on a real 88-key piano (a Yamaha DGX-660) in Chrome. Notes
 fall toward the keys, every note you play is judged to the millisecond, and the game answers with combo, bursts and
 sound. A learning side reads your takes and tells you what to fix. At the end a player can play a real piece on a
 real piano, see exactly how they played it, and be told what to practice next.
@@ -50,5 +52,6 @@ decides (see the `needs-human` issue). Until then, nothing may claim to meet it.
   line aligned to the keys.
 - AI in the core playing loop. AI lives in the learning lane.
 - Sheet music on the arcade screen (deferred to practice mode).
-- Sign-in screens or required accounts: a player is an anonymous user, and linking Google is optional. Also not doing:
-  an online leaderboard, mobile apps, live transcription on stage.
+- Required accounts: a player is an anonymous user, and linking Google is optional. An optional sign-in screen is
+  allowed only with "Play as guest" on it, so nobody has to sign in to play. Also not doing: an online leaderboard,
+  mobile apps, live transcription on stage.

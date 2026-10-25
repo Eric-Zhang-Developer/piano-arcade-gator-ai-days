@@ -10,7 +10,8 @@ assignee: "eric"
 The video is recorded off `/` and `/play`. Today the frames carry things a viewer shouldn't see: the mouse cursor,
 beat-track's "Beat: laptop" status (`web/src/game/beat/index.ts:169`), /play's MIDI status line and laptop-keys hint,
 the latency slider and `<SfxControls />` (juice-sound's) under the start and results screens, the timing panel's
-"Set latency offset to N ms" suggestion, and the Calibrate latency link on `/`. `?capture=1` hides them and changes
+"Set latency offset to N ms" suggestion, and the Options button on `/` (options-panel's; it replaced the Calibrate
+latency link in #385). `?capture=1` hides them and changes
 nothing else.
 
 Issue: #272
@@ -31,7 +32,7 @@ Other features' files stay with their owners: a spec that isn't done holds its `
    and `[data-capture-hide]` gets `display: none !important`. `web/src/app/layout.tsx` mounts it.
 2. `data-capture-hide` in `web/src/app/play/page.tsx` on the MIDI status line, the laptop-keys hint, the latency
    slider, the timing panel's suggestion (button and note) and a `display: contents` wrapper around `<SfxControls />`
-   (no box, so nothing moves without the flag); in `web/src/app/page.tsx` on the Calibrate latency link. Beat's
+   (no box, so nothing moves without the flag); on options-panel's Options button (it was the Calibrate latency link in `web/src/app/page.tsx`). Beat's
    `draw` skips its status text when `captureOn()`; the beat still plays.
 3. `specs/features/capture-mode/recording.md`, the recording guide below.
 
@@ -68,7 +69,7 @@ stays 3–8 lines). Each step as it works on main when written:
 - Recording on `pnpm -C web build && pnpm -C web start`, Playwright at 1920×1080 with video on: `/?capture=1` for
   3 s, then `/play?song=twinkle&bot=perfect` in the same tab (no param: sessionStorage carries it), Start, through to
   results. On the select, the start screen and the results: computed `cursor: none` on `body` and on Start or Retry,
-  and no visible element whose text has "MIDI:", "Laptop keys", "Latency", "Effects" or "Calibrate". The same run
+  and no visible element whose text has "MIDI:", "Laptop keys", "Latency", "Effects" or "OPTIONS" (the Options button as rendered; it was "Calibrate", #431). The same run
   without the flag finds each of those words on one of the three screens, so the check can fail. Keep the .webm and
   screenshots of the select, mid-take and the results.
 - Eric (mark it in the done note): record a take by `recording.md` with his own recorder; any cursor or debug text?

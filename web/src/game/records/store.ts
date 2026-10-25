@@ -56,6 +56,11 @@ export function setInitials(records: Records, chartId: string, date: string, ini
   return { ...records, [chartId]: { ...rec, top: rec.top.map((t) => (t.date === date ? { ...t, initials } : t)) } };
 }
 
+// A take's records key: an Easy take (easy-charts, ?level=easy) keeps its own best and top 5 under <id>@easy.
+export function recordKey(chartId: string, params: URLSearchParams): string {
+  return params.get("level") === "easy" ? `${chartId}@easy` : chartId;
+}
+
 // A practice take isn't a record: a loop, a slower tempo, a mode, a bot, versus, or one hand.
 export function practiceReason(params: URLSearchParams): string | null {
   for (const k of ["from", "to", "tempo", "mode", "bot", "versus"]) if (params.has(k)) return k;

@@ -13,6 +13,7 @@ import { drawHighway, makeLayout, staticRange, type HighwayState, type KeyRange,
 import { createZoom, zoomOn } from "../../game/highway-zoom";
 import { Judge, noteTimeMs } from "../../game/core/judge";
 import { keysDevice, midiDevice, testDevice } from "../../game/core/input";
+import { laptopKey } from "../../game/laptop-sound";
 import { describeTiming, timingSummary, type TimingSummary } from "../../game/timing";
 import { SfxControls } from "../../game/sound/SfxControls";
 import { nextPause, pauseClock, type PauseAction, type PauseMode } from "../../game/play-slots";
@@ -20,7 +21,9 @@ import { Slots } from "../../game/play-slots/ui";
 import { PauseMenu } from "../../game/pause-skin";
 import { ResultsLayout } from "../../game/results-layout";
 import { emptyHud, reduceHud } from "../../game/hud";
-import { holdClock, isWaitMode } from "../../game/wait-mode";
+import { barStep, holdClock, isWaitMode } from "../../game/wait-mode";
+import { isFlowMode } from "../../game/flow-mode/clock";
+import { FlowJudge } from "../../game/flow-mode/judge";
 import {
   GOOD_MS,
   LATENCY_MAX,
@@ -43,6 +46,7 @@ interface TestHook {
   ready: boolean;
   chart: Chart | null;
   press(pitch: number, chartTimeMs: number, velocity?: number): void;
+  pressNow?(pitch: number, velocity?: number): void; // at the current wall time, for flow mode's moving clock
   now?(): number; // the chart clock (holds and pauses taken out)
   results: Results | null;
 }
@@ -166,7 +170,10 @@ export default function Play() {
       if (e.type === "wrongNote") hw.latest = { judgment: "WRONG", offsetMs: null, atMs: e.atMs };
       for (const p of plugins) if (p.onEvent) guard.run(p.id, "onEvent", () => p.onEvent!(e));
     };
-    const judge = new Judge(chart, emit, { scored: !isWaitMode(params) }); // wait mode: no score moments
+    // ?mode=flow: the flow judge, which owns a clock that waits at each note and follows your tempo (flow-mode). With
+    // ?tempo= the chart is already slowed by bar-loop, so rate 1 is the asked tempo and the steadiness reference.
+    const flowJudge = isFlowMode(params) ? new FlowJudge(chart, emit, { startRate: params.has("tempo") ? 1 : undefined }) : null;
+    const judge = flowJudge ?? new Judge(chart, emit, { scored: !isWaitMode(params) }); // wait mode: no score moments
     hw.noteState = judge.noteState;
     // Zero is fixed here, after the stage and judge are built, so songStart's atMs is the chart time now and a plugin's
     // performance.now() - atMs is the same zero the judge uses. Fixed before the build, it trailed by the build (#173).
@@ -174,24 +181,30 @@ export default function Play() {
     const pauses = pauseClock(zeroPerf); // stands still while paused (play-slots)
     // ?mode=wait: the chart clock also holds at each note until it's pressed, and nothing is a MISS (wait-mode).
     const wait = isWaitMode(params) ? holdClock(chart, judge.noteState) : null;
+    const held = wait ?? flowJudge?.clock ?? null; // either clock runs over the pause clock
     const clock = {
-      now: (perf: number) => (wait ? wait.now(pauses.now(perf)) : pauses.now(perf)),
-      toPerf: (chartMs: number) => pauses.toPerf(wait ? wait.toOuter(chartMs) : chartMs),
+      now: (perf: number) => (held ? held.now(pauses.now(perf)) : pauses.now(perf)),
+      toPerf: (chartMs: number) => pauses.toPerf(held ? held.toOuter(chartMs) : chartMs),
     };
     emit({ type: "songStart", atMs: hw.nowMs });
 
     // Input: every device feeds one handler; a key's judged time is its arrival minus the latency offset.
     let firstKind = true;
     const onInput = (kind: Take["inputDevice"]) => (e: InputEvent) => {
+      // laptop-sound: a laptop key sounds here, still inside its key event (no frame wait), after laptop-octaves'
+      // shift, so the note heard is the note judged; before the pause check, as a piano's keys sound while paused.
+      if (kind === "keys") laptopKey(e.type, e.pitch, e.velocity);
       if (pauses.paused) return; // keys while paused are neither judged nor recorded
       // A press during a hold lands on the held note's time; taking off the latency could put it outside GOOD.
-      const t = wait?.holding ? clock.now(e.timeMs) : clock.now(e.timeMs) - latencyRef.current;
+      const t = held?.holding ? clock.now(e.timeMs) : clock.now(e.timeMs) - latencyRef.current;
       if (e.type === "on") {
         if (firstKind && !test) take.inputDevice = kind;
         firstKind = false;
         hw.pressed.add(e.pitch);
         take.events.push({ pitch: e.pitch, velocity: e.velocity, timeMs: t, offTimeMs: null });
-        judge.press(e.pitch, t, take.events.length - 1);
+        // Flow judges steadiness in wall time (the pause clock's), so it gets the press's own, latency taken off.
+        if (flowJudge) flowJudge.press(e.pitch, t, take.events.length - 1, pauses.now(e.timeMs) - latencyRef.current);
+        else judge.press(e.pitch, t, take.events.length - 1);
       } else {
         hw.pressed.delete(e.pitch);
         hw.pressedHand!.delete(e.pitch);
@@ -216,7 +229,7 @@ export default function Play() {
     const resize = () => {
       w = window.innerWidth;
       h = window.innerHeight;
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = Math.min(window.devicePixelRatio || 1, settings.pixelRatioCap);
       for (const c of [canvas, ...layerRefs.current]) {
         if (!c) continue;
         c.width = w * dpr;
@@ -235,6 +248,15 @@ export default function Play() {
     let mode: PauseMode = "playing";
     let countdownUntil = 0; // wall time the resume countdown ends
     let shownCount = 0;
+    // Held keys end at a pause: their releases arrive while paused, where input is ignored.
+    const endHeld = (at: number) => {
+      for (const pitch of hw.pressed) {
+        const ev = take.events.findLast((x) => x.pitch === pitch && x.offTimeMs === null);
+        if (ev) ev.offTimeMs = at - latencyRef.current;
+      }
+      hw.pressed.clear();
+      hw.pressedHand!.clear();
+    };
     // Pause, Resume, Retry and Quit (play-slots). Esc and the menu's buttons both come here.
     const act = (a: PauseAction) => {
       const next = nextPause(mode, a);
@@ -244,13 +266,7 @@ export default function Play() {
         pauses.pause(perf);
         const at = clock.now(perf);
         emit({ type: "pause", atMs: at });
-        // Held keys end at the pause: their releases arrive while paused, where input is ignored.
-        for (const pitch of hw.pressed) {
-          const ev = take.events.findLast((x) => x.pitch === pitch && x.offTimeMs === null);
-          if (ev) ev.offTimeMs = at - latencyRef.current;
-        }
-        hw.pressed.clear();
-        hw.pressedHand!.clear();
+        endHeld(at);
       }
       if (next === "countdown") {
         countdownUntil = perf + chart.beatsPerBar * mpb;
@@ -275,6 +291,26 @@ export default function Play() {
       act("esc");
     };
     if (!test) window.addEventListener("keydown", onKey); // ?input=test never pauses
+    // rewind (wait mode): ← back to the bar before, → ahead to the next bar, while playing past the count-in. A pause and
+    // a resume at the bar start around it, so plugins re-anchor (the resume's atMs is the target). Works with input=test.
+    const rewind = (dir: -1 | 1) => {
+      const perf = performance.now();
+      const at = clock.now(perf);
+      if (!wait || mode !== "playing" || done || at < 0) return;
+      const target = barStep(hw.barLines?.map((b) => b.atMs) ?? [], at, dir);
+      if (target === null) return;
+      emit({ type: "pause", atMs: at });
+      endHeld(at);
+      if (dir < 0) judge.rewind(target);
+      wait.seek(target, pauses.now(perf));
+      emit({ type: "resume", atMs: target });
+    };
+    const onArrow = (e: KeyboardEvent) => {
+      if ((e.key !== "ArrowLeft" && e.key !== "ArrowRight") || e.repeat || e.shiftKey || e.ctrlKey || e.metaKey || e.altKey || !wait) return;
+      e.preventDefault();
+      rewind(e.key === "ArrowLeft" ? -1 : 1);
+    };
+    window.addEventListener("keydown", onArrow);
     // After the take, the background keeps animating behind the results screen until the next take or unmount.
     const idle = () => {
       if (background) guard.run(bgId, "background", () => background.frame({ ...layout!, nowMs: clock.now(performance.now()) }));
@@ -306,13 +342,14 @@ export default function Play() {
         else if (Math.ceil(left / mpb) !== shownCount) setCountdown((shownCount = Math.ceil(left / mpb)));
       }
       const perf = performance.now();
-      wait?.update(pauses.now(perf));
+      held?.update(pauses.now(perf));
       const now = clock.now(perf);
       hw.nowMs = now;
       const beat = now < 0 ? Math.floor(now / mpb) + settings.countInBeats + 1 : 0;
       hw.countInBeat = beat > 0 ? beat : null;
       if (beat > lastBeat) emit({ type: "countInBeat", beat, atMs: (beat - 1 - settings.countInBeats) * mpb });
       lastBeat = beat;
+      // Flow's advance never MISSes: it only notices a stop past the free beats.
       if (!wait) core("the judge", () => judge.advance(now - Math.max(0, latencyRef.current) - INPUT_GRACE_MS));
 
       if (zoom) layout = makeLayout(chart, w, h, perspective, zoom(now));
@@ -334,6 +371,7 @@ export default function Play() {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
       window.removeEventListener("keydown", onKey);
+      window.removeEventListener("keydown", onArrow);
       for (const d of devices) d.stop();
     }
     stopRef.current = () => {
@@ -347,6 +385,7 @@ export default function Play() {
         ready: true,
         results: null,
         press: (pitch: number, chartTimeMs: number, velocity = 80) => tester?.queue(pitch, clock.toPerf(chartTimeMs) + latencyRef.current, velocity),
+        pressNow: (pitch: number, velocity = 80) => tester?.queue(pitch, performance.now() + latencyRef.current, velocity),
         now: () => clock.now(performance.now()),
       });
     }
@@ -393,9 +432,9 @@ export default function Play() {
     <main style={{ position: "fixed", inset: 0, overflow: "hidden" }}>
       <div ref={backgroundRef} style={canvasStyle} />
       <canvas ref={highwayRef} style={canvasStyle} />
-      {plugins.map((p, i) => (
-        <canvas key={p.id} ref={(c) => void (layerRefs.current[i] = c)} style={canvasStyle} />
-      ))}
+      {/* A canvas only for a plugin that draws, still at its plugin's index, so the crash guard and the frame find it.
+          Every canvas is a full-window layer the compositor blends each frame, drawn on or not. */}
+      {plugins.map((p, i) => p.draw && <canvas key={p.id} ref={(c) => void (layerRefs.current[i] = c)} style={canvasStyle} />)}
 
       {phase === "playing" && (
         <PauseMenu
@@ -442,7 +481,8 @@ export default function Play() {
               settings={controls}
             />
           )}
-          {phase !== "results" && controls}
+          {/* not while loading: the slider would show useState's 0 before the stored offset is read (#447, #478) */}
+          {phase !== "results" && phase !== "loading" && controls}
         </div>
       )}
     </main>

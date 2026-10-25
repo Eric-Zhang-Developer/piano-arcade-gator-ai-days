@@ -50,6 +50,23 @@
   animation: enter 200ms ease-out;
 }
 
+/* The left column: the focused song, then the footer pushed to the bottom. All in flow, so nothing in it can overlap;
+   a tall song pushes the footer down rather than under it. */
+.left {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.footer {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6em 1.2em;
+  padding: 1.2vh 0 2vh;
+}
+
 @keyframes enter {
   from {
     opacity: 0;
@@ -58,7 +75,7 @@
 }
 
 .jacket {
-  width: min(100%, 38vh); /* leaves room under the stats for song-preview's row */
+  width: min(100%, 30vh); /* leaves room under the stats for song-preview's row and song-options' two */
   aspect-ratio: 1;
   flex: none;
   border-radius: 6px;
@@ -66,7 +83,7 @@
 }
 
 .title {
-  margin: 3vh 0 0;
+  margin: 2vh 0 0;
   font-family: var(--pa-font-display), system-ui, sans-serif;
   font-style: italic;
   font-weight: 800;
@@ -85,10 +102,18 @@
   color: var(--pa-ink-dim);
 }
 
+/* The stats and the level toggle share one row, so the toggle adds no height (#532). */
+.statsRow {
+  display: flex;
+  align-items: center;
+  gap: 2vw;
+  margin: 2vh 0 0;
+}
+
 .stats {
   display: flex;
   gap: 2vw;
-  margin: 3vh 0 0;
+  margin: 0;
 }
 
 .stats > div {

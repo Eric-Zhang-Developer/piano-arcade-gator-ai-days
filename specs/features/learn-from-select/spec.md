@@ -28,8 +28,12 @@ Two PRs.
   `/play?song=<focused id>&mode=wait` once. Cmd+L and Ctrl+L keep doing what the browser does with them.
 - **LEARN:** the focused song's preview row shows a LEARN link (`data-testid="preview-learn"`) to the same URL. It
   shows as soon as the row does, because it doesn't need the chart, unlike PRACTICE 70%.
+  duo-select (#646) replaces that row with the select's panel, which has PLAY and PRACTICE only. From then on L is
+  the way into wait mode, and the check clicks LEARN only where the link exists.
 - **Enter and click are unchanged:** both still open `/play?song=<id>`, judged.
-- **The hint** reads exactly `↑ ↓ choose · Enter play · L learn`.
+- **The hint** names `L learn`, beside `W watch` (watch-demo) and `E easy` (easy-charts). Until duo-select (#646) it
+  read exactly `↑ ↓ choose · Enter play · L learn · W watch · E easy`. duo-select restyles it in the frame's
+  monospace caps, so the check reads the three keys, not one string.
 - **The preview stops:** leaving with L stops the opening at once (the queue cleared, All Notes Off on the
   piano), as Enter does, under the same rule as L above.
 

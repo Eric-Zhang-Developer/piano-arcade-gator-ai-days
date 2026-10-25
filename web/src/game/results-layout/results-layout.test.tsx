@@ -66,6 +66,16 @@ test("a chunk-practice step features chunk practice's panel, and the graph moves
   expect(details).toContain('aria-label="Take graph"');
   const plain = render({ plugins: all, params: new URLSearchParams("song=twinkle") });
   expect(between(plain, 'data-testid="results"', 'id="results-details"')).toContain("GRAPH");
+  const adapt = render({ plugins: all, params: new URLSearchParams("song=twinkle&from=1&to=4&practice=adapt&ok=0&ko=0&clean=0") });
+  expect(between(adapt, 'data-testid="results"', 'id="results-details"')).toContain("NEXT"); // adaptive-chunks' step too
+});
+
+test("a watch-demo take features its way back, and the graph moves to the details", () => {
+  const all = [...plugins, plugin("watch-demo", "BACK")];
+  const html = render({ plugins: all, params: new URLSearchParams("song=twinkle&bot=perfect&audible=1&demo=1") });
+  const ceremony = between(html, 'data-testid="results"', 'id="results-details"');
+  expect(ceremony).toContain("BACK");
+  expect(ceremony).not.toContain("GRAPH");
 });
 
 test("wait mode shows no rank or counts", () => {
@@ -78,4 +88,16 @@ test("wait mode shows no rank or counts", () => {
 test("card names come from plugin ids unless the settings name them", () => {
   expect(panelName("chord-sync")).toBe("Chord sync");
   expect(panelName("take-midi")).toBe("MIDI");
+});
+
+test("a NEW RECORD take features record-moment alone, and the graph moves to the details for that take", () => {
+  const all = [...plugins, plugin("record-moment", "NEW RECORD")];
+  const html = render({ plugins: all, newRecord: true });
+  const ceremony = between(html, 'data-testid="results"', 'id="results-details"');
+  const details = html.slice(html.indexOf('id="results-details"'));
+  expect(ceremony).toContain("NEW RECORD");
+  expect(ceremony).not.toContain("GRAPH");
+  expect(details).toContain('aria-label="Take graph"');
+  const plain = render({ plugins: all, newRecord: false });
+  expect(between(plain, 'data-testid="results"', 'id="results-details"')).toContain("GRAPH");
 });

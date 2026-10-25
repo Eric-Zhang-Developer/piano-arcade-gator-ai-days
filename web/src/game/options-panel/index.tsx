@@ -7,6 +7,7 @@ import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent }
 import { LATENCY_MAX, LATENCY_MIN, loadLatencyOffset, saveLatencyOffset } from "../core/settings";
 import { LABEL_SETTINGS, LABELS_KEY, labelSetting, type LabelSetting } from "../note-labels/labels";
 import { DEFAULT_PREFS, getPrefs, savePrefs, subscribePrefs, type Prefs } from "../sound";
+import { DEFAULT_PIANO_VOLUME, getPianoVolume, setPianoVolume, subscribePianoVolume } from "../laptop-sound/volume";
 import styles from "./options-panel.module.css";
 
 export const LABEL_NAMES: Record<LabelSetting, string> = { auto: "Auto", notes: "Note names", keys: "Laptop keys", off: "Off" };
@@ -38,6 +39,32 @@ export interface OptionValues {
   latency: number;
   prefs: Prefs;
   labels: LabelSetting;
+}
+
+// laptop-sound's "Piano volume": the laptop piano's level, on its own store, so the effects mute doesn't touch it.
+function PianoVolumeRow() {
+  const volume = useSyncExternalStore(subscribePianoVolume, getPianoVolume, () => DEFAULT_PIANO_VOLUME);
+  return (
+    <div className={styles.row}>
+      <label className={styles.label} htmlFor="opt-piano-volume">
+        Piano volume
+      </label>
+      <div className={styles.control}>
+        <input
+          id="opt-piano-volume"
+          data-row
+          data-testid="opt-piano-volume"
+          type="range"
+          min={0}
+          max={1}
+          step={0.05}
+          value={volume}
+          onChange={(e) => setPianoVolume(Number(e.target.value))}
+        />
+        <output className={styles.value}>{Math.round(volume * 100)}%</output>
+      </div>
+    </div>
+  );
 }
 
 // The rows, in the spec's order. Each row's first control carries data-row, the target of ↑/↓.
@@ -102,6 +129,7 @@ export function OptionsRows({
           <output className={styles.value}>{Math.round(prefs.volume * 100)}%</output>
         </div>
       </div>
+      <PianoVolumeRow />
       <label className={styles.row}>
         <span className={styles.label}>Mute</span>
         <input data-row data-testid="opt-mute" type="checkbox" className={styles.check} checked={prefs.muted} onKeyDown={enterToggles} onChange={(e) => onPrefs({ muted: e.target.checked })} />

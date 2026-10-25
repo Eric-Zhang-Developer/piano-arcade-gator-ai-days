@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piano LED tester</title>
+<style>
+  :root { --bg:#0d0b1a; --panel:#17142b; --text:#ece8ff; --muted:#9a93c0; --accent:#ff4fd8; --ok:#3ef0b0; --bad:#ff6b6b; }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.45 system-ui, sans-serif; }
+  main { max-width:860px; margin:0 auto; padding:16px; }
+  h1 { font-size:20px; margin:8px 0 4px; } h2 { font-size:15px; margin:0 0 8px; color:var(--accent); }
+  section { background:var(--panel); border-radius:10px; padding:14px; margin:12px 0; }
+  button { background:#2a2550; color:var(--text); border:1px solid #3d3670; border-radius:6px; padding:6px 12px; font:inherit; cursor:pointer; margin:2px; }
+  button:hover { border-color:var(--accent); }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .muted { color:var(--muted); } .ok { color:var(--ok); } .bad { color:var(--bad); }
+  input[type=number] { width:80px; background:#0d0b1a; color:var(--text); border:1px solid #3d3670; border-radius:6px; padding:4px; }
+  pre { background:#0d0b1a; padding:8px; border-radius:6px; max-height:160px; overflow:auto; font-size:12px; white-space:pre-wrap; }
+  label { display:inline-flex; gap:6px; align-items:center; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Piano LED tester</h1>
+  <p class="muted">Chrome only (Web Serial + Web MIDI). Open this file directly, or serve it from localhost. Close the Arduino serial monitor first: only one program can hold the port.
+    No piano handy? <a href="playground.html" style="color:var(--accent)">The playground</a> plays the strip from this computer.</p>
+
+  <section>
+    <h2>1. Connect</h2>
+    <p class="muted">Click both buttons once. After that this page connects by itself whenever it opens or the board is plugged in.</p>
+    <div class="row">
+      <button id="btnSerial">Connect LED board</button> <span id="serialState" class="muted">not connected</span>
+    </div>
+    <div class="row">
+      <button id="btnMidi">Connect piano</button> <span id="midiState" class="muted">not connected</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. Hour-0 test</h2>
+    <div class="row">
+      <button data-test="ends">A0 red + C8 blue</button>
+      <button data-test="raw">Raw LED 0 and last</button>
+      <button data-test="sweep">Sweep all keys</button>
+      <button data-test="white">All keys dim white (power check)</button>
+      <button data-test="clear">Clear</button>
+    </div>
+    <p class="muted">Raw LED 0 lights green near DIN, and the last LED lights green at the far end. If LED 0 shows red instead, the color order is wrong (the sketch says GRB).</p>
+  </section>
+
+  <section>
+    <h2>3. Calibrate</h2>
+    <p class="muted">Nudge until the lit LEDs are centered on the key. Steps are 1/4 LED (1.7 mm).</p>
+    <div class="row"><b style="width:120px">A0 (lowest)</b>
+      <button data-cal="10,-4">◀◀</button><button data-cal="10,-1">◀</button><button data-cal="10,1">▶</button><button data-cal="10,4">▶▶</button>
+      <span id="calLowVal" class="muted"></span></div>
+    <div class="row"><b style="width:120px">C8 (highest)</b>
+      <button data-cal="11,-4">◀◀</button><button data-cal="11,-1">◀</button><button data-cal="11,1">▶</button><button data-cal="11,4">▶▶</button>
+      <span id="calHighVal" class="muted"></span></div>
+    <div class="row"><b style="width:120px">Joint gap</b>
+      <button data-cal="13,-4">−</button><button data-cal="13,4">+</button>
+      <span id="gapVal" class="muted"></span>
+      <span class="muted">Fix keys just right of the strip joint after A0 and C8 look right.</span></div>
+    <div class="row">
+      <label><input id="reverse" type="checkbox"> Strip runs right to left</label>
+      <label>Brightness <input id="bright" type="number" min="0" max="255" value="160"></label>
+      <label>Fade ms <input id="fade" type="number" min="0" max="2000" value="180"></label>
+      <label>Hint pulse ms <input id="pulse" type="number" min="0" max="5000" value="900"></label>
+      <label>Ripple ms <input id="ripple" type="number" min="0" max="3000" value="700"></label>
+    </div>
+    <div class="row">
+      <button data-preset="low">Low (brightness 70)</button>
+      <button data-preset="high">High (brightness 160)</button>
+      <span class="muted">Lower brightness keeps hue; at full brightness 144/m strips wash toward white.</span>
+    </div>
+    <div class="row">
+      <button id="btnCheck">Show A0, middle C, C8</button>
+      <button id="btnSave">Save to board</button>
+      <button id="btnDefaults">Reset to defaults</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>4. Play</h2>
+    <div class="row">
+      <label><input type="radio" name="mode" value="free" checked> Free play: keys light as you press them</label>
+      <label><input type="radio" name="mode" value="guide"> Guide lights: Twinkle, the next key glows until you hit it</label>
+    </div>
+    <div class="row">
+      <label>Colors <select id="colors">
+        <option value="hands">Hands: left cyan, right pink</option>
+        <option value="rainbow">Rainbow by pitch</option>
+      </select></label>
+      <span class="muted">Every key press sends a ripple along the strip in its color (Ripple ms above; 0 turns it off).</span>
+    </div>
+    <p id="guideState" class="muted"></p>
+  </section>
+
+  <section>
+    <h2>5. Measure</h2>
+    <div class="row">
+      <button id="btnPing">Latency: 200 pings</button>
+      <button id="btnStress">Stress: chords + fast trill</button>
+    </div>
+    <pre id="measure">Not run yet.</pre>
+    <p class="muted">The ping is a round trip: browser to board and back, plus the board's frame cost. Key to light is
+      roughly half the round trip plus one frame. The only true end-to-end number is a 240 fps slow-mo video of a key
+      press: count frames from key down to light on.</p>
+  </section>
+
+  <section>
+    <h2>Log</h2>
+    <pre id="log"></pre>
+  </section>
+</main>
+<script>
+// Protocol: see firmware/piano_leds/piano_leds.ino. All data bytes are 0-127.
+const LOW = 21, HIGH = 108, NUM_LEDS = 288;
+let writer = null, cfg = {};
+const $ = id => document.getElementById(id);
+const log = s => { const el = $('log'); el.textContent = (s + '\n' + el.textContent).slice(0, 4000); };
+
+function send(bytes) { if (writer) writer.write(new Uint8Array(bytes)).catch(e => log('write failed: ' + e)); }
+const c7 = v => Math.max(0, Math.min(127, Math.round(v)));
+const keyOn = (n, [r, g, b]) => send([0x90, n, c7(r), c7(g), c7(b)]);
+const keyOff = n => send([0x80, n]);
+const hint = (n, [r, g, b]) => send([0xA0, n, c7(r), c7(g), c7(b)]);
+const param = (p, v) => { v = Math.max(0, Math.min(16383, Math.round(v))); send([0xB0, p, v & 127, v >> 7]); };
+const raw = (i, [r, g, b]) => send([0xC0, i & 127, i >> 7, c7(r), c7(g), c7(b)]);
+const clearAll = () => send([0xF0]);
+
+// 7-bit colors, brighter with velocity. Hands: left hand cyan, right hand pink (synthwave).
+// Rainbow: hue runs red to violet from A0 to C8, so a scale paints across the strip.
+function colorFor(note, vel) {
+  const k = 0.35 + 0.65 * (vel / 127);
+  if ($('colors').value === 'rainbow') {
+    const h = (note - LOW) / (HIGH - LOW) * 5, f = h - Math.floor(h), i = Math.floor(h);
+    const rgb = [[1, f, 0], [1 - f, 1, 0], [0, 1, f], [0, 1 - f, 1], [f, 0, 1], [1, 0, 1]][i];
+    return rgb.map(c => 127 * c * k);
+  }
+  return note < 60 ? [0, 90 * k, 127 * k] : [127 * k, 20 * k, 110 * k];
+}
+
+// ---- Serial
+// The first connect needs a click (Chrome's port picker). Chrome remembers the grant, so after that
+// the page opens the board on load and again whenever it's plugged back in.
+setInterval(() => send([0xFE]), 1000);  // heartbeat for the firmware watchdog
+$('btnSerial').onclick = async () => {
+  if (!('serial' in navigator)) return log('No Web Serial: use desktop Chrome or Edge.');
+  try { openPort(await navigator.serial.requestPort()); } catch (e) { log('serial: ' + e); }
+};
+
+let portBusy = false;  // load and plug-in can both try to open the same port
+async function openPort(port) {
+  if (portBusy) return;
+  portBusy = true;
+  try {
+    await port.open({ baudRate: 115200 });
+  } catch (e) {
+    portBusy = false;
+    return log('serial: ' + e + ' (is the Arduino serial monitor still open?)');
+  }
+  writer = port.writable.getWriter();
+  $('serialState').textContent = 'opened, waiting for the board (it resets on connect)...';
+  $('serialState').className = 'muted';
+  readLines(port);
+  // Opening the port resets most ESP32 dev boards; ask again in case the boot line was missed.
+  setTimeout(() => send([0xF1]), 1800);
+}
+
+async function readLines(port) {
+  const decoder = new TextDecoderStream();
+  port.readable.pipeTo(decoder.writable).catch(() => {});
+  const reader = decoder.readable.getReader();
+  let buf = '';
+  for (;;) {
+    let value, done;
+    try { ({ value, done } = await reader.read()); } catch { break; }  // unplugged
+    if (done) break;
+    buf += value;
+    let i;
+    while ((i = buf.indexOf('\n')) >= 0) {
+      const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+      if (!line) continue;
+      log('board: ' + line);
+      if (line.startsWith('PONG ')) { onPong(line); continue; }
+      if (line.startsWith('PAL1 leds=')) {
+        cfg = Object.fromEntries(line.split(' ').slice(1).map(kv => kv.split('=')).map(([k, v]) => [k, parseFloat(v)]));
+        showCfg();
+      }
+    }
+  }
+  // close() waits for both streams to unlock; then the same port can open again on the next plug-in.
+  try { writer.releaseLock(); } catch {}
+  writer = null;
+  await port.close().catch(() => {});
+  portBusy = false;
+  $('serialState').textContent = 'disconnected: plug the board back in and it reconnects'; $('serialState').className = 'bad';
+}
+
+function showCfg() {
+  $('serialState').textContent = 'ready'; $('serialState').className = 'ok';
+  $('calLowVal').textContent = 'LED ' + cfg.calLow.toFixed(2);
+  $('calHighVal').textContent = 'LED ' + cfg.calHigh.toFixed(2);
+  $('gapVal').textContent = cfg.gap.toFixed(2) + ' LEDs at index ' + cfg.joint;
+  $('reverse').checked = !!cfg.reverse;
+  $('bright').value = cfg.bright; $('fade').value = cfg.fade;
+  if (cfg.pulse !== undefined) $('pulse').value = cfg.pulse;
+  if (cfg.ripple !== undefined) $('ripple').value = cfg.ripple;
+}
+
+// ---- MIDI
+let midiAccess = null;
+$('btnMidi').onclick = () => connectMidi();
+async function connectMidi() {
+  if (midiAccess) return;
+  try {
+    const access = midiAccess = await navigator.requestMIDIAccess();
+    const hook = () => {
+      const names = [];
+      for (const input of access.inputs.values()) { input.onmidimessage = onMidi; names.push(input.name); }
+      $('midiState').textContent = names.length ? names.join(', ') : 'no MIDI input found';
+      $('midiState').className = names.length ? 'ok' : 'bad';
+    };
+    hook(); access.onstatechange = hook;  // replug the piano without reloading
+  } catch (e) { midiAccess = null; log('midi: ' + e); }
+}
+
+// ---- Plug and play
+(async () => {
+  if ('serial' in navigator) {
+    const [port] = await navigator.serial.getPorts();  // ports this page was granted before
+    if (port) openPort(port);
+    navigator.serial.onconnect = e => openPort(e.target);
+  }
+  // Only reconnect MIDI on load if Chrome already allowed it, so a first visit doesn't open with a prompt.
+  const midi = await navigator.permissions?.query({ name: 'midi' }).catch(() => null);
+  if (midi?.state === 'granted') connectMidi();
+})();
+
+function onMidi(e) {
+  const [st, n, v] = e.data, type = st & 0xF0;
+  if (type === 0x90 && v > 0) pressed(n, v);
+  else if (type === 0x80 || (type === 0x90 && v === 0)) keyOff(n);
+}
+
+// ---- Play modes
+// Guide lights: the next key breathes bright, the one after glows dim, so the player sees where
+// the melody is going, not just one step. A wrong key flashes red and the hint stays.
+const TWINKLE = [60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60];
+const NEXT = [0, 70, 110], AFTER = [0, 10, 18], OFF = [0, 0, 0];
+let guideAt = 0, misses = 0, startedAt = 0;
+const mode = () => document.querySelector('input[name=mode]:checked').value;
+document.querySelectorAll('input[name=mode]').forEach(r => r.onchange = () => { clearAll(); guideAt = 0; misses = 0; showGuide(); });
+
+function showGuide() {
+  if (mode() !== 'guide') { $('guideState').textContent = ''; return; }
+  const n = TWINKLE[guideAt], after = TWINKLE[(guideAt + 1) % TWINKLE.length];
+  if (after !== n) hint(after, AFTER);
+  hint(n, NEXT);
+  $('guideState').textContent = `Next: note ${n} (${guideAt + 1}/${TWINKLE.length}), misses ${misses}`;
+}
+
+function pressed(n, v) {
+  if (mode() !== 'guide') return keyOn(n, colorFor(n, v));
+  const want = TWINKLE[guideAt];
+  if (n !== want) { misses++; keyOn(n, [127, 0, 0]); setTimeout(() => keyOff(n), 150); return showGuide(); }
+  if (guideAt === 0) startedAt = performance.now();
+  hint(n, OFF);
+  keyOn(n, [0, 127, 70]);  // green hit
+  guideAt = (guideAt + 1) % TWINKLE.length;
+  if (guideAt === 0) {
+    const secs = ((performance.now() - startedAt) / 1000).toFixed(1);
+    log(`guide: Twinkle done in ${secs} s with ${misses} misses`);
+    misses = 0;
+  }
+  setTimeout(showGuide, 60);  // repeated notes: let the hit show before the hint returns
+}
+
+// ---- Measure
+let pongWait = null;
+function onPong(line) {
+  const [, id, showUs, active] = line.split(' ').map(Number);
+  if (pongWait && pongWait.id === id) { pongWait.resolve({ t: performance.now(), showUs, active }); pongWait = null; }
+}
+function ping(id) {
+  return new Promise(resolve => {
+    pongWait = { id, resolve };
+    send([0xF2, id]);
+    setTimeout(() => { if (pongWait && pongWait.id === id) { pongWait = null; resolve(null); } }, 500);
+  });
+}
+const pct = (xs, p) => { const a = [...xs].sort((x, y) => x - y); return a[Math.min(a.length - 1, Math.floor(p * a.length))]; };
+$('btnPing').onclick = async () => {
+  if (!writer) return log('connect the LED board first');
+  const rtts = []; let lost = 0, last = null;
+  for (let i = 0; i < 200; i++) {
+    const t0 = performance.now(), r = await ping(i % 128);
+    if (!r) { lost++; continue; }
+    rtts.push(r.t - t0); last = r;
+    await sleep(5);
+  }
+  const f = x => x.toFixed(1);
+  $('measure').textContent = rtts.length
+    ? `round trip ms: median ${f(pct(rtts, 0.5))}, p95 ${f(pct(rtts, 0.95))}, max ${f(Math.max(...rtts))}, lost ${lost}/200\n` +
+      `board frame: show() ${(last.showUs / 1000).toFixed(2)} ms for ${last.active} LEDs\n` +
+      `target: median < 15 ms, p95 < 25 ms, lost 0 (targets, not yet measured on real hardware)`
+    : 'no replies: is the board connected and flashed with this version?';
+};
+$('btnStress').onclick = async () => {
+  if (!writer) return log('connect the LED board first');
+  clearAll();
+  const chord = [48, 52, 55, 60, 64, 67, 72, 76, 79, 84];
+  const t0 = performance.now();
+  for (let r = 0; r < 20; r++) {
+    chord.forEach(n => keyOn(n, colorFor(n, 110))); await sleep(40);
+    chord.forEach(n => keyOff(n)); await sleep(40);
+  }
+  for (let i = 0; i < 64; i++) { const n = i % 2 ? 72 : 74; keyOn(n, colorFor(n, 100)); await sleep(31); keyOff(n); }
+  const r = await ping(99);
+  $('measure').textContent = `stress: 400 chord messages + 128 trill messages in ${((performance.now() - t0) / 1000).toFixed(1)} s\n` +
+    (r ? 'board still answering: pass (watch for any LED left on, or flicker during the chords)' : 'board did not answer: FAIL');
+};
+
+// ---- Tests
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+document.querySelectorAll('[data-test]').forEach(b => b.onclick = async () => {
+  clearAll();
+  const t = b.dataset.test;
+  if (t === 'ends') { keyOn(LOW, [127, 0, 0]); keyOn(HIGH, [0, 0, 127]); }
+  if (t === 'raw') { raw(0, [0, 127, 0]); raw(NUM_LEDS - 1, [0, 127, 0]); }
+  if (t === 'sweep') for (let n = LOW; n <= HIGH; n++) { keyOn(n, colorFor(n, 100)); await sleep(25); keyOff(n); }
+  if (t === 'white') for (let n = LOW; n <= HIGH; n++) keyOn(n, [40, 40, 40]);
+});
+
+// ---- Calibration
+document.querySelectorAll('[data-cal]').forEach(b => b.onclick = () => {
+  const [p, steps] = b.dataset.cal.split(',').map(Number);
+  const cur = { 10: cfg.calLow, 11: cfg.calHigh, 13: cfg.gap }[p] ?? 0;
+  param(p, (cur + steps / 4) * 16);
+  showCheck();
+});
+function showCheck() { clearAll(); keyOn(LOW, [127, 0, 0]); keyOn(60, [0, 127, 0]); keyOn(HIGH, [0, 0, 127]); }
+$('btnCheck').onclick = showCheck;
+$('reverse').onchange = e => param(14, e.target.checked ? 1 : 0);
+$('bright').onchange = e => param(1, e.target.value);
+$('fade').onchange = e => param(2, e.target.value);
+$('pulse').onchange = e => param(5, e.target.value);
+$('ripple').onchange = e => param(6, e.target.value);
+document.querySelectorAll('[data-preset]').forEach(b => b.onclick = () => {
+  const v = b.dataset.preset === "low" ? 70 : 160;
+  $('bright').value = v; param(1, v);
+});
+$('btnSave').onclick = () => param(20, 0);
+$('btnDefaults').onclick = () => param(21, 0);
+</script>
+</body>
+</html>

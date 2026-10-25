@@ -1,7 +1,9 @@
 // Perf budget's run (spec: perf-budget): frame work time during fever on the densest chart at 1920×1080, stage on.
 // Builds and serves the app (or uses --base), plays the scene --runs times on a fresh page each, and writes perf.json.
 // Exit 0 pass, 1 over budget or an invalid run, 2 when it can't run (build, browser, server).
-// Usage: node web/src/game/perf-budget/perf.mjs [--song maple-leaf-rag] [--runs 3] [--params k=v&…] [--base <url>] [--out <dir>]
+// --dpr 2 measures at a Retina MacBook's devicePixelRatio. Each run also reports the page's <canvas> count and their
+// total backing size in megapixels: what the compositor blends every frame, which no callback time shows (#665's lag).
+// Usage: node web/src/game/perf-budget/perf.mjs [--song maple-leaf-rag] [--runs 3] [--dpr 1] [--params k=v&…] [--base <url>] [--out <dir>]
 import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createServer } from "node:net";
@@ -20,6 +22,7 @@ const arg = (name, d) => (process.argv.includes(name) ? process.argv[process.arg
 
 const song = arg("--song", "maple-leaf-rag");
 const runs = Number(arg("--runs", 3));
+const dpr = Number(arg("--dpr", 1));
 const extra = new URLSearchParams(arg("--params", ""));
 const git = (...a) => execFileSync("git", a, { cwd: webDir, encoding: "utf8" }).trim();
 const sha = git("rev-parse", "--short", "HEAD");
@@ -96,7 +99,7 @@ try {
 }
 
 async function run(i) {
-  const context = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
+  const context = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: dpr });
   const page = await context.newPage();
   await page.addInitScript(probeText);
   let frozen = false;
@@ -114,8 +117,12 @@ async function run(i) {
   await start.click();
   await page.waitForTimeout(2000);
   const stage = (await page.locator("main > div canvas").count()) > 0;
+  const canvases = await page.evaluate(() => {
+    const cs = [...document.querySelectorAll("canvas")];
+    return { count: cs.length, mp: cs.reduce((a, c) => a + c.width * c.height, 0) / 1e6 };
+  });
   await page.getByTestId("results").waitFor({ timeout: 300_000 });
-  const r = await page.evaluate(() => ({ ...window.__perfProbe.report(), feverSeen: window.__perfProbe.feverSeen() }));
+  const r = await page.evaluate(() => ({ ...window.__perfProbe.report(), feverSeen: window.__perfProbe.feverSeen(), gaps: window.__perfProbe.intervals() }));
   await context.close();
   const invalid = !r.feverSeen
     ? "never reached fever"
@@ -127,8 +134,20 @@ async function run(i) {
           ? "no frames counted"
           : undefined;
   const round = (x) => (x === null ? null : Math.round(x * 100) / 100);
-  const res = { frames: r.frames, p50: round(r.p50), p95: round(r.p95), max: round(r.max), ...(invalid ? { invalid } : {}), ...(frozen ? { frozenAtMs } : {}) };
-  say(`perf-budget: run ${i + 1}: ${res.frames} frames, p50 ${res.p50}, p95 ${res.p95}, max ${res.max} ms${invalid ? ` (invalid: ${invalid}${frozen ? ` ${frozenAtMs} ms after Start` : ""})` : ""}`);
+  const res = {
+    frames: r.frames,
+    p50: round(r.p50),
+    p95: round(r.p95),
+    max: round(r.max),
+    interval: { p50: round(r.gaps.p50), p95: round(r.gaps.p95) },
+    canvases: canvases.count,
+    canvasMP: round(canvases.mp),
+    ...(invalid ? { invalid } : {}),
+    ...(frozen ? { frozenAtMs } : {}),
+  };
+  say(
+    `perf-budget: run ${i + 1}: ${res.frames} frames, p50 ${res.p50}, p95 ${res.p95}, max ${res.max} ms; interval p50 ${res.interval.p50}, p95 ${res.interval.p95} ms; ${res.canvases} canvases, ${res.canvasMP} MP${invalid ? ` (invalid: ${invalid}${frozen ? ` ${frozenAtMs} ms after Start` : ""})` : ""}`,
+  );
   return res;
 }
 
@@ -158,7 +177,7 @@ writeFileSync(
       commit: sha,
       url,
       viewport: { width: 1920, height: 1080 },
-      devicePixelRatio: 1,
+      devicePixelRatio: dpr,
       chromium: browser.version(),
       webglRenderer: renderer,
       budgetMs,
@@ -166,7 +185,7 @@ writeFileSync(
       p95Spread: { lo, hi },
       pass: v.pass,
       invalid: v.invalid,
-      note: "Main-thread work only: GPU work isn't in a callback's time. A SwiftShader renderer means WebGL was drawn in software.",
+      note: "p50/p95/max are main-thread work only: GPU work isn't in a callback's time. interval is frame to frame, compositing included, but noisy headless (an empty page reads p95 17.6 ms): compare runs, don't budget it. canvases and canvasMP are what's composited each frame. A SwiftShader renderer means WebGL was drawn in software.",
     },
     null,
     2,
@@ -175,6 +194,6 @@ writeFileSync(
 say(`perf-budget: perf.json in ${out}`);
 for (const why of v.invalid) say(`perf-budget: invalid ${why}`);
 say(
-  `perf-budget: p95 ${range(p95s)} ms over ${results.length} runs (p50 ${range(results.map((r) => r.p50).filter((x) => x !== null))}, max ${range(results.map((r) => r.max).filter((x) => x !== null))}) at ${sha}: ${v.pass ? "pass" : v.invalid.length ? "invalid" : "over budget"}`,
+  `perf-budget: p95 ${range(p95s)} ms over ${results.length} runs (p50 ${range(results.map((r) => r.p50).filter((x) => x !== null))}, max ${range(results.map((r) => r.max).filter((x) => x !== null))}) at ${sha}, devicePixelRatio ${dpr}, ${results[0]?.canvases ?? "?"} canvases: ${v.pass ? "pass" : v.invalid.length ? "invalid" : "over budget"}`,
 );
 process.exit(v.pass ? 0 : 1);

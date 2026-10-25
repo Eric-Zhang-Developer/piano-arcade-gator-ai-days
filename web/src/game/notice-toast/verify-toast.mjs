@@ -3,7 +3,10 @@
 // 2. /sim: Watch the bot, then Unplug -> the disconnected toast in the game; Replug -> the connected toast.
 // 3. Reduced motion: the toast's box doesn't move between appearing and leaving.
 // 4. Mid-song with a toast up: it's below the HUD band and inside the top half, clear of the highway's lower half.
-// Usage: node web/src/game/notice-toast/verify-toast.mjs --out <dir>
+// The toast must be gone by 4 s + 100 ms. The one lateness excused is a long task the page records running past the leave
+// (3.8 s): on a starved page the toast goes in the first frame after it, and no frame can come sooner (#584). Each such
+// stall is printed. CPU=6 throttles the page's CPU 6x (Chrome's own emulation, no load on the machine) to prove that.
+// Usage: [CPU=6] node web/src/game/notice-toast/verify-toast.mjs --out <dir>
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { createServer } from "node:net";
@@ -22,6 +25,8 @@ mkdirSync(out, { recursive: true });
 const say = (s) => process.stdout.write(`${s}\n`);
 const HUD_MAX = 84; // hudLayout's band height cap
 const TOAST_MS = 4000;
+const LEAVE_MS = 200; // toastSettings.leaveMs: both motions leave at TOAST_MS - LEAVE_MS
+const CPU = Number(process.env.CPU ?? 1);
 
 const port = await new Promise((res, rej) => {
   const s = createServer().once("error", rej);
@@ -50,19 +55,36 @@ for (let end = Date.now() + 120_000; ; ) {
   await new Promise((r) => setTimeout(r, 500));
 }
 
-// In the page: every frame from the first toast until it's gone, its box and text.
+// In the page: when the first toast is put in the DOM and when the last one leaves it, timed exactly by a
+// MutationObserver (an animation-frame poll is up to a frame late, 30–50 ms on a CI runner: #432), and every frame's
+// box and text while it shows, and the long tasks (over 50 ms) that ran past the leave.
 const TRACK = `new Promise((done) => {
   const samples = [];
+  const longs = [];
+  new PerformanceObserver((l) => longs.push(...l.getEntries().map((e) => [e.startTime, e.duration]))).observe({ type: "longtask" });
   let seenAt = null;
-  const tick = () => {
-    const t = document.querySelector('[data-testid="toast"]');
+  let goneAt = null;
+  const toastIn = (n) => n.nodeType === 1 && (n.matches('[data-testid="toast"]') || n.querySelector('[data-testid="toast"]'));
+  const watch = new MutationObserver((records) => {
     const now = performance.now();
+    if (seenAt === null && records.some((r) => [...r.addedNodes].some(toastIn))) seenAt = now;
+    if (seenAt !== null && !document.querySelector('[data-testid="toast"]')) {
+      goneAt = now;
+      watch.disconnect();
+    }
+  });
+  watch.observe(document, { childList: true, subtree: true });
+  const tick = () => {
+    if (goneAt !== null) {
+      const stalls = longs.filter(([t, d]) => t + d > seenAt + ${TOAST_MS - LEAVE_MS} && t < goneAt).map(([t, d]) => ({ at: Math.round(t - seenAt), ms: Math.round(d) }));
+      return done({ samples, goneMs: goneAt - seenAt, stalls });
+    }
+    const t = document.querySelector('[data-testid="toast"]');
     if (t) {
-      seenAt ??= now;
       const r = t.getBoundingClientRect();
-      samples.push({ ms: now - seenAt, left: r.left, right: r.right, top: r.top, bottom: r.bottom, text: t.textContent,
+      samples.push({ ms: performance.now() - seenAt, left: r.left, right: r.right, top: r.top, bottom: r.bottom, text: t.textContent,
         font: parseFloat(getComputedStyle(t).fontSize), count: document.querySelectorAll('[data-testid="toast"]').length });
-    } else if (seenAt !== null) return done({ samples, goneMs: now - seenAt });
+    }
     requestAnimationFrame(tick);
   };
   tick();
@@ -80,6 +102,7 @@ try {
       const tag = `${w}x${h}${reduced ? "-reduced" : ""}`;
       const context = await browser.newContext({ viewport: { width: w, height: h }, reducedMotion: reduced ? "reduce" : "no-preference" });
       const page = await context.newPage();
+      if (CPU > 1) await (await context.newCDPSession(page)).send("Emulation.setCPUThrottlingRate", { rate: CPU });
       const errors = [];
       page.on("pageerror", (e) => errors.push(e.message));
       await page.addInitScript(`window.__toastTrack = ${TRACK};`);
@@ -94,14 +117,16 @@ try {
       const settled = s.filter((x) => x.ms > 300 && x.ms < TOAST_MS - 300);
       const box = settled.at(-1) ?? s.at(-1);
       const scenes = await page.locator('[data-testid="scenes-notice"]').count();
-      results[tag] = { goneMs: track.goneMs, first: s[0], box, frames: s.length, errors };
+      const stall = Math.max(0, ...track.stalls.map((x) => x.ms));
+      results[tag] = { goneMs: track.goneMs, stalls: track.stalls, first: s[0], box, frames: s.length, errors };
       await context.close();
 
       const where = `${tag}:`;
       if (!/Unknown bot "nobody"/.test(box.text)) fail.push(`${where} toast says ${JSON.stringify(box.text)}`);
       if (Math.max(...s.map((x) => x.count)) !== 1) fail.push(`${where} more than one toast`);
       if (scenes) fail.push(`${where} the old scenes-notice is still drawn`);
-      if (track.goneMs > TOAST_MS + 100) fail.push(`${where} the toast stayed ${track.goneMs.toFixed(0)} ms`);
+      if (track.goneMs > TOAST_MS + 100 + stall)
+        fail.push(`${where} the toast stayed ${track.goneMs.toFixed(0)} ms (bound ${TOAST_MS + 100} + ${stall} ms of long task)`);
       if (Math.abs(box.right - (w - 16)) > 1) fail.push(`${where} right edge at ${box.right}, want ${w - 16}`);
       if (box.top < HUD_MAX) fail.push(`${where} top at ${box.top}, under the HUD band (${HUD_MAX})`);
       if (box.bottom > h / 2) fail.push(`${where} bottom at ${box.bottom}, below the top half (${h / 2})`);
@@ -111,7 +136,7 @@ try {
         if (moved) fail.push(`${where} the box moved under reduced motion`);
       } else if (!(s[0].left > box.left)) fail.push(`${where} no slide-in (first frame at ${s[0].left}, settled at ${box.left})`);
       if (errors.length) fail.push(`${where} page errors: ${errors.join("; ")}`);
-      say(`verify-toast: ${tag} one toast at ${box.left.toFixed(0)}–${box.right.toFixed(0)} × ${box.top.toFixed(0)}–${box.bottom.toFixed(0)}, ${box.font} px, gone at ${track.goneMs.toFixed(0)} ms${reduced ? ", still the whole time" : ""}`);
+      say(`verify-toast: ${tag} one toast at ${box.left.toFixed(0)}–${box.right.toFixed(0)} × ${box.top.toFixed(0)}–${box.bottom.toFixed(0)}, ${box.font} px, gone at ${track.goneMs.toFixed(0)} ms${stall ? ` after a ${stall} ms long task` : ""}${reduced ? ", still the whole time" : ""}`);
     }
   }
 

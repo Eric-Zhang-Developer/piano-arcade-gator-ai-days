@@ -2,6 +2,7 @@
 // right hand on the treble staff, the left on the bass; bars, ties, chords, voices and a spelled key. Pure: the same
 // chart gives the same string. placeNotes is what sheet-view uses to find a judged note's notehead.
 import type { Chart, ChartNote } from "../../contracts";
+import { shouldBeam } from "../sheet-beams";
 import { estimateKey, spell, spellingFor, type Key } from "./key";
 import { overrides, type Override } from "./overrides";
 
@@ -54,6 +55,18 @@ export function keyAndMeter(chart: Chart, song: Chart = chart): { key: Key; mete
   if ((4 * meter.beats) / meter.beatType !== chart.beatsPerBar)
     throw new Error(`${chart.id}: the table's ${meter.beats}/${meter.beatType} isn't beatsPerBar ${chart.beatsPerBar}`);
   return { key, meter };
+}
+
+// A pickup's length in beats (sheet-pickups): the song's first note's beat short of a bar, when the table says the
+// source opens with one and that note falls inside bar 1 after beat 0. 0 when `chart` (a hand, a loop) has a note
+// before it. A length that isn't a whole number of 16ths throws, as a bar does.
+export function pickupBeats(chart: Chart, song: Chart = chart): number {
+  if (!overrides[song.id]?.pickup || !song.notes.length) return 0;
+  const first = Math.min(...song.notes.map((n) => n.beat));
+  if (first <= 0 || first >= chart.beatsPerBar || chart.notes.some((n) => n.beat < first)) return 0;
+  const beats = chart.beatsPerBar - first;
+  if (!Number.isInteger(beats * DIVISIONS)) throw new Error(`${chart.id}: a pickup of ${beats} beats isn't a whole number of 16ths`);
+  return beats;
 }
 
 export interface Placed {
@@ -113,22 +126,35 @@ export function chartToMusicXml(chart: Chart, song: Chart = chart): string {
   const { key, meter } = keyAndMeter(chart, song);
   const table = spellingFor(key);
   const placed = placeNotes(chart);
+  // Each beamed chord's place in its beam (sheet-beams), by its first note's id. A beamable chord is one printed
+  // value inside one beat group, so it's always one <note> per pitch. VexFlow draws the 16th lines itself.
+  const onsetOf = new Map(placed.map((p) => [p.id, p.onset]));
+  const beamAt = new Map<string, "begin" | "continue" | "end">();
+  for (const ids of shouldBeam(placed, meter)) {
+    const onsets = [...new Set(ids.map((id) => onsetOf.get(id)))];
+    for (const id of ids) {
+      const i = onsets.indexOf(onsetOf.get(id));
+      beamAt.set(id, i === 0 ? "begin" : i === onsets.length - 1 ? "end" : "continue");
+    }
+  }
   const bars = Math.max(1, Math.ceil(Math.max(0, ...placed.map((p) => p.end)) / barLen));
+  const pickup = pickupBeats(chart, song) * DIVISIONS; // bar 0 is only the padded first bar's last `pickup` divisions
   const staves: [1 | 2, Chord[]][] = [
     [1, voices(placed, 1)],
     [2, voices(placed, 2)],
   ];
 
-  const note = (staff: number, voice: number, len: number, type: string, dot: boolean, body: string, ties = "", tied = "") =>
-    `<note>${body}<duration>${len}</duration>${ties}<voice>${voice}</voice><type>${type}</type>${dot ? "<dot/>" : ""}<staff>${staff}</staff>${tied ? `<notations>${tied}</notations>` : ""}</note>`;
+  const note = (staff: number, voice: number, len: number, type: string, dot: boolean, body: string, ties = "", tied = "", beam = "") =>
+    `<note>${body}<duration>${len}</duration>${ties}<voice>${voice}</voice><type>${type}</type>${dot ? "<dot/>" : ""}<staff>${staff}</staff>${beam ? `<beam number="1">${beam}</beam>` : ""}${tied ? `<notations>${tied}</notations>` : ""}</note>`;
   const rests = (staff: number, voice: number, len: number) =>
     pieces(len).map(([d, type, dot]) => note(staff, voice, d, type, dot, "<rest/>")).join("");
   const forward = (staff: number, voice: number, len: number) => `<forward><duration>${len}</duration><voice>${voice}</voice><staff>${staff}</staff></forward>`;
 
   const measures: string[] = [];
   for (let b = 0; b < bars; b++) {
-    const start = b * barLen;
-    const stop = start + barLen;
+    const start = b === 0 && pickup ? barLen - pickup : b * barLen;
+    const stop = (b + 1) * barLen;
+    const len = stop - start;
     const parts: string[] = [];
     for (const [staff, chords] of staves) {
       const used = [...new Set(chords.map((c) => c.voice))].sort((x, y) => x - y);
@@ -138,7 +164,7 @@ export function chartToMusicXml(chart: Chart, song: Chart = chart): string {
         const here = chords.filter((c) => c.voice === v && c.end > start && c.onset < stop);
         if (v !== first && !here.length) continue;
         if (v === first && !here.length) {
-          parts.push(`<note><rest measure="yes"/><duration>${barLen}</duration><voice>${v}</voice><staff>${staff}</staff></note>`);
+          parts.push(`<note><rest measure="yes"/><duration>${len}</duration><voice>${v}</voice><staff>${staff}</staff></note>`);
           continue;
         }
         let at = start;
@@ -156,7 +182,7 @@ export function chartToMusicXml(chart: Chart, song: Chart = chart): string {
             c.pitches.forEach((p, j) => {
               const s = spell(p, table);
               const pitch = `<pitch><step>${s.step}</step>${s.alter ? `<alter>${s.alter}</alter>` : ""}<octave>${s.octave}</octave></pitch>`;
-              out += note(staff, v, d, type, dot, `${j ? "<chord/>" : ""}${pitch}`, ties, tied);
+              out += note(staff, v, d, type, dot, `${j ? "<chord/>" : ""}${pitch}`, ties, tied, j ? "" : (beamAt.get(c.first) ?? ""));
             });
           });
           at = to;
@@ -171,7 +197,8 @@ export function chartToMusicXml(chart: Chart, song: Chart = chart): string {
           `<time><beats>${meter.beats}</beats><beat-type>${meter.beatType}</beat-type></time><staves>2</staves>` +
           `<clef number="1"><sign>G</sign><line>2</line></clef><clef number="2"><sign>F</sign><line>4</line></clef></attributes>`
         : "";
-    measures.push(`<measure number="${b + 1}">${attributes}${parts.join(`<backup><duration>${barLen}</duration></backup>`)}</measure>`);
+    const head = pickup && !b ? `<measure number="0" implicit="yes">` : `<measure number="${pickup ? b : b + 1}">`;
+    measures.push(`${head}${attributes}${parts.join(`<backup><duration>${len}</duration></backup>`)}</measure>`);
   }
 
   return (

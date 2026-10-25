@@ -73,7 +73,8 @@ try {
   page.on("pageerror", (e) => errors.push(e.message));
 
   // 1. Space plays: the laptop tone, counters, a raised pillar, a chapter.
-  await page.goto(`${base}/attract`);
+  // ?midi=off: no piano at all. Without it, laptop-sound's virtual "Portable Grand" is the piano (spec: laptop-sound).
+  await page.goto(`${base}/attract?midi=off`);
   await page.getByText("● LIVE").waitFor({ timeout: 60_000 });
   await page.locator("canvas").waitFor({ timeout: 30_000 });
   await page.keyboard.press("Space");
@@ -140,21 +141,32 @@ try {
   await fp.getByText(/No WebGL here/).waitFor({ timeout: 30_000 });
   check((await fp.locator("canvas").count()) === 0, "without WebGL: no canvas, the flat list instead");
   // The rhythm is timed here: headless WebGL is software-rendered, and its 200-500 ms frames on a loaded machine
-  // stall every timer on the page, which says nothing about the clock. Step times come from inside the page.
-  await fp.evaluate(() => {
-    const el = [...document.querySelectorAll("span")].find((x) => /^\d+ \/ \d+$/.test(x.textContent));
-    window.__steps = [];
-    new MutationObserver(() => window.__steps.push({ k: Number(el.textContent.split(" / ")[0]), t: performance.now() })).observe(el, {
-      childList: true, characterData: true, subtree: true,
-    });
-  });
+  // stall every timer on the page, which says nothing about the clock. So the clock is checked by its own record
+  // (performance marks, one per step: when it was due and how late its timer fired), not by when the DOM changed.
+  // Due times must sit on Twinkle's beats to the ms, a re-anchor moving later ones by exactly its lateness, so a
+  // clock that drifts or rushes to catch up fails. How late a timer fires is the machine's, not the clock's: the page
+  // re-anchors past MAX_LATE_MS by design, so lateness is reported, not bounded. A per-step bound on DOM times failed
+  // on loaded CI runners at 138-155 ms (#552); with the CPU throttled 6x, timers ran a median 151 ms late while the
+  // clock stayed exact.
+  await fp.evaluate(() => performance.clearMarks("attract-step"));
   await fp.keyboard.press("Space");
   await sleep(9_000);
-  const seen = await fp.evaluate(() => window.__steps);
-  const gaps = seen.slice(2).map((s, i) => ({ got: s.t - seen[i + 1].t, k: s.k }));
+  const marks = await fp.evaluate(() => performance.getEntriesByName("attract-step").map((m) => m.detail));
   const beat = 60_000 / chart.bpm;
-  const off = gaps.map(({ got, k }) => Math.abs(got - (chart.notes[k - 1].beat - chart.notes[k - 2].beat) * beat));
-  check(gaps.length >= 8 && Math.max(...off) < 120, `steps land on Twinkle's beats (${gaps.length} gaps, worst ${Math.round(Math.max(...off))} ms off)`);
+  const n = chart.notes.length;
+  const loop = chart.notes[n - 1].beat + chart.notes[n - 1].duration; // steps go round Twinkle's notes
+  const beatOf = (step) => Math.floor(step / n) * loop + chart.notes[step % n].beat;
+  const off = marks.slice(1).map((m, i) => {
+    const prev = marks[i];
+    const want = (beatOf(m.step) - beatOf(prev.step)) * beat + (prev.reanchored ? prev.late : 0);
+    return Math.abs(m.dueMs - prev.dueMs - want);
+  });
+  const lates = marks.map((m) => m.late).sort((a, b) => a - b);
+  const median = lates[Math.floor(lates.length / 2)];
+  check(
+    off.length >= 8 && Math.max(...off) < 1,
+    `steps land on Twinkle's beats (${off.length} gaps, clock worst ${Math.max(...off).toFixed(2)} ms off; timers late median ${Math.round(median)} ms, worst ${Math.round(lates.at(-1))} ms)`,
+  );
   check((await stepOf(fp)) >= 4 && (await fp.getByText(/^▲ /).count()) >= 1, `without WebGL the replay still steps and raises (step ${await stepOf(fp)})`);
   await fp.screenshot({ path: join(out, "attract-no-webgl.png") });
   await flat.close();

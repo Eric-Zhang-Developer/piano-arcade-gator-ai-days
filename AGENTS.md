@@ -114,6 +114,20 @@ feature of another lane owns stays closed: cross-lane changes still need the own
 2 removed lines per file, or the owner rule applies. A `feat(song-pack-<n>)` PR may append its credits to
 `CREDITS.md` (no removed lines). Both are checked by `check_ownership.py`.
 
+## Visible changes
+Any PR that changes what a person sees (`.tsx`, `.css`, canvas draw code, a page layout) gets a design pass. Backend,
+CI and test-only PRs are exempt. Eric, 2026-10-25: "Every time we're doing something that involves the frontend".
+1. Invoke the `frontend-design` skill before writing the UI, and `design-taste-frontend` (taste v2) for the look loop.
+2. Between iterations, screenshot at 1280×720 and 1920×1080 (plus reduced motion when motion changed), score against
+   taste v2's `references/critique.md`, and fix the top three problems. At most three rounds.
+3. Take those shots from your running dev server through the in-app browser, not a fresh headless run each round.
+   `verify.py` still runs once before the done note.
+4. The PR body gets a **Design** section: the skills invoked, each round's score, the fixes, and before/after shots.
+   No Design section, no ready PR.
+5. **At most 2 worker dev servers at once,** besides Eric's :3000. Take a slot with
+   `mkdir "$(git rev-parse --git-common-dir)/devserver.1"` (or `.2`) and write your pid into it. Remove the slot
+   when you stop the server, and stop it whenever you go idle. A slot whose pid is dead is free.
+
 ## When something needs a person
 - Could running something answer it (a script, a throwaway prototype in a scratch dir)? Then run it instead of asking.
 - Two fixes for the same failure didn't work? Write down what both assumed before trying a third.

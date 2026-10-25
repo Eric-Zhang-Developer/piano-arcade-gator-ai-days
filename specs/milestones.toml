@@ -178,6 +178,7 @@ features = [
   "sheet-paper",
   "lab",
   "nav-bar",
+  "hit-particles", # Eric, 2026-10-25 (#750): a priority, so ahead of duo-start
   "duo-start",
   "level-forge",
   "veritas",

@@ -4,7 +4,7 @@
 //    click, and __pianoArcadeDemo.on is true.
 // 2. Mid-take the HUD shows DEMO (screenshot); the results reach 100%; localStorage's records are byte-for-byte as before.
 // 3. "Back to songs" has the focus; within 10 s of the results the URL is /.
-// 4. Meta+W on / doesn't navigate; WATCH on the preview has the same URL as W.
+// 4. Meta+W on / doesn't navigate. (No WATCH link: #599 took it out of the preview's row, which it overflowed.)
 // 5. Screenshots of the DEMO badge and the results panel at 1280×720 and 1920×1080, and the results with reduced motion.
 // Usage: node web/src/game/watch-demo/verify-watch.mjs --out <dir>
 import { spawn } from "node:child_process";
@@ -87,13 +87,11 @@ for (const [w, h, reducedMotion] of [
   await page.evaluate((k) => localStorage.setItem(k, JSON.stringify({ "twinkle:normal": { best: null, top: [] }, seededBy: "verify-watch" })), RECORDS);
   const before = await page.evaluate((k) => localStorage.getItem(k), RECORDS);
   if (first) {
-    // 4. Meta+W doesn't navigate; WATCH has W's URL.
+    // 4. Meta+W doesn't navigate.
     await twinkle.focus();
     await page.keyboard.press("Meta+w");
     await page.waitForTimeout(500);
     check(new URL(page.url()).pathname === "/", `Meta+W stays on ${new URL(page.url()).pathname}`);
-    const watch = await page.getByTestId("preview-watch").getAttribute("href", { timeout: 10_000 }).catch(() => null);
-    check(watch === `/play?${WANT}`, `WATCH links ${watch}`);
   }
 
   // 1. W opens the demo, which starts itself.

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Chart } from "../../../contracts";
 import { beatDetector, isFist, type Sample } from "./beats";
 import { clockSettings, conductorClock } from "./clock";
-import { scheduler, scheduleSettings, scoreEvents } from "./schedule";
+import { scheduler, scheduleSettings, scoreEvents, velocityFactor } from "./schedule";
 
 // Feeds the clock beats and reads its position on a 5 ms grid; returns position samples.
 function drive(clock: ReturnType<typeof conductorClock>, beats: number[], until: number) {
@@ -46,6 +46,18 @@ describe("the clock (conductor)", () => {
   it("on a 60 BPM chart, the clamp spreads the same correction over more beats", () => {
     expect(settle(60, 2).phaseMs).toBeGreaterThan(30);
     expect(settle(60, 6).phaseMs).toBeLessThan(30);
+  });
+
+  it("measures a beat reported late at its own time", () => {
+    const late = conductorClock(60);
+    const ontime = conductorClock(60);
+    for (const b of [0, 1000, 2000, 3000]) {
+      ontime.at(b);
+      ontime.beat(b);
+      late.at(b + 120); // the detector confirms the low point 120 ms on
+      late.beat(b);
+    }
+    expect(late.at(4000)).toBeCloseTo(ontime.at(4000), 6);
   });
 
   it("never goes backward over a jittery beat list, with one beat far early and one far late", () => {
@@ -190,6 +202,10 @@ describe("the scheduler (conductor)", () => {
     const ons = sent.filter((e) => e.data[0] === 0x90).map((e) => e.at);
     ons.forEach((t, i) => expect(t).toBeCloseTo(i * 1000, 0));
   });
+  it("puts a re-pedal's up before its down, and both before the notes on that beat", () => {
+    const ev = scoreEvents(chart, [[0, 2], [2, 4]]).filter((e) => e.beat === 2).map((e) => (e.kind === "pedal" ? `pedal ${e.data[2]}` : e.kind));
+    expect(ev).toEqual(["pedal 0", "pedal 127", "on"]); // the chart's notes are half a beat: no off on 2
+  });
   it("sends nothing while held, and applies the velocity factor within 1–127", () => {
     const c = conductorClock(60);
     c.beat(-2000);
@@ -203,5 +219,14 @@ describe("the scheduler (conductor)", () => {
     expect(sent).toHaveLength(n);
     expect(sent.filter((d) => d[0] === 0x90).every((d) => d[2] === 127 || d[2] === 64 * 3)).toBe(true);
     expect(Math.max(...sent.filter((d) => d[0] === 0x90).map((d) => d[2]))).toBe(127);
+  });
+});
+
+describe("the dynamics (conductor)", () => {
+  it("plays the chart as written at the reference stroke, swells a big one, and stays within its clamp", () => {
+    expect(velocityFactor(2)).toBe(1);
+    expect(velocityFactor(3)).toBe(1.5);
+    expect(velocityFactor(40)).toBe(1.6);
+    expect(velocityFactor(0)).toBe(0.5);
   });
 });

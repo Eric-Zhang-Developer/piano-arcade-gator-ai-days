@@ -2,11 +2,18 @@
 // note-off and pedal event that falls inside the next lookahead window of conducted time, with its timestamp. The
 // window is short, so a tempo change or a hold takes effect within it. Each event is sent once, never in the past.
 import type { Chart } from "../../../contracts";
+import type { Pedal } from "../../pedal";
 
 export const scheduleSettings = {
   lookaheadMs: 100, // logged in decisions/conductor-thresholds
   channel: 0,
 };
+
+// Dynamics: a stroke's depth in hand sizes scales each note's own chart velocity, so the score's shape stays and a big
+// swing swells it. A stroke of `refStroke` plays the chart as written (decisions/conductor-thresholds).
+export const dynamicsSettings = { refStroke: 2, minFactor: 0.5, maxFactor: 1.6 };
+export const velocityFactor = (stroke: number, s = dynamicsSettings) =>
+  Math.min(s.maxFactor, Math.max(s.minFactor, stroke / s.refStroke));
 
 export interface ScoreEvent {
   beat: number;
@@ -14,16 +21,19 @@ export interface ScoreEvent {
   kind: "on" | "off" | "pedal";
 }
 
-// The chart's notes (each held its written length in conducted time) and the pedal, by beat. Offs and pedal-ups
-// sort before ons at the same beat.
-export function scoreEvents(chart: Chart, pedal: [number, number][] | null = null): ScoreEvent[] {
+// The chart's notes (each held its written length in conducted time) and the pedal (pedal.json's [down, up] pairs),
+// by beat. At the same beat offs and pedal-ups go first, then pedal-downs, then ons: a re-pedal catches the new notes.
+export function scoreEvents(chart: Chart, pedal: Pedal | null = null): ScoreEvent[] {
   const ch = scheduleSettings.channel;
   const ev: ScoreEvent[] = [];
   for (const n of chart.notes) {
     ev.push({ beat: n.beat, data: [0x90 | ch, n.pitch, n.velocity ?? 80], kind: "on" });
     ev.push({ beat: n.beat + n.duration, data: [0x80 | ch, n.pitch, 0], kind: "off" });
   }
-  for (const [beat, value] of pedal ?? []) ev.push({ beat, data: [0xb0 | ch, 64, value >= 64 ? 127 : 0], kind: "pedal" });
+  for (const [down, up] of pedal ?? []) {
+    ev.push({ beat: down, data: [0xb0 | ch, 64, 127], kind: "pedal" });
+    ev.push({ beat: up, data: [0xb0 | ch, 64, 0], kind: "pedal" });
+  }
   const order = (e: ScoreEvent) => (e.kind === "on" ? 2 : e.kind === "pedal" && e.data[2] > 0 ? 1 : 0);
   return ev.sort((a, b) => a.beat - b.beat || order(a) - order(b));
 }

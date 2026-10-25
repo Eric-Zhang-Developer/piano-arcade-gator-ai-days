@@ -79,8 +79,8 @@ export function conductorClock(chartBpm: number, startBeat = 0, beatUnit = 1, s 
         return;
       }
       if (state === "held") {
-        // the next downbeat resumes from where it held, at the tempo it had
-        t = bt;
+        // the next downbeat resumes from where it held, at the tempo it had; a beat reported late moves nothing back
+        t = Math.max(t ?? bt, bt);
         corr = 0;
         state = "running";
         lastBeat = bt;
@@ -92,9 +92,11 @@ export function conductorClock(chartBpm: number, startBeat = 0, beatUnit = 1, s 
         rate += s.ratePull * (target - rate);
       }
       lastBeat = bt;
-      // the beat lands on the nearest conducted beat; the gap is corrected over phaseBeats
-      const nearest = startBeat + Math.round((pos - startBeat) / beatUnit) * beatUnit;
-      corr = nearest - pos;
+      // the beat lands on the nearest conducted beat; the gap is corrected over phaseBeats. The detector reports a
+      // beat once the wrist rises again, after its low point: the error is measured where the clock was at bt.
+      const then = t !== null && bt < t ? pos - rate * (t - bt) : pos;
+      const nearest = startBeat + Math.round((then - startBeat) / beatUnit) * beatUnit;
+      corr = nearest - then;
       corrRate = Math.abs(corr) / ((s.phaseBeats * beatUnit) / rate);
     },
     // A fermata: the position stops where it is.

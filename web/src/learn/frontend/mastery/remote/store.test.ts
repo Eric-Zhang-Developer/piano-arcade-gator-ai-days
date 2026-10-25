@@ -62,6 +62,19 @@ describe('remoteStore', () => {
     expect(sent(fetch)).toEqual(['GET', { attempt: a3 }]);
   });
 
+  it('keeps a limited attempt on the device and sends it again on the next read', async () => {
+    const fallback = memoryStore();
+    const limited = route({ status: 'limited' }, 429);
+    expect(await remoteStore({ session, fallback, fetch: limited }).append(a1)).toBe(true);
+    expect(await fallback.list('me')).toEqual([a1]);
+
+    const fetch = vi.fn<Fetch>(async (_, init) =>
+      Response.json(init?.method === 'POST' ? { status: 'saved' } : { status: 'ok', attempts: [], goals: { songIds: [] } }),
+    );
+    expect(await remoteStore({ session, fallback, fetch }).list('me')).toEqual([a1]);
+    expect(sent(fetch)).toEqual(['GET', { attempt: a1 }]);
+  });
+
   it('reads the server goals, and the device goals when the server has none', async () => {
     const fallback = memoryStore([], { songIds: ['minuet-in-g'] });
     const withGoals = route({ status: 'ok', attempts: [], goals: { songIds: ['ode-to-joy'] } });

@@ -19,11 +19,13 @@ export type AttemptsRequest = { attempt: Attempt } | { goals: Goals };
 
 /**
  * `not-configured`: this deploy has no Supabase server key. `not-ready`: the tables (issue #753) don't exist yet.
- * Either way the device store keeps everything, and nothing is lost.
+ * `limited` (429): over the database's save limit for this player. The device store keeps everything, and sends what
+ * the server hasn't seen the next time it reads, so nothing is lost.
  */
 export type AttemptsResponse =
   | { status: 'ok'; attempts: Attempt[]; goals: Goals }
   | { status: 'saved' }
   | { status: 'not-configured' }
   | { status: 'not-ready' }
+  | { status: 'limited' }
   | { status: 'error'; message: string };

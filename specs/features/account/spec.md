@@ -29,6 +29,10 @@ guest", never required to play. Merge that first too.
 - **Signed in with Google:** name, email and avatar, read from the Supabase user's Google identity on each visit,
   never stored in our tables. Whatever Google doesn't give stays empty and visible, never a placeholder name.
   `AccountChip` shows the handle when there is one, else the Google name, else what it shows today.
+- After a Google sign-in (`/auth/callback`): a player with no handle, who hasn't skipped on this device, sees one field,
+  **Name**, filled with their Google first name cut to the handle rule; Save stores it, Skip doesn't ask again here.
+  Every Google sign-in then shows **Welcome, Name** over a two-octave keyboard whose keys light up left to right
+  (still under `prefers-reduced-motion`), and goes on after about two seconds (Continue skips the wait).
 - **Handle:** the player can set or change it. The rule is the existing CHECK. The browser never writes: it calls a
   route under `web/src/app/auth/`, which checks the player's token, then writes only that player's `players.handle`
   with the secret key. A refused handle shows why and leaves the old one. An anonymous player can set one too (they're

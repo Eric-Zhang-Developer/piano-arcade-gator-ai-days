@@ -26,11 +26,78 @@ on a real piano. The arcade is the method.
 ## Fresh off the frontier
 
 The challenge asks for "a technology, dataset, or discovery first made publicly available within the past 12 months"
-([event.md](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/specs/context/event.md), section 1). Ours is Claude Opus 5.5, which Anthropic released on
-2026-09-22 ([announcement](https://www.anthropic.com/claude-opus-5-5), [system card](https://www-cdn.anthropic.com/fc1b44717c85dc068bc6ba5024219938094694bd/Claude%20Opus%205.5%20System%20Card.pdf)).
-It is the tutor's judgment: it picks each next step from the skill graph's candidates and runs the theory chat
-([decide/index.ts](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/src/learn/frontend/mastery/decide/index.ts), [tutor.ts](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/src/app/learn/api/chat/tutor.ts)).
-Without it the tutor falls back to a ranked list and has no chat. Decided on 2026-10-25 ([#10]).
+([event.md](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/specs/context/event.md), section 1). Ours is Claude Opus 5.5, which Anthropic released on 2026-09-22
+([announcement](https://www.anthropic.com/claude-opus-5-5), [system card](https://www-cdn.anthropic.com/fc1b44717c85dc068bc6ba5024219938094694bd/Claude%20Opus%205.5%20System%20Card.pdf)).
+Decided on 2026-10-25 ([#10]).
+
+Calling a model is not the story. The story is **stateful learning**: a model that remembers nothing between calls,
+given everything a great tutor remembers about a student, for every student at once.
+
+**The problem.** A tutor is worth it because they remember you: what you know, what you got wrong last week, what's
+slipping, and what you want to play. A model call starts from zero. Each request to the Messages API carries
+everything the model will know, and nothing stays behind
+([decide/index.ts](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/src/learn/frontend/mastery/decide/index.ts)). Ask a bare model "what should I practice?" and all it can do is guess.
+
+**How Étude carries the state.**
+
+- **Every attempt is kept.** Each theory answer and each played passage is saved: the skill, the item, right or
+  wrong, whether it was cold (a first try with no help), and how much help was on. It lands on the device first, then
+  in Supabase. The student's goal songs are saved too
+  ([migration](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/supabase/migrations/20261025000009_learning_attempts.sql), [remote/store.ts](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/src/learn/frontend/mastery/remote/store.ts)).
+- **The history becomes a state.** The engine replays every attempt into a state for each skill: its phase, the belief
+  that the student knows it, how many attempts counted, which items were seen, and when its next cold check is due
+  ([engine/replay.ts](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/src/learn/frontend/mastery/engine/replay.ts), [constants.ts](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/src/learn/frontend/mastery/engine/constants.ts)).
+- **The graph gives the state meaning.** 207 skills with 481 prerequisite links, so what the student knows says what
+  they're ready for ([curriculum](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/tree/main/web/src/learn/frontend/mastery/curriculum)). A new student isn't a blank either:
+  a diagnostic of up to 15 minutes seeds their state ([diagnostic/model.ts](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/src/learn/frontend/mastery/diagnostic/model.ts)).
+- **The state is the model's context.** Before each session, the server rebuilds the state from the attempts. It turns
+  the state into up to 20 candidate skills, each with its belief, its counted attempts, whether a check is due, whether
+  it's new, its links to mastered skills, and the goal songs that need it. That's what Opus 5.5 reads: the student,
+  boiled down to evidence ([decide/prompt.ts](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/src/learn/frontend/mastery/decide/prompt.ts), [candidates.ts](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/src/learn/frontend/mastery/decide/candidates.ts)).
+- **The model brings the judgment.** Its instructions are seven learning principles:
+  1. build on prior knowledge
+  2. try before being told
+  3. core ideas before details
+  4. at most 3 new skills
+  5. due checks so nothing slips
+  6. trust the record over confidence
+  7. diagnose before remedy
+
+  Opus 5.5 weighs one student's evidence against those principles, picks 3 to 5 steps and tells the student why in a
+  line. Its answer is checked against the graph, and anything outside the candidates is rejected
+  ([decide/prompt.ts](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/src/learn/frontend/mastery/decide/prompt.ts), [validate.ts](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/src/learn/frontend/mastery/decide/validate.ts)).
+- **The chat is bounded the same way.** The theory chat sees the question in focus and the student's attempts on it,
+  and is told to claim nothing beyond them ([tutor.ts](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/src/app/learn/api/chat/tutor.ts)).
+
+**Why it matters.** The model holds no student; the state does. Any number of students, each with their own history,
+get the same tutor's judgment applied to their own evidence. That's personalization at scale, and it's what a 10/10
+tutor for everyone needs.
+
+**We built Étude the same way.** Coding agents have the same problem: a session forgets everything when it ends or its
+context fills up. So we made the build stateful too, by engineering each agent's context:
+
+- **The spec is the memory.** [AGENTS.md](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/AGENTS.md) opens with "The spec is the source of truth. Chat and memory
+  aren't." Every agent run starts from files on `main`: the mission, the stack, the roadmap, the milestones and its
+  feature's spec. On 2026-10-25 at 19:54 UTC, `main` held 233 feature specs, 218 decision records and 205 done notes
+  ([`specs/features/`](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/tree/main/specs/features), [`specs/decisions/`](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/tree/main/specs/decisions), [`changes/`](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/tree/main/changes)).
+- **Lanes.** Each person owns a lane and its folders, and a worker serves only its person. CI checks every PR's files
+  against what its title allows, so agents can't step on each other's work
+  ([AGENTS.md](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/AGENTS.md#lanes), [check_ownership.py](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/.agents/scripts/check_ownership.py)).
+- **A talking agent and worker sessions.** In the learning lane, a talking agent holds the conversation with Andres and
+  a spec, slices the work into independent pieces, and starts one fresh Claude Code session per slice, each with only
+  its brief. Each worker ships its own PR and reports back in one line. Before a context compacts, a hook saves a brief
+  of everything in it, so a long run loses nothing. This setup lives in our local Claude Code config, not in the repo.
+  Its output is: 31 merged PRs mention the student-graph run in their description, from the foundation ([#770]) to
+  the end-to-end check ([#1263]).
+- **Asking instead of guessing.** When an agent hits a decision that belongs to a person, it files a `needs-human`
+  issue and moves on. 47 issues carried that label at 19:54 UTC
+  ([AGENTS.md](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/AGENTS.md#when-something-needs-a-person)).
+- **CI is the integrator.** No orchestrator merges anything. Each worker merges its own PR on green, after
+  [pr_ready.py](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/.agents/scripts/pr_ready.py) checks GitHub's whole verdict. A full browser run every 30 minutes
+  guards `main`, and a red run opens an issue ([ci.yml](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/.github/workflows/ci.yml)).
+
+838 PRs merged between 2026-10-24 01:11 UTC and 2026-10-25 19:52 UTC (`gh pr list --state merged`, measured at
+19:54 UTC).
 
 ## About the project
 
@@ -142,8 +209,8 @@ a part you can read:
   failure. One failed check keeps the skill; two in a row demote it. Every number is a standard knowledge-tracing
   value, not calibrated on real students
   ([constants.ts](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/src/learn/frontend/mastery/engine/constants.ts)).
-- **Claude picks what's next.** The server replays your attempts and builds up to 20 candidates from the graph,
-  scored by whether a check is due, the skill's layer, its links to skills you've mastered, and the songs you said you
+- **Claude picks what's next, from your state** (see [Fresh off the frontier](#fresh-off-the-frontier)). The server
+  replays your attempts and builds up to 20 candidates from the graph, scored by whether a check is due, the skill's layer, its links to skills you've mastered, and the songs you said you
   want to play, with at most 3 skills you've never touched. Claude Opus 5.5 picks 3 to 5 of them and says why. A reply
   that doesn't pass the graph check, an upstream error or a missing key falls back to the top candidates, and the plan
   says which one it is
@@ -176,8 +243,9 @@ a part you can read:
 - An ESP32 drives a WS2812B strip over the keys ([led-strip](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/changes/led-strip.md),
   [firmware results](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/firmware/RESULTS.md)).
 
-**The team.** Three people and a swarm of coding agents, specs first: a feature counts as done only when its done note
-with a check is on `main`. The counts, the CI times and how they were measured are in
+**The team.** Three people and a swarm of coding agents, made stateful through their context: specs first, lanes,
+worker sessions and CI as the integrator (see [Fresh off the frontier](#fresh-off-the-frontier)). A feature counts as
+done only when its done note with a check is on `main`. The counts, the CI times and how they were measured are in
 [judges.md](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/docs/judges.md#technicality-how-it-was-built) and [the build story](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/docs/story.md).
 
 ### Challenges we ran into
@@ -238,9 +306,9 @@ What's known not to be true yet ([judges.md](https://github.com/Eric-Zhang-Devel
 ## Built with
 
 Next.js, React, TypeScript, Web MIDI, Web Audio, three.js, OpenSheetMusicDisplay, Supabase (Postgres and Auth),
-Vitest, Playwright, GitHub Actions, the Anthropic API (Claude Opus 5.5: the theory chat and the next-step picker),
-ESP32, WS2812B
-([`web/package.json`](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/package.json), [tech-stack.md](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/specs/tech-stack.md),
+Vitest, Playwright, GitHub Actions, the Anthropic API (Claude Opus 5.5: the next-step planner, given the learner's
+state, and the theory chat), Claude Code (the coding agents), ESP32, WS2812B
+([CLAUDE.md](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/CLAUDE.md), [`web/package.json`](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/package.json), [tech-stack.md](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/specs/tech-stack.md),
 [led-strip](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/changes/led-strip.md), [decide/index.ts](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/blob/main/web/src/learn/frontend/mastery/decide/index.ts)).
 
 ## Links
@@ -267,7 +335,7 @@ judging only (decided on 2026-10-25).
 
 | Prize | What it needs | In the repo today |
 |---|---|---|
-| 1st / 2nd / 3rd | The main judging, on the challenge statement | Entering: Claude Opus 5.5 (see [Fresh off the frontier](#fresh-off-the-frontier)) |
+| 1st / 2nd / 3rd | The main judging, on the challenge statement | Entering: stateful learning on Claude Opus 5.5 (see [Fresh off the frontier](#fresh-off-the-frontier)) |
 | Best Open Source Project (MLH) | "a public GitHub repository with a clear open-source license" | Public repo; no license yet ([#958]) |
 | Best Use of Gemini (MLH) | Built with the Gemini API or Google AI Studio | No Gemini call in the code |
 | Best Use of the Twinly API | Twinly's computer-use, voice-clone calling or iMessage APIs | None |
@@ -285,3 +353,5 @@ judging only (decided on 2026-10-25).
 [#792]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/792
 [#874]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/874
 [#958]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/958
+[#770]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/770
+[#1263]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/1263

@@ -2,8 +2,9 @@
 
 An arcade rhythm game played on a real 88-key piano (a Yamaha DGX-660) in Chrome. Notes fall toward the keys,
 every note you play is judged against the chart's clock to the millisecond, and the results screen shows how you
-played it: PERFECT, GREAT, GOOD, MISS and WRONG, how early or late, combo and rank. A learning side will read your takes
-and tell you what to practice next; today it runs on a sample learner.
+played it: PERFECT, GREAT, GOOD, MISS and WRONG, how early or late, combo and rank. The learning side, a tutor at
+`/learn`, finds what you know with a short diagnostic, picks what to practice next with Claude, and listens to every
+passage you play; it doesn't read your `/play` takes yet ([#874](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/874)).
 
 **Judging this project?** Start with [`docs/judges.md`](docs/judges.md), then [Run it for judging](#run-it-for-judging).
 
@@ -28,7 +29,7 @@ pnpm dev            # http://localhost:3000: the song select
 | `/play?song=<id>` | The game. Plug a MIDI piano in over USB and Chrome asks for MIDI access. With no piano, the home row plays the white keys (`A` through `;`), the row above plays the black keys between them, and Z / X move them an octave. |
 | `/play?midi=sim` | The game on a virtual DGX-660 instead of real MIDI. |
 | `/sim` | The piano simulator: the game, a virtual keyboard, a raw MIDI log, fault buttons (stall, unplug, jitter, stuck note) and a bot that plays the song perfectly. `/sim?record` records a real piano into a test fixture. |
-| `/learn` | The learning side (the nav's **Learn**) and its activities. It runs on an authored sample learner and isn't connected to your takes or an account yet ([#874](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/874)). Its activities: `/learn/understand` (explore a musical idea), `/learn/practice` (a short passage with guidance), `/learn/review/theory` (recall the idea) and `/learn/play-through` (the whole melody, feedback after the last bar); `/learn/brand-preview` is a brand direction review, and `/learn/review` redirects to `/learn`. A student with no answers yet lands in the diagnostic (`/learn/diagnostic`) first. |
+| `/learn` | The tutor (the nav's **Learn**). A new student names the songs they want to play, then takes the diagnostic (`/learn/diagnostic`, up to 15 minutes); after that `/learn` opens on a map of music skills with the next step ready to start. Its steps: `/learn/understand` (explore a musical idea, with a theory chat), `/learn/review/theory` (recall the idea), `/learn/practice` (a passage with help that fades), `/learn/check` (a cold check: at tempo, both hands, no help) and `/learn/play-through` (the whole piece, feedback after the last bar). `/learn/goals` changes the songs you're aiming at. Attempts save on the device first, and on the server when Supabase is configured; the tutor doesn't read your `/play` takes yet ([#874](https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/874)). `/learn/brand-preview` is a brand direction review, and `/learn/review` redirects to `/learn`. |
 | `/sheet?song=<id>` | The chart's score as sheet music, following the take while `/play` runs. |
 | `/stage` | The live take on NOSTALGIA's hill, for people watching on a second display. `/play`'s start screen opens it. |
 | `/calibrate` | Tap along to 12 clicks to measure your latency offset. |
@@ -71,8 +72,8 @@ work, and takes save in the browser's localStorage. These features read keys fro
 | Variable | Used by | Without it |
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Sign-in, the account chip, server-saved takes, `/progress` from the server (`web/src/data/config.ts`) | No sign-in; takes stay in localStorage |
-| `SUPABASE_SECRET_KEY` | The server routes that save and read takes (`web/src/data/server.ts`) | Takes aren't saved on the server |
-| `ANTHROPIC_API_KEY` | The learning side's theory chat (`web/src/app/learn/api/chat/route.ts`) | The chat shows it isn't configured, never a reply |
+| `SUPABASE_SECRET_KEY` | The server routes that save and read takes (`web/src/data/server.ts`) and the tutor's attempts and goals (`web/src/app/learn/api/attempts/route.ts`) | Takes and attempts aren't saved on the server |
+| `ANTHROPIC_API_KEY` | The learning side's theory chat (`web/src/app/learn/api/chat/route.ts`) and next-step picker (`web/src/app/learn/api/next/route.ts`) | The chat shows it isn't configured, never a reply; Next falls back to the top-scored candidates |
 
 Never commit `web/.env.local`, and never put a secret in a `NEXT_PUBLIC_` name.
 

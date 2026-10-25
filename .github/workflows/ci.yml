@@ -6,10 +6,10 @@ on:
     types: [opened, synchronize, reopened, edited]   # edited: fixing a PR title reruns the checks
   push:
     branches: [main]
-  # The full browser suite: every 30 min on main, and by hand (Actions > ci > Run workflow). A PR and a push run the
-  # smoke check only (decision ci-browser-pr-scope.md, Eric 2026-10-25).
+  # The full browser suite: at :00, :20 and :40 on main (Eric 2026-10-25: "do it at 0, 20, 40 ok"), and by hand
+  # (Actions > ci > Run workflow). A PR and a push run the smoke check only (decision ci-browser-pr-scope.md).
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "0,20,40 * * * *"
   workflow_dispatch:
 
 concurrency:

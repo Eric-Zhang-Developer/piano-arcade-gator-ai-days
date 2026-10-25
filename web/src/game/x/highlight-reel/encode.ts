@@ -38,48 +38,60 @@ export async function encode(
   sound: AudioBuffer,
   drawFrame: (n: number) => void,
   onProgress: (frame: number) => void,
+  signal?: AbortSignal, // the page leaving (#1320): the recorder, the capture track and the AudioContext all close
 ): Promise<Encoded> {
   const mimeType = encodeSettings.mimeTypes.find((m) => MediaRecorder.isTypeSupported(m)) ?? "";
   const ac = new AudioContext({ sampleRate: sound.sampleRate });
-  await ac.resume();
-  const dest = ac.createMediaStreamDestination();
-  const src = ac.createBufferSource();
-  src.buffer = sound;
-  src.connect(dest);
   const video = canvas.captureStream(0).getVideoTracks()[0] as CaptureTrack;
-  const rec = new MediaRecorder(new MediaStream([video, ...dest.stream.getAudioTracks()]), {
-    mimeType: mimeType || undefined,
-    videoBitsPerSecond: encodeSettings.videoBitsPerSecond,
-  });
+  let rec: MediaRecorder | null = null;
   const chunks: Blob[] = [];
-  rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
-  const stopped = new Promise<void>((r) => (rec.onstop = () => r()));
-
-  drawFrame(0);
-  rec.start();
-  const t0 = ac.currentTime + encodeSettings.leadS;
-  src.start(t0);
   let n = 0;
   let late = 0;
   const drawn: number[] = [];
-  while (n < S.frames) {
-    const due = (ac.currentTime - t0 - encodeSettings.avLatencyMs / 1000) * S.fps;
-    if (due >= n) {
-      if (due - n > 1) late++;
-      const t = performance.now();
-      drawFrame(n);
-      drawn.push(performance.now() - t);
-      video.requestFrame();
-      onProgress(n);
-      n++;
-    } else await tick();
+  try {
+    await ac.resume();
+    signal?.throwIfAborted();
+    const dest = ac.createMediaStreamDestination();
+    const src = ac.createBufferSource();
+    src.buffer = sound;
+    src.connect(dest);
+    rec = new MediaRecorder(new MediaStream([video, ...dest.stream.getAudioTracks()]), {
+      mimeType: mimeType || undefined,
+      videoBitsPerSecond: encodeSettings.videoBitsPerSecond,
+    });
+    rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+    const r = rec;
+    const stopped = new Promise<void>((done) => (r.onstop = () => done()));
+
+    drawFrame(0);
+    rec.start();
+    const t0 = ac.currentTime + encodeSettings.leadS;
+    src.start(t0);
+    while (n < S.frames) {
+      signal?.throwIfAborted();
+      const due = (ac.currentTime - t0 - encodeSettings.avLatencyMs / 1000) * S.fps;
+      if (due >= n) {
+        if (due - n > 1) late++;
+        const t = performance.now();
+        drawFrame(n);
+        drawn.push(performance.now() - t);
+        video.requestFrame();
+        onProgress(n);
+        n++;
+      } else await tick();
+    }
+    while (ac.currentTime < t0 + encodeSettings.avLatencyMs / 1000 + S.frames / S.fps + encodeSettings.tailS) {
+      signal?.throwIfAborted();
+      await tick();
+    }
+    rec.stop();
+    await stopped;
+  } finally {
+    if (rec && rec.state !== "inactive") rec.stop();
+    video.stop();
+    await ac.close();
   }
-  while (ac.currentTime < t0 + encodeSettings.avLatencyMs / 1000 + S.frames / S.fps + encodeSettings.tailS) await tick();
-  rec.stop();
-  await stopped;
-  video.stop();
-  await ac.close();
   drawn.sort((a, b) => a - b);
   const q = (p: number) => drawn[Math.min(drawn.length - 1, Math.floor(p * (drawn.length - 1)))];
-  return { blob: new Blob(chunks, { type: mimeType || "video/webm" }), mimeType: rec.mimeType || mimeType, framesRequested: n, framesLate: late, drawMs: { median: q(0.5), p95: q(0.95) } };
+  return { blob: new Blob(chunks, { type: mimeType || "video/webm" }), mimeType: rec?.mimeType || mimeType, framesRequested: n, framesLate: late, drawMs: { median: q(0.5), p95: q(0.95) } };
 }

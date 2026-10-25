@@ -1,9 +1,10 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Chart, Judgment, Results, Take } from "../../../contracts";
 import { msPerBeat } from "../../core/settings";
 import { bestRun, cut, expectedOnsetsMs, highlightSettings as S, reelMsOf, slowRateAt, slowSourceFrames, takeTimeAt, type Edl } from "./cut";
+import { encode } from "./encode";
 import { detectOnsets, matchOnsets } from "./onsets";
 import { focusSave, ReelStatus, renderLock } from "./status";
 
@@ -175,5 +176,30 @@ describe("Render reel's focus and the done line (lab-pages-a11y, #1143)", () => 
     expect(before).toMatch(/role="status"[^>]*>Plays the reel once/);
     const after = renderToStaticMarkup(createElement(ReelStatus, { state: "done", video: { bytes: 4_200_000, late: 3 } }));
     expect(after).toMatch(/role="status"[^>]*>4\.2 MB WebM · 3 late frames<\/p>$/);
+  });
+});
+
+describe("leaving mid-render (#1320)", () => {
+  afterEach(() => vi.unstubAllGlobals());
+  it("an aborted encode stops the recorder and the capture track, and closes its AudioContext", async () => {
+    let clock = 0;
+    const ac = { get currentTime() { return (clock += 0.005); }, close: vi.fn(async () => {}), resume: async () => {}, createMediaStreamDestination: () => ({ stream: { getAudioTracks: () => [] } }), createBufferSource: () => ({ connect() {}, start() {} }) };
+    const rec = { state: "inactive", start: vi.fn(() => (rec.state = "recording")), stop: vi.fn(() => (rec.state = "inactive")), mimeType: "video/webm" };
+    vi.stubGlobal("AudioContext", function () {
+      return ac;
+    });
+    vi.stubGlobal("MediaRecorder", Object.assign(function () {
+      return rec;
+    }, { isTypeSupported: () => true }));
+    vi.stubGlobal("MediaStream", function () {});
+    const track = { stop: vi.fn(), requestFrame() {} };
+    const canvas = { captureStream: () => ({ getVideoTracks: () => [track] }) } as unknown as HTMLCanvasElement;
+    const abort = new AbortController();
+    let frames = 0;
+    const going = encode(canvas, { sampleRate: 48_000 } as AudioBuffer, () => {}, () => ++frames === 5 && abort.abort(), abort.signal); // the clock runs on as it's read
+    await expect(going).rejects.toThrow();
+    expect(rec.stop).toHaveBeenCalledOnce();
+    expect(track.stop).toHaveBeenCalledOnce();
+    expect(ac.close).toHaveBeenCalledOnce();
   });
 });

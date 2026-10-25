@@ -105,6 +105,11 @@ export function Highlight() {
   const renderHasFocus = useRef(false);
   const renderHadFocus = useRef(false); // read as the reel finishes, before Render unmounts (and maybe blurs)
   const prevState = useRef<State>("loading");
+  const rendering = useRef<AbortController | null>(null);
+  // Leaving mid-render ends the encode and its AudioContext; a finished reel's object URL goes with it, or with the next
+  // reel (#1320).
+  useEffect(() => () => rendering.current?.abort(), []);
+  useEffect(() => () => void (video && URL.revokeObjectURL(video.url)), [video]);
 
   useEffect(() => {
     takeFor(new URLSearchParams(params.toString()))
@@ -173,10 +178,11 @@ export function Highlight() {
     const ctx = monitor.current.getContext("2d")!;
     setPhase("rendering");
     hook.state = "rendering";
+    const abort = (rendering.current = new AbortController());
     try {
       const sound = await renderAudio(edl, saved.take);
       hook.audioHash = audioHash(sound);
-      const out = await encode(monitor.current, sound, (n) => drawer.drawFrame(ctx, n), (n) => n % 6 === 0 && setFrame(n));
+      const out = await encode(monitor.current, sound, (n) => drawer.drawFrame(ctx, n), (n) => n % 6 === 0 && setFrame(n), abort.signal);
       blobRef.current = out.blob;
       Object.assign(hook, { framesRequested: out.framesRequested, framesLate: out.framesLate, drawMs: out.drawMs, blobBytes: out.blob.size, mimeType: out.mimeType, state: "done" });
       setVideo({ url: URL.createObjectURL(out.blob), bytes: out.blob.size, late: out.framesLate });
@@ -184,6 +190,7 @@ export function Highlight() {
       renderHadFocus.current = renderHasFocus.current;
       setPhase("done");
     } catch (e) {
+      if (abort.signal.aborted) return; // the page has gone
       setError((e as Error).message);
       setPhase("error");
       hook.state = "error";

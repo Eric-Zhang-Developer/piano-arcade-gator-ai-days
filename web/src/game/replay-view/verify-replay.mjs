@@ -84,12 +84,16 @@ try {
   if (worst > 20) fail.push(`a note was ${worst.toFixed(1)} ms from its marker's crossing`);
   say(`verify-replay: ${ons.length} replayed notes; send time vs marker crossing: max ${worst.toFixed(2)} ms (clock), max ${worstFrame.toFixed(1)} ms (first frame past the line)`);
 
-  // Esc closes a second replay early.
+  // Esc closes a second replay early. The replay is a modal dialog (#1245): Stop has focus while it's open, and focus
+  // goes back to Watch replay after.
+  const focused = () => frame.evaluate(() => document.activeElement?.getAttribute("data-testid") ?? null);
   await game.getByTestId("watch-replay").click();
   await page.waitForTimeout(1500);
+  if ((await focused()) !== "replay-stop") fail.push(`Stop wasn't focused in the open replay (${await focused()})`);
   await page.keyboard.press("Escape");
   await page.waitForTimeout(300);
   if (await game.getByTestId("replay-overlay").count()) fail.push("Esc didn't close the replay");
+  else if ((await focused()) !== "watch-replay") fail.push(`focus didn't go back to Watch replay (${await focused()})`);
   fail.push(...errors);
   writeFileSync(join(out, "replay.json"), JSON.stringify({ gaps, hook }, null, 2));
   if (fail.length) throw new Error(fail.join("; "));

@@ -1,7 +1,10 @@
 import { readFileSync } from "node:fs";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { stampStartMs } from "../rank-stamp";
 import { initialsOf, pressKey, type Outcome } from "../records";
+import { InitialsSaid } from ".";
 import { momentTimes, showsMoment } from "./timing";
 
 describe("record-moment timing", () => {
@@ -48,5 +51,17 @@ describe("record-moment's look (Duo kit, #1138)", () => {
     const at = (h: number) => Math.min(+max, Math.max(+min, (+vh * h) / 100));
     expect(Math.round(at(720))).toBe(16);
     expect(Math.round(at(1080))).toBe(24);
+  });
+});
+
+describe("the initials are heard (#1247)", () => {
+  const said = (letters: string[], done = false, saved = false) => renderToStaticMarkup(createElement(InitialsSaid, { letters, done, saved }));
+  const live = /^<p class="[^"]*" role="status" aria-live="polite" data-testid="initials-said">(.*)<\/p>$/;
+
+  it("one polite region carries the letters so far, then the saved line", () => {
+    expect(said([]).match(live)![1]).toBe("");
+    expect(said(["E", "Z"]).match(live)![1]).toBe("Initials: E Z");
+    expect(said(["E", "Z", "A"], true, true).match(live)![1]).toBe("EZA · saved");
+    expect(said(["E", "Z", "A"], true, false).match(live)![1]).toBe("EZA · couldn&#x27;t be saved");
   });
 });

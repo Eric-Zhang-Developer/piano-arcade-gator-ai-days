@@ -145,7 +145,9 @@ describe("the panels", () => {
     expect(bands).toContain(">BARS 9–12<");
     const tutor = html(duoTutor(), ctx(furElise, missed, "song=fur-elise&hands=R&bot=perfect"))!;
     expect(tutor).toContain("PRACTICE BARS 9–12");
-    expect(tutor).toContain('data-href="/play?song=fur-elise&amp;hands=R&amp;from=9&amp;to=12&amp;tempo=70"');
+    // A link in the kit's primary look, not a button that navigates (#1244).
+    expect(tutor).toMatch(/<a data-testid="duo-practice" href="\/play\?song=fur-elise&amp;hands=R&amp;from=9&amp;to=12&amp;tempo=70" class="[^"]*primary[^"]*"/);
+    expect(tutor).not.toContain("<button");
     expect(tutor).toContain("Bars 9–12 were your weakest: 0% accuracy.");
   });
 

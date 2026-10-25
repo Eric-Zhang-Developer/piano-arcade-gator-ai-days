@@ -62,6 +62,17 @@
   font: clamp(16px, 2.223vh, 24px) var(--pa-font-data), ui-monospace, monospace;
 }
 
+/* The live region: heard, not seen. Out of flow, so the grid's rows and gaps don't change. */
+.said {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .saved {
   font: 800 clamp(22px, 3.4vh, 36px) var(--pa-font-display), system-ui, sans-serif;
   letter-spacing: 0.06em;

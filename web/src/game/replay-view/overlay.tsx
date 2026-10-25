@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Chart, Results, Take } from "../../contracts";
 import { drawHighway, makeLayout } from "../core/highway";
 import { settings } from "../core/settings";
-import { Button } from "../duo-tokens";
+import { Button, MonoLabel } from "../duo-tokens";
 import { wrong } from "../ui-tokens";
 import { getReplayState, pianoOutSettings, startReplay, stopReplay } from "../piano-out";
 import { highwayAt, latePresses, replayChartTime, replaySpan } from ".";
@@ -21,20 +21,40 @@ declare global {
 
 export function ReplayButton(props: Props) {
   const [open, setOpen] = useState(false);
+  const button = useRef<HTMLSpanElement>(null);
+  const was = useRef(false);
   const close = useCallback(() => setOpen(false), []); // stable, so a re-render of the results doesn't restart the replay
+  // Focus goes back to Watch replay once the dialog is gone (#1245): while it's open, the page behind is inert.
+  useEffect(() => {
+    if (was.current && !open) button.current?.querySelector("button")?.focus();
+    was.current = open;
+  }, [open]);
   return (
     <>
-      <Button kind="secondary" data-testid="watch-replay" onClick={() => setOpen(true)}>
-        Watch replay
-      </Button>
+      <span ref={button} style={{ display: "contents" }}>
+        <Button kind="secondary" data-testid="watch-replay" onClick={() => setOpen(true)}>
+          Watch replay
+        </Button>
+      </span>
       {open && <ReplayOverlay {...props} onClose={close} />}
     </>
   );
 }
 
-function ReplayOverlay({ chart, take, results, onClose }: Props & { onClose(): void }) {
+// A native modal <dialog> (#1245), as the Controls card is: the page behind is inert and Tab stays on Stop. Esc is
+// still ours (the keydown below), so the replay stops the same way whichever closes it.
+export function ReplayOverlay({ chart, take, results, onClose }: Props & { onClose(): void }) {
   const canvas = useRef<HTMLCanvasElement>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
+  const stop = useRef<HTMLSpanElement>(null);
   const [sound] = useState(() => getReplayState().canReplay);
+
+  useEffect(() => {
+    const d = dialog.current!;
+    if (!d.open) d.showModal();
+    stop.current?.querySelector("button")?.focus();
+    return () => d.close();
+  }, []);
 
   useEffect(() => {
     const c = canvas.current!;
@@ -118,15 +138,37 @@ function ReplayOverlay({ chart, take, results, onClose }: Props & { onClose(): v
     };
   }, [chart, take, results, sound, onClose]);
 
+  // The caption and Stop read on video (16 px at 1280, 24 at 1920). The caption carries no key hint: Stop's title does,
+  // and the ? card lists Esc (#1246).
   return (
-    <div data-testid="replay-overlay" style={{ position: "fixed", inset: 0, zIndex: 20, background: "#000" }}>
+    <dialog ref={dialog} data-testid="replay-overlay" aria-labelledby="replay-caption" style={full}>
       <canvas ref={canvas} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
-      <div style={{ position: "absolute", top: 16, left: 0, right: 0, textAlign: "center", fontSize: 16, color: "rgba(255,255,255,0.8)" }}>
-        Replay{sound ? " on the piano" : ": no piano connected, so it's silent"} · Esc to stop
-      </div>
-      <Button kind="secondary" data-testid="replay-stop" onClick={onClose} style={{ position: "absolute", top: 12, right: 16 }}>
-        Stop
-      </Button>
-    </div>
+      <p id="replay-caption" style={{ position: "absolute", top: 16, left: 0, right: 0, margin: 0, textAlign: "center" }}>
+        <MonoLabel dim={false} style={{ fontSize: "clamp(16px, 1.25vw, 24px)", textTransform: "none", letterSpacing: "0.04em" }}>
+          Replay{sound ? " on the piano" : ": no piano connected, so it's silent"}
+        </MonoLabel>
+      </p>
+      <span ref={stop} style={{ position: "absolute", top: 12, right: 16 }}>
+        <Button kind="secondary" data-testid="replay-stop" onClick={onClose} title="Stop (Esc)" aria-keyshortcuts="Escape" style={{ fontSize: "clamp(16px, 1.25vw, 24px)" }}>
+          Stop
+        </Button>
+      </span>
+    </dialog>
   );
 }
+
+// The dialog covers the screen: the browser's own dialog box (border, padding, max sizes) is undone.
+const full = {
+  position: "fixed",
+  inset: 0,
+  width: "100%",
+  height: "100%",
+  maxWidth: "none",
+  maxHeight: "none",
+  margin: 0,
+  padding: 0,
+  border: "none",
+  background: "#000",
+  color: "var(--pa-ink)",
+  zIndex: 20,
+} as const;

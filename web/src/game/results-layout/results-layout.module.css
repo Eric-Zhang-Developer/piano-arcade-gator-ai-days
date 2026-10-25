@@ -264,3 +264,8 @@
   align-items: center;
   margin-top: 24px;
 }
+
+/* A Flow take's held tempo in the stats line: in ink, since below 90% it caps the rank (play-modes). */
+.tempo {
+  color: var(--pa-ink);
+}

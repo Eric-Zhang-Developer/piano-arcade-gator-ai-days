@@ -5,6 +5,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type { GamePlugin, Results } from "../../contracts";
 import { Brackets, Button, DataCell, MonoLabel, Panel } from "../duo-tokens";
+import { FlowJudge } from "../flow-mode/judge";
+import { playMode } from "../play-modes/modes";
 import { Slots } from "../play-slots/ui";
 import { showsMoment } from "../record-moment/timing";
 import { takeOutcome } from "../records";
@@ -81,6 +83,7 @@ export function ResultsLayout({
   settings,
   params = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search),
   newRecord = showsMoment(takeOutcome()),
+  heldTempo = playMode(params) === "flow" ? (FlowJudge.live?.heldTempo ?? null) : null,
 }: {
   results: Results;
   title?: string; // the song's title, beside the rank
@@ -94,6 +97,7 @@ export function ResultsLayout({
   settings?: ReactNode; // latency, sound and MIDI controls: last, under the details
   params?: URLSearchParams; // the take's URL; /play's own when not given
   newRecord?: boolean; // this take set a new record (records' outcome when not given): record-moment's first view
+  heldTempo?: number | null; // a Flow take's held tempo, beside the rank, since it caps the rank (play-modes)
 }) {
   const { actions } = resultsLayoutSettings;
   const featured = featuredFor(params, newRecord);
@@ -129,6 +133,11 @@ export function ResultsLayout({
                   Wrong <span className={styles.wrong}>✕ <Tally value={results.counts.wrong ?? 0} index={tallies - 2} of={tallies} testid="count-wrong" /></span>
                   {" · "}Extra <Tally value={results.counts.extra} index={tallies - 1} of={tallies} testid="count-extra" />
                   {" · "}Score <span data-testid="score">{score === undefined ? "—" : score.toLocaleString("en-US")}</span>
+                  {heldTempo !== null && (
+                    <>
+                      {" · "}Tempo <span data-testid="held-tempo" className={styles.tempo}>{heldTempo}%</span>
+                    </>
+                  )}
                 </MonoLabel>
               </p>
             </div>

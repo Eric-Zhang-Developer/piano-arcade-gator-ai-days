@@ -15,11 +15,6 @@
   text-transform: uppercase;
 }
 
-/* The start screen's modes row is a 2-column grid: the ladder takes the whole row. */
-.wide {
-  grid-column: 1 / -1;
-}
-
 .rung {
   display: flex;
   align-items: baseline;
@@ -30,19 +25,13 @@
   padding: 1.1vh 0.6em;
   border: 1px solid var(--pa-line);
   border-radius: 0;
-  color: var(--pa-ink-dim);
+  color: var(--pa-ink);
   text-decoration: none;
   white-space: nowrap;
   transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
 }
 
-.num {
-  font-weight: 400;
-  opacity: 0.7;
-}
-
 a.rung:hover {
-  color: var(--pa-ink);
   background: rgba(125, 132, 150, 0.12);
 }
 
@@ -56,7 +45,6 @@ a.rung:focus-visible {
 }
 
 .next {
-  color: var(--pa-ink);
   border-color: var(--pa-primary);
 }
 
@@ -75,17 +63,21 @@ a.rung:focus-visible {
   align-self: center;
   padding: 0 0.5em;
   color: var(--pa-ink-dim);
-  opacity: 0.6;
 }
 
-/* The select's read-only mark: the same rungs, slimmer; a step reached is ink, the furthest one lit. */
+/* The select's read-only mark: the same rungs, slimmer; a step not reached is dim, one reached ink, the furthest lit. */
 .mark .rung {
+  color: var(--pa-ink-dim);
   padding: 0.55vh 0.4em;
   font-size: clamp(11px, 0.75vw, 14px);
 }
 
-.reached {
+.mark .reached {
   color: var(--pa-ink);
+}
+
+.mark .current {
+  color: var(--pa-primary);
 }
 
 @media (prefers-reduced-motion: reduce) {

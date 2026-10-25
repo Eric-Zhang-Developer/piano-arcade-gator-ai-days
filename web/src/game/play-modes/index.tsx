@@ -40,15 +40,10 @@ export function Ladder({ params, at, focus }: { params: URLSearchParams; at: "st
     if (focus) ref.current?.focus();
   }, [focus]);
   return (
-    <nav aria-label="Play mode" className={at === "start" ? styles.wide : undefined} data-testid="ladder" data-mode={now}>
+    <nav aria-label="Play mode" data-testid="ladder" data-mode={now}>
       <ol className={styles.ladder}>
         {MODES.map((m, i) => {
-          const label = (
-            <>
-              <span className={styles.num}>{i + 1}</span>
-              {modeName[m]}
-            </>
-          );
+          const label = modeName[m];
           return [
             i > 0 && (
               <li key={`${m}-chev`} className={styles.chev} aria-hidden>

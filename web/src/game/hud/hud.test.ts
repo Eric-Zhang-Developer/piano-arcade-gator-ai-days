@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import type { Chart, GameEvent } from "../../contracts";
-import { makeLayout } from "../core/highway";
+import { judgmentPlace, makeLayout } from "../core/highway";
 import { Judge } from "../core/judge";
 import { GOOD_MS, msPerBeat } from "../core/settings";
-import { emptyHud, hud, hudBottom, hudLayout, hudSettings, reduceHud, rollup, tierFlash, tierFor, tierProgress } from ".";
+import { comboAlpha, comboHeat, emptyHud, hud, hudBottom, hudLayout, hudSettings, mixHex, reduceHud, rollup, tierFlash, tierFor, tierProgress } from ".";
 
 // What the judge sends for a hit: noteHit, then combo, then comboMilestone at 25.
 function hits(judgment: "PERFECT" | "GREAT", n: number, comboBefore: number): GameEvent[] {
@@ -169,7 +169,7 @@ describe("the combo in the band (combo-hud)", () => {
     [1920, 1080],
   ] as const;
 
-  it.each(sizes)("at %ix%i the song tag and the combo cluster sit in the band, apart, clear of beat-track's gutter", (w, h) => {
+  it.each(sizes)("at %ix%i the song tag and the cluster sit in the band, apart, clear of beat-track's gutter; the combo is at top centre under the band (#1404)", (w, h) => {
     const l = hudLayout(w, makeLayout(chart, w, h, 0).judgmentLineY);
     for (const b of [l.tag, l.cluster]) {
       expect(b.x1).toBeGreaterThan(b.x0);
@@ -178,14 +178,28 @@ describe("the combo in the band (combo-hud)", () => {
     }
     expect(l.tag.x1).toBeLessThan(l.cluster.x0);
     expect(l.cluster.x1).toBeLessThanOrEqual(w - hudSettings.statusGutterPx);
-    expect(l.combo.cx).toBeGreaterThan(l.cluster.x0);
-    expect(l.combo.cx).toBeLessThan(l.stack.x);
+    expect(l.stack.x).toBeGreaterThan(l.cluster.x0);
     expect(l.stack.x).toBeLessThan(l.cluster.x1);
+    // #1404 moved the combo out of the cluster: centred, its room clear of the tag and the cluster, COMBO under the
+    // band and the numeral under COMBO, all above the notes' landing zone.
+    expect(l.combo.cx).toBe(w / 2);
+    expect(l.combo.cx - l.combo.room / 2).toBeGreaterThan(l.tag.x1);
+    expect(l.combo.cx + l.combo.room / 2).toBeLessThan(l.cluster.x0);
+    expect(l.combo.labelY - l.stack.px / 2).toBeGreaterThanOrEqual(l.panel.h);
+    expect(l.combo.cy - l.combo.size * 0.35).toBeGreaterThan(l.combo.labelY);
+    expect(hudBottom(l)).toBeLessThanOrEqual(l.safeY);
   });
 
-  it("readable on video: at 1920x1080 the combo numeral is at least 64 px and its labels at least 16 px", () => {
+  it.each(sizes)("at %ix%i the combo's COMBO label sits under the judgment word's place (judgmentPlace)", (w, h) => {
+    const line = makeLayout(chart, w, h, 0).judgmentLineY;
+    const l = hudLayout(w, line);
+    expect(l.combo.labelY - l.stack.px / 2).toBeGreaterThanOrEqual(judgmentPlace(w, line).bottom);
+    expect(l.combo.labelY - l.stack.px / 2).toBeLessThan(judgmentPlace(w, line).bottom + l.stack.px);
+  });
+
+  it("readable on video: at 1920x1080 the combo numeral is about 120 px (#1404) and its labels at least 16 px", () => {
     const l = hudLayout(1920, makeLayout(chart, 1920, 1080, 0).judgmentLineY);
-    expect(l.combo.size).toBeGreaterThanOrEqual(64);
+    expect(l.combo.size).toBeGreaterThanOrEqual(110);
     expect(Math.round(l.stack.px)).toBeGreaterThanOrEqual(16);
   });
 
@@ -226,14 +240,38 @@ describe("the combo in the band (combo-hud)", () => {
   };
   const comboFills = (d: ReturnType<typeof drawAt>, n: number) => d.fills.filter((f) => f.text === String(n) && f.x === d.l.combo.cx);
 
-  it.each(sizes)("at %ix%i, combo 120 just after the 100 milestone: every fill stays in the band, the combo at full strength", (w, h) => {
+  it.each(sizes)("at %ix%i, combo 120 just after the 100 milestone: all but the combo stays in the band, the combo's swell and ghost above the notes, at full strength", (w, h) => {
     const d = drawAt(120, 100, 100, w, h);
-    for (const f of d.fills) expect(f.bottom).toBeLessThanOrEqual(d.band + 0.01);
+    for (const f of d.fills) expect(f.bottom).toBeLessThanOrEqual(f.x === d.l.combo.cx ? d.l.safeY : d.band + 0.01);
     const n = comboFills(d, 120);
     expect(n).toHaveLength(1);
     expect(n[0].alpha).toBe(1);
     expect(d.fills.some((f) => f.alpha === 0.2)).toBe(false);
     expect(comboFills(d, 100)).toHaveLength(1); // the ghost
+  });
+
+  it.each(sizes)("at %ix%i, combo 37 at rest: every fill stays above hudBottom", (w, h) => {
+    const d = drawAt(37, null, 500, w, h);
+    expect(comboFills(d, 37)).toHaveLength(1);
+    for (const f of d.fills) expect(f.bottom).toBeLessThanOrEqual(hudBottom(d.l) + 0.01);
+  });
+
+  it("the combo is hidden at 0 and 1, fades in over 2–5, and is whole from 5", () => {
+    expect([0, 1, 2, 3, 4, 5, 120].map(comboAlpha)).toEqual([0, 0, 0.25, 0.5, 0.75, 1, 1]);
+    expect(comboFills(drawAt(1, null, 500), 1)).toHaveLength(0);
+  });
+
+  it("fever's heat eases in from feverStart and out from feverEnd", () => {
+    const ms = hudSettings.heatMs;
+    expect(comboHeat(null, 5000)).toBe(0);
+    expect([0, ms / 2, ms, ms * 3].map((t) => comboHeat({ on: true, atMs: 1000 }, 1000 + t))).toEqual([0, 0.5, 1, 1]);
+    expect([0, ms / 2, ms].map((t) => comboHeat({ on: false, atMs: 1000 }, 1000 + t))).toEqual([1, 0.5, 0]);
+  });
+
+  it("fever warms the numeral from primary to amber", () => {
+    expect(mixHex("#2b9bff", "#ffb02e", 0)).toBe("#2b9bff");
+    expect(mixHex("#2b9bff", "#ffb02e", 1)).toBe("#ffb02e");
+    expect(mixHex("#000000", "#ffffff", 0.5)).toBe("#808080");
   });
 
   it("a milestone at 25 doesn't swell the combo; one at 50 does", () => {

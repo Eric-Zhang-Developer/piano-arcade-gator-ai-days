@@ -1,5 +1,6 @@
-// Arcade HUD in the Duo look: a bracketed song tag top left (BAR n / N and a progress line) and a bracketed combo
-// cluster top right (the combo, its multiplier, ACC and SCORE), in the band up top (specs: hud, combo-hud, duo-hud).
+// Arcade HUD in the Duo look: a bracketed song tag top left (BAR n / N and a progress line), a bracketed cluster top
+// right (the multiplier, ACC and SCORE), and the combo itself at top centre under the band, NOSTALGIA-style, in the
+// moment face (specs: hud, combo-hud, duo-hud; #1404).
 // Driven by GameEvents and the clock; reduceHud and hudLayout are pure so tests can pin them.
 import type { Chart, Frame, GameEvent, GamePlugin } from "../../contracts";
 import { barLines, type BarLine } from "../bar-lines";
@@ -12,7 +13,14 @@ import { bg, gold, good, ink, inkDim, line as hairline, miss, panel, primary, ti
 // visual-direction.md's --pa-line: ink-dim at about 25%, for the divider and the progress line's track.
 
 export const hudSettings = {
-  comboFrom: 5, // the combo number shows from this combo
+  comboFrom: 5, // the combo number is fully shown from this combo, fading in from fadeFrom (hidden at 0 and 1)
+  fadeFrom: 2,
+  comboFraction: 0.15, // the numeral's em size, of the judgment line's height: about 130 px at 1080p (#1404)
+  popMs: 110, // each increment ticks the numeral up and back; short, so a fast run reads as a pulse, not a jitter
+  popScale: 1.08,
+  feverColor: "#ffb02e", // fever's amber (fever-arc's wisps use the same): the numeral warms with fever's heat
+  heatMs: 400, // the warm-up and cool-down. From the HUD's own fever events: importing fever-arc pulls results-landing's
+  // React hooks into the server graph through /'s imports
   points: { PERFECT: 100, GREAT: 50, GOOD: 25 },
   // Guitar Hero 3's tier colors: white, orange, green, purple (decision hud-look).
   tiers: [
@@ -126,7 +134,7 @@ export interface HudLayout {
   slots: { card: HudSlot };
   tag: HudBox;
   cluster: HudBox;
-  combo: { cx: number; cy: number; size: number; room: number }; // the numeral: its em size and the width it may fill
+  combo: { cx: number; cy: number; size: number; room: number; labelY: number }; // top centre: the numeral's centre, em size and width; COMBO above it
   stack: { x: number; rows: [number, number, number]; px: number }; // COMBO, ACC and SCORE, left-aligned at x
   safeY: number; // nothing drawn below this
 }
@@ -139,22 +147,48 @@ export function hudLayout(width: number, judgmentLineY: number): HudLayout {
   const [y0, y1] = [m, h - m];
   const tag = { x0: pad, x1: Math.min(width * 0.36, pad + h * 6.2), y0, y1 };
   const cx1 = width - hudSettings.statusGutterPx - pad * 0.5;
-  const cluster = { x0: cx1 - h * 4.4, x1: cx1, y0, y1 };
-  const numeral = { x0: cluster.x0 + pad * 0.6, x1: cluster.x0 + h * 1.75 };
+  const cluster = { x0: cx1 - h * 2.65, x1: cx1, y0, y1 };
+  const size = Math.max(36, L * hudSettings.comboFraction);
+  const labelPx = h * 0.19;
+  // Under the judgment word and its ms readout (core/highway.ts judgmentPlace: under fever-gauge's meter strip), which
+  // also sit at top centre. Computed here, since importing either module pulls fever-arc's React into the server graph;
+  // hud.test pins it to judgmentPlace.
+  const word = Math.max(18, Math.round(L * 0.045));
+  const wordBottom = h + Math.max(4, Math.round(h * 0.1)) + word * 0.8 + word * 1.1;
+  const labelY = wordBottom + labelPx * 0.9;
   return {
     panel: { h },
     slots: { card: { x0: tag.x0, x1: tag.x1 } },
     tag,
     cluster,
-    combo: { cx: (numeral.x0 + numeral.x1) / 2, cy: h / 2, size: h * 0.8, room: numeral.x1 - numeral.x0 },
-    stack: { x: cluster.x0 + h * 1.95, rows: [h * 0.26, h * 0.5, h * 0.74], px: h * 0.19 },
+    combo: { cx: width / 2, cy: labelY + labelPx * 0.8 + size * 0.42, size, room: Math.min(width * 0.24, size * 2.2), labelY },
+    stack: { x: cluster.x0 + h * 0.3, rows: [h * 0.26, h * 0.5, h * 0.74], px: labelPx },
     safeY: L * hudSettings.safeFraction,
   };
 }
 
-// The lowest point the HUD reaches: its band. The combo, its swell and its ghost stay inside it.
+// The lowest point the HUD reaches: the band, or the combo under it at top centre (its swell and ghost may pass it).
 export function hudBottom(l: HudLayout): number {
-  return l.panel.h;
+  return Math.max(l.panel.h, l.combo.cy + l.combo.size * 0.5);
+}
+
+// Fever's heat on the numeral, 0–1: up over heatMs from feverStart, down over heatMs from feverEnd.
+export function comboHeat(fever: { on: boolean; atMs: number } | null, nowMs: number): number {
+  if (!fever) return 0;
+  const k = Math.min(1, Math.max(0, (nowMs - fever.atMs) / hudSettings.heatMs));
+  return fever.on ? k : 1 - k;
+}
+
+// The combo's opacity: hidden at 0 and 1, fading in over fadeFrom..comboFrom.
+export function comboAlpha(combo: number): number {
+  const { fadeFrom, comboFrom } = hudSettings;
+  return Math.min(1, Math.max(0, (combo - fadeFrom + 1) / (comboFrom - fadeFrom + 1)));
+}
+
+// "#rrggbb" a to b by k (0–1), as "#rrggbb".
+export function mixHex(a: string, b: string, k: number): string {
+  const ch = (h: string, i: number) => parseInt(h.slice(1 + i * 2, 3 + i * 2), 16);
+  return "#" + [0, 1, 2].map((i) => Math.round(ch(a, i) + (ch(b, i) - ch(a, i)) * Math.min(1, Math.max(0, k))).toString(16).padStart(2, "0")).join("");
 }
 
 // Live accuracy, the judge's formula over the notes judged so far: null before the first.
@@ -191,8 +225,9 @@ function data(ctx: CanvasRenderingContext2D, px: number): void {
 }
 
 // wait: a wait-mode take isn't scored, so the band holds the song tag only (wait-hud draws its own count into it).
-// shown: the score on screen (mid-roll); flash: the multiplier's tier-up flash, 0–1.
-function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, tag: Tag | null, wait = false, shown = s.score, flash = 0): void {
+// shown: the score on screen (mid-roll); flash: the multiplier's tier-up flash, 0–1; pop: the last increment's tick, 0–1;
+// heat: fever's warmth on the numeral, 0–1.
+function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, tag: Tag | null, wait = false, shown = s.score, flash = 0, pop = 0, heat = 0): void {
   const l = hudLayout(f.width, f.judgmentLineY);
   const { h } = l.panel;
   const tier = wait ? hudSettings.tiers[0] : tierFor(s.combo);
@@ -234,24 +269,10 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, tag: Tag 
 
   if (wait) return;
 
-  // Top right: the combo cluster. The numeral, then COMBO with the multiplier, ACC and SCORE.
+  // Top right: the cluster. COMBO with the multiplier, ACC and SCORE; the numeral itself is at top centre.
   const c = l.cluster;
   drawBrackets(ctx, c.x0, c.y0, c.x1 - c.x0, c.y1 - c.y0);
-  const still = reducedMotion();
-  const m = s.milestone && s.milestone.count >= hudSettings.swellFrom && !still ? s.milestone : null;
-  const t = m ? f.nowMs - m.atMs : Infinity;
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(c.x0, 0, l.stack.x - c.x0, h);
-  ctx.clip();
-  if (m && t >= 0 && t < hudSettings.ghostMs) {
-    const k = t / hudSettings.ghostMs;
-    drawCombo(ctx, l, String(m.count), 1 + (hudSettings.ghostScale - 1) * k, hudSettings.ghostAlpha * (1 - k), tier.color);
-  }
-  const swell = t >= 0 && t < hudSettings.swellMs ? 1 + (hudSettings.swellScale - 1) * Math.sin((Math.PI * t) / hudSettings.swellMs) : 1;
-  // Dim until it counts (comboFrom), then the primary color.
-  drawCombo(ctx, l, String(s.combo), swell, 1, s.combo >= hudSettings.comboFrom ? primary : inkDim);
-  ctx.restore();
+  drawCenterCombo(ctx, f, l, s, pop, heat);
 
   const { x, rows, px } = l.stack;
   const room = c.x1 - x - (c.y1 - c.y0) * 0.2;
@@ -288,7 +309,31 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, tag: Tag 
   ctx.letterSpacing = "0px";
 }
 
-// The combo's numeral, condensed and upright, shrunk to its room if three digits would overflow it.
+// The combo at top centre (#1404): a small COMBO label over the numeral in the moment face, the milestone's ghost
+// swelling behind it, a tick on each increment, and fever's amber. Hidden at 0; miss-moment draws a break here.
+function drawCenterCombo(ctx: CanvasRenderingContext2D, f: Frame, l: HudLayout, s: HudState, pop: number, heat: number): void {
+  const alpha = comboAlpha(s.combo);
+  const still = reducedMotion();
+  const m = s.milestone && s.milestone.count >= hudSettings.swellFrom && !still ? s.milestone : null;
+  const t = m ? f.nowMs - m.atMs : Infinity;
+  const color = mixHex(primary, hudSettings.feverColor, heat);
+  if (m && t >= 0 && t < hudSettings.ghostMs) {
+    const k = t / hudSettings.ghostMs;
+    drawCombo(ctx, l, String(m.count), 1 + (hudSettings.ghostScale - 1) * k, hudSettings.ghostAlpha * (1 - k), color);
+  }
+  if (alpha <= 0) return;
+  ctx.globalAlpha = alpha;
+  data(ctx, l.stack.px);
+  ctx.fillStyle = inkDim;
+  ctx.textAlign = "center";
+  ctx.fillText("COMBO", l.combo.cx, l.combo.labelY);
+  ctx.letterSpacing = "0px";
+  const swell = t >= 0 && t < hudSettings.swellMs ? 1 + (hudSettings.swellScale - 1) * Math.sin((Math.PI * t) / hudSettings.swellMs) : 1;
+  const tick = still ? 1 : 1 + (hudSettings.popScale - 1) * pop;
+  drawCombo(ctx, l, String(s.combo), swell * tick, alpha, color);
+}
+
+// The combo's numeral in the moment face, sized for three digits so it doesn't jump at 100, shrunk to its room.
 function drawCombo(ctx: CanvasRenderingContext2D, l: HudLayout, text: string, scale: number, alpha: number, color: string): void {
   ctx.globalAlpha = alpha;
   ctx.fillStyle = color;
@@ -296,10 +341,10 @@ function drawCombo(ctx: CanvasRenderingContext2D, l: HudLayout, text: string, sc
   ctx.textBaseline = "middle";
   ctx.letterSpacing = "0px";
   let px = l.combo.size;
-  ctx.font = canvasFonts.numeral(Math.round(px)); // the kit's condensed numeral
-  const w = ctx.measureText(text.length < 3 ? "888" : text).width; // sized for three digits, so it doesn't jump at 100
+  ctx.font = canvasFonts.moment(Math.round(px));
+  const w = ctx.measureText(text.length < 3 ? "888" : text).width;
   if (w > l.combo.room) px *= l.combo.room / w;
-  ctx.font = canvasFonts.numeral(Math.round(px * scale));
+  ctx.font = canvasFonts.moment(Math.round(px * scale));
   ctx.fillText(text, l.combo.cx, l.combo.cy);
   ctx.globalAlpha = 1;
 }
@@ -317,6 +362,8 @@ export function hud(): GamePlugin {
   // The roll and the flash live here, not in HudState, so the score there stays exact at every event.
   let roll = { from: 0, to: 0, atMs: 0 };
   let tierUpAt: number | null = null;
+  let popAt: number | null = null; // the last increment, for the numeral's tick
+  let fever: { on: boolean; atMs: number } | null = null;
   let title: string | null = null;
   let lines: BarLine[] = [];
   let endMs = 1;
@@ -341,10 +388,14 @@ export function hud(): GamePlugin {
       if (e.type === "songStart") {
         roll = { from: 0, to: 0, atMs: e.atMs };
         tierUpAt = null;
+        popAt = null;
+        fever = null;
       } else if (state.score !== roll.to) {
         roll = { from: rollup(roll.from, roll.to, e.atMs - roll.atMs), to: state.score, atMs: e.atMs }; // from what's shown
       }
       if (tierFor(state.combo).mult > tierFor(before.combo).mult) tierUpAt = e.atMs;
+      if (state.combo > before.combo) popAt = e.atMs;
+      if (e.type === "feverStart" || e.type === "feverEnd") fever = { on: e.type === "feverStart", atMs: e.atMs };
       publish();
     },
     draw(ctx, frame) {
@@ -357,7 +408,9 @@ export function hud(): GamePlugin {
         publish();
       }
       const tag = title === null ? null : { title, bar, progress: frame.nowMs / endMs };
-      drawHud(ctx, frame, state, tag, wait, shown, flash);
+      const since = popAt === null ? Infinity : frame.nowMs - popAt;
+      const pop = since >= 0 && since < hudSettings.popMs ? (1 - since / hudSettings.popMs) ** 2 : 0;
+      drawHud(ctx, frame, state, tag, wait, shown, flash, pop, comboHeat(fever, frame.nowMs));
     },
   };
 }

@@ -20,6 +20,7 @@ const family = (v: string, fallback: string) => {
 // Font strings for ctx.font. "condensed" is the shorthand's stretch keyword (75%); percentages aren't allowed there.
 export const canvasFonts = {
   numeral: (px: number) => `800 condensed ${px}px ${family("--pa-font-display", "system-ui, sans-serif")}`,
+  moment: (px: number) => `italic 900 ${px}px ${family("--pa-font-moment", family("--pa-font-display", "system-ui, sans-serif"))}`, // type-moments: Saira italic
   display: (px: number) => `800 ${px}px ${family("--pa-font-display", "system-ui, sans-serif")}`,
   data: (px: number) => `500 ${px}px ${family("--pa-font-data", "ui-monospace, monospace")}`,
 };

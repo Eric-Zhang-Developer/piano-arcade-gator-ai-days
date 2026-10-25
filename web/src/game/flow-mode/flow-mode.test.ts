@@ -131,19 +131,33 @@ describe("flow mode's slips", () => {
   const onsets = onsetsOf(twinkle);
   const noteAt = (k: number) => twinkle.notes.find((n) => n.id === onsets[k].ids[0])!;
 
-  it("one wrong pitch: a WRONG, the combo breaks, and that note still waits", () => {
+  // Eric, 2026-10-25: flow "really sloppy so it follows me". A wrong pitch used to be a WRONG and break the combo.
+  it("one wrong pitch is harmless: no WRONG, no slip, the combo holds, and that note still waits", () => {
     const presses = steadyPlayer(twinkle, 1);
     const wrongAt = (presses[5].wallMs + presses[6].wallMs) / 2;
     let waiting: boolean | null = null;
     const { judge, events, results } = run(twinkle, [...presses, { pitch: 30, wallMs: wrongAt }], {}, (t, j) => {
       if (waiting === null && t >= wrongAt) waiting = !j.noteState.has(noteAt(6).id);
     });
-    expect(results.counts.wrong).toBe(1);
-    expect(events.filter((e) => e.type === "wrongNote")).toHaveLength(1);
+    expect(results.counts.wrong).toBe(0);
+    expect(results.counts.extra).toBe(1);
+    expect(events.filter((e) => e.type === "wrongNote")).toHaveLength(0);
+    expect(breaks(events)).toHaveLength(0);
     expect(waiting).toBe(true);
     expect(results.judgments.find((j) => j.noteId === noteAt(6).id)!.judgment).not.toBe("MISS");
     expect(results.counts.MISS).toBe(0);
-    expect(judge.slips).toBe(1);
+    expect(results.maxCombo).toBe(twinkle.notes.length);
+    expect(judge.slips).toBe(0);
+  });
+
+  it("a stray key two onsets ahead skips nothing: it's harmless and both notes still wait (lookahead 1)", () => {
+    const k = onsets.findIndex((_, i) => i > 3 && ![noteAt(i).pitch, noteAt(i + 1).pitch].includes(noteAt(i + 2).pitch));
+    const presses = steadyPlayer(twinkle, 1);
+    const strayAt = (presses[k - 1].wallMs + presses[k].wallMs) / 2;
+    const { judge, results } = run(twinkle, [...presses, { pitch: noteAt(k + 2).pitch, wallMs: strayAt }]);
+    expect(results.counts.MISS).toBe(0);
+    expect(results.counts.wrong).toBe(0);
+    expect(judge.slips).toBe(0);
   });
 
   it("one skipped note (a later note played first): that note is a MISS", () => {
@@ -154,11 +168,13 @@ describe("flow mode's slips", () => {
     expect(judge.slips).toBe(1);
   });
 
-  it("a 3-beat stop mid-song: the combo breaks once, a slip counts, and the take still completes", () => {
+  // Eric, 2026-10-25: a stop used to zero the combo; now it only counts for the results.
+  it("a 3-beat stop mid-song: a slip counts once, the combo holds, and the take still completes", () => {
     const { judge, events, results } = run(twinkle, steadyPlayer(twinkle, 1, (k) => (k === 20 ? 3 * mpb : 0)));
     expect(judge.lost).toBe(1);
     expect(judge.slips).toBe(1);
-    expect(breaks(events)).toHaveLength(1);
+    expect(breaks(events)).toHaveLength(0);
+    expect(results.maxCombo).toBe(twinkle.notes.length);
     expect(results.counts.MISS).toBe(0);
   });
 

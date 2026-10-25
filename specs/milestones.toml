@@ -237,6 +237,11 @@ features = [
   "learn-titles", # polish refill (#1141): each /learn page names its own tab
   "docs-refresh", # polish refill (#1140, #1142): README routes and devpost.md experiments; docs only
   "name-theme", # Eric, 2026-10-25 (#1190): wow feeder; a judge's name as a musical cryptogram the DGX plays, an experiment
+  "wet-paint-polish", # polish sweep 2 (#1195, #1196, #1197): /paint names its tab, clears the strip, focuses the frame
+  "musicbox-polish", # polish sweep 2 (#1198, #1199, #1200): /musicbox names its tab, closes its audio, plain toggles
+  "speak-polish", # polish sweep 2 (#1201, #1202, #1203): /speak lets go of the mic, 12 px floor, announced notes
+  "roll-pages-polish", # polish sweep 2 (#1204, #1205, #1206, #1207): /sonata upright and quiet, /composers-hands stops clean
+  "kit-leftovers-small", # polish sweep 2 (#1208, #1209, #1210): data-face labels, square key chips, /real-keys upright
 ]
 cut = []
 

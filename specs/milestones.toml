@@ -183,6 +183,7 @@ features = [
   "hit-particles", # Eric, 2026-10-25 (#750): a priority, so ahead of duo-start
   "mouse-first", # Eric, 2026-10-25 (#772): key hints off the screens, onto the ? card
   "foreman-duo", # Eric, 2026-10-25 (#774): the foreman's pages fully in the Duo look
+  "sampled-piano", # Eric, 2026-10-25 (#798): the laptop voice plays real piano samples
   "duo-start",
   "level-forge",
   "veritas",

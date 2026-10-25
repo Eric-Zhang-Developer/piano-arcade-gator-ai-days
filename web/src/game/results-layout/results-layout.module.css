@@ -161,12 +161,12 @@
   display: block !important;
   width: 100% !important;
   margin: 0 !important;
-  padding: 12px 10px !important;
+  padding: clamp(12px, 1.6vh, 18px) 10px !important;
   border: 1px solid var(--pa-line) !important;
   border-radius: 0 !important;
   background: transparent !important;
   font-family: var(--pa-font-data), ui-monospace, monospace !important;
-  font-size: 13px !important;
+  font-size: clamp(13px, 0.85vw, 17px) !important; /* scales with the screen's type, readable at 1920 */
   font-style: normal !important;
   font-weight: 700 !important;
   letter-spacing: 0.1em !important;
@@ -176,6 +176,21 @@
   white-space: nowrap;
   color: var(--pa-ink) !important;
   cursor: pointer;
+}
+
+/* An odd action out (five of them: Retry, three panels, Songs) takes the whole last row, not half of it beside an
+   empty cell (#883). */
+.tutor:not(:empty) + .actions > :last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+/* The tutor's primary (NEXT SONG or PRACTICE BARS X–Y) at least as big as an action cell, in the same type: it's the
+   screen's one primary, so it can't be the smallest button on it (#883). */
+.tutor [data-testid="duo-practice"] {
+  box-sizing: border-box;
+  min-width: calc((clamp(360px, 32vw, 560px) - 12px) / 2); /* one column of .actions' grid */
+  padding: clamp(12px, 1.6vh, 18px) 1.2em !important;
+  font-size: clamp(13px, 0.85vw, 17px) !important;
 }
 
 /* A panel that wraps its button (score-card's span) still fills the cell. */
@@ -202,7 +217,7 @@
 .cue {
   align-self: center;
   font-family: var(--pa-font-data), ui-monospace, monospace;
-  font-size: 12px;
+  font-size: clamp(12px, 0.75vw, 16px);
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;

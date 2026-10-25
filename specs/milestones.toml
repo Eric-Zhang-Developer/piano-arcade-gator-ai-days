@@ -216,6 +216,8 @@ features = [
   "song-pack-7", # Eric, 2026-10-25 (#849): five famous Medium to Medium-hard pieces
   "song-pack-8", # Eric, 2026-10-25 (#849): five Medium-hard to Expert showpieces
   "song-finder", # Eric, 2026-10-25 (#850): sort by level, composer or recently played, and filter, at about 40 songs
+  "main-page", # Eric, 2026-10-25 (#851): "we would have to redo our main page"; the select laid out for 40 songs
+  "video-shots", # Eric, 2026-10-25 (#852): visuals for the hackathon video; a shot list, two cards, capture clean
 ]
 cut = []
 

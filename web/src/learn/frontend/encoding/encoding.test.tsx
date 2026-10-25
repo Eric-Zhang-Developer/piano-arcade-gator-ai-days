@@ -10,22 +10,39 @@ const { EncodingSandbox, chatOutcome } = await import('./EncodingSandbox');
 
 const css = readFileSync(new URL('./encoding.module.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
 
+/** What a person sees at a glance: the header's and the workspace's own children, Help's closed panel not counted. */
+function items(html: string): string[] {
+  const tags = (from: string) => {
+    const out: string[] = [];
+    let depth = 0;
+    for (const m of from.matchAll(/<(\/?)([a-z][\w-]*)([^>]*?)(\/?)>/g)) {
+      const [whole, close, name, , self] = m;
+      if (close) { depth--; if (depth < 0) break; continue; }
+      if (depth === 0) out.push(whole);
+      if (!self && !['input', 'br', 'img', 'hr'].includes(name)) depth++;
+    }
+    return out;
+  };
+  const inside = (open: RegExp) => {
+    const m = html.match(open);
+    return m ? html.slice(m.index! + m[0].length) : '';
+  };
+  return [...tags(inside(/<header[^>]*>/)), ...tags(inside(/<section[^>]*aria-label="Workspace"[^>]*>/))];
+}
+
+/** Every aria-controls names an element on the page (#1278). */
+function controlsExist(html: string) {
+  for (const [, id] of html.matchAll(/aria-controls="([^"]*)"/g)) expect(html).toContain(`id="${id}"`);
+}
+
 describe('the sandbox on first load', () => {
   // The server render has no saved progress, so it is what a learner sees before answering anything.
   const html = renderToStaticMarkup(<EncodingSandbox />);
 
-  it('has the hairline header: title and Stop back to /learn, with progress only in the gate strip', () => {
+  it('has the hairline header: title and Stop back to /learn, and no progress count', () => {
     expect(html).toContain(`<h1>${theoryTitle}</h1>`);
     expect(html).toMatch(/<a [^>]*href="\/learn"[^>]*>Stop<\/a>/);
-    // The strip already shows each gate's progress, so the header repeats no count (decision "Agent drives").
     expect(html).not.toContain('gates passed');
-    expect([...html.matchAll(/<li data-state="(\w+)" data-gate=/g)].map(m => m[1])).toEqual(['current', 'open', 'open']);
-  });
-
-  it('has the Score, Reference and Gates files, with Gates open', () => {
-    for (const tab of ['score', 'reference', 'gates']) expect(html).toContain(`data-tab="${tab}"`);
-    expect(html).toMatch(/data-tab="gates"[^>]*>Gates</);
-    expect(html).toMatch(/aria-selected="true"[^>]*data-tab="gates"/);
   });
 
   it('asks the first question of the first gate, with nothing judged yet', () => {
@@ -36,9 +53,35 @@ describe('the sandbox on first load', () => {
     expect(html).not.toContain('data-complete');
   });
 
-  it('has the tutor chat beside the workspace', () => {
-    expect(html).toContain('aria-label="Tutor chat"');
-    expect(html).toContain('id="chat-input"');
+  it('shows a phrase only when the question asks about one, with Listen', async () => {
+    // The first question (the tonic) names no phrase, so no score; a phrase question gets its own phrase only.
+    expect(theoryGates[0].questions[0].phrase).toBeUndefined();
+    expect(html).not.toContain('<figure');
+    const { EncodingScore } = await import('./EncodingScore');
+    const score = renderToStaticMarkup(<EncodingScore focus={1} />);
+    expect([...score.matchAll(/<figure[^>]*data-phrase="(\d)"/g)].map(m => m[1])).toEqual(['1']);
+    expect(score.match(/>Listen</g)).toHaveLength(1);
+    expect(renderToStaticMarkup(<EncodingScore />)).toBe('');
+  });
+
+  it('has no files or gate strip: the question is the screen (decision "Agent drives")', () => {
+    expect(html).not.toContain('role="tab"');
+    expect(html).not.toContain('data-tab=');
+    expect(html).not.toContain('aria-label="Gates"');
+  });
+
+  it('keeps the tutor and Show answer behind a closed Help whose panel exists (#1278)', () => {
+    expect(html).toMatch(/<button[^>]*aria-expanded="false"[^>]*aria-controls="help-panel"[^>]*>Help</);
+    const panel = html.slice(html.indexOf('id="help-panel"'));
+    expect(html).toMatch(/<div id="help-panel"[^>]*hidden=""/);
+    expect(panel).toContain('>Show answer<');
+    expect(panel).toContain('aria-label="Tutor chat"');
+    expect(panel).toContain('id="chat-input"');
+    controlsExist(html);
+  });
+
+  it('holds seven items or fewer: title, Stop, question, answers, Check, Help (a phrase question adds its phrase)', () => {
+    expect(items(html)).toHaveLength(6);
   });
 
   it('says passed, never mastered', () => {
@@ -49,6 +92,7 @@ describe('the sandbox on first load', () => {
 describe('the sandbox for a node', () => {
   const node = nodeScreen(curriculum, 'pitch-grand-staff')!;
   const html = renderToStaticMarkup(<EncodingSandbox node={node} />);
+  const about = node.around.nodes.find(n => n.id === node.gate.id)!;
 
   it('asks the node\'s first item under its title, with Stop', () => {
     expect(html).toContain('data-mode="node"');
@@ -57,15 +101,25 @@ describe('the sandbox for a node', () => {
     expect(html).toMatch(/<a [^>]*href="\/learn"[^>]*>Stop<\/a>/);
   });
 
-  it('has no files, gate strip or tutor: Next chose the node', () => {
+  it('has no files, score, gate strip or tutor: Next chose the node', () => {
     expect(html).not.toContain('data-tab=');
+    expect(html).not.toContain('<figure');
     expect(html).not.toContain('aria-label="Gates"');
     expect(html).not.toContain('aria-label="Tutor chat"');
     expect(html).not.toContain(theoryGates[0].questions[0].prompt);
   });
 
-  it('keeps a place for Next\'s keywords beside the work', () => {
-    expect(html).toContain('aria-label="To explore"');
+  it('keeps why the node matters and where to read about it behind a closed Help', () => {
+    expect(html).toMatch(/aria-expanded="false"[^>]*aria-controls="help-panel"/);
+    const panel = html.slice(html.indexOf('id="help-panel"'));
+    expect(panel).toContain('>Show answer<');
+    expect(panel).toContain(about.whyImportant.replace(/&/g, '&amp;').replace(/'/g, '&#x27;'));
+    for (const src of about.sources) expect(panel).toContain(`href="${src.url}"`);
+    controlsExist(html);
+  });
+
+  it('holds seven items or fewer: title, Stop, question, answers, Check, Help', () => {
+    expect(items(html)).toHaveLength(6);
   });
 
   it('says there is nothing to answer for a node without theory items', () => {
@@ -99,6 +153,10 @@ describe('the encoding styles', () => {
     for (const [, value] of css.matchAll(/border-radius:\s*([^;}]+)/g)) expect(value.trim()).toBe('0');
     expect(css).not.toContain('italic');
   });
+  it('underline links and ring focus in the accent (#947)', () => {
+    expect(css).toMatch(/\.sources a \{[^}]*text-decoration:underline/);
+    expect(css).toMatch(/:focus-visible \{ outline:2px solid var\(--learn-accent\)/);
+  });
   it('set no text under 16px', () => {
     const sizes = [...css.matchAll(/font-size:\s*(\d+(?:\.\d+)?)px/g)].map(m => Number(m[1]));
     expect(sizes.length).toBeGreaterThan(0);
@@ -114,7 +172,7 @@ describe('the score for a screen reader (#945)', () => {
   it('names each phrase and its bars, never the note it ends on', async () => {
     const { EncodingScore } = await import('./EncodingScore');
     const { PhraseScore } = await import('../Score');
-    const labels = [renderToStaticMarkup(<EncodingScore />), renderToStaticMarkup(<><PhraseScore phrase={1} /><PhraseScore phrase={2} /></>)]
+    const labels = [renderToStaticMarkup(<><EncodingScore focus={1} /><EncodingScore focus={2} /></>), renderToStaticMarkup(<><PhraseScore phrase={1} /><PhraseScore phrase={2} /></>)]
       .flatMap(html => [...html.matchAll(/role="img" aria-label="([^"]*)"/g)].map(m => m[1]));
     expect(labels).toContain('Phrase 1, bars 1 to 2');
     expect(labels).toContain('Phrase 2, bars 3 to 4');

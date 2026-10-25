@@ -9,10 +9,6 @@ import s from './encoding.module.css';
 
 // Staff steps from the bottom line (E4) for the pitches Twinkle uses.
 const pitchSteps: Record<number, number> = { 60: -2, 62: -1, 64: 0, 65: 1, 67: 2, 69: 3, 71: 4, 72: 5 };
-const phrases = [
-  { phrase: 1, bars: '1-2', ending: 'G' },
-  { phrase: 2, bars: '3-4', ending: 'C' },
-] as const;
 
 // The kit button's inline colours would beat any class, so they are cleared here and .listen draws it in paper ink.
 const paperButton = { background: undefined, color: undefined, border: undefined, cursor: undefined, fontSize: 16 };
@@ -40,7 +36,7 @@ function Staff({ phrase }: { phrase: Phrase }) {
   </svg>;
 }
 
-/** Both phrases on paper, each with Listen. The phrase the current question asks about is marked. */
+/** The phrase the current question asks about, on paper with Listen. Nothing when no question is open. */
 export function EncodingScore({ focus }: { focus?: Phrase }) {
   const [playing, setPlaying] = useState<Phrase | null>(null);
   const stop = useRef<(() => void) | null>(null);
@@ -52,34 +48,32 @@ export function EncodingScore({ focus }: { focus?: Phrase }) {
     window.clearTimeout(timer.current);
     setPlaying(null);
   };
-  // An offline gate hides the tab through Activity, which runs this cleanup but keeps state, so it resets `playing` too.
-  useEffect(() => () => { stop.current?.(); stop.current = null; window.clearTimeout(timer.current); setPlaying(null); }, []);
+  // A new phrase, or leaving the page, stops the one still sounding.
+  useEffect(() => () => { stop.current?.(); stop.current = null; window.clearTimeout(timer.current); setPlaying(null); }, [focus]);
 
-  const listen = (phrase: Phrase) => {
-    const again = playing === phrase;
+  if (focus === undefined) return null;
+
+  const listen = () => {
+    const again = playing === focus;
     halt();
     if (again) return;
     try {
-      stop.current = playPhrase(phrase);
+      stop.current = playPhrase(focus);
     } catch {
       // No audio here (blocked or unsupported): the score still reads without it.
       return;
     }
-    setPlaying(phrase);
+    setPlaying(focus);
     timer.current = window.setTimeout(() => { stop.current = null; setPlaying(null); }, 4400);
   };
 
-  return <div className={s.sheet}>
-    {phrases.map(p => <figure key={p.phrase} className={s.paper} data-focus={p.phrase === focus} data-phrase={p.phrase}>
-      <div className={s.paperBar}>
-        <span className={s.paperTitle}>Phrase {p.phrase} · bars {p.bars}</span>
-        {playing === p.phrase && <span className={s.playing} role="status">Playing</span>}
-        <Button kind="secondary" className={s.listen} style={paperButton} aria-pressed={playing === p.phrase} onClick={() => listen(p.phrase)}>
-          {playing === p.phrase ? 'Stop' : 'Listen'}
-        </Button>
-      </div>
-      <Staff phrase={p.phrase} />
-      <figcaption>Ends on {p.ending}, held two beats.</figcaption>
-    </figure>)}
-  </div>;
+  return <figure className={s.paper} data-phrase={focus}>
+    <div className={s.paperBar}>
+      {playing === focus && <span className={s.playing} role="status">Playing</span>}
+      <Button kind="secondary" className={s.listen} style={paperButton} aria-pressed={playing === focus} onClick={listen}>
+        {playing === focus ? 'Stop' : 'Listen'}
+      </Button>
+    </div>
+    <Staff phrase={focus} />
+  </figure>;
 }

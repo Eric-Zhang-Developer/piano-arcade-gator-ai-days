@@ -6,7 +6,7 @@
   display: grid;
   grid-template-rows: auto 1fr auto;
   gap: 2vh;
-  padding: 4vh 4vw;
+  padding: calc(4vh + 16px) 4vw 4vh; /* the top 4vh is the nav bar's band (nav-bar) */
   background: var(--pa-bg);
   color: var(--pa-ink);
   overflow: hidden;

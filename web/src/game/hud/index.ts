@@ -5,12 +5,11 @@ import type { Chart, Frame, GameEvent, GamePlugin } from "../../contracts";
 import { barLines, type BarLine } from "../bar-lines";
 import { GOOD_WEIGHT, msPerBeat } from "../core/settings";
 import { barReadout } from "../duo-hud/bar";
-import { drawBrackets } from "../duo-hud/brackets";
+import { canvasFonts, drawBrackets, kitSettings } from "../duo-tokens";
 import { isWaitMode } from "../wait-mode";
-import { bg, gold, good, handR, ink, inkDim, miss, panel, tierX1, tierX2, tierX3, tierX4, whenDisplayFontReady, wrong } from "../ui-tokens";
+import { bg, gold, good, ink, inkDim, line as hairline, miss, panel, primary, tierX1, tierX2, tierX3, tierX4, wrong } from "../ui-tokens";
 
 // visual-direction.md's --pa-line: ink-dim at about 25%, for the divider and the progress line's track.
-const hairline = "rgba(125, 132, 150, 0.25)";
 
 export const hudSettings = {
   comboFrom: 5, // the combo number shows from this combo
@@ -172,14 +171,9 @@ interface Tag {
   progress: number; // 0–1, the clock over the chart's end
 }
 
-export interface HudFonts {
-  display: string; // Saira, condensed where its width axis has loaded
-  data: string; // the monospace for data
-}
-
 // Draws at (x, y), shrunk to fit down to 60%, then cut with an ellipsis.
-function fitText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxW: number, px: number, family: string, weight = ""): void {
-  const set = (p: number) => (ctx.font = `${weight} ${Math.round(p)}px ${family}`);
+function fitText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxW: number, px: number, font: (px: number) => string): void {
+  const set = (p: number) => (ctx.font = font(Math.round(p)));
   set(px);
   const w = ctx.measureText(text).width;
   if (w > maxW) set(Math.max(px * 0.6, (px * maxW) / w));
@@ -190,15 +184,15 @@ function fitText(ctx: CanvasRenderingContext2D, text: string, x: number, y: numb
 
 const reducedMotion = () => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// Monospace caps with wide tracking, as visual-direction's data type.
-function data(ctx: CanvasRenderingContext2D, fonts: HudFonts, px: number, weight = 500): void {
-  ctx.font = `${weight} ${Math.round(px)}px ${fonts.data}`;
-  ctx.letterSpacing = `${(px * 0.14).toFixed(1)}px`;
+// Monospace caps with wide tracking: the kit's data type.
+function data(ctx: CanvasRenderingContext2D, px: number): void {
+  ctx.font = canvasFonts.data(Math.round(px));
+  ctx.letterSpacing = kitSettings.dataTracking;
 }
 
 // wait: a wait-mode take isn't scored, so the band holds the song tag only (wait-hud draws its own count into it).
 // shown: the score on screen (mid-roll); flash: the multiplier's tier-up flash, 0–1.
-function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, tag: Tag | null, fonts: HudFonts, wait = false, shown = s.score, flash = 0): void {
+function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, tag: Tag | null, wait = false, shown = s.score, flash = 0): void {
   const l = hudLayout(f.width, f.judgmentLineY);
   const { h } = l.panel;
   const tier = wait ? hudSettings.tiers[0] : tierFor(s.combo);
@@ -213,10 +207,10 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, tag: Tag 
     const { x0, x1, y0, y1 } = l.tag;
     const bh = y1 - y0;
     const inset = bh * 0.32;
-    drawBrackets(ctx, x0, y0, x1 - x0, bh, { color: inkDim, arm: bh * 0.22 });
+    drawBrackets(ctx, x0, y0, x1 - x0, bh); // the kit's defaults, so every screen's brackets match
     const row = y0 + bh * 0.4;
     const px = h * 0.21;
-    data(ctx, fonts, px);
+    data(ctx, px);
     ctx.fillStyle = inkDim;
     ctx.textAlign = "right";
     const bar = `BAR ${tag.bar.n} / ${tag.bar.N}`;
@@ -227,13 +221,13 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, tag: Tag 
     ctx.fillRect(Math.round(divX), row - px * 0.6, 1, px * 1.2);
     ctx.fillStyle = ink;
     ctx.textAlign = "left";
-    data(ctx, fonts, px);
-    fitText(ctx, tag.title.toUpperCase(), x0 + inset, row, divX - px * 0.9 - (x0 + inset), px, fonts.data, "500");
+    data(ctx, px);
+    fitText(ctx, tag.title.toUpperCase(), x0 + inset, row, divX - px * 0.9 - (x0 + inset), px, canvasFonts.data);
     const ly = Math.round(y0 + bh * 0.76);
     const lw = x1 - x0 - inset * 2;
     ctx.fillStyle = hairline;
     ctx.fillRect(x0 + inset, ly, lw, 2);
-    ctx.fillStyle = handR;
+    ctx.fillStyle = primary;
     ctx.fillRect(x0 + inset, ly, lw * Math.min(1, Math.max(0, tag.progress)), 2);
     ctx.letterSpacing = "0px";
   }
@@ -242,7 +236,7 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, tag: Tag 
 
   // Top right: the combo cluster. The numeral, then COMBO with the multiplier, ACC and SCORE.
   const c = l.cluster;
-  drawBrackets(ctx, c.x0, c.y0, c.x1 - c.x0, c.y1 - c.y0, { color: inkDim, arm: (c.y1 - c.y0) * 0.22 });
+  drawBrackets(ctx, c.x0, c.y0, c.x1 - c.x0, c.y1 - c.y0);
   const still = reducedMotion();
   const m = s.milestone && s.milestone.count >= hudSettings.swellFrom && !still ? s.milestone : null;
   const t = m ? f.nowMs - m.atMs : Infinity;
@@ -252,18 +246,18 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, tag: Tag 
   ctx.clip();
   if (m && t >= 0 && t < hudSettings.ghostMs) {
     const k = t / hudSettings.ghostMs;
-    drawCombo(ctx, l, String(m.count), 1 + (hudSettings.ghostScale - 1) * k, hudSettings.ghostAlpha * (1 - k), tier.color, fonts.display);
+    drawCombo(ctx, l, String(m.count), 1 + (hudSettings.ghostScale - 1) * k, hudSettings.ghostAlpha * (1 - k), tier.color);
   }
   const swell = t >= 0 && t < hudSettings.swellMs ? 1 + (hudSettings.swellScale - 1) * Math.sin((Math.PI * t) / hudSettings.swellMs) : 1;
   // Dim until it counts (comboFrom), then the primary color.
-  drawCombo(ctx, l, String(s.combo), swell, 1, s.combo >= hudSettings.comboFrom ? handR : inkDim, fonts.display);
+  drawCombo(ctx, l, String(s.combo), swell, 1, s.combo >= hudSettings.comboFrom ? primary : inkDim);
   ctx.restore();
 
   const { x, rows, px } = l.stack;
   const room = c.x1 - x - (c.y1 - c.y0) * 0.2;
   ctx.textAlign = "left";
-  data(ctx, fonts, px, 600);
-  ctx.fillStyle = handR;
+  data(ctx, px);
+  ctx.fillStyle = primary;
   ctx.fillText("COMBO", x, rows[0]);
   const comboW = ctx.measureText("COMBO").width;
   // The multiplier in its tier color; a tier-up glows it, settling from a little larger.
@@ -282,12 +276,12 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, tag: Tag 
   ctx.restore();
   const acc = liveAccuracy(s);
   const line = (label: string, value: string, y: number) => {
-    data(ctx, fonts, px);
+    data(ctx, px);
     ctx.fillStyle = inkDim;
     ctx.fillText(label, x, y);
     const lw = ctx.measureText(`${label} `).width;
     ctx.fillStyle = ink;
-    fitText(ctx, value, x + lw, y, room - lw, px, fonts.data, "500");
+    fitText(ctx, value, x + lw, y, room - lw, px, canvasFonts.data);
   };
   line("ACC", acc === null ? "—" : `${(acc * 100).toFixed(1)}%`, rows[1]);
   line("SCORE", shown.toLocaleString("en-US"), rows[2]);
@@ -295,20 +289,18 @@ function drawHud(ctx: CanvasRenderingContext2D, f: Frame, s: HudState, tag: Tag 
 }
 
 // The combo's numeral, condensed and upright, shrunk to its room if three digits would overflow it.
-function drawCombo(ctx: CanvasRenderingContext2D, l: HudLayout, text: string, scale: number, alpha: number, color: string, display: string): void {
+function drawCombo(ctx: CanvasRenderingContext2D, l: HudLayout, text: string, scale: number, alpha: number, color: string): void {
   ctx.globalAlpha = alpha;
   ctx.fillStyle = color;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.letterSpacing = "0px";
-  ctx.fontStretch = "condensed";
   let px = l.combo.size;
-  ctx.font = `800 ${Math.round(px)}px ${display}`;
+  ctx.font = canvasFonts.numeral(Math.round(px)); // the kit's condensed numeral
   const w = ctx.measureText(text.length < 3 ? "888" : text).width; // sized for three digits, so it doesn't jump at 100
   if (w > l.combo.room) px *= l.combo.room / w;
-  ctx.font = `800 ${Math.round(px * scale)}px ${display}`;
+  ctx.font = canvasFonts.numeral(Math.round(px * scale));
   ctx.fillText(text, l.combo.cx, l.combo.cy);
-  ctx.fontStretch = "normal";
   ctx.globalAlpha = 1;
 }
 
@@ -320,17 +312,6 @@ declare global {
   }
 }
 
-// A face from a CSS variable (layout.tsx's next/font), once loaded; `fallback` until then.
-function cssFace(name: string, fallback: string, set: (family: string) => void, ready: Promise<unknown>): void {
-  if (typeof document === "undefined") return;
-  void ready.then(() => {
-    const family = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-    if (family) set(`${family}, ${fallback}`);
-  });
-}
-
-const monoFallback = "ui-monospace, SFMono-Regular, Menlo, monospace";
-
 export function hud(): GamePlugin {
   let state = emptyHud();
   // The roll and the flash live here, not in HudState, so the score there stays exact at every event.
@@ -341,14 +322,6 @@ export function hud(): GamePlugin {
   let endMs = 1;
   let wait = false;
   let bar = { n: 0, N: 0 };
-  // Fallback faces until the real ones have loaded (or 1 s has passed), so the HUD never draws a half-loaded font.
-  const fonts: HudFonts = { display: hudSettings.font, data: monoFallback };
-  cssFace("--pa-font-display", hudSettings.font, (f) => (fonts.display = f), whenDisplayFontReady());
-  const dataReady = () => {
-    const family = getComputedStyle(document.documentElement).getPropertyValue("--pa-font-data").trim();
-    return family && document.fonts ? Promise.race([document.fonts.load(`500 1em ${family}`), new Promise((r) => setTimeout(r, 1000))]) : Promise.resolve();
-  };
-  if (typeof document !== "undefined") cssFace("--pa-font-data", monoFallback, (f) => (fonts.data = f), dataReady());
   const publish = () => {
     if (typeof window !== "undefined") window.__pianoArcadeHud = { ...state, bar: bar.n, bars: bar.N };
   };
@@ -384,7 +357,7 @@ export function hud(): GamePlugin {
         publish();
       }
       const tag = title === null ? null : { title, bar, progress: frame.nowMs / endMs };
-      drawHud(ctx, frame, state, tag, fonts, wait, shown, flash);
+      drawHud(ctx, frame, state, tag, wait, shown, flash);
     },
   };
 }

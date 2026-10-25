@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" fill="none" role="img" aria-labelledby="gator-title">
+  <title id="gator-title">A friendly baby alligator with piano keys on its belly</title>
+  <g stroke="#10131B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- A broad hooked tail keeps the silhouette recognizably reptilian. -->
+    <path d="M41 65C29 67 22 64 17 57C15 70 20 82 35 82L48 77" fill="#45C8B1"/>
+    <path d="M22 70L27 67L29 73L35 70L36 77" stroke="#188D89" stroke-width="2"/>
+    <path d="M39 79C34 83 34 87 39 89H49L52 83M65 82L68 89H79C83 85 78 80 73 78" fill="#5EF2C4"/>
+    <path d="M42 84V88M47 85V88M71 85V88M76 84V88" stroke-width="1.8"/>
+    <path d="M41 57C33 63 31 75 40 81L48 74M74 58C84 62 86 71 79 76L71 70" fill="#5EF2C4"/>
+    <path d="M36 71L40 72M79 67L75 69" stroke-width="1.8"/>
+    <path d="M44 48C34 59 35 77 47 83C55 87 69 85 75 76C81 65 75 51 66 48" fill="#5EF2C4"/>
+    <path d="M49 57C43 62 42 74 49 79C54 83 65 81 69 75C74 67 67 57 61 55" fill="#B9F4D7" stroke="none"/>
+    <!-- Eye crests and the long low muzzle form one clean head silhouette. -->
+    <path d="M31 39C27 34 28 24 34 20C40 15 48 18 52 23C56 15 65 14 71 19C76 23 77 29 76 34L84 37C90 39 92 45 88 50C85 55 78 58 65 58H46C33 58 25 53 26 46C26 43 28 40 31 39Z" fill="#5EF2C4"/>
+    <path d="M28 46C37 50 50 49 61 49C74 49 82 47 87 44" stroke="#188D89" stroke-width="2"/>
+    <path d="M37 52L40 56L43 52M71 51L74 55L77 50" fill="#F2F2F5" stroke-width="1.7"/>
+    <path d="M37 27C39 24 44 24 46 28M59 25C62 22 66 23 68 26" stroke="#188D89" stroke-width="2"/>
+    <ellipse cx="42" cy="33" rx="6.8" ry="8.2" fill="#F2F2F5"/>
+    <ellipse cx="64" cy="31" rx="6.5" ry="8" fill="#F2F2F5"/>
+    <ellipse cx="44" cy="34" rx="3" ry="4.2" fill="#10131B" stroke="none"/>
+    <ellipse cx="66" cy="32" rx="3" ry="4.2" fill="#10131B" stroke="none"/>
+    <circle cx="44.8" cy="32.4" r="1.2" fill="#FFF" stroke="none"/>
+    <circle cx="66.8" cy="30.4" r="1.2" fill="#FFF" stroke="none"/>
+    <path d="M80 39L81 40" stroke-width="3"/>
+    <path d="M52 65H65V76H52Z" fill="#F2F2F5" stroke-width="1.8"/>
+    <path d="M56.3 65V76M60.7 65V76" stroke-width="1"/>
+    <path d="M55 65H57.5V71H55ZM59.5 65H62V71H59.5Z" fill="#10131B" stroke="none"/>
+  </g>
+</svg>

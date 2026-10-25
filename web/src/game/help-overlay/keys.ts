@@ -42,6 +42,7 @@ export const helpGroups: HelpGroup[] = [
       { keys: ["E"], what: "switch Normal and Easy", source: [SELECT], match: ["e"] },
       { keys: ["F"], what: "a guided first song, 30 seconds", source: ["game/first-run/index.tsx"], match: ["f"] },
       { keys: ["O"], what: "Options: latency, volume, labels", source: [OPTIONS], match: ["o"] },
+      { keys: ["X"], what: "the lab: every experiment and hidden feature; Esc comes back", source: ["game/lab/LabLink.tsx", "game/lab/Lab.tsx"], match: ["x", "Escape"] },
       {
         keys: ["↑", "↓", "←", "→", "Enter"],
         what: "rows, values, boxes",
@@ -99,5 +100,6 @@ export const helpGroups: HelpGroup[] = [
 export const unlisted: Record<string, string> = {
   "game/cabinet/idle.ts": "any key restarts the cabinet's idle timer: not a control",
   "game/song-preview/index.tsx": "Enter and L stop the preview as you leave the select: the select's lines cover them",
+  "game/laptop-sound/index.ts": "starts the laptop's audio on the first key or pointer press; its notes are the laptop keys' lines: not a control",
   "game/ui-sounds/index.ts": "notes the page's first key or pointer press, after which UI sounds may play: not a control",
 };

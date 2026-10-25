@@ -59,7 +59,7 @@ export const labGroups: LabGroup[] = [
       {
         slug: "rewind",
         name: "Rewind",
-        description: "In wait mode, and so in chunk-practice's learn steps, ← moves back a bar and → skips ahead one",
+        description: "In Learn mode, ◀ (or ←) moves back a bar and ▶ (or →) skips ahead one, from the HUD's buttons.",
         href: "/play?song=twinkle&mode=wait",
         open: "Twinkle, Learn",
       },
@@ -71,7 +71,7 @@ export const labGroups: LabGroup[] = [
       {
         slug: "watch-demo",
         name: "Watch demo",
-        description: "W on the music select plays the focused song with the perfect bot, audible and hands-off.",
+        description: "WATCH on the music select plays the focused song with the perfect bot, audible and hands-off.",
         href: "/play?song=twinkle&bot=perfect&audible=1&demo=1",
         open: "Twinkle, the perfect bot",
       },
@@ -88,6 +88,13 @@ export const labGroups: LabGroup[] = [
         description: "one merged PR per note of Twinkle on the chart's own rhythm, while each step's note plays",
         href: "/attract",
         open: "/attract",
+      },
+      {
+        slug: "stage-view",
+        name: "Stage view",
+        description: "notes rise dim on a back slope, tip over a lit crest and speed down to the bar, over 1033 ms.",
+        href: "/stage",
+        open: "/stage",
       },
     ],
   },
@@ -112,6 +119,13 @@ export const labGroups: LabGroup[] = [
         description: "plays the opening notes of a library song, you repeat them, and each round adds a note.",
         href: "/simon",
         open: "/simon",
+      },
+      {
+        slug: "wrong-note-spike",
+        name: "Spot the Wrong Note",
+        description: "the DGX plays 8 notes of Twinkle (or Ode to Joy, Minuet in G, Für Elise) with one moved 2 semitones",
+        href: "/wrong-note",
+        open: "/wrong-note",
       },
       {
         slug: "veritas",
@@ -154,7 +168,7 @@ export const labGroups: LabGroup[] = [
       {
         slug: "learning-ui",
         name: "Learning",
-        description: "guided mastery map, three-state parent/leaf examples, one prepared Start/real Resume, four existing activities",
+        description: "a map of music skills, from pitch and rhythm to phrase endings, with the next lesson ready to start.",
         href: "/learn",
         open: "/learn",
       },

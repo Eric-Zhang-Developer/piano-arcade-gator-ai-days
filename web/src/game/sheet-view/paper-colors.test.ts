@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { paper } from "../ui-tokens";
 import { paperJudgmentColors } from "./paper-colors";
@@ -21,4 +22,11 @@ describe("paperJudgmentColors", () => {
   it("gives each judgment its own color", () => {
     expect(new Set(Object.values(paperJudgmentColors)).size).toBe(4);
   });
+});
+
+// verify-sheet.mjs counts PERFECT noteheads by fill. It can't import this TypeScript, so it keeps its own copy: #730
+// changed the color here and the check went on looking for the old gold (#1021).
+it("verify-sheet.mjs looks for the paper's PERFECT", () => {
+  const src = readFileSync(new URL("./verify-sheet.mjs", import.meta.url), "utf8");
+  expect(src.match(/const PERFECT_FILL = "(#[0-9a-f]{6})"/i)?.[1]).toBe(paperJudgmentColors.PERFECT);
 });

@@ -43,8 +43,9 @@ Sources (public domain, Mutopia): `curl -O` each into `source/`:
 The `...` are `--id --title --composer --catalog --source -o`, as in each chart's fields.
 
 ## What it refuses
-- A file whose notes in the chosen bars start off a 1/12-beat grid: that's a performance, not notation. It says how
-  many notes did. (A grace note, an off-grid sliver under 1/8 beat, is skipped and logged instead.)
+- A file whose notes in the chosen bars start off the 1/12- and 1/8-beat grids (16ths, triplets, 32nds): that's a performance, not notation. It says how
+  many notes did. (A grace note is skipped and logged instead: an off-grid onset at most 1/4 beat before the hand's next
+  onset on the grid, stopping within 1/4 beat of it. One held longer is tied into its main note and starts on that onset.)
 - A hand with no notes in the bar range.
 
 ## What it changes, and says so on stderr
@@ -127,4 +128,30 @@ S=../../web/public/songs
 .venv/bin/python perform.py pedal $S/moonlight-3/chart.json --ly source/moonlight3-a4.ly --context sustain \
   --midi source/moonlight3.mid --bars 1-8
 for s in gymnopedie-1 clair-de-lune maple-leaf-rag; do .venv/bin/python perform.py pedal $S/$s/chart.json --harmony; done
+```
+Batch 6 (#1102), with song-pack-5's sources (`specs/decisions/song-pack-5-sources.md`). The marks are hand-read:
+`dynamics` lays Wild Horseman's dynamics line, which sits outside its `\repeat volta`, over the unfolded MIDI, and
+it misplaces Happy Farmer's accents inside its `\voiceOne << >>` blocks.
+```bash
+S=../../web/public/songs
+.venv/bin/python perform.py velocity $S/happy-farmer/chart.json --marks "RL@7/2=f,RL@36!,RL@40!,RL@60!,RL@64!"
+.venv/bin/python perform.py velocity $S/wild-horseman/chart.json \
+  --marks "RL@5/2=mf,RL@6!,RL@9!,RL@18!,RL@21!,RL@30!,RL@33!,RL@42!,RL@45!,RL@54!,RL@57!,RL@66!"
+.venv/bin/python perform.py velocity $S/old-french-song/chart.json --marks "RL@3/2=p,RL@35/2=pp"
+for s in happy-farmer old-french-song minuet-g-minor musette-d; do .venv/bin/python perform.py pedal $S/$s/chart.json --harmony; done
+```
+Batch 7 (#1103), with song-pack-6's sources plus `chopin_prelude_op28_no7.ly` from
+`ftp/ChopinFF/O28/Chop-28-7/Chop-28-7-lys.zip`. `dynamics` reads Chopin (`--right playRH --left playLH`); it refuses
+Träumerei (4 notes by its uncharted grace notes) and can't name K. 331's inline staves, so those two are hand-read.
+```bash
+S=../../web/public/songs
+.venv/bin/python perform.py velocity $S/chopin-prelude-7/chart.json --marks "RL@2=p,RL@33-36~+16"
+.venv/bin/python perform.py velocity $S/traumerei/chart.json \
+  --marks "RL@3=p,RL@13/2-17/2~+16,RL@45/2-49/2~+16,RL@36=p,RL@77/2-81/2~+16,RL@109/2-113/2~+16"
+.venv/bin/python perform.py velocity $S/mozart-331-theme/chart.json --marks "RL@0=p,RL@41/2!,RL@21=p,RL@24=p,RL@89/2!,RL@45=p"
+.venv/bin/python perform.py pedal $S/chopin-prelude-7/chart.json --ly source/chopin_prelude_op28_no7.ly --context playLH \
+  --midi source/Chop-28-7.mid --pickup 1 --bars 1-17
+.venv/bin/python perform.py pedal $S/traumerei/chart.json --ly source/SchumannOp15No07.ly --context pedaltr \
+  --down sustainDown --up sustainUp --spans 0-33,1-33 --start-beat 3
+for s in mozart-331-theme brahms-waltz-15; do .venv/bin/python perform.py pedal $S/$s/chart.json --harmony; done
 ```

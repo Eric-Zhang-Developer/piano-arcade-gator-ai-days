@@ -78,6 +78,19 @@ const look = (page, button) =>
     };
   }, [WORDS, button]);
 
+// The setup words in the Options drawer, which the start and results screens keep closed (duo-start #763, duo-details
+// #839): opened when its button shows, read, closed again. Capture hides the button, so there it can't open at all.
+async function drawer(page) {
+  const open = page.getByTestId("options-open").first();
+  if (!(await open.isVisible())) return { shown: false, words: [] };
+  await open.click();
+  await page.getByTestId("options").waitFor({ timeout: 5000 });
+  const { words } = await look(page, null);
+  await page.keyboard.press("Escape");
+  await page.getByTestId("options").waitFor({ state: "hidden", timeout: 5000 });
+  return { shown: true, words };
+}
+
 async function take(capture) {
   const name = capture ? "capture" : "plain";
   const dir = join(out, name);
@@ -104,12 +117,14 @@ async function take(capture) {
   await page.waitForTimeout(500);
   screens.start = await look(page, "Start");
   await page.screenshot({ path: join(dir, "start.png") });
+  screens.startDrawer = await drawer(page);
   await start.click();
   await page.waitForTimeout(12_000);
   await page.screenshot({ path: join(dir, "mid-take.png") });
   await page.getByTestId("results").waitFor({ timeout: 90_000 });
   await page.waitForTimeout(2500); // the results ceremony
   screens.results = await look(page, "Retry");
+  screens.resultsDrawer = await drawer(page);
   await page.screenshot({ path: join(dir, "results.png") });
   await context.close();
   const [video] = readdirSync(dir).filter((f) => f.endsWith(".webm"));
@@ -121,6 +136,10 @@ const browser = await chromium.launch({ headless: true });
 
 const on = await take(true);
 for (const [screen, s] of Object.entries(on.screens)) {
+  if ("shown" in s) {
+    check(!s.shown, `capture, ${screen}: the Options button is hidden`);
+    continue;
+  }
   check(s.body === "none", `capture, ${screen}: body's cursor is ${s.body}`);
   if (s.button !== null) check(s.button === "none", `capture, ${screen}: the button's cursor is ${s.button}`);
   check(s.words.length === 0, `capture, ${screen}: no setup text${s.words.length ? ` (found ${s.words.join(", ")})` : ""}`);

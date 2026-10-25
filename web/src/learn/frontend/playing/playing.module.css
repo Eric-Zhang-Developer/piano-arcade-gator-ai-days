@@ -1,12 +1,12 @@
 .workspace { --playing-bg: var(--learn-bg, #11151b); --playing-surface: var(--learn-surface, #191f28); --playing-text: var(--learn-text, #eee9de); --playing-muted: var(--learn-muted, #b5b9bf); --playing-border: var(--learn-border, #343a43); --playing-accent: var(--learn-accent, #e8b36c); display: grid; grid-template-columns: 340px minmax(0, 1fr); min-height: 620px; height: calc(100dvh - var(--learn-header-height)); grid-template-rows: minmax(0, 1fr); border: 0; border-radius: 0; overflow: hidden; color: var(--playing-text); background: linear-gradient(180deg, var(--pa-bg), var(--pa-sky)); font: inherit; }
 .workspace * { box-sizing: border-box; }
-.workspace :focus-visible { outline: 2px solid var(--pa-magenta); outline-offset: 4px; }
+.workspace :focus-visible { outline: 2px solid var(--pa-primary); outline-offset: 4px; }
 .workspace ::selection { color: var(--playing-bg); background: var(--playing-accent); }
 .stage { grid-column: 2; grid-row: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
 .header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 28px 28px 20px; }
 .header h1 { font-family: var(--pa-font-display), system-ui, sans-serif; font-style: italic; font-size: 30px; line-height: 1.2; font-weight: 800; margin: 0; text-wrap: balance; }
 .header p { margin: 8px 0 0; font-size: 14px; color: var(--playing-muted); }
-.preview { flex: none; font-size: 12px; color: var(--playing-muted); padding: 5px 0; }
+.preview { flex: none; font-size: 13px; color: var(--playing-muted); padding: 5px 0; }
 .tools { display: flex; align-items: center; gap: 24px; padding: 0 28px 20px; flex-wrap: wrap; font-size: 14px; }
 .tempo { display: flex; align-items: center; gap: 12px; }
 .tempo input { width: 100px; accent-color: var(--playing-accent); cursor: pointer; }

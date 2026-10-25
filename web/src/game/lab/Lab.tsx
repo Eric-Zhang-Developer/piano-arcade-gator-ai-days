@@ -33,8 +33,8 @@ export function Lab() {
               On trial ↓
             </a>
           )}
-          <Link href="/" className={styles.back}>
-            Esc · Songs
+          <Link href="/" className={styles.back} title="Songs (Esc)" aria-keyshortcuts="Escape">
+            Songs
           </Link>
         </nav>
       </header>

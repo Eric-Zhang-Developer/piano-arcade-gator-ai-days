@@ -4,6 +4,9 @@ import type { CSSProperties } from "react";
 import { APP_NAME } from "../game/app-name";
 import { Brackets, MonoLabel, Panel, kitButton } from "../game/duo-tokens";
 
+// The tab says what the page says (#1046), like every other page since #1001.
+export const metadata = { title: `Not found · ${APP_NAME}` };
+
 export default function NotFound() {
   return (
     <main style={screen}>

@@ -16,7 +16,7 @@ import styles from "./sheet-view.module.css";
 
 // The ids /play takes: a folder under web/public/songs/ (the same pattern as play/page.tsx).
 const SONG_ID = /^[a-z0-9][a-z0-9_-]*(\/[a-z0-9][a-z0-9_-]*)*$/i;
-const ZOOM_KEY = "pianoArcade.sheetZoom";
+const ZOOM_KEY = "pianoArcade.sheetZoomPicked"; // a new key: the old one held window-fitted values, like 150% at 1920
 const ZOOM_MIN = 0.5;
 const ZOOM_MAX = 2.5;
 const ZOOM_STEP = 0.1;
@@ -40,16 +40,23 @@ declare global {
 
 const clampZoom = (z: number) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Math.round(z * 10) / 10));
 
-// Unless the player chose one, the score grows with the window: 100% at 1280 wide, 150% on a 1920 monitor.
+// 100% unless the player picked a zoom with − or + (sheet-engraving, #827: fitting the window made the notes gigantic
+// at 1920).
 function loadZoom(): number {
-  const fit = clampZoom(Math.max(1, window.innerWidth / 1280));
   try {
     const z = Number(localStorage.getItem(ZOOM_KEY));
-    return z ? clampZoom(z) : fit;
+    return z ? clampZoom(z) : 1;
   } catch {
-    return fit;
+    return 1;
   }
 }
+
+// A press of − or +: the new zoom, remembered as the player's pick. Only a press stores one.
+const pickZoom = (z: number, step: number) => {
+  const next = clampZoom(z + step);
+  saveZoom(next);
+  return next;
+};
 
 function saveZoom(z: number) {
   try {
@@ -84,6 +91,7 @@ export function SheetView() {
   const [state, setState] = useState<State>({ phase: "loading" });
   const [zoom, setZoom] = useState(1);
   const [rendered, setRendered] = useState(false);
+  const [bars, setBars] = useState(0); // the engraved score's, for its accessible name
   const scoreRef = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLElement>(null);
   const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
@@ -202,6 +210,7 @@ export function SheetView() {
       if (!live) return;
       osmd.Zoom = loadZoom();
       osmd.render();
+      setBars(osmd.Sheet.SourceMeasures.length);
       osmdRef.current = osmd;
       shownRef.current = chart;
       attach(osmd, chart);
@@ -213,14 +222,13 @@ export function SheetView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- attach only reads refs
   }, [chart, song]);
 
-  // Zoom: re-render at the new size and remember it.
+  // Zoom: re-render at the new size.
   useEffect(() => {
     const osmd = osmdRef.current;
     if (!rendered || !osmd || osmd.Zoom === zoom) return;
     osmd.Zoom = zoom;
     osmd.render();
     if (shownRef.current) attach(osmd, shownRef.current);
-    saveZoom(zoom);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- attach only reads refs
   }, [zoom, rendered]);
 
@@ -263,8 +271,8 @@ export function SheetView() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
-      if (e.key === "-" || e.key === "_") setZoom((z) => clampZoom(z - ZOOM_STEP));
-      if (e.key === "+" || e.key === "=") setZoom((z) => clampZoom(z + ZOOM_STEP));
+      if (e.key === "-" || e.key === "_") setZoom((z) => pickZoom(z, -ZOOM_STEP));
+      if (e.key === "+" || e.key === "=") setZoom((z) => pickZoom(z, ZOOM_STEP));
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -304,18 +312,19 @@ export function SheetView() {
           ))}
         </ul>
         <div className={styles.zoom} role="group" aria-label="Zoom">
-          <button onClick={() => setZoom((z) => clampZoom(z - ZOOM_STEP))} disabled={zoom <= ZOOM_MIN} aria-label="Zoom out">
+          <button onClick={() => setZoom((z) => pickZoom(z, -ZOOM_STEP))} disabled={zoom <= ZOOM_MIN} aria-label="Zoom out">
             −
           </button>
           <output aria-live="polite">{Math.round(zoom * 100)}%</output>
-          <button onClick={() => setZoom((z) => clampZoom(z + ZOOM_STEP))} disabled={zoom >= ZOOM_MAX} aria-label="Zoom in">
+          <button onClick={() => setZoom((z) => pickZoom(z, ZOOM_STEP))} disabled={zoom >= ZOOM_MAX} aria-label="Zoom in">
             +
           </button>
         </div>
       </header>
       <div className={styles.score}>
         <Panel paper style={{ padding: "1.5rem clamp(0.75rem, 2vw, 1.5rem)" }}>
-          <div ref={scoreRef} />
+          {/* OSMD rebuilds its <svg> on every render, so the name sits on the host: a screen reader hears one image (#954). */}
+          <div ref={scoreRef} role="img" aria-label={chart && bars ? `${chart.title}: the score, ${bars} bars` : "The score"} />
         </Panel>
       </div>
     </main>

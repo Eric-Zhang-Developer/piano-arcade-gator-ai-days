@@ -1,7 +1,7 @@
 import { existsSync, readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { doneSlots } from "./done";
-import { GITHUB_URL, SLOTS, hideNav, isCurrent } from "./slots";
+import { GITHUB_URL, LAB_PAGES, SLOTS, hideNav, isCurrent } from "./slots";
 
 const repo = new URL("../../../../", import.meta.url).pathname;
 const changes = `${repo}changes`;
@@ -34,8 +34,8 @@ describe("nav bar slots", () => {
     expect(doneSlots("/nonexistent")).toEqual([]);
   });
 
-  it("hides on /play, /cabinet, /attract and in capture mode; shows on /, /learn, /lab, /progress, /operator", () => {
-    for (const p of ["/play", "/cabinet", "/attract", "/attract/x"]) expect(hideNav(p, false), p).toBe(true);
+  it("hides on /play, /stage, /real-keys, /cabinet, /attract and in capture mode; shows on /, /learn, /lab, /progress, /operator", () => {
+    for (const p of ["/play", "/stage", "/real-keys", "/cabinet", "/attract", "/attract/x"]) expect(hideNav(p, false), p).toBe(true);
     expect(hideNav("/", true)).toBe(true);
     expect(hideNav("/operator", true)).toBe(true);
     for (const p of ["/", "/learn", "/lab", "/progress", "/player", "/operator", "/operator/x"]) expect(hideNav(p, false), p).toBe(false);
@@ -44,5 +44,15 @@ describe("nav bar slots", () => {
   it("marks the current slot: Play only on /, others on their path and below", () => {
     const [play, learn] = SLOTS;
     expect([isCurrent(play, "/"), isCurrent(play, "/learn"), isCurrent(learn, "/learn"), isCurrent(learn, "/learn/x")]).toEqual([true, false, true, true]);
+  });
+
+  it("marks Lab current on the pages the Lab lists that no other slot owns (#1043)", () => {
+    const lab = SLOTS.find((s) => s.path === "/lab")!;
+    for (const p of ["/lab", "/simon", "/wrong-note", "/sim", "/veritas", "/calibrate"]) expect(isCurrent(lab, p), p).toBe(true);
+    // Learn's own page stays Learn's, and a page the Lab doesn't list lights nothing.
+    expect(LAB_PAGES).not.toContain("/learn");
+    expect(LAB_PAGES).not.toContain("/");
+    expect([isCurrent(lab, "/learn"), isCurrent(lab, "/"), isCurrent(lab, "/progress")]).toEqual([false, false, false]);
+    expect(SLOTS.filter((s) => isCurrent(s, "/simon")).map((s) => s.label)).toEqual(["Lab"]);
   });
 });

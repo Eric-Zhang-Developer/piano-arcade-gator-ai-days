@@ -2,6 +2,7 @@
 W on the music select plays the focused song with the perfect bot, audible and
 hands-off. The DEMO badge sits on the HUD, nothing is saved to records, and 8 s after the results it returns to `/`.
 With the DGX on USB the demo plays on the piano, otherwise a laptop tone.
+Since mouse-first, W has a button too: WATCH on the music select plays the focused song with the perfect bot, audible and hands-off.
 ## Where it lives
 `web/src/game/watch-demo/` (plugin, `watchUrl`, `isWatchKey`, `verify-watch.mjs`; #528) · select-layout's W and hint
 (#580) · song-preview's W stop (#581; its WATCH link came out in #599) · results-layout's `demoFeatured` (#582) · screens in

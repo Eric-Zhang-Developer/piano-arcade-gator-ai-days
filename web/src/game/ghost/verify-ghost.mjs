@@ -1,4 +1,4 @@
-// Headless proof of the ghost on Twinkle: a take played 40 ms late, then Retry and two takes all PERFECT. The second
+// Headless proof of the ghost on Twinkle: a take played 60 ms late, then Retry and two takes all PERFECT. The second
 // take shows the late take's ghost (one outline per note, screenshot: outlines trail the notes), the third shows
 // the second's (aligned). With ?ghost=off, Retry shows none. ?beat=off keeps the laptop click out of it.
 // Usage: node web/src/game/ghost/verify-ghost.mjs --out <dir>
@@ -76,7 +76,7 @@ try {
   const errors = [];
   page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
   await page.goto(base);
-  const late = await take(page, 40);
+  const late = await take(page, 60); // GREAT: 40 ms is PERFECT since judging-tiers (#859)
   if (late.shown?.hits !== 0) fail.push(`first take showed a ghost: ${JSON.stringify(late.shown)}`);
   if (late.counts.GREAT !== late.notes) fail.push(`late take: ${JSON.stringify(late.counts)}`);
   await retry(page);
@@ -97,7 +97,7 @@ try {
   if (off.shown?.on !== false) fail.push(`?ghost=off: ${JSON.stringify(off.shown)}`);
 
   if (fail.length) throw new Error(fail.join("; "));
-  say(`verify-ghost: pass, Retry after a +40 ms take showed ${second.shown.hits} outlines; two takes in a row all PERFECT (${second.notes}/${second.notes}); ?ghost=off drew none (evidence: ${out})`);
+  say(`verify-ghost: pass, Retry after a +60 ms take showed ${second.shown.hits} outlines; two takes in a row all PERFECT (${second.notes}/${second.notes}); ?ghost=off drew none (evidence: ${out})`);
 } catch (e) {
   failed = true;
   console.error(`verify-ghost: FAIL: ${e.message}`);

@@ -50,6 +50,7 @@ import { rewind } from "./rewind";
 import { waitHint } from "./wait-hint";
 import { scoreCard } from "./score-card";
 import { sheetView } from "./sheet-view/plugin";
+import { stageView } from "./stage-view/plugin";
 import { sheetReview } from "./sheet-review";
 import { leds } from "./leds";
 import { createSavePlugin, queueAndSend } from "../data/save-plugin";
@@ -112,6 +113,7 @@ export const plugins: GamePlugin[] = [
   helpOverlay(), // ? card: knows when a take runs, so ? opens on the start screen and results only
   createSavePlugin(queueAndSend), // take-store: saves finished takes after the results screen
   sheetView(), // last: posts the chart as played (after every transformChart) to /sheet; "Sheet music ↗" on the start screen
+  stageView(), // "Stage view ↗" on the start screen: /stage reads sheet-view's channel
   sheetReview(), // results panel: "Review on sheet ↗" stores this take's judgments and opens /sheet?review=1
   leds(), // after every transformChart: guide lights, hits and misses on the LED strip; "Connect lights" on the start screen
   xFrame(), // ?x=<name>: the Lab's experiments, off by default; late, so they see the final chart and draw on top

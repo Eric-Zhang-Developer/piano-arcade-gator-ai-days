@@ -1,0 +1,80 @@
+<!doctype html>
+<!-- Conductor spike (spec: conductor, Validation b): records about 2 minutes of conducting to a click, for labeling.
+     Open this file on purpose (it's linked from nowhere). Frame the camera on your hand, not your face. The clip and
+     its click times download to your Downloads folder: move them into spikes/conductor/local/, which git ignores. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conductor clip</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; padding: 24px; background: #030607; color: #e2e6f0; font: 16px/1.4 system-ui, sans-serif; }
+  video { width: 480px; max-width: 100%; transform: scaleX(-1); background: #0a0d15; display: block; }
+  button { font: 700 14px ui-monospace, monospace; padding: 12px 24px; border: 1px solid #2b9bff; background: #2b9bff; color: #030607; cursor: pointer; }
+  button:disabled { opacity: 0.4; cursor: default; }
+  #cue { font: 800 40px/1.1 system-ui, sans-serif; margin: 16px 0; min-height: 1.2em; }
+  #plan { color: #7d8496; }
+</style>
+</head>
+<body>
+<p id="plan">60 BPM for 30 s · 90 BPM for 30 s · 120 BPM for 30 s · a fermata: hold still for 4 s · then one beat and a fist. Beat on each click, the low point of the stroke on the click.</p>
+<video id="v" muted playsinline></video>
+<p id="cue">Press Record</p>
+<button id="go">Record</button>
+<script>
+const SECTIONS = [
+  { bpm: 60, s: 30, cue: "60 BPM: beat with the click" },
+  { bpm: 90, s: 30, cue: "90 BPM" },
+  { bpm: 120, s: 30, cue: "120 BPM" },
+  { bpm: 0, s: 4, cue: "Fermata: hold still" },
+  { bpm: 60, s: 2, cue: "One beat, then a fist" },
+  { bpm: 0, s: 4, cue: "Fist" },
+];
+const v = document.getElementById("v"), cue = document.getElementById("cue"), go = document.getElementById("go");
+const save = (blob, name) => { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click(); };
+go.onclick = async () => {
+  go.disabled = true;
+  const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: 640, height: 480, frameRate: { ideal: 60 } }, audio: false });
+  v.srcObject = stream;
+  await v.play();
+  const ctx = new AudioContext();
+  const rec = new MediaRecorder(stream, { mimeType: "video/webm" });
+  const chunks = [];
+  rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+  // The clicks, scheduled on the audio clock from 2 s after the recording starts; their times in the clip's ms.
+  const clicks = [];
+  const lead = 2;
+  rec.start();
+  const t0 = ctx.currentTime;
+  let t = t0 + lead;
+  for (const sec of SECTIONS) {
+    setTimeout(() => (cue.textContent = sec.cue), (t - t0) * 1000);
+    if (sec.bpm) {
+      for (let k = 0; k < (sec.s * sec.bpm) / 60; k++) {
+        const at = t + (k * 60) / sec.bpm;
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.frequency.value = k % 4 === 0 ? 1500 : 1000;
+        g.gain.setValueAtTime(0.4, at);
+        g.gain.exponentialRampToValueAtTime(0.001, at + 0.05);
+        o.connect(g).connect(ctx.destination);
+        o.start(at);
+        o.stop(at + 0.06);
+        clicks.push({ ms: Math.round((at - t0) * 1000), bpm: sec.bpm });
+      }
+    }
+    t += sec.s;
+  }
+  setTimeout(() => {
+    rec.onstop = () => {
+      stream.getTracks().forEach((tr) => tr.stop());
+      save(new Blob(chunks, { type: "video/webm" }), "conductor-clip.webm");
+      save(new Blob([JSON.stringify({ note: "click times in ms from the recording's start (MediaRecorder start ≈ clip 0)", clicks }, null, 1)], { type: "application/json" }), "conductor-clicks.json");
+      cue.textContent = "Saved to Downloads: move both into spikes/conductor/local/";
+    };
+    rec.stop();
+  }, (t - t0 + 1) * 1000);
+};
+</script>
+</body>
+</html>

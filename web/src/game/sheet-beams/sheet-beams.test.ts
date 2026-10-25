@@ -1,37 +1,45 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { expect, test } from "vitest";
 import type { Chart } from "../../contracts";
-import { keyAndMeter, placeNotes, type Placed } from "../sheet-xml";
-import { beamGroups, beamJudgment, shouldBeam } from ".";
+import { paperJudgmentColors } from "../sheet-view/paper-colors";
+import { DIVISIONS as XML_DIVISIONS, keyAndMeter, placeNotes, type Placed } from "../sheet-xml";
+import { paper, paperInk } from "../ui-tokens";
+import { beamGroups, beamJudgment, DIVISIONS, shouldBeam } from ".";
 
 const songs = new URL("../../../public/songs/", import.meta.url);
 const load = (id: string): Chart => JSON.parse(readFileSync(new URL(`${id}/chart.json`, songs), "utf8"));
 const four4 = { beats: 4, beatType: 4 };
+const S = DIVISIONS / 4; // a 16th
 // Notes on the treble staff from [onset, end] in 16ths, ids n1, n2, …
-const rh = (...spans: [number, number][]): Placed[] => spans.map(([onset, end], i) => ({ id: `n${i + 1}`, staff: 1, onset, end, pitch: 60 + i }));
+const rh = (...spans: [number, number][]): Placed[] => spans.map(([onset, end], i) => ({ id: `n${i + 1}`, staff: 1, onset: onset * S, end: end * S, pitch: 60 + i }));
+
+test("sheet-beams counts in sheet-xml's divisions", () => {
+  expect(DIVISIONS).toBe(XML_DIVISIONS);
+});
 
 test("beat groups: a quarter in n/4 and 2/2, a dotted quarter in 3/8, 6/8, 9/8 and 12/8, else a quarter", () => {
-  expect(beamGroups(four4)).toEqual([4, 4, 4, 4]);
-  expect(beamGroups({ beats: 3, beatType: 4 })).toEqual([4, 4, 4]);
-  expect(beamGroups({ beats: 2, beatType: 2 })).toEqual([4, 4, 4, 4]);
-  expect(beamGroups({ beats: 3, beatType: 8 })).toEqual([6]);
-  expect(beamGroups({ beats: 6, beatType: 8 })).toEqual([6, 6]);
-  expect(beamGroups({ beats: 12, beatType: 8 })).toEqual([6, 6, 6, 6]);
-  expect(beamGroups({ beats: 5, beatType: 8 })).toEqual([4, 4, 2]);
+  const in16ths = (m: { beats: number; beatType: number }) => beamGroups(m).map((g) => g / S);
+  expect(in16ths(four4)).toEqual([4, 4, 4, 4]);
+  expect(in16ths({ beats: 3, beatType: 4 })).toEqual([4, 4, 4]);
+  expect(in16ths({ beats: 2, beatType: 2 })).toEqual([4, 4, 4, 4]);
+  expect(in16ths({ beats: 3, beatType: 8 })).toEqual([6]);
+  expect(in16ths({ beats: 6, beatType: 8 })).toEqual([6, 6]);
+  expect(in16ths({ beats: 12, beatType: 8 })).toEqual([6, 6, 6, 6]);
+  expect(in16ths({ beats: 5, beatType: 8 })).toEqual([4, 4, 2]);
 });
 
 test("Für Elise is in 3/8, so its beam group is a dotted quarter: its opening six 16ths share one beam", () => {
   const chart = load("fur-elise");
   const { meter } = keyAndMeter(chart);
   expect(meter).toEqual({ beats: 3, beatType: 8 });
-  expect(beamGroups(meter)).toEqual([6]);
+  expect(beamGroups(meter)).toEqual([6 * S]);
   const placed = placeNotes(chart);
   const beams = shouldBeam(placed, meter);
   const longest = Math.max(...beams.map((b) => b.length));
   expect(longest).toBeLessThanOrEqual(6 * 3); // six 16th chords at most, of up to 3 notes
   // every beam stays inside one bar's single group
   const at = new Map(placed.map((p) => [p.id, p]));
-  for (const b of beams) expect(new Set(b.map((id) => Math.floor(at.get(id)!.onset / 6))).size).toBe(1);
+  for (const b of beams) expect(new Set(b.map((id) => Math.floor(at.get(id)!.onset / (6 * S)))).size).toBe(1);
 });
 
 test("four 16ths in one beat of 4/4 are one beam", () => {
@@ -54,24 +62,31 @@ test("two eighths across a beat are two groups: no beam crosses a beat group or 
 
 test("a chord pair beams once, with every note of both chords under it", () => {
   const placed: Placed[] = [
-    { id: "a", staff: 1, onset: 0, end: 2, pitch: 60 },
-    { id: "b", staff: 1, onset: 0, end: 2, pitch: 64 },
-    { id: "c", staff: 1, onset: 2, end: 4, pitch: 62 },
-    { id: "d", staff: 1, onset: 2, end: 4, pitch: 65 },
+    { id: "a", staff: 1, onset: 0, end: 2 * S, pitch: 60 },
+    { id: "b", staff: 1, onset: 0, end: 2 * S, pitch: 64 },
+    { id: "c", staff: 1, onset: 2 * S, end: 4 * S, pitch: 62 },
+    { id: "d", staff: 1, onset: 2 * S, end: 4 * S, pitch: 65 },
   ];
   expect(shouldBeam(placed, four4)).toEqual([["a", "b", "c", "d"]]);
 });
 
 test("each staff and each voice beams on its own; quarters and longer never beam", () => {
   const placed: Placed[] = [
-    { id: "r1", staff: 1, onset: 0, end: 2, pitch: 72 },
-    { id: "r2", staff: 1, onset: 2, end: 4, pitch: 74 },
-    { id: "held", staff: 1, onset: 0, end: 4, pitch: 60 }, // a quarter under them: voice 2, not beamed
-    { id: "l1", staff: 2, onset: 0, end: 2, pitch: 48 },
-    { id: "l2", staff: 2, onset: 2, end: 4, pitch: 52 },
+    { id: "r1", staff: 1, onset: 0, end: 2 * S, pitch: 72 },
+    { id: "r2", staff: 1, onset: 2 * S, end: 4 * S, pitch: 74 },
+    { id: "held", staff: 1, onset: 0, end: 4 * S, pitch: 60 }, // a quarter under them: voice 2, not beamed
+    { id: "l1", staff: 2, onset: 0, end: 2 * S, pitch: 48 },
+    { id: "l2", staff: 2, onset: 2 * S, end: 4 * S, pitch: 52 },
   ];
   expect(shouldBeam(placed, four4)).toEqual([["r1", "r2"], ["l1", "l2"]]);
   expect(shouldBeam(rh([0, 4], [4, 8]), four4)).toEqual([]);
+});
+
+test("three eighth triplets in one beat are one beam; a triplet quarter and eighth aren't", () => {
+  const T = DIVISIONS / 3; // an eighth triplet
+  const trip = (...spans: [number, number][]): Placed[] => spans.map(([onset, end], i) => ({ id: `t${i + 1}`, staff: 1, onset: onset * T, end: end * T, pitch: 60 + i }));
+  expect(shouldBeam(trip([0, 1], [1, 2], [2, 3]), four4)).toEqual([["t1", "t2", "t3"]]);
+  expect(shouldBeam(trip([0, 2], [2, 3]), four4)).toEqual([]);
 });
 
 test("the beam color rule: all PERFECT is PERFECT; PERFECT with GREAT, or with one unjudged note, is ink", () => {
@@ -95,9 +110,17 @@ test("every committed chart: each beam has 2+ chords, all eighths or shorter, in
       const ps = b.map((x) => at.get(x)!);
       expect(new Set(ps.map((p) => p.staff)).size).toBe(1);
       expect(new Set(ps.map((p) => p.onset)).size).toBeGreaterThan(1);
-      expect(ps.every((p) => p.end - p.onset <= 3)).toBe(true);
+      expect(ps.every((p) => p.end - p.onset <= 3 * S)).toBe(true);
     }
     counts.push(`${id} ${meter.beats}/${meter.beatType}: ${beams.length} beams over ${beams.flat().length} of ${placed.length} notes`);
   }
   process.stdout.write(`${counts.join("\n")}\n`);
+});
+
+// verify-beams.mjs can't import TypeScript, so it keeps its own copies of the sheet's colors: #730 moved the score to
+// paper and the check went on looking for the Duo gold and ink (#1021).
+test("verify-beams.mjs looks for the paper's PERFECT, ink and page", () => {
+  const src = readFileSync(new URL("./verify-beams.mjs", import.meta.url), "utf8");
+  const hex = (name: string) => src.match(new RegExp(`const ${name} = "(#[0-9a-f]{6})"`, "i"))?.[1];
+  expect([hex("GOLD"), hex("INK"), hex("BG")]).toEqual([paperJudgmentColors.PERFECT, paperInk, paper]);
 });

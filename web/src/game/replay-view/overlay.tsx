@@ -6,8 +6,9 @@ import type { Chart, Results, Take } from "../../contracts";
 import { drawHighway, makeLayout } from "../core/highway";
 import { settings } from "../core/settings";
 import { Button } from "../duo-tokens";
+import { wrong } from "../ui-tokens";
 import { getReplayState, pianoOutSettings, startReplay, stopReplay } from "../piano-out";
-import { highwayAt, replayChartTime, replaySpan } from ".";
+import { highwayAt, latePresses, replayChartTime, replaySpan } from ".";
 
 type Props = { chart: Chart; take: Take; results: Results };
 
@@ -40,6 +41,7 @@ function ReplayOverlay({ chart, take, results, onClose }: Props & { onClose(): v
     const ctx = c.getContext("2d")!;
     const span = replaySpan(chart, take);
     const presses = take.events.filter((e) => e.velocity > 0).sort((a, b) => a.timeMs - b.timeMs);
+    const late = new Set([...latePresses(results)].map((i) => take.events[i]));
     const lead = pianoOutSettings.leadMs;
     // The clock opens one bar before the first press; the piano starts so its first note lands on that press.
     let startPerf = performance.now() + (span.firstPressMs - span.fromMs) - lead;
@@ -72,17 +74,27 @@ function ReplayOverlay({ chart, take, results, onClose }: Props & { onClose(): v
       const t = replayChartTime(perf, startPerf, span.firstPressMs, lead);
       if (t > span.toMs) return close();
       drawHighway(ctx, L, chart, highwayAt(chart, take, results, t));
-      // Press markers: a ring in the pitch's lane at the press's time.
+      // Press markers: a ring in the pitch's lane at the press's time; a LATE press's ring glows red.
       for (const e of presses) {
         if (e.timeMs < t - 300 || e.timeMs > t + settings.lookaheadMs) continue;
         const y = L.judgmentLineY - (e.timeMs - t) * pxPerMs;
         const k = L.keyX(e.pitch);
-        const r = Math.max(5, Math.min(14, k.width * 0.3));
+        const slip = late.has(e);
+        const r = Math.max(5, Math.min(14, k.width * 0.3)) * (slip ? 1.4 : 1);
         ctx.beginPath();
         ctx.arc(L.project(k.x + k.width / 2, y), y, r, 0, Math.PI * 2);
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = "#ffffff";
+        if (slip) {
+          ctx.shadowColor = wrong;
+          ctx.shadowBlur = r * 2;
+          ctx.globalAlpha = 0.45;
+          ctx.fillStyle = wrong;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+        ctx.lineWidth = slip ? 4 : 3;
+        ctx.strokeStyle = slip ? wrong : "#ffffff";
         ctx.stroke();
+        ctx.shadowBlur = 0;
       }
       while (crossed < presses.length && presses[crossed].timeMs <= t) {
         const e = presses[crossed++];

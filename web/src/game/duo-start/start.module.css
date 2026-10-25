@@ -52,8 +52,9 @@
   order: -1;
 }
 
-/* An adaptive step's strip and line: a row of their own under the ladder, too wide for one button's cell. */
-.modes > [data-testid="slot-chunk-practice"]:has([data-testid="chunk-step"]) {
+/* Chunks take their own row under the ladder: an adaptive step's strip and line are too wide for one cell, and the
+   two buttons that open a second window, Sheet music ↗ and Stage view ↗, then share the row under it (#1031). */
+.modes > [data-testid="slot-chunk-practice"] {
   grid-column: 1 / -1;
 }
 

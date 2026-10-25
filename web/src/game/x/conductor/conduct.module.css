@@ -1,0 +1,160 @@
+/* /conduct: the podium, in the Duo look. The highway takes the screen; the stand beside it holds the camera, the
+   tempo as one big numeral, and the controls. Type scales with the width (16 px at 1280, 24 px at 1920), as /lab. */
+.page {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 2.4em 2.5em 1.2em;
+  background: var(--pa-bg);
+  color: var(--pa-ink);
+  font: 400 clamp(14px, 1.25vw, 28px) / 1.35 system-ui, sans-serif;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2em;
+}
+
+.title {
+  margin: 0;
+  font: 800 2.2em/1 var(--pa-font-display), system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.sub {
+  margin: 0;
+  color: var(--pa-ink-dim);
+}
+
+.back {
+  margin-left: 1.6em;
+  color: var(--pa-ink-dim);
+  text-decoration: none;
+}
+
+.back:hover,
+.back:focus-visible {
+  color: var(--pa-ink);
+}
+
+.note {
+  margin: 0.6em 0 0;
+  color: var(--pa-gold);
+}
+
+.podium {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16em;
+  gap: 1.4em;
+  flex: 1;
+  min-height: 0;
+  margin-top: 1em;
+}
+
+.highway {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #000;
+}
+
+.stand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7em;
+  min-height: 0;
+}
+
+.camera {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--pa-panel);
+  border: 1px solid var(--pa-line);
+}
+
+.thumb {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.video {
+  display: none;
+}
+
+.dot {
+  display: inline-block;
+  width: 0.6em;
+  height: 0.6em;
+  margin-right: 0.3em;
+  border-radius: 50%;
+  background: var(--pa-wrong);
+  vertical-align: 0.05em;
+}
+
+.tempo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+}
+
+.bpm {
+  font: 800 5.2em/0.95 var(--pa-font-display), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.state {
+  margin: 0;
+  min-height: 2.7em;
+  color: var(--pa-ink);
+}
+
+.cells {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6em;
+}
+
+.file {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+
+.small {
+  margin: 0;
+  color: var(--pa-ink-dim);
+  font-size: 0.85em;
+}
+
+.songs {
+  display: flex;
+  gap: 1.1em;
+  margin-left: auto;
+}
+
+.song {
+  padding: 0.35em 0;
+  color: var(--pa-ink-dim);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+
+.song:hover,
+.song:focus-visible {
+  color: var(--pa-ink);
+}
+
+.song[aria-current="page"] {
+  color: var(--pa-ink);
+  border-bottom-color: var(--pa-primary);
+}

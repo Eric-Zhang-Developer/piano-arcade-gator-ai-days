@@ -8,6 +8,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  flex: 0 1 auto;
   min-height: 0;
   padding: clamp(14px, 1.4vw, 26px);
   border: 1px solid var(--pa-line);
@@ -26,14 +27,16 @@
 }
 
 .roll {
-  height: clamp(120px, 26vh, 300px);
-  flex: none;
+  flex: 0 1 28vh; /* the one piece that gives way when the panel runs out of room */
+  min-height: 10vh;
+  max-height: 300px;
   border: 1px solid var(--pa-line);
   background: var(--pa-bg);
 }
 
 .title {
-  margin: 2.4vh 0 0;
+  flex: none;
+  margin: 2.2vh 0 0;
   font-family: var(--pa-font-display), system-ui, sans-serif;
   font-weight: 700;
   font-size: clamp(32px, 3.4vw, 64px);
@@ -54,8 +57,35 @@
 }
 
 .composer {
+  flex: none;
   margin: 0.8vh 0 0;
   font-size: clamp(14px, 1.1vw, 21px);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.composer,
+.cells,
+.next,
+.buttons,
+.extras {
+  flex: none;
+}
+
+/* The level toggle beside the preview's Hands, Speed, source and status. */
+.extras {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.4vw;
+  margin-top: 1.6vh;
+}
+
+.extras > :last-child {
+  flex: 1;
+  min-width: 0;
+  margin-top: 0;
 }
 
 /* LV · NOTES · BEST: monospace caps over a condensed numeral, split by hairlines. */
@@ -201,6 +231,9 @@
 .rowComposer {
   margin-top: 0.4vh;
   font-size: clamp(12px, 0.9vw, 17px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rowLevel {

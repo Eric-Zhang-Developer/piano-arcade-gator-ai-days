@@ -74,7 +74,7 @@ export function FocusPanel(p: FocusPanelProps) {
           </span>
         )}
       </div>
-      {p.children}
+      {p.children && <div className={styles.extras}>{p.children}</div>}
     </section>
   );
 }

@@ -39,19 +39,51 @@ This is the frontend slice commissioned from the published `piano-learning` plan
 - Existing cited repository score data is reused, with provenance retained. Original teaching summaries distinguish melodic closure from harmonic cadence evidence.
 - Leaving a session for the map or a hub stops active audio, count-ins and preview takes; Resume restores safe stopped state and retains the underlying answers/settings/results. Offline recovery names the connection problem and sync limits, preserves in-memory answers, history, practice settings and completed results, and cancels active audio, count-ins and preview takes. The anonymous arcade, game loop, root styles, frozen contracts and dependencies stay unchanged.
 
+## Student graph
+The map's 134 fictional skills and fictional learner give way to the student graph: a full-curriculum skill graph built
+ahead of time, an adaptive diagnostic at the real piano, Bayes mastery in three colours, and a model-chosen Next. Where
+it disagrees with the map requirements above (fictional distributions, Secure/Partial/Low, no scheduling or agent
+decision), this section wins. The code lives in `web/src/learn/frontend/mastery/`; the decisions and simplifications are
+in `specs/decisions/learning-ui-student-graph.md`.
+- **Graph:** JSON in `mastery/curriculum/`, one file per region (pitch, rhythm, keys, chords, expression, pieces), plus
+  the backbone, cross-region links and song tags. It runs from zero to ABRSM Grade 5 theory and playing to the game's
+  level. Nodes have a layer (backbone, concept, detail), a kind (declarative, procedural), `whyImportant` and sources;
+  edges are in-context, analogous or contradicts, weighted 1-5 with a rationale. No prerequisite order. Every node has
+  at least two items, each crediting one node. A vitest audit fails a node without a source or `whyImportant`, an edge
+  without a rationale, a node with fewer than two items, or a graph that isn't one connected piece.
+- **Mastery:** each node has a phase (encoding or retrieval) and a Bayes belief, updated once per counting attempt. At
+  0.95 with three counting attempts on two items it moves to retrieval; below 0.6 on cold checks it goes back. Time
+  never lowers the belief; it only schedules cold checks (1, 3, 7, 21, 60 days). A theory answer counts if no hint was
+  revealed; a playing attempt counts if at least 70% was cold. State is replayed from append-only attempts, on the
+  device until a `learning_attempts` table exists.
+- **Piano evidence:** `/learn` reads Web MIDI and scores right notes in order, steadiness, evenness, legato and pedal.
+  Game takes played cold at the target tempo count for their song's tagged nodes.
+- **Diagnostic:** adaptive, theory and playing alternating, backbone first, the item whose node's belief is nearest 0.5.
+  An answer nudges linked nodes' priors, never their colour. It stops when every backbone node is below 0.2 or above
+  0.8, or at 15 minutes, and resumes.
+- **Colours:** unknown (no counting attempt), in progress (encoding with evidence), mastered (retrieval).
+- **Next:** `POST /learn/api/next`. Code builds candidates; Claude (the chat's key and model) picks 3-5 activities with
+  a reason each; code rejects anything off the list. No key or a rejected reply falls back to the top candidates by
+  score. Every decision is logged with its inputs. The student picks 1-3 goal songs, which weight the candidates.
+
 ## Validation
 - `pnpm -C web test`, `pnpm -C web lint`, `pnpm -C web typecheck`, `pnpm -C web build` pass.
-- In visible Chrome at 1440x900/1280x800, check the read-only map, one Start/real Resume, no manual exploration/mode/hide controls, accessible node state names, unchanged graph geometry/colors and unclipped text.
+- In visible Chrome at 1440x900/1280x800, check the read-only map, one Start/real Resume, no manual exploration/mode/hide controls, accessible node state names and unclipped text. The map is the student graph: its nodes and the three colours come from `mastery/curriculum/` and the student's replayed attempts.
 - Observe actual character departure, midpoint, arrival and page reveal, using frame coordinates and genuine captures or explicitly documented browser-only timeline inspection. Assert one shared character remains through the route, reaches the actual skill without covering its node/caption, and the page materializes without a blank interval. Record total time, both desktop sizes and caption/font fit through arrival. Static post-route screenshots alone do not prove motion.
 - Follow prepared Start -> answer/feedback/edit draft/select Reference -> Back to map -> Resume. Confirm the same question, answer, history, reference and title. Check double-click guard, native button semantics/focus, offline interruption and navigation/unmount cancellation. Reduced motion must enter directly without travel/reveal clipping; distinguish a harness-tested branch from actual OS emulation when reporting.
 - Unit checks cover every supported learning/retrieval target at both sizes: shared trajectory, measured perch, camera convergence, character/node/caption clearance and stable caption anchors. Obsolete manual-selection/zoom tests are removed because that behavior is explicitly removed.
 - Existing activity validation remains: Learn reference available; Review reference locked until answering each question; computed closed feedback and ungraded explanation comparison; hints/audio; divider keyboard/pointer bounds; independent material/history scrolling; procedural support fading, whole-melody take/result and explicit completed repeat. Preserve honest demo/score provenance labels and black-ink staff/glyph contrast on the paper panel.
 - With an owned visible-Chrome tab, `chrome-devtools-axi run < web/src/learn/frontend/offline.browser.mjs` covers prepared-entry cancellation plus all four activity recovery paths, retained state, active audio/count-in/take cancellation and fresh playback.
 - At 1280×720, `/learn/understand` and `/learn/review/theory` show the Duo look (black, blue, purple; red only beside a ✕; zero radius; Saira upright; nothing under 16px). `/learn/understand` is complete only after every gate passes, a reload resumes gate progress, and the chat replies or, with no `ANTHROPIC_API_KEY`, says it isn't connected. On `/learn/review/theory` a wrong answer shows ✕ and the explanation for the option chosen, beside the answer.
+- `pnpm -C web exec vitest run src/learn src/app/learn` passes, including the curriculum audit test.
+- At 1280x720, `verify-mastery.mjs` (through `verify.py --slug learning-ui`) has a fresh student take the diagnostic with
+  simulated MIDI and answers; it asks both theory and playing, and adapts. The map then shows unknown, in progress and
+  mastered. Next returns 3-5 activities on the candidate list (the no-key fallback is fine). Two cold failures on a
+  mastered node turn it back to in progress. Screenshots of the map and the diagnostic, in the Duo look.
 - Run repository ownership, gate and marker checks. The repository's game verification is separate; report any unrun validation honestly.
 
 ## Defaults
-Preview state is local and disposable, except theory gate progress, which stays on the device. Unknown student progress stays unknown. The one model connection is the theory chat at `/learn/api/chat`; no auth or other backend is implied.
+Preview state is local and disposable, except theory gate progress, which stays on the device. Unknown student progress stays unknown. The model connections are the theory chat at `/learn/api/chat` and Next at `/learn/api/next`; no auth is implied, and attempts stay on the device until Supabase has a `learning_attempts` table.
 
 ## Current editable frontend
 

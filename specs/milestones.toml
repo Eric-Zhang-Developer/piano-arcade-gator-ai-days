@@ -185,6 +185,7 @@ features = [
   "highway-field", # Eric, 2026-10-25 (#1114): one deep polish pass on the highway's dark field, a #856 hero item
   "round", # Eric, 2026-10-25 (#1123): wow feeder; play a round once and the DGX echoes it as voices 2-4, an experiment
   "fever-arc", # Eric, 2026-10-25 (#1150): fever as one designed arc, build-up, drop, sustain, release, a #856 hero item
+  "hand-palette", # Eric, 2026-10-25 (#1127): the hand and judgment colors solved for CVD, compared in the Lab first
   "laptop-sound",
   "flow-mode",
   "duo-tokens",

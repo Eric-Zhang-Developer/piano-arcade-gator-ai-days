@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
-import type { Chart, Frame, GameEvent } from "../../contracts";
+import type { Chart, Frame, GameEvent, InputEvent } from "../../contracts";
+import { LATENCY_KEY } from "../core/settings";
 import { Judge } from "../core/judge";
 import { gaugeSize } from "../fever-gauge/gauge";
 import { BOTS, botPresses, feverChart, scenes, scenesSettings, TAKE_FILE, takePresses, type BotName } from ".";
@@ -179,21 +180,26 @@ describe("the bot on the piano: pedal and velocity", () => {
   const cc = (v: number) => [0xb0, 64, v];
 
   // A starved page, as in the #586 test: frames every 100 ms drive the pump, and no timer fires.
-  async function harness(pedalFile: () => Promise<unknown> = async () => pedal) {
+  async function harness(pedalFile: () => Promise<unknown> = async () => pedal, latency = 0) {
     let perf = 0;
     const raf: (() => void)[] = [];
     const sent: number[][] = [];
+    const stamps: number[] = []; // each send's Web MIDI timestamp
+    const judged: InputEvent[] = [];
     vi.spyOn(performance, "now").mockImplementation(() => perf);
     vi.stubGlobal("requestAnimationFrame", (cb: () => void) => raf.push(cb));
     vi.stubGlobal("setTimeout", () => 0);
     vi.stubGlobal("clearTimeout", () => {});
+    vi.stubGlobal("setInterval", () => 0); // the piano's ticker starves too: frames send it
+    vi.stubGlobal("clearInterval", () => {});
+    vi.stubGlobal("localStorage", { getItem: (k: string) => (k === LATENCY_KEY ? String(latency) : null) });
     vi.stubGlobal("fetch", async () => ({ ok: true, json: pedalFile }));
-    const piano = { name: "Portable Grand", send: (d: number[]) => void sent.push([...d]) };
+    const piano = { name: "Portable Grand", send: (d: number[], at: number) => void (sent.push([...d]), stamps.push(at)) };
     vi.stubGlobal("navigator", { requestMIDIAccess: async () => ({ outputs: new Map([["dgx", piano]]) }) });
     const p = scenes();
     p.transformChart!(chart, new URLSearchParams("song=local/synthetic&bot=perfect&audible=1"));
     await new Promise((r) => setImmediate(r)); // the pedal read
-    await p.wrapInput!({ kind: "keys", start() {}, stop() {} }).start(() => {});
+    await p.wrapInput!({ kind: "keys", start() {}, stop() {} }).start((e) => void judged.push(e));
     let zero = 0;
     // Frames from chart time `fromMs` to `toMs`, with chart zero put where that makes `fromMs` now.
     const frames = (fromMs: number, toMs: number) => {
@@ -205,7 +211,7 @@ describe("the bot on the piano: pedal and velocity", () => {
         p.draw!({} as CanvasRenderingContext2D, { nowMs: t + 0.5 - zero } as Frame);
       }
     };
-    return { p, sent, frames };
+    return { p, sent, stamps, judged, frames, zero: () => zero };
   }
   // What the piano heard from the first note on: the pedal-ups every cancel sends before it are housekeeping.
   const heard = (sent: number[][]) => sent.slice(sent.findIndex((m) => m[0] === 0x90 || m[2] === 127));
@@ -221,6 +227,34 @@ describe("the bot on the piano: pedal and velocity", () => {
       expect(heard(sent)).toEqual([
         on(60, 40), cc(127), cc(0), off(60), on(64, 100), cc(127), off(64), on(67, 80), cc(0), off(67),
       ]);
+    } finally {
+      cleanup();
+    }
+  });
+
+  // One clock rule: the judge reads each press calibrated, the piano plays it on the chart's clock, the recording's.
+  it.each([0, 60, -60])("calibration %i ms moves the judge's times, never the piano's", async (latency) => {
+    try {
+      const { sent, stamps, judged, frames, zero } = await harness(async () => null, latency);
+      frames(-200, 1700);
+      const z = zero() - 0.5; // the bot's own zero estimate: half a ms under /play's, as in #586
+      const ons = sent.flatMap((m, i) => (m[0] === 0x90 && m[2] > 0 ? [stamps[i] - z] : []));
+      expect(ons.map(Math.round)).toEqual([0, 500, 1000]);
+      const presses = judged.filter((e) => e.type === "on").map((e) => Math.round(e.timeMs - z));
+      expect(presses).toEqual([latency, 500 + latency, 1000 + latency]);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it("pause with a key down releases it, stamped after anything already handed to the piano", async () => {
+    try {
+      const { p, sent, stamps, frames } = await harness();
+      frames(-200, 700); // 64 is down, and its release (1000) not yet handed over
+      p.onEvent!({ type: "pause" } as GameEvent);
+      const i = sent.findLastIndex((m) => m[0] === 0x90 && m[1] === 64 && m[2] === 0);
+      expect(i).toBeGreaterThan(-1);
+      expect(stamps[i]).toBeGreaterThanOrEqual(Math.max(...stamps.slice(0, i)));
     } finally {
       cleanup();
     }

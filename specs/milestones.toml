@@ -173,6 +173,7 @@ features = [
   "golden-demo", # Eric, 2026-10-25 (#807): Golden's DGX autoplay sounds like a performance; his priority now
   "duo-details", # Eric, 2026-10-25 (#833): the results screen's Details grid in the Duo look, settings in Options
   "play-modes", # Eric, 2026-10-25 (#835): Learn, Flow and Perform as a ladder; practice keeps your mode (#832)
+  "demo-performance", # Eric, 2026-10-25 (#814): sustain, dynamics and legato for every demo, five songs a batch
   "laptop-sound",
   "flow-mode",
   "duo-tokens",
@@ -181,6 +182,7 @@ features = [
   "duo-select",
   "duo-results",
   "sheet-paper",
+  "sheet-engraving", # Eric, 2026-10-25 (#827): clef changes, 8va, beamed eighths and a readable zoom on /sheet; after sheet-paper, same worker
   "lab",
   "nav-bar",
   "hit-particles", # Eric, 2026-10-25 (#750): a priority, so ahead of duo-start

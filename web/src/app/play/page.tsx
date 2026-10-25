@@ -421,8 +421,9 @@ export default function Play() {
     saveLatencyOffset(v);
   };
 
-  // Latency, sound and MIDI status: under the start screen, and under the details on the results screen. Setup, not the
-  // game: ?capture=1 hides each of them (capture-mode); the SfxControls wrapper has no box, so nothing moves without it.
+  // Latency, sound and MIDI status on the error screen; the start and results screens have them in their Options
+  // drawers (duo-start, duo-details). Setup, not the game: ?capture=1 hides each of them (capture-mode); the SfxControls
+  // wrapper has no box, so nothing moves without it.
   const controls = (
     <>
       <label data-capture-hide style={{ marginTop: 24, display: "flex", gap: 8, alignItems: "center" }}>
@@ -509,10 +510,11 @@ export default function Play() {
               plugins={take && loaded ? plugins : []}
               panel={(p) => take && loaded && p.resultsPanel?.({ ...loaded, take, results, retry: start })}
               onRetry={start}
-              settings={controls}
+              onLatency={onLatency}
+              status={!isTest && <p data-capture-hide>{midiStatus}</p>}
             />
           )}
-          {/* the start screen has them in its Options drawer. Not while loading: the slider would show useState's 0 before
+          {/* the start and results screens have them in their Options drawers. Not while loading: the slider would show useState's 0 before
               the stored offset is read (#447, #478) */}
           {phase === "error" && controls}
         </div>
@@ -525,22 +527,22 @@ export default function Play() {
 function TimingPanel({ timing, latency, onLatency }: { timing: TimingSummary; latency: number; onLatency: (ms: number) => void }) {
   const suggested = timing.suggestedLatencyMs;
   return (
-    <div data-testid="timing" style={{ marginTop: 16, fontSize: 16, lineHeight: 1.6 }}>
+    <div data-testid="timing" style={{ lineHeight: 1.6 }}>
       {describeTiming(timing).map((line) => (
         <div key={line}>{line}</div>
       ))}
       {suggested !== null && suggested !== latency && (
-        <div data-capture-hide style={{ marginTop: 8 }}>
-          <button style={{ ...button, fontSize: 15, padding: "6px 16px", background: "#ddd" }} onClick={() => onLatency(suggested)}>
+        <div data-capture-hide style={{ marginTop: 12 }}>
+          <Button kind="secondary" onClick={() => onLatency(suggested)}>
             Set latency offset to {suggested} ms
-          </button>
-          <div style={{ fontSize: 13, opacity: 0.6, marginTop: 4 }}>
+          </Button>
+          <div style={{ fontSize: 13, color: "var(--pa-ink-dim)", marginTop: 6 }}>
             Shifts every press, so it also hides a habit of rushing or dragging.
           </div>
         </div>
       )}
       {suggested !== null && suggested === latency && (
-        <div data-capture-hide style={{ fontSize: 13, opacity: 0.6, marginTop: 8 }}>
+        <div data-capture-hide style={{ fontSize: 13, color: "var(--pa-ink-dim)", marginTop: 8 }}>
           Latency offset set to {latency} ms. Press Retry to use it.
         </div>
       )}
@@ -558,15 +560,6 @@ const overlay: React.CSSProperties = {
   justifyContent: "safe center", // centered while it fits; once results panels make it taller, it starts at the top
   overflowY: "auto", // … and scrolls, so the rank and counts are never cut off above the window
   background: "rgba(0,0,0,0.75)",
-};
-const button: React.CSSProperties = {
-  padding: "12px 32px",
-  fontSize: 20,
-  borderRadius: 8,
-  border: "none",
-  background: settings.noteColor,
-  color: "#000",
-  cursor: "pointer",
 };
 
 // The play corner (mouse-first): small square kit buttons in the HUD's top-right status gutter (hudSettings.statusGutterPx,

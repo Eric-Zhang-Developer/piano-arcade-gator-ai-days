@@ -1,12 +1,14 @@
 // The results screen's layout (spec: results-layout), in the Duo bands (spec: duo-results). The first view, with no
 // scroll at 1280×720: the rank in brackets with the six data cells, the featured panels (BY BAR and TIMING), then the
-// tutor beside the buttons. Every other plugin panel is a card in the details grid below.
+// tutor beside the buttons. Below it, the details (spec: duo-details): every other plugin panel as a bracketed card in
+// two groups, How I played and Do something, with the settings in the Options drawer.
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { GamePlugin, Results } from "../../contracts";
 import { Brackets, Button, DataCell, MonoLabel, Panel } from "../duo-tokens";
 import { FlowJudge } from "../flow-mode/judge";
 import { playMode } from "../play-modes/modes";
+import { OptionsDrawer } from "../options-panel";
 import { Slots } from "../play-slots/ui";
 import { showsMoment } from "../record-moment/timing";
 import { takeOutcome } from "../records";
@@ -23,7 +25,12 @@ export const resultsLayoutSettings = {
   // the first view, so it moves to the details for that take (spec: record-moment, First view)
   demoFeatured: ["watch-demo"], // a demo=1 take: its way back to the songs, so its focused button scrolls nothing
   actions: ["piano-out", "sheet-review", "score-card"], // panels that are buttons: they join Retry and Songs
-  names: { "take-midi": "MIDI", "replay-view": "Replay", "weak-bars": "Phrases", "tempo-curve": "Tempo" } as Record<string, string>,
+  // The details, by what a player wants (spec: duo-details; specs/decisions/duo-details-groups.md). Timing leads How I
+  // played; a panel in neither list joins the end of it, as duo-start does with a panel in no group.
+  played: ["tempo-curve", "evenness", "dynamics", "take-graph", "bar-loop", "weak-bars", "chord-sync", "records"],
+  doing: ["replay-view", "take-midi"], // panels that are buttons: one row of the kit's
+  wide: ["take-graph"], // spans both columns: at half width the graph's 900-wide plot overflowed the card
+  names: { "take-midi": "MIDI", "replay-view": "Replay", "weak-bars": "Phrases", "tempo-curve": "Tempo", "bar-loop": "Passes" } as Record<string, string>,
 };
 
 // A card's heading: the plugin's name, from its id unless names gives one ("chord-sync" → "Chord sync").
@@ -80,7 +87,8 @@ export function ResultsLayout({
   plugins,
   panel,
   onRetry,
-  settings,
+  onLatency,
+  status,
   params = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search),
   newRecord = showsMoment(takeOutcome()),
   heldTempo = playMode(params) === "flow" ? (FlowJudge.live?.heldTempo ?? null) : null,
@@ -94,7 +102,8 @@ export function ResultsLayout({
   plugins: GamePlugin[]; // layers.ts order
   panel: (p: GamePlugin) => ReactNode; // a plugin's results panel, as Slots takes it
   onRetry: () => void;
-  settings?: ReactNode; // latency, sound and MIDI controls: last, under the details
+  onLatency?: (ms: number) => void; // /play's own, so Retry uses an offset set in the Options drawer
+  status?: ReactNode; // the MIDI status line, inside the Options drawer
   params?: URLSearchParams; // the take's URL; /play's own when not given
   newRecord?: boolean; // this take set a new record (records' outcome when not given): record-moment's first view
   heldTempo?: number | null; // a Flow take's held tempo, beside the rank, since it caps the rank (play-modes)
@@ -102,16 +111,23 @@ export function ResultsLayout({
   const { actions } = resultsLayoutSettings;
   const featured = featuredFor(params, newRecord);
   const only = (ids: string[]) => plugins.filter((p) => ids.includes(p.id));
-  const rest = plugins.filter((p) => ![...featured, ...actions, ...resultsLayoutSettings.tutor, ...resultsLayoutSettings.ladder].includes(p.id));
-  const card = (p: GamePlugin) => {
+  const { played, doing, wide } = resultsLayoutSettings;
+  const rest = plugins.filter((p) => ![...featured, ...actions, ...resultsLayoutSettings.tutor, ...resultsLayoutSettings.ladder, ...doing].includes(p.id));
+  const rank = (id: string) => (played.includes(id) ? played.indexOf(id) : played.length);
+  const playedPlugins = [...rest].sort((a, b) => rank(a.id) - rank(b.id)); // stable: unlisted panels keep layers.ts order
+  const card = (name: string, node: ReactNode, span = false) => (
+    <Brackets tone="line" style={{ height: "100%", boxSizing: "border-box" }}>
+      <Panel style={{ height: "100%", boxSizing: "border-box" }}>
+        <section className={styles.card} aria-label={name} data-wide={span || undefined}>
+          <h3 className={styles.cardName}>{name}</h3>
+          {node}
+        </section>
+      </Panel>
+    </Brackets>
+  );
+  const pluginCard = (p: GamePlugin) => {
     const node = panel(p);
-    if (node === null || node === undefined) return node;
-    return (
-      <section className={styles.card} aria-label={panelName(p.id)}>
-        <h3 className={styles.cardName}>{panelName(p.id)}</h3>
-        {node}
-      </section>
-    );
+    return node === null || node === undefined ? node : card(panelName(p.id), node, wide.includes(p.id));
   };
   const tutor = only(resultsLayoutSettings.tutor);
   const tallies = dataCells(results).filter((c) => c.tally).length + 2; // the cells, then WRONG and EXTRA
@@ -190,19 +206,22 @@ export function ResultsLayout({
         </a>
       </div>
       <div id="results-details" className={styles.details}>
-        <h2 className={styles.detailsName}>Details</h2>
-        <div className={styles.grid}>
-          {scored && timing && (
-            <div data-testid="slot-timing" style={{ marginTop: 16 }}>
-              <section className={styles.card} aria-label="Timing">
-                <h3 className={styles.cardName}>Timing</h3>
-                {timing}
-              </section>
-            </div>
-          )}
-          <Slots plugins={rest} panel={card} />
+        <div className={styles.groupHead}>
+          <h2 className={styles.groupName}>How I played</h2>
+          <OptionsDrawer keys={false} onLatency={onLatency} note="Latency and labels apply when you press Retry.">
+            {status}
+          </OptionsDrawer>
         </div>
-        {settings && <div className={styles.settings}>{settings}</div>}
+        <div className={styles.grid} data-group="played">
+          {scored && timing && <div data-testid="slot-timing">{card("Timing", timing)}</div>}
+          <Slots plugins={playedPlugins} panel={pluginCard} />
+        </div>
+        <div className={styles.doing} data-group="doing">
+          <h2 className={styles.groupName}>Do something</h2>
+          <div className={styles.doingRow}>
+            <Slots plugins={only(doing)} panel={panel} />
+          </div>
+        </div>
       </div>
     </section>
   );

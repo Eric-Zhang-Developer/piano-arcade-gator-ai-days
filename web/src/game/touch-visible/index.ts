@@ -46,7 +46,7 @@ export function touchVisible(): GamePlugin {
         ...device,
         start(onEvent) {
           return device.start((e) => {
-            if (e.type === "on") ons.on(e.pitch, e.velocity, e.timeMs);
+            if (e.type === "on") ons.on(e.pitch, e.velocity, performance.now()); // arrival: a bot stamps its planned time
             onEvent(e);
           });
         },
@@ -60,7 +60,7 @@ export function touchVisible(): GamePlugin {
         rings = [];
       }
       if (e.type !== "noteHit") return;
-      const v = ons.hit(e.pitch, performance.now()); // the note-on's clock: noteHit's atMs is the chart's
+      const v = ons.hit(e.pitch, performance.now()); // arrival time on both sides: noteHit's atMs is the chart's clock
       const t = touchOf(v === null ? 0.5 : place.place(v));
       touches.set(e.noteId, t);
       if (t.ring && !reducedMotion()) {

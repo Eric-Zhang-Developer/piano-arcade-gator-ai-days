@@ -1,5 +1,5 @@
 ## What shipped
-Five songs from Mutopia notation MIDI, checked against the scans, bringing the library to ten: `gymnopedie-1` (bars 22–31, 56 BPM, 68 notes, A1–A5), `clair-de-lune` (bars 1–8, 60 BPM, 79, G#2–G#5), `nocturne-op9-2` (pickup + 1–8, 60 BPM, 267, A#1–D6), `maple-leaf-rag` (A strain twice, 100 BPM, 552, G#1–G#6), `moonlight-3` (bars 1–8, 147 BPM measured from a recording since #821 (was 60), 206, A1–C#6). Note counts from the scans equal the charts' (R + L: 22+46, 55+24, 77+190, 234+318, 139+67).
+Five songs from Mutopia notation MIDI, checked against the scans, bringing the library to ten: `gymnopedie-1` (bars 22–31, 56 BPM, 68 notes, A1–A5), `clair-de-lune` (bars 1–8, 60 BPM, 79, G#2–G#5), `nocturne-op9-2` (pickup + 1–8, 60 BPM, 267, A#1–D6), `maple-leaf-rag` (A strain twice, 100 BPM, 552, G#1–G#6), `moonlight-3` (the exposition, bars 1–65, since 2026-10-25 (was bars 1–8 and 206 notes); 147 BPM measured from a recording since #821 (was 60); 1,629, G1–E6). Note counts from the scans equal the charts' (R + L: 22+46, 55+24, 77+190, 234+318), and Moonlight's 831 + 798 come from the MIDI, not counted on the scan.
 
 ## Where it lives
 `web/public/songs/{gymnopedie-1,clair-de-lune,nocturne-op9-2,maple-leaf-rag,moonlight-3}/chart.json`, `specs/decisions/song-pack-2-excerpts.md`, `specs/features/song-pack-2/maple-leaf-rag-highway.png` (widest chart)

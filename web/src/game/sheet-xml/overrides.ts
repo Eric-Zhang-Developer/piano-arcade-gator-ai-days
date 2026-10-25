@@ -23,6 +23,9 @@ export const overrides: Record<string, Override> = {
   "gymnopedie-1": { mode: "minor" },
   // Mutopia 23, maple.ly line 38: `\partial 8`.
   "maple-leaf-rag": { pickup: true },
+  // Mutopia 276, moonlight-lys.zip, moonlight3-a4.ly lines 110 and 535: `\key cis \minor`. Read 2026-10-25, when the
+  // chart grew to the whole exposition (bars 1–65) and the estimate drifted to G♯ minor, the second theme's key.
+  "moonlight-3": { fifths: 4, mode: "minor" },
   // Mutopia 1590, chopin_nocturne_op9_n2.ly lines 92–93: `\key ef \major` and `\time 12/8`. The estimate agrees on
   // E♭ major; the rule gave 6/4 from beatsPerBar 6. Line 97: `\partial 8`.
   "nocturne-op9-2": { beats: 12, beatType: 8, pickup: true },

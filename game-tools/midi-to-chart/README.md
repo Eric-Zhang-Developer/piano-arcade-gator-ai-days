@@ -120,13 +120,16 @@ S=../../web/public/songs
   --midi source/chopin_nocturne_op9_n2.mid --pickup 0.5 --bars 1-9
 .venv/bin/python perform.py dynamics $S/maple-leaf-rag/chart.json --ly source/maple.ly --right top --left bottom --unfold \
   --midi source/maple.mid --pickup 0.5 --bars 1-33
+.venv/bin/python convert.py source/moonlight3.mid --rh 1 --lh 2 --bars 1-65 --bpm 147 --id moonlight-3 \
+  --title "Moonlight Sonata, 3rd movement (Presto agitato)" --composer "Ludwig van Beethoven" \
+  --catalog "Piano Sonata No. 14, Op. 27 No. 2" --source "<the chart's source line>" -o $S/moonlight-3/chart.json
 .venv/bin/python perform.py dynamics $S/moonlight-3/chart.json --ly source/moonlight3-a4.ly --right topmain --left bottom \
-  --midi source/moonlight3.mid --bars 1-8
+  --midi source/moonlight3.mid --bars 1-65   # the exposition: the repeat's bars 1-64 and its first ending, bar 65
 .venv/bin/python perform.py velocity $S/clair-de-lune/chart.json --mark pp
 .venv/bin/python perform.py pedal $S/nocturne-op9-2/chart.json --ly source/chopin_nocturne_op9_n2.ly --context lower \
   --down ped --up pes --midi source/chopin_nocturne_op9_n2.mid --pickup 0.5 --bars 1-9
 .venv/bin/python perform.py pedal $S/moonlight-3/chart.json --ly source/moonlight3-a4.ly --context sustain \
-  --midi source/moonlight3.mid --bars 1-8
+  --midi source/moonlight3.mid --bars 1-65
 for s in gymnopedie-1 clair-de-lune maple-leaf-rag; do .venv/bin/python perform.py pedal $S/$s/chart.json --harmony; done
 ```
 Batch 6 (#1102), with song-pack-5's sources (`specs/decisions/song-pack-5-sources.md`). The marks were hand-read;

@@ -44,17 +44,10 @@ it("stopping cancels the queue and sends All Notes Off on channel 1", () => {
   expect(sent.at(-1)).toEqual([0xb0, 123, 0]);
 });
 
-it("a song never played shows a blank best grade", () => {
-  const html = renderToStaticMarkup(<SongPreview id="twinkle" />);
-  expect(html).toMatch(/data-testid="preview-best"><\/b>/);
-  expect(renderToStaticMarkup(<SongPreview id="twinkle" best={{ rank: "A", accuracy: 0.912 }} />)).toContain("A · 91.2%");
-  expect(html).toContain("Press any key for previews");
-});
-
-it("LEARN links the song in wait mode before its chart has loaded (learn-from-select)", () => {
+it("the panel keeps the status line, and leaves best, LEARN and PRACTICE to the select's panel (duo-select)", () => {
   const html = renderToStaticMarkup(<SongPreview id="fur-elise" />);
-  expect(html).toContain('data-testid="preview-learn" href="/play?song=fur-elise&amp;mode=wait"');
-  expect(html).not.toContain("preview-practice"); // PRACTICE 70% waits for the chart; LEARN doesn't
+  expect(html).toContain("Press any key for previews");
+  for (const gone of ["preview-best", "preview-learn", "preview-practice", "preview-nps"]) expect(html).not.toContain(gone);
 });
 
 it("L is plain l or L: no Ctrl, Meta or Alt, no repeat", () => {

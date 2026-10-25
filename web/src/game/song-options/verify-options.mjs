@@ -116,7 +116,9 @@ try {
   const lastBeat = Math.max(...chart.notes.map((n) => n.beat + n.duration));
   await page.waitForSelector('[data-testid="results"]', { timeout: lastBeat * mpb + 30_000 });
   const results = await page.evaluate(() => window.__pianoArcade.results);
-  const recordShown = await page.getByText("NEW RECORD").count();
+  // Visible only: the help card (a closed <dialog> on every page) reads "initials for a new record", and getByText is
+  // case-insensitive and counts hidden text.
+  const recordShown = await page.getByText("NEW RECORD").filter({ visible: true }).count();
   const records = await page.evaluate(() => Object.keys(JSON.parse(localStorage.getItem("pianoArcade.records") ?? "{}")));
   check(results?.accuracy === 1 && recordShown === 0 && !records.length, `a perfect take: ${results ? `${(results.accuracy * 100).toFixed(1)}%` : "no results"}, no NEW RECORD, records [${records.join(", ")}]`);
   await page.screenshot({ path: join(out, "fur-elise-right-70-results.png") });

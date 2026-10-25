@@ -54,6 +54,14 @@ function saveCal(device: string, c: Calibration) {
   }
 }
 
+const download = (name: string, data: unknown) => {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: "application/json" }));
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+
 // One visual moment, shown when the camera's picture catches up with it.
 type Visual = { at: number; kind: "down" | "up" | "hit" | "wrong"; pitch: number; judgment?: "PERFECT" | "GREAT" | "GOOD" };
 
@@ -93,6 +101,7 @@ export function RealKeys() {
     quads: new Map<number, Quad>(), // each key in the picture
     samples: new Map<number, Int32Array>(), // analysis-picture pixel offsets per key
     latency: { pitch: null as number | null, presses: [] as number[], frames: [] as Sample[] },
+    analysis: new Map<number, Sample[]>(), // clip mode: each logged key's luma per frame, for score.mjs
     judge: null as Judge | null,
     zero: 0, // the clock at chart time 0
     endAt: Infinity,
@@ -311,18 +320,27 @@ export function RealKeys() {
     let raf = 0, vfc = 0, lastWall = performance.now();
 
     // Each new video frame: its luma per key for the latency step, on the picture's own display clock.
+    // In clip mode, also every logged key's luma, so score.mjs can find each key going down (latency and sparks).
+    const logged = [...new Set(log.map((n) => n.pitch))];
     const onFrame = (_now: number, meta: VideoFrameCallbackMetadata) => {
       const L = live.current;
-      if (L.step === "latency" && L.latency.pitch !== null && v.videoWidth) {
-        const at = L.samples.get(L.latency.pitch);
-        if (at) {
-          small.width = ANALYSIS_W;
-          small.height = Math.round((v.videoHeight * ANALYSIS_W) / v.videoWidth);
-          sctx.drawImage(v, 0, 0, small.width, small.height);
-          const img = sctx.getImageData(0, 0, small.width, small.height);
-          const t = clipMode ? meta.mediaTime * 1000 : meta.expectedDisplayTime;
-          L.latency.frames.push({ t, b: meanLuma(img.data, at) });
-        }
+      const at = L.step === "latency" && L.latency.pitch !== null ? L.samples.get(L.latency.pitch) : undefined;
+      const analyse = clipMode && logged.length > 0 && L.samples.size > 0 && (L.step === "latency" || L.step === "play");
+      if ((at || analyse) && v.videoWidth) {
+        small.width = ANALYSIS_W;
+        small.height = Math.round((v.videoHeight * ANALYSIS_W) / v.videoWidth);
+        sctx.drawImage(v, 0, 0, small.width, small.height);
+        const img = sctx.getImageData(0, 0, small.width, small.height);
+        const t = clipMode ? meta.mediaTime * 1000 : meta.expectedDisplayTime;
+        if (at) L.latency.frames.push({ t, b: meanLuma(img.data, at) });
+        if (analyse)
+          for (const p of logged) {
+            const q = L.samples.get(p);
+            if (!q) continue;
+            const list = L.analysis.get(p) ?? [];
+            if (list.at(-1)?.t !== t) list.push({ t, b: meanLuma(img.data, q) });
+            L.analysis.set(p, list);
+          }
       }
       vfc = v.requestVideoFrameCallback(onFrame);
     };
@@ -538,6 +556,14 @@ export function RealKeys() {
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     }, "image/png");
+    // The calibration it was taken with, for score.mjs edges: numbers, no picture.
+    download(`real-keys-calibration-${c.width}x${c.height}.json`, cal);
+  };
+
+  // Clip mode: the frames' luma per logged key, the log and the delay, for score.mjs latency and sparks.
+  const saveAnalysis = () => {
+    const frames = Object.fromEntries([...live.current.analysis].map(([p, f]) => [p, [...f].sort((a, b) => a.t - b.t)]));
+    download(`${(clipName ?? "clip").replace(/\.[^.]+$/, "")}.analysis.json`, { clip: clipName, delayMs: cal.delayMs, notes: log, frames });
   };
 
   const steps: [Step, string][] = [
@@ -738,6 +764,11 @@ export function RealKeys() {
             <Button kind="secondary" onClick={saveStill} disabled={!sourceOn}>
               Save still
             </Button>
+            {clipMode && (
+              <Button kind="secondary" onClick={saveAnalysis} disabled={!sourceOn || !log.length}>
+                Save analysis log
+              </Button>
+            )}
             <MonoLabel>
               {perf ? `p95 ${perf.p95.toFixed(2)} ms · ${composite}` : composite}{" "}
               <a className={css.link} href={`?${new URLSearchParams({ ...Object.fromEntries(params), composite: composite === "draw" ? "video" : "draw" })}`}>

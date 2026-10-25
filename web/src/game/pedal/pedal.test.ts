@@ -1,4 +1,5 @@
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import { sep } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { loadPedal, parsePedal, PEDAL_SONGS, pedalEvents } from ".";
 
@@ -38,7 +39,9 @@ describe("pedal.json", () => {
   // The committed library: every listed song has a valid pedal.json inside its chart, and every pedal.json is listed.
   it("library.json and the library's pedal.json files agree, each in order and inside its song", () => {
     const songs = new URL("../../../public/songs/", import.meta.url);
-    const files = readdirSync(songs).filter((id) => existsSync(new URL(`${id}/pedal.json`, songs)));
+    const files = readdirSync(songs, { recursive: true, encoding: "utf8" }) // nested too: x/build-sonata
+      .filter((f) => f.split(sep).pop() === "pedal.json")
+      .map((f) => f.split(sep).slice(0, -1).join("/"));
     expect([...PEDAL_SONGS].sort()).toEqual(files.sort());
     for (const id of PEDAL_SONGS) {
       const pedal = parsePedal(JSON.parse(readFileSync(new URL(`${id}/pedal.json`, songs), "utf8")));

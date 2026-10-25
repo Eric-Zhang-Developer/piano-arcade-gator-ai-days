@@ -28,6 +28,7 @@ export const labels: Record<string, Label> = {
   "name-theme": { kind: "wow", needs: [], poster: "/lab/name-theme.webp" },
   "hand-palette": { kind: "polish", needs: [], poster: "/lab/hand-palette.webp" },
   "ui-sounds-ab": { kind: "polish", needs: [], poster: "/lab/ui-sounds-ab.webp" },
+  inside: { kind: "wow", needs: [], poster: "/lab/inside.webp" },
 };
 
 export type Labeled = Experiment & Label;

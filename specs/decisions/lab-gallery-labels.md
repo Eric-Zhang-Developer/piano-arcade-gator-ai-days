@@ -12,7 +12,7 @@ as a text card until someone adds its line here; no test forces it, so a new exp
 **How to undo.** Move each entry's fields onto its `Experiment` once `x/index.ts` is free, and drop `labels.ts`.
 
 ## kind: the issue's labels
-`wow` where the issue carries `wow` (#985, #1017, #913, #1069, #1106, #1123, #1162, #1153, #1171, #1190); `polish`
+`wow` where the issue carries `wow` (#985, #1017, #913, #1069, #1106, #1123, #1162, #1153, #1171, #1190, #1226); `polish`
 where it carries `polish` (#1127, #1167). #878 (sample) and #990 (screen-shake) carry neither, so they have no kind
 and the chip shows their group (The frame, Juice). No issue carries `spike`, so none is `spike`, though the
 registry comments call highlight-reel and speaking-piano spikes.
@@ -29,7 +29,8 @@ experiment's point depends on:
 - **speaking-piano: dgx.** The spike's question is whether the DGX itself can speak (`Speak.tsx:53`). The mic is
   optional: three preset phrases need none (`Speak.tsx:39`, spec 59-61), so no `mic`.
 - **Everything else: none.** It runs on laptop keys, a bot, a demo take or laptop sound (composers-hands, wet-paint,
-  build-sonata and name-theme use the DGX when it's there, through the virtual output when not).
+  build-sonata and name-theme use the DGX when it's there, through the virtual output when not). inside (#1255,
+  merged while this was in review) plays from laptop keys or the sim (`Inside.tsx:104`, spec "How it mounts").
 
 No experiment needs `mic`.
 
@@ -40,7 +41,8 @@ on eric-agent-8's dev server, Next's dev badge hidden, encoded with `cwebp -q 86
 - about 10 s into the bot's take after Start: screen-shake (`bot=fever`), hand-palette (`bot=perfect`), round (its
   href plus `bot=perfect`, which stands in for the player: voice 2 has come in);
 - the page as it opens: conductor ("Raise a hand"), highlight-reel (the scripted take), speaking-piano (phrase A's
-  spectrogram), pinned (the cylinder), name-theme (HAYDN), build-sonata (after its count-up settles, ~10 s);
+  spectrogram), pinned (the cylinder), name-theme (HAYDN), build-sonata (after its count-up settles, ~10 s), inside
+  (the action at rest, labeled);
 - after one action: composers-hands ("Use the test roll"), wet-paint (the page's own `__wetPaint.play` hook: pedal
   down and 18 notes);
 - real-keys: no camera here and no committed clip, so the honest still is its "camera off" frame, cropped to the key

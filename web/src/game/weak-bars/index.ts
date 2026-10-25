@@ -1,4 +1,5 @@
 import { createElement } from "react";
+import { kitButton } from "../duo-tokens";
 import type { Chart, GamePlugin, Results, Take } from "../../contracts";
 import { passAccuracy } from "../bar-loop";
 import { msPerBeat } from "../core/settings";
@@ -77,38 +78,32 @@ export function weakBars(): GamePlugin {
             "data-testid": "weak-bars-cell",
             "data-weakest": s === worst || undefined,
             style: {
-              padding: "4px 8px",
-              borderRadius: 6,
-              minWidth: 64,
-              background: s === worst ? "rgba(255, 77, 94, 0.18)" : "var(--pa-panel)",
-              border: `1px solid ${s === worst ? "var(--pa-wrong)" : "rgba(242, 242, 245, 0.15)"}`,
+              padding: "6px 10px",
+              borderRadius: 0,
+              minWidth: 72,
+              background: s === worst ? "color-mix(in srgb, var(--pa-primary) 14%, transparent)" : "var(--pa-panel)",
+              border: `1px solid ${s === worst ? "var(--pa-primary)" : "var(--pa-line)"}`,
+              fontFamily: "var(--pa-font-data), ui-monospace, monospace",
+              fontVariantNumeric: "tabular-nums",
               fontSize: "0.8em",
               lineHeight: 1.3,
             },
           },
-          createElement("div", { style: { color: "var(--pa-ink-dim)" } }, label(s)),
+          createElement("div", { style: { color: "var(--pa-ink-dim)", whiteSpace: "nowrap" } }, label(s)),
           createElement("div", { style: { color: "var(--pa-ink)", fontSize: "1.25em" } }, `${Math.round(s.accuracy * 100)}%`),
         );
       return createElement(
         "div",
-        { "data-testid": "weak-bars", style: { textAlign: "center" } },
-        createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" } }, ...scores.map(cell)),
+        { "data-testid": "weak-bars" },
+        createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(112px, 1fr))", gap: 6 } }, ...scores.map(cell)),
         worst
           ? createElement(
               "a",
               {
                 href: practiceUrl(chart, params, worst),
                 "data-testid": "weak-bars-practice",
-                style: {
-                  display: "inline-block",
-                  marginTop: 10,
-                  padding: "6px 14px",
-                  borderRadius: 8,
-                  background: "var(--pa-hand-r)",
-                  color: "#000",
-                  textDecoration: "none",
-                  fontWeight: 600,
-                },
+                className: kitButton("primary").className,
+                style: { ...kitButton("primary").style, marginTop: 14 },
               },
               `Practice ${label(worst).toLowerCase()} at ${weakBarsSettings.practiceTempo}%`,
             )

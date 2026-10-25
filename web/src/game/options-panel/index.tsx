@@ -249,15 +249,18 @@ const typing = (t: EventTarget | null) => t instanceof HTMLElement && (t.isConte
 // The Options button and its drawer. O toggles it from anywhere on the page; Esc closes it (the dialog's own).
 // /play's start screen (duo-start) passes keys={false}, since O is a laptop piano key there, its own onLatency so the
 // next take uses the new offset, and the start panels that belong in it (Connect lights, the MIDI status) as children.
+// The results screen (duo-details) does the same, with its own note: there the next take starts from Retry.
 export function OptionsDrawer({
   recording = false,
   keys = true,
   onLatency,
+  note,
   children,
 }: {
   recording?: boolean;
   keys?: boolean;
   onLatency?: (ms: number) => void;
+  note?: string;
   children?: ReactNode;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -334,7 +337,7 @@ export function OptionsDrawer({
           }}
         />
         {children && <div className={styles.extra}>{children}</div>}
-        <p className={styles.note}>{onLatency ? "Labels apply when you press Start." : `Latency, labels${recording ? " and the recording" : ""} apply from the next song.`}</p>
+        <p className={styles.note}>{note ?? (onLatency ? "Labels apply when you press Start." : `Latency, labels${recording ? " and the recording" : ""} apply from the next song.`)}</p>
       </dialog>
     </>
   );

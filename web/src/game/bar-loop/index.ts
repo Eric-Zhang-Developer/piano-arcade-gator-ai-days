@@ -1,3 +1,4 @@
+import { createElement } from "react";
 import type { Chart, GamePlugin } from "../../contracts";
 import { GOOD_WEIGHT, msPerBeat } from "../core/settings";
 import { isWaitMode } from "../wait-mode";
@@ -71,12 +72,14 @@ interface Pass {
 export const passAccuracy = (p: Pass, notes: number) => (p.PERFECT + 0.5 * p.GREAT + GOOD_WEIGHT * p.GOOD) / (notes + p.wrong);
 
 // Practice bars X to Y at a slower tempo: /play?song=<id>&from=<bar>&to=<bar>&tempo=<percent>[&passes=<n>].
-// Each pass is scored on its own, and the list shows next to the results so improvement is visible.
+// Each pass is scored on its own, and the list is a results panel (Passes, in duo-details' How I played) so improvement
+// is visible.
 export function barLoop(): GamePlugin & { passes(): number[] } {
   let plan: LoopPlan | null = null;
   let bpm = 0;
   let tally: Pass[] = [];
   let wait = false; // wait mode isn't scored: no Passes list (every learn step would read 100.0%)
+  let ended = false; // the passes are scored once the song ends
   const passOf = (noteId: string) => Number(/^p(\d+)-/.exec(noteId)?.[1] ?? 0) - 1;
   const accuracies = () => (plan ? tally.map((p) => passAccuracy(p, plan!.notesPerPass)) : []);
 
@@ -94,7 +97,7 @@ export function barLoop(): GamePlugin & { passes(): number[] } {
       if (!plan) return;
       if (e.type === "songStart") {
         tally = Array.from({ length: plan.passes }, () => ({ PERFECT: 0, GREAT: 0, GOOD: 0, MISS: 0, wrong: 0 }));
-        showPasses(null);
+        ended = false;
       }
       if (e.type === "noteHit") tally[passOf(e.noteId)][e.judgment]++;
       if (e.type === "noteMiss") tally[passOf(e.noteId)].MISS++;
@@ -102,37 +105,36 @@ export function barLoop(): GamePlugin & { passes(): number[] } {
         const k = Math.floor(e.atMs / (plan.passBeats * msPerBeat(bpm)));
         if (tally[k]) tally[k].wrong++;
       }
-      if (e.type === "songEnd" && !wait && !(plan.whole && plan.passes === 1)) showPasses(accuracies()); // one pass: the results say it
+      if (e.type === "songEnd") ended = true;
+    },
+    // One accuracy per pass, in the data mono. None in wait mode, and none for a single whole-song pass: the results
+    // say it.
+    resultsPanel() {
+      if (!plan || !ended || wait || (plan.whole && plan.passes === 1)) return null;
+      return createElement(
+        "ol",
+        { "data-testid": "bar-loop-passes", style: passesStyle },
+        ...accuracies().map((a, i) =>
+          createElement(
+            "li",
+            { key: i, style: { display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 28 } },
+            createElement("span", { style: { color: "var(--pa-ink-dim)", fontSize: 12, letterSpacing: "0.14em" } }, `PASS ${String(i + 1).padStart(2, "0")}`),
+            createElement("span", { style: { fontSize: 20, color: "var(--pa-ink)" } }, `${(a * 100).toFixed(1)}%`),
+          ),
+        ),
+      );
     },
   };
 }
 
-// The results screen is core-loop's, so the pass list is its own small panel beside it.
-function showPasses(list: number[] | null) {
-  if (typeof document === "undefined") return;
-  document.querySelector('[data-testid="bar-loop-passes"]')?.remove();
-  if (!list) return;
-  const el = document.createElement("ol");
-  el.setAttribute("data-testid", "bar-loop-passes");
-  Object.assign(el.style, {
-    position: "fixed",
-    top: "72px",
-    right: "16px",
-    margin: "0",
-    padding: "12px 16px 12px 40px",
-    background: "rgba(0, 0, 0, 0.8)",
-    border: "1px solid #333",
-    borderRadius: "8px",
-    font: "16px system-ui, sans-serif",
-    color: "#eee",
-    zIndex: "900",
-    fontVariantNumeric: "tabular-nums",
-  });
-  el.innerHTML = `<div style="margin-left:-24px;margin-bottom:6px;opacity:.7">Passes</div>`;
-  for (const a of list) {
-    const li = document.createElement("li");
-    li.textContent = `${(a * 100).toFixed(1)}%`;
-    el.appendChild(li);
-  }
-  document.body.appendChild(el);
-}
+const passesStyle = {
+  display: "flex",
+  flexDirection: "column" as const,
+  gap: 6,
+  width: "min(100%, 220px)",
+  margin: 0,
+  padding: 0,
+  listStyle: "none",
+  fontFamily: "var(--pa-font-data), ui-monospace, monospace",
+  fontVariantNumeric: "tabular-nums",
+};

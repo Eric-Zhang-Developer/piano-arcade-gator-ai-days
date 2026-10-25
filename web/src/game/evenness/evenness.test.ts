@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { Chart, ChartNote, Hand, Results, Take } from "../../contracts";
-import { describeEvenness, findRuns, scoreEvenness } from ".";
+import { describeEvenness, evenness, findRuns, scoreEvenness } from ".";
 
 const twinkle: Chart = JSON.parse(readFileSync(new URL("../../../public/songs/twinkle/chart.json", import.meta.url), "utf8"));
 
@@ -72,5 +72,16 @@ describe("scores", () => {
   it("a chart with no runs gives the message", () => {
     const chart = chartOf([note("a", 0), note("b", 1), note("c", 3)]);
     expect(describeEvenness(score(chart, () => 0), chart).empty).toBe("No runs to score in this song");
+  });
+
+  it("either empty line is no card on the results screen; a scored run is (duo-details)", () => {
+    const panel = (chart: Chart, missed: string[] = []) => {
+      const t = take(chart, () => 0, missed);
+      return evenness().resultsPanel!({ chart, ...t, params: new URLSearchParams(), retry() {} });
+    };
+    expect(panel(chartOf([note("a", 0), note("b", 1), note("c", 3)]))).toBeNull(); // no runs
+    const run = chartOf([0, 1, 2, 3, 4].map((b) => note(`r${b}`, b)));
+    expect(panel(run, ["r1", "r3"])).toBeNull(); // too little of the run played
+    expect(panel(run)).not.toBeNull();
   });
 });

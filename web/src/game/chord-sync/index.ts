@@ -14,7 +14,7 @@ export function chordSync(): GamePlugin {
       const line = (text: string, style: Record<string, string> = {}) => createElement("div", { key: text, style }, text);
       return createElement(
         "div",
-        { "data-testid": "chord-sync", style: { textAlign: "center", lineHeight: 1.5 } },
+        { "data-testid": "chord-sync", style: { lineHeight: 1.5 } },
         line(d.summary, { fontSize: "1.15em", color: "var(--pa-ink)" }),
         ...d.rows.map((r) => line(r, { color: "var(--pa-ink-dim)", fontSize: "0.9em" })),
       );

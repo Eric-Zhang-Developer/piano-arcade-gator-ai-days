@@ -15,7 +15,10 @@ const report = (line: string) => process.stderr.write(`crowd: ${line}\n`);
 
 afterEach(() => vi.unstubAllGlobals());
 
-describe("(a) detection on known-time mixes, over the laptop voice playing twinkle", () => {
+// The mixes are seconds of audio synthesized and scanned in JS: on a busy machine that outruns the 5 s default.
+const heavy = { timeout: 60_000 };
+
+describe("(a) detection on known-time mixes, over the laptop voice playing twinkle", heavy, () => {
   // The level: each clap's RMS over its first 20 ms against the bed's RMS over the notes' span (mix.ts).
   const levels = [0, -6, -12].map((db) => {
     const runs = [1, 2, 3].map((seed) => {
@@ -150,7 +153,7 @@ describe("the worklet", () => {
   });
 });
 
-describe("(b) CPU", () => {
+describe("(b) CPU", heavy, () => {
   it("each 128-sample block's work is under 30% of the block's budget (offline, node: 3 runs)", () => {
     const m = crowdMix(twinkle, everyBeat, -6, 1, RATE);
     const budget = (128 / RATE) * 1000;

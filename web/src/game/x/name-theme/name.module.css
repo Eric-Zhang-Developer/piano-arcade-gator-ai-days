@@ -1,0 +1,204 @@
+/* /name: the name falls letter by letter into its notes, and the theme it makes runs under it as a roll. Type scales
+   with the width (16 px at 1280, 24 px at 1920), as /speak and /conduct. */
+.page {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 2.4em 2.5em 1.6em;
+  background: var(--pa-bg);
+  color: var(--pa-ink);
+  font: 400 clamp(14px, 1.25vw, 28px) / 1.35 system-ui, sans-serif;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2em;
+}
+
+.title {
+  margin: 0;
+  font: 800 2.2em/1 var(--pa-font-display), system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.back {
+  margin-left: auto;
+  padding: 0.3em 0;
+  color: var(--pa-ink-dim);
+  text-decoration: none;
+}
+
+.back:hover,
+.back:focus-visible {
+  color: var(--pa-ink);
+}
+
+.body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(16em, 22em) 1fr;
+  gap: 2.5em;
+  margin-top: 1.8em;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.field {
+  display: grid;
+  gap: 0.45em;
+}
+
+.input {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid var(--pa-line);
+  border-radius: 0;
+  background: var(--pa-panel);
+  color: var(--pa-ink);
+  font: italic 800 1.8em / 1.1 var(--pa-font-display), system-ui, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.35em 0.45em;
+}
+
+.input::placeholder {
+  color: var(--pa-ink-dim);
+  opacity: 0.45;
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--pa-primary);
+  outline-offset: 2px;
+}
+
+.row,
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+}
+
+.small {
+  margin: 0;
+  color: var(--pa-ink-dim);
+  font-size: max(12px, 0.85em);
+}
+
+.status {
+  margin: 0;
+  font-family: var(--pa-font-data), ui-monospace, monospace;
+  font-size: max(12px, 0.9em);
+}
+
+.main {
+  container-type: inline-size;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 1.2em;
+  min-width: 0;
+}
+
+/* One column per letter: the letter, a hairline, its note. */
+.strip {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 0 0.15em;
+}
+
+.strip[data-example] {
+  opacity: 0.4;
+}
+
+.cell,
+.silent {
+  display: grid;
+  justify-items: center;
+  min-width: 0;
+}
+
+.letter {
+  font: italic 900 min(clamp(72px, 8vw, 180px), calc(118cqw / var(--n))) / 0.95 var(--pa-font-display), system-ui, sans-serif;
+  padding: 0 0.04em 0.1em;
+  border-bottom: 1px solid var(--pa-line);
+  width: 100%;
+  text-align: center;
+}
+
+.note {
+  padding-top: 0.35em;
+  font: 700 clamp(20px, 1.9vw, 42px) / 1 var(--pa-font-data), ui-monospace, monospace;
+  color: var(--pa-primary);
+}
+
+.silent .letter {
+  color: var(--pa-ink-dim);
+  opacity: 0.4;
+}
+
+.silent .note {
+  color: var(--pa-ink-dim);
+}
+
+.rollBox {
+  position: relative;
+  min-height: 10em;
+}
+
+/* Each letter rides its note in the roll: where the name turned into the music. */
+.tag {
+  position: absolute;
+  transform: translate(0.2em, -125%);
+  font: italic 900 clamp(13px, 1.1vw, 24px) / 1 var(--pa-font-display), system-ui, sans-serif;
+  color: var(--pa-ink);
+  pointer-events: none;
+}
+
+.roll {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--pa-panel);
+  outline: 1px solid var(--pa-line);
+}
+
+.bar {
+  stroke: var(--pa-line);
+  stroke-width: 1;
+}
+
+.seam {
+  stroke: var(--pa-primary);
+  stroke-width: 2;
+}
+
+.right {
+  fill: var(--pa-primary);
+}
+
+.left {
+  fill: var(--pa-ink-dim);
+  opacity: 0.6;
+}
+
+.chords {
+  margin: 0;
+  color: var(--pa-ink-dim);
+  font: 500 max(12px, 0.85em) / 1.4 var(--pa-font-data), ui-monospace, monospace;
+  letter-spacing: 0.06em;
+}
+
+@media (max-width: 760px) {
+  .body {
+    grid-template-columns: 1fr;
+  }
+}

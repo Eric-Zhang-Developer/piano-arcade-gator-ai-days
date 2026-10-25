@@ -1,0 +1,144 @@
+/* The diagnostic screen: one item at a time in a bracketed panel, the duo look of the retrieval screen. Every rule is
+   scoped under .screen so the learn tokens always resolve. */
+.screen {
+  min-height: calc(100dvh - var(--learn-header-height));
+  background: var(--learn-bg);
+  color: var(--learn-text);
+  padding: 40px 48px;
+  font-size: 16px;
+}
+
+.screen .column {
+  width: min(880px, 100%);
+  margin: 0 auto;
+}
+
+.screen .top {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 12px;
+}
+
+
+.screen .stopLink {
+  font-family: var(--learn-font-data);
+  font-size: 16px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--learn-secondary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+
+.screen .prompt {
+  margin: 0 0 28px;
+  font-size: 36px;
+  line-height: 1.15;
+  font-style: normal;
+  color: var(--learn-text);
+}
+
+.screen .prompt:focus {
+  outline: none;
+}
+
+
+.screen .options {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+
+.screen .option {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  border: 1px solid var(--learn-border);
+  border-radius: 0;
+  background: var(--learn-bg);
+}
+
+.screen .option[data-picked] {
+  border-color: var(--learn-secondary);
+}
+
+.screen .option:has(input:focus-visible) {
+  outline: 2px solid var(--learn-text);
+  outline-offset: 2px;
+}
+
+.screen .choice {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.screen .choice input {
+  appearance: none;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 3px;
+  border: 2px solid var(--learn-muted);
+  border-radius: 0;
+  background: transparent;
+  background-clip: content-box;
+  cursor: pointer;
+}
+
+.screen .choice input:checked {
+  border-color: var(--learn-secondary);
+  background-color: var(--learn-secondary);
+}
+
+.screen .choice input:focus-visible {
+  outline: none;
+}
+
+.screen .choice input:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.screen .choice:has(input:disabled) {
+  cursor: default;
+}
+
+/* The passage sits on paper, as printed music does. */
+.screen .paper {
+  background: var(--learn-paper);
+  color: var(--learn-paper-text);
+  padding: 24px;
+  margin: 0 0 20px;
+  border-radius: 0;
+}
+
+.screen .status {
+  margin: 0;
+  color: var(--learn-muted);
+  font-family: var(--learn-font-data);
+  font-size: 16px;
+  letter-spacing: .06em;
+}
+
+.screen .actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-top: 28px;
+}
+
+.screen :is(input, button, a):focus-visible {
+  outline: 2px solid var(--learn-text);
+  outline-offset: 2px;
+}
+

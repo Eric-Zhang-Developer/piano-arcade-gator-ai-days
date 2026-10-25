@@ -244,6 +244,12 @@ features = [
   "kit-leftovers-small", # polish sweep 2 (#1208, #1209, #1210): data-face labels, square key chips, /real-keys upright
   "select-motion", # Eric, 2026-10-25 (#1212): one deep polish pass on the select's motion, springs and no queue, a #856 hero item
   "inside", # Eric, 2026-10-25 (#1226): wow feeder; a live cutaway of a grand's action driven by the DGX, an experiment
+  "lab-gallery", # Eric, 2026-10-25 (#1249): the Lab's On trial as an exhibition with posters, and Eric's verdict sheet
+  "select-a11y", # polish sweep 3 (#1236, #1237, #1238): an arrow step reads the song, Song N of M heard, GitHub tab
+  "play-polish", # polish sweep 3 (#1239, #1240): the start screen reads on video, the toast ring off the old cyan
+  "take-seams", # polish sweep 3 (#1241, #1242, #1243): Back says quit, WARNING upright, the broken combo as the HUD
+  "results-polish", # polish sweep 3 (#1244-#1247): PRACTICE BARS a link, Watch replay a kit dialog, initials heard
+  "record-follows", # Eric, 2026-10-25 (#1261): wow feeder; the real recording stretches to follow the player, an experiment
 ]
 cut = []
 

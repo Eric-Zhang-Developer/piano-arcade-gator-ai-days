@@ -2,6 +2,7 @@
 // comb voice, one revolution for the whole take; Macro moves in on the pluck point; Export writes the STL.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, MonoLabel } from "../../duo-tokens";
+import { crankAudio } from "./crank-audio";
 import { getPrefs } from "../../sound";
 import { hz, pinTake } from "./cylinder";
 import { makeMusicBox, type MusicBox } from "./scene";
@@ -16,7 +17,8 @@ const clock = (ms: number) => `${Math.floor(ms / 60000)}:${String(Math.floor(ms 
 export function Pinned() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const boxRef = useRef<MusicBox | null>(null);
-  const audioRef = useRef<{ ctx: AudioContext; sources: AudioBufferSourceNode[]; t0: number } | null>(null);
+  const [audio] = useState(() => crankAudio()); // one context for every crank, closed on leaving
+  const runRef = useRef<{ t0: number } | null>(null); // the crank in progress
   const turnRef = useRef(0);
   // The take: the one /play saved, else (below) a scripted perfect run of the demo song. Client-only page.
   const [saved, setSaved] = useState<Saved | null>(() => (new URLSearchParams(location.search).get("take") === "last" ? loadLast() : null));
@@ -48,12 +50,14 @@ export function Pinned() {
     const lengthS = pinned.lengthMs / 1000;
     let raf = 0;
     const loop = () => {
-      const a = audioRef.current;
-      if (a) {
-        const t = a.ctx.currentTime - a.t0;
+      const run = runRef.current;
+      if (run && audio.ctx) {
+        const t = audio.ctx.currentTime - run.t0;
         turnRef.current = Math.min(2 * Math.PI, (t / lengthS) * 2 * Math.PI);
         if (t > lengthS + voiceSettings.lengthS) {
-          audioRef.current = null;
+          // the natural end: stop()'s steps, inlined so the effect doesn't rerun on every render
+          runRef.current = null;
+          audio.stop();
           setPlaying(false);
         }
       }
@@ -67,14 +71,13 @@ export function Pinned() {
       box.dispose();
       boxRef.current = null;
     };
-  }, [pinned, still]);
+  }, [pinned, still, audio]);
 
-  useEffect(() => () => stop(), []);
+  useEffect(() => () => audio.close(), [audio]);
 
   function stop() {
-    const a = audioRef.current;
-    audioRef.current = null;
-    a?.sources.forEach((s) => s.stop());
+    runRef.current = null;
+    audio.stop();
     setPlaying(false);
   }
 
@@ -82,26 +85,25 @@ export function Pinned() {
   function crank() {
     if (!pinned) return;
     if (playing) return stop();
-    const ctx = new AudioContext();
-    const out = ctx.createGain();
     const prefs = getPrefs();
-    out.gain.value = prefs.muted ? 0 : prefs.volume;
-    out.connect(ctx.destination);
-    const voices = pinned.teeth.map((p) => {
-      const samples = renderTooth(hz(p), ctx.sampleRate);
-      const buf = ctx.createBuffer(1, samples.length, ctx.sampleRate);
-      buf.copyToChannel(samples, 0);
-      return buf;
+    let t0 = 0;
+    audio.start(prefs.muted ? 0 : prefs.volume, (ctx, out) => {
+      const voices = pinned.teeth.map((p) => {
+        const samples = renderTooth(hz(p), ctx.sampleRate);
+        const buf = ctx.createBuffer(1, samples.length, ctx.sampleRate);
+        buf.copyToChannel(samples, 0);
+        return buf;
+      });
+      t0 = ctx.currentTime + LEAD_S;
+      return pinned.pins.map((pin) => {
+        const src = ctx.createBufferSource();
+        src.buffer = voices[pin.tooth];
+        src.connect(out);
+        src.start(t0 + pin.timeMs / 1000);
+        return src;
+      });
     });
-    const t0 = ctx.currentTime + LEAD_S;
-    const sources = pinned.pins.map((pin) => {
-      const src = ctx.createBufferSource();
-      src.buffer = voices[pin.tooth];
-      src.connect(out);
-      src.start(t0 + pin.timeMs / 1000);
-      return src;
-    });
-    audioRef.current = { ctx, sources, t0 };
+    runRef.current = { t0 };
     setPlaying(true);
   }
 
@@ -147,12 +149,7 @@ export function Pinned() {
         </dl>
         {saved?.scripted && <MonoLabel>A scripted take, a perfect run. Pin your own from the results with Pinned on in the Lab.</MonoLabel>}
         <div className={styles.actions}>
-          <Button onClick={crank} disabled={!pinned} data-testid="pinned-crank" aria-pressed={playing}>
-            {playing ? "Stop" : "Turn the crank"}
-          </Button>
-          <Button kind="secondary" onClick={toggleMacro} disabled={!pinned || noGl} data-testid="pinned-macro" aria-pressed={macro}>
-            {macro ? "Wide" : "Macro"}
-          </Button>
+          <Toggles playing={playing} macro={macro} onCrank={crank} onMacro={toggleMacro} crankOff={!pinned} macroOff={!pinned || noGl} />
           <Button kind="secondary" onClick={exportStl} disabled={!pinned} data-testid="pinned-export">
             Export STL
           </Button>
@@ -165,5 +162,31 @@ export function Pinned() {
         <span className={styles.hint}>Drag to turn the view.</span>
       </p>
     </main>
+  );
+}
+
+// The two toggles say one thing: each label names what a press does next ("Stop", "Wide"), and neither carries
+// aria-pressed, which made a reader hear "Stop, pressed" (#1200, decision musicbox-polish-toggles). Each keeps the
+// width of its longer label, so the row doesn't jump as they change: both labels share one grid cell, and the idle one
+// is hidden (visibility, so it leaves the accessible name too).
+export function Toggles(p: { playing: boolean; macro: boolean; onCrank(): void; onMacro(): void; crankOff: boolean; macroOff: boolean }) {
+  return (
+    <>
+      <Button onClick={p.onCrank} disabled={p.crankOff} data-testid="pinned-crank">
+        <Swap on={p.playing} off="Turn the crank" onLabel="Stop" />
+      </Button>
+      <Button kind="secondary" onClick={p.onMacro} disabled={p.macroOff} data-testid="pinned-macro">
+        <Swap on={p.macro} off="Macro" onLabel="Wide" />
+      </Button>
+    </>
+  );
+}
+
+function Swap({ on, off, onLabel }: { on: boolean; off: string; onLabel: string }) {
+  return (
+    <span className={styles.swap}>
+      <span data-idle={on || undefined}>{off}</span>
+      <span data-idle={!on || undefined}>{onLabel}</span>
+    </span>
   );
 }

@@ -1,8 +1,12 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { analysisDefaults, analyze, keyHz } from "./analysis";
+import { micHold } from "./mic";
 import { phraseMessages, play, silenceOnPagehide, type PlayFrame } from "./playback";
+import { NoteLines, Speak, type Note } from "./Speak";
 
 const SR = 22050;
 const tone = (hz: number, s = 1) => Float32Array.from({ length: SR * s }, (_, i) => 0.5 * Math.sin((2 * Math.PI * hz * i) / SR));
@@ -94,5 +98,81 @@ describe("mic privacy", () => {
     const files = readdirSync(dir).filter((f) => /\.(ts|tsx)$/.test(f) && !f.endsWith(".test.ts"));
     expect(files.length).toBeGreaterThan(0);
     for (const f of files) expect(readFileSync(join(dir, f), "utf8")).not.toMatch(/\bfetch\s*\(|XMLHttpRequest|WebSocket|sendBeacon|EventSource|\.postMessage\(/);
+  });
+});
+
+describe("leaving mid-hold (speak-polish, #1201)", () => {
+  afterEach(() => vi.useRealTimers());
+  const stubMic = () => {
+    const mic = { stopped: 0, stop: () => (mic.stopped++, { samples: new Float32Array(SR), rate: SR }) };
+    return mic;
+  };
+
+  it("tearing down mid-hold stops the mic, and 3 s later nothing plays", async () => {
+    vi.useFakeTimers();
+    const mic = stubMic();
+    const onTake = vi.fn();
+    const hold = micHold(async () => mic, 3000, onTake);
+    await hold.down();
+    vi.advanceTimersByTime(1000);
+    hold.dispose();
+    vi.advanceTimersByTime(5000);
+    expect(mic.stopped).toBe(1);
+    expect(onTake).not.toHaveBeenCalled();
+  });
+
+  it("a mic still opening when the page goes is stopped as it arrives, with no timer", async () => {
+    vi.useFakeTimers();
+    const mic = stubMic();
+    let resolve!: (m: typeof mic) => void;
+    const onTake = vi.fn();
+    const hold = micHold(() => new Promise((r) => (resolve = r)), 3000, onTake);
+    const down = hold.down();
+    hold.dispose();
+    resolve(mic);
+    await down;
+    vi.advanceTimersByTime(5000);
+    expect(mic.stopped).toBe(1);
+    expect(onTake).not.toHaveBeenCalled();
+  });
+
+  it("without leaving, the take still ends at 3 s or on release, once", async () => {
+    vi.useFakeTimers();
+    const mic = stubMic();
+    const onTake = vi.fn();
+    const hold = micHold(async () => mic, 3000, onTake);
+    await hold.down();
+    vi.advanceTimersByTime(3000);
+    hold.up();
+    expect(onTake).toHaveBeenCalledTimes(1);
+    expect(mic.stopped).toBe(1);
+  });
+});
+
+describe("the page's type and notes (speak-polish, #1202, #1203)", () => {
+  it("nothing resolves under the kit's 12 px at 1280×720 (16 px base), the canvas's octave names included", () => {
+    const tsx = readFileSync(join(__dirname, "Speak.tsx"), "utf8");
+    const css = readFileSync(join(__dirname, "speak.module.css"), "utf8");
+    const base = 16; // clamp(14px, 1.25vw, 28px) at 1280
+    // Each rule's em size on the page's base; .dim sits inside .subtitle, whose own size is read from the file.
+    const emOf = (sel: string) => Number(new RegExp(`\\${sel} \\{[^}]*font(?:-size)?:[^;]*?(\\d*\\.?\\d+)em`).exec(css)?.[1]);
+    const parent: Record<string, number> = { ".dim": emOf(".subtitle") };
+    expect(parent[".dim"]).toBe(2.6);
+    for (const [, sel, body] of css.matchAll(/([.\w :-]+)\{([^}]*)\}/g))
+      for (const m of body.matchAll(/font(?:-size)?:\s*(?:\d+ )?(\d*\.?\d+)em/g))
+        expect(Number(m[1]) * base * (parent[sel.trim()] ?? 1), `${sel.trim()} ${m[0]}`).toBeGreaterThanOrEqual(12);
+    for (const m of tsx.matchAll(/fontSize: "(\d*\.?\d+)em"/g)) expect(Number(m[1]) * base, m[0]).toBeGreaterThanOrEqual(12);
+    for (const m of `${css}\n${tsx}`.matchAll(/max\((\d+)px/g)) expect(Number(m[1]), m[0]).toBeGreaterThanOrEqual(12);
+    expect(tsx).toMatch(/canvasFonts\.data\(Math\.max\(12,/);
+  });
+
+  it("an error is an alert, a hint a polite status that's there before it's needed, and the way back reads Back to the Lab", () => {
+    const md = (note: Note | null) => renderToStaticMarkup(createElement(NoteLines, { note }));
+    expect(md({ text: "No piano output: plug in the DGX.", alert: true })).toMatch(/role="alert"[^>]*>No piano output/);
+    expect(md({ text: "Hold Speak a little longer, then let go.", alert: false })).toMatch(/role="status"[^>]*>Hold Speak a little longer/);
+    expect(md(null)).toMatch(/role="status"[^>]*><\/p>$/);
+    const page = renderToStaticMarkup(createElement(Speak));
+    expect(page).toMatch(/<a[^>]*href="\/lab"[^>]*>Back to the Lab<\/a>/);
+    expect(page).toMatch(/role="status"/);
   });
 });

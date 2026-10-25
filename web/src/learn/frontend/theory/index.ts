@@ -5,3 +5,5 @@ export type { GateProgress, ProgressEvent, TheoryProgress } from './progress';
 export { PROGRESS_KEY, allPassed, emptyProgress, firstTry, gateProgress, loadProgress, openGate, progressReducer, saveProgress } from './progress';
 export type { ChatMessage, ChatRequest, ChatResponse, ParsedChatRequest, StudentMessage, TutorMessage } from './chat';
 export { CHAT_LIMITS, chatRequest, parseChatRequest, parseChatResponse } from './chat';
+export type { NodeScreen } from './node';
+export { LEARNER_ID, exploreNodes, masteryAttempt, nodeGate, nodeScreen, nodesToExplore, recordAnswer } from './node';

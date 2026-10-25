@@ -1,6 +1,8 @@
 // Headless proof of the encoding sandbox at /learn/understand (spec: theory-screens, V1). Its own `next dev`. At 1280×720:
 // - a wrong answer is judged wrong and, after a reload, is still on record (progress is kept on this device);
-// - every gate answered through to the end shows complete and 3/3, never before;
+// - every gate answered through to the end shows complete and all three gates passed on the strip, never before;
+// - with ?node=pitch-grand-staff: the node's own questions, Next's keywords to explore, and every Check appended to
+//   the device's attempts, a revealed one marked so it isn't counted;
 // - the chat replies, or says plainly it isn't connected;
 // - no page errors, and the Gates, Score and Reference files render on screen.
 // Keeps the screenshots. Usage: node web/src/learn/frontend/encoding/verify-encoding.mjs --out <dir>
@@ -100,11 +102,12 @@ await page.goto(url);
 await page.evaluate((key) => localStorage.removeItem(key), PROGRESS_KEY);
 await page.reload();
 
-// A miss is judged wrong, says it comes back, and moves the gate on.
+// A miss is judged wrong and moves the gate on.
 const first = await current();
 check(first === "home/tonic", `opens on the first question (${first})`);
 check((await answer("g")) === "wrong", "a wrong answer is judged wrong");
-check(await page.getByText("This question comes back later.").isVisible(), "a miss says it comes back later");
+// The queue shows the miss comes back, so no line says it (decision "Agent drives").
+check((await page.getByText("This question comes back later.").count()) === 0, "no line says the miss comes back");
 await page.screenshot({ path: join(out, "encoding-miss.png") });
 await next();
 const afterMiss = await current();
@@ -113,7 +116,8 @@ const afterMiss = await current();
 await page.reload();
 check((await storedAttempts()) === 1, "the miss is saved on this device");
 check((await current()) === afterMiss, `a reload resumes on the same question (${afterMiss})`);
-check((await page.locator("[data-passed]").innerText()).startsWith("0/3"), "no gate has passed yet");
+const passedGates = () => page.locator('ol[aria-label="Gates"] li[data-state="passed"]').count();
+check((await passedGates()) === 0, "no gate has passed yet");
 
 // Stop goes back to /learn; coming back keeps progress.
 await page.getByRole("link", { name: "Stop" }).click();
@@ -146,7 +150,7 @@ for (let i = 0; i < 40; i++) {
 }
 check(!completeEarly, "complete shows only after the last Next");
 check(await page.locator('[data-complete="true"]').isVisible(), "every gate passed shows complete");
-check((await page.locator("[data-passed]").innerText()).startsWith("3/3"), "the header shows 3/3 gates passed");
+check((await passedGates()) === 3, "the strip shows all three gates passed");
 
 // The chat replies, or says it isn't connected.
 await page.locator("#chat-input").fill("Why is C home?");
@@ -158,6 +162,43 @@ const replied = await tutor.count();
 const statusText = replied ? "" : await status.innerText();
 check(replied > 0 || statusText.includes("isn’t connected"), `the chat ${replied ? "replies" : `says: ${statusText}`}`);
 await page.screenshot({ path: join(out, "encoding-complete.png") });
+
+// One node, as Next sends it: the node's questions, its keywords, and each Check appended to the device.
+const NODE_ANSWERS = { "pitch-grand-staff-1": "g", "pitch-grand-staff-2": "ledger" };
+const NODE_MISSES = { "pitch-grand-staff-1": "e", "pitch-grand-staff-2": "treble-bottom" };
+const ATTEMPTS_KEY = "pianoArcade.mastery.attempts.v1";
+const nodeAttempts = () => page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "[]"), ATTEMPTS_KEY);
+const nodeQuestion = async () => {
+  await prompt.waitFor();
+  return prompt.getAttribute("data-question");
+};
+await page.goto(`${base}/learn/understand?node=pitch-grand-staff`);
+await page.evaluate((key) => localStorage.removeItem(key), ATTEMPTS_KEY);
+await page.reload();
+check((await page.locator('[data-mode="node"]').count()) === 1, "?node= opens the node's sandbox");
+await page.locator('aside[aria-label="To explore"] li[data-node]').first().waitFor({ timeout: 10_000 });
+check((await page.locator('aside[aria-label="To explore"] li[data-node]').count()) >= 1, "Next's keywords show to explore");
+const missed = await nodeQuestion();
+check((await answer(NODE_MISSES[missed])) === "wrong", `a miss on ${missed} is judged wrong`);
+await page.waitForFunction((key) => JSON.parse(localStorage.getItem(key) ?? "[]").length === 1, ATTEMPTS_KEY);
+const [miss] = await nodeAttempts();
+check(miss.itemId === missed && miss.correct === false && miss.cold === true && miss.learnerId === "local", `the miss is appended cold for the local learner (${JSON.stringify(miss)})`);
+await next();
+const revealedId = await nodeQuestion();
+await page.getByRole("button", { name: "Show answer", exact: true }).click();
+check((await page.locator("[data-result]").getAttribute("data-result")) === "revealed", "Show answer reveals it");
+await next();
+for (let i = 0; i < 10 && !(await page.locator("[data-complete]").count()); i++) {
+  const id = await nodeQuestion();
+  if ((await answer(NODE_ANSWERS[id])) !== "correct") check(false, `${id} judged correct`);
+  await next();
+}
+check(await page.getByText("All questions passed").isVisible(), "the node's questions all pass");
+const stored = await nodeAttempts();
+const afterReveal = stored.filter((a) => a.itemId === revealedId).at(-1);
+check(afterReveal?.revealed === true, `the answer after a reveal is marked revealed (${JSON.stringify(afterReveal)})`);
+check(stored.every((a) => a.nodeId === "pitch-grand-staff" && a.kind === "theory"), `every attempt credits the node (${stored.length})`);
+await page.screenshot({ path: join(out, "encoding-node.png") });
 
 check(errors.length === 0, `no page errors${errors.length ? `: ${errors.join(" | ")}` : ""}`);
 await browser.close();

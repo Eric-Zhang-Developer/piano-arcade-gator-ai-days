@@ -15,6 +15,7 @@
   .row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
   .muted { color:var(--muted); } .ok { color:var(--ok); } .bad { color:var(--bad); }
   label { display:inline-flex; gap:8px; align-items:center; }
+  select { background:#0d0b1a; color:var(--text); border:1px solid #3d3670; border-radius:8px; padding:6px 8px; font:inherit; }
   input[type=range] { width:160px; }
   #piano { position:relative; height:170px; user-select:none; touch-action:none; overflow-x:auto; }
   .w, .b { position:absolute; top:0; border-radius:0 0 6px 6px; cursor:pointer; }
@@ -44,6 +45,15 @@
 
   <section>
     <h2>Look</h2>
+    <div class="row">
+      <label>Menu
+        <select id="lightMode">
+          <option value="0" selected>Quiet — key light and ripple</option>
+          <option value="1">Full — the show</option>
+        </select>
+      </label>
+    </div>
+    <p class="muted">Open the menu and pick one. Quiet (the default) lights each key and runs a ripple. Full plays the show: hint build-up, wrong-key red, count-in bar, fever, pause rainbow, finale and idle lights, and turns ripples off.</p>
     <div class="row">
       <label>Color <input id="color" type="color" value="#ff2bd6"></label>
       <label><input id="rainbow" type="checkbox"> Rainbow by pitch</label>
@@ -78,7 +88,7 @@ const param = (p, v) => { v = Math.max(0, Math.min(16383, Math.round(v))); send(
 const clearAll = () => send([0xF0]);
 setInterval(() => send([0xFE]), 1000);
 
-// The heartbeat above also keeps the board's idle rainbow away while this page is connected.
+// In quiet mode this heartbeat also keeps the dim rainbow away. In full mode a heartbeat is not play, so the aurora can still start.
 const status = (text, cls) => { $('state').textContent = text; $('state').className = cls; };
 $('connect').onclick = async () => {
   if (!('serial' in navigator)) return status('No Web Serial here: use desktop Chrome.', 'bad');
@@ -93,12 +103,44 @@ async function openPort(port) {
   catch (e) { portBusy = false; return status(e + ' (is the tester or the game holding the board?)', 'bad'); }
   writer = port.writable.getWriter();
   status('connected', 'ok');
-  await port.readable.pipeTo(new WritableStream()).catch(() => {});  // ends when unplugged
+  readBoard(port);
+  setTimeout(() => send([0xF1]), 1800);  // the board resets on open; ask again if the boot line was missed
+}
+
+async function readBoard(port) {
+  const decoder = new TextDecoderStream();
+  port.readable.pipeTo(decoder.writable).catch(() => {});
+  const reader = decoder.readable.getReader();
+  let buf = '';
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += value;
+      let i;
+      while ((i = buf.indexOf('\n')) >= 0) {
+        const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+        if (line.startsWith('PAL1 leds=')) applyHello(line);
+      }
+    }
+  } catch {}
   try { writer.releaseLock(); } catch {}
   writer = null;
   await port.close().catch(() => {});
   portBusy = false;
   status('disconnected: plug the board back in and it reconnects', 'bad');
+}
+
+function applyHello(line) {
+  const cfg = Object.fromEntries(line.split(' ').slice(1).map(kv => kv.split('=')).map(([k, v]) => [k, parseFloat(v)]));
+  if (cfg.light === 0 || cfg.light === 1) $('lightMode').value = String(cfg.light);
+  if (cfg.ripple !== undefined && !Number.isNaN(cfg.ripple)) {
+    $('ripple').value = cfg.ripple; $('rippleVal').textContent = cfg.ripple + ' ms';
+  }
+  if (cfg.fade !== undefined && !Number.isNaN(cfg.fade)) {
+    $('fade').value = cfg.fade; $('fadeVal').textContent = cfg.fade + ' ms';
+  }
+  if (cfg.bright !== undefined && !Number.isNaN(cfg.bright)) $('bright').value = cfg.bright;
 }
 
 // Like the tester: a board Chrome granted before connects on load and on plug-in.
@@ -153,6 +195,7 @@ addEventListener('keydown', e => {
 addEventListener('keyup', e => { const k = e.key.toLowerCase(); if (held[k] !== undefined) { up(held[k]); delete held[k]; } });
 
 // ---- look
+$('lightMode').onchange = e => param(15, e.target.value);
 $('bright').oninput = e => param(1, e.target.value);
 $('ripple').oninput = e => { param(6, e.target.value); $('rippleVal').textContent = e.target.value + ' ms'; };
 $('fade').oninput = e => { param(2, e.target.value); $('fadeVal').textContent = e.target.value + ' ms'; };

@@ -59,10 +59,12 @@ import { leds } from "./leds";
 import { createSavePlugin, queueAndSend } from "../data/save-plugin";
 import { crashGuard } from "./crash-guard";
 import { xFrame } from "./x";
+import { nameThemeSwap } from "./x/name-theme/swap";
 
 // Open file: each game feature registers its plugin here, one line each. /play draws every plugin's layer on its
 // own canvas above the highway, forwards every GameEvent, and applies transformChart and wrapInput in this order.
 export const plugins: GamePlugin[] = [
+  nameThemeSwap(), // song=x/name-theme: first, the held name's chart replaces the placeholder for every plugin after
   easyCharts(), // ?level=easy: first, so every later plugin (chunks, loops, hands, bots, the judge) sees the Easy chart
   scoreCard(), // results panel: Save card, the take as a PNG; before bar-loop, so it keeps the song's own title
   playModes(), // LEARN → FLOW → PERFORM on the start screen and results; before chunk-practice, so it leads the modes row

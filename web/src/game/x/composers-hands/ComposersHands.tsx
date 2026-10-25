@@ -14,20 +14,17 @@ import { Brackets, Button, canvasFonts, DataCell, kitChip, MonoLabel, Panel } fr
 import { echoGuard, splitHands } from "../../hand-mode/hands";
 import { hud } from "../../hud";
 import { PIANO_NAME } from "../../laptop-sound";
-import { allNotesOff } from "../../piano-out";
 import { createSimMidiAccess, installSim } from "../../sim/fake";
 import { fitCurve, tempoCurveSettings } from "../../tempo-curve";
 import { handL, handR, inkDim } from "../../ui-tokens";
 import { dtw, sequence } from "./align";
 import { parseMidi, rollSettings, secondsChart, splitPoints, type Roll } from "./roll";
-import { ROLLS, sendsBetween, testRoll } from "./rolls";
+import { AHEAD_MS, ROLLS, sendsBetween, silence, testRoll, type Out } from "./rolls";
 import css from "./composers-hands.module.css";
 
 type Mode = "listen" | "duet" | "compare";
-type Out = { send(data: number[], timestamp?: number): void; name?: string | null };
 
 const LEAD_MS = 1500; // from Play to the roll's first instant: time to find the keys
-const AHEAD_MS = 150; // the scheduler queues this far ahead, timestamped
 const splitKey = (id: string) => `pianoArcade.composersHands.split.${id}`;
 const NAMES = ["C", "C♯", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
 const noteName = (p: number) => `${NAMES[Math.round(p) % 12]}${Math.floor(Math.round(p) / 12) - 1}`;
@@ -220,7 +217,7 @@ export function ComposersHands() {
         clearInterval(timer);
         cancelAnimationFrame(raf);
         for (const d of devices) d.stop();
-        for (const msg of allNotesOff(0)) out?.send(msg.bytes);
+        silence(out, performance.now());
         if (window.__composersHands) window.__composersHands.ended = true;
         setPlaying(false);
         stopRef.current = () => {};
@@ -230,7 +227,15 @@ export function ComposersHands() {
     [roll, seconds, splits, his],
   );
 
-  useEffect(() => () => stopRef.current(), []);
+  // Unmount and pagehide stop it too, so closing the tab mid-roll leaves no note or pedal down.
+  useEffect(() => {
+    const leave = () => stopRef.current();
+    addEventListener("pagehide", leave);
+    return () => {
+      removeEventListener("pagehide", leave);
+      leave();
+    };
+  }, []);
 
   // At rest the stage shows the roll's opening, as it will fall, rather than an empty field.
   useEffect(() => {
@@ -359,7 +364,7 @@ export function ComposersHands() {
                 </div>
               </div>
             )}
-            <p className={css.status}>{status}</p>
+            <StatusLine text={status} />
             {!isTest && info && (
               <a className={css.source} href={info.page} target="_blank" rel="noreferrer">
                 Source: the IAMMP roll database ↗
@@ -444,4 +449,13 @@ function drawCompare(ctx: CanvasRenderingContext2D, w: number, h: number, chart:
     samples.forEach((q, k) => (k ? ctx.lineTo(x(q.t), y(q.bpm)) : ctx.moveTo(x(q.t), y(q.bpm))));
     ctx.stroke();
   }
+}
+
+// The piano status (#1207), "No piano output: the highway plays silent" among them, read out when it changes.
+export function StatusLine({ text }: { text: string }) {
+  return (
+    <p className={css.status} role="status" aria-live="polite" data-testid="ch-status">
+      {text}
+    </p>
+  );
 }

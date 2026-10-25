@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
-import { theoryGates, theoryTitle } from '../theory';
+import { curriculum } from '../mastery/curriculum';
+import { nodeScreen, theoryGates, theoryTitle } from '../theory';
 
 vi.mock('next/font/google', () => ({ Source_Sans_3: () => ({ variable: 'reading-face', className: 'reading-face', style: { fontFamily: 'Source Sans 3' } }) }));
 
@@ -13,10 +14,12 @@ describe('the sandbox on first load', () => {
   // The server render has no saved progress, so it is what a learner sees before answering anything.
   const html = renderToStaticMarkup(<EncodingSandbox />);
 
-  it('has the hairline header: title, gate progress and Stop back to /learn', () => {
+  it('has the hairline header: title and Stop back to /learn, with progress only in the gate strip', () => {
     expect(html).toContain(`<h1>${theoryTitle}</h1>`);
-    expect(html).toContain(`<strong>0</strong>/${theoryGates.length} gates passed`);
     expect(html).toMatch(/<a [^>]*href="\/learn"[^>]*>Stop<\/a>/);
+    // The strip already shows each gate's progress, so the header repeats no count (decision "Agent drives").
+    expect(html).not.toContain('gates passed');
+    expect([...html.matchAll(/<li data-state="(\w+)" data-gate=/g)].map(m => m[1])).toEqual(['current', 'open', 'open']);
   });
 
   it('has the Score, Reference and Gates files, with Gates open', () => {
@@ -40,6 +43,36 @@ describe('the sandbox on first load', () => {
 
   it('says passed, never mastered', () => {
     expect(html.toLowerCase()).not.toContain('master');
+  });
+});
+
+describe('the sandbox for a node', () => {
+  const node = nodeScreen(curriculum, 'pitch-grand-staff')!;
+  const html = renderToStaticMarkup(<EncodingSandbox node={node} />);
+
+  it('asks the node\'s first item under its title, with Stop', () => {
+    expect(html).toContain('data-mode="node"');
+    expect(html).toContain(`<h1>${node.gate.title}</h1>`);
+    expect(html).toContain(`data-gate="${node.gate.id}" data-question="${node.gate.questions[0].id}"`);
+    expect(html).toMatch(/<a [^>]*href="\/learn"[^>]*>Stop<\/a>/);
+  });
+
+  it('has no files, gate strip or tutor: Next chose the node', () => {
+    expect(html).not.toContain('data-tab=');
+    expect(html).not.toContain('aria-label="Gates"');
+    expect(html).not.toContain('aria-label="Tutor chat"');
+    expect(html).not.toContain(theoryGates[0].questions[0].prompt);
+  });
+
+  it('keeps a place for Next\'s keywords beside the work', () => {
+    expect(html).toContain('aria-label="To explore"');
+  });
+
+  it('says there is nothing to answer for a node without theory items', () => {
+    const none = renderToStaticMarkup(<EncodingSandbox node={null} />);
+    expect(none).toContain('<h1>No theory questions for this node</h1>');
+    expect(none).toMatch(/href="\/learn"[^>]*>Back to map</);
+    expect(none).not.toContain('>Check<');
   });
 });
 

@@ -3,11 +3,13 @@
 // rows of the voice's spectrogram sits beside the key it strikes. A playhead turns the voiceprint into the roll it
 // became; the keys light as they sound; the words appear only once the piano has finished. Reduced motion: two still
 // panels, voiceprint above and roll below, no morph. The mic's audio is analyzed in memory and dropped after playback.
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, canvasFonts, MonoLabel } from "../../duo-tokens";
 import { PIANO_NAME } from "../../laptop-sound";
 import { bg, ink, inkDim, line, panel, primary, secondary } from "../../ui-tokens";
 import { analysisDefaults, analyze, HIGH_KEY, LOW_KEY } from "./analysis";
+import { micHold, type Take } from "./mic";
 import { phraseMessages, play, playbackSettings, silenceOnPagehide, type Output, type Player, type PlayFrame } from "./playback";
 import hello from "./presets/hello-judges.json";
 import thanks from "./presets/thank-you.json";
@@ -41,7 +43,7 @@ const MIC_MS = 3000;
 const KEYS = HIGH_KEY - LOW_KEY + 1;
 // The kit sizes its buttons and labels in px; this page scales its type with the width (as /conduct), so they follow.
 const SCALED = { fontSize: "0.85em", padding: "0.85em 1.2em" };
-const LABEL = { fontSize: "0.7em" };
+const LABEL = { fontSize: "max(12px, 0.7em)" }; // the kit's 12 px floor (speak-polish, #1202)
 const MORPH_MS = 260; // a cell turns into its strike over this, just behind the playhead
 
 type Phase = "idle" | "listening" | "playing" | "done";
@@ -56,7 +58,7 @@ async function pianoOutput(): Promise<(Output & { name?: string }) | null> {
 }
 
 // Up to MIC_MS of the mic, in memory. The stream and its context close as soon as the take ends.
-async function openMic(): Promise<{ stop: () => { samples: Float32Array; rate: number } }> {
+async function openMic(): Promise<{ stop: () => Take }> {
   const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: true } });
   const ctx = new AudioContext();
   const src = ctx.createMediaStreamSource(stream);
@@ -108,7 +110,7 @@ export function drawSpeak(ctx: CanvasRenderingContext2D, w: number, h: number, p
     ctx.fillStyle = line;
     ctx.fillRect(keyW + 1, pn.y, 1, pn.h);
     // The pitch axis: each C named beside its key, so an empty band reads as where the voice never goes.
-    ctx.font = canvasFonts.data(Math.max(9, Math.round(h * 0.022)));
+    ctx.font = canvasFonts.data(Math.max(12, Math.round(h * 0.022)));
     ctx.textBaseline = "middle";
     ctx.fillStyle = inkDim;
     for (let key = 24; key <= HIGH_KEY; key += 12) ctx.fillText(`C${key / 12 - 1}`, keyW + 5, rowY(key) + rowH / 2);
@@ -154,16 +156,37 @@ export function drawSpeak(ctx: CanvasRenderingContext2D, w: number, h: number, p
   }
 }
 
+// The stand's note (#1203): the two errors as alerts, a hint as a polite status. The status line is always mounted, so
+// a screen reader hears it change.
+export interface Note {
+  text: string;
+  alert: boolean;
+}
+export function NoteLines({ note }: { note: Note | null }) {
+  return (
+    <>
+      {note?.alert && (
+        <p className={s.note} role="alert">
+          {note.text}
+        </p>
+      )}
+      <p className={s.note} role="status">
+        {note && !note.alert ? note.text : ""}
+      </p>
+    </>
+  );
+}
+
 export function Speak() {
   const canvas = useRef<HTMLCanvasElement>(null);
   const [phrase, setPhrase] = useState<Phrase | null>(PRESETS[0]); // its voiceprint at rest, not played
   const [phase, setPhase] = useState<Phase>("idle");
   const [outName, setOutName] = useState<string | null>(null);
-  const [note, setNote] = useState<string | null>(null);
+  const [note, setNote] = useState<Note | null>(null);
   const startAt = useRef<number | null>(null);
   const player = useRef<Player | null>(null);
-  const mic = useRef<Awaited<ReturnType<typeof openMic>> | null>(null);
-  const micTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hold = useRef<ReturnType<typeof micHold> | null>(null);
+  const alive = useRef(true);
   const phaseRef = useRef<Phase>("idle");
   useEffect(() => {
     phaseRef.current = phase;
@@ -175,7 +198,6 @@ export function Speak() {
   }, []);
 
   useEffect(() => silenceOnPagehide(window, stop), [stop]);
-  useEffect(() => () => stop(), [stop]);
 
   // The draw loop: the playhead and the lit keys move with the clock; idle frames redraw too, so a resize lands.
   useEffect(() => {
@@ -208,9 +230,10 @@ export function Speak() {
       stop();
       setPhrase(p);
       const out = await pianoOutput();
+      if (!alive.current) return;
       setOutName(out ? (out.name ?? PIANO_NAME) : null);
       if (!out) {
-        setNote("No piano output: plug in the DGX, or open this page with laptop sound on.");
+        setNote({ text: "No piano output: plug in the DGX, or open this page with laptop sound on.", alert: true });
         setPhase("done");
         return;
       }
@@ -228,43 +251,55 @@ export function Speak() {
   );
 
   // Hold to speak: the mic opens on the first press (the browser asks then), and the take ends on release or at 3 s.
+  const onTake = useCallback(
+    (raw: Take) => {
+      let take: Take | null = raw;
+      if (take.samples.length < take.rate * 0.2) {
+        setPhase("idle");
+        setNote({ text: "Hold Speak a little longer, then let go.", alert: false });
+        return;
+      }
+      const a = analyze(take.samples, take.rate, { ...analysisDefaults, fps: PICK.fps, n: PICK.n });
+      take = null; // the audio goes now: only the strikes and the spectrogram's numbers are kept
+      void speak({
+        label: "Your voice",
+        text: null,
+        fps: PICK.fps,
+        n: PICK.n,
+        frameMs: a.frameMs,
+        frames: a.frames.map((f) => ({ tMs: f.tMs, fricative: f.fricative, strikes: f.strikes.map((x) => [x.key, x.vel] as [number, number]) })),
+        bandsDb: a.bandsDb,
+      });
+    },
+    [speak],
+  );
+
+  // Leaving: stop the player, let go of the mic (timer, tracks, context), and play nothing that was pending (#1201).
+  useEffect(() => {
+    const h = micHold(openMic, MIC_MS, onTake);
+    hold.current = h;
+    alive.current = true;
+    return () => {
+      alive.current = false;
+      stop();
+      h.dispose();
+    };
+  }, [stop, onTake]);
+
   const micDown = async () => {
-    if (mic.current || phaseRef.current === "listening") return;
+    if (!hold.current || hold.current.open || phaseRef.current === "listening") return;
     stop();
     try {
       setPhase("listening");
       setPhrase(null);
-      mic.current = await openMic();
-      micTimer.current = setTimeout(micUp, MIC_MS);
+      await hold.current.down();
     } catch {
+      if (!alive.current) return;
       setPhase("idle");
-      setNote("The mic isn't available here. The presets still play.");
+      setNote({ text: "The mic isn't available here. The presets still play.", alert: true });
     }
   };
-  const micUp = () => {
-    if (micTimer.current) clearTimeout(micTimer.current);
-    micTimer.current = null;
-    const m = mic.current;
-    mic.current = null;
-    if (!m) return;
-    let take: { samples: Float32Array; rate: number } | null = m.stop();
-    if (take.samples.length < take.rate * 0.2) {
-      setPhase("idle");
-      setNote("Hold Speak a little longer, then let go.");
-      return;
-    }
-    const a = analyze(take.samples, take.rate, { ...analysisDefaults, fps: PICK.fps, n: PICK.n });
-    take = null; // the audio goes now: only the strikes and the spectrogram's numbers are kept
-    void speak({
-      label: "Your voice",
-      text: null,
-      fps: PICK.fps,
-      n: PICK.n,
-      frameMs: a.frameMs,
-      frames: a.frames.map((f) => ({ tMs: f.tMs, fricative: f.fricative, strikes: f.strikes.map((x) => [x.key, x.vel] as [number, number]) })),
-      bandsDb: a.bandsDb,
-    });
-  };
+  const micUp = () => hold.current?.up();
 
   const busy = phase === "playing" || phase === "listening";
   return (
@@ -272,9 +307,9 @@ export function Speak() {
       <header className={s.head}>
         <h1 className={s.title}>The Speaking Piano</h1>
         <p className={s.sub}>A voice, struck on 88 keys. After Peter Ablinger&apos;s speaking piano.</p>
-        <a className={s.back} href="/lab">
-          ← Lab
-        </a>
+        <Link className={s.back} href="/lab">
+          Back to the Lab
+        </Link>
       </header>
       <div className={s.stage}>
         <div className={s.roll}>
@@ -322,7 +357,7 @@ export function Speak() {
             ))}
           </dl>
           <MonoLabel style={{ ...LABEL, color: outName ? undefined : inkDim }}>{outName ? `Out: ${outName}` : "Out: the piano, when you press"}</MonoLabel>
-          {note && <p className={s.note}>{note}</p>}
+          <NoteLines note={note} />
           <p className={s.small} style={{ background: panel }}>
             The mic&apos;s sound stays in this tab: analyzed in memory, dropped after it plays, never stored or sent.
           </p>

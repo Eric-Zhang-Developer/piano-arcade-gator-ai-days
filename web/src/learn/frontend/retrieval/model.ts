@@ -4,7 +4,7 @@ import { choiceById, firstTry, isCorrect, theoryGates, type Attempt, type Closed
 export type Item = { gateId: string; question: ClosedQuestion };
 /** Where the student is: the current question, the option they picked, whether it was checked, and every answer so far. */
 export type RetrievalState = { index: number; selected: string | null; checked: boolean; attempts: readonly Attempt[] };
-export type RetrievalEvent = { type: 'select'; choiceId: string } | { type: 'check' } | { type: 'next' } | { type: 'restart' };
+export type RetrievalEvent = { type: 'select'; choiceId: string } | { type: 'check' } | { type: 'next' };
 
 export function items(gates: readonly Gate[] = theoryGates): readonly Item[] {
   return gates.flatMap(g => g.questions.map(question => ({ gateId: g.id, question })));
@@ -22,7 +22,6 @@ export function current(state: RetrievalState, list: readonly Item[] = theoryIte
  * end summary is judged on exactly what the student answered the first time.
  */
 export function retrievalReducer(state: RetrievalState, event: RetrievalEvent, list: readonly Item[] = theoryItems): RetrievalState {
-  if (event.type === 'restart') return initialRetrieval;
   const item = current(state, list);
   if (!item) return state;
   switch (event.type) {

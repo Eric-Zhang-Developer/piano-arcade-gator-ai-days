@@ -2,6 +2,7 @@
 // the archive's page, empty where the page is silent. The files are local (decision composers-hands-rolls-local), so
 // they load only on Eric's machine; anywhere else the page offers the test roll, built from our own chart.
 import type { Chart } from "../../../contracts";
+import { allNotesOff } from "../../piano-out";
 import type { Roll } from "./roll";
 
 export interface RollInfo {
@@ -64,4 +65,18 @@ export function sendsBetween(notes: { pitch: number; onMs: number; offMs: number
   }
   for (const p of pedal) if (inside(p.atMs)) out.push({ bytes: [0xb0, 64, p.down ? 127 : 0], atMs: p.atMs, rank: 0 });
   return out.sort((a, b) => a.atMs - b.atMs || a.rank - b.rank).map(({ bytes, atMs }) => ({ bytes, atMs }));
+}
+
+export const AHEAD_MS = 150; // the scheduler queues this far ahead, timestamped
+export type Out = { send(data: number[], timestamp?: number): void; clear?(): void; name?: string | null };
+
+// Every stop (#1206): the button, the end, unmount and pagehide. Drop what's queued where the port can, then All Notes
+// Off and the pedal up now and again AHEAD_MS later, since note-ons and pedal-downs may be queued that far ahead.
+export function silence(out: Out | null, now: number) {
+  if (!out) return;
+  if (typeof out.clear === "function") out.clear();
+  for (const at of [now, now + AHEAD_MS]) {
+    for (const m of allNotesOff(at)) out.send(m.bytes, m.atMs);
+    out.send([0xb0, 64, 0], at);
+  }
 }

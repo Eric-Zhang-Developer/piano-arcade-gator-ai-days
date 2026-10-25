@@ -250,6 +250,7 @@ features = [
   "take-seams", # polish sweep 3 (#1241, #1242, #1243): Back says quit, WARNING upright, the broken combo as the HUD
   "results-polish", # polish sweep 3 (#1244-#1247): PRACTICE BARS a link, Watch replay a kit dialog, initials heard
   "record-follows", # Eric, 2026-10-25 (#1261): wow feeder; the real recording stretches to follow the player, an experiment
+  "record-seams", # Eric, 2026-10-25 (#1269): the recording's seams, an L-cut outro on a bar line and a J-cut intro, a #856 hero item
 ]
 cut = []
 

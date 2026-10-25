@@ -84,8 +84,9 @@ lands on main off by default and stays out of the main game until Eric picks it 
 5. **The screen:**
    - a kit chip (`kitChip`), "FOLLOWING · 0.82×", the ratio to two decimals;
    - "HELD" while frozen;
-   - the trim is `audio.json`'s `offsetMs`. There's no on-screen offset control today; the pitch's "existing
-     recording-offset control" doesn't exist, so the sidecar is the trim, logged;
+   - the trim is the existing "Recording offset" row in Options: ±300 ms, `getRecordingOffset` in
+     `audio-track/index.ts`, `RecordingOffsetRow` in `options-panel/index.tsx`, from golden-demo part 6. It's added to
+     `audio.json`'s `offsetMs` exactly as audio-track's `fileOffset()` does;
    - under reduced motion, the chip doesn't animate.
 
 ## Design pass (AGENTS.md, Visible changes)

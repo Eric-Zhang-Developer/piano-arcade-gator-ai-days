@@ -9,6 +9,7 @@ import { Button, MonoLabel } from "../duo-tokens";
 import { wrong } from "../ui-tokens";
 import { getReplayState, pianoOutSettings, startReplay, stopReplay } from "../piano-out";
 import { highwayAt, latePresses, replayChartTime, replaySpan } from ".";
+import { takeKeys } from "./keys";
 
 type Props = { chart: Chart; take: Take; results: Results };
 
@@ -79,7 +80,7 @@ export function ReplayOverlay({ chart, take, results, onClose }: Props & { onClo
     c.width = innerWidth * dpr;
     c.height = innerHeight * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const L = makeLayout(chart, innerWidth, innerHeight, settings.perspective);
+    const L = makeLayout(chart, innerWidth, innerHeight, settings.perspective, undefined, takeKeys() ?? undefined); // the take's keyboard
     const pxPerMs = L.judgmentLineY / settings.lookaheadMs;
     let crossed = 0;
     let raf = 0;

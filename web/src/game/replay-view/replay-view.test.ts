@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -7,6 +8,10 @@ import { GOOD_MS } from "../core/settings";
 import { pianoOutSettings } from "../piano-out";
 import { highwayAt, latePresses, replayChartTime, replaySpan, replayView } from ".";
 import { ReplayOverlay } from "./overlay";
+import { makeLayout } from "../core/highway";
+import { staticRange } from "../core/range";
+import { plugins } from "../layers";
+import { takeKeys } from "./keys";
 
 // 4/4 at 120 bpm (500 ms a beat, 2 s a bar): C D E F on beats 0–3.
 const chart: Chart = {
@@ -92,4 +97,20 @@ describe("the overlay", () => {
     expect(caption).not.toContain("Esc");
     expect(html).toMatch(/<button[^>]*title="Stop \(Esc\)"[^>]*aria-keyshortcuts="Escape"[^>]*>Stop<\/button>/);
   });
+});
+
+// replay-keys (#419): a hands= or bar-loop take keeps the loaded chart's keyboard, and so does its replay.
+describe("the replay's keyboard is the take's", () => {
+  const raw = JSON.parse(readFileSync("public/songs/fur-elise/chart.json", "utf8")) as Chart;
+  const keysOf = (l: { lowPitch: number; highPitch: number }) => [l.lowPitch, l.highPitch];
+  for (const q of ["hands=R", "hands=L", "from=9&to=12", "from=9&to=12&tempo=70"]) {
+    it(`fur-elise ${q}: the take's range, through layers.ts in its own order`, () => {
+      const params = new URLSearchParams(`song=fur-elise&${q}`);
+      const chart = plugins.reduce((c, p) => p.transformChart?.(c, params) ?? c, raw); // as /play loads it
+      const take = staticRange(raw); // /play's keysRef: C2–C7 here
+      expect(keysOf(take)).toEqual([36, 96]);
+      expect(keysOf(makeLayout(chart, 1280, 720, 0.5))).not.toEqual(keysOf(take)); // what the replay drew before
+      expect(keysOf(makeLayout(chart, 1280, 720, 0.5, undefined, takeKeys()!))).toEqual(keysOf(take));
+    });
+  }
 });

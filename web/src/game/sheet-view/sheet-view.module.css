@@ -1,4 +1,5 @@
-/* The score window: the dark Duo page and header, the music on a lit paper panel (sheet-paper), never inverted. */
+/* The score window: the dark Duo page and header (upright type, square controls), the music on a lit paper panel
+   (sheet-paper), never inverted. */
 .sheet {
   min-height: 100vh;
   background: var(--pa-bg);
@@ -24,15 +25,21 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 1.5rem;
-  padding: 1.25rem clamp(1rem, 4vw, 3rem) 1rem;
+  /* The top 4vh is the nav bar's band (nav-bar, fixed over every page): the title starts under it, as / does (#882). */
+  padding: calc(4vh + 0.75rem) clamp(1rem, 4vw, 3rem) 1rem;
   background: var(--pa-bg);
   border-bottom: 1px solid color-mix(in srgb, var(--pa-primary) 45%, transparent);
+}
+
+/* The title block takes what the legend and zoom leave, so a long title wraps and the legend keeps one line. */
+.head > :first-child {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .title {
   margin: 0;
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
   font-weight: 800;
   font-size: clamp(1.5rem, 2.6vw, 2.5rem);
   line-height: 1.05;
@@ -62,7 +69,7 @@
   width: 2.5rem;
   height: 2.5rem;
   border: 1px solid var(--pa-ink-dim);
-  border-radius: 0.5rem;
+  border-radius: 0; /* Duo: square controls */
   background: transparent;
   color: var(--pa-ink);
   font-size: 1.25rem;
@@ -90,7 +97,6 @@
   min-width: 3.5rem;
   text-align: center;
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -107,8 +113,8 @@
 
 /* Names the notehead colors, so color is never alone. */
 .legend {
+  flex: none;
   display: flex;
-  flex-wrap: wrap;
   gap: 0.4rem 1.1rem;
   align-items: center;
   min-height: 2.5rem; /* the zoom buttons' height: both sit on the header's bottom, so their centers line up */
@@ -116,7 +122,6 @@
   padding: 0;
   list-style: none;
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
   font-weight: 700;
   font-size: 0.875rem;
   letter-spacing: 0.04em;

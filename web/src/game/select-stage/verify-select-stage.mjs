@@ -103,6 +103,25 @@ async function open(context, path) {
   return page;
 }
 
+// duo-select (#646) takes the stage off the select: there, / mounts no select-stage and holds no live WebGL context,
+// and the rest of this check, which is about the stage on /, has nothing to look at.
+{
+  const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
+  await context.addInitScript(keepContexts);
+  const page = await open(context, "/");
+  await page.waitForTimeout(1500);
+  const mounted = await page.locator("[data-testid=select-stage]").count();
+  if (!mounted) {
+    check((await page.evaluate(() => window.__liveContexts())) === 0, "the select has no stage (duo-select): no live WebGL context on /");
+    await page.screenshot({ path: join(out, "select-no-stage-1280x720.png") });
+    writeFileSync(join(out, "verify-select-stage.json"), JSON.stringify({ failures, stage: "off the select" }, null, 2));
+    await browser.close();
+    say(failures.length ? `verify-select-stage: ${failures.length} failed` : "verify-select-stage: pass (the select has no stage)");
+    process.exit(failures.length ? 1 : 0);
+  }
+  await context.close();
+}
+
 for (const [width, height] of [
   [1280, 720],
   [1920, 1080],

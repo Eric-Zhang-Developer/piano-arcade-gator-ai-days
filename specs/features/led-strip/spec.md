@@ -21,7 +21,7 @@ build of the sketch with checks (`hosttest/`). Wiring, flashing and calibration 
   never share an LED, except a key whose slot falls in the gap at the strip joint, which borrows the nearest LED.
 - **Layers:** a held or fading key beats a hint on the same key. Released keys fade over `fadeMs` (default 180).
 - **Watchdog:** 2.5 s with no bytes releases every held key. In quiet mode, 15 s with no bytes plays a dim idle animation.
-- **Light modes** (setting 15): **Quiet** (0, the default) is key light plus a ripple, breathing hints, and that dim rainbow. **Full** (1) is the show: hint build-up, wrong-key red, count-in bar, fever, pause rainbow, finale and idle aurora, with ripples off until setting 6 turns them back on. The tester and the playground each open a menu that sends setting 15. Save (setting 20) keeps the choice. The game does not send it yet.
+- **Light modes** (setting 15): **Learning** (0) is the game's guide: hints that build from faint to gold, wrong-key red, and soft glows for the count-in, fever, pause, the end and idle. **Demo** (1, the default, and every power-on starts in it) makes the piano feel alive: every press ripples out like a breaking wave, about nine keys each way, cooling as it goes, and crashes where two ripples meet; nothing else lights. The sustain pedal (the website sends setting 6) makes ripples ring longer and further. The BOOT button, the tester, the playground and the website's Lights chip switch it.
 - **Power:** `FastLED.setMaxPowerInVoltsAndMilliamps(5, 3000)`.
 - **Settings** (brightness, fade, calibration, joint gap, reverse, and the light mode) save to flash and survive power off.
 - **Tester:** connect board and piano, hour-0 tests, calibration nudges and save, free play, a Twinkle guide-lights

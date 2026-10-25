@@ -25,7 +25,7 @@ std::vector<int> litFor(uint8_t n) { std::vector<int> v; forEachLed(n, [&](int i
 int countLit() { int c = 0; for (int i = 0; i < NUM_LEDS; i++) if (leds[i]) c++; return c; }
 void pump(int ms) { uint32_t end = millis() + ms; do { loop(); } while (millis() < end); }
 // Compiled defaults, but with ripples, shows and idle lights off: most checks below count exactly the LEDs under a key.
-void defaults() { Serial.feed({0xB0, 21, 0, 0, 0xB0, 6, 0, 0, 0xB0, 9, 0, 0, 0xB0, 4, 0, 0}); }  // shows, idle off
+void defaults() { Serial.feed({0xB0, 21, 0, 0, 0xB0, 6, 0, 0, 0xB0, 9, 0, 0, 0xB0, 4, 0, 0, 0xB0, 15, 0, 0}); }  // shows, idle off, learning
 
 int main() {
   setup();
@@ -33,7 +33,7 @@ int main() {
   CHECK(Serial.out.find("ripple=0 ") != std::string::npos, "ripple off by default");
   CHECK(Serial.out.find("wrong=1") != std::string::npos, "wrong keys red by default");
   CHECK(Serial.out.find("shows=1") != std::string::npos, "shows on by default");
-  CHECK(Serial.out.find("demo=0") != std::string::npos, "classy by default");
+  CHECK(Serial.out.find("demo=1") != std::string::npos, "demo by default");
   CHECK(Serial.out.find("ramp=1500") != std::string::npos, "hint ramp on by default");
   defaults(); pump(5);
 
@@ -264,7 +264,7 @@ int main() {
   // Fever, mirrored from the hit colors: 12 PERFECTs fill Twinkle's gauge and start it (a glow under the keys);
   // a miss shatters it. Before fever a miss halves the gauge and GREAT adds half a point. A song's end sizes the
   // next gauge from its judged notes (a quarter, 12 to 50).
-  Serial.feed({0xB0, 9, 1, 0, 0xB0, 15, 1, 0, 0xA0, 40, 0, 0, 1, 0xA0, 40, 0, 0, 0});  // shows on, demo, song live
+  Serial.feed({0xB0, 9, 1, 0, 0xB0, 15, 0, 0, 0xA0, 40, 0, 0, 1, 0xA0, 40, 0, 0, 0});  // shows on, learning, song live
   for (int i = 0; i < 4; i++) { Serial.feed({0x90, 60, 127, 113, 61, 0x80, 60}); pump(30); }
   Serial.feed({0x90, 62, 127, 38, 47, 0x80, 62}); pump(30);
   CHECK(!fever && gaugeFill == 2.0f, "a miss before fever halves the gauge: %.1f", gaugeFill);
@@ -286,6 +286,15 @@ int main() {
   pump(50); Serial.feed({0xF0}); pump(5);
   CHECK(gaugeSize == 25, "100 judged notes: a 25-point gauge next time: %u", gaugeSize);
   Serial.feed({0xF0}); defaults(); pump(5); stopShows();
+  // Demo shows presses only: the gauge still counts, but fever draws no glow, bloom or red wash.
+  Serial.feed({0xB0, 9, 1, 0, 0xB0, 15, 1, 0, 0xA0, 40, 0, 0, 1, 0xA0, 40, 0, 0, 0});
+  for (int i = 0; i < 30; i++) { Serial.feed({0x90, 60, 127, 113, 61, 0x80, 60}); pump(30); }
+  pump(800);  // the presses' own ripples are over
+  int demoFeverLit = countLit();
+  Serial.feed({0x90, 62, 127, 38, 47}); pump(20);
+  int demoBreakLit = countLit();
+  CHECK(demoFeverLit == 0 && demoBreakLit == 0, "demo: fever and its break draw nothing: %d, %d lit", demoFeverLit, demoBreakLit);
+  Serial.feed({0x80, 62, 0xF0}); defaults(); pump(5); stopShows();
 
   // Pause: during a song, notes keep messages coming, so no pause show; 2 s of only heartbeats starts it (the
   // paused hint stays on top), and the next message of any other kind ends it at once.
@@ -351,36 +360,76 @@ int main() {
   int ripplesBefore = 0; for (auto &r : ripples) ripplesBefore += r.on;
   Serial.feed({0x90, 60, 47, 121, 98}); pump(20);
   int ripplesAfter = 0; for (auto &r : ripples) ripplesAfter += r.on;
-  CHECK(ripplesAfter == ripplesBefore && keys[60].color == CRGB(94, 242, 196), "demo: the hit recolors the held key, no second ripple");
+  CHECK(ripplesAfter == ripplesBefore && keys[60].color == applyGamma_video(CRGB(94, 242, 196), DEMO_GAMMA), "demo: the hit recolors the held key, no second ripple");
   Serial.feed({0x80, 60}); pump(1200);
   CHECK(countLit() == 0, "demo: then dark again: %d", countLit());
   std::printf("demo: a press lit %d LEDs with its ripple, everything else stayed dark\n", simpleLit);
-  // The splash: glitter flies off a press, a hard press reaches further than a soft one (the website scales a
-  // press's color by its velocity, 45% to 100%), and a three-key chord throws a shower.
-  auto reach = [](int note) {
-    auto mine = litFor(note);
-    int c = mine[mine.size() / 2], far = 0;
-    for (int i = 0; i < activeLeds; i++) if (leds[i]) far = max(far, abs(i - c));
+  // The ripple: a press of the right hand's blue lights its key with no white flash, ripples out about seven keys
+  // each way, cooler (more green, toward cyan) than the key and never whiter, and it's gone by 700 ms.
+  Serial.feed({0x90, 60, 21, 77, 127}); pump(150);
+  auto mine = litFor(60);
+  int keyMid = mine[mine.size() / 2], reach = 0, whiter = 0;
+  CRGB key = leds[keyMid];
+  for (int i = 0; i < activeLeds; i++) {
+    if (!leds[i]) continue;
+    reach = std::max(reach, std::abs(i - keyMid));
+    if (leds[i].r > key.r) whiter++;
+  }
+  CRGB edge = leds[keyMid + 3];
+  pump(550);
+  int afterRipple = countLit();
+  std::printf("demo ripple: key (%d,%d,%d), reaches %d LEDs at 150 ms, edge (%d,%d,%d); %d lit at 700 ms (the key alone is %zu)\n",
+              key.r, key.g, key.b, reach, edge.r, edge.g, edge.b, afterRipple, mine.size());
+  CHECK(key == applyGamma_video(CRGB(42, 154, 255), DEMO_GAMMA), "demo: the key is its color, deepened for the LEDs, no white flash: %d %d %d", key.r, key.g, key.b);
+  CHECK(reach >= 8 && reach <= 22, "demo: a ripple several keys each way: %d LEDs", reach);
+  CHECK(whiter == 0, "demo: no LED whiter than the key: %d", whiter);
+  CHECK(edge && edge.g * key.b > key.g * edge.b, "demo: the ripple cools toward cyan: %d %d %d", edge.r, edge.g, edge.b);
+  CHECK(afterRipple == (int)mine.size(), "demo: the ripple is over by 700 ms: %d lit", afterRipple);
+  Serial.feed({0x80, 60}); pump(600);
+  // The crash: two keys 14 LEDs apart, pressed together, send crests that meet in the middle, and the middle flares
+  // brighter than one ripple alone makes it (green: one ripple already fills the blue).
+  auto midBetween = [](int a, int b) { return (litFor(a)[0] + litFor(b)[0]) / 2; };
+  int m = midBetween(60, 67);
+  uint8_t alone = 0, clash = 0;
+  Serial.feed({0x90, 60, 21, 77, 127});
+  for (int t = 0; t < 400; t += 5) { pump(5); alone = std::max(alone, leds[m].g); }
+  Serial.feed({0x80, 60}); pump(800);
+  Serial.feed({0x90, 60, 21, 77, 127, 0x90, 67, 21, 77, 127});
+  for (int t = 0; t < 400; t += 5) { pump(5); clash = std::max(clash, leds[m].g); }
+  std::printf("demo clash: the LED between two keys peaks at %d alone, %d when both ripple\n", alone, clash);
+  CHECK(clash > alone * 2, "demo: crossing ripples crash brighter: %d vs %d", clash, alone);
+  Serial.feed({0x80, 60, 0x80, 67}); pump(800);
+  // The sustain pedal (the website sends setting 6 = 1200 while it's held): a ripple rings longer and goes further,
+  // and one already on its way keeps the length it started with when the pedal comes up.
+  auto furthest = [&]() {  // the furthest a press's ripple gets in its whole life
+    Serial.feed({0x90, 60, 21, 77, 127});
+    int far = 0, mid = litFor(60)[litFor(60).size() / 2];
+    for (int t = 0; t < 1500; t += 10) {
+      pump(10);
+      for (int i = 0; i < activeLeds; i++) if (leds[i].b > 8) far = std::max(far, std::abs(i - mid));
+    }
+    Serial.feed({0x80, 60}); pump(500);
     return far;
   };
-  Serial.feed({0x90, 60, 21, 77, 127}); pump(5);
-  int glitter = sparksFlying();
-  pump(345);
-  int hardReach = reach(60);
-  Serial.feed({0x80, 60}); pump(1400);
-  Serial.feed({0x90, 60, 9, 35, 57}); pump(350);
-  int softReach = reach(60);
-  Serial.feed({0x80, 60}); pump(1400);
-  int before = sparksFlying();
-  Serial.feed({0x90, 60, 21, 77, 127, 0x90, 64, 21, 77, 127, 0x90, 67, 21, 77, 127}); pump(5);
-  int chord = sparksFlying() - before;
-  std::printf("demo splash: %d glitter sparks per hard press; reach %d LEDs hard, %d soft; a chord throws %d sparks\n",
-              glitter, hardReach, softReach, chord);
-  CHECK(glitter >= 10, "demo: a hard press throws glitter: %d", glitter);
-  CHECK(hardReach > softReach + 3, "demo: a hard press reaches further: %d vs %d", hardReach, softReach);
-  CHECK(chord >= 3 * 6 + 20, "demo: a chord adds a shower: %d", chord);
-  Serial.feed({0x80, 60, 0x80, 64, 0x80, 67}); pump(1500);
-  CHECK(countLit() == 0, "demo: the splash ends dark: %d", countLit());
+  int plain = furthest();
+  Serial.feed({0xB0, 6, 1200 & 127, 1200 >> 7}); pump(5);
+  int sustained = furthest();
+  Serial.feed({0xB0, 6, 1200 & 127, 1200 >> 7, 0x90, 60, 21, 77, 127}); pump(100);
+  Serial.feed({0xB0, 6, 0, 0}); pump(700);
+  bool rings = countLit() > (int)litFor(60).size();
+  std::printf("demo sustain: reaches %d LEDs plain, %d with the pedal; a pedal ripple still rings at 800 ms: %d\n", plain, sustained, rings);
+  CHECK(sustained > plain + 6 && rings, "demo: the pedal rings ripples longer and further: %d vs %d", sustained, plain);
+  Serial.feed({0x80, 60}); pump(1500);
+  // The hello: the first clear after the board starts (the website's, on connecting) crashes two ripples in the middle.
+  helloDue = true;
+  Serial.feed({0xF0}); pump(250);
+  int helloLit = countLit();
+  CRGB helloMid = leds[activeLeds / 2];
+  pump(800);
+  std::printf("demo hello: %d LEDs lit at 250 ms, the middle (%d,%d,%d); then %d\n", helloLit, helloMid.r, helloMid.g, helloMid.b, countLit());
+  CHECK(helloLit > 20 && helloMid && !helloDue && countLit() == 0, "demo: a hello crash on the first clear: %d lit", helloLit);
+  Serial.feed({0xF0}); pump(250);
+  CHECK(countLit() == 0, "demo: only the first clear says hello: %d lit", countLit());
   Serial.feed({0xF0}); defaults(); pump(5); stopShows();
 
   // A save from older firmware (no hintRampMs at the end) still loads its calibration.

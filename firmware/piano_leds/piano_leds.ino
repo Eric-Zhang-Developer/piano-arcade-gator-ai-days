@@ -39,10 +39,11 @@
 //   12 jointIndex          first LED of the second strip (144 for two 1 m strips)
 //   13 jointGap x16        extra space at the joint, in 1/16 LED pitch (6.94 mm at 144/m)
 //   14 reverse 0/1         strip runs right to left (DIN at the treble end)
-//   15 demo 0/1            the mode: 0 learning (the default: hints that build up faint to gold, wrong-key red,
+//   15 demo 0/1            the mode: 0 learning (hints that build up faint to gold, wrong-key red,
 //                          soft glows for the count-in, fever, pause, the end and idle), 1 demo (every key pressed
-//                          on the piano lights and splashes: a ripple, glitter, harder presses go further; and
-//                          nothing else; the website sends those presses). BOOT flips it
+//                          on the piano lights in its note color (the default) with a breaking-wave ripple about nine keys each way
+//                          that cools as it goes and crashes where two ripples cross, no white, and nothing else; the website
+//                          sends those presses). BOOT flips it. Every power-on starts in demo, whatever was saved
 //   20 save                write settings to flash (survive power off)
 //   21 defaults            reset settings to the compiled defaults (not saved until 20)
 
@@ -99,7 +100,8 @@ struct Settings {
   uint16_t hintRampMs = 1500;   // the game's hint lead (led-game leadMs), which the game sends on connect
   uint16_t wrongRed = 1;
   uint16_t shows = 1;
-  uint16_t demo = 0;             // new fields go last: loadSettings reads an older, shorter save as a prefix
+  uint16_t demo = 1;             // demo by default (Sharan, 2026-10-25: it's what matters). New fields go last:
+                                 // loadSettings reads an older, shorter save as a prefix
 };
 
 struct Key {
@@ -117,8 +119,7 @@ struct Ripple {
   CRGB color;
   uint32_t start;
   bool on;
-  float power;     // 0.45..1, from how hard the key went down (demo): reach, life and brightness
-  CRGB drift;      // the crest shifts toward this color as it travels (demo); black = stays
+  uint16_t life;   // ms, fixed at its start: the sustain pedal changes setting 6 mid-ripple
 };
 
 CRGB leds[NUM_LEDS];
@@ -273,7 +274,7 @@ inline uint8_t scale7(uint8_t c) { return c >= 127 ? 255 : c << 1; }
 #define INTRO_MAX_MS 9000      // no hint by then: the count-in show stops
 #define INTRO_STEPS 8          // the count-in is 8 beats (core settings' countInBeats): the bar fills in 8 steps
 #define FINALE_MS 3500
-#define MAX_SPARKS 96         // demo glitter: a fast run of hard presses and a chord shower
+#define MAX_SPARKS 48
 #define TRAIL_FADE_PER_MS 1.6f // fx layer fades ~16/255 per 10 ms frame: a moving light leaves a short trail
 
 // Pause: during a song the game sends a hint or a key every note, so PAUSE_MS of nothing but heartbeats means
@@ -472,6 +473,7 @@ void feverBreak(uint8_t note) {
   fever = false;
   gaugeFill = 0;
   feverGlow = 0;
+  if (!showsOn()) return;  // demo: the strip shows presses only
   if (!demoExtras()) {
     for (int i = 0; i < activeLeds; i++) fx[i] |= CRGB(50, 0, 4);
     return;
@@ -486,7 +488,9 @@ void feverHit(uint8_t note, uint8_t j) {
   songJudged++;
   if (j == J_MISS) { feverBreak(note); return; }
   float c = ledCenterOf(note);
+  bool draw = showsOn();  // demo: the gauge still counts, but the strip shows presses only
   if (fever) {  // every hit in fever: classy, a small warm bloom; demo, pulses out both ways
+    if (!draw) return;
     if (!demoExtras()) { bloom(c, CRGB(120, 80, 20), 450, 6); return; }
     spark(c, 0.3f, UI_GOLD, 350);
     spark(c, -0.3f, UI_MAGENTA, 350);
@@ -495,6 +499,7 @@ void feverHit(uint8_t note, uint8_t j) {
   gaugeFill = min((float)gaugeSize, gaugeFill + (j == J_PERFECT ? 1.0f : j == J_GREAT ? 0.5f : 0.0f));
   if (gaugeFill >= gaugeSize) {  // FEVER. Classy: a warm swell from this key. Demo: a gold flash and a burst
     fever = true;
+    if (!draw) return;
     if (!demoExtras()) { bloom(c, CRGB(150, 100, 25), 1500, 90); return; }
     for (int i = 0; i < activeLeds; i++) fx[i] |= CRGB(150, 110, 20);
     burst(c, UI_GOLD, 20, 0.2f);
@@ -699,39 +704,39 @@ void clearAll() {
   if (anyRaw) { anyRaw = false; updateActiveLeds(); }
 }
 
-// How long a key on's ripple lasts: setting 6 if set; otherwise demo mode brings it back at 700 ms (the hit
-// "breaks to both sides", as the strip first did) and classy keeps each key's light on its key.
-uint16_t rippleLife() { return cfg.rippleMs ? cfg.rippleMs : cfg.demo && cfg.shows ? 700 : 0; }
+// How long a key on's ripple lasts: setting 6 if set; otherwise demo mode brings it back as a 600 ms ripple
+// (renderDemoRipple: about nine keys each way) and learning keeps each key's light on its key.
+#define DEMO_RIPPLE_MS 600
+// Demo's colors through a gamma: the website's colors are made for a screen, and on these LEDs (linear, with a strong
+// green) they come out pale; per-channel gamma 2.2 brings back their saturation (#2b9bff blue (42,154,255) becomes
+// (5,85,255), #ff2fd0 pink becomes (255,6,163)).
+#define DEMO_GAMMA 2.2f
+CRGB keyColor(const uint8_t *m) {
+  CRGB c(scale7(m[2]), scale7(m[3]), scale7(m[4]));
+  return demoSimple() ? applyGamma_video(c, DEMO_GAMMA) : c;
+}
+uint16_t rippleLife() { return cfg.rippleMs ? cfg.rippleMs : cfg.demo && cfg.shows ? DEMO_RIPPLE_MS : 0; }
 
-// Demo's splash: the website sends a press's color scaled by how hard it went down (45% to 100%), so its
-// brightest channel is the press's power. A harder press ripples further and brighter, the crest drifts one
-// step along the Duo palette as it goes (blue to violet, violet to magenta), and glitter flies off the key,
-// more and faster the harder the press; a chord (three keys inside 90 ms) throws a magenta-and-gold shower.
-uint32_t chordAt = 0;
-uint8_t chordKeys = 0;
 void startRipple(uint8_t note, CRGB color) {
   if (!rippleLife()) return;
   float sum = 0;
   int n = 0;
   forEachLed(note, [&](int i) { sum += i; n++; });
   if (!n) return;
-  float center = sum / n, power = 1;
-  CRGB drift = CRGB::Black;
-  if (demoSimple()) {
-    power = max(0.45f, max(color.r, max(color.g, color.b)) / 255.0f);
-    drift = note < 60 ? UI_MAGENTA : UI_VIOLET;  // the left hand's violet warms, the right hand's blue cools
-    burst(center, color, 4 + (int)(8 * power), 0.12f + 0.22f * power);
-    spark(center, 0.3f * power, UI_GOLD, 500);
-    spark(center, -0.3f * power, UI_GOLD, 500);
-    uint32_t now = millis();
-    chordKeys = now - chordAt < 90 ? chordKeys + 1 : 1;
-    chordAt = now;
-    if (chordKeys == 3) {
-      burst(center, UI_MAGENTA, 14, 0.4f);
-      burst(center, UI_GOLD, 8, 0.3f);
-    }
-  }
-  ripples[nextRipple] = {center, color, millis(), true, power, drift};
+  ripples[nextRipple] = {sum / n, color, millis(), true, rippleLife()};
+  nextRipple = (nextRipple + 1) % MAX_RIPPLES;
+}
+
+// Demo's hello, the first time the website clears the strip after the board starts (opening the port resets it):
+// a blue ripple and a pink one from either side of the middle crash into each other, so the link shows across a room.
+bool helloDue = true;
+void helloCrash() {
+  helloDue = false;
+  if (!demoSimple()) return;
+  float mid = (activeLeds - 1) / 2.0f;
+  ripples[nextRipple] = {mid - 10, applyGamma_video(UI_BLUE, DEMO_GAMMA), millis(), true, DEMO_RIPPLE_MS};
+  nextRipple = (nextRipple + 1) % MAX_RIPPLES;
+  ripples[nextRipple] = {mid + 10, applyGamma_video(UI_MAGENTA, DEMO_GAMMA), millis(), true, DEMO_RIPPLE_MS};
   nextRipple = (nextRipple + 1) % MAX_RIPPLES;
 }
 
@@ -757,15 +762,15 @@ void runMessage(const uint8_t *m) {
       }
       // Demo: the website already lit this key on its press; the game's hit for it only recolors it.
       if (demoSimple() && k.held && k.level > 0) {
-        k.color = CRGB(scale7(m[2]), scale7(m[3]), scale7(m[4]));
+        k.color = keyColor(m);
         if (songLive && j) feverHit(m[1], j);
         break;
       }
-      k.color = CRGB(scale7(m[2]), scale7(m[3]), scale7(m[4]));
+      k.color = keyColor(m);
       k.level = 1.0f;
       k.held = true;
       k.holdUntil = 0;
-      k.flash = cfg.flash ? 1.0f : 0.0f;
+      k.flash = cfg.flash && !demoSimple() ? 1.0f : 0.0f;  // demo: the key's own color, no white
       if (showMode == SHOW_INTRO) showMode = SHOW_NONE;  // a key on before any hint: not a count-in
       // A hint still on after a hit is for this key's next note (the game keeps one hint lit across
       // a repeated note), so its ramp starts over from the hit. It shows once the key's light fades.
@@ -817,6 +822,7 @@ void runMessage(const uint8_t *m) {
       songLive = false;
       stopShows();
       if (showsOn()) startShow(ending ? SHOW_FINALE : SHOW_INTRO);
+      if (helloDue) helloCrash();
       break;
     }
     case 0xF1: printHello(); break;
@@ -880,26 +886,79 @@ bool stepAnimations(float dtMs, uint32_t now) {
   return animating;
 }
 
-CRGB scaleBy(CRGB c, float f);  // below, with the hints
+// Demo's ripple instead: a breaking wave. Two crests leave the key, slow down and stop about nine keys out each way
+// (the reach grows with the life: setting 6 tunes both). Each crest is steep and bright at its front with foam
+// trailing back toward the key, and it all fades out; no white anywhere. It cools as it goes, from the key's color
+// toward cooler(), which works from whatever color the website sends, so a new palette needs no firmware change.
+// Where two crests cross they crash (renderClash), so a chord or a fast run makes the waves collide.
+#define DEMO_RIPPLE_LEDS_PER_MS (18.0f / DEMO_RIPPLE_MS)
+#define DEMO_FRONT 1.5f   // LEDs from the crest's peak to dark, ahead of it
+#define DEMO_FOAM 5.0f    // LEDs of foam trailing behind it
+float crestSum[NUM_LEDS];    // this frame's crests per LED, for the crash
+uint8_t crestCount[NUM_LEDS];
+CRGB cooler(CRGB c) {  // less red, more green and blue: blue goes cyan, violet goes sky blue, pink goes violet
+  return CRGB(c.r / 2, qadd8(c.g, c.r / 3), qadd8(c.b, c.r / 2));
+}
+void renderDemoRipple(const Ripple &r, float u, uint16_t life) {
+  float radius = life * DEMO_RIPPLE_LEDS_PER_MS * (1 - (1 - u) * (1 - u));  // ease-out
+  float amp = 0.95f * (1 - u);
+  CRGB tint = blend(r.color, cooler(r.color), (uint8_t)(255 * u));
+  int from = max(0, (int)floorf(r.center - radius - DEMO_FRONT));
+  int to = min(activeLeds - 1, (int)ceilf(r.center + radius + DEMO_FRONT));
+  for (int i = from; i <= to; i++) {
+    float d = fabsf(i - r.center), past = d - radius;  // > 0 ahead of the crest, < 0 behind it
+    float crest = past >= 0 ? 1 - past / DEMO_FRONT : 1 + past / DEMO_FOAM;
+    crest = crest > 0 ? crest * crest : 0;               // a sharp peak with a soft tail
+    float wake = d < radius ? 0.2f * (1 - d / radius) : 0;
+    if (crest > 0.3f && d > 2) { crestSum[i] += crest * amp; crestCount[i]++; }  // off the key itself
+    float level = max(crest, wake);
+    if (level <= 0) continue;
+    CRGB c = tint;
+    c.nscale8_video((uint8_t)(amp * level * 255));
+    leds[i] += c;
+  }
+}
+
+// The crash: where two or more crests cross this frame, that spot flares to three times what's there and spills a
+// little onto its neighbours (saturating, so it goes pale toward the colors' tints, never plain white).
+void renderClash() {
+  static CRGB extra[NUM_LEDS];
+  for (int i = 0; i < activeLeds; i++) {
+    extra[i] = CRGB::Black;
+    if (crestCount[i] < 2) continue;
+    extra[i] = leds[i];
+    extra[i].nscale8_video((uint8_t)(min(1.0f, crestSum[i]) * 255));
+  }
+  for (int i = 0; i < activeLeds; i++) {
+    if (!extra[i]) continue;
+    leds[i] += extra[i];
+    leds[i] += extra[i];
+    CRGB spill = extra[i];
+    spill.nscale8_video(110);
+    if (i > 0) leds[i - 1] += spill;
+    if (i < activeLeds - 1) leds[i + 1] += spill;
+  }
+  memset(crestSum, 0, sizeof(crestSum));
+  memset(crestCount, 0, sizeof(crestCount));
+}
 
 // Two wavefronts per ripple, one each way. A splash, not a slide: they leave fast and slow down (ease-out, to
 // the same reach the first firmware had: RIPPLE_LEDS_PER_MS over the life), start a little white-hot and cool
 // into the key's color, and widen from 2 to 3.5 LEDs as they go; a faint wake glows behind each and fades with
 // it. They start at 70% and fade quadratically, so the key itself stays the brightest thing and a chord's ripples
 // add up without washing out. A ripple turns off on the frame it expires, and that frame draws it dark.
+// In demo every ripple is drawn as renderDemoRipple instead, and crossing crests crash (renderClash).
 void renderRipples(uint32_t now) {
   for (auto &r : ripples) {
     if (!r.on) continue;
     uint32_t age = now - r.start;
-    uint16_t life = rippleLife() * (0.6f + 0.6f * r.power);  // a hard press lasts and travels longer
+    uint16_t life = r.life;
     if (age >= life) { r.on = false; continue; }
-    float u = (float)age / life, fade = (1 - u) * (1 - u), amp = (0.45f + 0.35f * r.power) * fade;
+    if (demoSimple()) { renderDemoRipple(r, (float)age / life, life); continue; }
+    float u = (float)age / life, fade = (1 - u) * (1 - u), amp = 0.7f * fade;
     float radius = life * RIPPLE_LEDS_PER_MS * (1 - fade);  // ease-out: 1 - (1 - u)^2
     float width = 2.0f + 1.5f * u;
-    CRGB base = r.color;
-    if (r.power < 1) base = scaleBy(base, 1 / r.power);  // the crest is full color; power sets amp instead
-    if (r.drift) base = blend(base, r.drift, (uint8_t)(190 * u));  // shifts along the palette as it goes
-    CRGB crest = blend(base, CRGB::White, (uint8_t)(150 * fade * (1 - u)));  // white-hot early, then its color
+    CRGB crest = blend(r.color, CRGB::White, (uint8_t)(150 * fade * (1 - u)));  // white-hot early, then its color
     for (int side = -1; side <= 1; side += 2) {
       float p = r.center + side * radius;
       int from = max(0, (int)floorf(min(p, r.center) - width)), to = min(activeLeds - 1, (int)ceilf(max(p, r.center) + width));
@@ -909,12 +968,13 @@ void renderRipples(uint32_t now) {
         float wake = d > 0 && d < radius ? 0.18f * (1 - d / radius) : 0;  // behind it, toward the key
         float level = max(w > 0 ? w : 0.0f, wake);
         if (level <= 0) continue;
-        CRGB c = w > wake ? crest : base;
+        CRGB c = w > wake ? crest : r.color;
         c.nscale8_video((uint8_t)(amp * level * 255));
         leds[i] += c;  // saturating add
       }
     }
   }
+  if (demoSimple()) renderClash();
 }
 
 // How bright a hint is drawn, as a multiple of its color (0 to HINT_PEAK). With the ramp on, a new hint
@@ -937,6 +997,7 @@ float hintFactor(const Key &k, uint32_t now) {
 // Learning: once a hint's ramp is done its note is due, and the key turns bright gold, breathing between 75% and
 // full: press it now. It fades over from the hand color in 120 ms so the change reads as one motion.
 #define GOLD_IN_MS 120
+CRGB scaleBy(CRGB c, float f);  // below
 CRGB hintColor(const Key &k, uint32_t now) {
   CRGB c = scaleBy(k.hint, hintFactor(k, now));
   uint32_t age = now - k.hintAt;
@@ -1030,7 +1091,7 @@ void checkBootButton(uint32_t now) {
   printHello();  // the tester shows the new mode
   float mid = (activeLeds - 1) / 2.0f;
   if (demoSimple()) {  // demo: one ripple from the middle, the only thing it does
-    ripples[nextRipple] = {mid, UI_BLUE, millis(), true, 1.0f, UI_VIOLET};
+    ripples[nextRipple] = {mid, UI_BLUE, millis(), true, DEMO_RIPPLE_MS};
     nextRipple = (nextRipple + 1) % MAX_RIPPLES;
   } else {  // learning: a soft white glow
     bloom(mid, CRGB(150, 150, 170), 1200, mid);
@@ -1045,6 +1106,7 @@ void setup() {
   pinMode(BOOT_PIN, INPUT_PULLUP);
 #endif
   loadSettings();
+  cfg.demo = MODE_DEMO;  // the piano always wakes up alive (Sharan, 2026-10-25); Learning is picked per session
   FastLED.addLeds<WS2812B, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS);
   FastLED.setMaxPowerInVoltsAndMilliamps(5, MAX_MILLIAMPS);
   FastLED.setBrightness(cfg.brightness);

@@ -6,6 +6,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type { GamePlugin, Results } from "../../contracts";
 import { Brackets, Button, DataCell, MonoLabel, Panel } from "../duo-tokens";
+import { FlowJudge } from "../flow-mode/judge";
+import { playMode } from "../play-modes/modes";
 import { OptionsDrawer } from "../options-panel";
 import { Slots } from "../play-slots/ui";
 import { showsMoment } from "../record-moment/timing";
@@ -16,12 +18,13 @@ import styles from "./results-layout.module.css";
 export const resultsLayoutSettings = {
   // panels in the first view, under the counts (record-moment: NEW RECORD takes only; flow-mode: its headline, Flow takes only)
   featured: ["flow-mode", "record-moment", "duo-results"], // duo-results: BY BAR and TIMING, the middle band
+  ladder: ["play-modes"], // LEARN → FLOW → PERFORM, under the rank: the next mode is one click from the take
   tutor: ["duo-tutor"], // the bottom band: the tutor's line and PRACTICE BARS X–Y, beside Retry and Songs
   practiceFeatured: ["chunk-practice"], // a practice=1 or =adapt take: chunk practice's way on in place of the graph (#294)
   newRecordFeatured: ["record-moment"], // a NEW RECORD take: the moment alone; at 1280×720 the graph pushed Retry off
   // the first view, so it moves to the details for that take (spec: record-moment, First view)
   demoFeatured: ["watch-demo"], // a demo=1 take: its way back to the songs, so its focused button scrolls nothing
-  actions: ["piano-out", "wait-mode", "sheet-review", "score-card"], // panels that are buttons: they join Retry and Songs
+  actions: ["piano-out", "sheet-review", "score-card"], // panels that are buttons: they join Retry and Songs
   // The details, by what a player wants (spec: duo-details; specs/decisions/duo-details-groups.md). Timing leads How I
   // played; a panel in neither list joins the end of it, as duo-start does with a panel in no group.
   played: ["tempo-curve", "evenness", "dynamics", "take-graph", "bar-loop", "weak-bars", "chord-sync", "records"],
@@ -88,6 +91,7 @@ export function ResultsLayout({
   status,
   params = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search),
   newRecord = showsMoment(takeOutcome()),
+  heldTempo = playMode(params) === "flow" ? (FlowJudge.live?.heldTempo ?? null) : null,
 }: {
   results: Results;
   title?: string; // the song's title, beside the rank
@@ -102,12 +106,13 @@ export function ResultsLayout({
   status?: ReactNode; // the MIDI status line, inside the Options drawer
   params?: URLSearchParams; // the take's URL; /play's own when not given
   newRecord?: boolean; // this take set a new record (records' outcome when not given): record-moment's first view
+  heldTempo?: number | null; // a Flow take's held tempo, beside the rank, since it caps the rank (play-modes)
 }) {
   const { actions } = resultsLayoutSettings;
   const featured = featuredFor(params, newRecord);
   const only = (ids: string[]) => plugins.filter((p) => ids.includes(p.id));
   const { played, doing, wide } = resultsLayoutSettings;
-  const rest = plugins.filter((p) => ![...featured, ...actions, ...resultsLayoutSettings.tutor, ...doing].includes(p.id));
+  const rest = plugins.filter((p) => ![...featured, ...actions, ...resultsLayoutSettings.tutor, ...resultsLayoutSettings.ladder, ...doing].includes(p.id));
   const rank = (id: string) => (played.includes(id) ? played.indexOf(id) : played.length);
   const playedPlugins = [...rest].sort((a, b) => rank(a.id) - rank(b.id)); // stable: unlisted panels keep layers.ts order
   const card = (name: string, node: ReactNode, span = false) => (
@@ -144,6 +149,11 @@ export function ResultsLayout({
                   Wrong <span className={styles.wrong}>✕ <Tally value={results.counts.wrong ?? 0} index={tallies - 2} of={tallies} testid="count-wrong" /></span>
                   {" · "}Extra <Tally value={results.counts.extra} index={tallies - 1} of={tallies} testid="count-extra" />
                   {" · "}Score <span data-testid="score">{score === undefined ? "—" : score.toLocaleString("en-US")}</span>
+                  {heldTempo !== null && (
+                    <>
+                      {" · "}Tempo <span data-testid="held-tempo" className={styles.tempo}>{heldTempo}%</span>
+                    </>
+                  )}
                 </MonoLabel>
               </p>
             </div>
@@ -165,10 +175,13 @@ export function ResultsLayout({
           <>
             {title && <p className={styles.song}>{title}</p>}
             <h2 data-testid="unscored" className={styles.unscored}>
-              Wait mode: not scored
+              Learn: not scored
             </h2>
           </>
         )}
+        <div className={styles.ladder}>
+          <Slots plugins={only(resultsLayoutSettings.ladder)} panel={panel} />
+        </div>
         <div className={styles.featured}>
           <Slots plugins={only(featured)} panel={panel} />
         </div>

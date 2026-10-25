@@ -2,9 +2,9 @@
 // The music select (/), in the Duo look (duo-select): the focused song in a bracketed panel on the left, the song rows
 // on the right. Each row is a link, so click and Enter play (the panel's piano roll moving into the stage card,
 // select-to-stage); ↑/↓ move focus and keep the focused row centered in the list; P opens adaptive practice
-// (adaptive-chunks); L learns the focused song in wait mode (learn-from-select); W watches it; E switches Normal and
-// Easy (easy-charts), and every href and best grade follows the level. Hrefs and L also carry the song's Hands and
-// Speed (song-options).
+// (adaptive-chunks) in Flow (play-modes); L learns the focused song in Learn (learn-from-select); W watches it; E
+// switches Normal and Easy (easy-charts), and every href and best grade follows the level. Hrefs and L also carry the
+// song's Hands and Speed (song-options).
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
@@ -60,13 +60,13 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
     return () => window.removeEventListener("keydown", onKey);
   }, [level, setLevel]);
 
-  // PRACTICE: adaptive practice from the whole song (adaptive-chunks), with the song's hands and level. It needs the
-  // chart's phrases, so it waits for the focused chart.
+  // PRACTICE: adaptive practice from the whole song (adaptive-chunks), in Flow (play-modes: practice opens Flow), with
+  // the song's hands and level. It needs the chart's phrases, so it waits for the focused chart.
   const hands = song ? options[song.id]?.hands : undefined;
   const practiceHref =
     song && chart?.id === song.id
       ? (() => {
-          const q = new URLSearchParams({ song: song.id });
+          const q = new URLSearchParams({ song: song.id, mode: "flow" });
           if (hands && hands !== "both") q.set("hands", hands);
           const list = songPhrases(chart.chart, q.get("hands"));
           return list.length ? withLevel(adaptUrl(q, list, start(list)), level) : null;

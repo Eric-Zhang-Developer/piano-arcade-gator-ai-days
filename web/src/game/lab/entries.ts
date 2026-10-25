@@ -21,10 +21,10 @@ export const labGroups: LabGroup[] = [
     entries: [
       {
         slug: "wait-mode",
-        name: "Wait mode",
+        name: "Learn mode",
         description: "the highway stops on each note (a chord waits for all its keys), never calls a MISS, plays no beat",
         href: "/play?song=twinkle&mode=wait",
-        open: "Twinkle, wait mode",
+        open: "Twinkle, Learn",
       },
       {
         slug: "flow-mode",
@@ -32,7 +32,7 @@ export const labGroups: LabGroup[] = [
         description:
           "the song waits at each note and follows your tempo (0.5–1.3×), scored on wrong notes, skipped notes and stops past 2 beats, not timing",
         href: "/play?song=twinkle&mode=flow",
-        open: "Twinkle, flow mode",
+        open: "Twinkle, Flow",
       },
       {
         slug: "adaptive-chunks",
@@ -61,7 +61,7 @@ export const labGroups: LabGroup[] = [
         name: "Rewind",
         description: "In wait mode, and so in chunk-practice's learn steps, ← moves back a bar and → skips ahead one",
         href: "/play?song=twinkle&mode=wait",
-        open: "Twinkle, wait mode",
+        open: "Twinkle, Learn",
       },
     ],
   },

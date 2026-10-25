@@ -91,6 +91,7 @@
 
 /* The slots carry their own top margins; the gap spaces the ceremony instead. */
 .featured > *,
+.ladder > *,
 .tutor > *,
 .actions > * {
   margin-top: 0 !important;
@@ -103,6 +104,16 @@
 }
 
 .featured:empty {
+  display: none;
+}
+
+/* The play-modes ladder: one slim row, as wide as the six cells' band at most, so the first view keeps Retry. */
+.ladder {
+  width: min(100%, 720px);
+  align-self: center;
+}
+
+.ladder:empty {
   display: none;
 }
 
@@ -292,4 +303,9 @@
 .doingRow:empty,
 .doing:has(.doingRow:empty) {
   display: none;
+}
+
+/* A Flow take's held tempo in the stats line: in ink, since below 90% it caps the rank (play-modes). */
+.tempo {
+  color: var(--pa-ink);
 }

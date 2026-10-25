@@ -1,7 +1,7 @@
 ---
 name: "Play modes: Learn, Flow and Perform as a ladder, and practice keeps your mode"
 depends_on: ["wait-mode", "flow-mode", "duo-results", "learn-from-select", "chunk-practice", "adaptive-chunks", "bar-loop", "duo-start", "help-overlay", "lab", "mouse-first", "results-layout", "duo-select", "select-layout", "song-preview", "weak-bars", "difficulty"]
-owns: ["specs/features/play-modes/", "changes/play-modes.md", "specs/decisions/play-modes-"]
+owns: ["web/src/game/play-modes/", "specs/features/play-modes/", "changes/play-modes.md", "specs/decisions/play-modes-"]
 assignee: "eric"
 ---
 
@@ -87,6 +87,9 @@ a `needs-human` issue for `sharan` to say "Learn mode" instead.
      | Help card, P (`:49`) | practice it: narrows onto the bars you miss | practice it in Flow: narrows onto the bars you miss |
      | Help card, Enter (`:47`) | play it | Perform: on the beat, ranked |
      | Lab (`lab/entries.ts:24,31`) | Wait mode · Twinkle, wait mode / Flow mode · Twinkle, flow mode | Learn mode · Twinkle, Learn / Flow mode · Twinkle, Flow |
+     | Lab, Rewind's link (`lab/entries.ts:64`) | Twinkle, wait mode | Twinkle, Learn (its description stays: lab's test copies it from rewind's done note) |
+     | Flow's tutor line and weak-bars' link (`duo-results/scores.ts`, `weak-bars/index.ts`) | … at 70% / Practice bars 3–4 at 80% | … in Flow / Practice bars 3–4 in Flow, on a Flow take only |
+     | Chunk practice's play-step line (`chunk-practice/index.tsx`) | Chunk 1 of 3 · play at 70% | Chunk 1 of 3 · play in Flow, on a Flow step only |
      | Select's LEARN title (`duo-select/Select.tsx:74`) | Learn: the song waits for each note (L) | unchanged |
 
      The canvas LEARN badge (`wait-hud`) and the ♩ readout already match. Any string the build finds that this table

@@ -35,6 +35,14 @@
   gap: 0.8vw;
 }
 
+/* The play-modes ladder takes the whole row, over the other ways in, and the mode's own line is its caption. */
+.modes > [data-testid="slot-play-modes"],
+.modes > [data-testid="slot-wait-mode"],
+.modes > [data-testid="slot-flow-mode"] {
+  grid-column: 1 / -1;
+  order: -1;
+}
+
 .modes > *,
 .modes a,
 .modes button {

@@ -1,6 +1,6 @@
 "use client";
 // /play's start screen in the Duo look (spec: duo-start). It only places what's already there: the stage card on the
-// left; on the right Start, the play modes in one row, the hands and the Options button. Settings live in the select's
+// left; on the right Start, the play-modes ladder over the other ways in, the hands and the Options button. Settings live in the select's
 // Options drawer (options-panel), not on the screen (Eric, #763). Each plugin's start panel goes in its group by id; a
 // panel in no group (first-run, versus, the demo's auto-start, any new one) goes under Start. Key hints never show
 // (#772): their shortcuts stay bound and are on the ? card.
@@ -13,7 +13,7 @@ import styles from "./start.module.css";
 
 export const groups = {
   card: ["stage-card"],
-  modes: ["chunk-practice", "wait-mode", "flow-mode", "sheet-view"],
+  modes: ["play-modes", "chunk-practice", "wait-mode", "flow-mode", "sheet-view"],
   bar: ["hand-mode"],
   drawer: ["leds"],
   // Labels is the drawer's own row; Z / X and ← → are key hints. See specs/decisions/duo-start-settings.md.

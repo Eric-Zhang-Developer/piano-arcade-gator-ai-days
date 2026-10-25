@@ -171,7 +171,7 @@ export default function Play() {
     };
     // ?mode=flow: the flow judge, which owns a clock that waits at each note and follows your tempo (flow-mode). With
     // ?tempo= the chart is already slowed by bar-loop, so rate 1 is the asked tempo and the steadiness reference.
-    const flowJudge = isFlowMode(params) ? new FlowJudge(chart, emit, { startRate: params.has("tempo") ? 1 : undefined }) : null;
+    const flowJudge = isFlowMode(params) ? new FlowJudge(chart, emit, { startRate: params.has("tempo") ? 1 : undefined, tempo: params.has("tempo") ? Number(params.get("tempo")) / 100 : 1 }) : null;
     const judge = flowJudge ?? new Judge(chart, emit, { scored: !isWaitMode(params) }); // wait mode: no score moments
     hw.noteState = judge.noteState;
     // Zero is fixed here, after the stage and judge are built, so songStart's atMs is the chart time now and a plugin's

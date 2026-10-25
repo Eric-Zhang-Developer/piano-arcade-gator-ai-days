@@ -44,9 +44,9 @@ export const helpGroups: HelpGroup[] = [
     files: [SELECT, "game/duo-select/Select.tsx", SONG_OPTIONS, "game/easy-charts/level.tsx", "game/first-run/index.tsx", OPTIONS, "game/lab/LabLink.tsx"],
     lines: [
       { keys: ["↑", "↓"], what: "choose a song", source: [SELECT], match: ["ArrowUp", "ArrowDown"], control: "Songs" },
-      { keys: ["Enter"], what: "play it", control: "PLAY" },
-      { keys: ["L"], what: "learn it: the song waits for each note", source: [SELECT], control: "LEARN" },
-      { keys: ["P"], what: "practice it: narrows onto the bars you miss", source: [SELECT], match: ["p"], control: "PRACTICE" },
+      { keys: ["Enter"], what: "Perform: on the beat, ranked", control: "PLAY" },
+      { keys: ["L"], what: "Learn: the song waits for each note", source: [SELECT], control: "LEARN" },
+      { keys: ["P"], what: "practice it in Flow: narrows onto the bars you miss", source: [SELECT], match: ["p"], control: "PRACTICE" },
       { keys: ["W"], what: "watch it: the perfect bot plays it", source: [SELECT], control: "WATCH" }, // through watch-demo's isWatchKey (#580)
       { keys: ["H"], what: "Hands: both, right or left", source: [SONG_OPTIONS], match: ["h"], control: "Hands" },
       { keys: ["←", "→"], what: "Speed: slower or faster", source: [SONG_OPTIONS], match: ["ArrowLeft", "ArrowRight"], control: "Speed" },

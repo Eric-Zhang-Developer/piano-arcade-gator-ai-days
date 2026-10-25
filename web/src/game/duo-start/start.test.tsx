@@ -7,6 +7,7 @@ import { handMode } from "../hand-mode";
 import { laptopOctaves } from "../laptop-octaves";
 import { leds } from "../leds";
 import { noteLabels } from "../note-labels";
+import { playModes } from "../play-modes";
 import { rewind } from "../rewind";
 import { sheetView } from "../sheet-view/plugin";
 import { stageCard } from "../stage-card";
@@ -46,7 +47,8 @@ const region = (html: string, testid: string) => {
 };
 
 test("every control on the old start screen renders, on the screen or in the Options drawer", () => {
-  const html = render([stageCard(), chunkPractice(), handMode(), laptopOctaves(), noteLabels(), waitMode(), flowMode(), sheetView(), leds()]);
+  // learn-first and play-flow are the play-modes ladder's Learn and Flow rungs since play-modes.
+  const html = render([stageCard(), playModes(), chunkPractice(), handMode(), laptopOctaves(), noteLabels(), waitMode(), flowMode(), sheetView(), leds()]);
   expect(region(html, "slot-stage-card")).toBe("card");
   expect(html).toContain("Are you ready?");
   for (const id of ["chunk-start", "learn-first", "play-flow", "sheet-music"]) expect(region(html, id)).toBe("modes");

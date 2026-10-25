@@ -17,8 +17,9 @@ overlays. It's a normal game-lane change with the design pass, and it has no fla
    (`x/ui-sounds-ab/index.tsx:74`) set their labels in `var(--pa-font-mono, …)`. No `--pa-font-mono` exists, so they
    fall back to the system monospace. They use the kit's `MonoLabel` or `var(--pa-font-data)` (`app/layout.tsx:26`), at
    12 px or more.
-2. **Rewind's key chips (#1209):** Learn mode's start screen shows ← → as `<kbd>` chips with `borderRadius: 4`
-   (`rewind/index.tsx:19-28`). They become square and match the help overlay's chip
+2. **Rewind's key chips (#1209):** rewind's start panel draws ← → as `<kbd>` chips with `borderRadius: 4`
+   (`rewind/index.tsx:19-28`). The start screen hides that panel today (`duo-start/StartScreen.tsx`, `hidden`; the keys
+   are in the help overlay), so this keeps the panel on the kit for when it shows. They become square and match the help overlay's chip
    (`help-overlay/help-overlay.module.css:131-140`).
 3. **/real-keys upright (#1210):** the title (`x/real-keys/real-keys.module.css:106-107`) drops `italic`, as the
    kit has it (`specs/context/visual-direction.md:90`).
@@ -44,7 +45,7 @@ rebase on main before editing it. No open PR held the other files.
   after, at 1280×720 and 1920×1080:
   - the start screens of `/play?song=fur-elise&x=hand-palette&p=A` and `/play?song=twinkle&x=ui-sounds-ab` (the Lab's
     hrefs);
-  - Learn mode's start screen with the rewind hint;
+  - Learn mode's start screen, where the rewind hint would sit (hidden today, so no shot of it);
   - /real-keys's rail. It needs a camera: shoot the state the page reaches without one, and say so.
 - Score each round against `references/critique.md` and fix the top three problems; at most three rounds.
 - The PR's Design section has the skills invoked, each round's score, the fixes, and before and after shots.

@@ -71,7 +71,7 @@ function Panel({ k }: { k: Key }) {
       ),
     [k],
   );
-  const mono = (color: string) => ({ font: "700 clamp(12px, 0.85vw, 17px) var(--pa-font-mono, ui-monospace, monospace)", letterSpacing: "0.12em", color });
+  const mono = (color: string) => ({ font: "700 clamp(12px, 0.85vw, 17px) var(--pa-font-data), ui-monospace, monospace", letterSpacing: "0.12em", color });
   const chip = (id: string, text: string, onClick: () => void) =>
     createElement("button", { type: "button", ...kitChip(lit === id), "aria-pressed": lit === id, onClick: () => (setLit(id), onClick()) }, text);
   const row = (name: UiSound, text: string, times = 1) =>

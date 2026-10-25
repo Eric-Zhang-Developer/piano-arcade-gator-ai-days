@@ -141,6 +141,8 @@ cut = []
 # video and a judge's first two minutes show. The other 17 batch-two specs and the 3 spikes stay backlog.
 # Last two are Sharan's lane (2026-10-24): `landing` (/about, what a judge opens first), then `account` (details
 # and a handle on /auth/login; waits on #467 and a contract: PR amending mission.md Not doing).
+# Then `piano-remote` (Sharan, 2026-10-25): the piano drives the menus at the booth; here so it's the next ready
+# feature in Sharan's lane before the Sun 5:00 PM ET freeze.
 [[milestone]]
 name = "judging"
 ship = ""
@@ -158,6 +160,7 @@ features = [
   "first-run",
   "landing",
   "account",
+  "piano-remote",
 ]
 cut = []
 

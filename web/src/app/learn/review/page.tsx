@@ -1,2 +1,2 @@
-import { TheoryWorkspace } from '@/learn/frontend/TheoryWorkspace';
-export default function Page() { return <TheoryWorkspace review/>; }
+import { redirect } from 'next/navigation';
+export default function Page() { redirect('/learn'); }

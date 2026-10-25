@@ -42,7 +42,9 @@ import { takeMidi } from "./take-midi";
 import { waitMode } from "./wait-mode/plugin";
 import { rewind } from "./rewind";
 import { waitHint } from "./wait-hint";
+import { scoreCard } from "./score-card";
 import { sheetView } from "./sheet-view/plugin";
+import { sheetReview } from "./sheet-review";
 import { leds } from "./leds";
 import { createSavePlugin, queueAndSend } from "../data/save-plugin";
 import { crashGuard } from "./crash-guard";
@@ -51,6 +53,7 @@ import { crashGuard } from "./crash-guard";
 // own canvas above the highway, forwards every GameEvent, and applies transformChart and wrapInput in this order.
 export const plugins: GamePlugin[] = [
   easyCharts(), // ?level=easy: first, so every later plugin (chunks, loops, hands, bots, the judge) sees the Easy chart
+  scoreCard(), // results panel: Save card, the take as a PNG; before bar-loop, so it keeps the song's own title
   chunkPractice(), // before bar-loop, so it sees the whole chart to cut into chunks (returns it unchanged)
   barLoop(), // first: every later plugin (the sim's bot included) sees the looped chart
   handMode(), // ?hands=R|L: before scenes and the sim, so their bots and the judge get only the played hand
@@ -95,6 +98,7 @@ export const plugins: GamePlugin[] = [
   demoReset(), // 60 s with no input on a plain take's results (not ?cabinet) loads / clean
   createSavePlugin(queueAndSend), // take-store: saves finished takes after the results screen
   sheetView(), // last: posts the chart as played (after every transformChart) to /sheet; "Sheet music ↗" on the start screen
+  sheetReview(), // results panel: "Review on sheet ↗" stores this take's judgments and opens /sheet?review=1
   leds(), // after every transformChart: guide lights, hits and misses on the LED strip; "Connect lights" on the start screen
   crashGuard(), // ?crash=draw|event: a plugin that throws on purpose, for crash-guard's check; inert without ?crash
 ];

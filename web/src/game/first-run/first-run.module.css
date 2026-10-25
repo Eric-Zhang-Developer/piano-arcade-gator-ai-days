@@ -1,4 +1,5 @@
-/* First run: the start line in the body face; the link on / small and quiet, in the select's footer. */
+/* First run: the start line in the body face; the link on /, in the select's footer, in ink: it's the one path built
+   for someone who has never played, so it reads beside OPTIONS instead of under it (#941). */
 .start {
   max-width: 36em;
   margin: 12px auto 0;
@@ -12,11 +13,12 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--pa-ink-dim);
+  min-height: 24px;
+  color: var(--pa-ink);
   font: clamp(13px, 1.6vh, 18px) system-ui, sans-serif;
   text-decoration: none;
 }
 
 .link:hover {
-  color: var(--pa-ink);
+  color: var(--pa-primary);
 }

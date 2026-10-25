@@ -18,7 +18,7 @@
 - The look loop's shots: `specs/features/stage-view/shots/`.
 
 ## How to check it
-- `pnpm -C web exec vitest run src/game/stage-view src/game/sheet-view`: 18 tests pass, covering the state, the curve
+- `pnpm -C web exec vitest run src/game/stage-view src/game/sheet-view`: 15 tests pass, covering the state, the curve
   against a measured note, and the channel.
 - The browser checks are not verified locally; main's scheduled full run covers them.
 - To see it: open `/play`, click "Stage view ↗", and play.

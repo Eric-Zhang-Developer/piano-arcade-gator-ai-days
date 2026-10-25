@@ -31,6 +31,22 @@ own session, so it can read that player's rows and nothing else. Auth: anonymous
 | `SUPABASE_SECRET_KEY` | server only | Project Settings > API Keys: `sb_secret_...`. Never in a `NEXT_PUBLIC_` variable. |
 | `SUPABASE_DB_URL` | `supabase/push.sh` only | Connect > Direct > Session pooler URI, with the database password filled in: `postgresql://postgres.umswmcehegvggcfcjdfy:<password>@aws-0-us-east-1.pooler.supabase.com:5432/postgres`. Not the direct `db.<ref>.supabase.co` one: it's IPv6-only and refused on most networks. |
 
+## Test everything (5 minutes)
+With the app running locally (`pnpm -C web dev`), from the repo root:
+1. `node supabase/tests/migrations.mjs`: every migration on a throwaway database, and the safety rules.
+2. `node supabase/tests/live-smoke.mjs`: the live project's grants, row-level security and guest sign-in.
+3. `node supabase/tests/every-song.mjs`: every committed song saves and reads back through the app.
+4. `node supabase/tests/login-e2e.mjs`: the whole journey in a real browser: sign-in screen, Play as guest, the
+   menu, a song on laptop keys ("Saved"), Easy ("Not saved"), the profile, the row in Supabase, both Google buttons
+   reaching Google's page, and a failed Google return. Each script deletes what it made.
+
+Google sign-in itself needs a person (no script logs into a Google account). Once per release:
+- On `/auth/login`, **Sign in with Google** lands on the menu with your name bottom-right.
+- As a guest, play a song, then **Keep my progress with Google** on `/progress`: the take stays, now under Google.
+- In a private window, play as a guest, then **Sign in with Google** with the same account: that take joins your
+  history.
+- **Sign out** on the menu: the chip goes back to "Sign in"; signing in again brings the history back.
+
 ## Adding a song
 Nothing to do in the database: a song's row in `songs` is written (or updated, with the chart's new SHA-256) the first
 time anyone saves a take of it. Put the chart at `web/public/songs/<id>/chart.json`, then prove every song still saves,

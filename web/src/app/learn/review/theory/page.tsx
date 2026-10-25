@@ -1,2 +1,3 @@
-import { TheoryWorkspace } from '@/learn/frontend/TheoryWorkspace';
-export default function Page() { return <TheoryWorkspace review/>; }
+import { Retrieval } from '@/learn/frontend/retrieval';
+
+export default function Page() { return <Retrieval/>; }

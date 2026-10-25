@@ -84,9 +84,10 @@ Supabase Postgres, in `sharan`'s lane. `supabase/README.md` lists what's in it a
    Validation step you skipped, with the reason). A person follows the release from these.
 6. Wait for CI, check GitHub's whole verdict, then squash-merge it yourself:
    `gh pr checks --watch && python3 .agents/scripts/pr_ready.py && gh pr merge --squash --delete-branch`.
-   Not for `plan:` PRs (except those `specs/decisions/002-overnight-planner.md` allows), `contract:` PRs that change
-   `AGENTS.md` (rules bind every future agent), or PRs that touch a path `.github/CODEOWNERS` assigns to a person other
-   than your own: those wait for that person. Paths assigned to your own person don't stop you; that's your lane.
+   `plan:` and `contract:` PRs merge on green the same way, `AGENTS.md` changes included (Eric, 2026-10-25). A PR waits
+   for a person only when it touches a path `.github/CODEOWNERS` assigns to a person other than your own, or changes
+   `web/src/contracts/`, which both people see. Paths assigned to your own person don't stop you; that's your lane.
+   One-way doors still go to Eric as `needs-human` + `one-way-door` issues: that's about decisions, not PR review.
 
 **PR titles** ([Conventional Commits](https://www.conventionalcommits.org/)); CI checks the files against the title:
 
@@ -97,7 +98,7 @@ Supabase Postgres, in `sharan`'s lane. `supabase/README.md` lists what's in it a
 | `fix: ...` with no scope (same types) | anything not frozen, not in `specs/` or `changes/`, and not owned by a feature in flight |
 | `docs: ...` | open paths (like `NOW.md`), and Markdown outside `specs/`, `changes/`, frozen paths and features in flight |
 | `contract: ...` | frozen paths and `specs/`: additive changes only |
-| `plan: ...` | `specs/features/`, `specs/shipped/`, `specs/milestones.toml`, `specs/roadmap.md`, `specs/context/findings.md`; a person merges it |
+| `plan: ...` | `specs/features/`, `specs/shipped/`, `specs/milestones.toml`, `specs/roadmap.md`, `specs/context/findings.md` |
 | `revert: ...` | exactly what the reverted commit changed; make it with `git revert` |
 
 The bootstrap feature (`bootstrap: true`) may change anything.

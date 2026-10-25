@@ -10,6 +10,7 @@ import { allNotesOff } from "../../game/piano-out";
 import { laptopReach, melody, newRun, phrase, phraseMessages, simonSettings, step, type Run, type SimonEvent } from "../../game/simon";
 import styles from "../../game/simon/simon.module.css";
 import { HelpLink } from "../../game/help-overlay";
+import { Button, kitChip } from "../../game/duo-tokens";
 import { tone } from "../../game/sound";
 
 const SONGS = [
@@ -177,7 +178,7 @@ function Simon() {
         <h1 className={styles.mark}>SIMON SAYS</h1>
         <nav className={styles.songs}>
           {SONGS.map(([id, name]) => (
-            <a key={id} href={`/simon?song=${id}`} aria-current={id === song ? "page" : undefined}>
+            <a key={id} href={`/simon?song=${id}`} aria-current={id === song ? "page" : undefined} {...kitChip(id === song)}>
               {name}
             </a>
           ))}
@@ -189,9 +190,9 @@ function Simon() {
         {run?.phase === "turn" && <Dots done={run.pos} of={phrase(tune, run.round).length} />}
         {chart && <Keys tune={tune} lit={lit} held={held} wrong={run?.phase === "over" ? run.wrong : null} />}
         {(!run || run.phase === "over" || run.phase === "won") && chart && (
-          <button className={styles.again} onClick={start} title={`${run ? "Again" : "Start"} (Space)`} aria-keyshortcuts="Space Enter">
+          <Button kind="primary" className={styles.again} onClick={start} title={`${run ? "Again" : "Start"} (Space)`} aria-keyshortcuts="Space Enter">
             {run ? "Again" : "Start"}
-          </button>
+          </Button>
         )}
       </section>
 

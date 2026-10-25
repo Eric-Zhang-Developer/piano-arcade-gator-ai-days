@@ -8,7 +8,7 @@ import { chartReadings, chordSettings } from "./chords";
 import { centroid, corners, fromId, nearest, nearestNode, pc, plr, toPlane, triadId, triadName, type Point } from "./tonnetz";
 
 export const constellationSettings = {
-  unit: 34, // px per lattice edge, the same on every song, so the wall compares them at one scale
+  unit: 44, // px per lattice edge, the same on every song, so the wall compares them at one scale
   margin: 0.9, // lattice units of empty patch around the path
   maxReach: 3.2, // a triad further than this from home goes to the copy nearest home instead: a wrap, drawn dashed
   minEdge: 1, // an edge's width for one traversal...
@@ -83,6 +83,8 @@ export function place(st: Stats, s = constellationSettings): { at: Map<number, P
 
 const esc = (t: string) => t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
 const f = (n: number) => +n.toFixed(1);
+// a ground-coloured outline under a label, so it reads over the edges and fills
+const halo = (look: Look, k: number) => `stroke="${look.ground}" stroke-width="${f(3 * k)}" stroke-linejoin="round" paint-order="stroke"`;
 
 export interface Look {
   ground: string;
@@ -97,18 +99,20 @@ export interface Look {
 
 // The SVG: the lattice patch (triangle edges and pitch-class nodes, lit where they sound), the visited triangles
 // (alpha by their share of the time), the edges between them (width by traversals, dashed for a wrap, P/L/R where the
-// move is one), chord names, and home in a bracket. `title` goes in <title> for the download and screen readers.
+// move is one), chord names, and home in a bracket. Sized in em (16 px each at 16 px type), so inline it scales with
+// the page's type at every width and every song keeps the same scale; a standalone file reads em as 16 px. `title` goes in <title> for the download and screen readers.
 export function constellationSvg(st: Stats, look: Look, title: string, s = constellationSettings): string {
   const { at, steps } = place(st, s);
-  // the patch holds the path, and each sounding pitch class's node nearest home, so a melody with no triad still shows
-  const centre = st.home === null ? ([0.5, -0.3] as Point) : at.get(st.home)!.c;
+  // the patch holds the path; with no triad at all, each sounding pitch class's node nearest the middle, so a melody
+  // still shows what it touches
   const pts = [...at.values()].flatMap((p) => corners(p.root, fromId(p.id).minor).map(toPlane));
-  for (const p of st.pcs) pts.push(toPlane(nearestNode(p, centre)));
+  if (!pts.length) for (const p of st.pcs) pts.push(toPlane(nearestNode(p, [0.5, -0.3])));
   if (!pts.length) pts.push([0, 0], [1, 0]);
   const xs = pts.map((p) => p[0]);
   const ys = pts.map((p) => p[1]);
   const [x0, x1, y0, y1] = [Math.min(...xs) - s.margin, Math.max(...xs) + s.margin, Math.min(...ys) - s.margin, Math.max(...ys) + s.margin];
   const u = s.unit;
+  const k = u / 44; // type, dots and strokes grow with the unit, so a bigger drawing is the same drawing
   const X = (x: number) => f((x - x0) * u);
   const Y = (y: number) => f((y - y0) * u);
   const out: string[] = [];
@@ -122,7 +126,7 @@ export function constellationSvg(st: Stats, look: Look, title: string, s = const
     }
   for (const [[lx, ly], p] of nodes)
     for (const q of [toPlane([lx + 1, ly]), toPlane([lx, ly + 1]), toPlane([lx + 1, ly - 1])])
-      if (q[0] >= x0 && q[0] <= x1 && q[1] >= y0 && q[1] <= y1) out.push(`<line x1="${X(p[0])}" y1="${Y(p[1])}" x2="${X(q[0])}" y2="${Y(q[1])}" stroke="${look.line}" stroke-width="1"/>`);
+      if (q[0] >= x0 && q[0] <= x1 && q[1] >= y0 && q[1] <= y1) out.push(`<line x1="${X(p[0])}" y1="${Y(p[1])}" x2="${X(q[0])}" y2="${Y(q[1])}" stroke="${look.line}" stroke-width="${f(k)}"/>`);
   const total = [...st.beats.values()].reduce((a, b) => a + b, 0) || 1;
   const top = Math.max(...st.beats.values(), 0) || 1;
   for (const p of at.values()) {
@@ -133,26 +137,31 @@ export function constellationSvg(st: Stats, look: Look, title: string, s = const
   }
   for (const { from, to, wrap } of steps.filter((v, i, a) => a.findIndex((w) => edgeKey(w.from.id, w.to.id) === edgeKey(v.from.id, v.to.id)) === i)) {
     const n = st.edges.get(edgeKey(from.id, to.id)) ?? 1;
-    const w = s.minEdge + s.edgeGain * Math.log2(n);
+    const w = (s.minEdge + s.edgeGain * Math.log2(n)) * k;
     out.push(`<line x1="${X(from.c[0])}" y1="${Y(from.c[1])}" x2="${X(to.c[0])}" y2="${Y(to.c[1])}" stroke="${look.ink}" stroke-width="${f(w)}" stroke-linecap="round"${wrap ? ' stroke-dasharray="3 5"' : ""}><title>${n}×</title></line>`);
     const move = plr(fromId(from.id), fromId(to.id));
-    if (move && !wrap) out.push(`<text x="${X((from.c[0] + to.c[0]) / 2)}" y="${Y((from.c[1] + to.c[1]) / 2) - 4}" fill="${look.dim}" font-size="10" text-anchor="middle">${move}</text>`);
+    // P, L or R beside the edge's middle, off to one side, so it never sits on a chord name
+    const [dx, dy] = [to.c[0] - from.c[0], to.c[1] - from.c[1]];
+    const len = Math.hypot(dx, dy) || 1;
+    const [mx, my] = [(from.c[0] + to.c[0]) / 2 - (dy / len) * 0.22, (from.c[1] + to.c[1]) / 2 + (dx / len) * 0.22];
+    if (move && !wrap) out.push(`<text x="${X(mx)}" y="${f(Y(my) + 3.5 * k)}" fill="${look.dim}" font-size="${f(10 * k)}" text-anchor="middle" ${halo(look, k)}>${move}</text>`);
   }
   for (const [[lx, ly], p] of nodes) {
     const lit = st.pcs.has(pc(lx, ly));
-    out.push(`<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="${lit ? 2.6 : 1.6}" fill="${lit ? look.ink : look.dim}"/>`);
+    out.push(`<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="${f((lit ? 2.6 : 1.6) * k)}" fill="${lit ? look.ink : look.dim}"/>`);
   }
   for (const p of at.values()) {
     const t = fromId(p.id);
+    // every visited triangle is named; the ones heard a quarter as long as the most-heard, smaller and dimmer
     const strong = (st.beats.get(p.id) ?? 0) / top > 0.25 || p.id === st.home;
-    if (strong) out.push(`<text x="${X(p.c[0])}" y="${Y(p.c[1]) + 4}" fill="${look.ink}" font-size="11" font-weight="700" text-anchor="middle">${esc(triadName(t))}</text>`);
+    out.push(`<text x="${X(p.c[0])}" y="${f(Y(p.c[1]) + (strong ? 4 : 3) * k)}" fill="${strong ? look.ink : look.dim}" font-size="${f((strong ? 11 : 8.5) * k)}" font-weight="700" text-anchor="middle" ${halo(look, k)}>${esc(triadName(t))}</text>`);
   }
   if (st.home !== null) {
     const p = at.get(st.home)!;
     const c = corners(p.root, fromId(p.id).minor).map(toPlane);
-    out.push(`<polygon points="${c.map((q) => `${X(q[0])},${Y(q[1])}`).join(" ")}" fill="none" stroke="${look.home}" stroke-width="2.5"><title>home: ${esc(triadName(fromId(p.id)))}</title></polygon>`);
+    out.push(`<polygon points="${c.map((q) => `${X(q[0])},${Y(q[1])}`).join(" ")}" fill="none" stroke="${look.home}" stroke-width="${f(2.5 * k)}"><title>home: ${esc(triadName(fromId(p.id)))}</title></polygon>`);
   }
   const W = f((x1 - x0) * u);
   const H = f((y1 - y0) * u);
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" ${look.font ? ` font-family="${esc(look.font)}"` : ""} role="img"><title>${esc(title)}</title><rect width="${W}" height="${H}" fill="${look.ground}"/>${out.join("")}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${f(W / 16)}em" height="${f(H / 16)}em" ${look.font ? ` font-family="${esc(look.font)}"` : ""} role="img"><title>${esc(title)}</title><rect width="${W}" height="${H}" fill="${look.ground}"/>${out.join("")}</svg>`;
 }

@@ -84,6 +84,7 @@
 }
 
 .chart {
+  margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -92,8 +93,15 @@
   padding: 1em;
 }
 
-.chart svg {
+.drawing {
+  display: flex;
+  justify-content: center;
   width: 100%;
+}
+
+/* natural size, so labels stay their size; a wide one shrinks to fit */
+.chart svg {
+  max-width: 100%;
   height: auto;
   max-height: 70vh;
 }
@@ -125,6 +133,19 @@
   border-radius: 0;
   padding: 0.4em 0.6em;
   max-width: 100%;
+  cursor: pointer;
+}
+
+label:has(> .select) {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  width: 100%;
+}
+
+label > .select {
+  flex: 1;
+  min-width: 0;
 }
 
 .facts {
@@ -160,11 +181,13 @@
   list-style: none;
 }
 
+/* as wide as its drawing (at least 12em), the caption wrapping under it */
 .plate {
   display: flex;
   flex-direction: column;
   gap: 0.5em;
-  min-width: 11em;
+  width: min-content;
+  min-width: 12em;
   color: inherit;
   text-decoration: none;
 }
@@ -189,7 +212,6 @@
 .plateTitle {
   font: 700 1.05em/1.15 var(--pa-font-display), system-ui, sans-serif;
   text-transform: uppercase;
-  max-width: 18em;
 }
 
 .plateMeta {

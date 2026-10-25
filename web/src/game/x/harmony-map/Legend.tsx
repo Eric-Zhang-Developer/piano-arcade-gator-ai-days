@@ -17,8 +17,8 @@ export function Legend() {
         <span className={css.swatch} style={{ outline: `2px solid ${look.home}`, outlineOffset: -2 }} />
         home: the most-played triad
       </li>
-      <li>brighter: longer · thicker edge: taken more often · dashed: wraps round the lattice</li>
-      <li>P · L · R: the neo-Riemannian moves</li>
+      <li>brighter: played longer · thicker: taken more · dashed: wraps round</li>
+      <li>P, L, R: the neo-Riemannian moves</li>
     </ul>
   );
 }

@@ -25,10 +25,9 @@ describe("the lattice", () => {
     expect(pc(1, -1)).toBe(3);
     expect(pc(-3, 5)).toBe((7 * -3 + 4 * 5 + 24) % 12);
   });
-  it("a patch of 7 × 5 points holds all 12 pitch classes", () => {
-    const seen = new Set<number>();
-    for (let x = -3; x <= 3; x++) for (let y = -2; y <= 2; y++) seen.add(pc(x, y));
-    expect(seen.size).toBe(12);
+  it("the live panel's patch holds all 12 pitch classes", async () => {
+    const { patchPoints } = await import("./live");
+    expect(new Set(patchPoints().map(([x, y]) => pc(x, y))).size).toBe(12);
   });
   it("a triad's triangle holds its three notes, wherever its copy lands", () => {
     for (const id of [0, 7, 21, 13])
@@ -104,7 +103,7 @@ describe("the atlas", () => {
     const { wallSongs } = await import("./atlas");
     const wall = wallSongs("public/songs");
     expect(wall.map((s) => s.id)).toEqual(loadSongs("public/songs").songs.map((s) => s.id));
-    for (const s of wall) expect(s.svg, s.id).toMatch(/^<svg [^>]*viewBox="0 0 [\d.]+ [\d.]+"/);
+    for (const s of wall) expect(s.svg, s.id).toMatch(/^<svg [^>]*viewBox="0 0 [\d.]+ [\d.]+" width="[\d.]+em"/);
   });
 });
 

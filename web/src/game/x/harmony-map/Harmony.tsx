@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Chart } from "../../../contracts";
 import { keysDevice } from "../../core/input";
 import { loadPedal, type Pedal } from "../../pedal";
-import { constellationSvg, stats } from "./constellation";
+import { constellationSettings, constellationSvg, stats } from "./constellation";
 import css from "./harmony.module.css";
 import { Legend } from "./Legend";
 import { drawPanel, liveHarmony } from "./live";
@@ -61,7 +61,8 @@ export function Harmony({ songs }: { songs: { id: string; title: string }[] }) {
     if (!data) return null;
     const st = stats(data.chart, data.pedal);
     const title = `${data.chart.title}: its harmony on the Tonnetz`;
-    return { st, svg: constellationSvg(st, look, title), file: () => constellationSvg(st, fileLook, title) };
+    const big = { ...constellationSettings, unit: 88 }; // one song alone: drawn larger than the atlas, still at natural size
+    return { st, svg: constellationSvg(st, look, title, big), file: () => constellationSvg(st, fileLook, title, big) };
   }, [data]);
 
   // Input: laptop keys always, and the first MIDI input when there is one.
@@ -140,7 +141,7 @@ export function Harmony({ songs }: { songs: { id: string; title: string }[] }) {
       <Legend />
       <div className={css.stage}>
         <figure className={css.chart} aria-busy={!view && !failed}>
-          {failed ? <p>No chart for {song}: {failed}</p> : view ? <div style={{ width: "100%" }} dangerouslySetInnerHTML={{ __html: view.svg }} /> : <p className={css.sub}>Drawing…</p>}
+          {failed ? <p>No chart for {song}: {failed}</p> : view ? <div className={css.drawing} dangerouslySetInnerHTML={{ __html: view.svg }} /> : <p className={css.sub}>Drawing…</p>}
         </figure>
         <aside className={css.side}>
           <canvas ref={canvas} className={css.panel} role="img" aria-label="Live: the notes you're playing on the Tonnetz, and the triad they make" />

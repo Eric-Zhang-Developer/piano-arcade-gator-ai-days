@@ -11,7 +11,7 @@ import { NAMES, type Triad } from "./tonnetz";
 export const chordSettings = {
   minScore: 2, // a triad with one extra note still lights (C E G D); two extras don't
   windowBeats: 1, // a strike's set: what's still sounding, plus what was struck in the beat up to it (an arpeggio adds up)
-  liveWindowMs: 600, // the same for a live player, in ms
+  liveWindowMs: 350, // the same for a live player, in ms: a rolled chord, not the last chord's keys
 };
 
 const QUALITIES: [string, number[], string][] = [

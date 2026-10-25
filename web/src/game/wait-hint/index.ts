@@ -43,6 +43,9 @@ function nameFont(): string {
   return family ?? "system-ui, sans-serif";
 }
 
+// The name's font: upright, as the kit is (visual-direction: no italic), and 0.089 of the frame's height.
+export const hintFont = (height: number): string => `900 ${Math.round(0.089 * height)}px ${nameFont()}`;
+
 const setHook = (v: WaitHintHook | null) => {
   if (typeof window !== "undefined") window.__pianoArcadeWaitHint = v;
 };
@@ -159,7 +162,7 @@ function drawHint(ctx: CanvasRenderingContext2D, f: Frame, keys: { pitch: number
   const px = Math.round(0.089 * f.height);
   ctx.globalAlpha = still ? 1 : Math.min(1, shownMs / s.nameFadeMs);
   ctx.fillStyle = ink;
-  ctx.font = `italic 900 ${px}px ${nameFont()}`;
+  ctx.font = hintFont(f.height);
   ctx.textAlign = "center";
   ctx.textBaseline = "bottom";
   const half = ctx.measureText(name).width / 2;

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { toast, toastSettings, toastStack, type Toast } from ".";
+import { toast, toastCss, toastSettings, toastStack, type Toast } from ".";
 
 describe("notice-toast", () => {
   beforeEach(() => vi.useFakeTimers());
@@ -99,4 +99,12 @@ describe("notice-toast", () => {
     expect(typeof document).toBe("undefined");
     expect(() => toast("x")).not.toThrow();
   });
+});
+
+it("the toast is square, its cyan accent bar and 200 ms motion unchanged (#1137)", () => {
+  const rule = toastCss.match(/\.pa-toast \{[^}]*\}/)![0];
+  expect(rule).not.toMatch(/border-radius/);
+  expect(rule).toMatch(/border-left: 3px solid var\(--pa-cyan\)/);
+  expect(rule).toMatch(/animation: pa-toast-in 200ms ease-out/);
+  expect(rule).toMatch(/transition: opacity 200ms ease-out, transform 200ms ease-out/);
 });

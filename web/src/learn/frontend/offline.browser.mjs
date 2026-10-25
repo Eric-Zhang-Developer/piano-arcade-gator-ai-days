@@ -2,6 +2,8 @@ const { page } = globalThis;
 const origin = await page.eval(() => location.origin);
 
 // An offline interruption must cancel prepared-entry navigation and restore its action.
+// A fresh profile has no answers, so /learn would send it to the diagnostic first; mark this tab as already offered.
+await page.eval(() => sessionStorage.setItem('learn:diagnostic-offered', '1'));
 await page.open(`${origin}/learn`);
 await page.wait('aside[aria-label="Your next activity"] button');
 await page.eval(async () => {

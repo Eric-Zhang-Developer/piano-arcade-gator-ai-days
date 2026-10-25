@@ -21,7 +21,8 @@ pianist, finds dark-mode notation uneasy to read.
 
 ## Plan
 1. **`fix(sheet-view)`:**
-   - the score sits on a paper panel (`--pa-paper` background, `--pa-paper-ink` notation, 1px hairline, zero radius)
+   - the score sits on the Duo kit's `Panel` in its `paper` variant (duo-tokens) if it fits, else a local panel with
+     the same tokens (log why): a paper panel (`--pa-paper` background, `--pa-paper-ink` notation, 1px hairline, zero radius)
      centered in the dark page;
    - the page chrome (title, legend, buttons) stays dark Duo;
    - the cursor is `--pa-primary` at low alpha.

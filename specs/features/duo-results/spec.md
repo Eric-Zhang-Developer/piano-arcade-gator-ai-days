@@ -38,6 +38,9 @@ screen where the tutor visibly decides", and this screen is that moment. Every n
    `verify-results.mjs`, the screenshots, the done note.
 
 ## Requirements
+- **Use the Duo kit** (`web/src/game/duo-tokens/`, from duo-tokens, #645) for every panel, bracket, button, data
+  cell and monospace label. Don't draw your own frames, buttons or cells. If the kit lacks something, add it to the kit
+  through a `fix(duo-tokens)`, not locally.
 - **Data cells:** labels in monospace caps, numbers in the condensed display face. PERFECT's number is gold and MISS's
   grey. Gold, red and grey appear only on judgment numbers, never on chrome. Practice and wait takes keep today's
   "not scored" rule.

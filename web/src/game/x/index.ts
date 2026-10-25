@@ -10,6 +10,7 @@ import { conductor } from "./conductor";
 import { handPalette } from "./hand-palette";
 import { realKeys } from "./real-keys";
 import { round } from "./round";
+import { pinned } from "./pinned";
 import { highlightReel } from "./highlight-reel";
 import { sample } from "./sample";
 import { screenShake } from "./screen-shake";
@@ -38,6 +39,7 @@ export const experiments: Experiment[] = [
   round, // #1123: play a round once, the DGX plays it back as voices 2–4
   buildSonataX, // #1162: its own page, /sonata; the night as music, one note per merged PR
   speakingPiano, // #1153: its own page, /speak; a spike that ends in findings
+  pinned, // #1171: your take as a brass music-box cylinder, at /musicbox
   handPalette, // #1127: the hand and judgment colors three ways, with a colour-blind simulation
   uiSoundsAb, // #1167: the menu sounds, old against new
 ];

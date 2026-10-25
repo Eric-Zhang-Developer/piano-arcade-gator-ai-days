@@ -1,11 +1,13 @@
 // ui-sound-family Validation (a) and (b): every sound rendered and measured, old against new, under the preview.
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { crc32, deflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import type { Chart } from "../../../contracts";
 import { keyOf, type UiSound } from "../../ui-sounds";
 import { admit, C_MAJOR, degreeHz, LENGTH_S, pileSettings, render, strikes, type Voice } from "../../ui-sounds/timbre";
 import { UI_LEVEL } from "../../ui-sounds";
-import { measure, renderNew, renderOld, renderPreview, SR, under } from "./measure";
+import { measure, renderNew, renderOld, renderPreview, spectrum, SR, under } from "./measure";
+import { UI_PEAK } from "../../ui-sounds";
 
 const chart = (id: string): Chart => JSON.parse(readFileSync(new URL(`../../../../public/songs/${id}/chart.json`, import.meta.url), "utf8"));
 const SOUNDS: UiSound[] = ["move", "confirm", "back", "sting", "tick", "tickAccent"];
@@ -101,4 +103,65 @@ it.runIf(process.env.UI_TABLE)("writes the before and after tables", () => {
     out,
     `# UI sound family: measurements\n\nWritten by \`UI_TABLE=1 pnpm -C web exec vitest run src/game/x/ui-sounds-ab\`. The reference is Twinkle's preview opening as laptop tones: peak ${ref.peak.toFixed(4)}, RMS ${ref.rms.toFixed(4)}. "Under" is how far below it, in dB.\n\n## Before\n\n${head}\n${fmt(table(renderOld))}\n\n## After\n\n${head}\n${fmt(table((n) => renderNew(n, C_MAJOR)))}\n`,
   );
+});
+
+// UI_SHOTS=1 draws Validation (c)'s images: per sound, old (grey) beside new (blue), each a waveform over a spectrogram
+// (0–8 kHz, −90–0 dB), on one time axis and one level scale per sound, so the drop and the softer edges show.
+function png(w: number, h: number, rgb: Uint8Array): Buffer {
+  const chunk = (type: string, data: Buffer) => {
+    const t = Buffer.concat([Buffer.from(type), data]);
+    const out = Buffer.alloc(12 + data.length);
+    out.writeUInt32BE(data.length, 0);
+    t.copy(out, 4);
+    out.writeUInt32BE(crc32(t), 8 + data.length);
+    return out;
+  };
+  const head = Buffer.alloc(13);
+  head.writeUInt32BE(w, 0);
+  head.writeUInt32BE(h, 4);
+  head.set([8, 2, 0, 0, 0], 8); // 8-bit RGB
+  const raw = Buffer.alloc((w * 3 + 1) * h);
+  for (let y = 0; y < h; y++) Buffer.from(rgb.subarray(y * w * 3, (y + 1) * w * 3)).copy(raw, y * (w * 3 + 1) + 1);
+  return Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), chunk("IHDR", head), chunk("IDAT", deflateSync(raw)), chunk("IEND", Buffer.alloc(0))]);
+}
+
+it.runIf(process.env.UI_SHOTS)("draws the waveform and spectrogram shots", () => {
+  const [W, WAVE, SPEC, GAP] = [320, 80, 160, 16];
+  const bg = [3, 6, 7];
+  const dir = new URL("../../../../../specs/features/ui-sound-family/shots/", import.meta.url);
+  mkdirSync(dir, { recursive: true });
+  for (const name of SOUNDS) {
+    const sides = [{ x: renderOld(name), color: [125, 132, 150] }, { x: renderNew(name, C_MAJOR), color: [43, 155, 255] }];
+    const span = Math.max(...sides.map((s) => s.x.length));
+    const width = 2 * W + GAP;
+    const height = WAVE + 4 + SPEC;
+    const rgb = new Uint8Array(width * height * 3);
+    for (let i = 0; i < width * height; i++) rgb.set(bg, i * 3);
+    const put = (x: number, y: number, c: number[], a: number) => {
+      const i = (y * width + x) * 3;
+      for (let k = 0; k < 3; k++) rgb[i + k] = Math.round(rgb[i + k] * (1 - a) + c[k] * a);
+    };
+    sides.forEach(({ x, color }, side) => {
+      const x0 = side * (W + GAP);
+      for (let col = 0; col < W; col++) {
+        // Waveform: min and max per column against the old sounds' peak.
+        const [a, b] = [Math.floor((col * span) / W), Math.floor(((col + 1) * span) / W)];
+        let [lo, hi] = [0, 0];
+        for (let i = a; i < Math.min(b, x.length); i++) [lo, hi] = [Math.min(lo, x[i]), Math.max(hi, x[i])];
+        const y = (v: number) => Math.round(WAVE / 2 - (v / UI_PEAK) * (WAVE / 2 - 2));
+        for (let py = y(hi); py <= y(lo); py++) put(x0 + col, py, color, 1);
+        put(x0 + col, WAVE / 2, color, 0.25);
+        // Spectrogram: a 1024-sample frame centred on the column, 0–8 kHz up the image.
+        const from = Math.round(((col + 0.5) * span) / W) - 512;
+        const frame = Float32Array.from({ length: 1024 }, (_, i) => (x[from + i] ?? 0) * (0.5 - 0.5 * Math.cos((2 * Math.PI * i) / 1023))); // Hann
+        const mag = spectrum(frame);
+        for (let row = 0; row < SPEC; row++) {
+          const bin = Math.round(((SPEC - 1 - row) / SPEC) * ((8000 / SR) * 1024));
+          const db = 20 * Math.log10(mag[bin] / (UI_PEAK * 256) + 1e-12);
+          put(x0 + col, WAVE + 4 + row, color, Math.min(1, Math.max(0, (db + 90) / 90)));
+        }
+      }
+    });
+    writeFileSync(new URL(`${name}.png`, dir), png(width, height, rgb));
+  }
 });

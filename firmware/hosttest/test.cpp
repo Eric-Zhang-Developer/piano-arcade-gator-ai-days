@@ -33,6 +33,7 @@ int main() {
   CHECK(Serial.out.find("ripple=0 ") != std::string::npos, "ripple off by default");
   CHECK(Serial.out.find("wrong=1") != std::string::npos, "wrong keys red by default");
   CHECK(Serial.out.find("shows=1") != std::string::npos, "shows on by default");
+  CHECK(Serial.out.find("demo=0") != std::string::npos, "classy by default");
   CHECK(Serial.out.find("ramp=600") != std::string::npos, "hint ramp on by default");
   defaults(); pump(5);
 
@@ -191,7 +192,7 @@ int main() {
   // strip settles to just that hint; a clear while a song is live plays the fireworks, which end dark.
   // A wrong-key release during the count-in isn't red, and a key on stops a count-in show (the tester).
   uint32_t wrongBefore = wrongFlashes;
-  Serial.feed({0xB0, 9, 1, 0, 0xF0}); pump(1000);
+  Serial.feed({0xB0, 9, 1, 0, 0xB0, 15, 1, 0, 0xF0}); pump(1000);  // demo
   int introLit = countLit();
   Serial.feed({0x80, 70}); pump(20);
   CHECK(wrongFlashes == wrongBefore, "no red during the count-in");
@@ -215,10 +216,50 @@ int main() {
   CHECK(showMode == SHOW_NONE && countLit() == (int)litFor(62).size(), "a key on stops a count-in show: %d", countLit());
   Serial.feed({0xF0}); defaults(); pump(5); stopShows();
 
+  // Classy (the default): the same moments with brightness only. No spark ever flies, no LED goes white.
+  auto sparksFlying = [] { int n = 0; for (auto &p : sparks) n += p.life != 0; return n; };
+  auto anyWhite = [] { for (int i = 0; i < activeLeds; i++) if (fx[i].r > 60 && fx[i].g > 60 && fx[i].b > 60) return true; return false; };
+  Serial.feed({0xB0, 9, 1, 0, 0xF0}); pump(1200);
+  CHECK(showMode == SHOW_INTRO && countLit() > 10 && !anyWhite() && sparksFlying() == 0, "classy count-in: a soft bar, no white edge, no sparks");
+  pump(2400);
+  Serial.feed({0xA0, 60, 0, 40, 127}); pump(150);
+  int bloomLit = countLit();
+  CHECK(bloomLit > 20 && sparksFlying() == 0, "classy launch: a bloom, %d lit, no sparks", bloomLit);
+  for (int i = 0; i < 12; i++) { Serial.feed({0x90, 62, 127, 113, 61, 0x80, 62}); pump(30); }
+  pump(600);
+  CHECK(fever && countLit() > 100 && sparksFlying() == 0, "classy fever: a breathing glow, no sparks: %d lit", countLit());
+  Serial.feed({0x90, 63, 127, 38, 47, 0x80, 63}); pump(20);
+  CHECK(!fever && sparksFlying() == 0, "classy break: no shatter");
+  for (int i = 0; i < 3; i++) { Serial.feed({0xFE}); pump(800); }
+  CHECK(showMode == SHOW_PAUSE && countLit() > 100 && sparksFlying() == 0, "classy pause: breathing, no comets");
+  Serial.feed({0xF0}); pump(1500);
+  int washLit = countLit();
+  CHECK(showMode == SHOW_FINALE && washLit > 100 && sparksFlying() == 0, "classy finale: a warm wash, %d lit", washLit);
+  pump(3000);
+  std::printf("classy: launch bloom %d lit, finale wash %d lit, then %d\n", bloomLit, washLit, countLit());
+  CHECK(countLit() == 0, "the wash fades out: %d", countLit());
+
+  // The BOOT button: a press flips classy and demo and saves it; a bounce inside 40 ms doesn't count.
+  Preferences::len = 0;
+  hostBootDown = true; pump(60); hostBootDown = false; pump(60);
+  CHECK(cfg.demo == 1 && Preferences::len > 0 && sparksFlying() > 0, "BOOT: demo, saved, rainbow comets");
+  hostBootDown = true; pump(5); hostBootDown = false; pump(5); hostBootDown = true; pump(60); hostBootDown = false; pump(60);
+  CHECK(cfg.demo == 0, "a bounce then a press: one flip, back to classy");
+  pump(1500);
+  Serial.feed({0xF0}); defaults(); pump(5); stopShows(); Preferences::len = 0;
+
+  // Demo brings the ripple back: a key on breaks out both ways along the strip. Classy keeps the light on its key.
+  Serial.feed({0xB0, 9, 1, 0, 0xB0, 15, 1, 0, 0x90, 70, 0, 127, 0}); pump(150);
+  CHECK(countLit() > (int)litFor(70).size() + 4, "demo: the hit ripples out both ways: %d lit", countLit());
+  Serial.feed({0x80, 70, 0xB0, 15, 0, 0}); pump(900);
+  Serial.feed({0x90, 70, 0, 127, 0}); pump(150);
+  CHECK(countLit() == (int)litFor(70).size(), "classy: no ripple: %d lit", countLit());
+  Serial.feed({0x80, 70, 0xF0}); defaults(); pump(300); stopShows();
+
   // Fever, mirrored from the hit colors: 12 PERFECTs fill Twinkle's gauge and start it (a glow under the keys);
   // a miss shatters it. Before fever a miss halves the gauge and GREAT adds half a point. A song's end sizes the
   // next gauge from its judged notes (a quarter, 12 to 50).
-  Serial.feed({0xB0, 9, 1, 0, 0xA0, 40, 0, 0, 1, 0xA0, 40, 0, 0, 0});  // shows on, a song is live
+  Serial.feed({0xB0, 9, 1, 0, 0xB0, 15, 1, 0, 0xA0, 40, 0, 0, 1, 0xA0, 40, 0, 0, 0});  // shows on, demo, song live
   for (int i = 0; i < 4; i++) { Serial.feed({0x90, 60, 127, 113, 61, 0x80, 60}); pump(30); }
   Serial.feed({0x90, 62, 127, 38, 47, 0x80, 62}); pump(30);
   CHECK(!fever && gaugeFill == 2.0f, "a miss before fever halves the gauge: %.1f", gaugeFill);
@@ -243,13 +284,14 @@ int main() {
 
   // Pause: during a song, notes keep messages coming, so no pause show; 2 s of only heartbeats starts it (the
   // paused hint stays on top), and the next message of any other kind ends it at once.
-  Serial.feed({0xB0, 9, 1, 0, 0xA0, 60, 0, 0, 60});  // shows on, a hint: a song is live
+  uint32_t pauseBase = pauseShows;  // earlier tests paused too
+  Serial.feed({0xB0, 9, 1, 0, 0xB0, 15, 1, 0, 0xA0, 60, 0, 0, 60});  // shows on, demo, a hint: a song is live
   // Green, not a judgment color: the fever gauge stays empty, so no embers sparkle into the counts below.
   for (int i = 0; i < 8; i++) { Serial.feed({0xFE, 0x90, 50, 0, 127, 0}); pump(250); Serial.feed({0x80, 50}); pump(250); }
-  CHECK(pauseShows == 0, "notes every 500 ms: no pause show (%u)", pauseShows);
+  CHECK(pauseShows == pauseBase, "notes every 500 ms: no pause show (%u)", pauseShows - pauseBase);
   for (int i = 0; i < 3; i++) { Serial.feed({0xFE}); pump(800); }
   int pauseLit = countLit();
-  CHECK(showMode == SHOW_PAUSE && pauseShows == 1 && pauseLit > 100, "2 s of heartbeats: pause show, %d lit", pauseLit);
+  CHECK(showMode == SHOW_PAUSE && pauseShows == pauseBase + 1 && pauseLit > 100, "2 s of heartbeats: pause show, %d lit", pauseLit);
   CHECK(leds[litFor(60)[0]].b > 60, "the paused hint still shows: %d", leds[litFor(60)[0]].b);
   Serial.feed({0x90, 60, 0, 127, 0}); pump(20);
   CHECK(showMode == SHOW_NONE, "the next message ends the pause show");

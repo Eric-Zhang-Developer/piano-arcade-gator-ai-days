@@ -63,13 +63,14 @@
       <span class="muted">Fix keys just right of the strip joint after A0 and C8 look right.</span></div>
     <div class="row">
       <label><input id="reverse" type="checkbox"> Strip runs right to left</label>
-      <label>Brightness <input id="bright" type="number" min="0" max="255" value="160"></label>
+      <label>Brightness <input id="bright" type="number" min="0" max="255" value="110"></label>
       <label>Fade ms <input id="fade" type="number" min="0" max="2000" value="180"></label>
       <label>Hint pulse ms <input id="pulse" type="number" min="0" max="5000" value="900"></label>
       <label>Ripple ms <input id="ripple" type="number" min="0" max="3000" value="0"></label>
       <label>Hint ramp ms <input id="ramp" type="number" min="0" max="5000" value="600"></label>
       <label><input id="wrong" type="checkbox" checked> Wrong keys red</label>
       <label><input id="shows" type="checkbox" checked> Count-in and song-end shows</label>
+      <label><input id="demo" type="checkbox"> Demo mode (or press BOOT on the board)</label>
     </div>
     <div class="row">
       <button data-preset="low">Low (brightness 70)</button>
@@ -213,6 +214,7 @@ function showCfg() {
   if (cfg.ramp !== undefined) $('ramp').value = cfg.ramp;
   if (cfg.wrong !== undefined) $('wrong').checked = !!cfg.wrong;
   if (cfg.shows !== undefined) $('shows').checked = !!cfg.shows;
+  if (cfg.demo !== undefined) $('demo').checked = !!cfg.demo;
 }
 
 // ---- MIDI
@@ -356,6 +358,7 @@ $('ripple').onchange = e => param(6, e.target.value);
 $('ramp').onchange = e => param(7, e.target.value);
 $('wrong').onchange = e => param(8, e.target.checked ? 1 : 0);
 $('shows').onchange = e => param(9, e.target.checked ? 1 : 0);
+$('demo').onchange = e => param(15, e.target.checked ? 1 : 0);
 document.querySelectorAll('[data-preset]').forEach(b => b.onclick = () => {
   const v = b.dataset.preset === "low" ? 70 : 160;
   $('bright').value = v; param(1, v);

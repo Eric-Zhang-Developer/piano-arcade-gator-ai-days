@@ -109,6 +109,10 @@ The game opens the port at 115200, waits for the line that starts `PAL1 leds=`, 
 - nothing extra for wrong keys: the game sends `0x80` for every released key but `0x90` only for judged notes, so a
   release of a key that never lit flashes it red (setting 8, on by default; only while a song is live, so not in the
   count-in). It shows on release, since the board never hears the press;
+- the shows come in two styles (setting 15): **classy**, the default, for learning and normal play, does everything
+  with brightness (blooms, swells, breathing, fades: no sparks, no white flashes); **demo**, for demos, adds the
+  sparks, bursts, comets and fireworks. **The BOOT button on the ESP32 flips between them** and saves it (rainbow
+  comets out from the middle mean demo, a soft white glow means classy); the tester's "Demo mode" box does the same;
 - nothing extra for the shows (setting 9): `0xF0` with no song live starts the count-in: a charge bar, cyan from the
   bass end and pink from the treble end, filling in 8 steps (one per count-in beat) to meet in the middle at the first
   hint, which launches a burst from that key. The bar's length is learned: each launch remembers how long its

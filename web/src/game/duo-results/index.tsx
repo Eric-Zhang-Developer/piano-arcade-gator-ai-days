@@ -23,6 +23,7 @@ import {
 
 export const duoPanelSettings = {
   maxCells: 64, // BY BAR's cells: past this many bars, a cell holds 2 (or more) so each stays ≥ 8 px at 1280 wide
+  maxNumbered: 16, // up to this many cells, each shows its accuracy under it; past it, only its accessible label
   gator: "/learning/mentor-gator-avatar.png", // the learning lane's existing art
 };
 
@@ -45,23 +46,34 @@ export function duoTake(chart: Chart, take: Take, results: Results, params: URLS
 }
 type DuoTake = NonNullable<ReturnType<typeof duoTake>>;
 
-// Labels scale with the window, so they stay legible at 1920 wide (visual-direction.md: readable on video).
-const label = "clamp(12px, 0.8vw, 17px)";
-const axis = "clamp(10px, 0.65vw, 14px)";
+// Labels scale with the window: 16 px at 1280 wide, 24 px at 1920 (visual-direction.md: read on video at ≥ 24 px).
+const label = "clamp(13px, 1.25vw, 24px)";
+const axis = label;
+const pct = (a: number | null) => (a === null ? "no notes" : `${Math.round(a * 100)}%`);
+const swatch = (color: string): CSSProperties => ({ display: "inline-block", width: "0.7em", height: "0.7em", background: color, marginRight: "0.4em" });
 const span = (r: { from: number; to: number }) => (r.from === r.to ? `BAR ${r.from}` : `BARS ${r.from}–${r.to}`);
 const head: CSSProperties = { display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 };
 const frame: CSSProperties = { boxSizing: "border-box", height: "100%", padding: "14px 18px 12px", textAlign: "left" };
 
 // One cell per bar (or per `per` bars), filled to its accuracy: gold when clean, grey when weak, a bare hairline when
-// the bar has no notes. The weakest run is bracketed in primary with BARS X–Y over it.
+// the bar has no notes, with its percentage under it and a key for the colors. The weakest run is bracketed in primary
+// with BARS X–Y over it.
 export function ByBar({ cells, per, run }: Pick<DuoTake, "cells" | "per" | "run">) {
   const { cleanAccuracy } = duoResultsSettings;
+  const numbered = cells.length <= duoPanelSettings.maxNumbered;
   const at = (bar: number) => Math.floor((bar - 1) / per) + 1; // the grid column of the cell holding a bar
   return (
     <Panel style={frame}>
       <div data-testid="duo-by-bar" style={{ display: "flex", flexDirection: "column", gap: 10, height: "100%" }}>
         <div style={head}>
-          <MonoLabel style={{ fontSize: label }}>BY BAR{per > 1 ? ` · ${per} BARS A CELL` : ""}</MonoLabel>
+          <MonoLabel style={{ fontSize: label }}>
+            BY BAR{numbered ? ` · 1–${cells.at(-1)?.to} · %` : ""}
+            {per > 1 ? ` · ${per} BARS A CELL` : ""}
+          </MonoLabel>
+          <MonoLabel style={{ fontSize: axis, whiteSpace: "nowrap" }}>
+            <span style={swatch("var(--pa-gold)")} />≥ {Math.round(cleanAccuracy * 100)}%{"  "}
+            <span style={{ ...swatch("var(--pa-miss)"), marginLeft: "1em" }} />WEAK
+          </MonoLabel>
         </div>
         <div
           style={{
@@ -69,7 +81,7 @@ export function ByBar({ cells, per, run }: Pick<DuoTake, "cells" | "per" | "run"
             minHeight: 56,
             display: "grid",
             gridTemplateColumns: `repeat(${cells.length}, minmax(0, 1fr))`,
-            gridTemplateRows: "clamp(18px, 1.3vw, 26px) 1fr",
+            gridTemplateRows: numbered ? `clamp(18px, 1.6vw, 32px) 1fr auto` : "clamp(18px, 1.6vw, 32px) 1fr",
             columnGap: 3,
           }}
         >
@@ -80,7 +92,9 @@ export function ByBar({ cells, per, run }: Pick<DuoTake, "cells" | "per" | "run"
               data-from={c.from}
               data-to={c.to}
               data-accuracy={c.accuracy ?? ""}
-              title={`${span(c)}: ${c.accuracy === null ? "no notes" : `${Math.round(c.accuracy * 100)}%`}`}
+              role="img"
+              aria-label={`${span(c)}: ${pct(c.accuracy)}`}
+              title={`${span(c)}: ${pct(c.accuracy)}`}
               style={{ gridRow: 2, gridColumn: i + 1, position: "relative", boxShadow: "inset 0 0 0 1px var(--pa-line)" }}
             >
               {c.accuracy !== null && (
@@ -96,6 +110,27 @@ export function ByBar({ cells, per, run }: Pick<DuoTake, "cells" | "per" | "run"
               )}
             </div>
           ))}
+          {numbered &&
+            cells.map((c, i) => (
+              <span
+                key={`n${c.from}`}
+                data-testid="duo-bar-pct"
+                aria-hidden
+                style={{
+                  gridRow: 3,
+                  gridColumn: i + 1,
+                  paddingTop: 4,
+                  textAlign: "center",
+                  fontFamily: "var(--pa-font-data), ui-monospace, monospace",
+                  fontVariantNumeric: "tabular-nums",
+                  fontSize: axis,
+                  lineHeight: 1,
+                  color: c.accuracy !== null && c.accuracy < cleanAccuracy ? "var(--pa-ink)" : "var(--pa-ink-dim)",
+                }}
+              >
+                {c.accuracy === null ? "–" : Math.round(c.accuracy * 100)}
+              </span>
+            ))}
           {run && (
             <Brackets style={{ gridRow: 2, gridColumn: `${at(run.from)} / ${at(run.to) + 1}`, padding: 0, margin: -4 }}>
               <span
@@ -111,10 +146,12 @@ export function ByBar({ cells, per, run }: Pick<DuoTake, "cells" | "per" | "run"
             </Brackets>
           )}
         </div>
-        <div style={head}>
-          <MonoLabel style={{ fontSize: axis }}>BAR 1</MonoLabel>
-          <MonoLabel style={{ fontSize: axis }}>BAR {cells.at(-1)?.to}</MonoLabel>
-        </div>
+        {!numbered && (
+          <div style={head}>
+            <MonoLabel style={{ fontSize: axis }}>BAR 1</MonoLabel>
+            <MonoLabel style={{ fontSize: axis }}>BAR {cells.at(-1)?.to}</MonoLabel>
+          </div>
+        )}
       </div>
     </Panel>
   );

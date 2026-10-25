@@ -2,7 +2,7 @@
 // the tests pin the exact messages: guide-light hints from a chart, a clock time and the judged notes, and key on/off.
 import type { Chart, GameEvent, Hand } from "../../contracts";
 import { noteTimeMs } from "../core/judge";
-import { noteColorFor } from "../hand-colors";
+import { handColor, noteColorFor } from "../hand-colors";
 import { hudSettings } from "../hud";
 
 export const ledSettings = {
@@ -27,10 +27,19 @@ export function rgb7(hex: string, k = 1): Rgb {
 export const keyOn = (pitch: number, [r, g, b]: Rgb): Message => [0x90, pitch, r, g, b];
 export const keyOff = (pitch: number): Message => [0x80, pitch];
 export const hint = (pitch: number, [r, g, b]: Rgb): Message => [0xa0, pitch, r, g, b];
-// The board's mode (firmware setting 15): 0 calm, 1 demo (calm plus a ripple on every press), 2 demo simple (only
-// the key light and its ripple). A board older than the setting ignores it.
-export type LightMode = 0 | 1 | 2;
+// The board's mode (firmware setting 15): 0 calm, 1 demo (every key pressed on the piano lights with its ripple,
+// and nothing else; the site sends the presses, see everywhere.tsx). A board older than the setting ignores it.
+export type LightMode = 0 | 1;
 export const lightMode = (m: LightMode): Message => [0xb0, 15, m, 0];
+// A piano's MIDI message to the board's key on or off, for demo mode on every page (everywhere.tsx): a press lights
+// its key in the hand color of its side of middle C, a release (or a note on at velocity 0) darkens it.
+export function pressKey(data: ArrayLike<number>): Message | null {
+  const kind = data[0] & 0xf0;
+  const pitch = data[1];
+  if (kind === 0x90 && data[2] > 0) return keyOn(pitch, rgb7(handColor(pitch < 60 ? "L" : "R")));
+  if (kind === 0x80 || kind === 0x90) return keyOff(pitch);
+  return null;
+}
 export const CLEAR: Message = [0xf0];
 export const HELLO: Message = [0xf1];
 export const HEARTBEAT: Message = [0xfe];

@@ -192,6 +192,8 @@ features = [
   "rewind",
   "score-card",
   "adaptive-chunks",
+  "song-pack-3",
+  "song-pack-4",
 ]
 cut = []
 

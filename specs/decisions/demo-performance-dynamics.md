@@ -92,4 +92,19 @@ before comes out unchanged.
 
 A single level reads as "This score marks no dynamics" in the dynamics grade (it needs two levels), as before.
 
+**Batch 9** (#1105). All read by `perform.py dynamics` (with #1121's reader), each list checked against its score's
+bar positions; each MIDI export's own velocities are replaced.
+- liszt-consolation-3 (bars 1–18): ppp (in a markup, *sempre legatissimo*); accents on the melody at bars 13 and 15, a
+  marcato and a crescendo hairpin in bar 14: 16, the marked notes 32–48.
+- rachmaninoff-prelude-cs (bars 1–14): ff on the three accented opening notes, ppp at bar 3, mf at bar 7, ppp at bars
+  9 and 13: 127 (ff plus the accent clamps), 16 and 80.
+- pathetique-3 (the pickup and bars 1–44): p; f on bar 16's second beat; fp at bars 18 and 22; p at bar 33 and on bar
+  43's last beat: 49, f 96, the fp chords 65. Its sf marks all fall after bar 44.
+- chopin-revolutionary (bars 1–18): f with accents at bars 1 and 3, hairpins through bars 2–18, f and p alternating at
+  bars 10–13, fz at bar 14 (an accent, as sf), the left hand's accented runs: 49–113.
+- chopin-fantaisie-impromptu (bars 1–24): sf on the opening octave (at mf, before any level), f at bar 3, p at bars 5
+  and 9, f at bar 13 with each beat accented, p at bar 17 with accented second sixteenths, 11 hairpins: 17–112.
+- entertainer, a correction to batch 4: the left hand's octave G at beat 7 is marked marcato too (`<g g,>^^`, line 183
+  of Mutopia 263's `.ly`), which #819's hand-read missed: those two notes 96 to 112, as the right hand's.
+
 **How to undo.** Strip `velocity` from a chart: it plays at 80 again.

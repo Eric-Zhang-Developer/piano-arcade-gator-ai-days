@@ -178,3 +178,25 @@ RL@85-89.5~-16,RL@96-101.5~+16,RL@101.5-104~-16"
 for s in debussy-arabesque-1 pathetique-2; do .venv/bin/python perform.py pedal $S/$s/chart.json --harmony; done
 python3 -c 'import json; print(json.dumps({"pedal": [[float(b), float(b + 1)] for b in range(48)]}))' > $S/chopin-prelude-20/pedal.json
 ```
+Batch 9 (#1105), with song-pack-8's sources (`specs/decisions/song-pack-8-excerpts.md`), all read by `dynamics`.
+Entertainer's line now prints both hands' marcato at beat 7 by itself (batch 4 appended `R@7!` by hand):
+```bash
+S=../../web/public/songs
+.venv/bin/python perform.py dynamics $S/liszt-consolation-3/chart.json --ly source/liszt-consolation-no3.ly --right up --left down \
+  --midi source/liszt-consolation-no3.mid --bars 1-18
+.venv/bin/python perform.py dynamics $S/rachmaninoff-prelude-cs/chart.json --ly source/rach-prelude-op3-no2.ly \
+  --right righthand --left lefthand --midi source/rach-prelude-op3-no2.mid --pickup 2 --bars 1-14
+.venv/bin/python perform.py dynamics $S/pathetique-3/chart.json --ly source/pathetique-3.ly --right top --left bottom \
+  --midi source/pathetique-3.mid --pickup 1.5 --bars 1-44
+.venv/bin/python perform.py dynamics $S/chopin-revolutionary/chart.json --ly source/op-10-12-wfi.ly --right rechts --left links \
+  --midi source/op-10-12-wfi.mid --bars 1-18
+.venv/bin/python perform.py dynamics $S/chopin-fantaisie-impromptu/chart.json --ly source/chopin_fantaisie-impromptu.ly \
+  --right upper --left lower --midi source/chopin_fantaisie-impromptu.mid --bars 1-24
+.venv/bin/python perform.py dynamics $S/entertainer/chart.json --ly source/entertainer.ly --right top,dyn --left bottom,dyn \
+  --unfold --midi source/entertainer.mid --spans 0-38,70-71.25
+.venv/bin/python perform.py pedal $S/liszt-consolation-3/chart.json --ly source/liszt-consolation-no3.ly --context down \
+  --midi source/liszt-consolation-no3.mid --bars 1-18
+.venv/bin/python perform.py pedal $S/chopin-fantaisie-impromptu/chart.json --ly source/chopin_fantaisie-impromptu.ly \
+  --context lower --midi source/chopin_fantaisie-impromptu.mid --bars 1-24
+for s in rachmaninoff-prelude-cs pathetique-3 chopin-revolutionary; do .venv/bin/python perform.py pedal $S/$s/chart.json --harmony; done
+```

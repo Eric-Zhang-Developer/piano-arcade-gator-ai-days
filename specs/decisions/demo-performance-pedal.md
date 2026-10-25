@@ -1,7 +1,7 @@
 # demo-performance: where each song's pedal comes from
 
 **Context.** The bot sends a song's `pedal.json` as CC64 (golden-demo). The spec takes it from the score's Ped. marks
-and, for a score with none, from golden-demo's per-harmony rule, logged here. Findings: batch 1 on #815, batch 2 on #816, batch 3 on #818, batch 4 on #819, batch 6 on #1102.
+and, for a score with none, from golden-demo's per-harmony rule, logged here. Findings: batch 1 on #815, batch 2 on #816, batch 3 on #818, batch 4 on #819, batch 6 on #1102, batch 7 on #1103.
 
 **Options.** For each song, in order: (A) the score's printed Ped. marks; (B) a pedal layer in the cited source file
 that only its MIDI renders, written by the edition's typesetter; (C) the per-harmony rule, an arrangement choice.
@@ -36,6 +36,11 @@ the commands.
 | old-french-song | Mutopia 2080: none | C (16 pairs) |
 | minuet-g-minor | Mutopia 76: none | C (32 pairs), as bach-prelude-c |
 | musette-d | Mutopia 79: none | C (40 pairs) |
+| chopin-prelude-7 | Mutopia 470: `\sustainOn/Off` in the left hand, one or two a bar | A, read from the left hand (10 pairs) |
+| traumerei | Mutopia 504: a pedal line, `\sustainDown/Up`, in bars 1–2 and 5–6 | A, read from it, both passes (8 pairs) |
+| mozart-331-theme | Mutopia 614: none | C (16 pairs), as mozart-545-1 |
+| brahms-waltz-15 | Mutopia 794: none | C (16 pairs) |
+| invention-1 | Mutopia 40: none; two-part counterpoint | **none**: the rule reads the left hand as harmony, and here it is one moving line; the rule would blur the counterpoint. Eric may prefer C, as bach-prelude-c. |
 
 **The rule (C)**, as golden-demo's (`specs/context/findings.md`, 2026-10-25). A harmony is the left hand's pitch
 classes struck in a half bar (a whole bar unless the bar has 4 beats). A new pair starts at a window that strikes a

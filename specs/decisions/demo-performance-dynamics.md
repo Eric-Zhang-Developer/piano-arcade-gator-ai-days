@@ -2,7 +2,7 @@
 
 **Context.** The bot plays `note.velocity ?? KEYS_VELOCITY` (80). The spec asks for velocities from each score's
 dynamic marks with one mapping for the library, never from memory or a recording. The song packs' converter already
-writes velocities where a source's MIDI renders them (decided on #181). Findings: batch 1 on #815, batch 2 on #816, batch 3 on #818, batch 4 on #819, batch 6 on #1102.
+writes velocities where a source's MIDI renders them (decided on #181). Findings: batch 1 on #815, batch 2 on #816, batch 3 on #818, batch 4 on #819, batch 6 on #1102, batch 7 on #1103.
 
 **Options.** (A) golden-demo's ladder for printed marks; (B) whatever each MIDI export renders, which differs by
 typesetter and is flat for most of these sources.
@@ -63,6 +63,17 @@ A's second pass. It also misplaces accents inside `\voiceOne << >>` blocks (Happ
   and of bars 10, 11 and 14 in B: 80, the sf notes 96.
 - old-french-song (the pickup and bars 1–16): p, then pp on bar 8's last eighth: 49, then 33.
 - minuet-g-minor, musette-d: no marks, no velocity (80).
+
+**Batch 7** (#1103):
+- chopin-prelude-7 (the pickup and bars 1–16): p, a crescendo from bar 11 into bar 12, then no mark to the end:
+  49–65. `dynamics` read it; its MIDI velocities (69–98) are replaced.
+- traumerei (the pickup and bars 1–8, twice): p, and two crescendo hairpins (bar 1 into 2, bar 5 into 6) with no
+  diminuendo: 49 swelling to 81. The repeat returns to bar 1's p, which is printed on the tail of the tied F that
+  strikes at the downbeat, so the mark sits on that note: each pass is 49–81. Hand-read, because `dynamics` refuses
+  4 notes by the uncharted grace notes.
+- mozart-331-theme (bars 1–8, twice): p; sf on both hands' last eighth of bar 7, then p; the volta repeats them: 49,
+  the sf chords 65. Hand-read (inline staves the reader can't name); its MIDI velocities (69/127) are replaced.
+- brahms-waltz-15, invention-1: no marks, no velocity (80).
 
 A single level reads as "This score marks no dynamics" in the dynamics grade (it needs two levels), as before.
 

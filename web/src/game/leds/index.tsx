@@ -79,6 +79,20 @@ const label: Record<LinkState, string> = {
   unsupported: "Lights need Chrome or Edge (Web Serial)",
 };
 
+// The pause menu's status (pause-skin's status slot): is the keyboard there, are the lights on, and the Demo lights
+// switch, so a demo can be checked and flipped mid-song without leaving it. `midi` is /play's own status line.
+export function PauseLights({ midi }: { midi: string }) {
+  return (
+    <>
+      <span data-testid="pause-keyboard">Keyboard: {midi.replace(/^(MIDI|Piano): /, "")}</span>
+      <span style={{ display: "flex" }}>
+        <ConnectLights />
+        <DemoLights />
+      </span>
+    </>
+  );
+}
+
 // Demo lights: with the board on, a chip that flips the strip into demo mode (hits ripple out both ways, sparks
 // for the big moments) and back. The choice is kept in this browser and sent again whenever the board connects,
 // since a board that restarted is back in its calm default.

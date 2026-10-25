@@ -1,7 +1,7 @@
 "use client";
 // Pause skin (spec: pause-skin): play-slots' Esc menu, styled and keyboard first, and a resume countdown that clicks
 // each beat on the audio clock. /play renders it in place of play-slots' PauseOverlay; the pause logic stays there.
-import { useEffect, useRef, type KeyboardEvent } from "react";
+import { useEffect, useRef, type KeyboardEvent, type ReactNode } from "react";
 import type { PauseMode } from "../play-slots";
 import { uiSound } from "../ui-sounds";
 import styles from "./pause-skin.module.css";
@@ -16,6 +16,7 @@ export function PauseMenu({
   onResume,
   onRetry,
   onQuit,
+  status,
 }: {
   mode: PauseMode;
   count: number; // countdown beats left; the bar's beats when the countdown starts
@@ -23,6 +24,7 @@ export function PauseMenu({
   onResume(): void;
   onRetry(): void;
   onQuit(): void;
+  status?: ReactNode; // under the menu: /play shows the keyboard and lights here (led-game)
 }) {
   // Every click of the countdown at once, when it shows: beatMs apart on the audio clock, not frame by frame. /play
   // sets count to the bar's beats as the countdown starts, so the first render of it has the right number.
@@ -88,6 +90,7 @@ export function PauseMenu({
           </button>
         ))}
       </div>
+      {status && <div className={styles.status}>{status}</div>}
     </div>
   );
 }

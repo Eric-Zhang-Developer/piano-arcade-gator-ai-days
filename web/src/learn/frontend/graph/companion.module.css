@@ -12,5 +12,7 @@
 @media (prefers-reduced-motion:reduce) { .pet { animation:none; transform:none; } }
 .eyebrow { display:block; margin-bottom:9px; color:var(--pa-ink-dim); font:16px/1.4 var(--pa-font-data),system-ui,sans-serif; }
 @media (max-width:1300px) { .companion { left:16px; top:18px; } .message h2 { font-size:26px; } }
+/* Stacked (graph.module.css): the companion takes its own row above the map instead of floating over it. */
+@media (max-width:900px) { .companion { position:static; order:-1; width:auto; max-width:none; margin:18px 16px 0; } }
 .companion .action:disabled { cursor:wait; }
 .companion[data-entering=true] .pet { visibility:hidden; }

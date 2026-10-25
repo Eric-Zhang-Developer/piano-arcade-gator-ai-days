@@ -36,19 +36,21 @@ describe("selectChecks", () => {
     expect(selectChecks(checks, ["web/src/game/simple/x.ts"])).toEqual([MAIN_CHECK]);
   });
 
+  it.each(["web/e2e/verify.mjs", ".github/workflows/ci.yml"])("gives every check when the runner or workflow changes (%s)", (f) => {
+    expect(selectChecks(checks, [f])).toEqual(checks);
+  });
+
   it.each([
     "web/src/game/core/judge.ts",
     "web/src/contracts/chart.ts",
     "web/src/app/play/page.tsx",
     "web/src/game/layers.ts",
-    "web/e2e/verify.mjs",
     "web/package.json",
     "web/pnpm-lock.yaml",
     "web/next.config.ts",
     "web/public/songs/twinkle/chart.json",
-    ".github/workflows/ci.yml",
-  ])("gives every check when shared code changes (%s)", (f) => {
-    expect(selectChecks(checks, [f])).toEqual(checks);
+  ])("gives only verify.mjs for shared code with no checks of its own (%s): main's full run covers it", (f) => {
+    expect(selectChecks(checks, [f])).toEqual([MAIN_CHECK]);
   });
 });
 
@@ -65,10 +67,10 @@ describe("shard", () => {
     expect(shard(["x", "y"], 1, 2, {})).toEqual(["x"]); // unknown checks count DEFAULT_SECONDS each
   });
 
-  it("a full run's 16 shards each fit about 7 min of checks, by the table (#673, Eric's 7 min target)", () => {
+  it("main's full run, 8 shards, each well inside the 20 min job by the table (#673)", () => {
     const all = allChecks(execFileSync("git", ["ls-files", "web/src", "web/e2e"], { cwd: new URL("../../", import.meta.url).pathname, encoding: "utf8" }).split("\n"));
-    const minutes = Array.from({ length: 16 }, (_, k) => shard(all, k + 1, 16).reduce((s, c) => s + (SECONDS[c] ?? DEFAULT_SECONDS), 0) / 60);
-    expect(Math.max(...minutes), minutes.map((m) => m.toFixed(1)).join(" ")).toBeLessThan(7);
+    const minutes = Array.from({ length: 8 }, (_, k) => shard(all, k + 1, 8).reduce((s, c) => s + (SECONDS[c] ?? DEFAULT_SECONDS), 0) / 60);
+    expect(Math.max(...minutes), minutes.map((m) => m.toFixed(1)).join(" ")).toBeLessThan(13);
   });
 
   it("leaves NOT_IN_CI out of every run, and only files that exist", () => {

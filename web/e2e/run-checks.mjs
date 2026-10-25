@@ -15,19 +15,10 @@ import { fileURLToPath } from "node:url";
 export const MAIN_CHECK = "web/e2e/verify.mjs";
 const say = (s) => process.stdout.write(`${s}\n`);
 
-// Code every screen runs through: a change here can break any check, so every check runs.
-export const SHARED = [
-  "web/src/game/core/",
-  "web/src/contracts/",
-  "web/src/app/",
-  "web/src/game/layers.ts",
-  "web/e2e/",
-  "web/package.json",
-  "web/pnpm-lock.yaml",
-  "web/next.config.ts",
-  "web/public/songs/twinkle/",
-  ".github/workflows/ci.yml",
-];
+// The paths whose change runs every check on a pull request: the runner and the workflow themselves. Shared app code
+// (core, contracts, app/, layers.ts, package.json…) no longer does: a PR runs verify.mjs plus the checks of the
+// folders it touched, and main's push runs every check (Eric, 2026-10-25; decision ci-browser-pr-scope.md).
+export const FULL_RUN = ["web/e2e/", ".github/workflows/ci.yml"];
 // The runner's own ceiling, so a hung check still fails its shard (and uploads evidence) inside the job's 20 min.
 // Not a check's timeout: decision ci-browser-check-timeout.md.
 const CHECK_TIMEOUT_MS = 8 * 60_000;
@@ -49,10 +40,10 @@ export function allChecks(files) {
 
 /**
  * The checks a change needs: verify.mjs, plus for each changed file under web/src/ the checks of the nearest folder
- * (its own, then each parent) that has any. Every check when a SHARED path changed.
+ * (its own, then each parent) that has any. Every check when a FULL_RUN path changed.
  */
 export function selectChecks(checks, changed) {
-  if (changed.some((f) => SHARED.some((s) => f === s || (s.endsWith("/") && f.startsWith(s))))) return checks;
+  if (changed.some((f) => FULL_RUN.some((s) => f === s || (s.endsWith("/") && f.startsWith(s))))) return checks;
   const byFolder = Map.groupBy(checks.filter((c) => c !== MAIN_CHECK), (c) => dirname(c));
   const picked = new Set([MAIN_CHECK]);
   for (const f of changed.filter((f) => f.startsWith("web/src/"))) {

@@ -48,14 +48,17 @@ Issue: #407
     take the `verify*.mjs` files of the first folder that has any. `web/src/game/notice-toast/index.ts` gives
     `verify-toast.mjs`; `web/src/operator/x.tsx` gives `verify-operator.mjs`; `web/src/game/fever-stage/x.ts` gives
     none.
-  - Every check when the PR touches shared code: `web/src/game/core/`, `web/src/contracts/`, `web/src/app/`,
-    `web/src/game/layers.ts`, `web/e2e/`, `web/package.json`, `web/pnpm-lock.yaml`, `web/next.config.ts`,
-    `web/public/songs/twinkle/`, `.github/workflows/ci.yml`. A push to main runs every check (`--all`).
+  - Every check only when the PR changes the runner or the workflow: `web/e2e/` or `.github/workflows/ci.yml`. Shared
+    app code (core, contracts, `app/`, `layers.ts`, `package.json`, …) gets the per-folder pick like any other file:
+    main's push runs every check (`--all`), and the red-main revert rule is the guard (Eric, 2026-10-25; decision
+    `ci-browser-pr-scope.md`).
   - "Every check" is `web/e2e/verify.mjs` plus `web/src/**/verify*.mjs`, found at run time, so a new check joins
     without editing the runner.
-  - Shard `i` of `n` takes the sorted list's entries whose index mod `n` is `i - 1`. Every check lands in exactly one
-    shard.
-- **Retry:** a failing check reruns once, into a fresh `--out` folder. Passes on retry: the shard passes and prints
+  - Shards balance by each check's measured seconds (`run-checks.seconds.json`): longest first, onto the lightest
+    shard. Every check lands in exactly one shard (decision `ci-browser-shard-balance.md`). `NOT_IN_CI` lists checks
+    that smaller checks cover (the whole `verify-sheet.mjs`).
+- **Retry, on main only:** on a pull request the first failure fails the shard. On main a failing check reruns once,
+  into a fresh `--out` folder. Passes on retry: the shard passes and prints
   `::warning title=flaky::flaky: <check>` (an annotation on the PR). Fails twice: the shard fails. Exit 0 when every
   check passed, 1 otherwise. No check's tolerance, timeout or arguments change; the runner passes only `--out`.
 - **Known red** (decision `ci-browser-known-red.md`): a check that is already red on `origin/main` when the job

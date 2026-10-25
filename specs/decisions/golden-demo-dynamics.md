@@ -1,25 +1,24 @@
-# golden-demo: how a sheet's dynamic marks become the bot's velocities
+# golden-demo: where the bot's velocities come from
 
-**Context.** The bot now presses at `note.velocity ?? KEYS_VELOCITY` (spec golden-demo, Requirement 2). Golden's three
-local charts get velocities from the scans' marks. The spec leaves the mark→velocity map, the hairpin ramp and the
-level before the first mark to this file. The velocities themselves stay local with the charts (decision 003).
+**Context.** The bot now presses at `note.velocity ?? KEYS_VELOCITY` (spec golden-demo, Requirement 2). The spec
+asks for Golden's velocities from the sheet's marks: p, mp, mf, f and hairpins. The sheet has none in any of its 96
+bars (`specs/context/findings.md`, 2026-10-25). Read as written, every note is mf, which is `KEYS_VELOCITY`: no change,
+and Eric's "no dynamics" stays. The velocities themselves stay local with the charts (decision 003).
 
 **Options.**
-- A. One fixed level per mark, hairpins ramped note by note between the levels they join.
-- B. A plus a per-hand balance (melody over accompaniment) and accents.
-- C. A curve fitted to the recording's loudness.
+- A. Mark-driven levels as the spec describes. With no marks, every note is mf: nothing changes.
+- B. Each bar's level from the recording's loudness in that bar. It's measured, not invented.
+- C. An arrangement of our own: louder choruses, a melody over its accompaniment, accents.
 
-**Choice: A.** It reads only what the sheet writes, so nothing is invented, and every number below is a rule a
-person can check against the scan. B adds an arrangement choice the sheet doesn't make; C reads Eric's recording,
-which isn't the sheet.
-- **Levels** (MIDI velocity, the common 16-step ladder): pp 33, p 49, mp 64, mf 80, f 96, ff 112. mf is
-  `KEYS_VELOCITY`, so a chart with no marks sounds as it did.
-- **Before the first mark:** mf.
-- **A mark** applies from its note to the next mark, both hands.
-- **A hairpin** ramps linearly by onset time, from the level where it starts to the mark that ends it. A hairpin that
-  ends on no mark ramps one step (16) up or down and holds there.
-- **A bar whose marks can't be read** keeps the previous level and is listed below.
+**Choice: B.** The recording is what the chart already lines up with, so its loudness is the song's own shape: quiet
+intro and outro, a softer bridge, full choruses. C would be our invention. A stays the rule for any chart with marks.
+- **Measure:** RMS of each sheet bar's span in the recording (`sheet_bar_starts`), in dB.
+- **Map:** linear in dB, from the bars' 10th percentile at p (49) to their 90th at f (96), clipped. Each note takes its
+  onset bar's level, in both hands, and in all three difficulties.
+- **For a chart with marks** (none yet): pp 33, p 49, mp 64, mf 80, f 96, ff 112; mf before the first mark; a hairpin
+  ramps linearly to the mark that ends it, or one step (16) if none does.
 
-**Bars kept at the previous level.** Filled in when the marks are read from the scans.
+The check is Eric's DGX listen. If it sounds wrong, C is the next thing to try, and it's his call as an arrangement.
 
-**How to undo.** Strip `velocity` from the local charts (or one hand's notes): the bot falls back to `KEYS_VELOCITY`.
+**How to undo.** Strip `velocity` from the local charts: the bot falls back to `KEYS_VELOCITY`. The local tool's
+`bar-loudness.json` can also be deleted, and `txt2chart.py` then writes no velocities.

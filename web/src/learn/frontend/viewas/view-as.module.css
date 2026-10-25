@@ -1,0 +1,9 @@
+/* In the site's top band, mirroring the Lights badge on the right: the corner the map and the activities leave free. */
+.marker { position:fixed; top:1.8px; left:3.2rem; z-index:40; display:flex; align-items:stretch; height:25.2px; border:1px solid var(--pa-line); color:var(--pa-ink-dim); font-family:var(--pa-font-data),ui-monospace,monospace; font-size:12px; letter-spacing:.04em; line-height:1; }
+.marker span { display:flex; align-items:center; gap:.6em; padding:0 9.6px; }
+.marker b { color:var(--pa-ink); font-weight:700; }
+.exit { padding:0 9.6px; border:0; border-left:1px solid var(--pa-line); border-radius:0; background:none; color:var(--pa-ink); font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
+.exit:hover { background:color-mix(in srgb, var(--pa-ink) 8%, transparent); }
+/* Narrower, the nav band's left side only fits the id; on a phone there is no room beside the nav, so it sits just under it. */
+@media (max-width:1000px) { .marker { left:16px; } .label { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; } }
+@media (max-width:640px) { .marker { top:32px; background:var(--pa-panel); } }

@@ -44,8 +44,9 @@ here did what its queue said. The queue and the tooling are what failed.
 
 ## Impact
 
-- **Four features blocked:** duo-hud, duo-select, duo-results and sheet-paper. Eric: "this was incredibly
-  important", the thing the whole frontend is gated on.
+- **Four features wait on the kit.** All four list `duo-tokens` in `depends_on`. `status.py`'s Blocked list names three:
+  duo-hud, duo-results and sheet-paper. duo-select is in flight on a part that doesn't need the kit ([#664]), and its
+  other parts still wait. Eric: "this was incredibly important", the thing the whole frontend is gated on.
 - **96 minutes and counting** from the claim commit (00:51:57) to the time of writing (02:28) with no kit pushed.
   For about 75 minutes (01:08 to 02:23), 534 lines of finished-looking code sat where no tool and no person looked.
 - **Nothing lost.** The files are intact in `~/.worktrees/gator-ai-days-2026/duo-tokens`. They are eric-agent-3's to
@@ -70,17 +71,24 @@ here did what its queue said. The queue and the tooling are what failed.
 6. **The kit's scope grew after the claim.** [#656] added the shared kit at 00:54, two minutes after the claim, on top
    of tokens the planner had asked to keep "small and fast" at 00:47.
 
-## Proposed rules (Eric decides; none is in force from this report)
+## Rules from now on
 
-1. **Push WIP before switching tasks, and at least every 30 minutes,** as hook-passing commits to the feature's own
-   branch.
-2. **A feature with dependents is critical path:** its owner takes nothing else until it's ready, CI waits included.
-3. **The planner's loop flags a draft whose only commit is its claim after 30 minutes,** blockers first.
-4. **`status.py` leads with "N features waiting on X",** so a blocker is the first thing anyone reads.
+Eric adopted fix 3 ("Yeah, let's do fix 3", relayed by the planner). Fixes 1, 2 and 4 are proposals; Eric decides.
+
+1. **Proposed: push WIP before switching tasks, and at least every 30 minutes,** as hook-passing commits to the
+   feature's own branch.
+2. **Proposed: a feature with dependents is critical path:** its owner takes nothing else until it's ready, CI
+   waits included.
+3. **Adopted: the planner's loop flags a draft whose only commit is its claim after 30 minutes,** blockers first (a
+   blocker is a slug in `status.py`'s Blocked list). It nudges the worker to push WIP, and relays blockers to
+   eric-asking-agent. Since about 02:35, in the planner's 15-minute loop, per the planner. Its first run flagged #655:
+   claim-only for 96 minutes, with 3 features waiting.
+4. **Proposed: `status.py` leads with "N features waiting on X",** so a blocker is the first thing anyone reads.
 
 [#650]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/650
 [#655]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/655
 [#656]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/656
 [#657]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/657
+[#664]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/664
 [#673]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/issues/673
 [#674]: https://github.com/Eric-Zhang-Developer/piano-arcade-gator-ai-days/pull/674

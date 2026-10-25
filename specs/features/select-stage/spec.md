@@ -12,6 +12,11 @@ behind the select, dim and scrolling slowly, makes the two screens read as one c
 
 Issue: #265
 
+**Retired (Eric, 2026-10-25; contract #728):** the sun, the grid floor and `--pa-sky` are allowed nowhere. duo-select
+(#714) already took the stage off `/`; `/auth/login` still mounts `<SelectStage />`. It now draws no scene: it's a
+fixed layer on `--pa-bg`, with no WebGL context. The driver and its test are gone.
+`specs/decisions/select-stage-retire.md` has why. The Plan and Requirements below describe the stage as first built.
+
 ## Plan
 Two PRs, about an hour. fever-stage's files (`web/src/game/stage/`) don't change.
 1. `feat(select-stage)` in `web/src/game/select-stage/`:
@@ -46,8 +51,7 @@ Two PRs, about an hour. fever-stage's files (`web/src/game/stage/`) don't change
 ## Validation
 - **After duo-select (#646),** which takes the stage off the select: the check confirms `/` mounts no stage and
   holds no live WebGL context, and stops there. The steps below hold while the select mounts the stage.
-- `pnpm -C web test`, a fake scene counting renders: moving, the driver renders every tick until a scripted slow run
-  trips the budget, then stops; still, it renders once, not again at the same size, and once more at a new size.
+- ~~`pnpm -C web test`, a fake scene counting renders~~: retired with the driver (no scene to render).
 - `verify.py --slug select-stage` passes (its first step opens Twinkle from `/`).
 - `node web/src/game/select-stage/verify-select-stage.mjs --out <dir>`, headless Chrome at 1280×720 and 1920×1080.
   An init script keeps every WebGL context `getContext` returns; live means `!isContextLost()`.

@@ -247,7 +247,7 @@ function WrongNote() {
 }
 
 // The kit's buttons are 14px; on this page they sit beside 112px pads, so they scale with the screen.
-const big = { fontSize: "clamp(14px, 1.1vw, 22px)", padding: "0.85em 1.7em" };
+const big = { fontSize: "clamp(14px, 1.1vw, 22px)", padding: "0.85em 1.7em", minWidth: "12em" }; // /simon's Start width
 
 function callText(set: WrongNoteSet | null, title: string, shift: number): string {
   if (!set) return `${title}: eight notes, one moved ${shift === 1 ? "a half step" : "a whole step"}. Which one?`;

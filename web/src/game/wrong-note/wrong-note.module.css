@@ -20,12 +20,22 @@
   gap: 1em 2em;
 }
 
+/* /simon's wordmark, the select's (select-layout): wide-tracked caps after a slanted bar in the primary. */
 .mark {
   margin: 0;
-  font: 800 clamp(28px, 3.6vw, 60px) / 1 var(--pa-font-display), system-ui, sans-serif;
-  font-stretch: 75%;
+  font: 700 clamp(32px, 3.4vw, 64px) / 1 var(--pa-font-display); /* a longer name than /simon's: 3.4vw keeps the songs beside it at 1280 */
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.01em;
+}
+
+.mark::before {
+  content: "";
+  display: inline-block;
+  width: 0.22em;
+  height: 0.78em;
+  margin-right: 0.5em;
+  background: var(--pa-primary);
+  transform: skewX(-18deg);
 }
 
 /* The song picker: the kit's chips (kitChip), the song in force lit, as on /simon. */
@@ -189,7 +199,7 @@
 }
 
 .foot p {
-  margin: 0;
+  margin: 0 0 0 auto; /* right, as /simon's; the Controls link takes the left */
 }
 
 .sets {

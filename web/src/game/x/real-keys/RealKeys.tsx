@@ -213,6 +213,7 @@ export function RealKeys() {
     }
   }, [deviceId, stopCamera]);
 
+  const hasLog = log.length > 0;
   const openClip = useCallback((file: File | undefined) => {
     if (!file) return;
     const v = videoRef.current!;
@@ -221,19 +222,21 @@ export function RealKeys() {
     v.onloadedmetadata = () => {
       setGave(`${v.videoWidth}×${v.videoHeight}, ${v.duration.toFixed(1)} s`);
       setClipName(file.name);
-      setStep((x) => (x === "source" ? "corners" : x));
+      // On to the corners once both files are in: going sooner unmounts the log's file input before it's picked.
+      if (hasLog) setStep((x) => (x === "source" ? "corners" : x));
     };
-  }, []);
+  }, [hasLog]);
   const openLog = useCallback((file: File | undefined) => {
     if (!file) return;
     void file.text().then((t) => {
       try {
         setLog(parseLog(JSON.parse(t)));
+        if (clipName) setStep((x) => (x === "source" ? "corners" : x));
       } catch {
         setError("notes.json: not JSON");
       }
     });
-  }, []);
+  }, [clipName]);
 
   // A key event, on the take's clock: setup steps read it, the judge scores it, and the overlay shows it delayed.
   const onKey = useCallback(

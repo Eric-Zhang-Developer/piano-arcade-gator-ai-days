@@ -36,10 +36,10 @@ are; open PR #761 is working in juice. Split only at a real seam if the PR passe
 **Coordinate with the open duo-hud PRs.** #747 (`fix(core-loop)`, the hit line and judgment word, branch
 `duo-hitline`, changes `highway.ts`) and #749 (`fix(note-pills)`, 2 px note corners, changes `note-pills/index.ts`)
 are open and wait for Eric's go. The lane rule closes those files while they're open, and they set the look this pass
-builds on (the Duo hit line, square-ish notes). So: check both before starting (`gh pr view 747 749`). If they've
-merged, branch from origin/main. If not, build on them (stack on `duo-hitline` with #749 merged in, or rebase onto main
-after they merge) and keep the PR a draft until both have merged or closed; then rebase on origin/main and mark it
-ready. If Eric closes either, the look it carried (the 2 px corners, the purple-to-blue line) is still the visual
+builds on (the Duo hit line, square-ish notes). Eric is asleep and they wait on his go, so they don't
+block this pass (planner, 2026-10-25): branch from origin/main and carry their look (the Duo hit line, 2 px corners)
+in this PR where key-polish redraws the same thing. Whichever lands second rebases onto the first; the same worker
+owns all three, so no one waits on a person. Merge on green like any feat PR. If Eric closes either, the look it carried (the 2 px corners, the purple-to-blue line) is still the visual
 direction's, so keep it.
 
 ## Research first

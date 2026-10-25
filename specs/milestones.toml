@@ -269,6 +269,9 @@ features = [
   "mascot", # Eric, 2026-10-25 (#1371): one chibi gator, incredibly minimal, in the Duo look; after the last feature with an open PR, so it's picked next
   "well-tempered", # Eric, 2026-10-25 (#1356): wow feeder; the DGX retunes and each interval's beat rate pulses, an experiment
   "hitch-free", # Eric, 2026-10-25 (#1362): no hitch from Start to results on Eric's setup, measured first, a #856 hero item
+  "level-review", # Eric, 2026-10-25 (#1379): every song's level checked against a cited published grade; merges on green
+  "song-pack-9", # Eric, 2026-10-25 (#1377): five very easy songs, Hot Cross Buns and Mary Had a Little Lamb first
+  "song-pack-10", # Eric, 2026-10-25 (#1378): very hard songs, the Ballade No. 1 coda and his two nocturnes
 ]
 cut = []
 

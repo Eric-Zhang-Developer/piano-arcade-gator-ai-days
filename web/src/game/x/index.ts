@@ -8,6 +8,7 @@ import { buildSonataX } from "./build-sonata";
 import { composersHands } from "./composers-hands";
 import { conductor } from "./conductor";
 import { handPalette } from "./hand-palette";
+import { nameTheme } from "./name-theme";
 import { realKeys } from "./real-keys";
 import { round } from "./round";
 import { pinned } from "./pinned";
@@ -40,6 +41,7 @@ export const experiments: Experiment[] = [
   buildSonataX, // #1162: its own page, /sonata; the night as music, one note per merged PR
   speakingPiano, // #1153: its own page, /speak; a spike that ends in findings
   pinned, // #1171: your take as a brass music-box cylinder, at /musicbox
+  nameTheme, // #1190: its own page, /name; a name becomes a theme the DGX plays and a level
   handPalette, // #1127: the hand and judgment colors three ways, with a colour-blind simulation
   uiSoundsAb, // #1167: the menu sounds, old against new
 ];

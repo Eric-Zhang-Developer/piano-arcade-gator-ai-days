@@ -24,8 +24,16 @@ export function parsePedal(raw: unknown): Pedal | null {
   return pairs as Pedal;
 }
 
-// No file: no pedal, quietly. A file that doesn't parse: no pedal, and one warning.
+// A pedal made in the browser for a chart made there too (name-theme): loadPedal answers it first, with no request.
+const held = new Map<string, Pedal>();
+export function holdPedal(song: string, pedal: Pedal | null): void {
+  if (pedal) held.set(song, pedal);
+  else held.delete(song);
+}
+
+// A held pedal first. No file: no pedal, quietly. A file that doesn't parse: no pedal, and one warning.
 export async function loadPedal(song: string): Promise<Pedal | null> {
+  if (held.has(song)) return held.get(song)!;
   if (!song.startsWith("local/") && !PEDAL_SONGS.includes(song)) return null;
   const res = await fetch(`/songs/${song}/pedal.json`).catch(() => null);
   if (!res?.ok) return null;

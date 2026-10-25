@@ -9,8 +9,8 @@ import styles from './retrieval.module.css';
 
 /**
  * The clean retrieval test: one question at a time in one panel, with no workspace or reference
- * beside it. A checked answer is final; the end view counts only the answers given in this round, and lists the
- * questions to revisit when there are any. Next decides what comes after, so the end view only leads back to the map.
+ * beside it. A checked answer is final, so only the picked option stays, with its verdict; the end view counts only
+ * the answers given in this round. Next decides what comes after, so the end view only leads back to the map.
  * With a node, the test is that node's items and every checked answer is appended to the device's attempts.
  * A null node has no items to test.
  */
@@ -77,7 +77,7 @@ function Question({ state, round, dispatch, check, heading, focusHeading }: { st
     <h1 id="retrieval-question" ref={heading} tabIndex={-1} className={styles.prompt}>{question.prompt}</h1>
     <fieldset key={question.id} className={styles.options} aria-describedby="retrieval-question">
       <legend className={styles.hidden}>Your answer</legend>
-      {choices(question).map(choice => {
+      {choices(question).filter(choice => !state.checked || choice.id === state.selected).map(choice => {
         const picked = state.selected === choice.id;
         const shown = picked && result ? result : null;
         return <div key={choice.id} className={styles.option} data-picked={picked || undefined} data-verdict={shown ? (shown.correct ? 'correct' : 'wrong') : undefined}>
@@ -104,13 +104,9 @@ function End({ state, round, heading }: { state: RetrievalState; round: Round; h
     <h1 ref={heading} tabIndex={-1} className={styles.prompt}>Test done</h1>
     <div className={styles.actions}><Link href="/learn" className={styles.primaryLink}>Back to map</Link></div>
   </>;
-  const { right, revisit, answered } = summary(state.attempts, round.gates);
+  const { right, answered } = summary(state.attempts, round.gates);
   return <>
     <h1 ref={heading} tabIndex={-1} className={styles.prompt}>{right.length} of {answered} right on the first try</h1>
-    {revisit.length > 0 && <>
-      <h2 className={styles.subhead}>To revisit</h2>
-      <ul className={styles.revisit}>{revisit.map(q => <li key={q.id}>{q.prompt}</li>)}</ul>
-    </>}
     <div className={styles.actions}><Link href="/learn" className={styles.primaryLink}>Back to map</Link></div>
   </>;
 }

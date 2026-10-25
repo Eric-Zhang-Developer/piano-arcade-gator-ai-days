@@ -84,13 +84,22 @@ describe('Retrieval', () => {
     expect(t).toContain('|Scale degree 5 is the dominant: G in C major.|');
     expect(t).not.toContain('The tonic is scale degree 1');
     expect(t).toContain('|Next|');
+    // A checked answer is final, so the options not picked go (decision "Agent drives", seven items or fewer).
+    expect(t).toContain('|5|');
+    for (const o of ['|1|', '|3|']) expect(t).not.toContain(o);
+  });
+  it('shows every option until Check', () => {
+    const s = retrievalReducer(retrievalReducer(answer(initialRetrieval, 'c'), { type: 'next' }), { type: 'select', choiceId: '5' });
+    const t = text(renderToStaticMarkup(<Retrieval initial={s} />));
+    for (const o of ['|1|', '|3|', '|5|']) expect(t).toContain(o);
+    expect(t).toContain('|Check|');
   });
   it('shows a right answer with the word and no explanation', () => {
     const t = text(renderToStaticMarkup(<Retrieval initial={answer(initialRetrieval, 'c')} />));
     expect(t).toContain('|Correct|');
     expect(t).not.toContain('A major scale is named');
   });
-  it('ends with first-try counts and what to revisit, and claims no mastery', () => {
+  it('ends with first-try counts and the way back, no revisit list, and claims no mastery', () => {
     const attempts: Attempt[] = [
       { type: 'answer', gateId: 'home', questionId: 'tonic', choiceId: 'c' },
       { type: 'answer', gateId: 'home', questionId: 'tonic-degree', choiceId: '5' },
@@ -98,8 +107,10 @@ describe('Retrieval', () => {
     const html = renderToStaticMarkup(<Retrieval initial={{ index: theoryItems.length, selected: null, checked: false, attempts }} />);
     const t = text(html);
     expect(t).toContain('|1 of 2 right on the first try|');
-    expect(t).toContain('|To revisit|');
-    expect(t).toContain('|Which scale degree is the tonic?|');
+    // Next picks what to revisit, so the end lists nothing to choose from (decision "Agent drives").
+    expect(t).not.toContain('To revisit');
+    expect(t).not.toContain('Which scale degree is the tonic?');
+    expect(t).toContain('|Back to map|');
     expect(html).toContain('href="/learn"');
     expect(html).not.toMatch(/master|mastery|passed|unlocked/i);
   });

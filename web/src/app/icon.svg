@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <!-- Étude's É: a squared Saira-style E in the kit ink (pa-ink), its acute accent a pa-primary blue note pill.
+       Every edge sits on an even unit, so at 16 px each one lands on a whole pixel. -->
+  <rect width="32" height="32" rx="6" fill="#030607" shape-rendering="geometricPrecision"/>
+  <path fill="#e2e6f0" d="M8 12h16v4H12v2h10v4H12v2h12v4H8z"/>
+  <rect x="14" y="4" width="10" height="4" rx="2" fill="#2b9bff" shape-rendering="geometricPrecision"/>
+</svg>

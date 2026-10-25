@@ -37,7 +37,7 @@
 .workspaceTabs button { border:0; border-bottom:2px solid transparent; border-radius:0; padding:0; background:none; color:var(--learn-muted); font-size:14px; }
 .workspaceTabs button[aria-pressed=true] { border-bottom-color:var(--learn-accent); color:var(--learn-text); font-weight:700; }
 .workspaceBody { padding:28px; overflow:auto; flex:1; }
-.paper { padding:32px; background:var(--learn-paper); color:var(--learn-paper-text); border-radius:6px; color-scheme:dark; min-height:440px; }
+.paper { --learn-muted:var(--learn-paper-text); --learn-border:var(--learn-paper-text); padding:32px; background:var(--learn-paper); color:var(--learn-paper-text); border-radius:6px; color-scheme:dark; min-height:440px; }
 .paper>header { text-align:center; padding-bottom:14px; }
 .paper h2 { font-family:var(--pa-font-display),system-ui,sans-serif; font-style:italic; font-weight:800; font-size:24px; line-height:1.25; margin:0 0 8px; }
 .paper header p { color:var(--learn-muted); margin:0; font-size:12px; }

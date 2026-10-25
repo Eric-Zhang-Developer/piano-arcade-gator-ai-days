@@ -1,33 +1,8 @@
-/* The Duo look inside /learn, read only from the --learn-* tokens in learning.module.css. Zero radius on every piece,
-   hairline frames, no gradients or glows; blue is the primary, red only ever sits beside a ✕. */
+/* What /learn adds to the Duo kit (duo-tokens), read only from the --learn-* tokens in learning.module.css: the reading
+   face with upright Saira headings, and the judged-answer mark. Red only ever sits beside a ✕. */
 .scope { --learn-font-body:var(--duo-font-reading),system-ui,sans-serif; font-family:var(--learn-font-body); }
 .scope :where(h1,h2,h3) { font-family:var(--learn-font-display); font-style:normal; font-stretch:75%; font-weight:700; letter-spacing:.01em; }
-
-.panel { background:var(--learn-surface); color:var(--learn-text); border:1px solid var(--learn-border); border-radius:0; }
-.panel[data-variant=paper] { background:var(--learn-paper); color:var(--learn-paper-text); border-color:color-mix(in srgb, var(--learn-paper-text) 25%, transparent); color-scheme:light; }
-
-.brackets { --duo-bracket:var(--learn-accent); position:relative; }
-.brackets[data-tone=line] { --duo-bracket:var(--learn-border); }
-.corner { position:absolute; width:14px; height:14px; border:0 solid var(--duo-bracket); pointer-events:none; }
-.corner[data-corner=tl] { top:-5px; left:-5px; border-top-width:2px; border-left-width:2px; }
-.corner[data-corner=tr] { top:-5px; right:-5px; border-top-width:2px; border-right-width:2px; }
-.corner[data-corner=bl] { bottom:-5px; left:-5px; border-bottom-width:2px; border-left-width:2px; }
-.corner[data-corner=br] { bottom:-5px; right:-5px; border-bottom-width:2px; border-right-width:2px; }
-
-.button { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:10px 20px; border:1px solid var(--learn-accent); border-radius:0; font:inherit; font-family:var(--learn-font-display); font-style:normal; font-stretch:75%; font-weight:700; font-size:18px; line-height:1; letter-spacing:.06em; text-transform:uppercase; cursor:pointer; transition:background-color 180ms ease-out, border-color 180ms ease-out, color 180ms ease-out; }
-.button:focus-visible { outline:2px solid var(--learn-accent); outline-offset:2px; }
-.button:disabled { cursor:not-allowed; opacity:.45; }
-.button[data-variant=primary] { background:var(--learn-accent); color:var(--learn-bg); }
-.button[data-variant=primary]:not(:disabled):hover { background:var(--learn-text); border-color:var(--learn-text); }
-.button[data-variant=secondary] { background:transparent; color:var(--learn-text); border-color:var(--learn-border); }
-.button[data-variant=secondary]:not(:disabled):hover { border-color:var(--learn-accent); }
 
 .mark { display:inline-flex; align-items:baseline; gap:6px; font-family:var(--learn-font-data); font-size:16px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; }
 .mark[data-kind=correct] { color:var(--learn-accent); }
 .mark[data-kind=wrong] { color:var(--learn-wrong); }
-
-.monoLabel { font-family:var(--learn-font-data); font-size:16px; letter-spacing:.12em; text-transform:uppercase; color:var(--learn-muted); }
-
-@media (prefers-reduced-motion: reduce) {
-  .button { transition:none; }
-}

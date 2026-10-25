@@ -38,7 +38,7 @@
 .line {
   margin: 0;
   font-family: var(--pa-font-display), system-ui, sans-serif;
-  font-style: italic;
+  font-stretch: 75%;
   font-weight: 800;
   font-size: 20px;
   letter-spacing: 0.06em;

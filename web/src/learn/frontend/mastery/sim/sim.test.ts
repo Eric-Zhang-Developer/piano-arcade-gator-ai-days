@@ -101,6 +101,12 @@ describe('isSyntheticId', () => {
 });
 
 describe('toLearningAttemptRows', () => {
+  it('gives each learner its own stable player uuid', () => {
+    const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+    for (const l of cohort) expect(l.playerId).toMatch(uuid);
+    expect(new Set(cohort.map(l => l.playerId)).size).toBe(COHORT_SIZE);
+  });
+
   it('maps every attempt to a learning_attempts row, oldest first, marked synthetic, ids left to the loader', () => {
     const learner = cohort[7];
     const rows = toLearningAttemptRows(learner, learner.attempts);

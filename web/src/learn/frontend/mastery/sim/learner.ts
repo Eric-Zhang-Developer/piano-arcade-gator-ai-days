@@ -39,6 +39,8 @@ export type SyntheticLearner = {
   startingLevel: string;
   /** The simulated history, diagnostic first, every attempt's `learnerId` this learner's id. */
   attempts: readonly Attempt[];
+  /** A stable uuid for this learner, so a loader can insert its rows as one player. */
+  playerId: string;
   /** The learner's own seed, from the cohort seed and its index: anything else drawn for it (takes) starts here. */
   seed: number;
   sessionsPerWeek: number;
@@ -92,6 +94,7 @@ export function simulateLearner(curriculum: Curriculum, seed: number, index: num
   const random = mulberry32(seed);
   const ids = mulberry32(mix(seed, 0x1d));
   const id = syntheticId(index);
+  const playerId = uuid(ids);
 
   const level = LEVELS[weighted(random, LEVELS.map(l => l.weight))];
   const input = chance(random, MIDI_SHARE) ? 'midi' : 'keyboard';
@@ -188,6 +191,7 @@ export function simulateLearner(curriculum: Curriculum, seed: number, index: num
     input,
     startingLevel: level.name,
     attempts,
+    playerId,
     seed,
     sessionsPerWeek,
     accuracy,

@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { ExperimentsGallery } from "../x/Gallery";
 import { labEntries, labGroups } from "./entries";
 import styles from "./lab.module.css";
 
@@ -49,6 +50,7 @@ export function Lab() {
           </section>
         ))}
       </div>
+      <ExperimentsGallery />
     </main>
   );
 }

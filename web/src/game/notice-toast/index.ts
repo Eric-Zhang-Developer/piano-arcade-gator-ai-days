@@ -66,10 +66,10 @@ export function toastStack(render: (toasts: readonly Toast[]) => void, reduced: 
 
 // Below the HUD band (hudLayout caps it at 84 px) and inside the top half, where every note is still over 700 ms from
 // the line: three toasts at 24 px end near 320 px of 1080. Text is 16 px at 720 high and 24 px at 1080 (the video rule).
-const CSS = `
+export const toastCss = `
 .pa-toasts { position: fixed; top: 96px; right: 16px; z-index: 950; display: flex; flex-direction: column; gap: 8px;
   align-items: flex-end; pointer-events: none; }
-.pa-toast { background: var(--pa-panel); color: var(--pa-ink); border-left: 3px solid var(--pa-cyan); border-radius: 6px;
+.pa-toast { background: var(--pa-panel); color: var(--pa-ink); border-left: 3px solid var(--pa-cyan);
   max-width: min(18em, 40vw); padding: 0.45em 0.8em; font: 500 clamp(16px, 2.2223vh, 24px) / 1.3 system-ui, sans-serif;
   box-shadow: 0 0 0 1px rgba(39, 225, 255, 0.18); backdrop-filter: blur(8px); animation: pa-toast-in 200ms ease-out;
   transition: opacity 200ms ease-out, transform 200ms ease-out; }
@@ -82,7 +82,7 @@ let push: ((text: string) => void) | null = null;
 
 function domStack(): (text: string) => void {
   const style = document.createElement("style");
-  style.textContent = CSS;
+  style.textContent = toastCss;
   document.head.appendChild(style);
   const box = document.createElement("div");
   box.className = "pa-toasts";

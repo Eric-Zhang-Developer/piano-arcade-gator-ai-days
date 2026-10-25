@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Chart, Frame, Judgment } from "../../contracts";
-import { hintTimer, waitHint, waitingNotes } from ".";
+import { hintFont, hintTimer, waitHint, waitingNotes } from ".";
 
 // 60 bpm: beat n at n s. A right-hand note at beat 1, then a two-hand chord at beat 2.
 const chart: Chart = {
@@ -79,4 +79,10 @@ describe("the plugin without mode=wait", () => {
     expect(calls).toEqual([]);
     expect(requestMIDIAccess).not.toHaveBeenCalled();
   });
+});
+
+it("the note's name is drawn upright, 0.089 of the frame's height (#1132)", () => {
+  expect(hintFont(720)).not.toMatch(/italic/);
+  expect(hintFont(720)).toMatch(/^900 64px /);
+  expect(hintFont(1080)).toMatch(/^900 96px /);
 });

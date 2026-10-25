@@ -48,9 +48,9 @@ export function FocusPanel(p: FocusPanelProps) {
             </span>
           </MonoLabel>
           <Panel style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", marginTop: "2.2vh", flex: "none" }}>
-            <DataCell label="LV" value={<span data-testid="cell-lv">{lv(p.level)}</span>} style={{ borderLeft: "none" }} />
-            <DataCell label="NOTES" value={<span data-testid="cell-notes">{p.notes}</span>} />
-            <DataCell label="BEST" value={<span data-testid="cell-best">{p.best ? `${(p.best.accuracy * 100).toFixed(1)}%` : "—"}</span>} />
+            <DataCell label="LV" value={<span data-testid="cell-lv">{lv(p.level)}</span>} style={{ ...cell, borderLeft: "none" }} />
+            <DataCell label="NOTES" value={<span data-testid="cell-notes">{p.notes}</span>} style={cell} />
+            <DataCell label="BEST" value={<span data-testid="cell-best">{p.best ? `${(p.best.accuracy * 100).toFixed(1)}%` : "—"}</span>} style={cell} />
           </Panel>
           <LadderMark song={p.id} />
           {next && (
@@ -90,6 +90,8 @@ export function FocusPanel(p: FocusPanelProps) {
   );
 }
 
+// The kit's 10 px, in vh: about the same at 1080, and 6 px back at 720 (#863).
+const cell: CSSProperties = { paddingTop: "1vh", paddingBottom: "1vh" };
 const buttonSize: CSSProperties = { fontSize: "clamp(15px, 1.2vw, 23px)", padding: "1.2vh 0", letterSpacing: "0.16em" };
 
 // The browser's storage, read as a snapshot (none on the server), so the strip appears after hydration.

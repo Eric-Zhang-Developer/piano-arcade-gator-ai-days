@@ -42,9 +42,11 @@ you played them, and arcade rhythm games are loud and addictive but don't teach 
   ([flow-mode](../changes/flow-mode.md)).
 - The results screen grades how you played: early or late, loudness against the score, evenness of runs, and the
   weakest bars, with a link to practice them slower ([judges.md](judges.md#impact-what-étude-does-for-a-learner)).
+- `/stage` shows the live take on NOSTALGIA's hill for the people watching on a second display
+  ([stage-view](../changes/stage-view.md)).
 - Takes save and `/progress` shows them over time; an LED strip on the piano lights the next key and every hit
   ([judges.md](judges.md#impact-what-étude-does-for-a-learner)).
-- 20 songs, each charted from a cited score ([`web/public/songs/`](../web/public/songs/)).
+- 40 songs, each charted from a cited score ([`web/public/songs/`](../web/public/songs/)).
 
 ### How we built it
 

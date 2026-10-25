@@ -25,10 +25,11 @@
 //                          and reads on camera; a steady dim LED looks like a stuck pixel
 //   6 rippleMs             each key on sends a ripple out both ways along the strip in the
 //                          key's color, fading over this long (0 = off, the default: light stays on its key)
-//   7 hintRampMs           a new hint starts nearly dark and brightens evenly, as the eye sees it, to twice
+//   7 hintRampMs           a new hint starts very faint and brightens evenly, as the eye sees it, to twice
 //                          its color over this long (0 = off: steady hint color, breathing). The game sends
-//                          hints at half the hand color 600 ms before the note, so the key reaches the full
-//                          hand color as the note lands. Then it breathes until it's cleared
+//                          hints at half the hand color this long before the note (it sends this setting on
+//                          connect), so the key reaches the full hand color as the note lands. Then, in
+//                          learning mode, it turns bright gold and breathes there: press it now
 //   8 wrongRed 0/1         a key released without ever lighting flashes red. The game sends a key off for
 //                          every released key but a key on only for a judged note, so that's a wrong key
 //                          (shown on release: the board never hears the press). Only during a song
@@ -38,9 +39,10 @@
 //   12 jointIndex          first LED of the second strip (144 for two 1 m strips)
 //   13 jointGap x16        extra space at the joint, in 1/16 LED pitch (6.94 mm at 144/m)
 //   14 reverse 0/1         strip runs right to left (DIN at the treble end)
-//   15 demo 0/1            the mode: 0 calm (the default: hint build-up, wrong-key red, soft glows for the
-//                          count-in, fever, pause, the end and idle), 1 demo (every key pressed on the piano lights
-//                          with its ripple, and nothing else; the website sends those presses). BOOT flips it
+//   15 demo 0/1            the mode: 0 learning (the default: hints that build up faint to gold, wrong-key red,
+//                          soft glows for the count-in, fever, pause, the end and idle), 1 demo (every key pressed
+//                          on the piano lights and splashes: a ripple, glitter, harder presses go further; and
+//                          nothing else; the website sends those presses). BOOT flips it
 //   20 save                write settings to flash (survive power off)
 //   21 defaults            reset settings to the compiled defaults (not saved until 20)
 
@@ -94,7 +96,7 @@ struct Settings {
   float jointGap = 0.0f;
   uint16_t reverse = 0;
   uint16_t rippleMs = 0;        // off: each key's light stays on its key. Setting 6 turns ripples back on
-  uint16_t hintRampMs = 600;    // the game's hint lead (led-game leadMs)
+  uint16_t hintRampMs = 1500;   // the game's hint lead (led-game leadMs), which the game sends on connect
   uint16_t wrongRed = 1;
   uint16_t shows = 1;
   uint16_t demo = 0;             // new fields go last: loadSettings reads an older, shorter save as a prefix
@@ -115,6 +117,8 @@ struct Ripple {
   CRGB color;
   uint32_t start;
   bool on;
+  float power;     // 0.45..1, from how hard the key went down (demo): reach, life and brightness
+  CRGB drift;      // the crest shifts toward this color as it travels (demo); black = stays
 };
 
 CRGB leds[NUM_LEDS];
@@ -123,9 +127,9 @@ Ripple ripples[MAX_RIPPLES];
 int nextRipple = 0;
 Settings cfg;
 // The modes (setting 15); see "The two modes" by demoExtras.
-#define MODE_CALM 0
+#define MODE_LEARNING 0
 #define MODE_DEMO 1
-inline bool demoSimple() { return cfg.demo != MODE_CALM; }  // demo is only the press light and its ripple
+inline bool demoSimple() { return cfg.demo != MODE_LEARNING; }  // demo is only the press light and its ripple
 inline bool showsOn() { return cfg.shows && !demoSimple(); }
 Preferences prefs;
 
@@ -238,7 +242,7 @@ void setParam(uint8_t param, uint16_t v) {
     case 7: cfg.hintRampMs = v; break;
     case 8: cfg.wrongRed = v ? 1 : 0; break;
     case 9: cfg.shows = v ? 1 : 0; if (!cfg.shows) stopShows(); break;
-    case 15: cfg.demo = v ? MODE_DEMO : MODE_CALM; if (demoSimple()) stopShows(); break;
+    case 15: cfg.demo = v ? MODE_DEMO : MODE_LEARNING; if (demoSimple()) stopShows(); break;
     case 10: cfg.calLow = v / 16.0f; break;
     case 11: cfg.calHigh = v / 16.0f; break;
     case 12: cfg.jointIndex = min<uint16_t>(v, NUM_LEDS); break;
@@ -269,7 +273,7 @@ inline uint8_t scale7(uint8_t c) { return c >= 127 ? 255 : c << 1; }
 #define INTRO_MAX_MS 9000      // no hint by then: the count-in show stops
 #define INTRO_STEPS 8          // the count-in is 8 beats (core settings' countInBeats): the bar fills in 8 steps
 #define FINALE_MS 3500
-#define MAX_SPARKS 48
+#define MAX_SPARKS 96         // demo glitter: a fast run of hard presses and a chord shower
 #define TRAIL_FADE_PER_MS 1.6f // fx layer fades ~16/255 per 10 ms frame: a moving light leaves a short trail
 
 // Pause: during a song the game sends a hint or a key every note, so PAUSE_MS of nothing but heartbeats means
@@ -337,7 +341,7 @@ void burst(float pos, CRGB color, int count, float speed) {
 #define DEMO_EXTRAS 0
 inline bool demoExtras() { return DEMO_EXTRAS && cfg.demo; }
 
-// The two modes (setting 15). Calm (0): everything as designed. Demo (1): whenever a piano key goes down it lights,
+// The two modes (setting 15). Learning (0): everything as designed, hints building up to gold. Demo (1): whenever a piano key goes down it lights,
 // with its ripple; that's all. No hints before a note, no red, none of the song shows. The website sends a key on
 // for every press in demo, on any page; when the game then reports the hit on that held key, it just takes the
 // hit's color (no second ripple). Older pages sent 2 for the same thing, so 2 is demo too.
@@ -699,13 +703,35 @@ void clearAll() {
 // "breaks to both sides", as the strip first did) and classy keeps each key's light on its key.
 uint16_t rippleLife() { return cfg.rippleMs ? cfg.rippleMs : cfg.demo && cfg.shows ? 700 : 0; }
 
+// Demo's splash: the website sends a press's color scaled by how hard it went down (45% to 100%), so its
+// brightest channel is the press's power. A harder press ripples further and brighter, the crest drifts one
+// step along the Duo palette as it goes (blue to violet, violet to magenta), and glitter flies off the key,
+// more and faster the harder the press; a chord (three keys inside 90 ms) throws a magenta-and-gold shower.
+uint32_t chordAt = 0;
+uint8_t chordKeys = 0;
 void startRipple(uint8_t note, CRGB color) {
   if (!rippleLife()) return;
   float sum = 0;
   int n = 0;
   forEachLed(note, [&](int i) { sum += i; n++; });
   if (!n) return;
-  ripples[nextRipple] = {sum / n, color, millis(), true};
+  float center = sum / n, power = 1;
+  CRGB drift = CRGB::Black;
+  if (demoSimple()) {
+    power = max(0.45f, max(color.r, max(color.g, color.b)) / 255.0f);
+    drift = note < 60 ? UI_MAGENTA : UI_VIOLET;  // the left hand's violet warms, the right hand's blue cools
+    burst(center, color, 4 + (int)(8 * power), 0.12f + 0.22f * power);
+    spark(center, 0.3f * power, UI_GOLD, 500);
+    spark(center, -0.3f * power, UI_GOLD, 500);
+    uint32_t now = millis();
+    chordKeys = now - chordAt < 90 ? chordKeys + 1 : 1;
+    chordAt = now;
+    if (chordKeys == 3) {
+      burst(center, UI_MAGENTA, 14, 0.4f);
+      burst(center, UI_GOLD, 8, 0.3f);
+    }
+  }
+  ripples[nextRipple] = {center, color, millis(), true, power, drift};
   nextRipple = (nextRipple + 1) % MAX_RIPPLES;
 }
 
@@ -751,7 +777,7 @@ void runMessage(const uint8_t *m) {
     case 0x80: {
       Key &k = keys[m[1]];
       // A release of a key that isn't lit: the game never sent its key on, so it was a wrong key.
-      if (cfg.wrongRed && cfg.demo == MODE_CALM && songLive && !k.held && k.level <= 0 && m[1] >= LOW_NOTE && m[1] <= HIGH_NOTE) {
+      if (cfg.wrongRed && cfg.demo == MODE_LEARNING && songLive && !k.held && k.level <= 0 && m[1] >= LOW_NOTE && m[1] <= HIGH_NOTE) {
         k.color = CRGB::Red;
         k.level = 1.0f;
         k.flash = 0;
@@ -854,6 +880,8 @@ bool stepAnimations(float dtMs, uint32_t now) {
   return animating;
 }
 
+CRGB scaleBy(CRGB c, float f);  // below, with the hints
+
 // Two wavefronts per ripple, one each way. A splash, not a slide: they leave fast and slow down (ease-out, to
 // the same reach the first firmware had: RIPPLE_LEDS_PER_MS over the life), start a little white-hot and cool
 // into the key's color, and widen from 2 to 3.5 LEDs as they go; a faint wake glows behind each and fades with
@@ -863,12 +891,15 @@ void renderRipples(uint32_t now) {
   for (auto &r : ripples) {
     if (!r.on) continue;
     uint32_t age = now - r.start;
-    uint16_t life = rippleLife();
+    uint16_t life = rippleLife() * (0.6f + 0.6f * r.power);  // a hard press lasts and travels longer
     if (age >= life) { r.on = false; continue; }
-    float u = (float)age / life, fade = (1 - u) * (1 - u), amp = 0.7f * fade;
+    float u = (float)age / life, fade = (1 - u) * (1 - u), amp = (0.45f + 0.35f * r.power) * fade;
     float radius = life * RIPPLE_LEDS_PER_MS * (1 - fade);  // ease-out: 1 - (1 - u)^2
     float width = 2.0f + 1.5f * u;
-    CRGB crest = blend(r.color, CRGB::White, (uint8_t)(150 * fade * (1 - u)));  // white-hot early, then its color
+    CRGB base = r.color;
+    if (r.power < 1) base = scaleBy(base, 1 / r.power);  // the crest is full color; power sets amp instead
+    if (r.drift) base = blend(base, r.drift, (uint8_t)(190 * u));  // shifts along the palette as it goes
+    CRGB crest = blend(base, CRGB::White, (uint8_t)(150 * fade * (1 - u)));  // white-hot early, then its color
     for (int side = -1; side <= 1; side += 2) {
       float p = r.center + side * radius;
       int from = max(0, (int)floorf(min(p, r.center) - width)), to = min(activeLeds - 1, (int)ceilf(max(p, r.center) + width));
@@ -878,7 +909,7 @@ void renderRipples(uint32_t now) {
         float wake = d > 0 && d < radius ? 0.18f * (1 - d / radius) : 0;  // behind it, toward the key
         float level = max(w > 0 ? w : 0.0f, wake);
         if (level <= 0) continue;
-        CRGB c = w > wake ? crest : r.color;
+        CRGB c = w > wake ? crest : base;
         c.nscale8_video((uint8_t)(amp * level * 255));
         leds[i] += c;  // saturating add
       }
@@ -901,6 +932,19 @@ float hintFactor(const Key &k, uint32_t now) {
   float seen = age < cfg.hintRampMs ? HINT_START + (1 - HINT_START) * age / cfg.hintRampMs
                                     : 0.7f + 0.3f * breath / 255.0f;
   return HINT_PEAK * powf(seen, HINT_GAMMA);
+}
+
+// Learning: once a hint's ramp is done its note is due, and the key turns bright gold, breathing between 75% and
+// full: press it now. It fades over from the hand color in 120 ms so the change reads as one motion.
+#define GOLD_IN_MS 120
+CRGB hintColor(const Key &k, uint32_t now) {
+  CRGB c = scaleBy(k.hint, hintFactor(k, now));
+  uint32_t age = now - k.hintAt;
+  if (!cfg.hintRampMs || age < cfg.hintRampMs) return c;
+  uint32_t t = age - cfg.hintRampMs;
+  uint8_t breath = cfg.hintPulseMs ? sin8((uint8_t)((t % cfg.hintPulseMs) * 256 / cfg.hintPulseMs + 64)) : 255;
+  CRGB gold = scale8Color(UI_GOLD, 190 + scale8(breath, 65));
+  return t < GOLD_IN_MS ? blend(c, gold, (uint8_t)(t * 255 / GOLD_IN_MS)) : gold;
 }
 
 // c times f, for f from 0 to 2: above 1 the color is added to itself (saturating), so the half-strength
@@ -931,7 +975,7 @@ void renderKeys(uint32_t now) {
       if (k.flash > 0) c = blend(c, CRGB::White, (uint8_t)(k.flash * 200));
       c.nscale8_video((uint8_t)(k.level * 255));
     } else if (k.hint && hintsShown()) {
-      c = scaleBy(k.hint, hintFactor(k, now));  // the key layer wins over the hint while a key is lit
+      c = hintColor(k, now);  // the key layer wins over the hint while a key is lit
     }
     if (!c) continue;
     forEachLed(n, [&](int i) { leds[i] |= c; });  // overlapping keys: brightest channel wins
@@ -980,15 +1024,15 @@ void checkBootButton(uint32_t now) {
   bootWas = down;
   bootChangedAt = now;
   if (!down) return;  // act on the press, not the release
-  cfg.demo = cfg.demo == MODE_CALM ? MODE_DEMO : MODE_CALM;
+  cfg.demo = cfg.demo == MODE_LEARNING ? MODE_DEMO : MODE_LEARNING;
   if (demoSimple()) stopShows();
   saveSettings();
   printHello();  // the tester shows the new mode
   float mid = (activeLeds - 1) / 2.0f;
   if (demoSimple()) {  // demo: one ripple from the middle, the only thing it does
-    ripples[nextRipple] = {mid, UI_BLUE, millis(), true};
+    ripples[nextRipple] = {mid, UI_BLUE, millis(), true, 1.0f, UI_VIOLET};
     nextRipple = (nextRipple + 1) % MAX_RIPPLES;
-  } else {  // calm: a soft white glow
+  } else {  // learning: a soft white glow
     bloom(mid, CRGB(150, 150, 170), 1200, mid);
   }
   showLive = dirty = true;

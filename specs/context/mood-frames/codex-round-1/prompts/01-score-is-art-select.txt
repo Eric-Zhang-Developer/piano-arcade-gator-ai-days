@@ -1,0 +1,18 @@
+Please use your image generation tool to create exactly one image from the art brief below. Save it in the current directory as 01-score-is-art-select.png (PNG). Don't create, edit or delete any other file. When you're done, reply with just the saved file's path. Thank you!
+
+Art brief:
+Context: Piano Arcade is a Japanese-style arcade rhythm game played on a real 88-key digital piano in Chrome. Notes fall toward the keys, every note is judged to the millisecond (PERFECT, GREAT, GOOD, MISS), and a learning side tells you what to practice. The image is a high-fidelity UI design mockup of one screen, shown flat and straight-on as a 1920x1080 browser screenshot (16:9, no browser chrome, no device frame, no hands, no people). It should look like a shipped, award-quality game interface: crisp vector edges, generous spacing, a clear visual hierarchy, and only a little text, set large and spelled exactly as given. Avoid generic AI-art clichés: no lens flares, no random glowing particles everywhere, no chrome 80s lettering, no pixel art.
+
+Screen: the music select menu, direction "the score is the art": a dark arcade cabinet where classical engraving is the visual motif.
+
+Layout: pure black background (#000000) with a very faint dark-violet vignette at the edges. Left third: the focused song, large. Right two thirds: a vertical list of 6 song cards, the focused one slightly larger and outlined with a thin magenta (#ff2fd0) focus ring.
+
+The signature idea: each song's cover art ("jacket") is NOT text. It is the first bar of that piece's real sheet music, engraved in fine, glowing white-and-gold staff lines and noteheads on black, like an illuminated score lit from behind, cropped tight and slightly zoomed so the noteheads and the treble clef are big and beautiful. Each jacket has a subtle different accent tint (mint #5ef2c4, azure #6aa8ff, gold #ffe27a, magenta, cyan).
+
+Type: song titles in an elegant high-contrast serif (like a concert program), white. Composer names in small, quiet sans-serif, 60% white. Numbers (level, note count) in a bold, upright, sporty sans-serif, like an arcade scoreboard. No italic everywhere: the contrast between the classical serif and the arcade numerals is the whole concept.
+
+Focused song panel (left): large engraved-score jacket, title "Minuet in G", composer "Petzold", then a row with "LEVEL 3" and "128 NOTES", then one big primary button "PLAY" and one quieter secondary button "LEARN". Nothing else.
+
+List cards (right), top to bottom: "Twinkle, Twinkle" / "Traditional", "Minuet in G" / "Petzold" (focused), "Für Elise" / "Beethoven", "Clair de lune" / "Debussy", "Gymnopédie No. 1" / "Satie", "Prelude in E minor" / "Chopin". Each card: jacket on the left, serif title, small composer, and a level number on the right.
+
+Top left: the logo "PIANO ARCADE" in a refined wide sans-serif with a thin gold underline. Mood: a concert hall at night that happens to be an arcade. Calm, premium, confident, high contrast.

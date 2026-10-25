@@ -1,0 +1,12 @@
+Please use your image generation tool to create exactly one image from the art brief below. Save it in the current directory as 04-score-is-art-playfield.png (PNG). Don't create, edit or delete any other file. When you're done, reply with just the saved file's path. Thank you!
+
+Art brief:
+Context: Piano Arcade is a Japanese-style arcade rhythm game played on a real 88-key digital piano in Chrome. Notes fall toward the keys, every note is judged to the millisecond (PERFECT, GREAT, GOOD, MISS), and a learning side tells you what to practice. The image is a high-fidelity UI design mockup of one screen, shown flat and straight-on as a 1920x1080 browser screenshot (16:9, no browser chrome, no device frame, no hands, no people). It should look like a shipped, award-quality game interface: crisp vector edges, generous spacing, a clear visual hierarchy, and only a little text, set large and spelled exactly as given. Avoid generic AI-art clichés: no lens flares, no random glowing particles everywhere, no chrome 80s lettering, no pixel art.
+
+Screen: the gameplay playfield, direction "the score is the art" (matching a menu where classical engraving glows on black).
+
+Layout: pure black. The bottom 18% is a photoreal-flat rendering of a full 88-key piano keyboard seen straight-on from above, white and black keys. Above it, a calm highway of very thin vertical lanes aligned exactly with each key, barely visible dark-grey separators. Rounded note bars fall down the lanes toward a thin glowing hit line just above the keys: right-hand notes in mint (#5ef2c4), left-hand notes in azure (#6aa8ff); far notes dim, near notes bright, the note head white-hot exactly at the hit line where two notes are being hit with a soft white flare. The keys being pressed glow in the same mint and azure. Like Synthesia, calm and readable.
+
+Around the playfield (edges only, never over the lanes): top left, the song title "Minuet in G" in an elegant serif with a thin, faint engraved staff line under it showing the current bar's notes in gold; top right, a compact HUD panel: a huge upright numeral combo "87" with the small label "COMBO", a score "412,550", and a small "x4" multiplier badge in violet (#c47cff). Just above the hit line, a small gold "PERFECT" judgment and a tiny "-8ms" timing label.
+
+Mood: a dark concert hall, quiet center, bright edges. Premium, minimal, high contrast.

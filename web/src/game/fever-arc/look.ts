@@ -12,6 +12,10 @@ export const lookSettings = {
   tongues: 5, // per wall
   flameAlpha: 0.34, // per tongue: they add up where they overlap
   coreAlpha: 0.42, // the white-hot inner tongues
+  lick: 0.08, // between beats each tip dips at most this share of its height, slowly
+  sway: 0.18, // and sways at most this share of its half-width
+  shimmer: 0.08, // and its alpha dips at most this much
+  coreDrift: 0.06, // the white-hot core creeps up and back by this share
   beatSwell: 0.14, // the walls grow this much on each beat, falling back over it
   lineGlowPx: 46, // the hot line's glow above the line
   lineAlpha: 0.6, // the glow's peak, on the beat; 0.55 of it between beats
@@ -32,6 +36,9 @@ const easeOut = (u: number) => 1 - (1 - u) ** 3;
 /** Three sines: a cheap, smooth, deterministic flicker in about -1…1. */
 export const flicker = (a: number, seed: number): number =>
   Math.sin(a * 2.1 + seed) * 0.5 + Math.sin(a * 4.7 + seed * 1.7) * 0.3 + Math.sin(a * 9.3 + seed * 3.1) * 0.2;
+
+/** Two slow sines: the walls' calm breathing between beats, in -1…1, with no fast harmonic to jitter. */
+export const calm = (a: number, seed: number): number => Math.sin(a + seed) * 0.65 + Math.sin(a * 1.7 + seed * 1.3) * 0.35;
 
 /** How tall the walls stand, 0–1 of lookSettings.flameH: heat, plus a swell that peaks on each beat in the sustain. */
 export function flameScale(arc: Arc, still: boolean): number {
@@ -178,10 +185,15 @@ export function fireLook() {
             const seed = side * 11 + j * 2.3;
             const cx = w * (0.08 + 0.2 * j); // outer tongues tallest, inner ones short
             const bw = w * (0.34 - 0.03 * j);
-            const tall = h * (1 - 0.15 * j) * (0.72 + 0.28 * flicker(t * 2.2 + j * 1.3, seed));
-            const sway = flicker(t * 2.9 + j, seed + 5) * bw * 0.9;
-            drawTongue(ctx, side ? f.width - cx : cx, line, side ? -sway : sway, bw, tall, AMBER, EMBER, lookSettings.flameAlpha * a);
-            if (j < 3) drawTongue(ctx, side ? f.width - cx : cx, line, side ? -sway * 0.6 : sway * 0.6, bw * 0.45, tall * 0.5, HOT, AMBER, lookSettings.coreAlpha * a);
+            // Between beats the fire only breathes (Eric: "tiny, minimalistic"): a slow lick of each tip, a small sway,
+            // a little shimmer, and the core creeping up and back. The beat's swell stays the big move.
+            const lick = calm(t * 1.6 + j * 1.3, seed);
+            const tall = h * (1 - 0.15 * j) * (1 - lookSettings.lick * (0.5 - 0.5 * lick));
+            const sway = calm(t * 1.1 + j, seed + 5) * bw * lookSettings.sway;
+            const shimmer = 1 - lookSettings.shimmer * (0.5 - 0.5 * calm(t * 2.3 + j * 2, seed + 9));
+            const rise = 1 + lookSettings.coreDrift * calm(t * 0.9 + j, seed + 3);
+            drawTongue(ctx, side ? f.width - cx : cx, line, side ? -sway : sway, bw, tall, AMBER, EMBER, lookSettings.flameAlpha * a * shimmer);
+            if (j < 3) drawTongue(ctx, side ? f.width - cx : cx, line, side ? -sway * 0.6 : sway * 0.6, bw * 0.45, tall * 0.5 * rise, HOT, AMBER, lookSettings.coreAlpha * a * shimmer);
           }
         }
       }

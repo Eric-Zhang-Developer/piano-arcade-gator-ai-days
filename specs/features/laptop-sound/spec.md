@@ -64,8 +64,8 @@ and `/sim` pages. So this feature doesn't touch them. It makes a "Portable Grand
 
 **Laptop key presses**
 - In laptop mode (the virtual output active), a laptop key sounds from its own key event (through `/play`'s input
-  handler), not the frame loop. The target is under ~15 ms from key to sound. With the DGX connected, laptop keys stay silent, so there's
-  no double sound.
+  handler), not the frame loop. The target is under ~15 ms from key to sound. With the DGX connected, laptop keys
+  stay silent, so there's no double sound.
 - The key's release ends the note, through the same voice and pedal rules.
 
 **Volume**

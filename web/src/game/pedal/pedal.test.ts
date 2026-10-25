@@ -1,5 +1,6 @@
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { loadPedal, parsePedal, pedalEvents } from ".";
+import { loadPedal, parsePedal, PEDAL_SONGS, pedalEvents } from ".";
 
 describe("pedal.json", () => {
   it("reads pairs in beats, a re-pedal's down allowed on the last up", () => {
@@ -26,6 +27,27 @@ describe("pedal.json", () => {
     expect(warn).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith("/songs/local/x/pedal.json");
     warn.mockRestore();
+  });
+
+  it("a library song not in library.json asks for nothing, so it logs no 404", async () => {
+    serve({ ok: false, status: 404 });
+    expect(await loadPedal("not-listed")).toBeNull();
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  // The committed library: every listed song has a valid pedal.json inside its chart, and every pedal.json is listed.
+  it("library.json and the library's pedal.json files agree, each in order and inside its song", () => {
+    const songs = new URL("../../../public/songs/", import.meta.url);
+    const files = readdirSync(songs).filter((id) => existsSync(new URL(`${id}/pedal.json`, songs)));
+    expect([...PEDAL_SONGS].sort()).toEqual(files.sort());
+    for (const id of PEDAL_SONGS) {
+      const pedal = parsePedal(JSON.parse(readFileSync(new URL(`${id}/pedal.json`, songs), "utf8")));
+      expect(pedal, id).not.toBeNull();
+      const chart = JSON.parse(readFileSync(new URL(`${id}/chart.json`, songs), "utf8"));
+      const end = Math.max(...chart.notes.map((n: { beat: number; duration: number }) => n.beat + n.duration));
+      expect(pedal![0][0], id).toBeGreaterThanOrEqual(0);
+      expect(pedal!.at(-1)![1], id).toBeLessThanOrEqual(end);
+    }
   });
 });
 

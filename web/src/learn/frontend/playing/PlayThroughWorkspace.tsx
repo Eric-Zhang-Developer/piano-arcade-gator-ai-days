@@ -46,7 +46,7 @@ export function PlayThroughWorkspace() {
         {phase === 'playing' && <><h2>Playing through</h2><p role="status">Bar {Math.min(12, Math.floor(Math.max(0, playback.beat) / 4) + 1)} of 12</p></>}
         {phase === 'result' && <><h2>Play-through complete</h2><p>In that example take the long notes ran short: keep them full length, especially at the end of each phrase.</p><details className={styles.details}><summary>What this example shows</summary><p>A scripted result for this melody with the score at {music.bpm} bpm. No performance was recorded or assessed. Playing from memory, retention after a delay and transfer to new music are untested.</p></details></>}
         {error && <p role="alert" className={styles.error}>{error}</p>}
-        {!running && <details className={styles.details}><summary>About this preview</summary><p>A silent playhead demonstrates a full take. You can play along on your piano; this preview does not listen. No hints or corrective coaching appear during the take.</p></details>}
+        {!running && <details className={styles.details}><summary>About these examples</summary><p>A silent playhead demonstrates a full take. You can play along on your piano; this preview does not listen. No hints or corrective coaching appear during the take.</p></details>}
       </div>
       <div className={styles.actions}>
         {phase === 'ready' && <button type="button" className={styles.primary} onClick={begin}>See an example take</button>}

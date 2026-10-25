@@ -78,8 +78,14 @@ try {
   const page = await context.newPage();
   const pressed = async (id) => (await page.getByTestId(id).getAttribute("aria-pressed")) === "true";
   // Focus a song on / and wait for its preview's chart (Hands shows once the chart says it has both hands).
+  // A focus that lands before hydration is lost: React never sees the event, and song-finder's mount effect then
+  // moves focus to the row the panel shows (the first song). So focus until the row itself says it's the focused one.
   const focus = async (id, twoHands) => {
-    await page.getByTestId(`song-${id}`).focus();
+    const row = page.locator(`[data-testid="song-${id}"] [data-focused]`);
+    for (let i = 0; i < 40 && !(await row.count()); i++) {
+      await page.getByTestId(`song-${id}`).focus();
+      await page.waitForTimeout(250);
+    }
     await page.getByTestId("song-options").waitFor({ timeout: 60_000 });
     if (twoHands) await page.getByTestId("hands-R").waitFor({ timeout: 10_000 });
     // The chart has loaded: song-preview's PRACTICE 70% shows, or duo-select's PRACTICE turns on.

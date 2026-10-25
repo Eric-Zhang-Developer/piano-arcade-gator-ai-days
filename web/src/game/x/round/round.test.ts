@@ -72,24 +72,31 @@ describe("no feedback", () => {
   it("drops a note-on the piano echoed on channel 2 (same pitch and timestamp), and its note-off", () => {
     const f = echoFilter();
     f.heard(0x91, 65, 90, 1000.25);
-    expect(f.drop("on", 65, 1000.25)).toBe(true);
-    expect(f.drop("off", 65, 1300)).toBe(true);
+    expect(f.drop("on", 65, 90, 1000.25)).toBe(true);
+    expect(f.drop("off", 65, 0, 1300)).toBe(true);
     expect(f.counts()).toEqual({ received: 1, filtered: 1 });
   });
 
   it("the echo guard drops a channel-1 copy within its window of a send, and keeps a real press outside it", () => {
     const f = echoFilter();
-    f.sent(67, 5000);
-    expect(f.drop("on", 67, 5000 + roundSettings.echoWindowMs - 1)).toBe(true);
-    expect(f.drop("off", 67, 5200)).toBe(true);
-    expect(f.drop("on", 67, 5000 + roundSettings.echoWindowMs + 20)).toBe(false); // the player's own press: judged
-    expect(f.drop("off", 67, 5400)).toBe(false);
+    f.sent(67, 70, 5000);
+    expect(f.drop("on", 67, 70, 5000 + roundSettings.echoWindowMs - 1)).toBe(true);
+    expect(f.drop("off", 67, 0, 5200)).toBe(true);
+    expect(f.drop("on", 67, 70, 5000 + roundSettings.echoWindowMs + 20)).toBe(false); // the player's own press: judged
+    expect(f.drop("off", 67, 0, 5400)).toBe(false);
   });
 
   it("the player's own channel-1 note is never taken for an echo, whatever its timestamp", () => {
     const f = echoFilter();
     f.heard(0x90, 60, 80, 2000);
-    expect(f.drop("on", 60, 2000)).toBe(false);
+    expect(f.drop("on", 60, 80, 2000)).toBe(false);
     expect(f.counts().received).toBe(0);
+  });
+
+  it("a press in exact unison with an echo, at its own velocity, is judged: a round makes unisons on purpose", () => {
+    const f = echoFilter();
+    f.sent(65, 80, 3000);
+    expect(f.drop("on", 65, 64, 3000)).toBe(false);
+    expect(f.drop("on", 65, 80, 3000)).toBe(true); // the copy
   });
 });

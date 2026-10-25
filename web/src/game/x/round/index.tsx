@@ -75,7 +75,7 @@ function roundPlugin(): GamePlugin {
     for (const s of echoes(played, entry.intervalMs, entry.voices, scheduledUntil, until)) {
       const at = zero + s.atMs;
       output.send(s.bytes, at);
-      if ((s.bytes[0] & 0xf0) === 0x90) filter.sent(s.bytes[1], at);
+      if ((s.bytes[0] & 0xf0) === 0x90) filter.sent(s.bytes[1], s.bytes[2], at);
       rec.sent.push({ bytes: s.bytes, at, due: at });
     }
     scheduledUntil = until;
@@ -98,7 +98,7 @@ function roundPlugin(): GamePlugin {
         ...dev,
         start: (onEvent) =>
           dev.start((e) => {
-            if (entry && filter.drop(e.type, e.pitch, e.timeMs)) return; // the piano echoing a voice: never judged
+            if (entry && filter.drop(e.type, e.pitch, e.velocity, e.timeMs)) return; // the piano echoing a voice: never judged
             if (entry && ticker) played.push({ type: e.type, pitch: e.pitch, velocity: e.velocity, atMs: e.timeMs - zero });
             onEvent(e);
           }),

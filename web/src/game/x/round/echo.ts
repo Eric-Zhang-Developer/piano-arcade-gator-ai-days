@@ -59,9 +59,12 @@ export const silence = (voices: number): number[][] =>
 
 // The DGX echoes received MIDI back out (#429). Core's input carries no channel, so a second read-only listener on the
 // same port notes every note-on on channels 2–16 by its timestamp; a note-on core passes with the same pitch and
-// timestamp is that echo. A channel-1 copy is caught by the echo guard: same pitch, within echoWindowMs of a send.
+// timestamp is that echo. A channel-1 copy is caught by the echo guard: same pitch and velocity, within echoWindowMs of
+// a send. The velocity matters: a round puts one pitch in two voices on purpose, so a perfect press lands on its own
+// echo (the sim bot lost 6 of 32 that way), but a copy always carries the velocity it was sent with.
 export function echoFilter(windowMs = roundSettings.echoWindowMs) {
-  const guard = echoGuard(windowMs);
+  const guard = echoGuard(windowMs); // keyed by pitch and velocity together
+  const key = (pitch: number, velocity: number) => pitch * 128 + velocity;
   const foreign: { pitch: number; timeStamp: number }[] = [];
   const dropped = new Set<number>(); // pitches whose note-on was dropped, so their note-off is dropped too
   let received = 0;
@@ -73,11 +76,11 @@ export function echoFilter(windowMs = roundSettings.echoWindowMs) {
       foreign.push({ pitch, timeStamp });
       if (foreign.length > 256) foreign.splice(0, foreign.length - 256);
     },
-    sent: guard.sent,
+    sent: (pitch: number, velocity: number, atMs: number) => guard.sent(key(pitch, velocity), atMs),
     // true: drop it. Called for every input event, in order.
-    drop(type: "on" | "off", pitch: number, timeMs: number): boolean {
+    drop(type: "on" | "off", pitch: number, velocity: number, timeMs: number): boolean {
       if (type === "off") return dropped.delete(pitch);
-      const echo = foreign.some((f) => f.pitch === pitch && Math.abs(f.timeStamp - timeMs) < 0.5) || guard.isEcho(pitch, timeMs);
+      const echo = foreign.some((f) => f.pitch === pitch && Math.abs(f.timeStamp - timeMs) < 0.5) || guard.isEcho(key(pitch, velocity), timeMs);
       if (echo) {
         dropped.add(pitch);
         filtered++;

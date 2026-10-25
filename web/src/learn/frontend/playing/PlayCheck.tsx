@@ -36,10 +36,10 @@ export function PlayCheck({ node, items, itemId }: PlayingNode & { itemId?: stri
     <aside className={styles.guide} aria-label="Check">
       <div className={styles.guideBody}>
         <PianoLine status={take.status} />
-        <h2>{title}</h2>
+        {/* #1276: the verdict and what was off, heard as they come; mounted before the take starts. */}
+        <div aria-live="polite"><h2>{title}</h2>{result && <OffList result={result} />}</div>
         {take.phase === 'playing' && <p>Keep going to the end, even after a slip.</p>}
         <TakeCount phase={take.phase} beat={take.beat} beats={beats} />
-        {result && <OffList result={result} />}
         {result && !result.verdict.pass && <p className={styles.note}>
           <Link href={`/learn/practice?node=${encodeURIComponent(node.id)}`}>Practise this passage</Link> with help, then come back for another cold take.
         </p>}

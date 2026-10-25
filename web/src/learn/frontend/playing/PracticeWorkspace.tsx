@@ -5,12 +5,14 @@ import { music, passageBeats, targetTempo } from './model';
 import { Score, ScoreSource } from './Score';
 import { useLearningSessions } from '../LearningSessions';
 import { usePlayback } from './usePlayback';
+import { useKeepFocus } from './TakeParts';
 import styles from './playing.module.css';
 
 export function PracticeWorkspace() {
   const { practice: state, dispatchPractice: dispatch } = useLearningSessions();
   const [demo, setDemo] = useState(false);
   const playback = usePlayback();
+  const actions = useKeepFocus();
   useEffect(() => () => { setDemo(false); dispatch({ type: 'stop' }); }, [dispatch]);
   const locked = state.busy || demo;
   async function hear() {
@@ -46,7 +48,7 @@ export function PracticeWorkspace() {
         {state.stage === 'drill' && <p className={styles.repetitions}>{state.repetitions} of 4 repetitions</p>}
         {state.error && <p role="alert" className={styles.error}>{state.error}</p>}
       </div>
-      <div className={styles.actions}>
+      <div className={styles.actions} ref={actions}>
         {locked ? <button type="button" className={styles.secondary} onClick={stop}>Stop {demo ? 'demo' : 'example'}</button>
           : state.stage === 'feedback' ? <button type="button" className={styles.primary} onClick={() => dispatch({ type: 'drill' })}>Practise the held note</button>
           : state.stage === 'drill' ? <button type="button" className={styles.primary} onClick={() => dispatch({ type: 'repeat' })}>I played it</button>

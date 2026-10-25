@@ -41,6 +41,11 @@
 .hint { color:var(--pa-ink-dim); }
 .empty { color:var(--pa-ink-dim); padding:12px 14px; border:1px dashed var(--pa-line); }
 .error { color:var(--pa-ink); padding:12px 14px; border:1px solid var(--pa-secondary); }
+/* The map's h1 (#1273): named for a screen reader, the map itself is the heading a sighted learner sees. */
+.srOnly { position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+/* While Next plans (#1274): where the companion will stand, in the data face, dim; empty and sizeless once it shows. */
+.planning { position:absolute; left:24px; top:24px; margin:0; color:var(--pa-ink-dim); font:16px/1.5 var(--pa-font-data),system-ui,sans-serif; }
+@media (max-width:1300px) { .planning { left:16px; top:18px; } }
 .songs { display:flex; flex-wrap:wrap; gap:8px; margin:0; padding:0; list-style:none; }
 /* Too narrow for the map, the companion and the rail side by side: stack them and scroll, never overprint. */
 @media (max-width:900px) { .body { display:flex; flex-direction:column; overflow:auto; } .mapStage { flex:1 0 auto; } .mapField { flex:1 0 420px; } .rail { flex:none; overflow:visible; border-left:0; border-top:1px solid var(--pa-line); } }

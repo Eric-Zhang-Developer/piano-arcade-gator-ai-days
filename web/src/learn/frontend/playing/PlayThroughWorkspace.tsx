@@ -5,6 +5,7 @@ import { music, totalBeats } from './model';
 import { Score, ScoreSource } from './Score';
 import { useLearningSessions } from '../LearningSessions';
 import { usePlayback } from './usePlayback';
+import { useKeepFocus } from './TakeParts';
 import styles from './playing.module.css';
 
 export function PlayThroughWorkspace() {
@@ -13,6 +14,7 @@ export function PlayThroughWorkspace() {
   const [error, setError] = useState<string | null>(null);
   const playback = usePlayback();
   const { start, stop } = playback;
+  const actions = useKeepFocus();
   useEffect(() => () => send('stop'), [send]);
   useEffect(() => {
     if (phase !== 'countin') return;
@@ -47,7 +49,7 @@ export function PlayThroughWorkspace() {
         {phase === 'result' && <><h2>Play-through complete</h2><p>In that example take the long notes ran short: keep them full length, especially at the end of each phrase.</p></>}
         {error && <p role="alert" className={styles.error}>{error}</p>}
       </div>
-      <div className={styles.actions}>
+      <div className={styles.actions} ref={actions}>
         {phase === 'ready' && <button type="button" className={styles.primary} onClick={begin}>See an example take</button>}
         {running && <button type="button" className={styles.secondary} onClick={() => { stop(); send('stop'); }}>Stop example</button>}
         {phase === 'result' && <Link className={styles.primary} href="/learn">Back to map</Link>}

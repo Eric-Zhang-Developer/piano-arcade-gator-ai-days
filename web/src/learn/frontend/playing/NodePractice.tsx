@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { MAX_HELP_SHARE } from '../mastery/engine';
 import { type Hands, handsOf, notesFor, passageBeats, type PlayingNode } from './attempt';
 import { Passage } from './Passage';
-import { OffList, PianoLine, TakeCount, TakeWarnings } from './TakeParts';
+import { OffList, PianoLine, TakeCount, TakeWarnings, useKeepFocus } from './TakeParts';
 import { useTake } from './useTake';
 import styles from './playing.module.css';
 
@@ -16,6 +16,7 @@ const limit = percent(MAX_HELP_SHARE);
  */
 export function NodePractice({ node, items }: PlayingNode) {
   const take = useTake();
+  const actions = useKeepFocus();
   const [index, setIndex] = useState(0);
   const item = items[index];
   const [bpm, setBpm] = useState(item.bpm);
@@ -65,11 +66,11 @@ export function NodePractice({ node, items }: PlayingNode) {
     <aside className={styles.guide} aria-label="Take">
       <div className={styles.guideBody}>
         <PianoLine status={take.status} />
-        <h2>{title}</h2>
+        {/* #1276: the verdict and what was off, heard as they come; mounted before the take starts. */}
+        <div aria-live="polite"><h2>{title}</h2>{result && <OffList result={result} />}</div>
         {line && <p>{line}</p>}
         <TakeCount phase={take.phase} beat={take.beat} beats={beats} />
         {result && <>
-          <OffList result={result} />
           <p className={styles.verdictLine} data-counts={result.counts}>
             {result.counts ? `Help ${percent(result.attempt.helpShare)}. This take counts.` : `Help ${percent(result.attempt.helpShare)}. Takes with more than ${limit} help don't count, so this one is practice.`}
           </p>
@@ -77,7 +78,7 @@ export function NodePractice({ node, items }: PlayingNode) {
         {!busy && !result && wholeHelp && <p className={styles.note}>At {Math.round(bpm)} bpm with {handLabel(hands)}, the whole take is help, so it won&apos;t count.</p>}
         <TakeWarnings result={result} silent={take.silent} />
       </div>
-      <div className={styles.actions}>
+      <div className={styles.actions} ref={actions}>
         {busy ? <button type="button" className={styles.primary} onClick={take.stop}>Stop</button> : <>
           <button type="button" className={styles.primary} disabled={!piano} onClick={() => void take.start(options)}>{result ? 'Try again' : 'Start take'}</button>
           <button type="button" className={styles.secondary} onClick={() => void take.listen(options)}>Hear it</button>

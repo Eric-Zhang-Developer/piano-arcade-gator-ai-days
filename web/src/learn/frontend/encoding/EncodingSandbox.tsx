@@ -151,7 +151,7 @@ function TwinkleSandbox() {
           role="tab"
           id={`tab-${t.id}`}
           aria-selected={tab === t.id}
-          aria-controls={`panel-${t.id}`}
+          aria-controls={tab === t.id ? `panel-${t.id}` : undefined} /* only the selected panel is rendered (#1278) */
           tabIndex={tab === t.id ? 0 : -1}
           className={s.tab}
           data-tab={t.id}

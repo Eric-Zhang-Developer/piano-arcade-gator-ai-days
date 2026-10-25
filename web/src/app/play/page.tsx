@@ -229,7 +229,7 @@ export default function Play() {
     const resize = () => {
       w = window.innerWidth;
       h = window.innerHeight;
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = Math.min(window.devicePixelRatio || 1, settings.pixelRatioCap);
       for (const c of [canvas, ...layerRefs.current]) {
         if (!c) continue;
         c.width = w * dpr;
@@ -432,9 +432,9 @@ export default function Play() {
     <main style={{ position: "fixed", inset: 0, overflow: "hidden" }}>
       <div ref={backgroundRef} style={canvasStyle} />
       <canvas ref={highwayRef} style={canvasStyle} />
-      {plugins.map((p, i) => (
-        <canvas key={p.id} ref={(c) => void (layerRefs.current[i] = c)} style={canvasStyle} />
-      ))}
+      {/* A canvas only for a plugin that draws, still at its plugin's index, so the crash guard and the frame find it.
+          Every canvas is a full-window layer the compositor blends each frame, drawn on or not. */}
+      {plugins.map((p, i) => p.draw && <canvas key={p.id} ref={(c) => void (layerRefs.current[i] = c)} style={canvasStyle} />)}
 
       {phase === "playing" && (
         <PauseMenu

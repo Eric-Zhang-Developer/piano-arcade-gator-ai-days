@@ -40,11 +40,11 @@ function burst(c: Chart) {
   const { ctx, colors } = recorder();
   const frame = { nowMs: 520, width: 800, height: 600, judgmentLineY: 500, keyX: () => ({ x: 100, width: 20 }) } as unknown as Frame;
   p.draw!(ctx, frame);
-  p.draw!(ctx, { ...frame, nowMs: 560 }); // wisps spawned last frame, now drawn
+  p.draw!(ctx, { ...frame, nowMs: 560 }); // sparks spawned last frame, now drawn
   return colors;
 }
 
-it("a left-hand hit's flare, pillar and wisps take the left hand's color", () => {
+it("a left-hand hit's flare, pillar and sparks take the left hand's color", () => {
   const colors = burst(chart(["R", "L"]));
   expect(colors.some((c) => c.startsWith(rgb(handColor("L"))))).toBe(true);
   expect(colors.some((c) => c.startsWith(rgb(handColor("R"))))).toBe(false);
@@ -54,6 +54,22 @@ it("a one-hand chart's burst keeps today's note color", () => {
   const colors = burst(chart(["L", "L"]));
   expect(colors.some((c) => c.startsWith(rgb(settings.noteColor)))).toBe(true);
   expect(colors.some((c) => c.startsWith(rgb(handColor("L"))))).toBe(false);
+});
+
+// White: the sparks' cores, plus the flare's white centre (a gradient stop, once a frame).
+const whites = (colors: string[]) => colors.filter((c) => c.startsWith("rgba(255, 255, 255,")).length;
+
+it("every hit bursts sparks with white cores (duo-hud); reduced motion draws none, the flare alone", () => {
+  const moving = whites(burst(chart(["R", "R"])));
+  const real = globalThis.matchMedia;
+  globalThis.matchMedia = ((q: string) => ({ matches: q.includes("reduce") })) as unknown as typeof matchMedia;
+  try {
+    const still = whites(burst(chart(["R", "R"])));
+    expect(still).toBeGreaterThan(0); // the flare still draws
+    expect(moving - still).toBeGreaterThanOrEqual(10); // a PERFECT's burst of cores, gone under reduced motion
+  } finally {
+    globalThis.matchMedia = real;
+  }
 });
 
 it("fever's edges stop above the 500 ms mark, so they never cover the edge lanes' next notes (#280)", () => {

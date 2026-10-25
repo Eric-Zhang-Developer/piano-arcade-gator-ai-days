@@ -12,7 +12,7 @@ export const juiceSettings = {
   flareMs: 320,
   pillarPx: 140, // a light pillar above the hit key (Nostalgia)
   missFlashMs: 220,
-  wisps: { PERFECT: 32, GREAT: 18, GOOD: 8 },
+  sparks: { PERFECT: 14, GREAT: 9, GOOD: 5 }, // a hit's burst up from the line (duo-hud): short, crisp streaks
   bright: { PERFECT: 1, GREAT: 0.7, GOOD: 0.45 },
   sparkEveryMs: 35, // a held hit note's spark stream
   laneLightAlpha: 0.13,
@@ -22,7 +22,7 @@ export const juiceSettings = {
   missColor: "150, 150, 160",
 };
 
-type Judgment = keyof typeof juiceSettings.wisps;
+type Judgment = keyof typeof juiceSettings.sparks;
 
 // One plugin for every visual effect. Effects rise above the line into empty space and are clipped out of the
 // rectangle of any note due within 500 ms, so they never hide the next thing to play.
@@ -150,15 +150,16 @@ export function juiceVisual(): GamePlugin {
         ctx.fillRect(0, 0, f.width, line * 0.25);
       }
 
-      // New hits become wisps; held hit notes stream sparks.
-      for (const h of pending) {
+      // New hits burst sparks; held hit notes stream them. Reduced motion: none, the flare alone marks the hit.
+      const still = reducedMotion();
+      for (const h of still ? [] : pending) {
         const { x, width } = f.keyX(h.pitch);
-        particles = spawn(particles, "wisp", s.wisps[h.judgment], x, width, line, s.bright[h.judgment], random, h.color);
+        particles = spawn(particles, "spark", s.sparks[h.judgment], x + width * 0.2, width * 0.6, line, s.bright[h.judgment], random, h.color);
       }
       pending = [];
       sparkClock += dt;
       for (; sparkClock >= s.sparkEveryMs; sparkClock -= s.sparkEveryMs) {
-        for (const [p, c] of heldHits) {
+        for (const [p, c] of still ? [] : heldHits) {
           const { x, width } = f.keyX(p);
           particles = spawn(particles, "spark", 1, x + width * 0.3, width * 0.4, line, 0.8, random, c);
         }
@@ -217,16 +218,22 @@ export function juiceVisual(): GamePlugin {
         ctx.fillRect(x + width * 0.15, line - s.pillarPx, width * 0.7, s.pillarPx);
       }
 
+      // Each spark a streak as long as its speed, in the hand's color with a white core at its head.
       for (const p of particles) {
         const a = alphaOf(p);
         if (a <= 0.01) continue;
-        ctx.fillStyle = hexAlpha(p.bright > 0.9 ? "#ffffff" : (p.color ?? settings.noteColor), a);
-        ctx.fillRect(p.x, p.y, p.size, p.size);
+        const len = Math.max(p.size * 2, -p.vy * 40);
+        ctx.fillStyle = hexAlpha(p.color ?? settings.noteColor, a);
+        ctx.fillRect(p.x - p.size / 2, p.y, p.size + 1, len);
+        ctx.fillStyle = hexAlpha("#ffffff", a * p.bright);
+        ctx.fillRect(p.x, p.y, 1, len * 0.5);
       }
       ctx.restore();
     },
   };
 }
+
+const reducedMotion = () => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function hexAlpha(hex: string, a: number) {
   const n = parseInt(hex.slice(1), 16);

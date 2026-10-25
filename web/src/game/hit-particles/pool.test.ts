@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { seededRandom } from "../sim/fake";
-import { DEAD, DUST, FLOATS, governor, hitParticleSettings as S, particlePool, spawnCap } from "./pool";
+import { DEAD, DUST, FLOATS, WISP, governor, hitParticleSettings as S, particlePool, spawnCap } from "./pool";
 
 const white = [1, 1, 1];
 
@@ -38,6 +38,21 @@ describe("pool", () => {
     pool.spawn(DUST, 20, 0, 1, 0, white, 1, 0, r); // more than the pool: every slot, once
     pool.dirty((s, c) => runs.push([s, c]));
     expect(runs).toEqual([[0, 6], [6, 2], [0, 2], [2, 6], [0, 2]]);
+  });
+});
+
+describe("ribbons (#1373)", () => {
+  it("a wisp is a run of segments sharing one origin and seed, each marking its place along the ribbon", () => {
+    const pool = particlePool(64, (n) => n);
+    pool.spawn(WISP, 2, 100, 20, 500, white, 1, 0, seededRandom(1), 4);
+    const slot = (i: number) => pool.data.slice(i * FLOATS, i * FLOATS + 5);
+    expect(pool.head).toBe(8);
+    for (const start of [0, 4]) for (let k = 0; k < 4; k++) {
+      expect(slot(start + k)[0]).toBe(slot(start)[0]); // x
+      expect(slot(start + k)[3]).toBe(slot(start)[3]); // seed
+      expect(slot(start + k)[4]).toBeCloseTo(WISP + k / 4); // kind + place
+    }
+    expect(slot(4)[3]).not.toBe(slot(0)[3]); // the next ribbon has its own seed
   });
 });
 

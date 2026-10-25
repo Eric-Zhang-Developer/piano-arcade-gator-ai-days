@@ -24,7 +24,8 @@ import {
 export const duoPanelSettings = {
   maxCells: 64, // BY BAR's cells: past this many bars, a cell holds 2 (or more) so each stays ≥ 8 px at 1280 wide
   maxNumbered: 16, // up to this many cells, each shows its accuracy under it; past it, only its accessible label
-  gator: "/learning/mentor-gator-avatar.png", // the learning lane's existing art
+  gator: "/learning/companion-gator.svg", // the mascot (spec: mascot), the same gator as the select and /learn
+  happyGator: "/mascot/d-happy.svg", // its happy pose (Eric, 2026-10-25: "A." with D), for a take with no weak run
 };
 
 // The take's numbers for both panels. A loop or wait take has neither: bar-loop's and wait-mode's own panels cover it.
@@ -204,8 +205,8 @@ export function Tutor({ d, chart, params }: { d: DuoTake; chart: Chart; params: 
   }, [params, chart.id, run, hand]);
   return (
     <div data-testid="duo-tutor" style={{ display: "flex", alignItems: "center", gap: 20, textAlign: "left" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- a fixed 240 px avatar from public/, nothing to optimize */}
-      <img src={duoPanelSettings.gator} alt="The tutor, a gator" width={72} height={72} style={{ flexShrink: 0, width: "clamp(72px, 5.5vw, 120px)", height: "auto" }} />
+      {/* eslint-disable-next-line @next/next/no-img-element -- a small static SVG from public/, nothing to optimize */}
+      <img src={run ? duoPanelSettings.gator : duoPanelSettings.happyGator} alt="The tutor, a gator" width={72} height={72} style={{ flexShrink: 0, width: "clamp(72px, 5.5vw, 120px)", height: "auto" }} />
       <div style={{ alignSelf: "stretch", width: 1, background: "var(--pa-secondary)" }} />
       <div style={{ flex: 1, minWidth: 0, fontSize: "clamp(16px, 1.25vw, 28px)", lineHeight: 1.35, textWrap: "pretty" }}>
         <p data-testid="duo-tutor-line" style={{ margin: 0, color: "var(--pa-ink)" }}>

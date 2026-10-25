@@ -15,8 +15,13 @@
   to act. Choices of what to learn (pick a skill, a mode, a lesson) go: Next picks.
 - **Each PR that applies it** lists, in its Design section, every kept button and text with why it is essential, and
   every removal. A check that asserts a removed element is fixed in the same PR, with the reason in the PR.
-- **First application, `/learn`:** a student with no answers yet goes straight to the diagnostic (once per tab, so
-  its Stop lands on the map). A returning student sees the painted map, the agent's next activity started by one
-  action, and the goal songs. `/learn/explore` is deleted: nothing links to it, and its redirect served no one.
+- **First application, `/learn`:** a student with no answers yet picks up to three goal songs once, then goes to the
+  diagnostic (once per tab, so its Stop lands on the map). A returning student sees the painted map, the agent's next
+  activity started by one action, and one Goals link. `/learn/explore` is deleted: nothing links to it, and its
+  redirect served no one.
+- **Goals are milestones, on their own page.** Goals change only on `/learn/goals`, where each shows mastered tagged
+  skills out of all tagged skills, replayed from attempts and never invented. The map keeps no goal panel or rail.
+- **Seven items or fewer** per screen at 1280×720. The graph counts as one; an expandable group counts as one and holds
+  seven or fewer when open; items hidden until focus don't count; the site's nav band is counted apart.
 - **How to undo:** put back the removed element (each PR's Design section lists them) and restore the redirect page
   from git history (`web/src/app/learn/explore/page.tsx`).

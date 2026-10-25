@@ -17,6 +17,7 @@ export const stageSettings = {
   warmupMs: 1000, // frames this soon after mount don't count (shader compile)
   star: "#cfd8ff",
   starStreak: 6, // star length in fever, world units
+  riseSpeed: 34, // fever's updraft, world units a second at full heat: the view is about 150 tall
 };
 
 export const STAGE_KEY = "pianoArcade.stage";

@@ -1,7 +1,9 @@
 "use client";
 // The select's sections on screen (spec: main-page): the chip strip over the list, which jumps to a section, and each
 // section's header. select-layout places them; sectionsOf decides what they are.
+import { useMemo, useRef } from "react";
 import { kitChip, MonoLabel } from "../duo-tokens";
+import { headerFrames, useMoveAnimation } from "../select-motion";
 import type { Section } from ".";
 import css from "./main-page.module.css";
 
@@ -58,10 +60,13 @@ export function SectionChips({
   );
 }
 
+// A chip that lands on this section settles its header in (select-motion).
 export function SectionHeader({ section }: { section: Section }) {
   const n = section.songs.length;
+  const ref = useRef<HTMLHeadingElement>(null);
+  useMoveAnimation(ref, useMemo(() => headerFrames(section.key), [section.key]));
   return (
-    <h3 className={css.header} id={sectionId(section.key)} data-testid={`section-${section.key}`}>
+    <h3 ref={ref} className={css.header} id={sectionId(section.key)} data-testid={`section-${section.key}`}>
       <span>{section.label}</span>
       <MonoLabel style={{ fontSize: READ }}>{n === 1 ? "1 song" : `${n} songs`}</MonoLabel>
     </h3>

@@ -1,4 +1,6 @@
-// Each goal song's title, copied from its chart (web/public/songs/<id>/chart.json) so the map doesn't load 40 charts to
+import type { Colour, SongTag } from '../mastery/schema';
+
+// Each goal song's title, copied from its chart (web/public/songs/<id>/chart.json) so the goal picker doesn't load 40 charts to
 // label its chips (#1277). learn-a11y.test.tsx fails when a chart's title or the curriculum's songs move; regenerate then.
 export const songTitles: Readonly<Record<string, string>> = {
   "alla-turca": "Rondo alla turca",
@@ -45,3 +47,28 @@ export const songTitles: Readonly<Record<string, string>> = {
 
 /** A goal song's title, or its id when it has no chart. */
 export const songTitle = (songId: string) => songTitles[songId] ?? songId;
+
+/** How many songs one page of the goal picker shows, so the page and its range label stay within seven things to read. */
+export const songsPerPage = 6;
+
+export type SongPage = { songs: readonly SongTag[]; fewest: number; most: number };
+
+/**
+ * The library in pages of six, fewest tagged skills first: the skill count is the one real measure of how much a song
+ * asks that every song has, so each page can say honestly what range of songs it holds.
+ */
+export function songPages(songs: readonly SongTag[]): readonly SongPage[] {
+  const ordered = [...songs].sort((a, b) => a.nodeIds.length - b.nodeIds.length || songTitle(a.songId).localeCompare(songTitle(b.songId)));
+  const pages: SongPage[] = [];
+  for (let start = 0; start < ordered.length; start += songsPerPage) {
+    const page = ordered.slice(start, start + songsPerPage);
+    pages.push({ songs: page, fewest: page[0].nodeIds.length, most: page[page.length - 1].nodeIds.length });
+  }
+  return pages;
+}
+
+/** A goal song as a milestone: how many of the skills it is tagged with the student has mastered, out of all of them. */
+export function songMilestone(song: SongTag, colours: ReadonlyMap<string, Colour>): { mastered: number; total: number } {
+  const skills = new Set(song.nodeIds);
+  return { mastered: [...skills].filter(id => colours.get(id) === 'mastered').length, total: skills.size };
+}

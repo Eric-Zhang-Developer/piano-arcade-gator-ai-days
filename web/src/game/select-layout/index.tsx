@@ -7,7 +7,7 @@
 // song's Hands and Speed (song-options).
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
 import type { Chart } from "../../contracts";
 import { adaptUrl, songPhrases, start } from "../adaptive-chunks/next";
 import { FocusPanel, SongRow } from "../duo-select/Select";
@@ -27,6 +27,7 @@ import { Finder, useFinder } from "../song-finder/Finder";
 import { readLastPlayed } from "../song-finder";
 import { sectionsOf } from "../main-page";
 import { SectionChips, SectionHeader, sectionId } from "../main-page/Sections";
+import { FocusBar, motionList, useFocusMotion } from "../select-motion";
 
 // footer: the left column's last row, in flow under the focused song (the Options button, first-run's link). Outside the
 // per-song section, so it isn't remounted on every ↑/↓.
@@ -48,6 +49,16 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
   const levelParams = new URLSearchParams(level === "easy" ? "level=easy" : "");
   const bestOf = (id: string) => best[recordKey(id, levelParams)];
   const [chart, setChart] = useState<{ id: string; chart: Chart } | null>(null); // the focused song's, for its Easy level
+  const motion = useFocusMotion(); // select-motion: the bar, the list's scroll and every focus move
+  const { setList, setBar } = motion;
+
+  // Focus that moved without moveFocus (the first paint, a sort, Find) takes the bar with it; so does a resize.
+  useLayoutEffect(() => motion.follow(), [motion, focused, shown]);
+  useEffect(() => {
+    const again = () => motion.follow();
+    addEventListener("resize", again);
+    return () => removeEventListener("resize", again);
+  }, [motion]);
 
   useEffect(() => {
     if (!song) return;
@@ -104,10 +115,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
     const links = [...e.currentTarget.querySelectorAll("a")];
     const next = links[focused + step];
     if (!next) return; // at the list's ends: no move, no sound
-    uiSound("move", 0, { key: shown[focused + step]?.key });
-    next.focus();
-    const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    next.scrollIntoView({ block: "center", behavior: still ? "auto" : "smooth" });
+    motion.moveFocus(next, { cause: e.repeat ? "repeat" : "key", step, key: shown[focused + step]?.key, scroll: "center" });
   }
 
   // A plain click or Enter (a click with detail 0) moves into the stage; modifier and middle clicks stay links.
@@ -115,6 +123,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
     uiSound("confirm", 0, { key: song?.key }); // Enter on a link clicks it too
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
+    motion.rest();
     goToStage(e.currentTarget.getAttribute("href")!, router);
   }
 
@@ -123,10 +132,8 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
     const header = document.getElementById(sectionId(key));
     const first = header?.parentElement?.querySelector("a");
     if (!header || !first) return;
-    uiSound("move", 0, { key: song?.key });
-    first.focus({ preventScroll: true });
-    const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    header.scrollIntoView({ block: "start", behavior: still ? "auto" : "smooth" });
+    const i = shown.findIndex((s) => first.dataset.testid === `song-${s.id}`);
+    motion.moveFocus(first, { cause: "chip", step: Math.sign(i - focused), key: song?.key, section: key, scroll: header });
   }
 
   const playHref = (id: string) => withOptions(withLevel(`/play?song=${id}`, level), options[id]);
@@ -140,7 +147,6 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
       <div className={styles.left}>
         {song && (
           <FocusPanel
-            key={song.id}
             id={song.id}
             title={song.title}
             composer={song.composer}
@@ -151,14 +157,16 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
             best={bestOf(song.id)}
             onPlay={() => {
               uiSound("confirm", 0, { key: song.key });
+              motion.rest();
               goToStage(playHref(song.id), router);
             }}
             onPractice={practiceHref ? () => router.push(practiceHref) : null}
             onLearn={() => router.push(learnHref(song.id))}
             onWatch={() => router.push(watchUrl(song.id))}
           >
-            <LevelToggle normal={song.level} chart={chart?.id === song.id ? chart.chart : null} />
-            <SongPreview id={song.id} />
+            {/* Keyed, as the whole panel was: the panel stays mounted now (select-motion), these start over per song. */}
+            <LevelToggle key={`level-${song.id}`} normal={song.level} chart={chart?.id === song.id ? chart.chart : null} />
+            <SongPreview key={`preview-${song.id}`} id={song.id} />
           </FocusPanel>
         )}
         {footer && <div className={styles.footer}>{footer}</div>}
@@ -172,7 +180,8 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
           onJump={jump}
         />
         {/* Nested lists, one per section: the outer one owns ↑/↓, which walk every link in order, headers or not. */}
-        <ol className={styles.list} onKeyDown={onKeyDown} aria-label="Songs">
+        <ol ref={setList} className={`${styles.list} ${motionList}`} onKeyDown={onKeyDown} onKeyUp={() => motion.keyUp()} aria-label="Songs">
+          <FocusBar place={setBar} />
           {sections.map((sec) => (
             <li key={sec.key} className={styles.section} aria-labelledby={sectionId(sec.key)}>
               <SectionHeader section={sec} />
@@ -188,7 +197,7 @@ export function MusicSelect({ songs, footer }: { songs: Song[]; footer?: ReactNo
                         data-testid={`song-${s.id}`}
                         onClick={onPlay}
                         onFocus={() => setFocusedId(s.id)}
-                        onMouseEnter={(e) => document.activeElement?.matches("input") || e.currentTarget.focus({ preventScroll: true })} // hover highlights too (song-preview), but never takes focus from the finder's box, where a typed P would start practice
+                        onMouseEnter={(e) => document.activeElement?.matches("input") || motion.moveFocus(e.currentTarget, { cause: "hover", step: Math.sign(i - focused), scroll: null })} // hover highlights too (song-preview), but never takes focus from the finder's box, where a typed P would start practice
                       >
                         <SongRow title={s.title} composer={s.composer} level={s.level} roll={s.roll} focused={i === focused} />
                       </Link>

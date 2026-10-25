@@ -6,7 +6,9 @@ export const hitParticleSettings = {
   capPerSec: 6000, // spawns written in any 1 s window, at most (decision hit-particles-spawn)
   burstShare: 0.2, // of the cap, spendable at once: a chord's hit; the rest refills evenly over the second
   dust: { PERFECT: 300, GREAT: 200, GOOD: 110 }, // specks per hit
-  wisps: { PERFECT: 1, GREAT: 0.6, GOOD: 0.4 }, // crescents per hit, on average (fractions round at random)
+  wisps: { PERFECT: 1.5, GREAT: 1, GOOD: 0.6 }, // ribbons per hit, on average (fractions round at random)
+  wispsPerSecHeld: 3, // ribbons a second from each held hit key (decision hit-particles-wisps-reference)
+  wispSegments: 24, // slots per ribbon: each a streak a little further back along the same rising path (#1373)
   bright: { PERFECT: 1, GREAT: 0.8, GOOD: 0.6 },
   streamPerSec: 600, // specks per second from each held hit key
   reducedMotion: 0.25, // of every spawn under prefers-reduced-motion
@@ -24,14 +26,16 @@ export type Judgment = keyof typeof hitParticleSettings.dust;
 export const DUST = 0;
 export const WISP = 1;
 
-// One slot: x, y, born (ms on the layer's clock), seed, kind, bright, r, g, b.
+// One slot: x, y, born (ms on the layer's clock), seed, kind, bright, r, g, b. A ribbon's segments share x and seed,
+// and kind carries the segment's place along it: kind + segment / segments.
 export const FLOATS = 9;
 export const DEAD = -1e9; // born long ago: the shader skips it
 
 export interface Pool {
   data: Float32Array; // allocated once; the GPU buffer mirrors it
   head: number; // the next slot written; it wraps, overwriting the oldest
-  spawn(kind: number, n: number, x: number, width: number, y: number, rgb: readonly number[], bright: number, nowMs: number, random: () => number): number;
+  // n groups of `segments` slots; the cap counts slots, and a capped last group is a shorter ribbon
+  spawn(kind: number, n: number, x: number, width: number, y: number, rgb: readonly number[], bright: number, nowMs: number, random: () => number, segments?: number): number;
   dirty(each: (start: number, count: number) => void): void; // the slots written since the last call, in up to two runs
 }
 
@@ -43,15 +47,22 @@ export function particlePool(slots = hitParticleSettings.slots, cap = spawnCap()
   const pool: Pool = {
     data,
     head: 0,
-    spawn(kind, n, x, width, y, rgb, bright, nowMs, random) {
-      const k = cap(n, nowMs);
+    spawn(kind, n, x, width, y, rgb, bright, nowMs, random, segments = 1) {
+      const k = cap(Math.floor(n) * segments, nowMs);
+      let at = x;
+      let seed = 0;
       for (let i = 0; i < k; i++) {
         const o = pool.head * FLOATS;
-        data[o] = x + random() * width;
+        const segment = i % segments;
+        if (segment === 0) {
+          at = x + random() * width;
+          seed = random();
+        }
+        data[o] = at;
         data[o + 1] = y;
         data[o + 2] = nowMs;
-        data[o + 3] = random();
-        data[o + 4] = kind;
+        data[o + 3] = seed;
+        data[o + 4] = kind + segment / segments;
         data[o + 5] = bright;
         data[o + 6] = rgb[0];
         data[o + 7] = rgb[1];

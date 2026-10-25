@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useId, useMemo, useRef, useState, type MouseEvent } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { kitChip } from '../../../game/duo-tokens';
+import { kitButton } from '../../../game/duo-tokens';
 import { DuoScope } from '../duo';
 import { curriculum } from '../mastery/curriculum';
 import { learnerId } from '../mastery/diagnostic/learner';
@@ -9,9 +10,8 @@ import { remoteStore } from '../mastery/remote';
 import type { Attempt, Colour, Goals } from '../mastery/schema';
 import { layoutCurriculum } from './layout';
 import { anchorLabels, followLabels, type AnchoredLabel, branchCurve, curve, mapSize, overviewCamera, placeLabels, presentation, projectGraph, viewPoints } from './projection';
-import { activityHref, activityLabel, fetchNext, maxGoals, noGoals, paint, shortTitle, tally, toggleGoal, type NextResult } from './student';
+import { activityHref, activityLabel, fetchNext, noGoals, paint, shortTitle, tally, type NextResult } from './student';
 import { GraphCompanion } from './GraphCompanion';
-import { songTitle } from './song-titles';
 import { useGuidedEntry } from './GuidedEntry';
 import type { PreparedActivity } from './prepared';
 import styles from './graph.module.css';
@@ -29,7 +29,7 @@ const legendBand = 56;
 const nextPatience = 8000;
 /** Painted dots draw larger than unknown ones so the student's own progress reads at the overview zoom. */
 const dotRadius = (depth: number, painted: boolean) => depth === 0 ? 9 : depth === 1 ? (painted ? 5.5 : 4.5) : painted ? 4 : 2.8;
-/** The student's own graph: the built curriculum, painted from their attempts, with their goal songs and the planner's next step. */
+/** The student's own graph: the built curriculum, painted from their attempts, with the planner's next step. Goals live on /learn/goals. */
 export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
   const { active, begin } = useGuidedEntry();
   const router = useRouter();
@@ -38,7 +38,6 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
   const [viewport, setViewport] = useState({ ...mapSize });
   const [flightCaptions, setFlightCaptions] = useState<AnchoredLabel[]>([]);
   const [loaded, setLoaded] = useState<Loaded | null>(null);
-  const [goalsSaved, setGoalsSaved] = useState(true);
   const [answer, setAnswer] = useState<{ for: Loaded; result: NextResult } | null>(null);
   useEffect(() => {
     const element = stage.current; if (!element) return;
@@ -79,15 +78,6 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
   }, [projected, recommendedId, viewport.width, field, priority, painted]);
   const labels = active ? followLabels(flightCaptions, points) : restingLabels;
   const backbone = world.relationships.filter(edge => pointById.has(edge.from) && pointById.has(edge.to));
-  function chooseGoal(songId: string) {
-    if (!loaded) return;
-    const previous = loaded.goals, goals = { songIds: [...toggleGoal(previous.songIds, songId)] };
-    setLoaded({ ...loaded, goals });
-    store.setGoals(loaded.learner, goals).then(saved => {
-      setGoalsSaved(saved);
-      if (!saved) setLoaded(current => current && { ...current, goals: previous });
-    });
-  }
   function enterActivity(event: MouseEvent<HTMLButtonElement>) {
     if (!first) return guide.onStart();
     const element = stage.current, pet = frame.current?.querySelector<HTMLImageElement>('[data-gator-perch]');
@@ -98,7 +88,7 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
     setFlightCaptions(anchorLabels(restingLabels, projected));
     if (!begin({ source: {x:source.left+source.width/2-bounds.left,y:source.top+source.height/2-bounds.top}, target:{x:target.screenX,y:target.screenY}, bounds:{left:bounds.left,top:bounds.top,width:bounds.width,height:bounds.height}, href:href.split('?')[0],title:titles.get(first.nodeId) ?? first.nodeId }, event.timeStamp, () => router.push(href))) router.push(href);
   }
-  const songs = curriculum.songs, chosen = loaded?.goals.songIds ?? [];
+  const goalsLink = kitButton('secondary');
   return <DuoScope className={styles.home} aria-busy={!!active || !loaded} aria-label="Your map">
     <h1 className={styles.srOnly}>Your map</h1>
     <div className={styles.body}>
@@ -119,6 +109,7 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
           })}
           {labels.map(label => <g key={`label-${label.id}`} className={styles.caption} data-label-id={label.id} data-target={label.id === recommendedId} pointerEvents="none"><rect className={styles.labelClearance} x={label.x} y={label.y} width={label.width} height={label.height}/><text x={label.x+label.width/2} y={label.y+label.height-6} textAnchor="middle" className={label.root?styles.groupLabel:styles.nodeLabel}>{label.text}</text></g>)}
         </svg>
+        <Link href="/learn/goals" className={`${goalsLink.className} ${styles.goalsLink}`} style={goalsLink.style}>Goals</Link>
         <ul className={styles.legend} aria-label="Map colours">{legend.map(colour => <li key={colour} data-state={colour}><span className={styles.swatch} aria-hidden="true"/>{colourWords[colour]}</li>)}</ul>
         </div>
         <p className={styles.planning} role="status">{!next && 'Planning your next step…'}</p>
@@ -126,17 +117,6 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
           ? <GraphCompanion title={shortTitle(titles.get(first.nodeId) ?? first.nodeId)} reason={first.reason} actionLabel={activityLabel(first.activity)} complete={false} entering={!!active} onStart={enterActivity}/>
           : <GraphCompanion eyebrow="Next isn't connected, so this is the prepared activity." title={guide.activity.title} reason={guide.activity.reason} actionLabel={guide.actionLabel} complete={guide.complete} entering={!!active} onStart={enterActivity}/>)}
       </div>
-      <aside className={styles.rail} aria-labelledby={`${uid}-goals`}>
-        <h2 id={`${uid}-goals`}>Goal songs</h2>
-        <p className={styles.hint}>Pick up to {maxGoals}. Next plans toward them.</p>
-        {songs.length
-          ? <ul className={styles.songs}>{songs.map(song => {
-            const lit = chosen.includes(song.songId), full = !lit && chosen.length >= maxGoals, chip = kitChip(lit);
-            return <li key={song.songId}><button type="button" className={chip.className} style={{ ...chip.style, fontSize: 16, textAlign: 'left' }} aria-pressed={lit} disabled={!loaded || full} onClick={() => chooseGoal(song.songId)}>{songTitle(song.songId)}</button></li>;
-          })}</ul>
-          : <p className={styles.empty}>No songs are tagged in the curriculum yet.</p>}
-        {!goalsSaved && <p className={styles.error} role="alert">Your goals could not be saved on this device.</p>}
-      </aside>
     </div>
   </DuoScope>;
 }

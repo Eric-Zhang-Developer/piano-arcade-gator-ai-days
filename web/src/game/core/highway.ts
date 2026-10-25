@@ -1,7 +1,7 @@
 // The highway: a flat-or-mildly-tilted lane per key, notes falling to the keyboard. Canvas 2D, no React.
 import type { Chart, Frame, Hand, Judgment } from "../../contracts";
-import { drawBarLines, type BarLine } from "../bar-lines";
-import { drawBlackKeyLanes } from "../black-key-lanes";
+import type { BarLine } from "../bar-lines";
+import { drawField } from "../highway-field";
 import { noteColorFor } from "../hand-colors";
 import { hitLinePath } from "../hit-line";
 import { meterLayout } from "../fever-gauge";
@@ -177,31 +177,31 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
   const beatMs = msPerBeat(chart.bpm);
   const pxPerMs = line / settings.lookaheadMs;
 
-  const alpha = s.backdropAlpha ?? 1;
-  if (alpha < 1) ctx.clearRect(0, 0, L.width, L.height); // a translucent fill would smear last frame
-  ctx.fillStyle = alpha < 1 ? `rgba(0,0,0,${alpha})` : "#000";
-  ctx.fillRect(0, 0, L.width, L.height);
-  drawBlackKeyLanes(ctx, L); // the lanes under black keys a shade lighter, under everything else
-
-  // Faint octave lines at each C, so the lanes read against the keys.
-  ctx.strokeStyle = "rgba(255,255,255,0.08)";
-  ctx.lineWidth = 1;
-  for (let p = L.lowPitch; p <= L.highPitch; p++) {
-    if (p % 12 !== 0) continue;
-    const x = L.keyX(p).x;
-    ctx.beginPath();
-    ctx.moveTo(L.project(x, 0), 0);
-    ctx.lineTo(x, line);
-    ctx.stroke();
-  }
-  if (s.barLines) drawBarLines(ctx, L, s.barLines, s.nowMs);
+  // A key that hit a note lights in that note's color; one that hit nothing, white. Its light fades on release
+  // (key-polish), and the field pools it up the lane (highway-field), so both read as one light.
+  const color = noteColorFor(chart);
+  const lit = (p: number) => {
+    const hand = s.pressedHand?.get(p);
+    return hand ? color(hand) : settings.keyLitColor;
+  };
+  const fading = releases(ctx, s, lit);
+  const light = (p: number): [string | null, number] => {
+    if (s.pressed.has(p)) return [lit(p), 1];
+    const f = fading.get(p);
+    return f ? [f.light, 1 - (s.nowMs - f.atMs) / notePolish.releaseMs] : [null, 1];
+  };
+  const lights = [...s.pressed, ...fading.keys()].map((pitch) => {
+    const [c, strength] = light(pitch);
+    return { pitch, color: c ?? settings.keyLitColor, strength };
+  });
+  // highway-field: the fill, haze, lane lines, spill, and bar lines with their downbeat, all under the notes.
+  drawField(ctx, L, { nowMs: s.nowMs, backdropAlpha: s.backdropAlpha, barLines: s.barLines, lights });
 
   // Notes, clipped to the highway so they slide into the keys.
   ctx.save();
   ctx.beginPath();
   ctx.rect(0, 0, L.width, line);
   ctx.clip();
-  const color = noteColorFor(chart);
   for (const n of chart.notes) {
     const state = s.noteState.get(n.id);
     const startMs = n.beat * beatMs;
@@ -262,18 +262,8 @@ export function drawHighway(ctx: CanvasRenderingContext2D, L: Layout, chart: Cha
   ctx.restore();
 
   // Keyboard (key-skin): whites, pressed whites (so their glow lies over their neighbours), then blacks on top. Its
-  // top edge is the judgment line. A key that hit a note lights in that note's color; one that hit nothing, white.
-  const lit = (p: number) => {
-    const hand = s.pressedHand?.get(p);
-    return hand ? color(hand) : settings.keyLitColor;
-  };
+  // top edge is the judgment line.
   const kbH = L.keyboardHeight;
-  const fading = releases(ctx, s, lit);
-  const light = (p: number): [string | null, number] => {
-    if (s.pressed.has(p)) return [lit(p), 1];
-    const f = fading.get(p);
-    return f ? [f.light, 1 - (s.nowMs - f.atMs) / notePolish.releaseMs] : [null, 1];
-  };
   for (const down of [false, true])
     for (let p = L.lowPitch; p <= L.highPitch; p++) {
       if (L.isBlack(p) || s.pressed.has(p) !== down) continue;

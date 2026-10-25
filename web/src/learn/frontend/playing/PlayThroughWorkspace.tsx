@@ -37,7 +37,7 @@ export function PlayThroughWorkspace() {
   const running = phase === 'countin' || phase === 'playing';
   return <section className={styles.workspace} aria-label="Independent play-through">
     <div className={styles.stage}>
-      <header className={styles.header}><div><h1>{music.title}</h1></div><span className={styles.preview}>Interactive demo</span></header>
+      <header className={styles.header}><div><h1>{music.title}</h1></div></header>
       <div className={styles.scoreArea}><Score whole beat={phase === 'playing' ? playback.beat : -1} /><ScoreSource /></div>
     </div>
     <aside className={styles.guide} aria-label="Play-through controls">

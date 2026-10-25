@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 import { curriculum } from './mastery/curriculum';
-import { songTitles } from './graph/song-titles';
+import { songPages, songTitles } from './graph/song-titles';
 
 // learn-a11y (#1273–#1278): what /learn says to a screen reader and a keyboard, from the server render.
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: () => {}, replace: () => {} }), usePathname: () => '/learn' }));
@@ -14,6 +14,7 @@ vi.mock('./playing/useTake', () => ({
 
 const { GuidedEntryProvider } = await import('./graph/GuidedEntry');
 const { MasteryGraphHome } = await import('./graph/MasteryGraphHome');
+const { GoalPicker } = await import('./graph/GoalPicker');
 const { preparedActivity } = await import('./graph/prepared');
 const { NoPassage } = await import('./playing/NoPassage');
 const { PlayCheck } = await import('./playing/PlayCheck');
@@ -54,9 +55,14 @@ describe('verdicts are heard (#1276)', () => {
 });
 
 describe('goal chips read titles (#1277)', () => {
-  it('show each song by its chart title, never its id', () => {
+  it('live on /learn/goals: the map links there and lists none', () => {
     const html = map();
-    for (const { songId } of curriculum.songs) {
+    expect(html).toMatch(/<a[^>]*href="\/learn\/goals"[^>]*>Goals<\/a>/);
+    for (const { songId } of curriculum.songs) expect(html).not.toContain(`>${songTitles[songId]}</button>`);
+  });
+  it('show each song by its chart title, never its id', () => {
+    const html = renderToStaticMarkup(<GoalPicker chosen={[]} onToggle={() => {}} />);
+    for (const { songId } of songPages(curriculum.songs)[0].songs) {
       expect(html).toContain(`>${songTitles[songId].replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;')}</button>`);
       expect(html).not.toContain(`>${songId}</button>`);
     }

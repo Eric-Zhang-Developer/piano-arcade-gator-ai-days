@@ -1,6 +1,8 @@
 import { curriculum } from '@/learn/frontend/mastery/curriculum';
 import { NodePractice, NoPassage, playingNode, PracticeWorkspace } from '@/learn/frontend/playing';
 
+export const metadata = { title: 'Practice' };
+
 type Params = { node?: string | string[] };
 
 export default async function Page({ searchParams }: { searchParams: Promise<Params> }) {

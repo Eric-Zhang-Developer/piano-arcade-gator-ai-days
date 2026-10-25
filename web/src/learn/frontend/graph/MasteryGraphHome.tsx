@@ -11,9 +11,11 @@ import { layoutCurriculum } from './layout';
 import { anchorLabels, followLabels, type AnchoredLabel, branchCurve, curve, mapSize, overviewCamera, placeLabels, presentation, projectGraph, viewPoints } from './projection';
 import { activityHref, activityLabel, fetchNext, maxGoals, noGoals, paint, shortTitle, tally, toggleGoal, type NextResult } from './student';
 import { GraphCompanion } from './GraphCompanion';
+import { songTitle } from './song-titles';
 import { useGuidedEntry } from './GuidedEntry';
 import type { PreparedActivity } from './prepared';
 import styles from './graph.module.css';
+import learning from '../learning.module.css';
 export type MasteryGraphHomeProps = { guide: { activity: PreparedActivity; href: string; actionLabel: string; complete: boolean; onStart: () => void } };
 const colourWords: Record<Colour, string> = { unknown: 'Not yet', 'in-progress': 'In progress', mastered: 'Mastered' };
 const legend: readonly Colour[] = ['unknown', 'in-progress', 'mastered'];
@@ -99,6 +101,7 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
   }
   const songs = curriculum.songs, chosen = loaded?.goals.songIds ?? [];
   return <DuoScope className={styles.home} aria-busy={!!active || !loaded} aria-label="Your map">
+    <h1 className={learning.srOnly}>Your map</h1>
     <div className={styles.body}>
       <div ref={frame} className={styles.mapStage} data-entering={!!active} data-camera-scale={camera.scale} data-camera-x={camera.x} data-camera-y={camera.y}>
         <div ref={stage} className={styles.mapField}>
@@ -119,6 +122,7 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
         </svg>
         <ul className={styles.legend} aria-label="Map colours">{legend.map(colour => <li key={colour} data-state={colour}><span className={styles.swatch} aria-hidden="true"/>{colourWords[colour]}</li>)}</ul>
         </div>
+        <p className={styles.planning} role="status">{!next && 'Planning your next step…'}</p>
         {next && (first
           ? <GraphCompanion title={shortTitle(titles.get(first.nodeId) ?? first.nodeId)} reason={first.reason} actionLabel={activityLabel(first.activity)} complete={false} entering={!!active} onStart={enterActivity}/>
           : <GraphCompanion eyebrow="Next isn't connected, so this is the prepared activity." title={guide.activity.title} reason={guide.activity.reason} actionLabel={guide.actionLabel} complete={guide.complete} entering={!!active} onStart={enterActivity}/>)}
@@ -129,7 +133,7 @@ export function MasteryGraphHome({ guide }: MasteryGraphHomeProps) {
         {songs.length
           ? <ul className={styles.songs}>{songs.map(song => {
             const lit = chosen.includes(song.songId), full = !lit && chosen.length >= maxGoals, chip = kitChip(lit);
-            return <li key={song.songId}><button type="button" className={chip.className} style={{ ...chip.style, fontSize: 16 }} aria-pressed={lit} disabled={!loaded || full} onClick={() => chooseGoal(song.songId)}>{song.songId}</button></li>;
+            return <li key={song.songId}><button type="button" className={chip.className} style={{ ...chip.style, fontSize: 16 }} aria-pressed={lit} disabled={!loaded || full} onClick={() => chooseGoal(song.songId)}>{songTitle(song.songId)}</button></li>;
           })}</ul>
           : <p className={styles.empty}>No songs are tagged in the curriculum yet.</p>}
         {!goalsSaved && <p className={styles.error} role="alert">Your goals could not be saved on this device.</p>}

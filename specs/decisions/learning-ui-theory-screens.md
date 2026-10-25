@@ -18,7 +18,9 @@
     in `web/src/learn/frontend/duo/` and the `--learn-*` aliases, and swap to Eric's shared kit when `duo-tokens`
     lands. Saira is upright, never italic, per `visual-direction.md`. Repointing the aliases restyles the existing
     `/learn` screens too; that is intended.
-  - **Publishing.** Per `AGENTS.md`: PRs, squash-merged after green CI (Andres).
+  - **Publishing.** Per `AGENTS.md`: PRs, squash-merged after green CI (Andres). No orchestrator or integration
+    branch: each slice ships as its own `fix(learning-ui)` PR, and the next batch starts once the one before it has
+    merged (Andres, 2026-10-25).
   - **Route (default, reversible).** A) under the coach's paths; B) `/learn/api/chat`, inside learning-ui's paths.
     **B**, so the work ships under one `fix(learning-ui)` PR title.
   - **Model (default, reversible).** Claude through `ANTHROPIC_API_KEY`, read server-side only (never a
@@ -29,5 +31,6 @@
     device, not a mastery claim.
 - **How to undo:** chat: remove `web/src/app/learn/api/chat/` and the chat panel, and restore "No fake chat" in
   `specs/features/learning-ui/spec.md`. Done: drop the gate check and the saved progress. Look: point the `--learn-*`
-  aliases back at `--pa-*`. Route, model and gate rule: change the route path, set `LEARN_CHAT_MODEL`, or edit the
-  gate rule in `web/src/learn/frontend/theory/`.
+  aliases back at `--pa-*`. Publishing: gather the slices on one integration branch again, shipped as one PR. Route,
+  model and gate rule: change the route path, set `LEARN_CHAT_MODEL`, or edit the gate rule in
+  `web/src/learn/frontend/theory/`.

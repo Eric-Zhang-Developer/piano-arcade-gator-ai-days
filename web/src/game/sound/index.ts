@@ -10,6 +10,7 @@ import { showsMoment } from "../record-moment/timing";
 import { takeOutcome } from "../records";
 import { isWaitMode } from "../wait-mode";
 import { ignitionFor } from "../fever-arc";
+import { landingSettings } from "../results-landing/timeline";
 
 export type Sound = "stinger" | "sweep" | "fanfare" | "drumroll" | "rankHit" | "miss";
 
@@ -190,6 +191,7 @@ export function scheduler(o: SchedulerOptions): (e: GameEvent, audioAtZero: numb
     if (broke) atMs = [...atMs.filter((s) => s.sound !== "miss"), { sound: "comboBreak", ms: e.atMs }];
     if (e.type === "songStart") atMs.push({ sound: "start", ms: e.atMs });
     if (kind && !o.wait) atMs.push({ sound: CLEAR_VOICE[kind], ms: e.atMs });
+    if (e.type === "songEnd") atMs.push({ sound: "tutorPop", ms: e.atMs + stampImpactMs() + landingSettings.afterGapMs }); // as the tutor fades in
     if (e.type === "songEnd") atMs.push({ sound: "settle", ms: e.atMs + stampImpactMs() + soundSettings.settleAfterHitMs });
     if (e.type === "songEnd" && o.newRecord()) atMs.push({ sound: "newRecord", ms: e.atMs + newRecordImpactMs() });
     return atMs.map(({ sound, ms }) => ({

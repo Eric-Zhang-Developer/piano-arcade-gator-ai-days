@@ -22,6 +22,7 @@ export const PADS: Pad[] = [
   { sound: "allPerfect", name: "All perfect", when: "the last note, every hit PERFECT", lenS: 4.6 },
   { sound: "drumroll", name: "Drumroll", when: "the song ends, before the rank (not after a full combo)", lenS: 1.2 },
   { sound: "rankHit", name: "Rank thud", when: "the rank stamp lands", lenS: 1.1 },
+  { sound: "tutorPop", name: "Tutor pop", when: "the gator tutor appears, 250 ms after the rank", lenS: 0.5 },
   { sound: "settle", name: "Results settle", when: "600 ms after the rank", lenS: 1.8 },
   { sound: "newRecord", name: "New record", when: "NEW RECORD stamps", lenS: 1.3 },
   // The menu sounds (ui-sound-family), through their own player at their own level

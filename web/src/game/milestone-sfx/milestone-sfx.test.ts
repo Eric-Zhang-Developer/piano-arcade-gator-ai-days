@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GameEvent, Results } from "../../contracts";
 import { stampImpactMs } from "../rank-stamp";
+import { landingSettings } from "../results-landing/timeline";
 import { eventSounds, savePrefs, scheduler, soundSettings, type SchedulerOptions } from "../sound";
 import { comboLift, playVoice, voiceSettings, type Voice } from "./voices";
 import { clearWatch, levelEnvelope, loudnessGain, loudnessSettings, newRecordImpactMs } from ".";
@@ -46,6 +47,7 @@ describe("never per hit", () => {
       "allPerfect@75000", // the clear card, on the last note; the 300 step on that note gives way to it
       // NOSTALGIA's FULL COMBO sequence is the fanfare, and the room stays quiet under it: no fanfare, no drumroll
       `rankHit@${76000 + stampImpactMs()}`,
+      `tutorPop@${76000 + stampImpactMs() + landingSettings.afterGapMs}`,
       `settle@${76000 + stampImpactMs() + soundSettings.settleAfterHitMs}`,
       `newRecord@${76000 + newRecordImpactMs()}`,
     ]);

@@ -4,7 +4,7 @@
 import type { ClearVoice } from ".";
 import { stampImpactMs } from "../rank-stamp";
 
-export type Voice = "stinger" | "sweep" | "fanfare" | "drumroll" | "rankHit" | ClearVoice | "newRecord" | "start" | "comboBreak" | "settle";
+export type Voice = "stinger" | "sweep" | "fanfare" | "drumroll" | "rankHit" | ClearVoice | "newRecord" | "start" | "comboBreak" | "settle" | "tutorPop";
 
 export const voiceSettings = {
   levels: {
@@ -20,6 +20,7 @@ export const voiceSettings = {
     start: 0.12,
     comboBreak: 0.1,
     settle: 0.08,
+    tutorPop: 0.1,
   } satisfies Record<Voice, number>,
   attackS: 0.005, // fast enough to read as a hit, slow enough not to click
   feverPeakS: 0.2, // fever-moment's edge flash peaks at 200 ms: the riser lands its chord there
@@ -203,6 +204,10 @@ export function playVoice(ctx: AudioContext, out: AudioNode, v: Voice, t: number
     case "comboBreak": // a deflate: a soft tone sagging a fifth, low-passed so it never reads as a note
       osc(ctx, out, "triangle", semis(-12), t, 0.4, L, 0, 1200).frequency.exponentialRampToValueAtTime(semis(-19), t + 0.35);
       noise(ctx, out, t, 0.25, L * 0.3, "lowpass", 700);
+      return;
+    case "tutorPop": // the gator tutor arriving: a round bubble pop, rising, with a tiny bright blip after
+      osc(ctx, out, "sine", semis(0), t, 0.12, L).frequency.exponentialRampToValueAtTime(semis(14), t + 0.06);
+      osc(ctx, out, "sine", semis(19), t + 0.07, 0.1, L * 0.4);
       return;
     case "settle": // the results settling in: a low warm add9 chord, swelling then fading
       for (const n of [-24, -17, -12, -10]) {

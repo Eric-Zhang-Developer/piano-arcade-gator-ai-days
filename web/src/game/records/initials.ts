@@ -1,7 +1,7 @@
 "use client";
 // A take's initials entry (spec: records; record-moment shares it). The state lives here, per take, so every
 // component showing the initials sees the same letters; only the one passed `listen` takes the keys.
-import { useEffect, useSyncExternalStore } from "react";
+import { useLayoutEffect, useSyncExternalStore } from "react";
 import { browserStorage, loadRecords, saveRecords, setInitials } from "./store";
 
 export interface Initials {
@@ -59,7 +59,9 @@ export const initialsOf = (chartId: string, date: string): Initials => takes.get
 export function useInitials(chartId: string, date: string, listen: boolean): Initials {
   const state = useSyncExternalStore(subscribe, () => initialsOf(chartId, date), () => NONE);
 
-  useEffect(() => {
+  // A layout effect, not useEffect: it attaches while the moment is committed, before the browser can deliver a key.
+  // A passive effect ran 60–134 ms after NEW RECORD appeared (4× CPU), so a letter typed at once was lost.
+  useLayoutEffect(() => {
     if (!listen || state.done) return;
     // Capture phase, so Enter saves the initials instead of pressing the focused Retry button.
     const onKey = (e: KeyboardEvent) => {

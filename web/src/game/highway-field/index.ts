@@ -5,6 +5,7 @@
 import type { GameEvent, GamePlugin } from "../../contracts";
 import { barLineSettings, drawBarLabels, type BarLine } from "../bar-lines";
 import { drawBlackKeyLanes } from "../black-key-lanes";
+import { meterLayout } from "../fever-gauge";
 import type { Layout } from "../core/highway";
 import { settings } from "../core/settings";
 import { handColorSettings } from "../hand-colors";
@@ -15,10 +16,10 @@ export const fieldSettings = {
   seamAlpha: 0.04, // the E/F seam, the octave's other half step (B/C is the C line itself)
   downbeatAlpha: 0.18, // a bar line's peak as it reaches the hit line
   downbeatMs: 120,
-  horizonHeight: 0.12, // of the highway's height: the haze band at the far end
-  horizonLuma: 0.05, // its brightest row, at the top
+  horizonHeight: 0.12, // of the highway's height: the haze, fading down from the far end's visible edge
+  horizonLuma: 0.08, // its brightest, at that edge
   horizonColor: "#7cb7ff", // cool, the primary's light side (ui-tokens good)
-  feverLuma: 0.08,
+  feverLuma: 0.12,
   feverColor: "#cfd8ff", // fever-stage's star (stageSettings.star): the stage exports no live tint; decision highway-field-fever
   feverEaseMs: 400, // fever-stage's feverEaseMs, so the haze and the stars turn together
   spillPx: 40, // a held key's light, up its own lane
@@ -64,9 +65,15 @@ export const barAlpha = (y: number, line: number, k: number) => {
   return rest + (fieldSettings.downbeatAlpha - rest) * k;
 };
 
-// The haze: its peak luma at the top, easing to 0 at horizonHeight down.
-export function horizon(y: number, line: number, peak: number): number {
-  const t = y / (line * fieldSettings.horizonHeight);
+// Where the far end shows: the HUD band and fever strip cover the highway's top (fever-gauge's meterLayout).
+export const farEdge = (L: Pick<Layout, "width" | "judgmentLineY">) => {
+  const { bar } = meterLayout(L.width, L.judgmentLineY);
+  return bar.y + bar.h;
+};
+
+// The haze: its peak luma down to the far edge, easing to 0 over horizonHeight below it.
+export function horizon(y: number, line: number, peak: number, edge = 0): number {
+  const t = (y - edge) / (line * fieldSettings.horizonHeight);
   return t >= 1 ? 0 : peak * (1 - Math.max(0, t)) ** 2;
 }
 
@@ -140,15 +147,16 @@ const linePitches = (L: Layout) => {
 
 function bakeHaze(cache: FieldCache, L: Layout, dpr: number, color: string, peak: number): Surface {
   const line = L.judgmentLineY;
+  const edge = farEdge(L);
   const w = Math.max(1, Math.round(L.width * dpr));
-  const h = Math.max(1, Math.ceil(line * fieldSettings.horizonHeight * dpr));
+  const h = Math.max(1, Math.ceil((edge + line * fieldSettings.horizonHeight) * dpr));
   const s = cache.make(w, h);
   const ctx = s.getContext("2d") as Ctx;
   const img = ctx.createImageData(w, h);
   const [r, g, b] = rgb(color);
   const k = 1 / luma(color); // alpha over black that gives a luma of 1
   for (let y = 0; y < h; y++) {
-    const a = horizon((y + 0.5) / dpr, line, peak) * k * 255;
+    const a = horizon((y + 0.5) / dpr, line, peak, edge) * k * 255;
     if (a <= 0) continue;
     for (let x = 0; x < w; x++) {
       const i = (y * w + x) * 4;
@@ -215,20 +223,24 @@ export function drawField(ctx: Ctx, L: Layout, s: FieldState, cache: FieldCache 
   ctx.fillRect(0, 0, L.width, L.height);
   drawBlackKeyLanes(ctx as CanvasRenderingContext2D, L); // off (tint 0) unless Eric turns them back on
 
-  const key = layoutKey(L, dpr);
-  if (cache.baked?.key !== key) cache.baked = bakeField(L, dpr, cache);
-  const { calm, hot, lines } = cache.baked;
-  const hazeH = Math.ceil(line * fieldSettings.horizonHeight * dpr) / dpr;
   ctx.save();
-  ctx.drawImage(calm, 0, 0, L.width, hazeH);
-  const heat = s.heat ?? feverHeat(s.nowMs, still);
-  if (heat > 0) {
-    ctx.globalAlpha = heat;
-    ctx.drawImage(hot, 0, 0, L.width, hazeH);
-    ctx.globalAlpha = 1;
+  // The baked layer, unless there's nothing to bake into (unit tests, the server).
+  if (cache !== shared || typeof OffscreenCanvas !== "undefined" || typeof document !== "undefined") {
+    const key = layoutKey(L, dpr);
+    if (cache.baked?.key !== key) cache.baked = bakeField(L, dpr, cache);
+    const { calm, hot, lines } = cache.baked;
+    const hazeH = Math.ceil((farEdge(L) + line * fieldSettings.horizonHeight) * dpr) / dpr;
+    ctx.drawImage(calm, 0, 0, L.width, hazeH);
+    const heat = s.heat ?? feverHeat(s.nowMs, still);
+    if (heat > 0) {
+      ctx.globalAlpha = heat;
+      ctx.drawImage(hot, 0, 0, L.width, hazeH);
+      ctx.globalAlpha = 1;
+    }
+    ctx.globalCompositeOperation = "lighten";
+    ctx.drawImage(lines, 0, 0, L.width, L.height);
   }
   ctx.globalCompositeOperation = "lighten";
-  ctx.drawImage(lines, 0, 0, L.width, L.height);
 
   // The spill: one light with the key's own, from the same color and release fade.
   for (const l of s.lights) {

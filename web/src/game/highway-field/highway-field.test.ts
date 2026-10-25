@@ -11,6 +11,7 @@ import {
   depth,
   downbeat,
   drawField,
+  farEdge,
   feverHeat,
   fieldSettings,
   horizon,
@@ -93,10 +94,13 @@ it("the spill: full at the line, fading to nothing by 40 px", () => {
   expect(spill(60)).toBe(0);
 });
 
-it("the haze: brightest at the top, gone by its height", () => {
-  expect(horizon(0, LINE, 1)).toBe(1);
-  expect(horizon(LINE * s.horizonHeight * 0.5, LINE, 1)).toBeCloseTo(0.25, 6);
-  expect(horizon(LINE * s.horizonHeight, LINE, 1)).toBe(0);
+it("the haze: at its peak down to the far edge the HUD leaves visible, gone by its height below it", () => {
+  const edge = farEdge({ width: 1000, judgmentLineY: LINE });
+  expect(edge).toBeGreaterThan(0);
+  expect(horizon(0, LINE, 1, edge)).toBe(1);
+  expect(horizon(edge, LINE, 1, edge)).toBe(1);
+  expect(horizon(edge + LINE * s.horizonHeight * 0.5, LINE, 1, edge)).toBeCloseTo(0.25, 6);
+  expect(horizon(edge + LINE * s.horizonHeight, LINE, 1, edge)).toBe(0);
 });
 
 it("the dither's noise covers 0 … 1 with a mean near a half", () => {

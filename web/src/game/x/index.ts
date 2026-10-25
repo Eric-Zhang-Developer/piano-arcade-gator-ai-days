@@ -12,6 +12,7 @@ import { round } from "./round";
 import { highlightReel } from "./highlight-reel";
 import { sample } from "./sample";
 import { screenShake } from "./screen-shake";
+import { speakingPiano } from "./speaking-piano";
 import { wetPaint } from "./wet-paint";
 import { uiSoundsAb } from "./ui-sounds-ab";
 
@@ -34,6 +35,7 @@ export const experiments: Experiment[] = [
   composersHands,
   wetPaint, // #1106: its own page, /paint
   round, // #1123: play a round once, the DGX plays it back as voices 2–4
+  speakingPiano, // #1153: its own page, /speak; a spike that ends in findings
   handPalette, // #1127: the hand and judgment colors three ways, with a colour-blind simulation
   uiSoundsAb, // #1167: the menu sounds, old against new
 ];

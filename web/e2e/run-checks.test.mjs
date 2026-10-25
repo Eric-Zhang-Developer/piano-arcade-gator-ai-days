@@ -3,7 +3,7 @@ import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { DEFAULT_SECONDS, KNOWN_RED, MAIN_CHECK, SECONDS, allChecks, exitCode, runChecks, selectChecks, shard } from "./run-checks.mjs";
+import { DEFAULT_SECONDS, KNOWN_RED, MAIN_CHECK, SECONDS, allChecks, exitCode, retriesFor, runChecks, selectChecks, shard } from "./run-checks.mjs";
 
 const TOAST = "web/src/game/notice-toast/verify-toast.mjs";
 const SIM = "web/src/game/sim/verify-sim.mjs";
@@ -122,6 +122,14 @@ describe("runChecks", () => {
     await new Promise((done) => child.on("close", done));
     expect(Date.now() - start).toBeLessThan(10_000);
   }, 30_000);
+
+  it("on a pull request, one attempt: a first failure is FAIL and nothing reruns (main keeps two)", async () => {
+    expect([retriesFor({ GITHUB_EVENT_NAME: "pull_request" }), retriesFor({ GITHUB_EVENT_NAME: "push" }), retriesFor({})]).toEqual([1, 2, 2]);
+    const out = join(dir, "out-pr");
+    const rows = await runChecks(dir, ["pass.mjs", "fail.mjs"], out, "1/1", 1);
+    expect(rows.map((r) => r.result)).toEqual(["pass", "FAIL"]);
+    expect(existsSync(join(out, "fail-retry"))).toBe(false);
+  });
 
   it("reports two failures as FAIL, and the shard exits 1", async () => {
     const rows = await run(["pass.mjs", "fail.mjs"]);

@@ -13,3 +13,8 @@ when any shard of a full run passes 14 min by the table, so a new long check sho
 Refresh the table from a full run's logs when that test fails or a shard nears 20 min.
 
 **How to undo.** Revert the PR; `shard()` goes back to `k % n`.
+
+**No rerun on pull requests (Eric, 2026-10-25).** `runChecks` takes `attempts`. `main()` passes 1 when
+`GITHUB_EVENT_NAME` is `pull_request` and 2 otherwise, so main still reruns once before going red. A PR's failing check
+then costs its time once, not twice: a check that fails twice at 7 min burned 14. Only 1 of ~520 sampled check runs
+passed on a rerun. No ci.yml change: GitHub sets the variable.

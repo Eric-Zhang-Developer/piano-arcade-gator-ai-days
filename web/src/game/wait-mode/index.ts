@@ -26,21 +26,31 @@ export function barStep(barStarts: readonly number[], nowMs: number, dir: -1 | 1
 }
 
 // Chart time with the holds taken out, over an outer clock (the pause clock's chart time). update() runs once a frame;
-// now() only reads, so input can ask for its own timestamp's time. While holding, now() is the held note's time.
+// now() only reads, so input can ask for its own timestamp's time. While holding, now() is the held note's time, exactly:
+// read back through the pause clock, (at + zero) - zero can land a float past it, and hand-mode would then send the
+// other hand's note at that time while yours is still held (#592).
 export function holdClock(chart: Chart, noteState: ReadonlyMap<string, Judgment>) {
   let hold = pauseClock(0);
+  let held: number | null = null;
   let floor = -Infinity;
+  const now = (outerMs: number) => held ?? hold.now(outerMs);
   return {
     update(outerMs: number) {
-      const at = shouldHold(chart, noteState, hold.now(outerMs), floor);
-      if (at === null) hold.resume(outerMs);
-      else hold.pause(hold.toPerf(at)); // from the outer moment the note reached the line
+      const at = shouldHold(chart, noteState, now(outerMs), floor);
+      if (at === null) {
+        hold.resume(outerMs);
+        held = null;
+      } else {
+        hold.pause(hold.toPerf(at)); // from the outer moment the note reached the line
+        held ??= at;
+      }
     },
-    now: (outerMs: number) => hold.now(outerMs),
+    now,
     toOuter: (chartMs: number) => hold.toPerf(chartMs),
     // rewind: from outerMs on, the clock reads chartMs, and notes before it are never held for.
     seek(chartMs: number, outerMs: number) {
       hold = pauseClock(outerMs - chartMs);
+      held = null;
       floor = chartMs;
       this.update(outerMs);
     },

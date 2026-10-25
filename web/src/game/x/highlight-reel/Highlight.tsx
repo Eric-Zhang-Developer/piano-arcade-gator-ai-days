@@ -93,7 +93,7 @@ const seconds = (frames: number) => `${(frames / S.fps).toFixed(1)} s`;
 export function Highlight() {
   const params = useSearchParams();
   const monitor = useRef<HTMLCanvasElement>(null);
-  const [state, setState] = useState<State>("loading");
+  const [phase, setPhase] = useState<"rendering" | "done" | "error" | null>(null); // the render's, once started
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const [saved, setSaved] = useState<Saved | null>(null);
@@ -109,17 +109,17 @@ export function Highlight() {
       })
       .catch((e: Error) => {
         setError(e.message);
-        setState("error");
+        setPhase("error");
       });
   }, [params]);
 
   const edl = useMemo(() => (saved ? cut(saved.chart, saved.take, saved.results) : null), [saved]);
   const drawer = useMemo(() => (saved && edl ? reel(saved.chart, saved.take, saved.results, edl) : null), [saved, edl]);
+  const state: State = phase ?? (!saved ? "loading" : edl ? "ready" : "no-reel");
 
   // The test hook, rebuilt as the take arrives; render() fills in the encode's numbers.
   useEffect(() => {
     if (!saved) return;
-    setState(edl ? "ready" : "no-reel");
     const scratch = () => new OffscreenCanvas(reelSize.width, reelSize.height).getContext("2d")!;
     window.__highlightReel = {
       state: edl ? "ready" : "no-reel",
@@ -160,7 +160,7 @@ export function Highlight() {
     if (!saved || !edl || !drawer || !monitor.current) return;
     const hook = window.__highlightReel!;
     const ctx = monitor.current.getContext("2d")!;
-    setState("rendering");
+    setPhase("rendering");
     hook.state = "rendering";
     try {
       const sound = await renderAudio(edl, saved.take);
@@ -170,10 +170,10 @@ export function Highlight() {
       Object.assign(hook, { framesRequested: out.framesRequested, framesLate: out.framesLate, blobBytes: out.blob.size, mimeType: out.mimeType, state: "done" });
       setVideo({ url: URL.createObjectURL(out.blob), bytes: out.blob.size, late: out.framesLate });
       setFrame(S.frames);
-      setState("done");
+      setPhase("done");
     } catch (e) {
       setError((e as Error).message);
-      setState("error");
+      setPhase("error");
       hook.state = "error";
     }
   };

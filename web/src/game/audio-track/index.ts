@@ -1,7 +1,7 @@
 // Audio track (spec: audio-track): a local song's own recording plays under /play, in sync with the chart clock, the
 // player's piano on top. The recording comes from a sidecar next to the chart, songs/local/<id>/audio.json:
 // { "src": "golden.mp3", "offsetMs": 1234 }, where offsetMs is the file time of chart time 0. No sidecar, no audio.
-import { createElement, useSyncExternalStore } from "react";
+import { createElement } from "react";
 import type { Chart, GameEvent, GamePlugin } from "../../contracts";
 import { msPerBeat } from "../core/settings";
 import { loopChart } from "../bar-loop";
@@ -10,7 +10,7 @@ import { isFlowMode } from "../flow-mode/clock";
 import { savedNumber } from "../laptop-sound/volume";
 import { levelEnvelope, loudnessSettings } from "../milestone-sfx";
 import { gainAt, planTail, tailEnvelope, type GainPoint, type TailPlan } from "../record-seams";
-import { SeamTag, type TailView } from "../record-seams/tag";
+import { TailPanel, type TailView } from "../record-seams/tag";
 
 export const audioTrackSettings = {
   fadeOutS: 0.25, // after songEnd with no tail (a bar loop, or the file already over): a short fade, then silence
@@ -135,10 +135,6 @@ const setTailView = (v: TailView | null) => {
 export const subscribeTail = (l: () => void) => (tailListeners.add(l), () => void tailListeners.delete(l));
 export const tailNow = () => tailView;
 export const stopMusic = () => stopTail();
-function TailPanel() {
-  const view = useSyncExternalStore(subscribeTail, tailNow, () => null);
-  return view && createElement(SeamTag, { view, onStop: stopMusic });
-}
 
 export function audioTrack(): GamePlugin {
   let audio: AudioContext | null = null;
@@ -342,6 +338,6 @@ export function audioTrack(): GamePlugin {
     },
     // The tail's tag, while it plays (record-seams). The results mount just after songEnd, so a take with no tail
     // shows no card.
-    resultsPanel: () => (tailView ? createElement(TailPanel) : null),
+    resultsPanel: () => (tailView ? createElement(TailPanel, { subscribe: subscribeTail, get: tailNow, onStop: stopMusic }) : null),
   };
 }

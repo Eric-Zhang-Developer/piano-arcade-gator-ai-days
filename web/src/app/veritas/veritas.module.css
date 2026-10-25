@@ -17,10 +17,11 @@
 /* The sky, lit from the top edge in the cabinet's two chrome colors: loud at the edge, dark behind the lanes. */
 :global(html):has(.page),
 :global(body):has(.page) {
-  background:
+  background-color: var(--pa-sky);
+  background-image:
     radial-gradient(70% 38% at 18% -6%, rgba(255, 47, 208, 0.2), transparent 70%),
-    radial-gradient(60% 34% at 88% -8%, rgba(39, 225, 255, 0.14), transparent 70%),
-    var(--pa-sky);
+    radial-gradient(60% 34% at 88% -8%, rgba(39, 225, 255, 0.14), transparent 70%);
+  background-repeat: no-repeat; /* once, at the top: repeated, it tiled every screen height with a seam */
   /* not background-attachment: fixed: that repaints the whole page on every scroll, a stutter in a screen capture */
 }
 
@@ -61,6 +62,7 @@
   margin: 0;
   max-width: 54ch;
   color: var(--pa-ink-dim);
+  text-wrap: pretty;
 }
 
 .h2 {
@@ -179,10 +181,11 @@
   animation-delay: calc(var(--i) * var(--sweep) + var(--x) * var(--sweep));
 }
 
-/* a planted mistake: ringed in the fever's orange, so the eye knows where the judge must look */
+/* a planted mistake: ringed in the fever's orange, so the eye knows where the judge must look. Thin: Chord Roller
+   and Jitter plant on nearly every note, and a thick ring merged them into bars. */
 .planted {
-  outline: 2px solid var(--pa-sun);
-  outline-offset: 3px;
+  outline: 1px solid rgba(255, 176, 46, 0.8);
+  outline-offset: 2px;
 }
 
 .press {
@@ -215,15 +218,22 @@
   text-shadow: 0 0 0.4em rgba(255, 77, 94, 0.7);
 }
 
+/* EARLY, LATE and ROLLED come by the dozen (Jitter 79, Chord Roller 89), so no size makes one readable on its
+   own: small and unglowing, they read as a band of marks, and the tally says the number. At 1em with a glow they
+   fused into solid bars. One ✕ is a statement; it keeps 1em. */
+.early,
+.late,
+.rolled {
+  font-size: 0.6em;
+}
+
 .early,
 .late {
   color: var(--pa-sun);
-  text-shadow: 0 0 0.4em rgba(255, 176, 46, 0.45);
 }
 
 .rolled {
   color: var(--pa-magenta);
-  text-shadow: 0 0 0.4em rgba(255, 47, 208, 0.5);
 }
 
 /* The playhead: a magenta scan line with a fading trail behind it, the cabinet sweeping the take. */

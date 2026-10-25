@@ -1,40 +1,23 @@
-// /shots: the video's title and end cards, recorded under ?capture=1 at 1920×1080 (spec: video-shots). The idea is the
-// game's own hit line: on the title the two hands fall onto it and the name lands there; the end card is that line at
-// rest. Each part's timing comes from MOTION; reduced motion shows the end state at once.
+// /shots: the video's title and end cards, recorded under ?capture=1 at 1920×1080 (specs: video-shots, video-cards). The
+// title is played: each letter lands on a note of the name's cipher motif (Title.tsx). The end card is the game's hit
+// line at rest: the name, the tagline, the URL to type, and a facts line counted from git (facts.ts). Its timing comes
+// from MOTION; reduced motion shows the end state at once.
 import type { CSSProperties } from "react";
 import Link from "next/link";
-import { APP_NAME, CARDS, clauses, endLinks, MOTION, TAGLINE, type Card, type Part } from ".";
+import { APP_NAME, CARDS, endSlots, MOTION, TAGLINE, type Card, type Part } from ".";
 import styles from "./cards.module.css";
+import { factsLine } from "./facts";
+import facts from "./facts.json";
+import { TitleCard } from "./Title";
 
 const timing = (card: Card, part: Part): CSSProperties => {
   const m = MOTION[card][part]!;
   return { "--delay": `${m.delay}ms`, "--dur": `${m.dur}ms` } as CSSProperties;
 };
 
-function TitleCard() {
-  return (
-    <main className={styles.card} data-card="title">
-      <div className={styles.stage}>
-        <span className={`${styles.note} ${styles.right}`} style={timing("title", "notes")} aria-hidden>
-          <span className={styles.flash} style={timing("title", "flash")} />
-        </span>
-        <span className={`${styles.note} ${styles.left}`} style={timing("title", "notes")} aria-hidden>
-          <span className={styles.flash} style={timing("title", "flash")} />
-        </span>
-        <h1 className={styles.name} style={timing("title", "name")}>{APP_NAME}</h1>
-      </div>
-      <div className={styles.line} style={timing("title", "line")} aria-hidden />
-      <p className={styles.tagline} style={timing("title", "words")}>
-        {clauses(TAGLINE).map((c) => (
-          <span key={c} className={styles.clause}>{c}</span>
-        ))}
-      </p>
-    </main>
-  );
-}
-
 function EndCard() {
-  const [repo, live] = endLinks();
+  const [lead, second] = endSlots();
+  const line = factsLine(facts.merged ? facts : null);
   return (
     <main className={styles.card} data-card="end">
       <div className={styles.stage}>
@@ -44,8 +27,10 @@ function EndCard() {
       </div>
       <div className={styles.line} style={timing("end", "line")} aria-hidden />
       <div className={styles.links} style={timing("end", "words")}>
-        {live && <p className={styles.live} data-testid="end-live">{live}</p>}
-        <p className={styles.repo} data-testid="end-repo">{repo}</p>
+        <p className={styles.endTagline}>{TAGLINE}</p>
+        <p className={`${styles.live} ${styles.lead}`} data-testid="end-lead">{lead}</p>
+        {second && <p className={`${styles.repo} ${styles.second}`} data-testid="end-repo">{second}</p>}
+        {line && <p className={styles.facts} data-testid="end-facts">{line}</p>}
       </div>
     </main>
   );

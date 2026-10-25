@@ -2,21 +2,12 @@
    Saira condensed for titles, the data mono for numbers and labels, blue and purple the only accents. State always
    carries a glyph or a word, so color only reinforces it; gold, red and grey stay with the game's judgments. */
 .root {
-  /* /attract borrows .root and reads these names (operator-replay); they point at the Duo tokens until its own
-     restyle, foreman-duo part 2. Its layout still sets --op-body and --op-display. */
-  --panel: var(--pa-panel);
-  --ink: var(--pa-ink);
-  --dim: var(--pa-ink-dim);
-  --magenta: var(--pa-secondary);
-  --cyan: var(--pa-primary);
-  --amber: var(--pa-ink);
-  --red: var(--pa-ink);
-  --green: var(--pa-primary);
+  /* /attract borrows .root too (operator-replay), so the two pages are one cabinet. */
   position: relative;
   min-height: 100vh;
   overflow-x: hidden;
   color: var(--pa-ink);
-  font-family: var(--op-body, system-ui), sans-serif;
+  font-family: system-ui, sans-serif;
   font-size: clamp(15px, 0.9vw, 18px); /* every other size is in em, so the board scales with it */
   background: var(--pa-bg);
 }

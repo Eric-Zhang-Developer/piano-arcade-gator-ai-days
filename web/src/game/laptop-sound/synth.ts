@@ -1,7 +1,9 @@
 // Laptop sound's synth (spec: laptop-sound): MIDI messages in, Web Audio out. Piano-like voices on channels 1–16
 // with the pedal (CC64) and All Notes Off (CC123), and four drum hits on channel 10 for beat-track.
 // The bookkeeping (which notes sound) runs with or without audio, so the test hook counts voices before the first
-// gesture lets the AudioContext start; the audio parts are skipped until then.
+// gesture lets the AudioContext start; the audio parts are skipped until then. Once sampled-piano's bank has
+// decoded, piano notes play its samples instead of the oscillators.
+import { playSample, type Bank } from "../sampled-piano";
 
 export const synthSettings = {
   maxVoices: 32, // a 33rd steals the oldest
@@ -13,6 +15,7 @@ export const synthSettings = {
 export interface Audio {
   ctx: AudioContext;
   out: GainNode; // the piano volume
+  bank?: Bank; // set once every sample has decoded (sampled-piano)
 }
 
 interface Voice {
@@ -25,8 +28,9 @@ interface Voice {
 const hz = (p: number) => 440 * 2 ** ((p - 69) / 12);
 
 // One piano-like voice: two partials through a lowpass that opens with velocity, a fast strike, then a decay that's
-// longer for low notes. Returns its release.
+// longer for low notes. Returns its release. With the samples in, the sampled voice instead.
 function strike(a: Audio, pitch: number, velocity: number, t: number): (atS: number) => void {
+  if (a.bank) return playSample(a, a.bank, pitch, velocity, t);
   const { ctx, out } = a;
   const v = velocity / 127;
   const env = ctx.createGain();

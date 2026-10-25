@@ -55,8 +55,10 @@ A nav link to a half-done Lab looks worse than none.
 - **The current page is marked** with the primary blue (`--pa-primary`) and `aria-current="page"`.
 - **The Duo look, with the kit.** Use `MonoLabel` (and `Panel` if the bar needs a ground) from
   `web/src/game/duo-tokens/`. Zero radius. Saira condensed for labels. No hype pink.
-- **It stays off** `/play`, `/cabinet`, `/attract` and `/operator`, and off every page while capture mode is on
+- **It stays off** `/play`, `/cabinet` and `/attract`, and off every page while capture mode is on
   (`isCapture` from `web/src/game/capture-mode/`), so it never shows up in the video.
+- **It shows on `/operator`.** Eric, 2026-10-25: "operator ... is also missing the nav bar." Status is `/operator`,
+  so the bar marks Status current there. The `/operator` restyle in foreman-duo (#774) keeps the bar.
 - **It doesn't break the select.** `/` keeps its layout, and every existing check on `/` (select-layout, select-stage,
   song-options, first-run) passes unchanged. If the bar needs room, it takes the top edge; log how in
   `specs/decisions/nav-bar-layout.md`. The quiet footer Lab link from #631 can stay. No new key on `/`, because its
@@ -69,8 +71,8 @@ A nav link to a half-done Lab looks worse than none.
    - every slot's slug has a `changes/<slug>.md` (the test reads the folder), and no done slot is missing;
    - every slot's path is a page under `web/src/app/`;
   - Status links to `/operator` and is left out of a production build; the GitHub link is the repo's URL;
-   - the hide rule returns true for `/play`, `/cabinet`, `/attract`, `/operator` and capture mode, and false for `/`,
-     `/learn`, `/lab` and `/progress`.
+   - the hide rule returns true for `/play`, `/cabinet`, `/attract` and capture mode, and false for `/`, `/learn`,
+     `/lab`, `/progress` and `/operator`.
 2. Headless, once, under `verify.lock`:
    `python3 .agents/scripts/verify.py --slug nav-bar --worktree . --cmd "node {worktree}/web/src/game/nav-bar/verify-nav.mjs --out {out}"`.
    It prints `verify-nav: pass` or names each failed step:

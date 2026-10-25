@@ -4,7 +4,7 @@ import { soundsFor } from "../sound";
 
 const dip = vi.fn();
 vi.mock("../stage", () => ({ dip: (atMs: number) => dip(atMs) }));
-const { comboBreakAt, dipsStage, keyCap, missLook, missMoment, missSettings, outlineAt, pulseAt } = await import(".");
+const { comboBreakAt, dipsStage, keyCap, lateT, missLook, missMoment, missSettings, outlineAt, pulseAt } = await import(".");
 
 const near = (a: number, b: number, tol = 0.02) => Math.abs(a - b) <= tol;
 
@@ -17,6 +17,14 @@ describe("the missed note's look (miss-moment)", () => {
     expect(missLook(299).alpha).toBeGreaterThan(0);
     expect(missLook(300).alpha).toBe(0);
     for (let t = 0; t < 300; t += 10) expect(missLook(t + 10).alpha).toBeLessThanOrEqual(missLook(t).alpha);
+  });
+
+  it("a miss the game learns of 130 ms late still starts at full and is gone by the same 300 ms", () => {
+    const t = (late: number) => lateT(1000 + late, 1000, 1130, missSettings.goneMs);
+    expect(missLook(t(130)).alpha).toBe(1);
+    expect(missLook(t(299)).alpha).toBeGreaterThan(0);
+    expect(missLook(t(300)).alpha).toBe(0);
+    expect(lateT(1150, 1000, 1000, 300)).toBe(150); // known on time: plain elapsed time
   });
 
   it("lights the key's outline until about 400 ms", () => {
@@ -142,6 +150,7 @@ describe("the plugin (miss-moment)", () => {
       p.draw!(ctx, frame(1120 + t));
       return calls;
     };
+    at(0); // the first frame that knows the miss
     const first = at(150);
     expect(first.some((c) => c.op === "strokeRect" && c.style === "#8a8f98")).toBe(true);
     const tail = first.find((c) => c.op === "fillRect")!;

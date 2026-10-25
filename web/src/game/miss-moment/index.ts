@@ -82,6 +82,15 @@ export function comboBreakAt(ms: number, oldCombo: number, height: number, reduc
 /** A break that dips the fever stage: 50 or more, and not under reduced motion. */
 export const dipsStage = (oldCombo: number, reduced = false) => !reduced && oldCombo >= missSettings.dipFrom;
 
+/**
+ * A curve's time for an event the game learned of late. The judge calls a miss INPUT_GRACE_MS (50) plus the latency
+ * offset after its window closes, about 130 ms at the default offset, so measured from atMs the fade would be over
+ * before its first frame. The whole curve plays instead between the first frame that knows (seenMs) and the same
+ * deadline, atMs + spanMs. Decision miss-moment-curves.
+ */
+export const lateT = (now: number, atMs: number, seenMs: number, spanMs: number) =>
+  seenMs <= atMs ? now - atMs : ((now - seenMs) * spanMs) / Math.max(1, atMs + spanMs - seenMs);
+
 type Rect = { x: number; y: number; w: number; h: number };
 
 /** A key's cap, the part of the drawn keyboard that's that key's (core/highway.ts's keyboard): a black key's short cap,
@@ -180,7 +189,7 @@ function playfieldLuma(overlay: HTMLCanvasElement, line: number, height: number)
   return sum / (px.length / 4) / 255;
 }
 
-type Miss = { pitch: number; atMs: number; endMs: number; hand: Hand };
+type Miss = { pitch: number; atMs: number; seenMs?: number; endMs: number; hand: Hand };
 
 export function missMoment(): GamePlugin {
   if (typeof window !== "undefined") window.__pianoArcadeMissCue = measureCue;
@@ -190,7 +199,7 @@ export function missMoment(): GamePlugin {
   let misses: Miss[] = [];
   let pulses: { pitch: number; atMs: number }[] = [];
   let combo = 0;
-  let broken: { atMs: number; combo: number } | null = null;
+  let broken: { atMs: number; seenMs?: number; combo: number } | null = null;
   let display = hudSettings.font;
   if (typeof document !== "undefined")
     void whenDisplayFontReady().then(() => {
@@ -264,7 +273,8 @@ export function missMoment(): GamePlugin {
       ctx.rect(0, 0, f.width, line);
       ctx.clip();
       for (const m of misses) {
-        const look = missLook(now - m.atMs, reduced);
+        m.seenMs ??= now;
+        const look = missLook(lateT(now, m.atMs, m.seenMs, missSettings.goneMs), reduced);
         const top = line - (m.endMs - now) * pxPerMs + settings.noteGapPx;
         if (look.alpha <= 0 || top >= line) continue;
         const k = f.keyX(m.pitch);
@@ -287,7 +297,7 @@ export function missMoment(): GamePlugin {
         return cap;
       };
       for (const m of misses) {
-        const a = outlineAt(now - m.atMs, reduced);
+        const a = outlineAt(lateT(now, m.atMs, m.seenMs ?? now, missSettings.outlineMs), reduced);
         if (a <= 0) continue;
         const cap = shape(m.pitch);
         const px = Math.max(1, Math.round(f.height / missSettings.outlinePerHeight));
@@ -313,7 +323,8 @@ export function missMoment(): GamePlugin {
 
       // The broken combo's old digits, dropping and fading in the HUD's combo slot (the HUD has already cut to blank).
       if (broken) {
-        const b = comboBreakAt(now - broken.atMs, broken.combo, f.height, reduced);
+        broken.seenMs ??= now;
+        const b = comboBreakAt(lateT(now, broken.atMs, broken.seenMs, missSettings.breakMs), broken.combo, f.height, reduced);
         if (!b) broken = null;
         else {
           const l = hudLayout(f.width, line);

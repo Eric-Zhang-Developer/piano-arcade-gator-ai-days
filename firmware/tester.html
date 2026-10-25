@@ -14,8 +14,7 @@
   button:hover { border-color:var(--accent); }
   .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
   .muted { color:var(--muted); } .ok { color:var(--ok); } .bad { color:var(--bad); }
-  input[type=number], select { background:#0d0b1a; color:var(--text); border:1px solid #3d3670; border-radius:6px; padding:4px; font:inherit; }
-  input[type=number] { width:80px; }
+  input[type=number] { width:80px; background:#0d0b1a; color:var(--text); border:1px solid #3d3670; border-radius:6px; padding:4px; }
   pre { background:#0d0b1a; padding:8px; border-radius:6px; max-height:160px; overflow:auto; font-size:12px; white-space:pre-wrap; }
   label { display:inline-flex; gap:6px; align-items:center; }
 </style>
@@ -38,20 +37,7 @@
   </section>
 
   <section>
-    <h2>2. Light mode</h2>
-    <div class="row">
-      <label>Menu
-        <select id="lightMode">
-          <option value="0" selected>Quiet — key light and ripple</option>
-          <option value="1">Full — the show</option>
-        </select>
-      </label>
-    </div>
-    <p class="muted">Open the menu and pick one. Quiet is the default, and the look that is safe to leave on: each key lights and a ripple runs. Full is the show: hint build-up, wrong-key red, count-in bar, fever, pause rainbow, finale and idle lights, with ripples off. Save to board keeps it for the game.</p>
-  </section>
-
-  <section>
-    <h2>3. Hour-0 test</h2>
+    <h2>2. Hour-0 test</h2>
     <div class="row">
       <button data-test="ends">A0 red + C8 blue</button>
       <button data-test="raw">Raw LED 0 and last</button>
@@ -63,7 +49,7 @@
   </section>
 
   <section>
-    <h2>4. Calibrate</h2>
+    <h2>3. Calibrate</h2>
     <p class="muted">Nudge until the lit LEDs are centered on the key. Steps are 1/4 LED (1.7 mm).</p>
     <div class="row"><b style="width:120px">A0 (lowest)</b>
       <button data-cal="10,-4">◀◀</button><button data-cal="10,-1">◀</button><button data-cal="10,1">▶</button><button data-cal="10,4">▶▶</button>
@@ -77,13 +63,14 @@
       <span class="muted">Fix keys just right of the strip joint after A0 and C8 look right.</span></div>
     <div class="row">
       <label><input id="reverse" type="checkbox"> Strip runs right to left</label>
-      <label>Brightness <input id="bright" type="number" min="0" max="255" value="160"></label>
+      <label>Brightness <input id="bright" type="number" min="0" max="255" value="110"></label>
       <label>Fade ms <input id="fade" type="number" min="0" max="2000" value="180"></label>
       <label>Hint pulse ms <input id="pulse" type="number" min="0" max="5000" value="900"></label>
-      <label>Ripple ms <input id="ripple" type="number" min="0" max="3000" value="700"></label>
-      <label>Hint ramp ms <input id="ramp" type="number" min="0" max="5000" value="0"></label>
-      <label><input id="wrong" type="checkbox"> Wrong keys red</label>
-      <label><input id="shows" type="checkbox"> Count-in, fever, pause and finale</label>
+      <label>Ripple ms <input id="ripple" type="number" min="0" max="3000" value="0"></label>
+      <label>Hint ramp ms <input id="ramp" type="number" min="0" max="5000" value="600"></label>
+      <label><input id="wrong" type="checkbox" checked> Wrong keys red</label>
+      <label><input id="shows" type="checkbox" checked> Count-in and song-end shows</label>
+      <label><input id="demo" type="checkbox"> Demo mode (or press BOOT on the board)</label>
     </div>
     <div class="row">
       <button data-preset="low">Low (brightness 70)</button>
@@ -98,7 +85,7 @@
   </section>
 
   <section>
-    <h2>5. Play</h2>
+    <h2>4. Play</h2>
     <div class="row">
       <label><input type="radio" name="mode" value="free" checked> Free play: keys light as you press them</label>
       <label><input type="radio" name="mode" value="guide"> Guide lights: Twinkle, the next key glows until you hit it</label>
@@ -108,13 +95,13 @@
         <option value="hands">Hands: left cyan, right pink</option>
         <option value="rainbow">Rainbow by pitch</option>
       </select></label>
-      <span class="muted">Quiet mode sends a ripple of each key's color along the strip (Ripple ms above, default 700; 0 turns it off). Full mode turns ripples off.</span>
+      <span class="muted">Ripple ms above sends a ripple of each key's color along the strip on every press (0, the default, turns it off).</span>
     </div>
     <p id="guideState" class="muted"></p>
   </section>
 
   <section>
-    <h2>6. Measure</h2>
+    <h2>5. Measure</h2>
     <div class="row">
       <button id="btnPing">Latency: 200 pings</button>
       <button id="btnStress">Stress: chords + fast trill</button>
@@ -227,7 +214,7 @@ function showCfg() {
   if (cfg.ramp !== undefined) $('ramp').value = cfg.ramp;
   if (cfg.wrong !== undefined) $('wrong').checked = !!cfg.wrong;
   if (cfg.shows !== undefined) $('shows').checked = !!cfg.shows;
-  if (cfg.light === 0 || cfg.light === 1) $('lightMode').value = String(cfg.light);
+  if (cfg.demo !== undefined) $('demo').checked = !!cfg.demo;
 }
 
 // ---- MIDI
@@ -371,7 +358,7 @@ $('ripple').onchange = e => param(6, e.target.value);
 $('ramp').onchange = e => param(7, e.target.value);
 $('wrong').onchange = e => param(8, e.target.checked ? 1 : 0);
 $('shows').onchange = e => param(9, e.target.checked ? 1 : 0);
-$('lightMode').onchange = e => param(15, e.target.value);
+$('demo').onchange = e => param(15, e.target.checked ? 1 : 0);
 document.querySelectorAll('[data-preset]').forEach(b => b.onclick = () => {
   const v = b.dataset.preset === "low" ? 70 : 160;
   $('bright').value = v; param(1, v);

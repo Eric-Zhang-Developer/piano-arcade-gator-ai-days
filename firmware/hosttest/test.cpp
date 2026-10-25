@@ -30,11 +30,11 @@ void defaults() { Serial.feed({0xB0, 21, 0, 0, 0xB0, 6, 0, 0, 0xB0, 9, 0, 0, 0xB
 int main() {
   setup();
   CHECK(Serial.out.find("PAL1 leds=288") == 0, "hello line: %s", Serial.out.c_str());
-  CHECK(Serial.out.find("ripple=700 ") != std::string::npos, "quiet: ripple on by default");
-  CHECK(Serial.out.find("wrong=0") != std::string::npos, "quiet: wrong keys off by default");
-  CHECK(Serial.out.find("shows=0") != std::string::npos, "quiet: shows off by default");
-  CHECK(Serial.out.find("ramp=0") != std::string::npos, "quiet: hint ramp off by default");
-  CHECK(Serial.out.find("light=0") != std::string::npos, "quiet mode by default");
+  CHECK(Serial.out.find("ripple=0 ") != std::string::npos, "ripple off by default");
+  CHECK(Serial.out.find("wrong=1") != std::string::npos, "wrong keys red by default");
+  CHECK(Serial.out.find("shows=1") != std::string::npos, "shows on by default");
+  CHECK(Serial.out.find("demo=0") != std::string::npos, "classy by default");
+  CHECK(Serial.out.find("ramp=600") != std::string::npos, "hint ramp on by default");
   defaults(); pump(5);
 
   // Geometry: every key 2 LEDs, positions strictly increasing, no two keys share an LED.
@@ -141,7 +141,7 @@ int main() {
 
   // Hint ramp: a new hint starts nearly dark and brightens evenly as the eye sees it (duty = seen^2.2) to twice
   // the color the game sent by 600 ms, then breathes from its peak. Sent at 60 (120 on the LEDs) so 2x isn't clipped.
-  Serial.feed({0xB0, 7, 600 & 127, 600 >> 7, 0xA0, 64, 0, 0, 60}); pump(20);
+  Serial.feed({0xA0, 64, 0, 0, 60}); pump(20);
   int r20 = leds[litFor(64)[0]].b; pump(280);
   int r300 = leds[litFor(64)[0]].b; pump(150);
   int r450 = leds[litFor(64)[0]].b; pump(140);
@@ -165,7 +165,7 @@ int main() {
 
   // Repeated note: the game keeps one hint lit across both notes. Hitting the key restarts the ramp, so the next
   // note's key is near full again when it lands, not wherever the breath happened to be.
-  Serial.feed({0xB0, 7, 600 & 127, 600 >> 7, 0xA0, 65, 0, 0, 127}); pump(1300);  // ramp on; long-lit hint, breathing
+  Serial.feed({0xA0, 65, 0, 0, 127}); pump(1300);                      // long-lit hint, breathing
   Serial.feed({0x90, 65, 0, 127, 0}); pump(100); Serial.feed({0x80, 65}); pump(250);  // hit, release, fade out
   int rep350 = leds[litFor(65)[0]].b; pump(240);
   int rep590 = leds[litFor(65)[0]].b;
@@ -175,7 +175,7 @@ int main() {
 
   // Wrong key: the game sends a key off for every release but a key on only for judged notes. A release of a
   // key that never lit flashes red, holds, then fades. A hit's release doesn't, and setting 8 turns it off.
-  Serial.feed({0xB0, 8, 1, 0, 0xA0, 40, 0, 0, 1, 0xA0, 40, 0, 0, 0});  // wrong-key red on; a hint has come: a song is live
+  Serial.feed({0xA0, 40, 0, 0, 1, 0xA0, 40, 0, 0, 0});  // a hint has come: a song is live
   Serial.feed({0x80, 70}); pump(20);
   CRGB w = leds[litFor(70)[0]];
   CHECK(w.r > 200 && w.g == 0 && w.b == 0, "wrong key red: %d %d %d", w.r, w.g, w.b);
@@ -192,7 +192,7 @@ int main() {
   // strip settles to just that hint; a clear while a song is live plays the fireworks, which end dark.
   // A wrong-key release during the count-in isn't red, and a key on stops a count-in show (the tester).
   uint32_t wrongBefore = wrongFlashes;
-  Serial.feed({0xB0, 9, 1, 0, 0xF0}); pump(1000);
+  Serial.feed({0xB0, 9, 1, 0, 0xB0, 15, 1, 0, 0xF0}); pump(1000);  // demo
   int introLit = countLit();
   Serial.feed({0x80, 70}); pump(20);
   CHECK(wrongFlashes == wrongBefore, "no red during the count-in");
@@ -216,10 +216,50 @@ int main() {
   CHECK(showMode == SHOW_NONE && countLit() == (int)litFor(62).size(), "a key on stops a count-in show: %d", countLit());
   Serial.feed({0xF0}); defaults(); pump(5); stopShows();
 
+  // Classy (the default): the same moments with brightness only. No spark ever flies, no LED goes white.
+  auto sparksFlying = [] { int n = 0; for (auto &p : sparks) n += p.life != 0; return n; };
+  auto anyWhite = [] { for (int i = 0; i < activeLeds; i++) if (fx[i].r > 60 && fx[i].g > 60 && fx[i].b > 60) return true; return false; };
+  Serial.feed({0xB0, 9, 1, 0, 0xF0}); pump(1200);
+  CHECK(showMode == SHOW_INTRO && countLit() > 10 && !anyWhite() && sparksFlying() == 0, "classy count-in: a soft bar, no white edge, no sparks");
+  pump(2400);
+  Serial.feed({0xA0, 60, 0, 40, 127}); pump(150);
+  int bloomLit = countLit();
+  CHECK(bloomLit > 20 && sparksFlying() == 0, "classy launch: a bloom, %d lit, no sparks", bloomLit);
+  for (int i = 0; i < 12; i++) { Serial.feed({0x90, 62, 127, 113, 61, 0x80, 62}); pump(30); }
+  pump(600);
+  CHECK(fever && countLit() > 100 && sparksFlying() == 0, "classy fever: a breathing glow, no sparks: %d lit", countLit());
+  Serial.feed({0x90, 63, 127, 38, 47, 0x80, 63}); pump(20);
+  CHECK(!fever && sparksFlying() == 0, "classy break: no shatter");
+  for (int i = 0; i < 3; i++) { Serial.feed({0xFE}); pump(800); }
+  CHECK(showMode == SHOW_PAUSE && countLit() > 100 && sparksFlying() == 0, "classy pause: breathing, no comets");
+  Serial.feed({0xF0}); pump(1500);
+  int washLit = countLit();
+  CHECK(showMode == SHOW_FINALE && washLit > 100 && sparksFlying() == 0, "classy finale: a warm wash, %d lit", washLit);
+  pump(3000);
+  std::printf("classy: launch bloom %d lit, finale wash %d lit, then %d\n", bloomLit, washLit, countLit());
+  CHECK(countLit() == 0, "the wash fades out: %d", countLit());
+
+  // The BOOT button: a press flips classy and demo and saves it; a bounce inside 40 ms doesn't count.
+  Preferences::len = 0;
+  hostBootDown = true; pump(60); hostBootDown = false; pump(60);
+  CHECK(cfg.demo == 1 && Preferences::len > 0 && sparksFlying() > 0, "BOOT: demo, saved, rainbow comets");
+  hostBootDown = true; pump(5); hostBootDown = false; pump(5); hostBootDown = true; pump(60); hostBootDown = false; pump(60);
+  CHECK(cfg.demo == 0, "a bounce then a press: one flip, back to classy");
+  pump(1500);
+  Serial.feed({0xF0}); defaults(); pump(5); stopShows(); Preferences::len = 0;
+
+  // Demo brings the ripple back: a key on breaks out both ways along the strip. Classy keeps the light on its key.
+  Serial.feed({0xB0, 9, 1, 0, 0xB0, 15, 1, 0, 0x90, 70, 0, 127, 0}); pump(150);
+  CHECK(countLit() > (int)litFor(70).size() + 4, "demo: the hit ripples out both ways: %d lit", countLit());
+  Serial.feed({0x80, 70, 0xB0, 15, 0, 0}); pump(900);
+  Serial.feed({0x90, 70, 0, 127, 0}); pump(150);
+  CHECK(countLit() == (int)litFor(70).size(), "classy: no ripple: %d lit", countLit());
+  Serial.feed({0x80, 70, 0xF0}); defaults(); pump(300); stopShows();
+
   // Fever, mirrored from the hit colors: 12 PERFECTs fill Twinkle's gauge and start it (a glow under the keys);
   // a miss shatters it. Before fever a miss halves the gauge and GREAT adds half a point. A song's end sizes the
   // next gauge from its judged notes (a quarter, 12 to 50).
-  Serial.feed({0xB0, 9, 1, 0, 0xA0, 40, 0, 0, 1, 0xA0, 40, 0, 0, 0});  // shows on, a song is live
+  Serial.feed({0xB0, 9, 1, 0, 0xB0, 15, 1, 0, 0xA0, 40, 0, 0, 1, 0xA0, 40, 0, 0, 0});  // shows on, demo, song live
   for (int i = 0; i < 4; i++) { Serial.feed({0x90, 60, 127, 113, 61, 0x80, 60}); pump(30); }
   Serial.feed({0x90, 62, 127, 38, 47, 0x80, 62}); pump(30);
   CHECK(!fever && gaugeFill == 2.0f, "a miss before fever halves the gauge: %.1f", gaugeFill);
@@ -244,13 +284,14 @@ int main() {
 
   // Pause: during a song, notes keep messages coming, so no pause show; 2 s of only heartbeats starts it (the
   // paused hint stays on top), and the next message of any other kind ends it at once.
-  Serial.feed({0xB0, 9, 1, 0, 0xA0, 60, 0, 0, 60});  // shows on, a hint: a song is live
+  uint32_t pauseBase = pauseShows;  // earlier tests paused too
+  Serial.feed({0xB0, 9, 1, 0, 0xB0, 15, 1, 0, 0xA0, 60, 0, 0, 60});  // shows on, demo, a hint: a song is live
   // Green, not a judgment color: the fever gauge stays empty, so no embers sparkle into the counts below.
   for (int i = 0; i < 8; i++) { Serial.feed({0xFE, 0x90, 50, 0, 127, 0}); pump(250); Serial.feed({0x80, 50}); pump(250); }
-  CHECK(pauseShows == 0, "notes every 500 ms: no pause show (%u)", pauseShows);
+  CHECK(pauseShows == pauseBase, "notes every 500 ms: no pause show (%u)", pauseShows - pauseBase);
   for (int i = 0; i < 3; i++) { Serial.feed({0xFE}); pump(800); }
   int pauseLit = countLit();
-  CHECK(showMode == SHOW_PAUSE && pauseShows == 1 && pauseLit > 100, "2 s of heartbeats: pause show, %d lit", pauseLit);
+  CHECK(showMode == SHOW_PAUSE && pauseShows == pauseBase + 1 && pauseLit > 100, "2 s of heartbeats: pause show, %d lit", pauseLit);
   CHECK(leds[litFor(60)[0]].b > 60, "the paused hint still shows: %d", leds[litFor(60)[0]].b);
   Serial.feed({0x90, 60, 0, 127, 0}); pump(20);
   CHECK(showMode == SHOW_NONE, "the next message ends the pause show");
@@ -261,7 +302,7 @@ int main() {
 
   // Idle lights: 8 s of nothing but heartbeats with no song live, and the aurora comes up; a key released then
   // sparkles without ending it; any play message ends it at once.
-  Serial.feed({0xB0, 15, 1, 0}); pump(5);  // full mode: aurora idle, ripples off
+  Serial.feed({0xB0, 4, 1, 0});
   for (int i = 0; i < 9; i++) { Serial.feed({0xFE}); pump(1000); }
   int idleLit = countLit();
   CHECK(attractOn && idleLit > 100, "idle lights after 8 s of heartbeats: %d lit", idleLit);
@@ -270,55 +311,25 @@ int main() {
   Serial.feed({0x90, 62, 0, 127, 0}); pump(20);
   std::printf("idle: %d LEDs lit after 9 s; a key on ends it -> %d lit\n", idleLit, countLit());
   CHECK(!attractOn && countLit() == (int)litFor(62).size(), "play ends idle: %d lit", countLit());
+  // No laptop: with no byte at all for 3 s, idle shows a standby pulse on the first 6 LEDs only, in the UI blue;
+  // a heartbeat brings the aurora back.
+  Serial.feed({0x80, 62}); for (int i = 0; i < 9; i++) { Serial.feed({0xFE}); pump(1000); }
+  CHECK(attractOn && countLit() > 100, "connected idle: the aurora");
+  pump(4500);
+  int standbyLit = 0, maxPulse = 0;
+  for (int k = 0; k < 40; k++) { pump(100); standbyLit = max(standbyLit, countLit()); maxPulse = max<int>(maxPulse, leds[0].b); }
+  CHECK(standbyLit > 0 && standbyLit <= STANDBY_LEDS && maxPulse > 20 && leds[0].r < leds[0].b, "no laptop: standby pulse, %d lit, peak %d", standbyLit, maxPulse);
+  Serial.feed({0xFE}); pump(1600);
+  std::printf("idle link: standby %d LEDs (peak blue %d); heartbeat back -> %d lit\n", standbyLit, maxPulse, countLit());
+  CHECK(attractOn && countLit() > 100, "a heartbeat brings the aurora back: %d", countLit());
+  Serial.feed({0x90, 62, 0, 127, 0, 0x80, 62}); pump(300);
   Serial.feed({0xF0}); defaults(); pump(5);
 
-  // Quiet idle stays the dim rainbow from main. Heartbeats count as bytes, so 9 s of them
-  // leave the strip dark. 15 s with nothing at all is the rainbow, and the next byte ends it.
-  Serial.feed({0xB0, 15, 0, 0}); pump(5);
-  for (int i = 0; i < 9; i++) { Serial.feed({0xFE}); pump(1000); }
-  CHECK(!attractOn && countLit() == 0, "quiet: heartbeats do not start idle lights (%d lit)", countLit());
-  pump(16000);
-  CHECK(attractOn && countLit() > 100, "quiet: 15 s of silence is the dim rainbow (%d lit)", countLit());
-  CHECK(leds[0].r <= 50 && leds[0].g <= 50 && leds[0].b <= 50, "rainbow stays dim: %d %d %d", leds[0].r, leds[0].g, leds[0].b);
-  Serial.feed({0xFE}); pump(30);
-  CHECK(!attractOn, "quiet: a heartbeat ends the rainbow");
-  defaults(); pump(5);
-
-  // Setting 15 switches the two looks. Full starts the count-in on a clear and turns ripples off.
-  // Quiet stops that show, brings the ripple back, and a clear stays dark.
-  Serial.out.clear();
-  Serial.feed({0xB0, 15, 1, 0}); pump(20);
-  CHECK(cfg.lightMode == 1 && cfg.rippleMs == 0 && cfg.hintRampMs == 600 && cfg.wrongRed == 1 && cfg.shows == 1,
-        "full preset: mode %u ripple %u ramp %u wrong %u shows %u", cfg.lightMode, cfg.rippleMs, cfg.hintRampMs, cfg.wrongRed, cfg.shows);
-  CHECK(Serial.out.find("light=1") != std::string::npos, "hello echoes full: %s", Serial.out.c_str());
-  Serial.feed({0xF0}); pump(1000);
-  CHECK(showMode == SHOW_INTRO && countLit() >= 3, "full: a clear starts the count-in (%d lit)", countLit());
-  Serial.feed({0xB0, 15, 0, 0}); pump(20);
-  CHECK(cfg.lightMode == 0 && cfg.rippleMs == 700 && cfg.hintRampMs == 0 && cfg.wrongRed == 0 && cfg.shows == 0,
-        "quiet preset: mode %u ripple %u ramp %u wrong %u shows %u", cfg.lightMode, cfg.rippleMs, cfg.hintRampMs, cfg.wrongRed, cfg.shows);
-  CHECK(showMode == SHOW_NONE, "quiet stops a show that was running");
-  Serial.feed({0xF0}); pump(400);
-  CHECK(showMode == SHOW_NONE && countLit() == 0, "quiet: a clear does not start the count-in (%d lit)", countLit());
-  Serial.feed({0x90, 60, 0, 0, 127}); pump(150);
-  {
-    float mid = (litFor(60).front() + litFor(60).back()) / 2.0f;
-    int left = 0, right = 0;
-    for (int i = 0; i < NUM_LEDS; i++) if (leds[i]) {
-      float d = i - mid;
-      if (d < -4) left++; if (d > 4) right++;
-    }
-    CHECK(left >= 2 && right >= 2, "quiet: a key on ripples both ways (%d left, %d right)", left, right);
-  }
-  Serial.feed({0xF0}); defaults(); pump(5);
-
-  // A save from firmware that didn't have light mode yet (one uint16 shorter) still loads its calibration.
-  // Boot default-initializes cfg first, so the missing byte stays quiet.
+  // A save from older firmware (no hintRampMs at the end) still loads its calibration.
   Serial.feed({0xB0, 10, 160 & 127, 160 >> 7, 0xB0, 20, 0, 0}); pump(5);
   Preferences::len = sizeof(Settings) - sizeof(uint16_t);
   cfg = Settings(); cfg.hintRampMs = 1; loadSettings();
   CHECK(cfg.calLow == 10.0f, "old save keeps calibration: %.2f", cfg.calLow);
-  CHECK(cfg.lightMode == 0, "a save without the light-mode byte stays quiet");
-  CHECK(cfg.hintRampMs == 0, "the saved quiet ramp overwrites a dirty value: %u", cfg.hintRampMs);
   Preferences::len = 0; defaults(); pump(5);
 
   // Ripple: a key on sends light out both ways, the key keeps its own color, and it all clears.

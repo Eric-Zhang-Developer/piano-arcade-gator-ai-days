@@ -48,12 +48,12 @@
     <div class="row">
       <label>Menu
         <select id="lightMode">
-          <option value="0" selected>Quiet — key light and ripple</option>
-          <option value="1">Full — the show</option>
+          <option value="0" selected>Calm — key light, build-up hints, soft glows</option>
+          <option value="1">Demo — calm plus the ripple on every hit</option>
         </select>
       </label>
     </div>
-    <p class="muted">Open the menu and pick one. Quiet (the default) lights each key and runs a ripple. Full plays the show: hint build-up, wrong-key red, count-in bar, fever, pause rainbow, finale and idle lights, and turns ripples off.</p>
+    <p class="muted">Pick one. Calm (the default) lights each key with the hint build-up, wrong-key red and soft glows for the count-in, fever, pause and the end. Demo adds the ripple: every hit breaks out both ways along the strip. The board's BOOT button and the game's pause menu switch it too.</p>
     <div class="row">
       <label>Color <input id="color" type="color" value="#ff2bd6"></label>
       <label><input id="rainbow" type="checkbox"> Rainbow by pitch</label>
@@ -88,7 +88,7 @@ const param = (p, v) => { v = Math.max(0, Math.min(16383, Math.round(v))); send(
 const clearAll = () => send([0xF0]);
 setInterval(() => send([0xFE]), 1000);
 
-// In quiet mode this heartbeat also keeps the dim rainbow away. In full mode a heartbeat is not play, so the aurora can still start.
+// A heartbeat is not play: with no keys for 8 s the board's idle aurora starts even while this page is connected.
 const status = (text, cls) => { $('state').textContent = text; $('state').className = cls; };
 $('connect').onclick = async () => {
   if (!('serial' in navigator)) return status('No Web Serial here: use desktop Chrome.', 'bad');
@@ -133,7 +133,7 @@ async function readBoard(port) {
 
 function applyHello(line) {
   const cfg = Object.fromEntries(line.split(' ').slice(1).map(kv => kv.split('=')).map(([k, v]) => [k, parseFloat(v)]));
-  if (cfg.light === 0 || cfg.light === 1) $('lightMode').value = String(cfg.light);
+  if (cfg.demo === 0 || cfg.demo === 1) $('lightMode').value = String(cfg.demo);
   if (cfg.ripple !== undefined && !Number.isNaN(cfg.ripple)) {
     $('ripple').value = cfg.ripple; $('rippleVal').textContent = cfg.ripple + ' ms';
   }

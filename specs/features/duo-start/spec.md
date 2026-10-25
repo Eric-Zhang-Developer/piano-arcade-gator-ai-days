@@ -34,6 +34,8 @@ real seam (a component other screens share), and say why.
   same keys. List them in the PR, before and after.
 - **The Duo kit only** (`web/src/game/duo-tokens/`): zero radius, Saira condensed for labels, mono for data. No
   browser-default controls left: style the sliders and checkboxes too. No hype pink, no sun or grid (#728).
+- **No key hints on the screen:** no `<kbd>` badges or key-hint lines. The shortcuts stay bound and are listed on
+  the `?` card, behind the "? controls" link (#772, Eric 2026-10-25).
 - **It fits** at 1280×720 and 1920×1080 with no page scroll, and works with the keyboard alone.
 - **Not in scope:** no new controls or modes, no change to what any control does, and no change to `/play`'s highway.
 

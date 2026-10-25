@@ -144,18 +144,18 @@ const bar = (c: Chart, style: string, from = 0) =>
 test("?beat=ragtime: kick on 1, snare on 2, hi-hat eighths, each 2-beat cycle of a 4/4 bar", () => {
   const c = meter(4);
   expect(bar(c, "ragtime")).toEqual([
-    [0, 36, 80], [0, 42, 45], [0.5, 42, 45], [1, 38, 70], [1, 42, 45], [1.5, 42, 45],
-    [2, 36, 80], [2, 42, 45], [2.5, 42, 45], [3, 38, 70], [3, 42, 45], [3.5, 42, 45],
+    [0, 36, 48], [0, 42, 45], [0.5, 42, 45], [1, 38, 42], [1, 42, 45], [1.5, 42, 45],
+    [2, 36, 48], [2, 42, 45], [2.5, 42, 45], [3, 38, 42], [3, 42, 45], [3.5, 42, 45],
   ]);
 });
 
 test("?beat=waltz: kick on 1, hi-hat on 2 and 3", () => {
-  expect(bar(meter(3), "waltz")).toEqual([[0, 36, 80], [1, 42, 50], [2, 42, 50]]);
+  expect(bar(meter(3), "waltz")).toEqual([[0, 36, 48], [1, 42, 50], [2, 42, 50]]);
 });
 
 test("?beat=trap: kick on 1, clap on 3, hi-hat sixteenths louder on the beat", () => {
   const hits = bar(meter(4), "trap");
-  expect(hits.filter(([, n]) => n !== 42)).toEqual([[0, 36, 85], [2, 39, 75]]);
+  expect(hits.filter(([, n]) => n !== 42)).toEqual([[0, 36, 51], [2, 39, 45]]);
   expect(hits.filter(([, n]) => n === 42).map(([t, , v]) => [t, v])).toEqual(
     Array.from({ length: 16 }, (_, i) => [i / 4, i % 4 ? 35 : 50]),
   );

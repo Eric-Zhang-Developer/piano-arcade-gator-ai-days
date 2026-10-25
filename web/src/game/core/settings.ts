@@ -17,6 +17,9 @@ export const settings = {
   noteGapPx: 8, // space at the end of each note, so repeated notes read as separate
   missColor: "#6b5560",
   keyLitColor: "#ffffff", // a pressed key that hit no note (key-skin: plain white, never red)
+  // The 2D canvases' devicePixelRatio at most, as fever-stage caps its WebGL canvas: a Retina screen's 2 made every
+  // full-window layer 4× the pixels to clear and composite each frame, and /play lagged on Eric's MacBook (2026-10-25).
+  pixelRatioCap: 1.5,
   stageBackdropAlpha: 0.55, // the highway's backdrop while a background layer (fever-stage) shows through
 };
 

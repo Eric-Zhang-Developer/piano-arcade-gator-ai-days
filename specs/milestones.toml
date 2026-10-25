@@ -177,6 +177,7 @@ features = [
   "duo-results",
   "sheet-paper",
   "lab",
+  "nav-bar",
   "level-forge",
   "veritas",
   "veritas-polish",

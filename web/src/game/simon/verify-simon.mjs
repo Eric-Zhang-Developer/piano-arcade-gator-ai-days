@@ -1,6 +1,7 @@
 // Headless proof of the Simon Says spike (spec: simon-says-spike, Validation 2). Starts its own dev server; prints
 // `verify-simon: pass` and exits 0, or names each failure and exits 1. Headless has no MIDI, so it plays laptop keys:
-// 1. /simon?song=twinkle, Start; round 1's keys, found by each drawn key's data-code -> "Round 2".
+// 1. /simon?song=twinkle, Start; round 1's keys, found by each drawn key's data-code -> "Round 2". The first one,
+//    held, adds a laptop-sound voice.
 // 2. One wrong key in round 2 -> "Run over" at round 2, the expected key lit; the run is listed. A screenshot.
 // 3. Again -> round 1. No page error or console error throughout.
 // Usage: node web/src/game/simon/verify-simon.mjs --out <dir>
@@ -91,7 +92,15 @@ try {
   await page.keyboard.press("Space");
   check(await seen("Round 1 · Listen"), `Space starts round 1`);
   check(await seen("Your turn"), `"Your turn" after round 1's phrase`);
-  for (const p of tune.slice(0, 2)) await press(p);
+  // Laptop sound is the piano here (no MIDI): the player's own laptop key sounds through it (#626).
+  const voices = () => page.evaluate(() => window.__pianoArcadeLaptop?.voices ?? -1);
+  const before = await voices();
+  const first = await page.locator(`[data-pitch="${tune[0]}"]`).getAttribute("data-code");
+  await page.keyboard.down(first);
+  const held = await voices();
+  await page.keyboard.up(first);
+  check(held === before + 1, `a laptop key sounds through laptop sound (voices ${before} -> ${held})`);
+  await press(tune[1]);
   check(await seen("Round 2"), `round 1's keys (${tune.slice(0, 2).join(", ")}) -> "Round 2"`);
 
   check(await seen("Your turn"), `"Your turn" after round 2's phrase`);

@@ -570,13 +570,14 @@ const button: React.CSSProperties = {
   cursor: "pointer",
 };
 
-// The play corner (mouse-first): small square kit buttons, top right, on a panel tint so they read over the highway.
-const corner: React.CSSProperties = { position: "fixed", top: "1.6vh", right: "1.2vw", display: "flex", gap: 6, zIndex: 5 };
+// The play corner (mouse-first): small square kit buttons in the HUD's top-right status gutter (hudSettings.statusGutterPx,
+// 120 px), under beat-track's status line at y = 20 and inside the band, so they cover neither the HUD nor the lanes.
+const corner: React.CSSProperties = { position: "fixed", top: 28, right: 12, display: "flex", gap: 4, zIndex: 5 };
 const cornerButton: React.CSSProperties = {
-  width: "clamp(34px, 2.6vw, 48px)",
-  height: "clamp(34px, 2.6vw, 48px)",
+  width: 28,
+  height: 28,
   padding: 0,
-  fontSize: "clamp(12px, 0.9vw, 17px)",
+  fontSize: 12,
   background: "color-mix(in srgb, var(--pa-panel) 80%, transparent)",
   color: "var(--pa-ink-dim)",
 };

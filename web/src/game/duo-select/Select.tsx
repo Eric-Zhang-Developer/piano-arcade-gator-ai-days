@@ -88,7 +88,7 @@ export function FocusPanel(p: FocusPanelProps) {
   );
 }
 
-const buttonSize: CSSProperties = { fontSize: "clamp(15px, 1.2vw, 23px)", padding: "1.5vh 0", letterSpacing: "0.16em" };
+const buttonSize: CSSProperties = { fontSize: "clamp(15px, 1.2vw, 23px)", padding: "1.2vh 0", letterSpacing: "0.16em" };
 
 // The browser's storage, read as a snapshot (none on the server), so the strip appears after hydration.
 const noop = () => () => {};

@@ -42,6 +42,6 @@ export function loadSongs(songsDir: string): { songs: Song[]; invalid: { path: s
     const id = dirname(path).split(sep).join("/");
     songs.push({ id, title: chart.title, composer: chart.composer, catalog: chart.catalog, noteCount: chart.notes.length, level: difficulty(chart).level, roll: roll(chart), key: keyOf(chart.notes.map((n) => n.pitch)) });
   }
-  songs.sort((a, b) => a.level - b.level || a.title.localeCompare(b.title)); // easiest first
+  songs.sort((a, b) => a.level - b.level || +(b.id === "twinkle") - +(a.id === "twinkle") || a.title.localeCompare(b.title)); // easiest first; Twinkle stays the front door, other ties sort by title
   return { songs, invalid };
 }

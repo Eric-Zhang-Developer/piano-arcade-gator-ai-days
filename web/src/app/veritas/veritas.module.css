@@ -1,25 +1,40 @@
 /* /veritas: cabinet chrome on the sky (visual-direction.md). All of the page's styling lives here, so veritas-polish
-   changes CSS only; components set nothing inline but data positions (--x, --y, --row, --i). */
+   changes CSS only; components set nothing inline but data positions (--x, --y, --row, --i).
+   The look: the cabinet's marquee up top, each take a calm black lane where the notes flare white as the playhead
+   reaches them (Synthesia's center), the judge's marks stamped over it; below, a quiet scoreboard. */
 .page {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 32px 40px 80px;
+  padding: 40px 40px 96px;
   min-height: 100vh;
   color: var(--pa-ink);
   font-family: system-ui, sans-serif;
-  font-size: max(16px, 1.25vw);
+  font-size: max(16px, 1.25vw); /* 16 px at 1280, 24 px at 1920: the video's floor */
   line-height: 1.4;
   box-sizing: content-box;
 }
 
+/* The sky, lit from the top edge in the cabinet's two chrome colors: loud at the edge, dark behind the lanes. */
 :global(html):has(.page),
 :global(body):has(.page) {
-  background: var(--pa-sky);
+  background:
+    radial-gradient(70% 38% at 18% -6%, rgba(255, 47, 208, 0.2), transparent 70%),
+    radial-gradient(60% 34% at 88% -8%, rgba(39, 225, 255, 0.14), transparent 70%),
+    var(--pa-sky);
+  background-attachment: fixed;
 }
 
+/* --- the marquee ------------------------------------------------------------------------------------------------- */
+
 .header {
-  border-bottom: 2px solid var(--pa-magenta);
-  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: end;
+  gap: 8px 40px;
+  padding-bottom: 20px;
+  margin-bottom: 32px;
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(90deg, var(--pa-magenta), var(--pa-cyan) 60%, transparent) 1;
 }
 
 .title,
@@ -28,23 +43,30 @@
   font-family: var(--pa-font-display), system-ui, sans-serif;
   font-style: italic;
   font-weight: 900;
-  letter-spacing: 2px;
 }
 
 .title {
-  margin: 0 0 8px;
-  font-size: max(32px, 3vw);
+  margin: 0;
+  font-size: max(56px, 5.5vw);
+  line-height: 0.9;
+  letter-spacing: 0.04em;
   color: var(--pa-magenta);
+  /* a neon tube: the magenta's own glow, and a thin cyan ghost off its edge */
+  text-shadow:
+    0 0 0.25em rgba(255, 47, 208, 0.55),
+    0.04em 0.03em 0 rgba(39, 225, 255, 0.55);
 }
 
 .header p {
-  margin: 0 0 12px;
-  max-width: 64ch;
+  margin: 0;
+  max-width: 54ch;
+  color: var(--pa-ink-dim);
 }
 
 .h2 {
-  margin: 0 0 16px;
-  font-size: max(22px, 1.8vw);
+  margin: 0 0 20px;
+  font-size: max(24px, 1.9vw);
+  letter-spacing: 0.04em;
   color: var(--pa-cyan);
 }
 
@@ -56,37 +78,61 @@
   font-family: var(--pa-font-display), system-ui, sans-serif;
   font-style: italic;
   font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 
 /* --- the hero ---------------------------------------------------------------------------------------------------- */
 
 .hero {
   --sweep: 4s;
-  margin-bottom: 40px;
+  margin-bottom: 56px;
 }
 
+/* Two takes a row when they fit; the golden test, first, gets the whole row. */
 .runs {
   display: grid;
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 700px), 1fr));
+  gap: 24px;
+}
+
+.run:first-child {
+  grid-column: 1 / -1;
 }
 
 .run {
-  padding: 12px 16px 14px;
-  border: 2px solid var(--pa-cyan);
-  border-radius: 10px;
+  position: relative;
+  padding: 0.7em 0.9em 0.8em 1.1em;
+  border: 1px solid rgba(39, 225, 255, 0.28);
+  border-radius: 12px;
   background: var(--pa-panel);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.6) inset,
+    0 18px 40px -24px rgba(255, 47, 208, 0.35);
+}
+
+/* the cabinet's edge: a magenta rail down the card's left side */
+.run::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(var(--pa-magenta), var(--pa-cyan));
 }
 
 .runHead {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 4px 16px;
+  gap: 2px 18px;
 }
 
 .player {
   margin: 0;
-  font-size: max(20px, 1.5vw);
+  font-size: 1.5em;
+  letter-spacing: 0.02em;
   color: var(--pa-ink);
 }
 
@@ -99,11 +145,17 @@
   color: var(--pa-ink-dim);
 }
 
+/* The lane: the playfield's black, faint time grid, the judge's marks in the top rows, the notes below them. */
 .strip {
   position: relative;
-  height: 130px;
-  margin: 10px 0 6px;
-  border-bottom: 1px solid rgba(242, 242, 245, 0.2);
+  height: 9.5em;
+  margin: 0.6em 0 0.5em;
+  border-radius: 8px;
+  background:
+    repeating-linear-gradient(90deg, rgba(242, 242, 245, 0.05) 0 1px, transparent 1px 10%),
+    linear-gradient(transparent 3.6em, rgba(242, 242, 245, 0.08) 3.6em, transparent calc(3.6em + 1px)),
+    var(--pa-bg);
+  box-shadow: 0 0 0 1px rgba(242, 242, 245, 0.1) inset;
   overflow: hidden;
 }
 
@@ -113,76 +165,138 @@
   left: calc(var(--x) * 100%);
 }
 
+/* A note: dim until the playhead reaches it, white-hot as it passes, then lit (visual-direction.md: brightness is
+   time to hit). Each lights at its own time, the same delay as the judge's marks. */
 .tick {
-  top: calc(26px + var(--y) * 80px);
-  width: 3px;
-  height: 8px;
-  background: var(--pa-cyan);
+  top: calc(4em + var(--y) * 4.6em);
+  width: 9px;
+  height: 6px;
+  margin-left: -4px;
+  border-radius: 3px;
+  background: var(--pa-ink);
+  opacity: 0.35;
+  animation: lit 450ms ease-out forwards;
+  animation-delay: calc(var(--i) * var(--sweep) + var(--x) * var(--sweep));
 }
 
+/* a planted mistake: ringed in the fever's orange, so the eye knows where the judge must look */
 .planted {
   outline: 2px solid var(--pa-sun);
   outline-offset: 3px;
-  border-radius: 1px;
 }
 
 .press {
   bottom: 0;
   width: 2px;
-  height: 10px;
-  background: var(--pa-ink-dim);
+  height: 0.55em;
+  background: rgba(242, 242, 245, 0.45);
 }
 
-/* The judge's marks: hidden until the playhead reaches them. */
+/* The judge's marks: stamped down as the playhead reaches them. */
 .mark {
   position: absolute;
   left: calc(var(--x) * 100%);
-  top: calc(var(--row) * 18px);
+  top: calc(0.25em + var(--row) * 1.1em);
   transform: translateX(-50%);
-  font-size: 14px;
+  font-size: 1em;
+  line-height: 1.1;
   font-family: var(--pa-font-display), system-ui, sans-serif;
   font-style: italic;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
   opacity: 0;
-  animation: reveal 1ms linear forwards;
+  animation: stamp 300ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   animation-delay: calc(var(--i) * var(--sweep) + var(--x) * var(--sweep));
 }
 
 .wrong {
   color: var(--pa-wrong);
-  font-size: 18px;
+  text-shadow: 0 0 0.4em rgba(255, 77, 94, 0.7);
 }
 
 .early,
 .late {
   color: var(--pa-sun);
+  text-shadow: 0 0 0.4em rgba(255, 176, 46, 0.45);
 }
 
 .rolled {
   color: var(--pa-magenta);
+  text-shadow: 0 0 0.4em rgba(255, 47, 208, 0.5);
 }
 
+/* The playhead: a magenta scan line with a fading trail behind it, the cabinet sweeping the take. */
 .playhead {
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
-  width: 2px;
+  width: 3px;
   background: var(--pa-magenta);
+  box-shadow: 0 0 14px 2px rgba(255, 47, 208, 0.8);
   opacity: 0;
   animation: sweep var(--sweep) linear forwards;
   animation-delay: calc(var(--i) * var(--sweep));
 }
 
+.playhead::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 100%;
+  width: 140px;
+  background: linear-gradient(90deg, transparent, rgba(255, 47, 208, 0.22));
+}
+
 .tally {
   margin: 0;
   opacity: 0;
-  animation: reveal 1ms linear forwards;
+  animation: rise 220ms ease-out forwards;
   animation-delay: calc((var(--i) + 1) * var(--sweep));
 }
 
-@keyframes reveal {
-  to {
+.tally .num {
+  font-size: 1.35em;
+  line-height: 1;
+  color: var(--pa-ink);
+}
+
+@keyframes lit {
+  0% {
+    opacity: 0.35;
+  }
+  25% {
     opacity: 1;
+    background: var(--pa-flare);
+    box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.9);
+  }
+  100% {
+    opacity: 0.9;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.35);
+  }
+}
+
+@keyframes stamp {
+  0% {
+    opacity: 0;
+    scale: 1.8;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes rise {
+  0% {
+    opacity: 0;
+    translate: 0 6px;
+  }
+  100% {
+    opacity: 1;
+    translate: 0 0;
   }
 }
 
@@ -207,27 +321,42 @@
     opacity: 1;
   }
 
+  .tick {
+    animation: none;
+    opacity: 0.9;
+  }
+
   .playhead {
     display: none;
   }
 }
 
 .note {
-  margin: 12px 0 0;
+  margin: 16px 0 0;
   color: var(--pa-ink-dim);
 }
 
 .replay {
   margin-left: 12px;
-  padding: 4px 14px;
+  padding: 0.2em 0.9em;
   border: 2px solid var(--pa-magenta);
-  border-radius: 8px;
+  border-radius: 999px;
   background: transparent;
   color: var(--pa-ink);
+  font: inherit;
   font-family: var(--pa-font-display), system-ui, sans-serif;
   font-style: italic;
   font-weight: 800;
+  letter-spacing: 0.04em;
   cursor: pointer;
+  transition:
+    background-color 180ms ease-out,
+    box-shadow 180ms ease-out;
+}
+
+.replay:hover {
+  background: rgba(255, 47, 208, 0.16);
+  box-shadow: 0 0 18px rgba(255, 47, 208, 0.45);
 }
 
 .replay:focus-visible {
@@ -235,11 +364,18 @@
   outline-offset: 3px;
 }
 
-/* --- the dashboard ----------------------------------------------------------------------------------------------- */
+/* --- the dashboard: a scoreboard, calm ---------------------------------------------------------------------------- */
 
 .dashboard {
-  padding-top: 24px;
-  border-top: 1px solid rgba(255, 47, 208, 0.4);
+  padding: 28px 32px 32px;
+  border: 1px solid rgba(242, 242, 245, 0.1);
+  border-top: 2px solid rgba(39, 225, 255, 0.5);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.dash > p:first-child {
+  margin-top: 0;
 }
 
 .dash a {
@@ -253,25 +389,38 @@
 }
 
 .h3 {
-  margin: 24px 0 8px;
+  margin: 32px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(242, 242, 245, 0.12);
   font-family: var(--pa-font-display), system-ui, sans-serif;
   font-style: italic;
   font-weight: 800;
+  font-size: 1em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pa-ink-dim);
 }
 
 .jobs,
 .suites {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 24px;
+  gap: 8px 12px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+.jobs li {
+  padding: 0.1em 0.7em;
+  border: 1px solid rgba(242, 242, 245, 0.14);
+  border-radius: 999px;
+}
+
 .suites {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+  gap: 4px 32px;
 }
 
 /* Pass and fail say so in words; the color only repeats it. Red stays WRONG's alone (visual-direction.md). */
@@ -285,17 +434,29 @@
 }
 
 .checks {
+  width: 100%;
   border-collapse: collapse;
 }
 
 .checks td {
-  padding: 2px 24px 2px 0;
+  padding: 6px 24px 6px 0;
+  border-bottom: 1px solid rgba(242, 242, 245, 0.07);
+}
+
+/* the seconds column: a number, so the display face, right-aligned like a scoreboard's */
+.checks td:last-child {
+  padding-right: 0;
+  text-align: right;
+  font-family: var(--pa-font-display), system-ui, sans-serif;
+  font-style: italic;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 .shots {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  gap: 20px;
 }
 
 .shots figure {
@@ -305,10 +466,17 @@
 .shots img {
   display: block;
   width: 100%;
-  border: 1px solid rgba(242, 242, 245, 0.2);
+  border-radius: 6px;
+  border: 1px solid rgba(242, 242, 245, 0.16);
 }
 
 .shots figcaption {
+  margin-top: 6px;
   color: var(--pa-ink-dim);
-  font-size: 0.8em;
+}
+
+@media (max-width: 900px) {
+  .header {
+    grid-template-columns: 1fr;
+  }
 }

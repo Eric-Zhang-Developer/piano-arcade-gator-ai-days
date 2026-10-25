@@ -56,8 +56,9 @@ jobs:
         run: pnpm -C web lint && pnpm -C web typecheck && pnpm -C web test && pnpm -C web build
 
   plan:
-    # How many browser shards this run needs: one per 3 checks, 1 to 8. Every run used to take 8 runners, even a PR
-    # whose changes pick 2 checks, and GitHub's job limit queued main 20+ min. Every check (main) still gets 8.
+    # How many browser shards this run needs: one per 3 checks, 1 to 16. Every run used to take 8 runners, even a PR
+    # whose changes pick 2 checks, and GitHub's job limit queued main 20+ min. Every check (main) gets 16, about 7 min
+    # of checks each since shards balance by seconds (Eric, 2026-10-25: 16 for the 7 min target; watch for queueing).
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -76,7 +77,7 @@ jobs:
         run: |
           if [ -n "$BASE" ]; then args="--base $BASE"; else args="--all"; fi
           count="$(node web/e2e/run-checks.mjs --list $args | awk 'NF { c++ } END { print c + 0 }')"
-          n=$(( (count + 2) / 3 )); n=$(( n < 1 ? 1 : n > 8 ? 8 : n ))
+          n=$(( (count + 2) / 3 )); n=$(( n < 1 ? 1 : n > 16 ? 16 : n ))
           echo "$count check(s) -> $n shard(s)"
           echo "shards=$(jq -nc --argjson n "$n" '[range(1; $n + 1)]')" >> "$GITHUB_OUTPUT"
 
@@ -97,7 +98,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: ${{ fromJSON(needs.plan.outputs.shards) }}  # at most 8: 4 left one all-checks shard at 18.75 of 20 min (#415)
+        shard: ${{ fromJSON(needs.plan.outputs.shards) }}  # at most 16 (plan): 4 left one all-checks shard at 18.75 of 20 min (#415)
     steps:
       - uses: actions/checkout@v5
         with:

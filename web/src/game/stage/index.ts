@@ -175,14 +175,18 @@ export function feverStage(): GamePlugin {
       let drawn = false;
       return {
         frame(f) {
-          if (frozen || (still && drawn)) return;
+          // Plain black in normal play (Eric, 2026-10-25): the stage fades in and out with fever's heat and isn't
+          // drawn at all outside it. Reduced motion shows fever's stage at once, with no fade.
+          const l = look(state, f.nowMs);
+          const heat = still ? Math.ceil(l.heat) : l.heat;
+          el.style.opacity = String(heat);
+          if (heat === 0 || frozen || (still && drawn)) return;
           if (!document.hidden && overBudget(performance.now() - mountedAt)) {
             frozen = true;
             console.info(`fever-stage: frames averaged over ${stageSettings.budgetMs} ms for 1 s; the stage is frozen for this take`);
             return;
           }
-          const l = look(state, f.nowMs);
-          scene.render(f, still ? { ...l, burst: null } : l, still ? 0 : gridPhase(f.nowMs, bpm, l.speed));
+          scene.render(f, still ? { ...l, heat: 1, burst: null } : l, still ? 0 : gridPhase(f.nowMs, bpm, l.speed));
           drawn = true;
         },
         dispose: scene.dispose,

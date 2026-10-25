@@ -42,7 +42,7 @@ export const helpGroups: HelpGroup[] = [
       { keys: ["E"], what: "switch Normal and Easy", source: [SELECT], match: ["e"] },
       { keys: ["F"], what: "a guided first song, 30 seconds", source: ["game/first-run/index.tsx"], match: ["f"] },
       { keys: ["O"], what: "Options: latency, volume, labels", source: [OPTIONS], match: ["o"] },
-      { keys: ["X"], what: "the lab: every experiment and hidden feature; Esc comes back", source: ["game/lab/LabLink.tsx", "game/lab/Lab.tsx"], match: ["x", "Escape"] },
+      { keys: ["X"], what: "the lab of experiments; Esc back", source: ["game/lab/LabLink.tsx", "game/lab/Lab.tsx"], match: ["x", "Escape"] },
       {
         keys: ["↑", "↓", "←", "→", "Enter"],
         what: "rows, values, boxes",

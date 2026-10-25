@@ -243,6 +243,7 @@ features = ["simon-says-spike", "restyle-spike", "score-follow-spike", "wrong-no
   "real-keys", # Eric, 2026-10-25 (#1017): wow feeder; the notes fall onto live video of the real DGX keys
   "composers-hands", # Eric, 2026-10-25 (#1069): wow feeder; the composer's own piano roll on the DGX, then a duet
   "wet-paint", # Eric, 2026-10-25 (#1106): wow feeder; free play where every note blooms as paint, wet under the pedal
+  "speaking-piano", # Eric, 2026-10-25 (#1153): wow feeder; can the DGX say a short phrase a listener understands
 ]
 cut = []
 

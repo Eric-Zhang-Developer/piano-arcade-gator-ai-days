@@ -91,7 +91,7 @@
    "id": "6ac4c2d",
    "pitch": 83,
    "beat": 7.25,
-   "duration": 2,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 94
   },
@@ -107,7 +107,7 @@
    "id": "19843d7",
    "pitch": 72,
    "beat": 8,
-   "duration": 2,
+   "duration": 1.25,
    "hand": "R",
    "velocity": 105
   },
@@ -139,7 +139,7 @@
    "id": "5f41783",
    "pitch": 84,
    "beat": 9,
-   "duration": 1,
+   "duration": 0.75,
    "hand": "R",
    "velocity": 101
   },
@@ -147,7 +147,7 @@
    "id": "c47b9a2",
    "pitch": 100,
    "beat": 9.25,
-   "duration": 0.5,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 81
   },
@@ -435,7 +435,7 @@
    "id": "dc611d7",
    "pitch": 84,
    "beat": 18.25,
-   "duration": 2,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 104
   },
@@ -459,7 +459,7 @@
    "id": "f9f79d0",
    "pitch": 76,
    "beat": 19,
-   "duration": 2,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 110
   },
@@ -475,7 +475,7 @@
    "id": "8f3d1b2",
    "pitch": 100,
    "beat": 19.5,
-   "duration": 0.5,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 83
   },
@@ -667,7 +667,7 @@
    "id": "26e19bf",
    "pitch": 72,
    "beat": 25.5,
-   "duration": 2,
+   "duration": 1.25,
    "hand": "R",
    "velocity": 96
   },
@@ -675,7 +675,7 @@
    "id": "e5742cc",
    "pitch": 76,
    "beat": 25.75,
-   "duration": 1.75,
+   "duration": 1.5,
    "hand": "R",
    "velocity": 95
   },
@@ -683,7 +683,7 @@
    "id": "924e4d0",
    "pitch": 81,
    "beat": 26,
-   "duration": 1.25,
+   "duration": 0.5,
    "hand": "R",
    "velocity": 90
   },
@@ -691,7 +691,7 @@
    "id": "bef27a6",
    "pitch": 84,
    "beat": 26.25,
-   "duration": 2,
+   "duration": 1.5,
    "hand": "R",
    "velocity": 93
   },
@@ -811,7 +811,7 @@
    "id": "8b26487",
    "pitch": 84,
    "beat": 30,
-   "duration": 1.5,
+   "duration": 1.25,
    "hand": "R",
    "velocity": 65
   },
@@ -835,7 +835,7 @@
    "id": "ab95bfe",
    "pitch": 72,
    "beat": 30.75,
-   "duration": 2,
+   "duration": 1.25,
    "hand": "R",
    "velocity": 74
   },
@@ -843,7 +843,7 @@
    "id": "bfb08e7",
    "pitch": 77,
    "beat": 31,
-   "duration": 2,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 97
   },
@@ -859,7 +859,7 @@
    "id": "330170b",
    "pitch": 84,
    "beat": 31.5,
-   "duration": 2,
+   "duration": 1.5,
    "hand": "R",
    "velocity": 83
   },
@@ -875,7 +875,7 @@
    "id": "c81c12b",
    "pitch": 76,
    "beat": 32,
-   "duration": 0.5,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 101
   },
@@ -931,7 +931,7 @@
    "id": "3feaf83",
    "pitch": 79,
    "beat": 33.75,
-   "duration": 2,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 99
   },
@@ -947,7 +947,7 @@
    "id": "7dcbcaa",
    "pitch": 72,
    "beat": 34.25,
-   "duration": 2,
+   "duration": 1.5,
    "hand": "R",
    "velocity": 80
   },
@@ -955,7 +955,7 @@
    "id": "3e14389",
    "pitch": 76,
    "beat": 34.5,
-   "duration": 2,
+   "duration": 1.5,
    "hand": "R",
    "velocity": 84
   },
@@ -971,7 +971,7 @@
    "id": "657a231",
    "pitch": 84,
    "beat": 35,
-   "duration": 0.5,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 96
   },
@@ -979,7 +979,7 @@
    "id": "ef4c17a",
    "pitch": 88,
    "beat": 35.25,
-   "duration": 2,
+   "duration": 1.25,
    "hand": "R",
    "velocity": 101
   },
@@ -987,7 +987,7 @@
    "id": "c1630da",
    "pitch": 84,
    "beat": 35.5,
-   "duration": 1.75,
+   "duration": 1.5,
    "hand": "R",
    "velocity": 97
   },
@@ -995,7 +995,7 @@
    "id": "94ff782",
    "pitch": 79,
    "beat": 35.75,
-   "duration": 1.75,
+   "duration": 1.5,
    "hand": "R",
    "velocity": 73
   },
@@ -1099,7 +1099,7 @@
    "id": "0f0b790",
    "pitch": 79,
    "beat": 39,
-   "duration": 2,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 104
   },
@@ -1179,7 +1179,7 @@
    "id": "78b4785",
    "pitch": 81,
    "beat": 41.5,
-   "duration": 2,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 89
   },
@@ -1355,7 +1355,7 @@
    "id": "fbaf6da",
    "pitch": 72,
    "beat": 47,
-   "duration": 1.75,
+   "duration": 1.25,
    "hand": "R",
    "velocity": 101
   },
@@ -1363,7 +1363,7 @@
    "id": "47de4cf",
    "pitch": 77,
    "beat": 47.25,
-   "duration": 2,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 66
   },
@@ -1395,7 +1395,7 @@
    "id": "5830386",
    "pitch": 103,
    "beat": 48.25,
-   "duration": 0.5,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 66
   },
@@ -1403,7 +1403,7 @@
    "id": "ad51206",
    "pitch": 76,
    "beat": 48.5,
-   "duration": 0.5,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 100
   },
@@ -1419,7 +1419,7 @@
    "id": "f0329d2",
    "pitch": 76,
    "beat": 49,
-   "duration": 1.5,
+   "duration": 1.25,
    "hand": "R",
    "velocity": 101
   },
@@ -2459,7 +2459,7 @@
    "id": "d7c91bc",
    "pitch": 77,
    "beat": 79.75,
-   "duration": 1.75,
+   "duration": 1.5,
    "hand": "R",
    "velocity": 93
   },
@@ -2475,7 +2475,7 @@
    "id": "e2e37fe",
    "pitch": 79,
    "beat": 80.25,
-   "duration": 2,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 92
   },
@@ -3043,7 +3043,7 @@
    "id": "ea28ed4",
    "pitch": 86,
    "beat": 102.5,
-   "duration": 0.5,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 98
   },
@@ -3779,7 +3779,7 @@
    "id": "0ec16c9",
    "pitch": 72,
    "beat": 125,
-   "duration": 2,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 96
   },
@@ -4211,7 +4211,7 @@
    "id": "b035a3d",
    "pitch": 76,
    "beat": 137,
-   "duration": 2,
+   "duration": 1.25,
    "hand": "R",
    "velocity": 88
   },
@@ -4219,7 +4219,7 @@
    "id": "f648635",
    "pitch": 81,
    "beat": 137.25,
-   "duration": 2,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 93
   },
@@ -4235,7 +4235,7 @@
    "id": "63156a0",
    "pitch": 105,
    "beat": 137.75,
-   "duration": 0.5,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 80
   },
@@ -4259,7 +4259,7 @@
    "id": "2adb3f9",
    "pitch": 100,
    "beat": 138.5,
-   "duration": 0.5,
+   "duration": 0.25,
    "hand": "R",
    "velocity": 85
   },
@@ -4331,7 +4331,7 @@
    "id": "c41d99a",
    "pitch": 81,
    "beat": 140.75,
-   "duration": 2,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 94
   },
@@ -4739,7 +4739,7 @@
    "id": "affb48e",
    "pitch": 79,
    "beat": 151.75,
-   "duration": 2,
+   "duration": 1.75,
    "hand": "R",
    "velocity": 102
   },

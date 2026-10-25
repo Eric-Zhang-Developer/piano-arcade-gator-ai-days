@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import type { Chart, GameEvent, GamePlugin } from "../../contracts";
 import { settings } from "../core/settings";
+import { canvasFonts, kitSettings } from "../duo-tokens";
 import { hudBottom, hudLayout } from "../hud";
-import { ink, panel, whenDisplayFontReady } from "../ui-tokens";
+import { ink, line, panel } from "../ui-tokens";
 import { cueAlpha, cueAt, cueBand, cuesFor, firstRunUrl, isFirstRun, type Cue, type CueId } from "./cues";
 import styles from "./first-run.module.css";
 
@@ -28,12 +29,6 @@ export function firstRun(): GamePlugin & { cue(nowMs: number): Cue | null } {
   let cues: Cue[] = [];
   let seen: CueId[] = [];
   let ended = false; // songEnd or quit: nothing more to draw, including /play's last frame behind the results
-  let display = "system-ui, sans-serif";
-  if (typeof document !== "undefined")
-    void whenDisplayFontReady().then(() => {
-      const family = getComputedStyle(document.documentElement).getPropertyValue("--pa-font-display").trim();
-      if (family) display = `${family}, system-ui, sans-serif`;
-    });
   const cue = (nowMs: number) => (chart ? cueAt(cues, nowMs) : null);
   return {
     id: "first-run",
@@ -65,15 +60,18 @@ export function firstRun(): GamePlugin & { cue(nowMs: number): Cue | null } {
       const y = (top + bottom) / 2;
       ctx.save();
       ctx.globalAlpha = cueAlpha(c, f.nowMs, reducedMotion());
-      ctx.font = `italic 800 ${size}px ${display}`;
+      ctx.font = canvasFonts.display(size); // Duo: upright, the kit's face
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       const w = ctx.measureText(c.text).width + size * 1.4;
       const h = size * 1.8;
       ctx.fillStyle = panel;
       ctx.beginPath();
-      ctx.roundRect(f.width / 2 - w / 2, y - h / 2, w, h, 8);
+      ctx.rect(f.width / 2 - w / 2, y - h / 2, w, h); // Duo: a square panel in a hairline frame
       ctx.fill();
+      ctx.strokeStyle = line;
+      ctx.lineWidth = kitSettings.hairline;
+      ctx.stroke();
       ctx.fillStyle = ink;
       ctx.fillText(c.text, f.width / 2, y);
       ctx.restore();

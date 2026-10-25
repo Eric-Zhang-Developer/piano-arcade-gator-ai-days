@@ -70,8 +70,10 @@ async function home() {
 }
 await home();
 const ids = await page.locator("ol a").evaluateAll((as) => as.map((a) => new URL(a.href).searchParams.get("song")));
-const hint = await page.getByText("choose ·").textContent();
-check(hint === "↑ ↓ choose · Enter play · L learn", `the hint reads "${hint}"`);
+// The hint names L, beside W and E. duo-select restyles it in its own words and case, so the check reads the keys,
+// not one exact string.
+const hint = (await page.locator("main header p").textContent()).replace(/\s+/g, " ").trim();
+check(/\bL learn\b/i.test(hint) && /\bW watch\b/i.test(hint) && /\bE easy\b/i.test(hint), `the hint names L learn, W watch and E easy: "${hint}"`);
 
 // 1. ↓ then L: the second song in wait mode.
 await page.keyboard.press("ArrowDown");
@@ -82,11 +84,14 @@ const line = page.getByText("Wait mode: the song waits for each note");
 await line.waitFor({ timeout: 30_000 }).catch(() => {});
 check(await line.isVisible(), "… and wait mode's start line shows");
 
-// 2. LEARN on the focused song.
+// 2. LEARN on the focused song, where the select has the link. duo-select's panel has PLAY and PRACTICE only, and L
+// (step 1) is its way into wait mode.
 await home();
-await page.getByTestId("preview-learn").click();
-await page.waitForURL(/\/play\?/, { timeout: 30_000 });
-check(search(page) === `?song=${ids[0]}&mode=wait`, `LEARN opens ${search(page)} (want ?song=${ids[0]}&mode=wait)`);
+if (await page.getByTestId("preview-learn").count()) {
+  await page.getByTestId("preview-learn").click();
+  await page.waitForURL(/\/play\?/, { timeout: 30_000 });
+  check(search(page) === `?song=${ids[0]}&mode=wait`, `LEARN opens ${search(page)} (want ?song=${ids[0]}&mode=wait)`);
+} else say("verify-learn: no LEARN link on this select (duo-select): L covers it, step 1");
 
 // 3. Enter is unchanged: a judged take.
 await home();
@@ -100,14 +105,14 @@ await page.keyboard.press(process.platform === "darwin" ? "Meta+L" : "Control+L"
 await page.waitForTimeout(1500);
 check(new URL(page.url()).pathname === "/" && search(page) === "", `${process.platform === "darwin" ? "Meta" : "Ctrl"}+L leaves the page on ${page.url()}`);
 
-// 5. Screenshots of / with the hint and LEARN.
+// 5. Screenshots of / with the hint.
 for (const [w, h] of [
   [1280, 720],
   [1920, 1080],
 ]) {
   await page.setViewportSize({ width: w, height: h });
   await home();
-  await page.getByTestId("preview-learn").waitFor();
+  await page.getByTestId("song-preview").waitFor();
   await page.screenshot({ path: join(out, `select-${w}x${h}.png`) });
 }
 say(`verify-learn: screenshots in ${out}`);

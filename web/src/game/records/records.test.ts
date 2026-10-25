@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Chart, GameEvent, Results } from "../../contracts";
-import { records } from ".";
-import { addTake, betterGrade, loadRecords, NO_INITIALS, practiceReason, RECORDS_KEY, setInitials, type Records } from "./store";
+import { records, takeOutcome } from ".";
+import { initialsOf, nextLetters, pressKey } from "./initials";
+import { addTake, betterGrade, loadRecords, NO_INITIALS, practiceReason, recordKey, RECORDS_KEY, setInitials, type Records } from "./store";
 
 const take = (score: number, accuracy = 0.9, rank: "S" | "A" | "B" | "C" | "D" = "A", date = `2026-10-24T00:00:0${score % 10}Z`) => ({ score, accuracy, rank, maxCombo: 10, date });
 
@@ -87,6 +88,13 @@ describe("the plugin", () => {
     return { p, store };
   }
 
+  it("publishes the take's outcome for record-moment: recorded with newRecord, then practice", () => {
+    play("song=twinkle");
+    expect(takeOutcome()).toMatchObject({ kind: "recorded", chartId: "twinkle", newRecord: true, inTop: true });
+    play("song=twinkle&bot=perfect");
+    expect(takeOutcome()).toEqual({ kind: "practice" });
+  });
+
   it("records the take at songEnd with the HUD's score and initials ---", () => {
     const { store } = play("song=twinkle");
     const saved = JSON.parse(store.get(RECORDS_KEY)!);
@@ -94,9 +102,51 @@ describe("the plugin", () => {
     expect(saved.twinkle.top[0]).toMatchObject({ score: 300, rank: "S", initials: NO_INITIALS }); // 3 PERFECT at x1
   });
 
+  it("an Easy take saves under <id>@easy and leaves the Normal records alone (easy-charts)", () => {
+    const { store } = play("song=twinkle&level=easy");
+    const saved = JSON.parse(store.get(RECORDS_KEY)!);
+    expect(Object.keys(saved)).toEqual(["twinkle@easy"]);
+    expect(recordKey("fur-elise", new URLSearchParams("level=easy"))).toBe("fur-elise@easy");
+    expect(recordKey("fur-elise", new URLSearchParams("level=normal"))).toBe("fur-elise");
+    expect(recordKey("fur-elise", new URLSearchParams())).toBe("fur-elise");
+  });
+
   it("records nothing for a practice take", () => {
     const { p, store } = play("bot=perfect");
     expect(store.has(RECORDS_KEY)).toBe(false);
     expect(p.resultsPanel!({} as never)).not.toBeNull(); // the panel says why
+  });
+});
+
+describe("the initials keys", () => {
+  it("A–Z appends up to three, ↑ ↓ cycle the last, Backspace removes it, anything else isn't ours", () => {
+    const type = (keys: string[]) => keys.reduce((l, k) => nextLetters(l, k) ?? l, [] as string[]);
+    expect(type(["e", "r", "i", "x"])).toEqual(["E", "R", "I"]);
+    expect(type(["ArrowUp"])).toEqual(["A"]);
+    expect(type(["ArrowDown"])).toEqual(["Z"]);
+    expect(type(["z", "ArrowUp"])).toEqual(["A"]);
+    expect(type(["e", "r", "Backspace"])).toEqual(["E"]);
+    expect(nextLetters([], "Enter")).toBeNull();
+    expect(nextLetters([], "1")).toBeNull();
+  });
+});
+
+describe("one take's entry, shared", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("keeps the keys pressed before anything shows them, and Enter with three letters saves them", () => {
+    const store = new Map<string, string>();
+    vi.stubGlobal("localStorage", { getItem: (k: string) => store.get(k) ?? null, setItem: (k: string, v: string) => void store.set(k, v) });
+    const date = "2026-10-24T17:00:00.000Z";
+    const records: Records = { twinkle: { best: { rank: "S", accuracy: 1, score: 300, date }, top: [{ initials: NO_INITIALS, score: 300, accuracy: 1, rank: "S", maxCombo: 3, date }] } };
+    store.set(RECORDS_KEY, JSON.stringify(records));
+    expect(pressKey("twinkle", date, "Enter")).toBe(true); // the entry's key, but two letters short: nothing saved
+    for (const k of ["e", "r", "i"]) expect(pressKey("twinkle", date, k)).toBe(true);
+    expect(pressKey("twinkle", date, "Tab")).toBe(false);
+    expect(initialsOf("twinkle", date)).toEqual({ letters: ["E", "R", "I"], done: false, saved: false });
+    pressKey("twinkle", date, "Enter");
+    expect(initialsOf("twinkle", date)).toEqual({ letters: ["E", "R", "I"], done: true, saved: true });
+    expect(JSON.parse(store.get(RECORDS_KEY)!).twinkle.top[0].initials).toBe("ERI");
+    expect(pressKey("twinkle", date, "x")).toBe(false); // closed: keys go back to the page
   });
 });

@@ -1,12 +1,17 @@
 "use client";
 // Song preview (spec: song-preview): the highlighted song's notes per second, best grade and PRACTICE 70%, and its
-// opening on the piano or as quiet tones. Mount it keyed by song id: each mount is one highlight.
+// opening on the piano or as quiet tones, and the song's Hands and Speed (song-options). Mount it keyed by song id:
+// each mount is one highlight.
 import { useEffect, useState, useSyncExternalStore, type CSSProperties } from "react";
 import type { Chart, Rank } from "../../contracts";
 import { difficultyInputs } from "../difficulty";
 import { pickOutput } from "../../replay/piano";
 import { modeUrl } from "../wait-mode/plugin";
 import { opening, openingMs, playAsTones, playOnPiano, practiceUrl, previewSettings } from "./opening";
+import { SongSource } from "../song-sources";
+import { useLevel, withLevel } from "../easy-charts";
+import { SongOptions, useSongOptions, withOptions } from "../song-options";
+import { isWatchKey } from "../watch-demo/demo";
 
 // The music select's L (learn-from-select): plain l or L, no Ctrl, Meta or Alt (Cmd+L stays the browser's), no repeat.
 export const isLearnKey = (e: Pick<KeyboardEvent, "key" | "ctrlKey" | "metaKey" | "altKey" | "repeat">) =>
@@ -43,6 +48,8 @@ export function SongPreview({ id, best }: { id: string; best?: { rank: Rank; acc
   const isArmed = useSyncExternalStore(subscribe, () => armed, () => false);
   const [chart, setChart] = useState<Chart | null>(null);
   const [voice, setVoice] = useState<"piano" | "tones" | null>(null);
+  const [level] = useLevel();
+  const options = useSongOptions()[id];
 
   useEffect(() => {
     let stop: (() => void) | null = null;
@@ -74,7 +81,7 @@ export function SongPreview({ id, best }: { id: string; best?: { rank: Rank; acc
       }
       setTimeout(() => live && end(), openingMs(notes) + 50); // the opening ended: All Notes Off
     }, previewSettings.delayMs);
-    const onEnter = (e: KeyboardEvent) => (e.key === "Enter" || isLearnKey(e)) && end(); // leaving: stop at once
+    const onEnter = (e: KeyboardEvent) => (e.key === "Enter" || isLearnKey(e) || isWatchKey(e)) && end(); // leaving: stop at once
     window.addEventListener("keydown", onEnter);
     window.addEventListener("pagehide", end);
     return () => {
@@ -99,16 +106,20 @@ export function SongPreview({ id, best }: { id: string; best?: { rank: Rank; acc
           <b data-testid="preview-best">{best ? `${best.rank} · ${(best.accuracy * 100).toFixed(1)}%` : ""}</b>
         </span>
         <span style={actions}>
-          <a data-testid="preview-learn" href={learnUrl(id)} style={action}>
+          <a data-testid="preview-learn" href={withOptions(withLevel(learnUrl(id), level), options)} style={action}>
             LEARN
           </a>
+          {/* PRACTICE keeps its own 70% whatever Speed says; it takes the song's level and hands */}
           {chart && (
-            <a data-testid="preview-practice" href={practiceUrl(id, chart)} style={action}>
+            <a data-testid="preview-practice" href={withOptions(withLevel(practiceUrl(id, chart), level), { hands: options?.hands ?? "both", speed: 70 })} style={action}>
               PRACTICE 70%
             </a>
           )}
         </span>
       </div>
+      <SongOptions id={id} chart={chart} />
+      {/* song-sources: the cited score, one click away; the proof, not setup, so ?capture=1 keeps it */}
+      {chart && <SongSource source={chart.source} />}
       <p data-testid="preview-status" data-capture-hide style={status}>
         {!isArmed ? "Press any key for previews" : voice === "piano" ? "Preview: on the piano" : voice === "tones" ? "Preview: laptop tones" : "\u00a0"}
       </p>
@@ -118,7 +129,9 @@ export function SongPreview({ id, best }: { id: string; best?: { rank: Rank; acc
 
 // One compact row and a status line: the music select's left column has little room under the stats. Sizes follow the
 // screen like the rest of the select, so the row is readable on video at 1920×1080 (visual-direction: Type).
-const panel: CSSProperties = { marginTop: "1.5vh" };
+// On --pa-panel, not on the select stage: Duo's ink is a little dimmer, and the stage's sun behind the row took
+// LEARN to 4.44:1 and the status to 4.1:1, under select-stage's 4.5:1 (duo-tokens).
+const panel: CSSProperties = { marginTop: "1.5vh", background: "var(--pa-panel)" };
 const row: CSSProperties = { display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.3em 1.1em", fontSize: "clamp(16px, 1.25vw, 24px)" };
 const label: CSSProperties = { fontSize: "clamp(12px, 0.8vw, 16px)", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--pa-ink-dim)" };
 // LEARN and PRACTICE 70%: one outline, one type, set apart from the stats so an empty BEST doesn't read into LEARN.
@@ -126,7 +139,7 @@ const actions: CSSProperties = { display: "inline-flex", gap: "0.6em", marginLef
 const action: CSSProperties = {
   padding: "0.25em 0.75em",
   borderRadius: 4,
-  border: "1px solid rgba(39, 225, 255, 0.5)",
+  border: "1px solid var(--pa-line)", // Duo's hairline; the old bright cyan was the brightest pixel behind the label
   color: "var(--pa-ink)",
   fontSize: "clamp(14px, 1.25vw, 24px)",
   fontWeight: 700,

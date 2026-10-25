@@ -7,6 +7,7 @@ interface Probe {
   stats(ms: number[]): { frames: number; p50: number | null; p95: number | null; max: number | null };
   verdict(runs: { frames: number; p95: number | null; invalid?: string }[]): { pass: boolean; invalid: string[] };
   report(): { frames: number; p50: number | null; p95: number | null; max: number | null };
+  intervals(): { frames: number; p50: number | null; p95: number | null; max: number | null };
 }
 
 // probe.js against a fake window: a fake clock, a rAF queue flushed by hand, the fever gauge and the results screen.
@@ -46,6 +47,17 @@ describe("perf budget probe", () => {
     frame(16, 20);
     frame(32, 3, 4);
     expect(probe.report()).toEqual({ frames: 2, p50: 7, p95: 20, max: 20 });
+  });
+
+  it("gives the gaps between counted frames, leaving out a stop in fever", () => {
+    const { probe, frame, state } = fake();
+    state.fever = true;
+    frame(16, 2);
+    frame(32, 2);
+    frame(64, 2);
+    frame(1000, 2); // fever stopped and started again
+    frame(1017, 2);
+    expect(probe.intervals()).toEqual({ frames: 3, p50: 17, p95: 32, max: 32 });
   });
 
   it("counts only frames during fever and before the results show", () => {

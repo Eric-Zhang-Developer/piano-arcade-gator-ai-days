@@ -3,7 +3,7 @@
 import type { Chart, Frame, GamePlugin } from "../../contracts";
 import { settings, msPerBeat } from "../core/settings";
 import { meterLayout } from "../fever-gauge";
-import { ink, inkDim, magenta, panel, whenDisplayFontReady } from "../ui-tokens";
+import { ink, inkDim, panel, primary, whenDisplayFontReady } from "../ui-tokens";
 import { difficulty, difficultySettings } from "./difficulty";
 
 export { difficulty, difficultyInputs, difficultySettings } from "./difficulty";
@@ -28,7 +28,7 @@ function drawWarning(ctx: CanvasRenderingContext2D, f: Frame, level: number, fon
   const b = warningLayout(f.width, f.judgmentLineY);
   ctx.fillStyle = panel;
   ctx.fillRect(b.x, b.y, b.w, b.h);
-  ctx.fillStyle = magenta; // cabinet chrome: the card's frame
+  ctx.fillStyle = primary; // cabinet chrome: the card's frame
   ctx.fillRect(b.x, b.y, b.w, 3);
   ctx.fillRect(b.x, b.y + b.h - 3, b.w, 3);
   ctx.textAlign = "center";

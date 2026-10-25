@@ -44,6 +44,10 @@ export class Judge {
 
   press(pitch: number, timeMs: number, eventIndex: number): void {
     if (this.results) return;
+    // First every note this press is past the reach of, as judgeTake does. The frame's sweep can land after the next
+    // press on a slow page, and a MISS counted after a later hit made max combo depend on frame timing (#586). Only the
+    // order changes, no window. Unscored (wait mode) never sweeps: nothing is a MISS there.
+    if (this.scored) this.advance(timeMs);
     let best = -1;
     for (const i of this.byTime) {
       if (this.judgments[i] || this.chart.notes[i].pitch !== pitch) continue;
@@ -75,6 +79,18 @@ export class Judge {
       if (this.times[i] + GOOD_MS >= nowMs) break;
       if (!this.judgments[i]) this.miss(i);
     }
+  }
+
+  // rewind (wait mode's ←): every note at or after fromMs is unjudged again and pressable, and the combo starts over.
+  rewind(fromMs: number): void {
+    if (this.results) return;
+    for (const [i, t] of this.times.entries()) {
+      if (t < fromMs - 1e-6 || !this.judgments[i]) continue;
+      this.judgments[i] = null;
+      this.noteState.delete(this.chart.notes[i].id);
+    }
+    this.combo = 0;
+    this.onEvent({ type: "combo", count: 0, atMs: fromMs });
   }
 
   finish(atMs: number): Results {

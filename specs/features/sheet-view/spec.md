@@ -27,8 +27,9 @@ Two `feat(sheet-view)` PRs; only the second writes the done note.
 ## Requirements
 - **The page:** `/sheet?song=<id>` takes the ids /play takes (`local/<id>` too). Title and composer once (OSMD's own
   title and composer off), and under them "Generated from the chart": it's our chart, not the engraved original.
-  Then the score, music in `--pa-ink` on `--pa-bg`, with OSMD's `autoBeam` on. A bad id shows the error and a link to
-  `/`, as /play does. Zoom with − and + (buttons and keys), remembered in localStorage inside try/catch.
+  Then the score, music in `--pa-ink` on `--pa-bg`, with OSMD's `autoBeam` off: sheet-xml writes the beams
+  (sheet-beams), and a beam takes its notes' color once they're all judged alike. A bad id shows the error and a link
+  to `/`, as /play does. Zoom with − and + (buttons and keys), remembered in localStorage inside try/catch.
 - **The channel** `pianoArcade.sheet`, from /play: `take` on songStart with the chart as played (after hands, loops
   and every other transform); `clock` with `frame.nowMs` each drawn frame; `judgment` (noteId, judgment) on noteHit
   and noteMiss; `end` on songEnd and quit. No ids: the sheet follows whichever /play started a take last.

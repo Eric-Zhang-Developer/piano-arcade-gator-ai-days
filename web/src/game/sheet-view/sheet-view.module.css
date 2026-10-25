@@ -26,7 +26,7 @@
   gap: 1.5rem;
   padding: 1.25rem clamp(1rem, 4vw, 3rem) 1rem;
   background: var(--pa-bg);
-  border-bottom: 1px solid color-mix(in srgb, var(--pa-magenta) 45%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--pa-primary) 45%, transparent);
 }
 
 .title {
@@ -77,7 +77,7 @@
 }
 
 .zoom button:focus-visible {
-  outline: 2px solid var(--pa-magenta);
+  outline: 2px solid var(--pa-primary);
   outline-offset: 2px;
 }
 
@@ -126,6 +126,12 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
+}
+
+.count {
+  margin-left: 0.15rem;
+  color: var(--pa-ink);
+  font-variant-numeric: tabular-nums;
 }
 
 .swatch {

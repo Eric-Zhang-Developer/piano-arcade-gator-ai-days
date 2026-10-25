@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { GameEvent } from "../../contracts";
+import { cyan } from "../ui-tokens";
 import { noteOn, reduceWaitHud, waitHud } from ".";
 
 const hit = (i: number): GameEvent => ({ type: "noteHit", noteId: `n${i}`, pitch: 60, judgment: "PERFECT", offsetMs: 0, atMs: i * 600 });
@@ -15,6 +16,20 @@ describe("the note you're on", () => {
   it("counts a chord's notes one each; a WRONG changes nothing; songStart resets", () => {
     expect(run([hit(0), hit(1), { type: "wrongNote", pitch: 30, atMs: 700 }, { type: "extra", pitch: 30, atMs: 700 }])).toBe(3);
     expect(run([hit(0), hit(1), { type: "songStart", atMs: 0 }])).toBe(1);
+  });
+});
+
+describe("a rewind (rewind)", () => {
+  const times = [0, 600, 1200, 1800, 2400, 3000, 3600, 4800]; // Twinkle's first eight notes
+  const hit = (i: number): GameEvent => ({ type: "noteHit", noteId: String(i), pitch: 60, judgment: "PERFECT", offsetMs: 0, atMs: times[i] });
+  const at = (events: GameEvent[]) => noteOn(events.reduce(reduceWaitHud, { N: 42, hits: 0, times }));
+  const five = [0, 1, 2, 3, 4].map(hit);
+  it("recounts on a resume at a bar start that isn't its pause's", () => {
+    expect(at([...five, { type: "pause", atMs: 3000 }, { type: "resume", atMs: 0 }])).toBe(1);
+    expect(at([...five, { type: "pause", atMs: 2400 }, { type: "resume", atMs: 4800 }])).toBe(8);
+  });
+  it("doesn't recount on a plain pause and resume", () => {
+    expect(at([...five, { type: "pause", atMs: 3000 }, { type: "resume", atMs: 3000 }])).toBe(6);
   });
 });
 
@@ -38,7 +53,7 @@ describe("the plugin", () => {
     const out = texts("mode=wait");
     expect(out.map((o) => o.text)).toEqual(["6 / 42", "NOTE", "LEARN"]);
     const learn = out.find((o) => o.text === "LEARN")!;
-    expect(learn.fill).toBe("#27e1ff");
+    expect(learn.fill).toBe(cyan); // the token, which Duo repaints (duo-tokens)
     expect(learn.font).toMatch(/^italic 900 /);
     for (const o of [learn, out[0]]) expect(Number(/(\d+)px/.exec(o.font)![1])).toBeGreaterThanOrEqual(24);
   });

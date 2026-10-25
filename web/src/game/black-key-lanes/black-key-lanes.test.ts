@@ -23,12 +23,12 @@ describe("drawBlackKeyLanes", () => {
   it("fills one lane per black key in view, C♯2 to A♯5 (the chart sits inside C2–C6), each at its key's x", () => {
     const L = makeLayout(chart, 900, 600, 0.2);
     const { ctx, fills } = recorder();
-    drawBlackKeyLanes(ctx, L);
-    expect(fills).toEqual([36, 48, 60, 72].flatMap((c) => [1, 3, 6, 8, 10].map((d) => c + d)).map((p) => `rgba(255,255,255,${blackKeyLaneSettings.tint}) ${L.keyX(p).x + L.keyX(p).width}`));
+    drawBlackKeyLanes(ctx, L, 0.04);
+    expect(fills).toEqual([36, 48, 60, 72].flatMap((c) => [1, 3, 6, 8, 10].map((d) => c + d)).map((p) => `rgba(255,255,255,0.04) ${L.keyX(p).x + L.keyX(p).width}`));
   });
 
-  it("stays at or under 0.04 luma over black, and draws nothing at tint 0", () => {
-    expect(blackKeyLaneSettings.tint).toBeLessThanOrEqual(0.04);
+  it("is off by default (Eric, 2026-10-25), and draws nothing at tint 0", () => {
+    expect(blackKeyLaneSettings.tint).toBe(0);
     const { ctx, fills } = recorder();
     drawBlackKeyLanes(ctx, makeLayout(chart, 900, 600, 0.2), 0);
     expect(fills).toEqual([]);

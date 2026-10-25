@@ -13,9 +13,9 @@ export const waitHintSettings = {
   nameFadeMs: 200, // none under reduced motion
 };
 
-// The held time's notes not yet hit: a chord's unpressed keys. Lowest first.
-export function waitingNotes(chart: Chart, hits: ReadonlyMap<string, Judgment>, nowMs: number): ChartNote[] {
-  const at = shouldHold(chart, hits, nowMs);
+// The held time's notes not yet hit: a chord's unpressed keys. Lowest first. floorMs: a rewind's bar start, as the clock's.
+export function waitingNotes(chart: Chart, hits: ReadonlyMap<string, Judgment>, nowMs: number, floorMs = -Infinity): ChartNote[] {
+  const at = shouldHold(chart, hits, nowMs, floorMs);
   if (at === null) return [];
   return chart.notes.filter((n) => noteTimeMs(chart, n) === at && !hits.has(n.id)).sort((a, b) => a.pitch - b.pitch);
 }

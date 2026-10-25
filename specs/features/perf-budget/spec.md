@@ -45,6 +45,11 @@ Issue: #263
 - **Output:** `<out>/perf.json` (per run: frames counted, p50, p95 and max in ms; the p95 spread; the commit, URL,
   viewport, devicePixelRatio, Chromium version and WebGL renderer string) and one line:
   `perf-budget: p95 <lo>–<hi> ms over <n> runs (p50 …, max …) at <sha>: pass | over budget`.
+- **At a Retina screen's density too** (Eric's MacBook lagged at devicePixelRatio 2 and not at 1, 2026-10-25):
+  `--dpr <n>` sets the context's deviceScaleFactor (default 1, the budget's scene). Each run also records the page's
+  `<canvas>` count, their total backing size in megapixels and frame-to-frame intervals (`__perfProbe.intervals()`).
+  Those show what the compositor blends, which callback time can't; intervals are noisy headless (above), so they
+  compare two runs and never set the verdict.
 - **Exit 1** when any run's p95 is over 16.7 ms, or a run is invalid: it counted no frames, never reached fever,
   fever-stage's frame-budget guard froze the stage (its `fever-stage: … frozen` console line), or it has no stage
   canvas (`main > div canvas`) while `--params` doesn't set `stage=off`.

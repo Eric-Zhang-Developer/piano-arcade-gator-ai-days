@@ -67,6 +67,7 @@ describe("ghost", () => {
   it("doesn't show a ghost on a different `from`, and stays off with ?ghost=off or storage", () => {
     expect(ghostKey("twinkle", new URLSearchParams("from=1&to=2"))).not.toBe(ghostKey("twinkle", new URLSearchParams("from=2&to=2")));
     expect(ghostKey("twinkle", new URLSearchParams("song=twinkle&beat=off"))).toBe(ghostKey("twinkle", new URLSearchParams("song=twinkle")));
+    expect(ghostKey("fur-elise", new URLSearchParams("level=easy"))).not.toBe(ghostKey("fur-elise", new URLSearchParams())); // easy-charts: an Easy take isn't Normal's ghost
     const p = ghost();
     p.transformChart!(twinkle, new URLSearchParams("from=1&to=2"));
     for (const e of take) p.onEvent!(e);

@@ -1,8 +1,9 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { Chart } from "../../contracts";
-import { chartToMusicXml, DIVISIONS, keyAndMeter, placeNotes } from ".";
+import { chartToMusicXml, DIVISIONS, keyAndMeter, pickupBeats, placeNotes } from ".";
 import { overrides } from "./overrides";
+import { shouldBeam } from "../sheet-beams";
 
 const songs = new URL("../../../public/songs/", import.meta.url);
 const charts: Chart[] = readdirSync(songs)
@@ -44,7 +45,18 @@ const kids = (e: El, n: string) => e.kids.filter((k) => k.name === n);
 const num = (e: El | undefined) => Number(e?.text ?? NaN);
 const STEP_PC: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 
-// Every sounding note read back (tied pieces joined), and each bar's per-voice totals.
+// A measure's length as its first voice fills it: everything before the first <backup>.
+function firstVoiceLength(m: El): number {
+  let len = 0;
+  for (const e of m.kids) {
+    if (e.name === "backup") break;
+    if (e.name === "forward" || (e.name === "note" && !kid(e, "chord"))) len += num(kid(e, "duration"));
+  }
+  return len;
+}
+
+// Every sounding note read back (tied pieces joined), and each bar's per-voice totals. An implicit bar 0 (a pickup)
+// is the end of the chart's first bar, so the read-back stays in chart time.
 function readBack(xml: string) {
   const score = parse(xml);
   const measures = kids(kid(score, "part")!, "measure");
@@ -60,7 +72,7 @@ function readBack(xml: string) {
       const t = kid(attrs, "time")!;
       barLen = (divisions * 4 * num(kid(t, "beats"))) / num(kid(t, "beat-type"));
     }
-    const start = b * barLen;
+    const start = b === 0 && m.attrs.implicit === "yes" ? barLen - firstVoiceLength(m) : b * barLen;
     let at = start;
     let last = start;
     const totals = new Map<string, number>();
@@ -97,7 +109,7 @@ function readBack(xml: string) {
         if (ties.includes("start")) open.set(k, n);
       }
     }
-    for (const [voice, total] of totals) voiceTotals.push({ bar: b + 1, voice, total, barLen });
+    for (const [voice, total] of totals) voiceTotals.push({ bar: b + 1, voice, total, barLen: (b + 1) * barLen - start });
   });
   return { score, notes, voiceTotals, divisions };
 }
@@ -129,15 +141,31 @@ describe.each(charts.map((c) => [c.id, c] as const))("%s", (_, chart) => {
   it("is the same string every time", () => {
     expect(chartToMusicXml(chart)).toBe(xml);
   });
+
+  it("writes sheet-beams' beams: one begin … end run per beam, on each chord's first note only", () => {
+    const marks = [...xml.matchAll(/<beam number="1">(\w+)<\/beam>/g)].map((m) => m[1]);
+    const beams = shouldBeam(placeNotes(chart), keyAndMeter(chart).meter);
+    expect(marks.filter((m) => m === "begin")).toHaveLength(beams.length);
+    expect(marks.join(" ")).toMatch(/^(begin( continue)* end ?)*$/); // a beam is one voice in one bar, so it's contiguous
+    const chords = beams.reduce((n, ids) => n + new Set(ids.map((id) => placeNotes(chart).find((p) => p.id === id)!.onset)).size, 0);
+    expect(marks).toHaveLength(chords);
+  });
 });
 
 // ---------- fixed cases ----------
 
 const attrs = (c: Chart, song = c) => {
-  const a = kid(kid(kid(parse(chartToMusicXml(c, song)), "part")!, "measure")!, "attributes")!;
+  const m = kid(kid(parse(chartToMusicXml(c, song)), "part")!, "measure")!;
+  const a = kid(m, "attributes")!;
   const key = kid(a, "key")!;
   const time = kid(a, "time")!;
-  return { fifths: num(kid(key, "fifths")), mode: kid(key, "mode")!.text, beats: num(kid(time, "beats")), beatType: num(kid(time, "beat-type")) };
+  return {
+    fifths: num(kid(key, "fifths")),
+    mode: kid(key, "mode")!.text,
+    beats: num(kid(time, "beats")),
+    beatType: num(kid(time, "beat-type")),
+    ...(m.attrs.implicit === "yes" && { pickup: true }),
+  };
 };
 const spelled = (c: Chart, midi: number) => {
   const xml = chartToMusicXml(c);
@@ -210,6 +238,53 @@ describe("fixed cases", () => {
     const xml = chartToMusicXml(synthetic({ title: "A & B <C>", notes: [{ id: "a", pitch: 60, beat: 0, duration: 1, hand: "L" }] }));
     expect(() => parse(xml)).not.toThrow();
     expect(xml).toContain("<work-title>A &amp; B &lt;C&gt;</work-title>");
+  });
+});
+
+describe("pickups (sheet-pickups)", () => {
+  const firstBars = (c: Chart, song = c) =>
+    kids(kid(parse(chartToMusicXml(c, song)), "part")!, "measure")
+      .slice(0, 2)
+      .map((m) => ({ number: m.attrs.number, implicit: m.attrs.implicit, len: firstVoiceLength(m) }));
+
+  it.each([
+    ["chopin-prelude-4", 4],
+    ["fur-elise", 2],
+    ["maple-leaf-rag", 2],
+    ["nocturne-op9-2", 2],
+  ] as const)("%s prints its pickup as an implicit bar 0 of %i divisions, then bar 1", (id, len) => {
+    const [zero, one] = firstBars(byId(id));
+    expect(zero).toEqual({ number: "0", implicit: "yes", len });
+    expect(one).toMatchObject({ number: "1", implicit: undefined });
+    expect(pickupBeats(byId(id)) * DIVISIONS).toBe(len);
+  });
+
+  it("every other chart opens on bar 1, as before", () => {
+    const pickups = ["chopin-prelude-4", "fur-elise", "maple-leaf-rag", "nocturne-op9-2"];
+    for (const c of charts.filter((c) => !pickups.includes(c.id))) expect(firstBars(c)[0], c.id).toMatchObject({ number: "1", implicit: undefined });
+  });
+
+  it("a chart marked pickup whose first note is at beat 0 has no bar 0", () => {
+    overrides["synthetic"] = { pickup: true };
+    try {
+      const c = synthetic({ notes: [{ id: "a", pitch: 60, beat: 0, duration: 1, hand: "R" }] });
+      expect(pickupBeats(c)).toBe(0);
+      expect(firstBars(c)[0].number).toBe("1");
+    } finally {
+      delete overrides["synthetic"];
+    }
+  });
+
+  it("Für Elise's left hand alone (?hands=L) keeps bar 0", () => {
+    const song = byId("fur-elise");
+    const left = { ...song, notes: song.notes.filter((n) => n.hand === "L") };
+    expect(firstBars(left, song)[0]).toEqual({ number: "0", implicit: "yes", len: 2 });
+  });
+
+  it("a part of the song with a note before the pickup (a loop shifted to beat 0) has no bar 0", () => {
+    const song = byId("fur-elise");
+    const shifted = { ...song, notes: song.notes.map((n) => ({ ...n, beat: n.beat - 1 })).filter((n) => n.beat >= 0) };
+    expect(pickupBeats(shifted, song)).toBe(0);
   });
 });
 

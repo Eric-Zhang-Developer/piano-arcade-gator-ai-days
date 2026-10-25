@@ -49,10 +49,13 @@ python3 .agents/scripts/check_ownership.py --lint-specs
 python3 .agents/scripts/check_ownership.py --title "<PR title>" --base origin/main
 python3 .agents/scripts/check_gates.py --title "<PR title>" --base origin/main
 python3 .agents/scripts/check_markers.py --base origin/main
-pnpm -C web lint && pnpm -C web typecheck && pnpm -C web test && pnpm -C web build
+pnpm -C web lint && pnpm -C web typecheck
+pnpm -C web exec vitest run --passWithNoTests <paths near your change>
+python3 .agents/scripts/verify.py --slug <slug> --worktree . --cmd "node {worktree}/<your feature's verify*.mjs> --out {out}"   # once, before the done note
 npm --prefix supabase/tests ci && node supabase/tests/migrations.mjs   # when supabase/ changed
 ```
-The bootstrap feature adds the `pnpm` scripts and replaces CI's placeholder "Project checks" step with that last line.
+The full `pnpm -C web test` and `pnpm -C web build` are left to CI's `ci` job, and every headless check to its
+`browser` job (`ci-browser`): locally, one headless check runs at a time per machine, through `verify.py`'s lock.
 
 ## Verify (see your change running)
 The bootstrap feature sets `[verify].command` in `.agents/config.toml` to a Playwright script that starts the app,

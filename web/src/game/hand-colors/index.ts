@@ -1,10 +1,10 @@
 import type { Chart, Frame, GamePlugin, Hand } from "../../contracts";
 import { msPerBeat, settings } from "../core/settings";
 
-// The two hands' colors: --pa-hand-r and --pa-hand-l in visual-direction.md (mint is today's note color). Simulated
-// with Machado 2009 they stay apart under protanopia (ΔE 65), deuteranopia (62) and tritanopia (26, the closest).
+// The two hands' colors: --pa-hand-r and --pa-hand-l in visual-direction.md, Duo's electric blue and purple
+// (duo-tokens). The right hand's blue is also the one-hand note color (settings.noteColor).
 export const handColorSettings = {
-  colors: { R: "#5ef2c4", L: "#6aa8ff" } as Record<Hand, string>,
+  colors: { R: "#2b9bff", L: "#a07cff" } as Record<Hand, string>,
   legendBeats: 1, // the legend fades out over the count-in's last beat, gone by beat 1
 };
 

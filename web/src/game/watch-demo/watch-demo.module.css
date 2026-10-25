@@ -1,0 +1,37 @@
+/* The demo's results panel: one line and one button, in results-layout's type. */
+.back {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em 1.2em;
+  font: clamp(16px, 2vh, 22px) system-ui, sans-serif;
+  color: var(--pa-ink-dim);
+}
+
+.line {
+  margin: 0;
+}
+
+.tag {
+  color: var(--pa-cyan);
+  font: italic 900 1em var(--pa-font-display), system-ui, sans-serif;
+  letter-spacing: 0.04em;
+}
+
+.button {
+  padding: 0.35em 1em;
+  border: none;
+  border-radius: 6px;
+  background: var(--pa-cyan);
+  color: var(--pa-bg);
+  font: italic 800 1em var(--pa-font-display), system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--pa-primary);
+  outline-offset: 3px;
+}

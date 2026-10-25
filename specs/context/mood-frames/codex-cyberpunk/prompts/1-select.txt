@@ -1,0 +1,7 @@
+Screen: the music select menu.
+
+Layout: top left, the wordmark "PIANO ARCADE" in a wide, clean, confident sans-serif with a small accent-colored tick before it. Top right, small monospace hints "↑↓ SELECT · ENTER PLAY · P PRACTICE".
+
+Left 40%: the focused song in a hairline-framed panel with corner brackets. At the top of the panel, a wide thumbnail that is a glowing piano-roll preview of the song (short horizontal bars in the two hand colors on a dark grid, like a waveform of the melody). Below it, the title "Für Elise" large, the line "BEETHOVEN · WoO 59" in small monospace, then three data cells in a row: "LV 05", "NOTES 412", "BEST 87.2%". Below that, a slim tutor strip: a small, minimal, friendly line-art alligator head icon in the accent color, then the text "Next for you: bars 9–12, left hand". Then two buttons: "PLAY" (primary, accent fill, dark text) and "PRACTICE" (outlined hairline).
+
+Right 60%: a vertical list of seven song rows, each a slim hairline row with a tiny piano-roll thumbnail, the title, the composer in small monospace caps, and a level "LV 01" etc. on the right: "Twinkle, Twinkle" / "TRADITIONAL" / LV 01; "Minuet in G" / "PETZOLD" / LV 03; "Ode to Joy" / "BEETHOVEN" / LV 04; "Für Elise" / "BEETHOVEN" / LV 05 (focused: accent bar on its left edge, slightly brighter row); "Gymnopédie No. 1" / "SATIE" / LV 04; "Prelude in E minor" / "CHOPIN" / LV 06; "Clair de lune" / "DEBUSSY" / LV 08.

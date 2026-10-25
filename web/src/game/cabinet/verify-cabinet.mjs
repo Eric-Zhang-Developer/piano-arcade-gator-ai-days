@@ -99,11 +99,32 @@ const fakePiano = () => {
   navigator.requestMIDIAccess = () => Promise.resolve(access);
 };
 
+// Attract replays the board's merged PRs, which /api/operator gets from `gh`. Where gh fails (not logged in, rate
+// limited: CI, #429) the board has none and attract has nothing to play, so this check would test gh, not the cabinet.
+// Then attract gets a few stand-in merges; with gh working it replays the real ones.
+const standInPrs = (at) =>
+  Array.from({ length: 8 }, (_, i) => {
+    const t = new Date(Date.parse(at) - (8 - i) * 60_000).toISOString();
+    return { number: i + 1, title: `chore: stand-in merge ${i + 1}`, state: "MERGED", createdAt: t, mergedAt: t, closedAt: t, url: `https://github.com/stand-in/repo/pull/${i + 1}`, worker: "stand-in" };
+  });
+const withMerges = async (route) => {
+  try {
+    const res = await route.fetch();
+    const board = await res.json().catch(() => null);
+    if (!board?.at || board.prs?.some((p) => p.mergedAt)) return await route.fulfill({ response: res });
+    say(`verify-cabinet: the board has no merged PRs (gh: ${board.gh?.status ?? "?"}); attract gets ${standInPrs(board.at).length} stand-ins`);
+    await route.fulfill({ response: res, json: { ...board, prs: standInPrs(board.at) } });
+  } catch {
+    // the page closed while gh was still answering: nothing left to fulfil
+  }
+};
+
 const browser = await chromium.launch({ headless: true });
 const errors = [];
 const fresh = async () => {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   page.on("pageerror", (e) => errors.push(e.message));
+  await page.route("**/api/operator", withMerges);
   await page.addInitScript(fakePiano);
   return page;
 };

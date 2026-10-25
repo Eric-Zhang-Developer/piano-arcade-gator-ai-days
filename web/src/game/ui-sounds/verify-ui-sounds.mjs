@@ -122,7 +122,9 @@ check(confirm === 2, `3: Enter -> a confirm (2 notes, got ${confirm})`);
 check(sting === 4 && after.length === 6, `3: the stage card -> one sting (4 notes, got ${sting}; ${after.length} starts in all)`);
 
 // 4
+await page.getByTestId("options-open").click(); // the start screen's settings are in its Options drawer (duo-start)
 await page.getByLabel("Mute").check();
+await page.keyboard.press("Escape");
 await page.goBack();
 await page.locator("ol a").first().waitFor({ timeout: 30_000 });
 await page.locator("ol a").first().focus();

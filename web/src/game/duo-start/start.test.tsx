@@ -7,6 +7,7 @@ import { handMode } from "../hand-mode";
 import { laptopOctaves } from "../laptop-octaves";
 import { leds } from "../leds";
 import { noteLabels } from "../note-labels";
+import { rewind } from "../rewind";
 import { sheetView } from "../sheet-view/plugin";
 import { stageCard } from "../stage-card";
 import { waitMode } from "../wait-mode/plugin";
@@ -23,16 +24,15 @@ const chart: Chart = {
   notes: Array.from({ length: 32 }, (_, i) => ({ id: `n${i}`, pitch: i % 2 ? 48 + (i % 5) : 84 + (i % 3), beat: i, duration: 1, hand: i % 2 ? ("L" as const) : ("R" as const) })),
 };
 
-function render(plugins: GamePlugin[]) {
-  const params = new URLSearchParams();
+function render(plugins: GamePlugin[], params = new URLSearchParams()) {
   const c = plugins.reduce((acc, p) => p.transformChart?.(acc, params) ?? acc, chart); // as /play does before the start screen
   return renderToStaticMarkup(
     <StartScreen
       plugins={plugins}
       panel={(p) => p.startPanel?.({ chart: c, params })}
       onStart={() => {}}
-      hint={<p>Laptop keys</p>}
-      controls={<label>Latency offset</label>}
+      onLatency={() => {}}
+      status={<p>MIDI: connects when you press Start</p>}
     />,
   );
 }
@@ -45,16 +45,27 @@ const region = (html: string, testid: string) => {
   return [...before.matchAll(/data-group="(\w+)"/g)].at(-1)?.[1];
 };
 
-test("every control on the old start screen renders, each from its own plugin, in its group", () => {
+test("every control on the old start screen renders, on the screen or in the Options drawer", () => {
   const html = render([stageCard(), chunkPractice(), handMode(), laptopOctaves(), noteLabels(), waitMode(), flowMode(), sheetView(), leds()]);
   expect(region(html, "slot-stage-card")).toBe("card");
   expect(html).toContain("Are you ready?");
   for (const id of ["chunk-start", "learn-first", "play-flow", "sheet-music"]) expect(region(html, id)).toBe("modes");
-  for (const id of ["labels-toggle", "hand-picker", "connect-lights"]) expect(region(html, id)).toBe("chips");
-  expect(region(html, "slot-laptop-octaves")).toBe("hints");
-  expect(html).toContain("Laptop keys");
-  expect(html).toContain("Latency offset");
+  expect(region(html, "hand-picker")).toBe("bar");
+  expect(region(html, "options-open")).toBe("bar");
+  expect(region(html, "connect-lights")).toBe("drawer");
+  // Labels, latency, effects, Mute and Miss sound are the drawer's own rows, so the start screen has none of its own.
+  expect(html).not.toContain("labels-toggle");
+  for (const label of ["Latency offset", "Effects volume", "Mute", "Miss sound", "Note labels"]) expect(html).toContain(label);
+  expect(html).toContain("MIDI: connects");
   expect(html.match(/<button[^>]*>Start<\/button>/)).not.toBeNull();
+});
+
+test("no key hints: the laptop keys line, Z / X and ← → stay off the screen (#772)", () => {
+  const html = render([stageCard(), laptopOctaves(), rewind(), waitMode()], new URLSearchParams("mode=wait"));
+  expect(html).not.toContain("slot-laptop-octaves");
+  expect(html).not.toContain("slot-rewind");
+  expect(html).not.toContain("<kbd");
+  expect(html).not.toContain("Laptop keys:"); // the old hint line; "Laptop keys" alone is a Note labels choice
 });
 
 test("Start is the one primary button, and it has focus", () => {

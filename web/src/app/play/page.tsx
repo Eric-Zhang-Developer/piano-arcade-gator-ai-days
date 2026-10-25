@@ -470,8 +470,8 @@ export default function Play() {
               plugins={plugins}
               panel={(p) => p.startPanel?.(loaded)}
               onStart={start}
-              hint={<p data-capture-hide>Laptop keys: A S D F G H J K L ; (white) · W E T Y U O P (black)</p>}
-              controls={controls}
+              onLatency={onLatency}
+              status={!isTest && <p data-capture-hide>{midiStatus}</p>}
             />
           )}
           {phase === "results" && results && (
@@ -488,7 +488,7 @@ export default function Play() {
               settings={controls}
             />
           )}
-          {/* the start screen has them in its settings panel. Not while loading: the slider would show useState's 0 before
+          {/* the start screen has them in its Options drawer. Not while loading: the slider would show useState's 0 before
               the stored offset is read (#447, #478) */}
           {phase === "error" && controls}
         </div>

@@ -62,6 +62,7 @@ function text(ctx: CanvasRenderingContext2D, s: string, cx: number, y: number, l
 
 export function noteLabels(): GamePlugin {
   let setting: LabelSetting = "auto";
+  let param: string | null = null; // ?labels=, which wins over the stored setting
   let midiPlayed = false;
   let perspective = false;
   let chart: Chart | null = null;
@@ -127,7 +128,8 @@ export function noteLabels(): GamePlugin {
     id: "note-labels",
     transformChart(c, params) {
       chart = c;
-      setting = labelSetting(params.get("labels"), readStored());
+      param = params.get("labels");
+      setting = labelSetting(param, readStored());
       perspective = Number(params.get("perspective")) > 0;
       lowest = Math.min(...c.notes.map((n) => n.pitch)); // the same lowest pitch /play gives keysDevice
       [letters, lettersShift] = [laptopLetters(lowest + laptopShift), laptopShift];
@@ -152,7 +154,12 @@ export function noteLabels(): GamePlugin {
       };
     },
     onEvent(e) {
-      if (e.type === "songStart") hit.clear();
+      if (e.type === "songStart") {
+        hit.clear();
+        // Read again at Start: /play's Options drawer (duo-start) saves a new setting without reloading the chart.
+        setting = labelSetting(param, readStored());
+        publish();
+      }
       if (e.type === "noteHit") hit.add(e.noteId);
     },
     draw(ctx, frame) {

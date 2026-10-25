@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import type { Chart, GameEvent } from "../../contracts";
-import { makeLayout } from "../core/highway";
+import { judgmentPlace, makeLayout } from "../core/highway";
 import { Judge } from "../core/judge";
 import { GOOD_MS, msPerBeat } from "../core/settings";
-import { comboAlpha, emptyHud, hud, hudBottom, hudLayout, hudSettings, mixHex, reduceHud, rollup, tierFlash, tierFor, tierProgress } from ".";
+import { comboAlpha, comboHeat, emptyHud, hud, hudBottom, hudLayout, hudSettings, mixHex, reduceHud, rollup, tierFlash, tierFor, tierProgress } from ".";
 
 // What the judge sends for a hit: noteHit, then combo, then comboMilestone at 25.
 function hits(judgment: "PERFECT" | "GREAT", n: number, comboBefore: number): GameEvent[] {
@@ -190,6 +190,13 @@ describe("the combo in the band (combo-hud)", () => {
     expect(hudBottom(l)).toBeLessThanOrEqual(l.safeY);
   });
 
+  it.each(sizes)("at %ix%i the combo's COMBO label sits under the judgment word's place (judgmentPlace)", (w, h) => {
+    const line = makeLayout(chart, w, h, 0).judgmentLineY;
+    const l = hudLayout(w, line);
+    expect(l.combo.labelY - l.stack.px / 2).toBeGreaterThanOrEqual(judgmentPlace(w, line).bottom);
+    expect(l.combo.labelY - l.stack.px / 2).toBeLessThan(judgmentPlace(w, line).bottom + l.stack.px);
+  });
+
   it("readable on video: at 1920x1080 the combo numeral is about 120 px (#1404) and its labels at least 16 px", () => {
     const l = hudLayout(1920, makeLayout(chart, 1920, 1080, 0).judgmentLineY);
     expect(l.combo.size).toBeGreaterThanOrEqual(110);
@@ -252,6 +259,13 @@ describe("the combo in the band (combo-hud)", () => {
   it("the combo is hidden at 0 and 1, fades in over 2–5, and is whole from 5", () => {
     expect([0, 1, 2, 3, 4, 5, 120].map(comboAlpha)).toEqual([0, 0, 0.25, 0.5, 0.75, 1, 1]);
     expect(comboFills(drawAt(1, null, 500), 1)).toHaveLength(0);
+  });
+
+  it("fever's heat eases in from feverStart and out from feverEnd", () => {
+    const ms = hudSettings.heatMs;
+    expect(comboHeat(null, 5000)).toBe(0);
+    expect([0, ms / 2, ms, ms * 3].map((t) => comboHeat({ on: true, atMs: 1000 }, 1000 + t))).toEqual([0, 0.5, 1, 1]);
+    expect([0, ms / 2, ms].map((t) => comboHeat({ on: false, atMs: 1000 }, 1000 + t))).toEqual([1, 0.5, 0]);
   });
 
   it("fever warms the numeral from primary to amber", () => {

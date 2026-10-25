@@ -75,7 +75,8 @@ export function reel(chart: Chart, take: Take, results: Results, edl: Edl) {
     drawBrackets(ctx, x, y, w, h, { color: primary, arm: 28, lineWidth: 4 });
     text(ctx, chart.title, x + 80, y + 140, canvasFonts.display(72), ink);
     text(ctx, chart.composer.toUpperCase(), x + 80, y + 190, canvasFonts.data(26), inkDim);
-    text(ctx, results.rank, x + w - 80, y + 420, canvasFonts.numeral(300), gold, "right");
+    text(ctx, results.rank, x + w - 80, y + 470, canvasFonts.numeral(280), gold, "right");
+    text(ctx, "RANK", x + w - 84, y + 510, canvasFonts.data(22), inkDim, "right");
     text(ctx, `${(results.accuracy * 100).toFixed(1)}%`, x + 80, y + 380, canvasFonts.numeral(110), ink);
     text(ctx, "ACCURACY", x + 84, y + 420, canvasFonts.data(22), inkDim);
     text(ctx, runLine, x + 80, y + h - 70, canvasFonts.display(40), primary);

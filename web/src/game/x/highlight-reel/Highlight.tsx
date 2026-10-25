@@ -34,7 +34,7 @@ declare global {
       mimeType: string;
       takeTimeAt(n: number): number | null;
       // Without ffprobe (CI's runner): length, frame count and onsets from the browser itself.
-      fallback(): Promise<{ durationS: number; frames: number; onsetsMs: number[] }>;
+      fallback(full: boolean): Promise<{ durationS: number; frames: number | null; onsetsMs: number[] | null }>;
     };
   }
 }
@@ -59,9 +59,9 @@ async function takeFor(params: URLSearchParams): Promise<{ saved: Saved; note: s
   return { saved: botTake(await loadChart(FALLBACK.song), FALLBACK.bot), note: "No take saved yet: showing a scripted take" };
 }
 
-// verify-highlight's fallback where ffprobe is missing: the <video>'s duration (seeked to the end, as Chrome's WebM
-// may carry none), its frames counted over a 1× playback, and the decoded sound's onsets.
-async function fallback(blob: Blob | null) {
+// The reel check's fallback where ffprobe is missing: the <video>'s duration (seeked to the end, as Chrome's WebM
+// may carry none), and with full, its frames counted over a 1× playback and the decoded sound's onsets.
+async function fallback(blob: Blob | null, full: boolean) {
   if (!blob) throw new Error("no video yet");
   const v = document.createElement("video");
   v.muted = true;
@@ -72,6 +72,7 @@ async function fallback(blob: Blob | null) {
     await new Promise((r) => (v.ondurationchange = r));
   }
   const durationS = v.duration;
+  if (!full) return { durationS, frames: null, onsetsMs: null };
   v.currentTime = 0;
   let frames = 0;
   const count = () => {
@@ -148,7 +149,7 @@ export function Highlight() {
       blobBytes: 0,
       mimeType: "",
       takeTimeAt: (n) => (edl ? takeTimeAt(edl, n) : null),
-      fallback: () => fallback(blobRef.current),
+      fallback: (full) => fallback(blobRef.current, full),
     };
   }, [saved, edl, drawer]);
 

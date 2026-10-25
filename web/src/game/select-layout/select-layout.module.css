@@ -84,6 +84,8 @@
   overflow-y: auto;
   scrollbar-width: none;
   mask-image: linear-gradient(to bottom, #000 calc(100% - 8vh), transparent 100%);
+  /* It rests on a row's top edge, so a scrolled list never starts with a sliver of the row above. */
+  scroll-snap-type: y mandatory;
 }
 
 .link {
@@ -91,5 +93,5 @@
   color: inherit;
   text-decoration: none;
   outline: none;
-  scroll-margin: 2vh;
+  scroll-snap-align: start;
 }

@@ -57,15 +57,15 @@ export function SongOptions({ id, chart }: { id: string; chart: Chart | null }) 
 }
 
 // easy-charts' LevelToggle halves, side by side and a size smaller (two rows under LEARN must clear the footer at
-// 1280×720): the setting in force lit in cyan (cabinet chrome: selection).
+// 1280×720): the setting in force lit in the primary blue, zero radius (Duo).
 const row: CSSProperties = { display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.4em 1.2em", marginTop: "0.6vh" };
-const group: CSSProperties = { display: "inline-flex", alignItems: "center", gap: "0.35em" };
-const label: CSSProperties = { marginRight: "0.3em", fontSize: "clamp(12px, 0.8vw, 16px)", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--pa-ink-dim)" };
-const kbd: CSSProperties = { font: "inherit", padding: "0 0.35em", borderRadius: 3, border: "1px solid rgba(242, 242, 245, 0.2)" };
+const group: CSSProperties = { display: "inline-flex", alignItems: "center", gap: "0.25em" };
+const label: CSSProperties = { marginRight: "0.15em", whiteSpace: "nowrap", fontSize: "clamp(12px, 0.8vw, 16px)", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--pa-ink-dim)" };
+const kbd: CSSProperties = { font: "inherit", padding: "0 0.35em", whiteSpace: "nowrap", border: "1px solid var(--pa-line)" };
 const half: CSSProperties = {
-  padding: "0.2em 0.6em",
-  borderRadius: 4,
-  border: "1px solid rgba(242, 242, 245, 0.2)",
+  padding: "0.2em 0.4em",
+  borderRadius: 0,
+  border: "1px solid var(--pa-line)",
   background: "none",
   color: "var(--pa-ink-dim)",
   font: "inherit",
@@ -74,5 +74,5 @@ const half: CSSProperties = {
   letterSpacing: "0.08em",
   cursor: "pointer",
 };
-const lit: CSSProperties = { ...half, border: "1px solid var(--pa-cyan)", background: "rgba(39, 225, 255, 0.14)", color: "var(--pa-cyan)" };
+const lit: CSSProperties = { ...half, border: "1px solid var(--pa-primary)", background: "color-mix(in srgb, var(--pa-primary) 14%, transparent)", color: "var(--pa-primary)" };
 const practice: CSSProperties = { fontSize: "clamp(13px, 0.85vw, 17px)", color: "var(--pa-ink-dim)" };
